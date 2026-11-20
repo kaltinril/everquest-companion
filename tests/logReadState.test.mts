@@ -11,8 +11,11 @@ import {
   noteLogReadConnection,
   noteLogReadError,
   noteLogReadHealth,
-  noteLogReadTurn
+  noteLogReadTurn,
+  noteReplySize
 } from '../src/main/dataServer/logReadState'
+
+const MIB = 1024 * 1024
 
 function say(count: number, prefix: string): void {
   for (let i = 1; i <= count; i += 1) noteEngineSaid(`${prefix} ${String(i)}`)
@@ -70,7 +73,9 @@ test('a new turn restarts the wait and forgets the last health answer', () => {
     movedAt: null,
     waitingSince: 9_000,
     error: null,
-    lastCombatRead: null
+    lastCombatRead: null,
+    tooLarge: null,
+    large: null
   })
 })
 
@@ -79,14 +84,49 @@ test('a new connection clears everything it can', () => {
   noteLogReadHealth('folding', 4096, 1_500)
   noteLogReadError('health', 'timeout', 1_600)
   noteCombatRead('the engine did not answer in time', 1_700)
+  noteReplySize({ op: 'combat.snapshot', module: null, chars: 70 * MIB, refused: true, limit: 64 * MIB }, 1_800)
+  noteReplySize({ op: 'module.snapshot', module: 'loot', chars: 20 * MIB, refused: false, limit: null }, 1_900)
   noteLogReadConnection(5_000)
   assert.deepEqual(logReadFacts(), {
     health: null,
     movedAt: null,
     waitingSince: 5_000,
     error: null,
-    lastCombatRead: null
+    lastCombatRead: null,
+    tooLarge: null,
+    large: null
   })
+})
+
+test('the newest reply that could not be shown and the newest large one are kept apart', () => {
+  noteLogReadConnection(1_000)
+  const refused = { op: 'module.snapshot', module: 'loot', chars: 70 * MIB, refused: true, limit: 64 * MIB }
+  const unshown = { op: 'combat.snapshot', module: null, chars: 40 * MIB, refused: false, limit: 32 * MIB }
+  const shown = { op: 'module.snapshot', module: 'events', chars: 20 * MIB, refused: false, limit: null }
+
+  noteReplySize(refused, 2_000)
+  assert.deepEqual(logReadFacts().tooLarge, { ...refused, at: 2_000 })
+  assert.equal(logReadFacts().large, null)
+
+  // A large reply that WAS shown does not displace the one that was not.
+  noteReplySize(shown, 2_100)
+  assert.deepEqual(logReadFacts().tooLarge, { ...refused, at: 2_000 })
+  assert.deepEqual(logReadFacts().large, { ...shown, at: 2_100 })
+
+  // The newest of each kind wins.
+  noteReplySize(unshown, 2_200)
+  noteReplySize({ ...shown, chars: 21 * MIB }, 2_300)
+  assert.deepEqual(logReadFacts().tooLarge, { ...unshown, at: 2_200 })
+  assert.equal(logReadFacts().large?.chars, 21 * MIB)
+})
+
+test('A NEW TURN FORGETS BOTH: a reply-s size is a fact about one read of the log', () => {
+  noteLogReadConnection(1_000)
+  noteReplySize({ op: 'combat.snapshot', module: null, chars: 70 * MIB, refused: true, limit: 64 * MIB }, 2_000)
+  noteReplySize({ op: 'module.snapshot', module: 'loot', chars: 20 * MIB, refused: false, limit: null }, 2_100)
+  noteLogReadTurn(3_000)
+  assert.equal(logReadFacts().tooLarge, null)
+  assert.equal(logReadFacts().large, null)
 })
 
 test('LIVE CLEARS THE ERROR: the read it was about has landed', () => {

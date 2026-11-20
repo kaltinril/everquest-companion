@@ -15,6 +15,7 @@ export type LogReadWait =
   | 'engineMissing'
   | 'engineFailing'
   | 'engineStarting'
+  | 'connecting'
   | 'notConnected'
   | 'attachRefused'
   | 'logMissing'
@@ -23,6 +24,7 @@ export type LogReadWait =
   | 'stalled'
   | 'notAnswering'
   | 'reading'
+  | 'replyTooLarge'
   | 'ok'
 
 /** A wait this long shows the box even when nothing has failed. */
@@ -51,6 +53,20 @@ export interface LogReadLink {
   /** Why the last connect failed or the last connection was lost. */
   readonly lastReason: string | null
   readonly everConnected: boolean
+}
+
+/** One engine reply that was large (main/dataServer/replySizes.ts states the two limits). */
+export interface LogReadReplySize {
+  readonly op: string
+  /** The module asked for, when the op is `module.snapshot`. */
+  readonly module: string | null
+  /** How long the reply was, in characters. */
+  readonly chars: number
+  /** Over what main itself may read, so it was dropped. */
+  readonly refused: boolean
+  /** The limit it was over, in characters; null when it was under both and was shown. */
+  readonly limit: number | null
+  readonly at: number
 }
 
 /** Everything main knows about the read. Every unknown is null, never 0. */
@@ -82,6 +98,10 @@ export interface LogReadFacts {
   /** Main's own look at the file, taken only on the failure path. */
   readonly probe: { readonly bytes: number | null; readonly problem: 'missing' | 'unreadable' | null } | null
   readonly lastCombatRead: { readonly unserved: string | null; readonly at: number } | null
+  /** The keeper of main's connection, or null when there is no client. */
+  readonly link: LogReadLink | null
+  /** The newest reply of this read that could not be shown, or null. */
+  readonly tooLarge: LogReadReplySize | null
 }
 
 /** What crosses IPC. No full path, no home directory. */
@@ -109,6 +129,7 @@ export const LOG_READ_WORDS: Readonly<Record<LogReadWait, string>> = {
   engineMissing: 'The data engine program is missing.',
   engineFailing: 'The data engine keeps failing to start.',
   engineStarting: 'Starting the data engine.',
+  connecting: 'Connecting to the data engine.',
   notConnected: 'The app cannot connect to its data engine.',
   attachRefused: 'The data engine refused the log file.',
   logMissing: 'The log file is missing.',
@@ -117,6 +138,7 @@ export const LOG_READ_WORDS: Readonly<Record<LogReadWait, string>> = {
   stalled: 'The data engine has stopped making progress.',
   notAnswering: 'The data engine is not answering.',
   reading: 'Still reading your log.',
+  replyTooLarge: 'The fight list is too large for the app to show.',
   ok: 'The data engine is answering; this panel has no reply yet.'
 }
 
@@ -124,6 +146,8 @@ export const LOG_READ_WORDS: Readonly<Record<LogReadWait, string>> = {
 const SHOW_AT_ONCE: ReadonlySet<LogReadWait> = new Set<LogReadWait>([
   'engineMissing',
   'engineFailing',
+  'notConnected',
+  'replyTooLarge',
   'attachRefused',
   'logMissing',
   'logUnreadable',
@@ -196,7 +220,8 @@ function engineWait(f: LogReadFacts): LogReadWait | null {
   if (f.supervisor === 'absent' || f.fault?.kind === 'no-binary') return 'engineMissing'
   if (f.fault !== null) return 'engineFailing'
   if (f.supervisor !== 'ready') return 'engineStarting'
-  if (f.connection !== 'ready') return 'notConnected'
+  // The connection is reopened by itself (linkKeeper.ts) until its keeper gives up.
+  if (f.connection !== 'ready') return f.link?.gaveUp === true ? 'notConnected' : 'connecting'
   return null
 }
 
@@ -219,19 +244,55 @@ function readWait(f: LogReadFacts): LogReadWait {
   if (step === 'health') return 'notAnswering'
   if (stalled(f)) return 'stalled'
   if (f.readiness !== 'ok') return 'reading'
-  return typeof f.lastCombatRead?.unserved === 'string' ? 'notAnswering' : 'ok'
+  if (typeof f.lastCombatRead?.unserved !== 'string') return 'ok'
+  // The meter's read went unserved BECAUSE its reply was too large: that is the cause to name.
+  // (A fight list too large only for main's own readers, with the meter served, is no wait.)
+  return f.tooLarge?.op === 'combat.snapshot' ? 'replyTooLarge' : 'notAnswering'
+}
+
+/** `connected`, or how the reconnect is going: `connecting (try 2 of 5)`. */
+function connectionWords(f: LogReadFacts): string {
+  const link = f.link
+  if (f.connection === 'ready' || link === null || link.gaveUp) {
+    return CONNECTION_WORDS.get(f.connection ?? '') ?? 'not connected'
+  }
+  return link.tries > 0 ? `connecting (try ${String(link.tries)} of ${String(link.of)})` : 'connecting'
 }
 
 function engineWords(f: LogReadFacts): string {
   const parts = [SUPERVISOR_WORDS.get(f.supervisor ?? '')]
-  if (f.supervisor === 'ready') parts.push(CONNECTION_WORDS.get(f.connection ?? '') ?? 'not connected')
+  if (f.supervisor === 'ready') parts.push(connectionWords(f))
   parts.push(HEALTH_WORDS.get(f.health?.status ?? ''))
   return parts.filter((word) => word !== undefined).join(', ')
 }
 
+/** Why the connection is not up, with how the retries stand: `connect: <reason> (try 2 of 5)`. */
+function linkErrorText(f: LogReadFacts): string | null {
+  const link = f.link
+  const reason = link?.lastReason ?? null
+  if (link === null || reason === null) return null
+  let count = link.tries > 0 ? ` (try ${String(link.tries)} of ${String(link.of)})` : ''
+  if (link.gaveUp) count = link.tries >= link.of ? ` (gave up after ${String(link.tries)} tries)` : ' (gave up)'
+  return `${STEP_WORDS.connect}: ${scrubPaths(reason, f.logPath, f.home)}${count}`
+}
+
+/** `read: the reply was 71.2 MB, over the 64.0 MB limit` */
+function tooLargeText(reply: LogReadReplySize): string {
+  const size = `${STEP_WORDS.fold}: the reply was ${humanBytes(reply.chars)}`
+  if (reply.limit === null) return size
+  const limit = humanBytes(reply.limit)
+  return reply.refused ? `${size}, over the ${limit} limit` : `${size}, over the ${limit} the app can show`
+}
+
 function lastErrorText(f: LogReadFacts, wait: LogReadWait): string | null {
-  if (f.error !== null) return `${STEP_WORDS[f.error.step]}: ${scrubPaths(f.error.detail, f.logPath, f.home)}`
+  const text = wait === 'connecting' || wait === 'notConnected' ? linkErrorText(f) : null
+  if (text !== null) return text
+  // With the connection up, a connect error is about one that has since been made.
+  if (f.error !== null && !(f.connection === 'ready' && f.error.step === 'connect')) {
+    return `${STEP_WORDS[f.error.step]}: ${scrubPaths(f.error.detail, f.logPath, f.home)}`
+  }
   if (typeof f.fault?.detail === 'string') return scrubPaths(f.fault.detail, f.logPath, f.home)
+  if (f.tooLarge !== null) return tooLargeText(f.tooLarge)
   if (wait === 'notAnswering') return f.lastCombatRead?.unserved ?? null
   return null
 }

@@ -64,24 +64,21 @@ import {
   type ConnectionState,
   type EngineClient
 } from '../../shared/dataServer/client'
-import { createNdjsonTransport, type ByteChannel } from '../../shared/dataServer/ndjson'
 import type {
-  ClientMessage,
-  EngineMessage,
-  FireMessage,
   KnowledgeRecord,
   PerfBudgetsResult,
   PerfSnapshotResult,
   PerfTimelineResult
 } from '../../shared/dataServer/protocol.generated'
-// THE AUDIO CUTOVER (JOS-491). It owns its own flag and its own gate; this file simply offers it
-// every fire and prints what it decided. A launch that turned it off (`EQC_ENGINE_ALERTS=0`, or
-// `EQC_ENGINE_SERVE=0` above it) finds `armed` false and pays one boolean read per fire.
-import { playEngineFire } from './alertsAudio'
-import { takeOwnFire, withOwnDefs } from './ownFires'
-// THE CON-CARD CUTOVER (JOS-496). Same shape as the audio one above and behind the serve flag
-// rather than a fourth of its own; this file simply offers every card and prints what was decided.
-import { conCardServeLine, noteConCardServe, openEngineConCard } from './conCardServe'
+import { withOwnDefs } from './ownFires'
+// WHAT THE CLIENT IS LISTENED TO FOR (fires, progress, con cards, cursors, wiki misses, large
+// replies): registered once per client by `engineClientWiring.ts`, which this file hands its guards.
+import { wireEngineClient } from './engineClientWiring'
+// THE CONNECTION, KEPT OPEN (fork #9): `engineLink.ts` opens it, takes it and hears it end, on
+// `linkKeeper.ts`'s retry policy; this file supplies the connect and what each edge means here.
+import { openEngineLink, type EngineLink } from './engineLink'
+import type { LinkFacts } from './linkKeeper'
+import { replySizes } from './replySizes'
 import { readDefine } from './appKnowledge'
 import { DEFINE_OPS, setAppKnowledgePusher, setLogDirPusher, type DefineOp } from './definePush'
 // WHERE THE CHARACTER LOGS LIVE (JOS-498, decision sheet 1a). THE APP NAMES THE DIRECTORY, so this
@@ -92,20 +89,16 @@ import { connectToEngine } from './socketChannel'
 // THE DELTA ARM (JOS-493). It owns the serve flag's second half and the fan-out; this file supplies
 // the only thing it cannot get for itself — the engine's own `moduleChanged` frames, and the two
 // edges where the world that answers a read changes hands.
-import { pushModuleChanged, pushWorldChanged } from './serveDeltas'
+import { pushWorldChanged } from './serveDeltas'
 // THE MIRROR ARM (JOS-496). The census's other fourteen readers are SYNCHRONOUS and have nowhere to
 // put an await, so they read a pushed cache instead of a promise. It hears the same two things the
 // delta arm does — a cursor, and the world changing hands — and it holds no import of this file, so
 // the requester is handed over rather than reached for.
-import { installMirrors, noteMirrorChanged, primeMirrors, resetMirrors } from './serveMirrors'
+import { installMirrors, primeMirrors, resetMirrors } from './serveMirrors'
 // THE WIKI-MISS FETCH (JOS-499 item 1, boundary verdict 5). The engine has no network stack, so it
 // announces a name it could not answer and this app looks it up on the queue it has always owned.
 // The leaf is electron-free and takes its capabilities here — see its header.
-import {
-  asKnowledgeRecord,
-  installKnowledgeMissFetch,
-  onKnowledgeMiss
-} from './knowledgeMissFetch'
+import { asKnowledgeRecord, installKnowledgeMissFetch } from './knowledgeMissFetch'
 import { knownItem } from '../itemLookup'
 import { noteEngineEdge } from '../telemetry/breadcrumbs'
 import { knownMob } from '../mobLookup'
@@ -114,7 +107,7 @@ import { hostClockHint, resolvedTimeZone } from './hostClock'
 // THE LAUNCH BANNER'S THREE EDGES (JOS-503). This file is the only place that knows when a
 // historical fold BEGINS (an accepted attach), how far it has got (the engine's progress frames)
 // and when it LANDS (the go-live edge below) — so it feeds all three to the one state main pushes.
-import { noteEngineFolding, noteEngineLive, noteFoldProgress } from './engineLaunchState'
+import { noteEngineFolding, noteEngineLive } from './engineLaunchState'
 // THE WAIT ITSELF (JOS-518). A leaf with its request, its turn, its sleep and its log sink handed
 // in, so the shapes that matter — a fold past the old budget, a poll refused once and then answered,
 // a connection that dies mid-wait — are drivable in a unit test. Its header carries the owner ruling
@@ -129,7 +122,7 @@ import {
 } from './logReadState'
 import { SERVABLE, type Readiness } from './readShim'
 import type { ReadyEngine } from './supervisor'
-import type { ParamsFor, RequestOp, ResultFor } from '../../shared/dataServer/ops'
+import { isLinkLost, type ParamsFor, type RequestOp, type ResultFor } from '../../shared/dataServer/ops'
 import type { CharacterRef } from '../../shared/types'
 
 /** How long the client's own loopback connect may take. The supervisor's probe just completed a
@@ -146,7 +139,10 @@ const CONNECT_TIMEOUT_MS = 2_000
 interface LiveEngine {
   readonly engine: ReadyEngine
   readonly client: EngineClient
-  /** The log this client last successfully attached the engine to. */
+  /** Opens this client's connection, and reopens it when it is lost (`engineLink.ts`). */
+  readonly link: EngineLink
+  /** The log this client last successfully attached the engine to. KEPT ACROSS A RECONNECT: the
+   *  engine is still on that log, so no second attach is sent and nothing is re-read. */
   attachedTo: string | null
 }
 
@@ -223,6 +219,8 @@ function bumpGen(): number {
   // measured on the world somebody has since replaced is a fact about a different log, and a
   // synchronous reader holding it would answer with authority about a character the app has left.
   resetMirrors()
+  // What was known about reply sizes was known about the last read (replySizes.ts).
+  replySizes.reset()
   noteLogReadTurn(Date.now())
   return gen
 }
@@ -280,7 +278,8 @@ export function onEngineReady(info: ReadyEngine | null): void {
   // (serveDeltas.ts `pushWorldChanged`). A launch whose engine was never live has served nobody and
   // says nothing.
   const wasServing = engineLiveOn !== null
-  const mine = bumpGen()
+  bumpGen()
+  live?.link.stop()
   live?.client.close()
   live = null
   if (wasServing) pushWorldChanged()
@@ -315,123 +314,57 @@ export function onEngineReady(info: ReadyEngine | null): void {
       debug(`data-server client: ${note}`)
     }
   })
-  live = { engine: info, client, attachedTo: null }
-  void openConnection(mine, info, client)
+  // THE CONNECTION GUARD, for everything below: a connection is per launch and outlives a world
+  // rebuild, so none of it asks the turn.
+  const current = (): boolean => live?.client === client
+  const link = openEngineLink({
+    client,
+    connect: () => connectToEngine(info.port, CONNECT_TIMEOUT_MS),
+    current,
+    connectFailed: (detail) => {
+      debug(`data-server client: could not reach the engine on port ${String(info.port)} (${detail})`)
+      noteLogReadError('connect', detail, Date.now())
+    },
+    connected: () => {
+      debug(`data-server client: connected to the engine on port ${String(info.port)}`)
+      // A FRESH TURN: whatever the last connection was in the middle of belongs to it.
+      void afterConnect(bumpGen())
+    },
+    // The windows that were being served are told the world changed hands, exactly as on a
+    // respawn (above). `attachedTo` is kept: see `LiveEngine`.
+    lost: () => {
+      if (engineLiveOn === null) return
+      bumpGen()
+      pushWorldChanged()
+    },
+    timer: unrefTimer,
+    now: () => Date.now(),
+    note: debug
+  })
+  live = { engine: info, client, link, attachedTo: null }
+  // ONCE PER CLIENT, not once per connect: the connection is reopened under this same client.
+  wireEngineClient(client, {
+    current,
+    servable: () => engineServeReadiness().ok,
+    logSize: (bytes) => {
+      lastFoldLogSize = bytes
+    },
+    note: debug
+  })
+  link.start()
 }
 
-async function openConnection(mine: number, info: ReadyEngine, client: EngineClient): Promise<void> {
-  let channel: ByteChannel
-  try {
-    channel = await connectToEngine(info.port, CONNECT_TIMEOUT_MS)
-  } catch (err) {
-    debug(`data-server client: could not reach the engine on port ${String(info.port)} (${describeErr(err)})`)
-    // The connection guard, not the turn one: a connect is per launch and outlives a world rebuild.
-    if (live?.client === client) noteLogReadError('connect', describeErr(err), Date.now())
-    return
+/** A timer that is never the reason this process stays alive (`delay`'s rule). */
+function unrefTimer(run: () => void, ms: number): () => void {
+  const handle = setTimeout(run, ms)
+  handle.unref()
+  return (): void => {
+    clearTimeout(handle)
   }
-  if (gen !== mine) {
-    channel.close()
-    return
-  }
-  // The hello rides this call — the client sends it the moment it has a transport, and queues
-  // everything else behind the answer, so there is no handshake to sequence here.
-  client.attach(createNdjsonTransport<ClientMessage, EngineMessage>(channel))
-  // THE FIRES — logged and counted always, PLAYED when the cutover armed. See `noteFire`.
-  client.onFire((fire) => {
-    noteFire(fire)
-  })
-  // THE FOLD'S OWN MEASUREMENT (JOS-503), for the launch banner. The identity guard is the
-  // CONNECTION one and not the turn one, for the reason spelled out on `onConCard` below: `gen`
-  // advances on every world rebuild, so `gen !== mine` here would silence the bar one second into
-  // every launch — which is precisely the bug that cost the cursor listener a whole e2e round.
-  //
-  // THE HOST CLOCK IS READ HERE AND NOWHERE DEEPER. `Date.now()` is the estimate's only clock, and
-  // it is taken at the one instant it is honest: when the frame arrived. Passing it down means the
-  // arithmetic in `shared/engineLaunch.ts` reads no clock at all and is pure integer maths in a
-  // test. A live-tail frame is dropped by `noteFoldProgress` itself — see its header.
-  client.onProgress((progress) => {
-    if (live?.client !== client) return
-    // THE DENOMINATOR, KEPT (JOS-518) — see `lastFoldLogSize`. Taken from every frame including a
-    // live-tail one, because what it states is how big the engine believes the FILE to be, which is
-    // true of the log whichever loop measured it; the banner's own live-frame refusal is a separate
-    // question and `noteFoldProgress` owns it.
-    lastFoldLogSize = progress.logSize
-    noteFoldProgress(progress, Date.now())
-  })
-  // THE CON CARDS (JOS-496, boundary verdict 2) — `onFire`'s shape exactly, and for its reasons: a
-  // thing that HAPPENED, connection-wide, nothing to reconcile. This file offers the frame and
-  // prints what was decided; `conCardServe.ts` owns the gate and `conCard.ts` owns the window.
-  //
-  // THE IDENTITY GUARD IS THE `moduleChanged` ONE AND NOT THE TURN ONE, for the reason stated
-  // below at length: a subscription is CONNECTION-scoped, and `gen` advances on every world
-  // rebuild — asking `gen !== mine` here would silence the cards one second into every launch,
-  // which is exactly the bug that cost the cursor listener a whole e2e round.
-  client.onConCard((card) => {
-    if (live?.client !== client) return
-    // THE DRAW IS ASYNCHRONOUS SINCE JOS-497 item 1 — the card's chips need the creature's LEVEL,
-    // and that is a served answer now rather than a synchronous read of this process's fold. So
-    // this listener stays synchronous (the client's frame dispatch is), starts the draw, and
-    // narrates when it settles.
-    //
-    // IT IS VOIDED AND IT NEVER THROWS, which is the same rule `noteMirrorChanged` and
-    // `playEngineFire` learned: this runs inside the client's frame dispatch, where a throw
-    // surfaces as a TRANSPORT FAULT — a con card would take the connection down. `openEngineConCard`
-    // already answers `false` for every ordinary refusal, so the catch is for the unexpected, and
-    // what it does with it is print a line.
-    void openEngineConCard(card)
-      .then((drew) => {
-        noteConCardServe(conCardServeLine(card, drew))
-      })
-      .catch((err: unknown) => {
-        debug(`data-server conCard: ${card.name} could not be drawn (${describeErr(err)})`)
-      })
-  })
-  // THE CURSORS (JOS-493) — the engine saying a module's published state moved, forwarded to every
-  // window that folds one. Two guards, and each answers a different question:
-  //
-  //   * IS THIS STILL THE CONNECTION THIS APP IS USING. A subscription is CONNECTION-scoped, not
-  //     turn-scoped, and that distinction cost a whole e2e round to learn: the first draft asked
-  //     `gen !== mine` — the rule every `await` in this file is followed by — and `gen` advances on
-  //     every WORLD REBUILD (`onWorldRebuilt`), which happens the moment this process's own fold
-  //     lands. So the listener went permanently silent one second into every launch and the live
-  //     fold stopped reaching every renderer. MEASURED: a loot line played into the log never
-  //     reached the ledger, and a watched respawn never drew a clock. Identity is the right
-  //     question, and `live` is where the answer is.
-  //   * `engineServeReadiness().ok` — the READ path is not taking this engine's answers right now
-  //     (still folding, on another log, connection not ready). A window's held snapshot therefore
-  //     came from THIS PROCESS's fold, and handing it a cursor from the other world is the very
-  //     mixing this ticket exists to end. That is the question a turn number was reaching for, and
-  //     it is asked here of the one function that owns it.
-  client.onModuleChanged((changed) => {
-    if (live?.client !== client) return
-    if (!engineServeReadiness().ok) return
-    pushModuleChanged(changed.module, changed.seq)
-    // …and main's own synchronous readers, which ride the same cursor for the same reason the
-    // renderers do: a mirror refreshed on anything but the engine's own publication edge would be a
-    // cache with a timer, which is the thing ruling 5 forbids.
-    noteMirrorChanged(changed.module, changed.seq)
-  })
-  // THE WIKI MISSES (JOS-499 item 1, boundary verdict 5) — the engine saying it could not answer a
-  // name, answered by the app's own lookup and pushed back as `knowledge.define`.
-  //
-  // THE GUARD IS THE CONNECTION ONE, NOT THE TURN ONE, and it is the `onConCard`/`onModuleChanged`
-  // reasoning verbatim: a subscription is CONNECTION-scoped while `gen` advances on every world
-  // rebuild, so asking `gen !== mine` here would silence the fetcher one second into every launch —
-  // the exact bug that cost the cursor listener a whole e2e round. It is written out again rather
-  // than cross-referenced because getting it wrong is silent: the corpus would simply stop learning
-  // and nothing would ever say so.
-  //
-  // AND THERE IS NO READINESS GATE HERE, unlike the cursor listener above. `engineServeReadiness()`
-  // asks whether the engine's answers may be THIS APP'S answers — a question about which world a
-  // read is served from. A miss is not a read: it names a page the wiki has and the corpus lacks,
-  // which is true of every world at once and stays true across a character switch. Gating it would
-  // drop exactly the misses raised during a fold, which is when a log full of unfamiliar mobs
-  // raises nearly all of them.
-  client.onKnowledgeMiss((miss) => {
-    if (live?.client !== client) return
-    onKnowledgeMiss(miss)
-  })
-  debug(`data-server client: connected to the engine on port ${String(info.port)}`)
+}
+
+/** What a new connection is told, in order. Each step is the turn's to abandon. */
+async function afterConnect(mine: number): Promise<void> {
   // WHERE THE LOGS LIVE GOES FIRST, and above all BEFORE `attachAndProbe` — which returns early on
   // a launch with no character, which is the launch a served character list is most needed on. See
   // `pushLogDirNow`.
@@ -517,42 +450,7 @@ async function pushLogDirNow(mine: number): Promise<void> {
   }
 }
 
-// ── the fires (owner ruling 22) ────────────────────────────────────────────────────────────────
-
-/** How many fires this launch has heard from the engine. Reported beside each one. */
-let firesHeard = 0
-
-/**
- * ONE ALERT FIRE FROM THE ENGINE — LOGGED AND COUNTED, AND PLAYED ONLY WHEN THE CUTOVER IS ARMED.
- *
- * WITH THE CUTOVER TURNED OFF (`EQC_ENGINE_ALERTS=0`) this is exactly what JOS-482 shipped: a line,
- * and no sound. The app's own `AlertsModule` is still firing and is still the only noise, because
- * playing this one too would double every alert the owner hears — and the owner is the regression
- * test for this whole program, so a duplicated sound would not be a cosmetic bug, it would corrupt
- * the evidence the cutover is being judged on.
- *
- * WITH THE FLAG (JOS-491) the two swap in one place rather than both being live: `alertsAudio.ts`
- * silenced this process's evaluator at arm time, so `playEngineFire` is the only thing publishing
- * a firing and the sound is engine-attributed by construction. The line stays either way, and says
- * which world it was in.
- *
- * WHAT THE LINE PROVES, even unplayed, is everything a sound would: the def reached the engine, the
- * engine evaluated it against a LIVE event, and the frame it sent back is fully resolved — the pack
- * key is right there, so the app needs nothing else to play it.
- */
-function noteFire(fire: FireMessage): void {
-  // The app's own line watch (ownFires.ts: the screenshot macro) is a command, not an alert: no sound.
-  if (takeOwnFire(fire)) {
-    debug(`data-server fire: ${fire.rule} taken by the app`)
-    return
-  }
-  firesHeard += 1
-  const outcome = playEngineFire(fire) ? 'PLAYED from the engine' : 'logged, not played'
-  debug(
-    `data-server fire: ${fire.rule} [${fire.sound}] at ${String(fire.at)} — ` +
-      `${fire.message} (fires this launch: ${String(firesHeard)}; ${outcome})`
-  )
-}
+// ── the fires (owner ruling 22): `noteFire` moved to engineClientWiring.ts with its listener ────
 
 // ── the attach ─────────────────────────────────────────────────────────────────────────────────
 
@@ -641,6 +539,9 @@ async function sendAttach(mine: number, l: LiveEngine, logPath: string): Promise
     return result.epoch
   } catch (err) {
     debug(`data-server client: session.attach was refused (${describeErr(err)})`)
+    // The connection went away under the attach: the engine refused nothing, and the reconnect
+    // sends it again (`attachedTo` is still unset).
+    if (isLinkLost(err)) return null
     if (gen === mine) noteLogReadError('attach', describeErr(err), Date.now())
     return null
   }
@@ -799,13 +700,20 @@ export function engineClientFacts(): {
   connection: ConnectionState | null
   readiness: string
   logSize: number | null
+  link: LinkFacts | null
 } {
   const ready = engineServeReadiness()
   return {
     connection: live?.client.state ?? null,
     readiness: ready.ok ? 'ok' : ready.why,
-    logSize: lastFoldLogSize
+    logSize: lastFoldLogSize,
+    link: live?.link.facts() ?? null
   }
+}
+
+/** A person asked for the connection to be tried again (`linkKeeper.ts tryNow`). */
+export function reconnectEngineClient(): void {
+  live?.link.tryNow()
 }
 
 // ── what the performance panel can ask this file (JOS-483) ─────────────────────────────────────
@@ -1032,6 +940,7 @@ export function stopEngineClient(): void {
   // What that costs instead is the residual JOS-496 already named and priced: at most sixty
   // seconds of the folding character's accretion, whose bucket the next attach re-derives from the
   // log anyway.
+  live?.link.stop()
   live?.client.close()
   live = null
 }

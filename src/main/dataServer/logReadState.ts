@@ -4,16 +4,21 @@
 // note it here, and `main/logReadReport.ts` reads it back when a "Reading log..." panel asks.
 // A leaf like engineLaunchState.ts: module-level state, no Electron import, so a test can drive it.
 
-import type { LogReadError, LogReadFacts, LogReadStep } from '../../shared/logReadReport'
+import type {
+  LogReadError,
+  LogReadFacts,
+  LogReadReplySize,
+  LogReadStep
+} from '../../shared/logReadReport'
 
 const SAID_KEPT = 8
 const SAID_WITH_ERROR = 4
 
-/** The slice of `LogReadFacts` this file owns. */
+/** The slice of `LogReadFacts` this file owns, plus the newest large reply that WAS shown. */
 export type LogReadNotes = Pick<
   LogReadFacts,
-  'health' | 'movedAt' | 'waitingSince' | 'error' | 'lastCombatRead'
->
+  'health' | 'movedAt' | 'waitingSince' | 'error' | 'lastCombatRead' | 'tooLarge'
+> & { readonly large: LogReadReplySize | null }
 
 /** The engine's newest stderr lines, already token-redacted and bounded by the supervisor. */
 let said: string[] = []
@@ -23,6 +28,8 @@ let lastOffset: number | null = null
 let movedAt: number | null = null
 let waitingSince: number | null = null
 let lastCombatRead: LogReadFacts['lastCombatRead'] = null
+let tooLarge: LogReadReplySize | null = null
+let large: LogReadReplySize | null = null
 
 /** One engine stderr line. */
 export function noteEngineSaid(line: string): void {
@@ -36,6 +43,8 @@ export function noteLogReadConnection(at: number): void {
   lastOffset = null
   movedAt = null
   lastCombatRead = null
+  tooLarge = null
+  large = null
   waitingSince = at
 }
 
@@ -46,6 +55,9 @@ export function noteLogReadTurn(at: number): void {
   health = null
   lastOffset = null
   movedAt = null
+  // A reply's size is a fact about one read of the log; the next one asks again (replySizes.ts).
+  tooLarge = null
+  large = null
   if (error !== null && error.step !== 'connect') error = null
 }
 
@@ -68,6 +80,15 @@ export function noteCombatRead(unserved: string | null, at: number): void {
   lastCombatRead = { unserved, at }
 }
 
+/**
+ * One engine reply that was large (fork #9). The newest that could NOT be shown is kept as
+ * `tooLarge` (`limit` is the one it was over); the newest that was shown is kept as `large`.
+ */
+export function noteReplySize(reply: Omit<LogReadReplySize, 'at'>, at: number): void {
+  if (reply.limit === null) large = { ...reply, at }
+  else tooLarge = { ...reply, at }
+}
+
 export function logReadFacts(): LogReadNotes {
-  return { health, movedAt, waitingSince, error, lastCombatRead }
+  return { health, movedAt, waitingSince, error, lastCombatRead, tooLarge, large }
 }

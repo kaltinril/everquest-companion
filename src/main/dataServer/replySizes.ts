@@ -16,7 +16,9 @@
 // Keyed by the question: `<op> <stableKey(params)>`, the key `readShim.ts` joins requests on.
 // Pure: no clock of its own and no app import, so `tests/dataServerReplySizes.test.mts` drives it.
 
-import { LARGE_MESSAGE_CHARS } from '../../shared/dataServer/ndjson'
+import { LARGE_MESSAGE_CHARS, MAX_MESSAGE_CHARS } from '../../shared/dataServer/ndjson'
+import type { LogReadReplySize } from '../../shared/logReadReport'
+import { stableKey } from './inFlight'
 
 /** The largest engine reply main will hand to a window, in characters. */
 export const MAX_FORWARD_CHARS = 32 * 1024 * 1024
@@ -65,6 +67,32 @@ export function createReplySizes(): ReplySizes {
       sizes.clear()
       sentAt.clear()
     }
+  }
+}
+
+/** A large reply as the client reports it (`shared/dataServer/client.ts OversizeNote`). */
+interface Sized {
+  readonly op: string | null
+  readonly params: unknown
+  readonly size: number
+  readonly refused: boolean
+}
+
+/**
+ * One large reply, as the two notes main keeps of it: the question's key for `note` above, and the
+ * fact the "Reading log..." report prints. `limit` is the limit it was over (what main may read,
+ * or what a window may be handed), null when it was under both. Null when the reply named no
+ * request, so there is no question to remember it against.
+ */
+export function sizedReply(sized: Sized): { key: string; reply: Omit<LogReadReplySize, 'at'> } | null {
+  if (sized.op === null) return null
+  const shown = !sized.refused && sized.size <= MAX_FORWARD_CHARS
+  const over = sized.refused ? MAX_MESSAGE_CHARS : MAX_FORWARD_CHARS
+  const asked = sized.params as { module?: unknown } | null
+  const module = sized.op === 'module.snapshot' && typeof asked?.module === 'string' ? asked.module : null
+  return {
+    key: `${sized.op} ${stableKey(sized.params)}`,
+    reply: { op: sized.op, module, chars: sized.size, refused: sized.refused, limit: shown ? null : over }
   }
 }
 

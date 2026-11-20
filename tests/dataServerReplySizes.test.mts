@@ -11,7 +11,8 @@ import {
   LARGE_REPLY_FLOOR_MS,
   MAX_FORWARD_CHARS,
   createReplySizes,
-  replySizes
+  replySizes,
+  sizedReply
 } from '../src/main/dataServer/replySizes'
 
 const MIB = 1024 * 1024
@@ -80,6 +81,30 @@ test('RESET CLEARS BOTH: a new read of the log starts with nothing known', () =>
   sizes.reset()
   assert.equal(sizes.delayFor(LOOT, 1_500), 0)
   assert.equal(sizes.blocked(FIGHTS), false)
+})
+
+test('sizedReply names the question and the limit a reply was over', () => {
+  // Over what main may read: dropped by the transport.
+  assert.deepEqual(sizedReply({ op: 'module.snapshot', params: { module: 'loot' }, size: 70 * MIB, refused: true }), {
+    key: LOOT,
+    reply: { op: 'module.snapshot', module: 'loot', chars: 70 * MIB, refused: true, limit: MAX_MESSAGE_CHARS }
+  })
+  // Read by main, over what a window may be handed.
+  assert.deepEqual(sizedReply({ op: 'combat.snapshot', params: { opts: {} }, size: 40 * MIB, refused: false }), {
+    key: FIGHTS,
+    reply: { op: 'combat.snapshot', module: null, chars: 40 * MIB, refused: false, limit: MAX_FORWARD_CHARS }
+  })
+  // Large, and shown: no limit was passed.
+  const shown = sizedReply({ op: 'module.snapshot', params: { module: 'loot' }, size: 20 * MIB, refused: false })
+  assert.equal(shown?.reply.limit, null)
+  assert.equal(sizedReply({ op: 'combat.snapshot', params: {}, size: MAX_FORWARD_CHARS, refused: false })?.reply.limit, null)
+  // The key is the read shim-s: the same question whatever order its params were written in.
+  assert.equal(
+    sizedReply({ op: 'combat.snapshot', params: { opts: { b: 1, a: 2 } }, size: 1, refused: true })?.key,
+    'combat.snapshot {"opts":{"a":2,"b":1}}'
+  )
+  // A reply that names no request has no question to be remembered against.
+  assert.equal(sizedReply({ op: null, params: null, size: 90 * MIB, refused: true }), null)
 })
 
 test('the app has one instance, and it starts empty', () => {
