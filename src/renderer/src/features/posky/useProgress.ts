@@ -292,6 +292,8 @@ export interface UseProgress {
    * turn-in from a hand-recorded one, so the tab holds both disabled (see `turnInActions.ts`).
    */
   turnInsReady: boolean
+  /** Has the log's loot loaded? Until it has, `lootHistory` is empty and the held counts lack it. */
+  lootReady: boolean
   /**
    * STATE ONE ITEM'S HELD COUNT BY HAND, or take the statement back with `count: null` (JOS-186).
    * Takes the item's DISPLAY name — the counting key is this module's business, not a control's —
@@ -603,6 +605,7 @@ export type InventoryRowsState = Pick<
 interface ProgressCore extends InventoryRowsState {
   progress: ProgressState | null
   ledger: TurnInLedger
+  lootReady: boolean
   itemOverrides: ItemCountOverride[]
   setItemOverride: UseProgress['setItemOverride']
   net: Record<string, number>
@@ -621,7 +624,8 @@ function useProgressCore(opts?: UseProgressOptions): ProgressCore {
   const [progress, setProgress] = useHeldProgress()
   // One pick per window (useCountSource.ts), so every instance of this hook follows the tab's.
   const countSource = useCountSource()
-  const lootHistory = useModule<LootSnap>('loot') ?? EMPTY_LOOT
+  const loot = useModule<LootSnap>('loot')
+  const lootHistory = loot ?? EMPTY_LOOT
   const ledger = useTurnInLedger(progress, setProgress, opts?.onQuestComplete)
 
   const reloadInventory = useCallback(async (): Promise<string> => {
@@ -666,6 +670,7 @@ function useProgressCore(opts?: UseProgressOptions): ProgressCore {
   return {
     progress,
     ledger,
+    lootReady: loot != null,
     lootHistory,
     inventoryRows,
     countSource,
@@ -731,6 +736,7 @@ export function useProgress(opts?: UseProgressOptions): UseProgress {
     undoTurnIn,
     resetTurnIns,
     turnInsReady,
+    lootReady: core.lootReady,
     setItemOverride: core.setItemOverride,
     itemOverrides,
     inventoryInfo: core.inventoryInfo,
