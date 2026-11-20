@@ -108,6 +108,17 @@ test('an item only the older log combined is carried with no session; a new one 
   assert.deepEqual(rows[2], LIVE.items[0])
 })
 
+test('by-products add, and a row neither log saw one on carries no count', () => {
+  const older = { ...EMPTY, items: [item('Bog Juice', { failed: 3, byProducts: 3 }), item('Short Beer', { made: 1, byProducts: 1 }), item('Mead', { made: 2 })] }
+  const newer = { ...EMPTY, items: [item('Bog Juice', { failed: 1, byProducts: 1 }), item('Mead', { made: 1 }), item('Short Ale', { failed: 2, byProducts: 2 })] }
+  const rows = merged(older, newer).items
+  assert.deepEqual(rows.map((r) => [r.item, r.byProducts]), [['Bog Juice', 4], ['Short Beer', 1], ['Mead', undefined], ['Short Ale', 2]])
+  assert.equal('byProducts' in rows[2], false)
+  // A log folded before the count existed has none to add.
+  const before = { ...EMPTY, items: [item('Bog Juice', { failed: 3 })] }
+  assert.equal(merged(before, newer).items[0].byProducts, 1)
+})
+
 test('money adds, and the last price, merchant and zone are the newer purchase', () => {
   const out = merged(ARCHIVED, LIVE)
   assert.deepEqual(out.bought, [

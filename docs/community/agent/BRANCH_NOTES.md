@@ -732,6 +732,14 @@ where one exists.
   (`ingredient`); a page lacking `[[Category:Tradeskill Ingredient]]` sets `forageUpdate.ingredient`,
   on the item's forage row when it has one, else a row of its own. 35 rows on the owner's logs.
   SAVED_ROWS 3.
+- By-products (2026-11-20, `gaps_craft.rs by_product`): a combine's by-product line
+  (`... create an alternate product: Bottle.`) files the item under kind `by-product`, through
+  `item_named` like any item mention (unknown: an Items row; known: no row; a redirect-only name:
+  a redirect row). Not `crafted`: `wikiPage.ts madeAndForaged` writes Player Crafted for
+  `crafted` and `failed-combine` only, and a returned Bottle is no recipe's product. No zone
+  (`gaps.rs note`, the list that also holds `crafted` and `fused`). Never passed to `Combines`:
+  a by-product that entered the pairing would overwrite the failed combine waiting for its raise.
+  Before the fix the reader matched a spelling the game never prints, so none of this ran.
 - `itemLookupParse.ts` is 421 code lines, near the 440 bar.
 - Job rule: `shared/gapJob.ts gapJob` is the one classification. Faction, drop and image rows are
   updates; a merchant is an update when `isMob`; a `forageUpdate` row is an update; a faction row
@@ -1736,12 +1744,12 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
   rows, pairing), `crafting_spans.rs`, `crafting_money.rs`, `crafting_tests.rs`. No parser kind and
   no protocol change: the failed combine, the trivial notice and the depot draw are read from
   `unknown` lines, as Wiki Gaps reads the first.
-- State: `items` (per item: `made`, `failed`, `trivial`, `trivialTs?`, `raises`, `firstRaise?`,
+- State: `items` (per item: `made`, `failed`, `byProducts?`, `trivial`, `trivialTs?`, `raises`, `firstRaise?`,
   `lastRaise?`, `tradeskill?`, `firstTs`, `lastTs`, `sessionMade`, `sessionFailed`,
   `sessionRaises`), `levels` (per tradeskill: `value` and its log's first line), `spans`,
   `olderSpans?`, `bought`, `sold`, `depot`. Types and helpers: `src/shared/crafting.ts`.
-- Shared with Wiki Gaps, one copy: `gaps_craft.rs` `failed_combine_of`, `is_tradeskill` and the
-  `Combines` pairing (the module is `gaps::craft`, `pub(crate)`); `gaps_details.rs` `coin_of` and
+- Shared with Wiki Gaps, one copy: `gaps_craft.rs` `failed_combine_of`, `alternate_product_of`,
+  `is_tradeskill` and the `Combines` pairing (the module is `gaps::craft`, `pub(crate)`); `gaps_details.rs` `coin_of` and
   `price_of`. A change to any of them changes both features.
 - Pairing: a tradeskill line and a combine pair when they share a log second, either order. The
   raise is counted on the item, the session and the span. A line restating the stored level is
@@ -1751,6 +1759,10 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
 - Not combines: the refused attempt (`Sorry, but you don't have everything ...`) and the
   by-product line (`... create an alternate product: Bottle.`), which rides on a failed combine
   already counted.
+- By-products (2026-11-20): the line is counted as `byProducts` on the item of the newest combine
+  when that combine is in its second or the one before; with no combine that near it is counted
+  nowhere. The key is absent at 0, in the engine and after a join (`mergeCrafting.ts` adds the
+  two sides). The by-product's own name is not kept. No session column.
 - The trivial notice is held and claimed by the next combine within 1 s, made or failed; a
   later combine does not get it.
 - Spans: a combine within 5 minutes of the last one extends the span, else opens one. The newest
@@ -1775,9 +1787,9 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
 - `combineCost` states a cost only when every ingredient was bought at least once; a crafted
   ingredient (Enchanted Gold Bar) is never bought, so its recipe must be costed first by the
   caller. It assumes a failed combine loses its materials.
-- Open: Wiki Gaps' `alternate_product_of` matches `create alternate product: `, but the game
-  prints `create an alternate product: ` (4 of 4 lines in the owner's archive), so Gaps never
-  reads a by-product. Left alone here; one word fixes it.
+- Fixed 2026-11-20: `alternate_product_of` reads `create an alternate product: `, the game's
+  spelling (4 of 4 lines in the owner's archive). The spelling without `an` is not read: nothing
+  ever printed it.
 
 ## Tradeskills section (fork #6, requirements/skills-tab.md, plans/2026-11-20-tradeskills-real-work.md)
 

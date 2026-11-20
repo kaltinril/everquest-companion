@@ -69,6 +69,7 @@ const ITEMS: Join<CraftedItemRow> = {
       ...n,
       made: o.made + n.made,
       failed: o.failed + n.failed,
+      byProducts: (o.byProducts ?? 0) + (n.byProducts ?? 0) || undefined,
       trivial: o.trivial + n.trivial,
       trivialTs: n.trivialTs ?? o.trivialTs,
       raises: o.raises + n.raises,

@@ -24,6 +24,8 @@ export interface CraftedItemRow {
   item: string
   made: number
   failed: number
+  /** By-product lines its combines printed (`... create an alternate product: Bottle.`); absent when none. */
+  byProducts?: number
   /** Combines the game's trivial notice preceded; 0 when it never printed for the item. */
   trivial: number
   /** The newest such combine. */

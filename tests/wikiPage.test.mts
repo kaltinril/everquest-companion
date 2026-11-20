@@ -356,6 +356,17 @@ test('a zone it both dropped and was foraged in is one category; an item never f
   assert.doesNotMatch(itemPage({ name: 'X', drops: [], soldBy: [], crafted: true }), /foraged|playercrafted|Tradeskill Ingredient/)
 })
 
+// A combine's by-product (the Bottle a failed brew hands back) is an item the log proved and nothing
+// more: its page claims no Player Crafted, whatever the engine filed beside it.
+test('a by-product row is not a crafted page', () => {
+  const row = { domain: 'item', name: 'Empty Bottle', kinds: ['by-product'], count: 4, first: '', last: '', details: { samples: [] } } as GapRow
+  const text = wikiPageText(row, [], {}, {})
+  assert.ok(text.includes('|itemname = Empty Bottle\n'), text)
+  assert.doesNotMatch(text, /Player Crafted|playercrafted/)
+  // The same item also made by a recipe is crafted on that line's word, not the by-product's.
+  assert.ok(wikiPageText({ ...row, kinds: ['by-product', 'crafted'] }, [], {}, {}).includes('[[Category:Player Crafted]]'))
+})
+
 test('AN ITEM SEEN ONLY IN A CAPTURE OR THE BAGS IS NOT READY UNTIL SOMETHING SAYS WHERE IT COMES FROM (owner, 2026-10-24)', () => {
   const captured = { domain: 'item', name: 'Burning Fighters Blade', kinds: ['captured'], count: 1, first: '', last: '', details: {} } as unknown as GapRow
   const shots = { itemShots: { 'Burning Fighters Blade': { statsblock: 'DMG: 9<br>' } } }
