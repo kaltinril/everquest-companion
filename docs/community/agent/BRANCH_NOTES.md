@@ -1852,9 +1852,10 @@ only: no engine, parser, protocol, network or dependency change.
   recipes in trivial order, what to make next, each material's sources and how many you hold."
   For slice 2: "Tradeskills is linked from the Loot page, the Bazaar, the Skills tab, the wish
   list and the Gear table, and a workbench lists the gear that raises its skill."
-- Not built, and no placeholder is drawn: the goal switch and routes, the shopping list across
-  several steps, the make-an-item planner, a "ready" mark. Merchants and locations, prices,
-  combine history and the guide panel are slice 3, below.
+- Not built, and no placeholder is drawn: the shopping list across several steps, the
+  make-an-item planner, a "ready" mark, a faction goal (no quest reward data). Merchants and
+  locations, prices, combine history and the guide panel are slice 3, below; the goal switch,
+  the routes and the shopping list for the next step are slice 4.
 - Links IN from other tabs (owner, 2026-11-20: "fully integrated with maps and other tabs"),
   slice 2, 2026-11-20 on `tradeskills-links`:
   - The opener: `openTradeskills({ tradeskill, item? })` in `appRouting.ts`, a `FocusSlot` like
@@ -1955,9 +1956,8 @@ only: no engine, parser, protocol, network or dependency change.
     recipes whose every input has a price, per item yielded; a material the wiki marks
     `Returned on Success` is left out; the sum is `crafting.combineCost`'s. Anything else leaves
     the cost unknown: the cell is blank and the panel says which material has no purchase.
-    Enchanted Gold Bar (never bought, no wiki recipe, made by a spell from a bought Gold Bar) is
-    that case and gets no special rule, so the Golden Ruby Ring has no cost. Open, the owner's
-    call: a rule such as "Enchanted X costs what X costs".
+    Enchanted Gold Bar (never bought, no wiki recipe, made by a spell from a bought Gold Bar) was
+    that case until slice 4 gave it a rule (below): it now costs what the Gold Bar cost.
   - Limits of the money: a tool the wiki does not mark as returned counts as consumed if the
     player ever bought one (the panel lists the parts it added up); the sale line states no
     quantity, so Sells is what one sale LINE paid and the difference is stated only for a recipe
@@ -1993,6 +1993,77 @@ only: no engine, parser, protocol, network or dependency change.
   - What's new line: "A Tradeskills workbench now shows your own combines, what a recipe costs at
     the prices you last paid, where you bought each material, and the two community guides: the
     leveling route with your level on it, and merchants with their locations."
+- Slice 4, goal routes and the shopping list (2026-11-20, branch `tradeskill-routes` off
+  `tradeskills-batch2`; not merged, not tried by the owner). TypeScript only; no engine, protocol,
+  network or dependency change.
+  - Where: a fourth workbench tab, "Your route", second after Recipes (`BENCH_TABS` gained
+    `route`). A workbench still opens on Recipes: the e2e steps before it assume that. Making the
+    route the opening tab is `FRESH.tab` in `tradeskillMemory.ts`.
+  - THE LAW: no success or skill-up rate of this game is measured, so no route states a chance, a
+    number of combines, a loss per point or a total for a stretch. `Route.basis` says what a route
+    ranks on, `Route.caveats` what it does not. `tests/tradeskillRoute.test.mts` "NOTHING
+    GUESSED" scans every step of every goal for forecast words and for a price the fixture's four
+    prices cannot add up. A new sentence that needs a formula fails it.
+  - Files: `shared/tradeskillRoute.ts` (goals, `buildRoute`, the route's own words),
+    `tradeskillRouteStep.ts` (a step and its sentences), `tradeskillRouteLevel.ts` (Cheapest,
+    Fastest), `tradeskillRouteExplore.ts` (Explore, the community route), `tradeskillShopping.ts`
+    (the list, where, total, copy text), `tradeskillMaterials.ts` (held counts, the expansion
+    through made and enchanted materials, "can it be bought"). Screens: `RoutePanel.tsx`,
+    `ShoppingPanel.tsx`, `routeMemory.ts`. They map over what the shared files return.
+  - Cost rule added to `tradeskillMoney.ts`: a material whose wiki source words include "Bought +
+    Enchanted" and whose name is "Enchanted <X>", that nothing in the book makes, costs the last
+    price of <X> (`enchantedFrom`, `CostPart.bar`). The parts text marks it "(the price of a Gold
+    Bar, enchanted by a spell)"; with no bar price the reason names the bar to buy. Both the words
+    and the name are needed: an imbued recipe's bar is sourced "Summoned" and stays unpriced. The
+    spell's own cost is not in the log and is not counted. One for one is the cost rule's reading
+    and the shopping list's too.
+  - Cheapest: from the level, the recipe above it with the least cost per combine; equal costs:
+    more combines on hand, then the lower trivial. With no priced recipe above: what is held, then
+    the next trivial up. TRAP for the reader: the cheapest per combine can sit far above the
+    level and skip a recipe the player holds materials for. The step's `aside` names that recipe
+    ("Not picked, but on hand: materials for 23 Golden Ruby Ring"). Whether held materials should
+    outrank a lower cost is the owner's call.
+  - Fastest: `recipeBuyable`. Bought means a purchase in the log, a wiki source word holding
+    "Bought" (not "Bought + Enchanted"), or a guide merchant; a bar a spell enchants counts and is
+    named; a made material counts when one of its recipes takes only bought materials; a tool the
+    combine gives back counts when one is held. When nothing above is buyable: the highest trivial
+    that lists materials, then the highest the wiki holds.
+  - Explore: never made (`recipeHistory(...).made === 0`), trivial from `level - 20` up, rated
+    recipes only. Groups, first that fits: quest, guide, odd (a different yield, or a container
+    under 5% of the tradeskill's recipes use once 20 state one), dropped, worn. 8 per group, the
+    rest counted. Empty until the crafting module is served.
+  - Two fields added to `BookRecipe`, filled in `main/tradeskillBook.ts` `madeItemFacts`: `quests`
+    (the made item's quest uses, a reward role left out, deduped) and `worn` (its own stats, saves
+    and effect names). Measured 2026-11-20: 319 recipes with `quests`, 1,766 with `worn`; the
+    payload is about 1.7 MB. `TRADESKILL_BOOK_VERSION` is unchanged: both are optional.
+  - Community route: `placedLadder` steps not done. A step is joined to a recipe only when the
+    guide's name is a wiki item's exactly; the Jewelcrafting route above 203 joins none ("Platinum
+    ruby"), so those steps are the guide's text with no cost and no shopping list.
+  - On hand: `tradeskillMaterials.onHand`, from `haveLookup` (the Have cell's own count). Null
+    with no dump and no depot line: no number. Plain bars held count toward a second number
+    ("or for 68 once the Platinum Bar you hold is enchanted").
+  - Shopping list (`shoppingList`): for the route's first step. `expandMaterials` walks the
+    recipe; one held stock serves every place a material is used; a made material short of its
+    need rolls up to its own recipe (the parent's tradeskill first, then the lowest trivial) in
+    `ceil(short / yield)` combines; a material that can be bought is never rolled up; an enchanted
+    bar short of its need rolls up to that many plain bars. A tool is needed once. Limit: a made
+    material used in two places is rounded up per place.
+  - Where: the log's last purchase (`PaidLine`), else the guide's merchant (`GuideSourceLine`),
+    else drops and forage (the Loot page's join, handed in as `ShoppingFacts.drops`), else the
+    wiki's source words. The total is stated only when every material still to buy has a price.
+  - Copy: `shoppingCopyText`, through `lib/clipboard.copyText` (main's clipboard); a refusal is
+    said beside the button.
+  - Memory (`routeMemory.ts`, localStorage): `eq.tradeskills.goal.<Tradeskill>` and
+    `eq.tradeskills.combines` (1 to 1000, default 20).
+  - `tradeskillMaterials.ts` may overlap a helper of the make-an-item planner branch
+    (`tradeskillPlan*.ts`): reconcile to one when both are on the trunk.
+  - Tests: `tests/tradeskillRoute.test.mts`, `tradeskillShopping.test.mts` (fixtures
+    `tradeskillRouteFixtures.mts`: the owner's case), `tradeskillMoney.test.mts`,
+    `tradeskillBook.test.mts`. e2e: `tests/e2e/tradeskillRouteSteps.mts` (`stepRoute`), called last
+    from `tradeskills.e2e.mts`; written, NOT run.
+  - What's new line: "Tradeskills: a workbench now plans a route from your level for the goal you
+    pick (cheapest, fastest, explore, or the community guide's), with a shopping list for the next
+    step. Jewelcraft recipes now show a cost: an enchanted bar counts at the price of its bar."
 
 ## Tradeskill guides as data (fork #6, requirements/skills-tab.md)
 

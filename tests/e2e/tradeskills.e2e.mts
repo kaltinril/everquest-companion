@@ -455,6 +455,7 @@ async function main(): Promise<void> {
       await stepHistory(page, crafted)
       await stepGuides(page, LEVEL)
     }
+    await (await import('./tradeskillRouteSteps.mjs')).stepRoute(page)
 
     check('no renderer console errors', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | '))
     if (failures.length) await dumpArtifacts(page, 'tradeskills-FAIL')
