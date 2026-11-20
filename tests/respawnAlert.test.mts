@@ -19,6 +19,7 @@ import {
   normalizeRespawnAlert,
   respawnAlertLeadFromDraft,
   respawnAlertLeadOk,
+  respawnAlertStepper,
   respawnAlertsDue
 } from '../src/shared/respawnAlert.ts'
 
@@ -118,6 +119,70 @@ test('a re-based clock is a new key; a moved estimate keeps the key', () => {
   assert.deepEqual(longer, first)
   const rebased = keys('Lake Nerius', [row('Lake Nerius', BASE + 5000, { basis: 'sighting' })], AT + 4500, AT + 5500)
   assert.deepEqual(rebased, [`lake nerius::enynti@${String(BASE + 5000)}`])
+})
+
+// ------------------------------------------------------------ once per clock (the watcher's steps)
+
+const KEY = `lake nerius::enynti@${String(BASE)}`
+const lake = (over: Partial<RespawnRow> = {}, baseTs = BASE): ReturnType<typeof snapIn> =>
+  snapIn('Lake Nerius', [row('Lake Nerius', baseTs, over)])
+const stepKeys = (
+  stepper: ReturnType<typeof respawnAlertStepper>,
+  snap: ReturnType<typeof snapIn> | null,
+  nowMs: number,
+  leadSec = LEAD
+): string[] => stepper.step(snap, leadSec, nowMs).map((d) => d.key)
+
+test('the first tick is a baseline, even one that lands on the lead moment; so is a fresh start', () => {
+  const stepper = respawnAlertStepper()
+  assert.deepEqual(stepKeys(stepper, lake(), AT), [])
+  assert.deepEqual(stepKeys(stepper, lake(), AT + 1000), [], 'and the moment has passed')
+  // The setting switched off and on again is a new stepper.
+  assert.deepEqual(stepKeys(respawnAlertStepper(), lake(), AT), [])
+})
+
+test('a clock alerts once, however its estimate moves afterwards', () => {
+  const stepper = respawnAlertStepper()
+  assert.deepEqual(stepKeys(stepper, lake(), AT - 500), [])
+  assert.deepEqual(stepKeys(stepper, lake(), AT + 500), [KEY])
+  // A longer estimate puts the same clock's lead moment in a later window.
+  const longer = lake({ estimateMs: EST + 60_000 })
+  assert.deepEqual(respawnAlertsDue(longer, LEAD, AT + 59_500, AT + 60_500).map((d) => d.key), [KEY], 'the window alone repeats it')
+  assert.deepEqual(stepKeys(stepper, longer, AT + 59_500), [])
+  assert.deepEqual(stepKeys(stepper, longer, AT + 60_500), [], 'already heard')
+})
+
+test('a clock alerts once when the lead is lowered after it was heard', () => {
+  const stepper = respawnAlertStepper()
+  stepKeys(stepper, lake(), AT - 500)
+  assert.deepEqual(stepKeys(stepper, lake(), AT + 500), [KEY])
+  const at10 = BASE + EST - 10_000
+  assert.deepEqual(stepKeys(stepper, lake(), at10 - 500, 10), [])
+  assert.deepEqual(stepKeys(stepper, lake(), at10 + 500, 10), [], 'not again at 10 s')
+})
+
+test('a tick with no snapshot still moves the clock on: no burst when the log has been read', () => {
+  const stepper = respawnAlertStepper()
+  assert.deepEqual(stepKeys(stepper, lake(), AT - 1000), [])
+  assert.deepEqual(stepKeys(stepper, null, AT + 500), [], 'reading the log')
+  assert.deepEqual(stepKeys(stepper, lake(), AT + 1000), [], 'its lead moment passed unseen')
+  // A first tick with no snapshot is the baseline too.
+  const late = respawnAlertStepper()
+  assert.deepEqual(stepKeys(late, null, AT - 500), [])
+  assert.deepEqual(stepKeys(late, lake(), AT + 500), [KEY])
+})
+
+test('a re-based clock alerts again; two clocks due in one tick are both returned', () => {
+  const stepper = respawnAlertStepper()
+  stepKeys(stepper, lake(), AT - 500)
+  assert.deepEqual(stepKeys(stepper, lake(), AT + 500), [KEY])
+  const rebased = lake({ basis: 'sighting' }, BASE + 5000)
+  assert.deepEqual(stepKeys(stepper, rebased, AT + 4500), [])
+  assert.deepEqual(stepKeys(stepper, rebased, AT + 5500), [`lake nerius::enynti@${String(BASE + 5000)}`])
+  const two = snapIn('Lake Nerius', [row('Lake Nerius 3 (Fused)', BASE), row('Lake Nerius', BASE)])
+  const both = respawnAlertStepper()
+  stepKeys(both, two, AT - 500)
+  assert.equal(stepKeys(both, two, AT + 500).length, 2)
 })
 
 test('where you stand is said plainly; another tier or instance names its place', () => {

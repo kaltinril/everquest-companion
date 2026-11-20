@@ -5,7 +5,7 @@
 
 import { useEffect, useRef, type JSX } from 'react'
 import type { RespawnSnap } from '@shared/respawn'
-import { respawnAlertsDue } from '@shared/respawnAlert'
+import { respawnAlertStepper } from '@shared/respawnAlert'
 import { useModule } from '../../lib/useModule'
 import { fireAppSignal } from '../alerts/player'
 import { useRespawnAlert } from './useRespawnAlert'
@@ -22,17 +22,10 @@ function ClockReader({ leadSec }: { leadSec: number }): null {
 
   useEffect(() => {
     // The first tick after mounting is a baseline; a clock fires once however its estimate moves.
-    let prevMs: number | null = null
-    const fired = new Set<string>()
+    const stepper = respawnAlertStepper()
     return window.eq.onRespawnAlertTick((nowMs) => {
       const now = live.current
-      const due = now.snap === null ? [] : respawnAlertsDue(now.snap, now.leadSec, prevMs, nowMs)
-      prevMs = nowMs
-      for (const d of due) {
-        if (fired.has(d.key)) continue
-        fired.add(d.key)
-        fireAppSignal('respawnSoon', d.context, d.captures)
-      }
+      for (const d of stepper.step(now.snap, now.leadSec, nowMs)) fireAppSignal('respawnSoon', d.context, d.captures)
     })
   }, [])
 

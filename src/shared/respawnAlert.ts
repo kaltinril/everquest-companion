@@ -105,3 +105,26 @@ export function respawnAlertsDue(
   }
   return out
 }
+
+/**
+ * The watcher's memory between ticks: `step` returns the clocks to alert on now, each once. The
+ * first step is a baseline. A step with no snapshot (the log is being read) still moves the clock
+ * on, so nothing bursts when the snapshot arrives. A clock already returned is never returned
+ * again, though a longer estimate or a lowered lead puts its lead moment in a later window. A new
+ * stepper (the setting switched off and on) starts over.
+ */
+export function respawnAlertStepper(): {
+  step: (snap: Pick<RespawnSnap, 'rows' | 'zone' | 'prefs'> | null, leadSec: number, nowMs: number) => RespawnAlertDue[]
+} {
+  let prevMs: number | null = null
+  const fired = new Set<string>()
+  return {
+    step(snap, leadSec, nowMs) {
+      const due = snap === null ? [] : respawnAlertsDue(snap, leadSec, prevMs, nowMs)
+      prevMs = nowMs
+      const fresh = due.filter((d) => !fired.has(d.key))
+      for (const d of fresh) fired.add(d.key)
+      return fresh
+    }
+  }
+}
