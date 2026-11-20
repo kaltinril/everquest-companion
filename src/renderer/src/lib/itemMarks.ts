@@ -9,6 +9,9 @@ import type { ItemMarks } from '@shared/itemKnowledge'
 
 /** name → its marks, or null once asked and found unknown. */
 const marks = new Map<string, ItemMarks | null>()
+/** Names asked and not answered yet. Their placeholder in `marks` is null too, so a probe that
+ *  read the map alone took a row's unanswered ask for "unknown" and lost a notable pickup. */
+const unsettled = new Set<string>()
 let pending = new Set<string>()
 let flush: ReturnType<typeof setTimeout> | null = null
 let version = 0
@@ -29,10 +32,33 @@ function subscribe(l: () => void): () => void {
 }
 
 function settle(names: readonly string[], got: Record<string, ItemMarks>): void {
-  for (const n of names) marks.set(n, got[n] ?? null)
+  for (const n of names) {
+    marks.set(n, got[n] ?? null)
+    unsettled.delete(n)
+  }
   version++
   reader = (name) => readMarks(name)
   for (const l of listeners) l()
+}
+
+/** Asked, answer still on its way: the placeholder and the mark that says so, written together. */
+function hold(name: string): void {
+  marks.set(name, null)
+  unsettled.add(name)
+}
+
+/** Resolves once none of the names is still waiting on main, whoever asked for it. */
+function whenSettled(names: readonly string[]): Promise<void> {
+  const waiting = (): boolean => names.some((n) => unsettled.has(n))
+  if (!waiting()) return Promise.resolve()
+  return new Promise((resolve) => {
+    const l = (): void => {
+      if (waiting()) return
+      listeners.delete(l)
+      resolve()
+    }
+    listeners.add(l)
+  })
 }
 
 function schedule(): void {
@@ -47,21 +73,18 @@ function schedule(): void {
   }, 30)
 }
 
-/** Ask for names outside a component (a probe over a list): resolves when their batch has landed. */
+/** Ask for names outside a component (a probe over a list): resolves when every one of them has
+ *  its answer, including a name a row or another probe asked for first and is still waiting on. */
 export function fetchItemMarks(names: readonly string[]): Promise<Record<string, ItemMarks>> {
   const missing = names.filter((n) => !marks.has(n))
-  if (missing.length === 0) return Promise.resolve(collect(names))
-  for (const n of missing) marks.set(n, null)
-  return window.eq.itemMarks(missing).then(
-    (got) => {
-      settle(missing, got)
-      return collect(names)
-    },
-    () => {
-      settle(missing, {})
-      return collect(names)
-    }
-  )
+  if (missing.length > 0) {
+    for (const n of missing) hold(n)
+    window.eq.itemMarks(missing).then(
+      (got) => settle(missing, got),
+      () => settle(missing, {})
+    )
+  }
+  return whenSettled(names).then(() => collect(names))
 }
 
 function collect(names: readonly string[]): Record<string, ItemMarks> {
@@ -87,11 +110,14 @@ export function useItemMarksReader(): (name: string) => ItemMarks | undefined {
 /** The marks for an item name: undefined until its batch answers, or when the DB does not know it. */
 export function useItemMarks(name: string): ItemMarks | undefined {
   useSyncExternalStore(subscribe, () => version)
-  useEffect(() => {
-    if (marks.has(name)) return
-    marks.set(name, null)
-    pending.add(name)
-    schedule()
-  }, [name])
+  useEffect(() => requestItemMarks(name), [name])
   return marks.get(name) ?? undefined
+}
+
+/** A row's ask: the name joins the batch that goes to main 30 ms on, unless it was asked before. */
+export function requestItemMarks(name: string): void {
+  if (marks.has(name)) return
+  hold(name)
+  pending.add(name)
+  schedule()
 }

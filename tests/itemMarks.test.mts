@@ -5,7 +5,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { isNotableKnowledge, isNotableMarks, marksOf, type ItemMarks } from '../src/shared/itemKnowledge.ts'
 import { buildItemDbIndex, itemKey, knowledgeFromDb } from '../src/main/itemsDb.ts'
-import { fetchItemMarks, itemMarksOf } from '../src/renderer/src/lib/itemMarks.ts'
+import { fetchItemMarks, itemMarksOf, requestItemMarks } from '../src/renderer/src/lib/itemMarks.ts'
 import type { ItemDbFile, ItemKnowledge, LootEvent } from '../src/shared/types.ts'
 import { buildDropRows } from '../src/renderer/src/features/overview/overviewData.ts'
 import itemsJson from '../src/main/data/items.json' with { type: 'json' }
@@ -115,4 +115,60 @@ test('a `+N` tier the probe never sent still gets its icon once the surface asks
       ['Arrow', 598]
     ]
   )
+})
+
+const LORE: ItemMarks = { lore: true, quest: false, questUses: 0, quests: [], recipes: 0, tradeskills: [], noTrade: false }
+
+/** A `window.eq` whose `itemMarks` calls every name lore, recording every batch it is asked. */
+function loreBridge(): string[][] {
+  const asked: string[][] = []
+  const eq = {
+    itemMarks(names: readonly string[]): Promise<Record<string, ItemMarks>> {
+      asked.push([...names])
+      return Promise.resolve(Object.fromEntries(names.map((n) => [n, LORE])))
+    }
+  }
+  ;(globalThis as unknown as { window: unknown }).window = { eq }
+  return asked
+}
+
+test('a probe waits for a name a row already asked for, instead of reading it as unknown', async () => {
+  // A mounted Loot row asks first: React runs the row's effect before the Loot view's probe in
+  // the same commit. The row's placeholder used to read as "answered, unknown", so the probe
+  // resolved empty at once and a lore or quest pickup never got its Notable pickups callout.
+  const asked = loreBridge()
+  const name = 'Row First Lore Idol'
+  requestItemMarks(name) // the row: its batch goes to main 30 ms on
+  const got = await fetchItemMarks([name]) // the probe, in the same tick
+  assert.ok(got[name], 'the probe has the marks the row asked for')
+  assert.equal(isNotableMarks(got[name]), true)
+  assert.deepEqual(asked, [[name]], 'main was asked once, by the row batch')
+})
+
+test('a probe with its own names to send still waits for the ones a row asked for', async () => {
+  const asked = loreBridge()
+  const rowName = 'Row First Lore Totem'
+  const probeName = 'Probe Only Lore Totem'
+  requestItemMarks(rowName)
+  const got = await fetchItemMarks([rowName, probeName])
+  assert.deepEqual(Object.keys(got).sort(), [probeName, rowName].sort())
+  assert.deepEqual(asked, [[probeName], [rowName]], 'the probe sends only what nobody asked for yet')
+})
+
+test('two probes for one name both get its marks, from one ask', async () => {
+  const asked = loreBridge()
+  const name = 'Twice Probed Lore Ring'
+  const [first, second] = await Promise.all([fetchItemMarks([name]), fetchItemMarks([name])])
+  assert.ok(first[name])
+  assert.ok(second[name], 'the second probe waited for the first one\'s answer')
+  assert.deepEqual(asked, [[name]])
+})
+
+test('a probe waiting on a row batch that fails resolves empty, and does not hang', async () => {
+  const eq = { itemMarks: (): Promise<Record<string, ItemMarks>> => Promise.reject(new Error('main is gone')) }
+  ;(globalThis as unknown as { window: unknown }).window = { eq }
+  const name = 'Row First Failed Idol'
+  requestItemMarks(name)
+  assert.deepEqual(await fetchItemMarks([name]), {})
+  assert.equal(itemMarksOf(name), undefined)
 })

@@ -3,8 +3,10 @@
 // keys stay "asked", so a discarded result would never be fetched again this mount.
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { useEffect } from 'react'
 import { mountHook } from './hookHost.mjs'
 import { useNotablePickups } from '../src/renderer/src/features/loot/useNotablePickups.ts'
+import { itemMarksOf, requestItemMarks } from '../src/renderer/src/lib/itemMarks.ts'
 import type { ItemMarks } from '../src/shared/itemKnowledge.ts'
 import type { ItemKnowledge, LootEvent } from '../src/shared/types.ts'
 
@@ -92,4 +94,29 @@ test('after a character switch a remount starts empty and asks again', async () 
   await new Promise((r) => setTimeout(r, 0))
   assert.deepEqual(second.render().notable.map((n) => n.item), ['Switch Lore Shard'])
   second.unmount()
+})
+
+test('a pickup whose row asked for its marks before the probe still gets its callout', async () => {
+  // On the Loot tab the row's icon asks for the item's marks in the same commit as the probe,
+  // and a child's effect runs before its parent's. The probe used to read the row's unanswered
+  // ask as "not notable" and never look again, so the strip stayed empty until the tab was reopened.
+  const eq = {
+    itemMarks: (names: readonly string[]) => Promise.resolve(Object.fromEntries(names.map((n) => [n, LORE]))),
+    lookupItem: (name: string): Promise<ItemKnowledge> =>
+      Promise.resolve({ name, lore: true, quest: false, questUses: [], cached: true })
+  }
+  ;(globalThis as unknown as { window: unknown }).window = { eq }
+  const item = 'Row First Lore Sigil'
+  const history: LootEvent[] = [{ ts: 1, item }]
+
+  const host = mountHook(() => {
+    useEffect(() => requestItemMarks(item), []) // the row's ask, declared first so it runs first
+    return useNotablePickups(history, new Set())
+  })
+  // The row's batch goes out 30 ms on; then one more turn for the probe's record fetch.
+  for (let i = 0; i < 100 && itemMarksOf(item) === undefined; i++) await new Promise((r) => setTimeout(r, 5))
+  await new Promise((r) => setTimeout(r, 0))
+
+  assert.deepEqual(host.render().notable.map((n) => n.item), [item])
+  host.unmount()
 })
