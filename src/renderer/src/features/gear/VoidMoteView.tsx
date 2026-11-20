@@ -24,7 +24,7 @@ export interface VoidMoteViewProps {
 }
 
 export default function VoidMoteView({ onOpenLoot }: VoidMoteViewProps = {}): JSX.Element {
-  const { rows } = useGearIndex()
+  const { rows, ready, refused } = useGearIndex()
   const classes = useGearClasses()
   const compare = useGearCompare(rows, ITEM_UPGRADE_BASE)
   const [motes, setMotes] = useVoidMotePrefs()
@@ -33,7 +33,15 @@ export default function VoidMoteView({ onOpenLoot }: VoidMoteViewProps = {}): JS
     <Box data-testid="void-motes-view" sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, height: '100%', minHeight: 0 }}>
       {/* The list is only as true as the dump is fresh: the Gear tab's own line, for the same file. */}
       <OutputKindLine kind="inventory" quiet testId="void-motes-dump-line" />
-      <VoidMotePanel compare={compare} classes={classes.classes} motes={motes} setMotes={setMotes} onOpenLoot={onOpenLoot} />
+      <VoidMotePanel
+        compare={compare}
+        indexReady={ready}
+        indexRefused={refused}
+        classes={classes.classes}
+        motes={motes}
+        setMotes={setMotes}
+        onOpenLoot={onOpenLoot}
+      />
     </Box>
   )
 }
