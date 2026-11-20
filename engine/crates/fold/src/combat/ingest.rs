@@ -384,9 +384,14 @@ fn ingest_ally_pet_leader(st: &mut EngineState, ev: &Event) -> Option<SourceRef>
     if !st.ally_caster_allowed(&owner_key) {
         return None;
     }
-    // Your own pet is yours, whatever a broadcast says. `says` is forgeable and the cost of getting
-    // this wrong is deleting a real pet's damage, so the refusal is absolute.
-    if st.pet_names.contains(&pet_key) || st.ever_pet.contains(&pet_key) {
+    // The pet you have NOW is yours, whatever a broadcast says. `says` is forgeable and the cost of
+    // getting this wrong is deleting a real pet's damage, so that refusal is absolute.
+    //
+    // A name that was your pet ONCE and is not one now is no such claim. Summoned pets are named
+    // from a small pool and the names come round: a group mate's new pet rolled the name your own
+    // had a week before, this refusal read `ever_pet`, and the pet's damage was credited to nobody
+    // (owner, 2026-11-19: Malkil's Xabantik). The line names its leader, and that is who has it.
+    if st.pet_names.contains(&pet_key) {
         return None;
     }
     let ever_charmed = st.charm.ever_charmed(&pet_key);

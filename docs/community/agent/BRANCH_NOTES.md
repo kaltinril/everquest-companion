@@ -290,6 +290,17 @@ where one exists.
   (fixed, PR #61). Path 2: a riposte against a groupmate wrote it; a LIVE roster member now passes
   the `ever_struck` refusal only (charm broadcast stays absolute). Path 2 was offered upstream on
   #60 (PR #80) and is left there.
+- `ever_pet` (every name that was ever YOUR pet, kept for the whole log) no longer refuses a
+  leader line that names somebody else: only a pet you have now (`pet_names`) does. Summoned pet
+  names come round, and a group mate's pet with a name your own once had was credited to nobody
+  (owner, 2026-11-19: Malkil's Xabantik; `fold/tests/ally_pet_reused_name.rs`). Still in force: a
+  name in `ever_pet` is never RECORDED as another player (`recordable_attacker`), so such a pet's
+  damage before its leader line is not kept, where another name's would move to the pet's row.
+- To see what the engine does with a real log: copy it as `eqlog_<Name>_<server>.<anything>.txt`
+  (the replay tool reads the character from that shape), then
+  `engine/target/release/parity <copy> --snapshots > out.json` (`cargo build --release -p parity`
+  first; the committed builds go stale). `scopes[]` holds every fight's rows. Keep the copy and
+  the output out of the repo: they are the owner's log.
 
 ## Log archive (was log-archive)
 
