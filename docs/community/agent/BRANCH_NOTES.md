@@ -2245,6 +2245,69 @@ only: no engine, parser, protocol, network or dependency change.
   - What's new line: "Tradeskills: the route has Only use materials I have, recipes you can make
     right now are marked and can be listed alone, and a recipe the wiki is missing materials or a
     trivial for says so with a link to its wiki page."
+- Slice 6, crafting AAs, fishing outcomes and the Foraging tile (2026-11-20, branch
+  `tradeskills-aa-gather` off `tradeskills-batch3`; not merged, not tried by the owner). TypeScript
+  only; no engine, protocol, network or dependency change; `security.ts`, `crafting.ts`,
+  `Workbench.tsx` and `TradeskillsHome.tsx` untouched.
+  - Mounts (one line each, by the coordinator): `<AaPanel tradeskill={tradeskill} />` under
+    `SkillGearPanel` in `Workbench.tsx`; `<ForagingTile />` after the tile grid in
+    `TradeskillsHome.tsx`. `GatherPanel` is mounted in `HistoryPanel.tsx` when the workbench is
+    Fishing. All three read their modules themselves (`useModule`): no prop from the workbench.
+  - AA data: `src/shared/tradeskillAaTable.generated.ts` (`GENERAL_AAS`: name, ranks, the Cost
+    cell and the Description cell as the wiki writes them, 32 rows; `TRADESKILL_AA_RULES`: the
+    lines of the wiki's Tradeskills page that link to the AA page, one today). Written by
+    `scripts/gen-tradeskill-aas.mts` (parsers `scripts/sources/generalAas.ts`) from the committed
+    caches, zero requests, no date in the file. `tests/tradeskillAaTable.test.mts` fails while the
+    file is behind the caches (DATA_REFRESH.md).
+  - Why not `classes.json`: its `aas` rows hold group, classes, levels and cast, no ranks, cost or
+    text, and `classWiki.aaRows` reads only rows written on one line with `||`. The wiki writes
+    Full Potential, Widened Perception and Point Blank Fire one cell per line, so those three are
+    not in `classes.json` (175 AAs there; `scrape:classes -- --offline` over the 2026-11-20 cache
+    rewrites nothing, so the file is in step with its parser). Not fixed here: reading them adds
+    three rows to `classes.json`, which the level-up unlock tables are built from.
+    `generalAas.aaCells` reads both layouts.
+  - Which AAs (`shared/tradeskillAa.ts aaReach`), read off the row, no name list: `<X> Mastery`
+    whose X folds to a tradeskill bears on it (`aaTradeskill`: `tradeskillOf` plus the wiki's
+    "Jewel Craft" and "Jewelcraft"); a text naming Forage bears on foraging; any other text saying
+    "tradeskill" bears on all (Crafting Mastery, Full Potential). 2026-11-20 cache: 8 masteries
+    (Alchemy, Baking, Blacksmithing, Brewing, Fletching, Jewelcrafting, Pottery, Tailoring),
+    Crafting Mastery, Full Potential, Foraging. No mastery for Fishing, Poison Making, Spell
+    Research, Tinkering; no fishing AA.
+  - Crafting Mastery's text lists seven "standard" tradeskills (Baking, Blacksmithing, Brewing,
+    Fletching, Jewelcraft, Pottery, Tailoring); the Tradeskills page's rule says "all other
+    tradeskills". Both are shown as written; a workbench outside the seven adds "The wiki's text
+    names ... It does not name <Tradeskill>". Which is right in game is not known.
+  - Figures: read only from `by A/B/C%` and `raise A/B/C additional`, once in the text, one value
+    per rank (`percents`, `extra`); else null. Shown as "At rank N the wiki states ...". THE LAW of
+    slice 4 holds: no chance, no rate, nothing worked out from a figure (the NOTHING GUESSED test
+    in `tests/tradeskillAa.test.mts`).
+  - Purchases: the `leveling` module's `aaSpends` through `aaLedger` (the top rank a line names;
+    a re-bought rank is one rank; every rank at cost 0 reads "granted"). The game's names match
+    the wiki's exactly on the owner's log (Jewel Craft Mastery, Baking Mastery, Crafting Mastery;
+    costs 2/4/6 and 3 each as the wiki lists). No line: "Your log shows no purchase", with a hover
+    saying a log that began later does not show it. Never "you do not have it".
+  - Past 200 (`pastCap`): `tradeskillLevel` over all twelve app tradeskills, level above 200,
+    named with their levels. The app does not work out how many more may pass 200.
+  - Panel: one line, closed by default (`eq.tradeskills.aaOpen`, localStorage), because the
+    workbench must not grow a scroll of panels; open, the details scroll inside 220 px.
+  - Fishing and forage words: `shared/tradeskillGather.ts` over `crafting.ts`'s `fishingRate`,
+    `forageRate`, `gatheredShares`, `unnamedCatches`. Fishing shares are over ALL catches (the
+    unnamed ones in the whole), so the named rows can add up to under 100%. A part that rounds to
+    0 reads "under 1%". The Foraging tile lists 5 items, then "Show all N" (window state only).
+  - The Forage level is the `skills` row spelled `Forage` (the newest line), not a tradeskill row.
+  - TRAP (same as the Crafting module's): a sealed archive gains `fishing` and `forage` only when
+    refolded, so the panel and the tile count the live log alone until then.
+  - TRAP: `tests/copyNoEmDash.test.mts` scans every string under `src/shared`, the generated table
+    included. `generalAas.cellText` writes an em or en dash in a wiki cell as a spaced hyphen (none
+    in the table today).
+  - Not built: a fishing or forage pace per hour; the zone a catch or a forage came from; the AA
+    table's Archetype, Class and Special rows (none bears on a tradeskill on today's page).
+  - Tests: `tests/tradeskillAa.test.mts`, `tradeskillAaTable.test.mts`, `tradeskillGather.test.mts`.
+    e2e: `tests/e2e/tradeskillGatherSteps.mts` (`stepAaAndGather(page, log)`), to be called last
+    from `tradeskills.e2e.mts`; written, NOT run; each part notes and skips when its mount is not in.
+  - What's new line: "Tradeskills: a workbench lists the AAs for its tradeskill with the ranks your
+    log shows bought, Fishing shows your casts, catches and what you caught, and Home has a
+    Foraging tile."
 
 ## Tradeskill guides as data (fork #6, requirements/skills-tab.md)
 
