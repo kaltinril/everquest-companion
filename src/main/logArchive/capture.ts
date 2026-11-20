@@ -95,12 +95,17 @@ async function takeAll(deps: CaptureDeps): Promise<Taken> {
   return { modules, fights, respawnHistory: null }
 }
 
+/** The engine read nothing between the two health answers. */
+function unmoved(before: EngineHealth, now: EngineHealth): boolean {
+  return now.mark?.offset === before.mark?.offset && now.events === before.events
+}
+
 /** The respawn history, after the pair; null unless the log is still where the pair saw it. */
 async function historyIfStill(deps: CaptureDeps, before: EngineHealth, modules: Record<string, SegmentModule>): Promise<RespawnRow[] | null> {
   if (deps.respawnHistory === undefined) return null
   const rows = await deps.respawnHistory(modules)
   const now = await deps.health()
-  return now.mark?.offset === before.mark?.offset && now.events === before.events ? rows : null
+  return unmoved(before, now) ? rows : null
 }
 
 function toSegment(deps: CaptureDeps, character: string, log: SegmentLog, t: Taken): Segment {
@@ -147,8 +152,7 @@ export async function captureSegment(deps: CaptureDeps, expected?: Attached): Pr
     // A read that failed refuses the capture: nothing is moved with a module missing (captureReads.ts).
     const taken = await takeAll(deps).catch(readFailure)
     if ('ok' in taken) return taken
-    const after = await deps.health()
-    if (after.mark?.offset !== before.mark?.offset || after.events !== before.events) continue
+    if (!unmoved(before, await deps.health())) continue
     const log = await deps.readPrefix(a.logPath, before.mark?.offset ?? 0)
     const respawnHistory = await historyIfStill(deps, before, taken.modules)
     if (!stillAttached(deps, expected)) return CHANGED
