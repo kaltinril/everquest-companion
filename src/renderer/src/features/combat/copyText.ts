@@ -70,15 +70,35 @@ function skillName(s: SkillRow): string {
 // ── Level 1: the ranked source meter ────────────────────────────────────────────────
 
 /**
+ * THE LEVEL-1 LIST AS THE PANEL IS SHOWING IT: the ranked rows after the meter scope and the pet
+ * layout have had their say, and the headline figures over them (`SegmentPanel.headline`). The
+ * paste prints these, so it cannot list a row the screen hides or headline a different total.
+ */
+export interface ShownSources {
+  rows: SourceView[]
+  total: number
+  dps: number
+  activeDps: number
+}
+
+/** The whole direction, unscoped: what a caller with no panel pastes. */
+function wholeSegment(seg: SegmentView, mode: 'out' | 'in'): ShownSources {
+  return mode === 'out'
+    ? { rows: seg.entities, total: seg.outTotal, dps: seg.outDps, activeDps: seg.activeDps }
+    : { rows: seg.incoming, total: seg.inTotal, dps: seg.inDps, activeDps: seg.inDps }
+}
+
+/**
  * The header stat run: direction, total, dps. Active-time DPS rides along under exactly the
  * panel's condition (outgoing only, and only when the fight actually had idle gaps — otherwise
  * it is the same number twice), and so does the enemy-heal caveat.
  */
-function segmentStats(seg: SegmentView, mode: 'out' | 'in'): string[] {
-  const total = mode === 'out' ? seg.outTotal : seg.inTotal
-  const dps = mode === 'out' ? seg.outDps : seg.inDps
-  const act =
-    mode === 'out' && seg.activeSec > 0 && seg.activeSec < seg.durationSec ? ` (act ${formatRate(seg.activeDps)})` : ''
+function segmentStats(seg: SegmentView, mode: 'out' | 'in', shown: ShownSources): string[] {
+  const { total, dps, activeDps } = shown
+  // The panel's two conditions (`ActiveDpsNote`): the fight had idle gaps, and the active rate is
+  // above the headline. A headline over your own clock can already beat it.
+  const gaps = mode === 'out' && seg.activeSec > 0 && seg.activeSec < seg.durationSec
+  const act = gaps && activeDps > dps ? ` (act ${formatRate(activeDps)})` : ''
   const stats = [`${mode === 'out' ? 'Outgoing' : 'Incoming'} damage`, formatNum(total), `${formatRate(dps)}${act}`]
   if (mode === 'out' && seg.enemyHealTotal > 0) stats.push(`+${formatNum(seg.enemyHealTotal)} enemy heal`)
   return stats
@@ -151,14 +171,18 @@ function healFooter(seg: SegmentView): string[] {
  * `mode` picks the same rows/total/dps the panel does, so an Incoming copy can never carry
  * outgoing numbers. Optional columns appear only when some row HAS that data — a fight with no
  * avoided swings has no Hit column at all, rather than a column of '100%'.
+ *
+ * `shown` is the panel's own list and headline (`ShownSources`). Without it the whole direction is
+ * pasted, unscoped.
  */
 export function formatSegmentText(
   seg: SegmentView,
   mode: 'out' | 'in',
-  selfLabel: string | null = null
+  selfLabel: string | null = null,
+  shown: ShownSources = wholeSegment(seg, mode)
 ): string {
-  const rows = mode === 'out' ? seg.entities : seg.incoming
-  const out: string[] = [subjectLine(null, seg), ...statLines(segmentStats(seg, mode))]
+  const rows = shown.rows
+  const out: string[] = [subjectLine(null, seg), ...statLines(segmentStats(seg, mode, shown))]
 
   // The defence block rides ABOVE the rows in the Incoming direction — where the panel used to put
   // it, and where a linear paste still wants it (it is the summary; the table is the detail). It is
