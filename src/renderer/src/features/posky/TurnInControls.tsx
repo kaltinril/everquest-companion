@@ -133,7 +133,8 @@ function UndoTurnIn({ q, onUndo }: { q: QuestProgress; onUndo?: () => void }): J
   // the hook remembers the rejection, so the next snapshot does not put it back.
   const canUndo = q.completionEvidence === undefined && q.turnIns > 0
   if (canUndo && onUndo === undefined) return <UndoButton title={UNDO_LOADING} />
-  const fromLog = q.turnIns <= q.logTurnIns
+  // What the click will do, not a count comparison: undo cuts the NEWEST turn-in whoever recorded it.
+  const fromLog = q.undoTakesLogTurnIn === true
   return (
     // The span outlives the tooltip that needed it, for the same reason: a DISABLED button
     // swallows no mouse events, and "why is this dead" is exactly the question the words answer.
@@ -142,7 +143,7 @@ function UndoTurnIn({ q, onUndo }: { q: QuestProgress; onUndo?: () => void }): J
         canUndo
           ? fromLog
             ? 'Take back the most recent turn-in. This one was read from your log; taking it back tells the app the trade did not count, and it stays taken back'
-            : 'Take back the most recent turn-in you recorded by hand'
+            : 'Take back the most recent turn-in, recorded by hand or read from an older log'
           : q.completionEvidence !== undefined
             ? EVIDENCE_UNDO[q.completionEvidence]
             : 'Nothing to take back'
@@ -170,10 +171,9 @@ function UndoButton({ title }: { title: string }): JSX.Element {
  * THE MANUAL COUNTER, which replaced a "Turned in / complete" checkbox: a turn-in is an event you
  * can have more than one of, and a checkbox can only ever say "at least one".
  *
- * "+1" records one, dated now. "-1" takes back the most recent turn-in THIS APP DID NOT READ OUT
- * OF THE LOG, and is disabled when there is no such turn-in — the log is evidence, and the next
- * snapshot would simply re-assert whatever the log still says. The hover text says that outright
- * rather than leaving a dead-looking button to be discovered.
+ * "+1" records one, dated now. "-1" takes back the most recent turn-in, whoever recorded it; one
+ * the log shows is also rejected, so the next snapshot does not put it back (upstream issue #72).
+ * The hover says which of the two the click will do.
  */
 export function TurnInCounter({
   q,
