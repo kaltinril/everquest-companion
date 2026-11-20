@@ -102,4 +102,22 @@ Opened 2026-11-20. Requirements: `../requirements/macro-editor.md`. Status at th
 
 ## Status
 
-- 2026-11-20: research done; requirements written; P0 being built on work branch `macro-editor`.
+- 2026-11-20: research done; requirements written.
+- 2026-11-20: mockup published for the owner (the usual first step: owner, "mockup first please"):
+  https://claude.ai/artifact/JkMN41trsBNEeY18EgGXUT . No answer on it yet.
+- 2026-11-20: P0 built (owner: "then you can send the agent back to building the real thing").
+  `src/shared/macros/` (pure, 24 unit tests), `src/main/ipc/macros.ts` (the library is
+  `<userData>/macros.json`; the game folder is listed and read, never written),
+  `src/renderer/src/features/macros/` (Library, Sets, Characters). The tab sits in the Config
+  group under Alerts (the app has no Tools group).
+- **Not yet seen on screen by anyone**: checked by typecheck, lint and the unit tests only. No e2e
+  spec. The main-process file has no unit test.
+- Not built in P0: removing or renaming one's own tag; dragging a macro between slots; a file
+  watcher (the game's files are read when the tab opens, when Characters opens and on "Read
+  again"); a retry button when a save fails.
+- The copied `[Socials]` text is the set alone: pasted over a file's section by hand it drops every
+  slot the set leaves empty (the table shows those as removed).
+- Parser choices not measured in game: lines are positional (a gap is kept, trailing blanks cut); a
+  slot with only a colour is empty; a colour that is not a number reads as 0; character and server
+  names hold no underscore; files are read as latin1. The pause hint (runs the command, then
+  waits, tenths of a second) is from guides for the older game.
