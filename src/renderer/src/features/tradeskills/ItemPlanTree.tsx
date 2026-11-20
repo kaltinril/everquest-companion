@@ -23,6 +23,7 @@ import { CellLink } from '../../lib/CellLink'
 import { GuideSourceLine, Have } from './MaterialWhere'
 import { WhereCell } from './RecipePanel'
 import { ItemLabel } from './tradeskillLinks'
+import { WikiGapLine } from './WikiGap'
 
 /** Material, Need, Have, Where: the recipe panel's columns. */
 const GRID_SX = {
@@ -119,9 +120,12 @@ function NodeRow({ node, setClosed }: { node: PlanNode; setClosed: SetClosed }):
 function Materials({ plan, setClosed }: { plan: PlanRecipe; setClosed: SetClosed }): JSX.Element {
   if (plan.from === 'none') {
     return (
-      <Typography variant="body2" color="text.secondary" data-testid="tradeskill-plan-no-materials">
-        {PLAN_NO_MATERIALS_TEXT}
-      </Typography>
+      <>
+        <Typography variant="body2" color="text.secondary" data-testid="tradeskill-plan-no-materials">
+          {PLAN_NO_MATERIALS_TEXT}
+        </Typography>
+        <WikiGapLine recipe={plan.recipe} />
+      </>
     )
   }
   return (
@@ -131,6 +135,8 @@ function Materials({ plan, setClosed }: { plan: PlanRecipe; setClosed: SetClosed
           {PLAN_GUIDE_MATERIALS_TEXT}
         </Typography>
       )}
+      {/* What the wiki page lacks (its materials here, or only its trivial), with the page to add it on. */}
+      <WikiGapLine recipe={plan.recipe} />
       {plan.materials.map((node) => (
         <NodeRow key={node.id} node={node} setClosed={setClosed} />
       ))}

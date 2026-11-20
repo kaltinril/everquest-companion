@@ -2123,7 +2123,8 @@ only: no engine, parser, protocol, network or dependency change.
     and the name are needed: an imbued recipe's bar is sourced "Summoned" and stays unpriced. The
     spell's own cost is not in the log and is not counted. One for one is the cost rule's reading
     and the shopping list's too.
-  - Cheapest: from the level, the recipe above it with the least cost per combine; equal costs:
+  - Cheapest (the two held tie-breaks in this bullet were removed the same day: slice 5 below):
+    from the level, the recipe above it with the least cost per combine; equal costs:
     more combines on hand, then the lower trivial. With no priced recipe above: what is held, then
     the next trivial up. TRAP for the reader: the cheapest per combine can sit far above the
     level and skip a recipe the player holds materials for. The step's `aside` names that recipe
@@ -2170,6 +2171,80 @@ only: no engine, parser, protocol, network or dependency change.
   - What's new line: "Tradeskills: a workbench now plans a route from your level for the goal you
     pick (cheapest, fastest, explore, or the community guide's), with a shopping list for the next
     step. Jewelcraft recipes now show a cost: an enchanted bar counts at the price of its bar."
+- Slice 5, held materials and wiki first (2026-11-20, branch `tradeskill-held-wiki` off the trunk;
+  not merged, not tried by the owner). TypeScript only; no engine, protocol, network, data or
+  dependency change; `security.ts` untouched. Owner rulings: "the price of the materials doesn't
+  change just because I already have them. but... you can add a 'only use materials i have'
+  option"; "WIKI is our PRIMARY source, and others are secondary. If there are issues with the
+  wiki, the users need to find out and fix the wiki".
+  - SUPERSEDES the Cheapest bullet above: Cheapest ranks on cost alone. `cheaperFirst` is cost,
+    then the lower trivial; with no priced recipe it is the next trivial up. Held counts are read
+    only for the aside ("Not picked, but on hand"). Do not put `ready` back in the order.
+  - Files: `shared/tradeskillRouteHeld.ts` (the held-only route), `tradeskillHeld.ts` (can make
+    now, whether anything says what is held, the switches' words), `tradeskillWiki.ts` (the page,
+    the gap, guide differences). Screens: `RecipeFilters.tsx` (the two table switches),
+    `WikiGap.tsx` (`WikiPageLink`, `WikiGapLine`, `GuideDifferences`).
+  - Held-only route (`RouteAsk.heldOnly`, read by Cheapest and Fastest only): candidates are
+    rated recipes above the level whose `onHand(...).ready` is at least 1 against what is LEFT of
+    the stock. Cheapest: cost, then lower trivial. Fastest: highest trivial. A step takes every
+    combine it covers and `take` removes that from the stock (a returned tool is not removed), so
+    the next step sees the rest. `handText` is "Your held materials cover N combines", with
+    "after what the steps above use" from the second step on.
+  - Strict on purpose: only a recipe's own materials count. Plain bars that a spell could enchant
+    and a made material whose parts are held do NOT qualify a recipe. A material with no stated
+    count (no dump, no depot line for it) is not held.
+  - TRAP: the count of combines is a count of materials. Nothing may say it reaches a level
+    (`HELD_NOT_MEASURED`; the NOTHING GUESSED test in `tests/tradeskillHeld.test.mts`).
+  - A held-only route can end below the wiki's top: `capTop(route)` is null for it (so "N more
+    steps, not listed" names no top) and `routeEndText` names the last listed step's trivial, or
+    nothing when steps were capped.
+  - Whether anything says what is held: `heldKnown` = an inventory dump or any depot line. False:
+    the route switch and "Can make now" are disabled with `HELD_UNKNOWN_SHORT` beside them, and no
+    mark is drawn. On Explore and Community route the route switch is disabled with
+    `HELD_ONLY_GOALS_TEXT`; the stored choice is kept.
+  - Can make now: `makeableNow(facts, recipes)` = recipe id to combines, each recipe judged alone
+    (two marked recipes may want the same material; only the route shares a stock). It does not
+    read the level. A recipe with no consumed material listed is never marked. The planner's mark
+    is `gatherHeld` (every leaf's To get is 0), so it covers sub-combines.
+  - Table switches: `LadderAsk.only` is a list of `LadderFilter` (`keep`, `emptyText`), applied
+    after the marks are set, like Hide trivial. `benchFilters(makeable | null, wikiGaps)` builds
+    it. Both switches are remembered across restarts (`eq.tradeskills.canMake`,
+    `eq.tradeskills.wikiGaps`), the section's rule for a choice; the count line says "N of M".
+  - `BookRecipe.page` (added in `main/tradeskillBook.ts`): the wiki page title, kept only when it
+    is not the item's name (122 recipes on 2026-11-20). The wiki link is
+    `wikiPageUrl(recipe.page ?? recipe.item)`, the app's one URL builder; `<a target="_blank">`
+    as on the Loot and Mobs pages. `TRADESKILL_BOOK_VERSION` unchanged (optional field).
+  - A table line's wiki link: `wikiRowLink(recipe)` = in the empty Materials cell, else beside
+    the item's name. TRAP: never in the Trivial cell. `tests/e2e/tradeskills.e2e.mts` `rows()`
+    reads that cell as a number or nothing, and its unrated-lines check wants nothing.
+  - Wiki first was already true in every fold (`recipeMaterials`, `planTree.linesOf`, the cost,
+    the shopping list read a guide list only when `recipe.ingredients` is empty); a test in
+    `tests/tradeskillWiki.test.mts` now holds it on fixtures and on the committed data.
+  - Guide differences (`guideDifferences`): the recipe guide's recipe for the same tradeskill and
+    item (materials and trivial), and the leveling guide's step for it (top-level materials only;
+    a nested sub-combine is not compared; its range is not a trivial). A list differs when a
+    shared material has another count, the guide names a real wiki item the wiki's list lacks, or
+    the leftovers differ in number or counts. A loose guide spelling alone ("Fresh Fresh") is NOT
+    a difference: it cannot be told from the wiki's own material.
+  - Measured 2026-11-20: 36 recipes have materials on both the wiki and the recipe guide; 23
+    match; 7 differ by the rule (Clump of Dough, Evergreen Extract, Fine Plate Breastplate, Fine
+    Plate Helm, Forged Javelin, Heady Kiola, Metal Bits); 6 differ only by a loose name. 5 state
+    another trivial (Fine Plate Helm, Fine Plate Visor, Metal Bits, Mithril Bundled Arrow Shafts,
+    Sheet Metal). 2 leveling guide steps differ (the two Unfired poison vials). 12 recipes in all.
+  - Seen in the data, not acted on: the wiki's Clump of Dough lists every kind of egg as its own
+    material (13 lines), so its cost and "can make" want all of them. A wiki page to fix.
+  - The guide's trivial where the wiki has none (`guideTrivialText`; Distillate of Clarity VI)
+    is said in the gap line only. The ladder still files the recipe as unrated.
+  - Missing on the wiki, 2026-11-20: 615 of 2,359 recipes (Alchemy 177, Baking 21, Blacksmithing
+    192, Brewing 26, Fishing 5, Fletching 7, Jewelcrafting 72, Poison Making 4, Pottery 8, Spell
+    Research 27, Tailoring 69, Tinkering 7). `tests/tradeskillWiki.test.mts` prints them.
+  - Tests: `tests/tradeskillHeld.test.mts`, `tradeskillWiki.test.mts`; changed
+    `tradeskillRoute.test.mts` (cost alone) and `tradeskillBook.test.mts` (`page`). e2e:
+    `tests/e2e/tradeskillHeldSteps.mts` (`stepHeldAndWiki`), called last from
+    `tradeskills.e2e.mts`; written, NOT run.
+  - What's new line: "Tradeskills: the route has Only use materials I have, recipes you can make
+    right now are marked and can be listed alone, and a recipe the wiki is missing materials or a
+    trivial for says so with a link to its wiki page."
 
 ## Tradeskill guides as data (fork #6, requirements/skills-tab.md)
 

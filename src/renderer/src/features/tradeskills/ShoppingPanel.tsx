@@ -39,6 +39,7 @@ import { useFacts } from './benchFacts'
 import { GuideSourceLine, PaidLine } from './MaterialWhere'
 import { useCombines } from './routeMemory'
 import { ItemLabel, MobLink, ZoneList } from './tradeskillLinks'
+import { WikiGapLine } from './WikiGap'
 
 /** Material, Need, Have, To buy, Where. */
 const GRID_SX = {
@@ -224,9 +225,12 @@ function HaveFrom(): JSX.Element | null {
 function ListBody({ list }: { list: ShoppingList }): JSX.Element {
   if (list.lines.length === 0) {
     return (
-      <Typography variant="body2" color="text.secondary" sx={{ py: 2 }} data-testid="tradeskill-shopping-empty">
-        {NO_LIST_TEXT}
-      </Typography>
+      <>
+        <Typography variant="body2" color="text.secondary" sx={{ pt: 2, pb: 0.5 }} data-testid="tradeskill-shopping-empty">
+          {NO_LIST_TEXT}
+        </Typography>
+        <WikiGapLine recipe={list.recipe} />
+      </>
     )
   }
   return (
@@ -236,6 +240,7 @@ function ListBody({ list }: { list: ShoppingList }): JSX.Element {
           {GUIDE_LIST_TEXT}
         </Typography>
       )}
+      {list.fromGuide && <WikiGapLine recipe={list.recipe} />}
       <ColumnHeads />
       {list.lines.map((line) => (
         <LineRow key={line.key} line={line} />

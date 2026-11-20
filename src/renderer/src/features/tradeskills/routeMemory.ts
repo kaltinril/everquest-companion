@@ -1,8 +1,10 @@
 // tradeskills/routeMemory.ts — what the route tab remembers, by the section's own rule
 // (tradeskillMemory.ts): what you CHOSE outlives a restart.
 //
-//   restart (localStorage)  the goal, per tradeskill (`eq.tradeskills.goal.<Tradeskill>`), and
-//                           the number of combines the shopping list is for
+//   restart (localStorage)  the goal, per tradeskill (`eq.tradeskills.goal.<Tradeskill>`), the
+//                           "Only use materials I have" switch, per tradeskill like the goal
+//                           (`eq.tradeskills.heldOnly.<Tradeskill>`), and the number of combines
+//                           the shopping list is for
 //
 // A stored value degrades, never errors: anything unreadable is the default (`asGoal`,
 // `asCombines`).
@@ -11,15 +13,21 @@ import { useCallback } from 'react'
 import { asGoal, type RouteGoal } from '@shared/tradeskillRoute'
 import { asCombines } from '@shared/tradeskillShopping'
 import type { Tradeskill } from '@shared/tradeskills'
-import { useRawPref } from '../combat/useCombatPrefs'
+import { useBoolPref, useRawPref } from '../combat/useCombatPrefs'
 
 const GOAL_KEY = 'eq.tradeskills.goal'
 const COMBINES_KEY = 'eq.tradeskills.combines'
+const HELD_ONLY_KEY = 'eq.tradeskills.heldOnly'
 
 /** The goal picked on one tradeskill's workbench; Cheapest until the player picks another. */
 export function useGoal(tradeskill: Tradeskill): [RouteGoal, (next: RouteGoal) => void] {
   const [raw, setRaw] = useRawPref(`${GOAL_KEY}.${tradeskill}`)
   return [asGoal(raw), setRaw]
+}
+
+/** "Only use materials I have" on one tradeskill's route; off until the player turns it on. */
+export function useHeldOnly(tradeskill: Tradeskill): [boolean, (next: boolean) => void] {
+  return useBoolPref(`${HELD_ONLY_KEY}.${tradeskill}`, false)
 }
 
 /** How many combines the shopping list is for, on every workbench. */

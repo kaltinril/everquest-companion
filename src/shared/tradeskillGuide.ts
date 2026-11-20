@@ -105,7 +105,7 @@ export function wikiNameOf(guide: Pick<GuideIndex, 'payload'>, raw: string): str
 }
 
 /** One key for a guide's name and the wiki's name of the same item. */
-function guideKey(payload: GuidePayload, raw: string): string {
+export function guideKey(payload: GuidePayload, raw: string): string {
   const key = sourceItemKey(raw)
   const wiki = payload.names[key]
   return wiki === undefined ? key : sourceItemKey(wiki)
@@ -168,15 +168,23 @@ export interface GuideMaterialLine {
 
 export const NO_GUIDE_LINES: readonly GuideMaterialLine[] = []
 
+/** The recipe guide's recipe of the same tradeskill that makes the same item, whatever the wiki lists; or null. */
+export function guideRecipeFor(guide: GuideIndex, recipe: BookRecipe): GuideRecipe | null {
+  if (recipe.tradeskill === undefined) return null
+  return guide.recipes.get(recipeSlot(recipe.tradeskill, recipe.key)) ?? null
+}
+
 /**
  * The recipe guide's materials for a recipe the wiki lists none for (Fleeting Quiver): the guide's
  * recipe of the same tradeskill that makes the same item. Empty when the wiki has its own list,
- * or the guide has no such recipe.
+ * or the guide has no such recipe. WIKI FIRST (owner, 2026-11-20: "WIKI is our PRIMARY source,
+ * and others are secondary"): a guide's list never stands in for one the wiki states, and where
+ * the two differ `tradeskillWiki.guideDifferences` says so beside the wiki's.
  */
 export function guideMaterialsFor(guide: GuideIndex, recipe: BookRecipe): readonly GuideMaterialLine[] {
-  if (recipe.ingredients.length > 0 || recipe.tradeskill === undefined) return NO_GUIDE_LINES
-  const found = guide.recipes.get(recipeSlot(recipe.tradeskill, recipe.key))
-  if (found === undefined) return NO_GUIDE_LINES
+  if (recipe.ingredients.length > 0) return NO_GUIDE_LINES
+  const found = guideRecipeFor(guide, recipe)
+  if (found === null) return NO_GUIDE_LINES
   return found.materials.map((material) => ({
     name: material.name,
     wikiName: wikiNameOf(guide, material.name),

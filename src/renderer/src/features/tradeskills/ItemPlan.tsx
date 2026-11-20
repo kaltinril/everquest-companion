@@ -7,16 +7,17 @@
 // calls them with the section's facts and lays the panels out.
 
 import { type JSX, useMemo } from 'react'
-import { Box, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material'
+import { Box, Chip, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material'
 import { recipeFacts, type BookRecipe } from '@shared/tradeskillBook'
 import { recipeGuideCreditText } from '@shared/tradeskillGuide'
 import { haveSourceText, logCountsInUse } from '@shared/tradeskillHistory'
 import { planTree, recipeCountText, recipeOptionText, treeDrawsGuide, type PlanDeps } from '@shared/tradeskillPlan'
-import { gatherFor, planHave, planPrice } from '@shared/tradeskillPlanGather'
+import { PLAN_CAN_MAKE_LABEL, gatherFor, gatherHeld, planCanMakeTip, planHave, planPrice } from '@shared/tradeskillPlanGather'
 import { skillNeeds, skillRoutes } from '@shared/tradeskillPlanLevels'
 import { withClosed, withCount, withRecipe, type PlanMemory } from '@shared/tradeskillPlanMemory'
 import OutputKindLine from '../../components/OutputKindLine'
 import { formatDate } from '../../lib/formatDate'
+import { Tooltip } from '../../lib/Tooltip'
 import { EraChip } from '../planner/PlannerChips'
 import { FactsProvider, type BenchFacts } from './benchFacts'
 import { ItemPlanGather } from './ItemPlanGather'
@@ -104,6 +105,12 @@ export function ItemPlan({ recipe, recipes, deps, facts, levels, plan, setPlan, 
         <Paper variant="outlined" sx={{ p: 1.5 }} data-testid="tradeskill-plan-head">
           <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
             <ItemLabel name={recipe.item} bold />
+            {/* Everything on the gather list is held: the same mark a recipe wears on the workbench. */}
+            {gatherHeld(gather) && (
+              <Tooltip title={planCanMakeTip(gather.count, recipe.item)}>
+                <Chip size="small" color="success" variant="outlined" label={PLAN_CAN_MAKE_LABEL} sx={{ height: 18, fontSize: 10 }} data-testid="tradeskill-plan-can-make" />
+              </Tooltip>
+            )}
             <EraChip subject={recipe} />
             <Typography variant="body2" color="text.secondary" data-testid="tradeskill-plan-facts">
               {recipeFacts(recipe, true)}

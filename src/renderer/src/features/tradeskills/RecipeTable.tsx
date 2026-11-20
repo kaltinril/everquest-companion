@@ -5,6 +5,11 @@
 // Cost, Sells and You are the player's own log (shared/tradeskillMoney.ts, tradeskillHistory.ts):
 // a cell is blank where the log states nothing.
 //
+// A recipe the player holds every material for wears "can make N" (shared/tradeskillHeld.ts). A
+// recipe the wiki lists no materials or no trivial for carries one link to its wiki page
+// (shared/tradeskillWiki.ts `wikiRowLink`, WikiGap.tsx), so a player who knows can add it there:
+// in the Materials cell the wiki left empty, else beside the item's name.
+//
 // The lines, their order and their marks are shared/tradeskillBook.ts `recipeLadder`.
 
 import { type JSX, memo, useEffect, useLayoutEffect, useRef } from 'react'
@@ -18,14 +23,17 @@ import {
   type LadderLine,
   type LadderState
 } from '@shared/tradeskillBook'
+import { canMakeLabel, canMakeTip } from '@shared/tradeskillHeld'
 import { historyWords, recipeHistory, type CraftBook } from '@shared/tradeskillHistory'
 import { COST_TIP, SELLS_TIP, YOU_TIP, costCell, sellsCell, type MoneyBook } from '@shared/tradeskillMoney'
+import { NO_WIKI_MATERIALS_CELL, WIKI_CELL_LINK, wikiRowLink } from '@shared/tradeskillWiki'
 import { Tooltip } from '../../lib/Tooltip'
 import { parkReturn } from '../../lib/navReturn'
 import { useWindowedRows } from '../../lib/useWindowedRows'
 import { EraChip } from '../planner/PlannerChips'
 import { NoticeChip } from './RecipeYou'
 import { ItemLabel, ItemLink } from './tradeskillLinks'
+import { WikiPageLink } from './WikiGap'
 
 export const ROW_HEIGHT = 36
 const COLUMNS = 7
@@ -55,6 +63,27 @@ export function StateChip({ state }: { state: LadderState }): JSX.Element | null
   )
 }
 
+/** The mark of a recipe the held materials cover: "can make 23". Nothing for a count of 0. */
+export function CanMakeChip({ combines }: { combines: number }): JSX.Element | null {
+  if (combines <= 0) return null
+  return (
+    <Tooltip title={canMakeTip(combines)}>
+      <Chip size="small" color="success" variant="outlined" label={canMakeLabel(combines)} sx={CHIP_SX} data-testid="tradeskill-can-make-chip" />
+    </Tooltip>
+  )
+}
+
+/** A line's link to its wiki page, drawn in the one place `wikiRowLink` names; nothing elsewhere or with no gap. */
+function RowWikiLink({ recipe, place }: { recipe: BookRecipe; place: 'materials' | 'item' }): JSX.Element | null {
+  const link = wikiRowLink(recipe)
+  if (link?.place !== place) return null
+  return (
+    <Typography variant="caption" component="span" color="text.secondary" sx={{ flexShrink: 0 }}>
+      <WikiPageLink recipe={recipe} label={WIKI_CELL_LINK} tip={link.tip} />
+    </Typography>
+  )
+}
+
 function Material({ ingredient, first }: { ingredient: BookIngredient; first: boolean }): JSX.Element {
   const words = sourceWords(ingredient)
   return (
@@ -74,6 +103,13 @@ function Material({ ingredient, first }: { ingredient: BookIngredient; first: bo
 
 /** Every material on one line, cut off with the whole list on hover; the panel has them in full. */
 function MaterialsCell({ recipe }: { recipe: BookRecipe }): JSX.Element {
+  if (recipe.ingredients.length === 0) {
+    return (
+      <TableCell sx={{ ...CUT_SX, color: 'text.secondary' }} data-testid="tradeskill-row-no-materials">
+        {NO_WIKI_MATERIALS_CELL} <RowWikiLink recipe={recipe} place="materials" />
+      </TableCell>
+    )
+  }
   return (
     <TableCell sx={CUT_SX} title={materialsText(recipe)}>
       {recipe.ingredients.map((ingredient, i) => (
@@ -112,9 +148,11 @@ interface RowProps {
   picked: boolean
   onPick: (id: string) => void
   log: RowLog
+  /** Combines the held materials cover; 0 for none, or when nothing says what is held. */
+  canMake: number
 }
 
-const RecipeRow = memo(function RecipeRow({ recipe, state, picked, onPick, log }: RowProps): JSX.Element {
+const RecipeRow = memo(function RecipeRow({ recipe, state, picked, onPick, log, canMake }: RowProps): JSX.Element {
   const money = log.money.of(recipe)
   return (
     <TableRow
@@ -132,7 +170,9 @@ const RecipeRow = memo(function RecipeRow({ recipe, state, picked, onPick, log }
         <Stack direction="row" spacing={0.75} alignItems="center" sx={{ flexWrap: 'nowrap', minWidth: 0 }}>
           <ItemLabel name={recipe.item} bold={state === 'next'} />
           <StateChip state={state} />
+          <CanMakeChip combines={canMake} />
           <EraChip subject={recipe} />
+          <RowWikiLink recipe={recipe} place="item" />
         </Stack>
       </TableCell>
       <TableCell sx={CUT_SX}>{recipe.container ?? ''}</TableCell>
@@ -222,6 +262,8 @@ export interface RecipeTableProps {
   parkOnLeave?: () => boolean
   /** The player's combines and prices for the Cost, Sells and You cells. */
   log: RowLog
+  /** By recipe `id`: the combines the held materials cover, for the recipes that can be made now. */
+  makeable: ReadonlyMap<string, number>
 }
 
 /**
@@ -246,7 +288,7 @@ function usePlacement(scrollRef: React.RefObject<HTMLDivElement | null>, p: Reci
 }
 
 export function RecipeTable(p: RecipeTableProps): JSX.Element {
-  const { lines, pickedId, onPick, parkAs, parkOnLeave, log } = p
+  const { lines, pickedId, onPick, parkAs, parkOnLeave, log, makeable } = p
   const scrollRef = useRef<HTMLDivElement>(null)
   const win = useWindowedRows({ count: lines.length, rowHeight: ROW_HEIGHT, scrollRef })
   usePlacement(scrollRef, p)
@@ -279,6 +321,7 @@ export function RecipeTable(p: RecipeTableProps): JSX.Element {
                 picked={line.recipe.id === pickedId}
                 onPick={onPick}
                 log={log}
+                canMake={makeable.get(line.recipe.id) ?? 0}
               />
             ) : (
               <UnratedHeading key="unrated-heading" count={line.count} />
