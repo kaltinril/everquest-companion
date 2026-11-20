@@ -17,7 +17,7 @@
 //! ever.
 
 use std::collections::BTreeMap;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::sync::{Arc, Mutex};
@@ -209,6 +209,9 @@ struct Fold {
     clock_source: Option<PerfSnapshotResultClockSource>,
     /// The live tail's own skew reading. See [`FoldMark::skew_ms`].
     clock_skew_ms: Option<i64>,
+    /// The log file's last-modified time as the ingest last saw it. See
+    /// [`World::report_log_mtime`]. A file fact that rides here and is folded by nothing.
+    log_mtime_ms: Option<i64>,
 }
 
 /// One measurement of an ingest, as the ingest thread hands it to the world.
@@ -246,24 +249,6 @@ pub struct FoldMark {
     ///
     /// It goes on the wire as `FoldProgress.live`, present only when true — see that field.
     pub live: bool,
-}
-
-/// One file's last-modified time, in epoch milliseconds, or `None` when there is no answer.
-///
-/// The server owns log-file facts, so the reading lives here rather than app-side. This is the
-/// whole of the reading.
-///
-/// Every failure is `None`, and that is the honest answer: a missing file, a permission refusal, a
-/// filesystem with no modification time and a stamp before the epoch are four reasons and one
-/// outcome — this engine cannot state the fact. `0` would claim 1970, which a client would draw as
-/// a real date beside a real character name.
-///
-/// Truncated, not rounded, so it equals `Math.floor(statSync(log).mtimeMs)`: Node reports the same
-/// NTFS stamp as a float with sub-millisecond digits, and the schema field is an integer.
-fn mtime_ms(log: &Path) -> Option<i64> {
-    let modified = std::fs::metadata(log).ok()?.modified().ok()?;
-    let since = modified.duration_since(std::time::UNIX_EPOCH).ok()?;
-    i64::try_from(since.as_millis()).ok()
 }
 
 /// What the fold has consumed, as a coordinate the caller can name.
@@ -552,16 +537,16 @@ impl World {
     /// attach, and absent is not zero: publishing `offset: 0` would be a measurement nobody took.
     /// The discriminator is the log, which the world knows from the instant an attach is accepted.
     ///
-    /// `logMtimeMs` is not a fold fact at all, and three properties of it are deliberate. It is
-    /// re-stated per answer, never remembered, because a remembered mtime is wrong the moment the
-    /// game appends a line. It never enters fold state — a module that folded an mtime would be a
-    /// module whose output depended on when it ran. And the stat happens with the lock released,
-    /// because a filesystem call is unbounded and this lock is on the path of every `report_*` the
-    /// ingest makes; the state is copied out first and the stat is made against the copy.
+    /// `logMtimeMs` is not a fold fact at all, and three properties of it are deliberate. It is the
+    /// reader's last look at the file ([`World::report_log_mtime`]), under a second old while the
+    /// reader is moving, absent until the reader has looked and when its last look failed. It is
+    /// never folded — a module that folded an mtime would be a module whose output depended on
+    /// when it ran. And NO FILESYSTEM CALL IS MADE HERE: a stat on a dropped share can block for
+    /// longer than the app's health probe waits, and two missed probes end a healthy engine.
     #[must_use]
     pub fn health(&self) -> HealthResult {
         // The lock is taken and released in this block, and everything below is a function of the
-        // copy — see the note above about statting outside it.
+        // copy.
         let (status, epoch, fold) = {
             let state = self.lock();
             (state.status, state.epoch, state.fold.clone())
@@ -582,10 +567,10 @@ impl World {
             // has folded nothing yet, or whose events carried no stamp the parser could read,
             // honestly has no log clock to report.
             last_event_ts: fold.last_ts,
-            // The file fact. Absent before an attach because there is no file, and absent when the
-            // stat fails because a log renamed out from under the engine has no answer — `0` would
-            // claim 1970 rather than admit the miss.
-            log_mtime_ms: fold.log.as_deref().and_then(mtime_ms),
+            // The file fact, as the reader last saw it. Absent before an attach because there is no
+            // file, and absent when the reader's look found none: a log renamed out from under
+            // the engine has no answer — `0` would claim 1970 rather than admit the miss.
+            log_mtime_ms: fold.log_mtime_ms,
             mark,
         }
     }
@@ -1396,6 +1381,18 @@ impl World {
         true
     }
 
+    /// The log file's last-modified time, as the ingest thread just saw it, or `None` when its look
+    /// found no file. Every stat of the log is made on that thread and handed in here, so
+    /// [`World::health`] never waits on a disk (`ingest/looks.rs`).
+    pub fn report_log_mtime(&self, generation: u64, modified_ms: Option<i64>) -> bool {
+        let mut state = self.lock();
+        if !self.owns(generation) {
+            return false;
+        }
+        state.fold.log_mtime_ms = modified_ms;
+        true
+    }
+
     /// Announce one measurement of the fold to every connection.
     ///
     /// The frame is an `EpochMessage` carrying `progress` — the schema says in as many words that
@@ -1787,6 +1784,35 @@ mod tests {
         assert_eq!(*health.epoch, 1);
         assert_eq!(world.mark().checkpoint, 0);
         assert!(world.mark().log.is_none());
+    }
+
+    /// `session.health` answers from memory. The log's time is the reader's last report and no
+    /// file is looked at here, whether it is there or not: a stat that hangs on a dead drive made
+    /// the app's probe time out and a healthy engine was ended for it.
+    #[test]
+    fn health_reports_the_readers_last_look_and_never_asks_the_disk() {
+        // A real file, so a health answer that asked the disk would have a time for it.
+        let real = std::env::temp_dir().join(format!("engined-world-{}.txt", std::process::id()));
+        std::fs::write(&real, b"x").expect("a scratch file");
+        let world = world();
+        assert_eq!(world.health().log_mtime_ms, None, "no log, no time");
+        world.attach(&real.to_string_lossy(), None, eqlog::ZoneHint::default());
+        let turn = generation(&world);
+        assert_eq!(world.health().log_mtime_ms, None, "the reader has not looked yet");
+
+        // The file goes and the recorded look still stands: the disk is not asked.
+        std::fs::remove_file(&real).expect("the scratch file goes");
+        assert!(world.report_log_mtime(turn, Some(1_787_181_707_123)));
+        assert_eq!(world.health().log_mtime_ms, Some(1_787_181_707_123));
+        assert!(world.report_log_mtime(turn, None));
+        assert_eq!(world.health().log_mtime_ms, None, "a look that found no file");
+
+        // A new attach is a new read: the old stamp is dropped and the old turn can state no other.
+        assert!(world.report_log_mtime(turn, Some(7)));
+        world.attach(A_LOG, None, eqlog::ZoneHint::default());
+        assert_eq!(world.health().log_mtime_ms, None);
+        assert!(!world.report_log_mtime(turn, Some(8)));
+        assert_eq!(world.health().log_mtime_ms, None);
     }
 
     #[test]

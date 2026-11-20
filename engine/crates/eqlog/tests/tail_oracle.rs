@@ -607,6 +607,25 @@ fn the_handoff_from_a_scan_reads_the_bytes_that_arrived_during_it() {
     assert_eq!(late.poll(|_| {}).unwrap().bytes, 0);
 }
 
+/// The file's modified time rides the poll's own stat: the engine reports it without a second call.
+#[test]
+fn a_polls_stats_carry_the_files_modified_time() {
+    let scratch = Scratch::new("modified");
+    let path = scratch.log();
+    let mut tail = FileTail::open(&path, TailStart::FromStart);
+    let absent = tail.poll(|_| {}).unwrap();
+    assert!(absent.missing);
+    assert_eq!(absent.modified_ms, None, "no file, no time: never a zero");
+
+    append(&path, b"[Wed Aug 19 16:00:00 2026] one.\n");
+    let truth = eqlog::tail::modified_ms(&std::fs::metadata(&path).unwrap());
+    assert!(truth.is_some_and(|ms| ms > 1_600_000_000_000), "{truth:?}");
+    assert_eq!(tail.poll(|_| {}).unwrap().modified_ms, truth);
+    // An idle poll still looks at the file, so it still says when it was last written.
+    let idle = tail.poll(|_| panic!("nothing new")).unwrap();
+    assert_eq!((idle.bytes, idle.modified_ms), (0, truth));
+}
+
 #[test]
 fn eof_start_reads_only_what_the_game_writes_next() {
     let scratch = Scratch::new("eof");

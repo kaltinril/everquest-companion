@@ -32,7 +32,9 @@ use crate::world::{FoldMark, World};
 use crate::{clock, spawn::DIAGNOSTIC_PREFIX};
 
 mod kept;
+mod looks;
 mod nap;
+use looks::Looks;
 use nap::{nap, Quiet};
 
 /// How many bytes one scan read asks for.
@@ -903,7 +905,10 @@ fn run(world: &World, generation: u64, attach: &Attach, sinks: &SinkFactory) -> 
     }
 
     let mut file = File::open(log)?;
-    let size = file.metadata()?.len();
+    let opened = file.metadata()?;
+    let size = opened.len();
+    // The file's time is the reader's to report: `session.health` never asks the disk (`looks.rs`).
+    let mut looks = Looks::opened(world, generation, &opened);
 
     if !world.report_status(generation, HealthResultStatus::Folding) {
         return Ok(Ended::Preempted);
@@ -969,6 +974,7 @@ fn run(world: &World, generation: u64, attach: &Attach, sinks: &SinkFactory) -> 
         // honest reading of a full-set replace: it is a fact about the world from here on, and the
         // events already folded were folded under what the user had said at the time.
         answer_writes(&writes, &mut *sink, &mut serving);
+        looks.scanning(world, generation, &file);
     }
 
     // The final measurement is not optional and does not ask the cadence. It is the one frame that
@@ -1049,6 +1055,7 @@ fn run(world: &World, generation: u64, attach: &Attach, sinks: &SinkFactory) -> 
                 seq += 1;
             }
         });
+        looks::polled(world, generation, &polled);
         // When the fold produced what the next frame will report. Read once, at the end of the
         // drain that produced it — the origin of the fold-to-frame measurement, and the one number
         // that cannot be recovered later. A drain that folded nothing sets nothing, so a frame with
@@ -1472,6 +1479,9 @@ mod tests {
     use std::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
     use std::sync::{Arc, Condvar, Mutex};
     use std::time::{Duration, Instant};
+
+    /// The file under a running read: its time, and a log cut or replaced (`tests/looks.rs`).
+    mod looks;
 
     #[test]
     fn the_character_comes_off_the_products_own_file_name() {

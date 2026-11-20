@@ -243,6 +243,17 @@ pub struct PollStats {
     /// The path did not exist at all this cycle. Not an error: the game may not have made the file
     /// yet, and a rotation is exactly this followed by an `add`.
     pub missing: bool,
+    /// The file's last-modified time as this poll's one `metadata` call saw it, in epoch
+    /// milliseconds; `None` when the path was missing. A file fact for the caller to report, never
+    /// to fold.
+    pub modified_ms: Option<i64>,
+}
+
+/// A file's last-modified time in epoch milliseconds, truncated, so it equals
+/// `Math.floor(statSync(log).mtimeMs)`. `None` when the filesystem has no answer: 0 would claim 1970.
+pub fn modified_ms(meta: &std::fs::Metadata) -> Option<i64> {
+    let since = meta.modified().ok()?.duration_since(std::time::UNIX_EPOCH);
+    i64::try_from(since.ok()?.as_millis()).ok()
 }
 
 /// A coordinate: which log, and how far into it the emitted lines reach. Every cache key over tail
@@ -339,7 +350,10 @@ impl FileTail {
         let mut stats = PollStats::default();
 
         let size = match std::fs::metadata(&self.path) {
-            Ok(m) => m.len(),
+            Ok(m) => {
+                stats.modified_ms = modified_ms(&m);
+                m.len()
+            }
             Err(e) if e.kind() == io::ErrorKind::NotFound => {
                 self.vanished = true;
                 stats.missing = true;

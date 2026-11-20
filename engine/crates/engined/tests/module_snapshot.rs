@@ -517,7 +517,7 @@ fn health_carries_the_mark_once_the_fold_is_live() {
     assert_eq!(
         live.log_mtime_ms,
         Some(truth),
-        "the engine stats the log it owns and serves what the filesystem says"
+        "the engine's reader stats the log it owns and health serves what the filesystem said"
     );
     // …and it is not the log's own clock: two kinds of fact share a health answer and a reader must
     // not be able to mistake one for the other.
@@ -527,8 +527,9 @@ fn health_carries_the_mark_once_the_fold_is_live() {
         "the file's stamp is not the log's last event"
     );
 
-    // And it is refreshed per answer, never remembered: the game writes a line and the very next
-    // health answer says so, with no attach and no re-fold in between.
+    // And it follows the file: the game writes a line and a health answer within a poll of the
+    // tail says so, with no attach and no re-fold in between. The answer itself asks the disk
+    // nothing — it is the reader's last look (`ingest/looks.rs`).
     let before = live.log_mtime_ms.expect("a served mtime");
     // The filesystem's mtime granularity is coarser than this loop, so the append has to be worth a
     // tick of it.
