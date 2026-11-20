@@ -91,6 +91,18 @@ export function parseHandCount(text: string): number | null {
   return count > MAX_OVERRIDE_COUNT ? null : count
 }
 
+/** What the pencil's box says when it will not take what was typed. */
+export const HAND_COUNT_PROBLEM = `Whole number, 0 to ${MAX_OVERRIDE_COUNT.toLocaleString('en-US')}`
+
+/**
+ * Why the pencil's box will not take `text`, or null when it will: a count `parseHandCount` reads,
+ * or a blank box (a changed mind, which closes the box). Before 2026-11-19 a count out of range
+ * closed the box, changed nothing and said nothing.
+ */
+export function handCountProblem(text: string): string | null {
+  return text.trim() !== '' && parseHandCount(text) === null ? HAND_COUNT_PROBLEM : null
+}
+
 /** Clean one statement, or reject it. Anything unusable is dropped rather than thrown over — a
  *  hand-edited store must not take the character's whole progress record down with it. */
 export function sanitizeItemOverride(value: unknown): ItemCountOverride | null {

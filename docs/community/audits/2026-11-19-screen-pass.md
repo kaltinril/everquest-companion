@@ -310,7 +310,8 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   tests/skyRecordedTurnInCounts.test.mts, against the real reconcile through the existing
   held()/moves() helpers. 1. Check that moves('both', true) is false: a dump of 5 vouches for the
   item and the '+' ...
-- NOT RE-CHECKED [medium, confusing] Typing 100000 (or -5) in the pencil box and pressing Enter
+- FIXED 2026-11-19 (re-checked in the code: the commit dropped an out-of-range count and closed the
+  box; the box now stays open and says "Whole number, 0 to 99,999", `handCountProblem`) [medium, confusing] Typing 100000 (or -5) in the pencil box and pressing Enter
   closes the box, changes nothing and says nothing Seen: Input value '100000': validity.valid true,
   validationMessage '', aria-invalid 'false', no max attribute (min=0, step=1). After Enter: editor
   gone, row still 'x3' (or 'x99999 By hand: 99999'), tab text byte-identical before and after, no

@@ -117,6 +117,8 @@ const POPPER = '.MuiTooltip-popper'
 const ROW_EDIT = `${ROW} [data-testid="posky-item-count-edit"]`
 const ROW_INPUT = `${ROW} [data-testid="posky-item-count-input"] input`
 const ROW_SAVE = `${ROW} [data-testid="posky-item-count-save"]`
+/** What the pencil's box says when it will not take the count typed. */
+const ROW_PROBLEM = '[data-testid="posky-cleanup"] [data-testid="posky-item-count-problem"]'
 const OVERRIDE_CLEAR = '[data-testid="posky-item-override"] .MuiChip-deleteIcon'
 const OVERRIDES_ACTIVE = '[data-testid="posky-overrides-active"]'
 /** The take-back chips for rows a hand count took off the table, INSIDE the list's own scroller. */
@@ -522,6 +524,11 @@ async function stepHandCountOnTheRow(page: Page): Promise<boolean> {
     { timeoutMs: 15_000 }
   )
   check('the Cleanup row`s pencil opens on the held count', filled === '3', String(filled))
+  // A count out of range used to close the box, change nothing and say nothing.
+  await page.fill(ROW_INPUT, '100000')
+  await page.click(ROW_SAVE, { timeout: 15_000 })
+  const said = await settle(() => page.innerText(ROW_PROBLEM).catch(() => ''), (t) => t !== '', { timeoutMs: 10_000 })
+  check('a count the box cannot take keeps the box open and says why', said.includes('0 to 99,999') && (await page.inputValue(ROW_INPUT).catch(() => null)) === '100000', said)
   await page.fill(ROW_INPUT, '0')
   await page.click(ROW_SAVE, { timeout: 15_000 })
   const gone = await settleCountOf(page, null)

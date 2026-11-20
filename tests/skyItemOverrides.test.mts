@@ -47,6 +47,8 @@ import {
   clearItemOverride,
   itemOverrideInstants,
   itemOverridesByKey,
+  HAND_COUNT_PROBLEM,
+  handCountProblem,
   parseHandCount,
   sanitizeItemOverride,
   sanitizeItemOverrides
@@ -134,6 +136,16 @@ test('a statement the store cannot keep leaves the one already made in place', (
   assert.deepEqual(applyItemOverride(list, { ...later, count: Number.NaN }), list)
   // And a usable one still replaces it.
   assert.equal(itemOverridesByKey(applyItemOverride(list, { ...later, count: 5 }))[claw].count, 5)
+})
+
+test('a count the pencil`s box cannot take is said, and a blank box is not a problem', () => {
+  // Before 2026-11-19 these closed the box, changed nothing and said nothing.
+  for (const bad of ['100000', '1e5', '-5', '-0.5', 'abc']) assert.equal(handCountProblem(bad), HAND_COUNT_PROBLEM, bad)
+  for (const fine of ['', '   ', '0', ' 3 ', '2.9', '1e3', String(MAX_OVERRIDE_COUNT)]) assert.equal(handCountProblem(fine), null, fine)
+  // The sentence names the range the store keeps.
+  assert.equal(HAND_COUNT_PROBLEM, 'Whole number, 0 to 99,999')
+  // Whatever is not a problem and not blank is a count the box commits.
+  for (const fine of ['0', ' 3 ', '2.9', '1e3']) assert.notEqual(parseHandCount(fine), null, fine)
 })
 
 test('what is typed in the pencil`s box: a whole count in range, or nothing at all', () => {

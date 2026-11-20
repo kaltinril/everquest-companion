@@ -28,7 +28,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import EditIcon from '@mui/icons-material/Edit'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import type { ItemCountOverride } from '@shared/types'
-import { parseHandCount } from '@shared/itemOverrides'
+import { handCountProblem, parseHandCount } from '@shared/itemOverrides'
 import type { ItemProgress } from './useProgress'
 // The one caveat that belongs in this cell without being about a statement (JOS-409) — see below.
 import { DUMP_BLIND_ITEM_NOTE, isDumpBlindItem } from './dumpBlindItems'
@@ -83,42 +83,53 @@ export function OverrideChip({
  *  one-field form that can only be finished with the mouse is a form nobody finishes. */
 function CountEditor({
   value,
+  problem,
   onValue,
   onCommit,
   onCancel
 }: {
   value: string
+  /** Why the last commit was refused, or null. The box stays open while this is said. */
+  problem: string | null
   onValue: (v: string) => void
   onCommit: () => void
   onCancel: () => void
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={0.25} alignItems="center">
-      <TextField
-        size="small"
-        type="number"
-        autoFocus
-        data-testid="posky-item-count-input"
-        label="I hold"
-        value={value}
-        onChange={(e) => onValue(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') onCommit()
-          if (e.key === 'Escape') onCancel()
-        }}
-        slotProps={{ htmlInput: { min: 0, step: 1, style: { width: 56, padding: '4px 6px' } } }}
-      />
-      <IconButton
-        size="small"
-        data-testid="posky-item-count-save"
-        title="Use this count from now on"
-        onClick={onCommit}
-      >
-        <CheckIcon fontSize="inherit" />
-      </IconButton>
-      <IconButton size="small" data-testid="posky-item-count-cancel" title="Leave the count alone" onClick={onCancel}>
-        <CloseIcon fontSize="inherit" />
-      </IconButton>
+    <Stack spacing={0.25} alignItems="flex-start">
+      <Stack direction="row" spacing={0.25} alignItems="center">
+        <TextField
+          size="small"
+          type="number"
+          autoFocus
+          error={problem !== null}
+          data-testid="posky-item-count-input"
+          label="I hold"
+          value={value}
+          onChange={(e) => onValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') onCommit()
+            if (e.key === 'Escape') onCancel()
+          }}
+          slotProps={{ htmlInput: { min: 0, step: 1, style: { width: 56, padding: '4px 6px' } } }}
+        />
+        <IconButton
+          size="small"
+          data-testid="posky-item-count-save"
+          title="Use this count from now on"
+          onClick={onCommit}
+        >
+          <CheckIcon fontSize="inherit" />
+        </IconButton>
+        <IconButton size="small" data-testid="posky-item-count-cancel" title="Leave the count alone" onClick={onCancel}>
+          <CloseIcon fontSize="inherit" />
+        </IconButton>
+      </Stack>
+      {problem !== null && (
+        <Typography variant="caption" color="error" role="alert" data-testid="posky-item-count-problem" sx={{ whiteSpace: 'nowrap' }}>
+          {problem}
+        </Typography>
+      )}
     </Stack>
   )
 }
@@ -181,14 +192,28 @@ export function HandCountCell({
 }): JSX.Element {
   const [editing, setEditing] = useState(false)
   const [text, setText] = useState('')
+  const [problem, setProblem] = useState<string | null>(null)
   const commit = (): void => {
+    // A count the box cannot take keeps the box open and says why. Blank is a changed mind.
+    const why = handCountProblem(text)
+    setProblem(why)
+    if (why !== null) return
     const n = parseHandCount(text)
     if (n !== null) onSetItemCount?.(name, n)
     setEditing(false)
   }
   if (editing && onSetItemCount) {
     return (
-      <CountEditor value={text} onValue={setText} onCommit={commit} onCancel={() => setEditing(false)} />
+      <CountEditor
+        value={text}
+        problem={problem}
+        onValue={(v) => {
+          setText(v)
+          setProblem(null)
+        }}
+        onCommit={commit}
+        onCancel={() => setEditing(false)}
+      />
     )
   }
   return (
@@ -204,6 +229,7 @@ export function HandCountCell({
           title="Set how many you hold when the log and export are wrong."
           onClick={() => {
             setText(String(held))
+            setProblem(null)
             setEditing(true)
           }}
         >
