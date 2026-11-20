@@ -364,6 +364,32 @@ fn a_second_price_right_after_the_first_is_a_guess() {
     );
 }
 
+/// Found on the owner's log, 2026-11-19: "WTB Bone Chips 1k per 100 300 for white dragon hide"
+/// counted the hide at 100,300pp. A price before the item is held to the same rule as one after
+/// it: with no unit it is a guess.
+#[test]
+fn a_price_before_the_item_with_no_unit_is_a_guess() {
+    assert_eq!(sure("paying 400 for fleeting quiver"), [false]);
+    assert_eq!(
+        sure("WTB Bone Chips 1k per 100 300 for Fleeting Quiver"),
+        [true, false]
+    );
+    assert_eq!(
+        sure("WTS 300 each: Fleeting Quiver | Rain Caller"),
+        [false, false]
+    );
+    // With its unit it counts, and so does the next item's own price.
+    assert_eq!(sure("paying 15k for fleeting quiver"), [true]);
+    assert_eq!(
+        sure("WTS 400 for Fleeting Quiver, Rain Caller 6k"),
+        [false, true]
+    );
+    assert_eq!(
+        sure("WTS 3k each: Fleeting Quiver | Rain Caller"),
+        [true, true]
+    );
+}
+
 /// A price of nothing is no price: the offer is listed with none, never counted at 0.
 #[test]
 fn a_zero_price_is_no_price() {

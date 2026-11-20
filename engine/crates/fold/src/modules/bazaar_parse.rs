@@ -154,6 +154,8 @@ struct Parser<'a> {
     lead_price: Option<f64>,
     /// `lead_price` stood before "for", so it prices the one item after it ("5k for A, B 3k").
     lead_once: bool,
+    /// `lead_price` has no unit, so the offers it prices are a guess.
+    lead_bare: bool,
     pending_qty: Option<u32>,
     /// Index into `out` of the offer the next tier, count or price belongs to.
     last: Option<usize>,
@@ -232,7 +234,7 @@ impl<'a> Parser<'a> {
             qty: self.pending_qty.take(),
             price_pp: lead,
             each: lead.is_some(),
-            sure: true,
+            sure: lead.is_none() || !self.lead_bare,
         });
         self.starts.push(i);
         self.last = Some(self.out.len() - 1);
@@ -426,6 +428,7 @@ impl<'a> Parser<'a> {
         if for_item {
             self.lead_price = Some(pp);
             self.lead_once = true;
+            self.lead_bare = bare;
             return;
         }
         let Some(last) = self.last else {
@@ -433,6 +436,7 @@ impl<'a> Parser<'a> {
             if each {
                 self.lead_price = Some(pp);
                 self.lead_once = false;
+                self.lead_bare = bare;
             }
             return;
         };
@@ -517,6 +521,7 @@ fn parse_tokens(t: Vec<Tok>, ix: &ItemIndex) -> Vec<Offer> {
         dir: None,
         lead_price: None,
         lead_once: false,
+        lead_bare: false,
         pending_qty: None,
         last: None,
         fresh: true,
