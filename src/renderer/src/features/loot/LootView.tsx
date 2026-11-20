@@ -37,7 +37,7 @@ import type { ZoneShort } from '@shared/maps'
 import type { NavBack } from '../../appRouting'
 import type { MobTarget } from '../mobs/mobTarget'
 import { useBackTarget } from '../../appBack'
-import { noteBack } from '../../lib/navReturn'
+import { noteBack, parkReturn, takeReturn } from '../../lib/navReturn'
 import { useWindowedRows } from '../../lib/useWindowedRows'
 import { itemCountKey } from '../../lib/itemName'
 import type { InventoryRow } from '../inventory/reconcile'
@@ -156,7 +156,17 @@ function useLootDetail(
   scrollRef: React.RefObject<HTMLDivElement | null>
 ): LootDetail {
   const { focusItem, focusNonce, onFocusConsumed } = props
-  const [selected, setSelected] = useState<string | null>(null)
+  // THE ITEM PAGE COMES BACK WITH THE TAB (lib/navReturn.ts, MobsView's arrangement): the page is
+  // parked whenever this view leaves the screen and taken only when a Back that says so brought it
+  // back. The one such Back today is the Tradeskills section's (the crafted note's link goes
+  // there), so `Back to Loot` lands on the item the reader left and not on the ledger. Every other
+  // arrival, the nav row and the mob page's Back included, opens exactly as before.
+  const [selected, setSelected] = useState<string | null>(() => takeReturn('loot') as string | null)
+  const selectedRef = useRef(selected)
+  useEffect(() => {
+    selectedRef.current = selected
+  }, [selected])
+  useEffect(() => () => parkReturn('loot', selectedRef.current), [])
   const savedScroll = useRef(0)
 
   // An inbound focus opens the detail pane, then is consumed. Keyed on the NONCE, not the item's
