@@ -7,6 +7,7 @@ import { aaPace, type AaPace } from '@shared/aaPace'
 // because those two really are questions about the level-up record.
 import { useStatedLevel } from './useStatedLevel'
 import { useModule } from '../../lib/useModule'
+import { LogReadInline } from '../../components/LogReadInline'
 import { peakLevel, swapCount, type LevelSegment } from './levelSeries'
 // Every fold over the `leveling` snapshot — see that file's header for why they left this one.
 import { useLevelingSeries } from './useLevelingSeries'
@@ -471,7 +472,8 @@ export default function LevelingView({
   onFocusConsumed,
   onOpenLoot
 }: LevelingViewProps): JSX.Element {
-  const state = useModule<LevelingSnap>('leveling') ?? EMPTY_LEVELING
+  const snap = useModule<LevelingSnap>('leveling')
+  const state = snap ?? EMPTY_LEVELING
   const { aaSpends: spends } = state
   // The SECOND module this view reads: the capped, range-queryable analytics series behind
   // the zone bands and the range panel. Deliberately separate from `leveling`, whose
@@ -619,9 +621,11 @@ export default function LevelingView({
               custom={custom}
             />
           ) : (
-            <Typography color="text.secondary" sx={{ p: 2 }} data-testid="leveling-empty">
-              No level-ups or AA gains found in this character&apos;s log yet. They&apos;ll appear here live as you play.
-            </Typography>
+            <LogReadInline module="leveling" served={snap !== null} sx={{ p: 2 }}>
+              <Typography color="text.secondary" sx={{ p: 2 }} data-testid="leveling-empty">
+                No level-ups or AA gains found in this character&apos;s log yet. They&apos;ll appear here live as you play.
+              </Typography>
+            </LogReadInline>
           )}
 
           {/* ONE MOUNT SITE, AND IT IS THE BOTTOM OF THE LEFT COLUMN (JOS-300, owner directive

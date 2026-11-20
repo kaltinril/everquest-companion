@@ -21,6 +21,7 @@ import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined'
 import type { ActiveBuff, BuffsSnap, MessageOverlay, OverlayVerdict } from '@shared/types'
 import { MESSAGE_OVERLAY_MODULE } from '@shared/buffsMessageOverlay'
 import { useModule } from '../../lib/useModule'
+import { LogReadInline } from '../../components/LogReadInline'
 import { useBoolPref } from '../combat/useCombatPrefs'
 import { ActiveRow } from './ActiveBuffRow'
 import { groupKey, groupLabel } from './format'
@@ -289,7 +290,8 @@ function AllowModeSwitch({ optIn, onChange }: { optIn: boolean; onChange: (v: bo
 }
 
 export default function BuffsView(): JSX.Element {
-  const snap = useModule<BuffsSnap>('buffs') ?? EMPTY_BUFFS
+  const served = useModule<BuffsSnap>('buffs')
+  const snap = served ?? EMPTY_BUFFS
   // The countdown clock lives in ActiveSection, with the cards that read it.
 
   // HIDDEN BY DEFAULT (JOS-215) — a display filter over the snapshot, never a request to the
@@ -359,9 +361,11 @@ export default function BuffsView(): JSX.Element {
           onToggle={() => setShowPermanent(!showPermanent)}
         />
         {active.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">
-            No active buffs.
-          </Typography>
+          <LogReadInline module="buffs" served={served !== null}>
+            <Typography variant="body2" color="text.secondary">
+              No active buffs.
+            </Typography>
+          </LogReadInline>
         ) : (
           <ActiveSection groups={activeGroups} />
         )}

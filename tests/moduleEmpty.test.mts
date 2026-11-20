@@ -10,7 +10,8 @@ import {
   LOG_READ_TRY,
   LOG_READ_WORDS,
   emptyOrWaiting,
-  inlineDue
+  inlineDue,
+  tabLineText
 } from '../src/shared/logReadWords'
 import type { LogReadFacts } from '../src/shared/logReadReport'
 import { error, health, report, NOW } from './logReadFactsHarness.mts'
@@ -55,6 +56,14 @@ test('A MODULE WHOSE REPLY WAS TOO LARGE says so on its own tab, and only on its
   // With the archive already on, the tab does not say to turn it on.
   const on = report({ ...LIVE, tooLargeModules: ['loot'], archiveOn: true })
   assert.deepEqual(emptyOrWaiting(true, on, 'loot'), { kind: 'waiting', text: LOG_READ_NOTE.tabTooLarge, tryLine: null })
+})
+
+test('the tab prints the sentence and what to try as one line, and no dangling space without a Try', () => {
+  const reading = emptyOrWaiting(true, report(), 'loot')
+  const unanswered = emptyOrWaiting(true, report(LIVE), 'loot')
+  assert.ok(reading.kind === 'waiting' && unanswered.kind === 'waiting')
+  assert.equal(tabLineText(reading), 'Still reading your log. Nothing to do. Large logs take a while.')
+  assert.equal(tabLineText(unanswered), 'The data engine is answering; this panel has no reply yet.')
 })
 
 test('a wait outranks the note: a read that is not live is the reason the tab is empty', () => {

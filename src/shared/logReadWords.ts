@@ -184,6 +184,11 @@ export function emptyOrWaiting(snapshotIsNull: boolean, report: LogReadReport, m
   return { kind: 'waiting', text: LOG_READ_WORDS.ok, tryLine: null }
 }
 
+/** The status sentence and what to try, as the one line a tab prints. */
+export function tabLineText(line: Extract<TabLine, { kind: 'waiting' }>): string {
+  return line.tryLine === null ? line.text : `${line.text} ${line.tryLine}`
+}
+
 /**
  * A tab's status line is held back this long unless main says to show the status: a rebuild of
  * the same log empties a tab for a moment, and that moment must not flash a sentence.

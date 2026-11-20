@@ -15,3 +15,8 @@ const NO_LOOT: LootEvent[] = []
 export function useLootHistory(): LootEvent[] {
   return useModule<LootSnap>('loot') ?? NO_LOOT
 }
+
+/** Has the loot snapshot landed? An empty history says "nothing looted" only when it has. */
+export function useLootServed(): boolean {
+  return useModule<LootSnap>('loot') !== null
+}
