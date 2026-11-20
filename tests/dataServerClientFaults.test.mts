@@ -131,6 +131,44 @@ test('a reset too large to read puts the error on that one subscription', () => 
   assert.equal(client.state, 'ready')
 })
 
+test('a refused frame drops the window, so a later diff cannot be applied to it or clear the error', () => {
+  const wire = handTransport()
+  const notes: string[] = []
+  const client = createEngineClient({ token: TEST_TOKEN, debug: (note) => notes.push(note) })
+  client.attach(wire.transport)
+  wire.deliver(HELLO_OK)
+  const held = client.subscribe({ source: 'events.feed' }, () => undefined)
+  const empty = client.subscribe({ source: 'loot.ledger' }, () => undefined)
+  wire.deliver({ kind: 'reply', id: 1, ok: true, result: { subscription: 1, subscribed: true } })
+  wire.deliver({ kind: 'reply', id: 2, ok: true, result: { subscription: 2, subscribed: true } })
+  wire.deliver({ kind: 'reset', id: 1, epoch: 4, total: 1, rows: [{ key: 'a', cells: {} }] })
+  wire.deliver({ kind: 'reset', id: 2, epoch: 4, total: 0, rows: [] })
+
+  // The engine now builds its diffs against frames this client never read.
+  wire.sized({ id: 1, size: 70_000_000, refused: true })
+  wire.sized({ id: 2, size: 70_000_000, refused: true })
+  assert.equal(held.state.rows, null, 'rows that missed a frame are still held')
+  assert.equal(empty.state.rows, null)
+  assert.equal(held.state.total, 0)
+
+  const insert = { op: 'insert' as const, row: { key: 'z', cells: {} } }
+  wire.deliver({ kind: 'diff', id: 1, epoch: 4, total: 9, ops: [insert] })
+  wire.deliver({ kind: 'diff', id: 2, epoch: 4, total: 9, ops: [insert] })
+
+  for (const view of [held, empty]) {
+    assert.equal(view.state.rows, null, 'a diff was applied to a window that missed a frame')
+    assert.equal(isTooLarge(view.state.error), true, 'the next diff wiped the too-large error')
+    assert.equal(view.state.loading, false)
+  }
+  assert.equal(notes.filter((note) => note.includes('arrived before its reset')).length, 2)
+
+  // The next reset is the repair, exactly as for any other window that could not be reconciled.
+  wire.deliver({ kind: 'reset', id: 1, epoch: 5, total: 1, rows: [{ key: 'b', cells: {} }] })
+  assert.deepEqual(rowKeys(held.state), ['b'])
+  assert.equal(held.state.error, null)
+  assert.equal(client.state, 'ready')
+})
+
 test('onOversize names the op and params of the request the message was for', () => {
   const wire = handTransport()
   const client = createEngineClient({ token: TEST_TOKEN })

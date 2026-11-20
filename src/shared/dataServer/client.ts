@@ -450,7 +450,9 @@ function failTooLarge(s: ClientState, id: RequestId, size: number, op: RequestOp
     return
   }
   const sub = s.subs.get(id)
-  if (sub !== undefined) emit(sub, { ...sub.view, loading: false, error })
+  // The window goes too: the engine builds its next diff against the frame this client never read,
+  // so `onDiff` must drop diffs (rows null) until a reset, and the error stays until then.
+  if (sub !== undefined) emit(sub, { ...LOADING, loading: false, error })
 }
 
 // ---- subscriptions ------------------------------------------------------------------------------
