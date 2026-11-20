@@ -358,9 +358,11 @@ export function rotateNow(): Promise<LogArchiveReply> {
     // Step 5.2: resist and message history is read between the capture and the move (engineBuckets.ts).
     const buckets = archiveBuckets(app.getPath('userData'), a.character)
     await buckets.settle()
-    const cap = await captureSegment(captureDeps)
+    // The wait can outlast a character switch: only `a`'s capture may stand behind a move of `a`'s log.
+    const cap = await captureSegment(captureDeps, a)
     if (!cap.ok) return reply(false, `Not archived: ${cap.reason}. Nothing has changed.`)
     const dir = logArchiveDir()
+    // No await from the capture's last check to the rename inside rotateLog: keep it that way.
     buckets.take()
     const r = await rotateLog(a.logPath, dir, cap.segment, rotateDeps)
     buckets.keep(dir, cap.segment.id, r.ok || r.logTouched)
