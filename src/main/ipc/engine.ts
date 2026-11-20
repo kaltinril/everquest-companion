@@ -33,7 +33,19 @@ import { ipcMain } from 'electron'
 import { IPC } from '../../shared/ipc'
 import { engineLaunchSay } from '../dataServer/engineLaunchState'
 import { retryEngineSupervisor } from '../dataServer/engineHost'
-import { buildLogReadReport, startLogReadStatus } from '../logReadReport'
+import { reattachEngineLog, reconnectEngineClient } from '../dataServer/engineClientHost'
+import { noteLogReadTouched } from '../dataServer/logReadState'
+import { createTryAgain } from '../logReadActions'
+import { buildLogReadReport, lastLogReadReport, startLogReadStatus } from '../logReadReport'
+
+/** The status's Try again: the action of the wait every window was last told. */
+const tryLogReadAgain = createTryAgain({
+  wait: () => lastLogReadReport().wait,
+  relaunch: retryEngineSupervisor,
+  reconnect: reconnectEngineClient,
+  reattach: reattachEngineLog,
+  now: () => Date.now()
+})
 
 /** Register them. Called from `registerIpc()` beside every other domain. */
 export function registerEngineLaunchIpc(): void {
@@ -42,5 +54,10 @@ export function registerEngineLaunchIpc(): void {
     retryEngineSupervisor()
   })
   ipcMain.handle(IPC.logReadReport, () => buildLogReadReport())
+  ipcMain.handle(IPC.logReadTryAgain, () => {
+    // After an action the status is composed again, whatever the action poked by itself: the
+    // press is answered by the status moving.
+    if (tryLogReadAgain() !== null) noteLogReadTouched()
+  })
   startLogReadStatus()
 }

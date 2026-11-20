@@ -190,6 +190,7 @@ export function createLinkKeeper<C extends { close(): void }>(deps: LinkKeeperDe
       if (s.phase !== 'waiting' && s.phase !== 'gaveUp') return
       s.tries = 0
       attempt()
+      deps.changed?.()
     },
     stop(): void {
       cancelTimers()

@@ -97,3 +97,29 @@ test('THE STATUS GOES TO EVERY WINDOW, and both preloads listen for it', () => {
   }
   assert.notEqual(IPC.onLogReadReport, IPC.logReadReport, 'the push and the read share a channel name')
 })
+
+// ---- the Try again button ------------------------------------------------------------------------
+
+test('TRY AGAIN IS BOUND TO THE THREE REAL VERBS, reads the wait that was last pushed, and is main-window only', () => {
+  const ipc = code(IPC_ENGINE)
+  const bound = /createTryAgain\(\{([\s\S]*?)\n\}\)/.exec(ipc)
+  assert.ok(bound, 'the handler is no longer built from createTryAgain')
+  assert.match(bound[1], /wait: \(\) => lastLogReadReport\(\)\.wait/)
+  assert.match(bound[1], /relaunch: retryEngineSupervisor/)
+  assert.match(bound[1], /reconnect: reconnectEngineClient/)
+  assert.match(bound[1], /reattach: reattachEngineLog/)
+  assert.match(ipc, /ipcMain\.handle\(IPC\.logReadTryAgain, /)
+  assert.match(code('../src/preload/engine.ts'), /ipcRenderer\.invoke\(IPC\.logReadTryAgain\)/)
+  // An overlay does not act on the engine: it is told the status and nothing more.
+  assert.doesNotMatch(code('../src/preload/overlay.ts'), /logReadTryAgain/)
+})
+
+test('a re-read is a new turn that forgets the attach, and with no connection it reconnects instead', () => {
+  const reattach = body(code(HOST), /export function reattachEngineLog\(\): void \{/)
+  assert.match(reattach, /if \(l\.client\.state !== 'ready'\) \{\s*l\.link\.reopen\(\)\s*return\s*\}/)
+  assert.match(reattach, /const mine = bumpGen\(\)[\s\S]*l\.attachedTo = null\s*void attachAndProbe\(mine\)/)
+  // Windows that were being served are told, as on every other edge that replaces the world.
+  assert.match(reattach, /const wasServing = engineLiveOn !== null[\s\S]*if \(wasServing\) pushWorldChanged\(\)/)
+  const reconnect = body(code(HOST), /export function reconnectEngineClient\(\): void \{/)
+  assert.match(reconnect, /live\?\.link\.reopen\(\)/, 'a connection that is up and silent is left as it is')
+})

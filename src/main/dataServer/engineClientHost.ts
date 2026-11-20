@@ -721,9 +721,30 @@ export function engineClientFacts(): {
   }
 }
 
-/** A person asked for the connection to be tried again (`linkKeeper.ts tryNow`). */
+/** A person asked for a new connection (`engineLink.ts reopen`): one that is up and not answering
+ *  is dropped first. The engine keeps its world, so nothing is read again. */
 export function reconnectEngineClient(): void {
-  live?.link.tryNow()
+  live?.link.reopen()
+}
+
+/**
+ * A person asked for the log to be read again (the status's Try again, fork #9): a new turn, and
+ * an attach that is sent even though the engine was already pointed at this log. It re-reads the
+ * log from the start. With no connection to send it on, the connection is what is tried.
+ */
+export function reattachEngineLog(): void {
+  const l = live
+  if (l === null) return
+  if (l.client.state !== 'ready') {
+    l.link.reopen()
+    return
+  }
+  // The windows this engine was serving are told the world changed hands, as on a respawn.
+  const wasServing = engineLiveOn !== null
+  const mine = bumpGen()
+  if (wasServing) pushWorldChanged()
+  l.attachedTo = null
+  void attachAndProbe(mine)
 }
 
 // ── what the performance panel can ask this file (JOS-483) ─────────────────────────────────────

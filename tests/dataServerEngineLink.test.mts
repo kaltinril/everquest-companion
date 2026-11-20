@@ -302,3 +302,62 @@ test('tryNow asks again after the link gave up; stop ends it', async () => {
   assert.deepEqual(retriesWaiting(r), [])
   assert.equal(r.timers.every((t) => t.cancelled), true, 'stop left a timer running')
 })
+
+// ── a new connection, asked for by a person (fork #9, phase R2) ─────────────────────────────────
+
+test('REOPEN DROPS A CONNECTION THAT IS UP AND NOT ANSWERING, and opens another at once', async () => {
+  const r = rig()
+  r.link.start()
+  const first = await r.open()
+  first.say(HELLO_OK)
+  const asked = r.client.request('session.health', {}).then(
+    () => null,
+    (error: unknown) => error
+  )
+
+  r.link.reopen()
+  assert.equal(first.closed, true, 'the connection that was not answering is still open')
+  assert.equal(r.losses.length, 1, 'the host is told once, so the windows it served re-hydrate')
+  assert.equal(r.connects, 2, 'the new connect waited on the retry ladder')
+  assert.deepEqual(retriesWaiting(r), [], 'and a retry is still scheduled behind it')
+  assert.equal(isLinkLost(await asked), true, 'what was in flight is rejected as a lost link, not left to time out')
+
+  const second = await r.open()
+  second.say(HELLO_OK)
+  assert.equal(r.client.state, 'ready')
+  assert.equal(r.connected, 2)
+  assert.equal(r.link.facts().tries, 0, 'a person asking is not a failed try')
+  // The dropped connection ending for real afterwards is no news.
+  first.end()
+  await tick()
+  assert.equal(r.losses.length, 1)
+})
+
+test('reopen with the connection down is tryNow; with the first connect in flight it does nothing', async () => {
+  const early = rig()
+  early.link.start()
+  early.link.reopen()
+  assert.equal(early.connects, 1, 'a second connect was started beside the first')
+  assert.deepEqual(early.losses, [])
+
+  const r = rig()
+  r.link.start()
+  const w = await r.open()
+  w.say({ kind: 'hello', ok: false, engineVersion: '0.1.0', protocolVersion: 1 })
+  assert.equal(r.link.facts().gaveUp, true)
+  const lost = r.losses.length
+  r.link.reopen()
+  assert.equal(r.connects, 2)
+  assert.equal(r.losses.length, lost, 'a connection that is already down is not lost a second time')
+})
+
+test('reopen drops a connection whose hello was never answered', async () => {
+  const r = rig()
+  r.link.start()
+  const first = await r.open()
+  assert.equal(r.client.state, 'connecting')
+  r.link.reopen()
+  assert.equal(first.closed, true)
+  assert.equal(r.connects, 2)
+})
+
