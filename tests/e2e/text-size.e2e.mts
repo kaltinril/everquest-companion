@@ -278,6 +278,13 @@ async function stepNavMenu(page: Page): Promise<void> {
   check(`a fresh install draws a menu row ${navPx(NAV_ROW_DEFAULT)} tall`, near(NAV_ROW_DEFAULT)(fresh), `${String(fresh)}px`)
   const shown = await textOf(page, navSel('pref-nav-row-value'))
   check('…and the Left menu card prints it', shown === navPx(NAV_ROW_DEFAULT), shown || 'nothing printed')
+  // The shipped menu, every group open, fits the default window. Measured here because a new tab
+  // adds a row: the day one does not fit, this says so (32px rows ran 21px over with Skills).
+  const fit = await page.evaluate(() => {
+    const paper = document.querySelector<HTMLElement>('.MuiDrawer-paper')
+    return paper === null ? null : { drawer: paper.clientHeight, menu: paper.scrollHeight }
+  })
+  check('…and at that height the open menu fits the default window, with no scrollbar', fit !== null && fit.menu <= fit.drawer, JSON.stringify(fit))
 
   await pressNav(page, 'pref-nav-row', 'minus', rowMin)
   const short = await drawn(rowMin)

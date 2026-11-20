@@ -423,3 +423,13 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
   nearby.` 568 / 357.
 - Checked in code by this change: the real parser types `You have become better at Fishing! (127)`
   as Kind::SkillUp with skill `Fishing` and value 127 (test in skills.rs).
+
+**Left menu (fork #10)**
+
+- Measured in the hidden e2e app, fresh install, default window (inner 1280 x 860, 100%), every
+  group open: the drawer is 820 px tall. At 14 px text in 32 px rows the open menu is 841 px, so it
+  scrolls by 21 px: 20 destination rows of 32 px (Overview, seven under Stats/Data with Skills, nine
+  under Research, two under Config, Preferences), three group headings of 28 px, and the two-line
+  Send feedback row at 57.4 px (its second line, "Off in the community build", wraps to two).
+- The row heights read back exactly as set (32.0 px each), so the styling holds; only the total was
+  wrong. A paper estimate from the MUI sources had the feedback row at about 42 px and no Skills row.

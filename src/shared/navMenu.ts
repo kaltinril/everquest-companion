@@ -5,8 +5,10 @@
 export const NAV_TEXT_STEPS: readonly number[] = [12, 13, 14, 15, 16]
 export const NAV_TEXT_DEFAULT = 14
 /** Row height stops, ascending. 48 is the old row. The shortest must hold the largest text. */
-export const NAV_ROW_STEPS: readonly number[] = [28, 32, 36, 40, 48]
-export const NAV_ROW_DEFAULT = 32
+export const NAV_ROW_STEPS: readonly number[] = [24, 28, 32, 36, 40, 48]
+/** The tallest stop at which the open menu fits the default window: measured, not computed (32px
+ *  rows ran 21px over once the Skills row joined). text-size.e2e holds the fit. */
+export const NAV_ROW_DEFAULT = 28
 
 export const NAV_TEXT_KEY = 'eq.nav.textPx'
 export const NAV_ROW_KEY = 'eq.nav.rowPx'
