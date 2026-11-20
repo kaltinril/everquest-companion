@@ -57,6 +57,13 @@ export interface Transport<Out, In> {
   onMessage(handler: (message: In) => void): void
   /** Register a handler for a transport-level failure. The connection is finished when it fires. */
   onError(handler: (error: TransportError) => void): void
+  /**
+   * Register the one handler for a message that was too large. `refused` true: the message was
+   * dropped and will never be delivered; false: it is large and is delivered next. `id` is the
+   * request or subscription the message names, or null when it names none. The connection stays
+   * open either way. Optional: a transport with no size limit has nothing to report.
+   */
+  onOversize?(handler: (m: { id: number | null; size: number; refused: boolean }) => void): void
   /** Stop. Idempotent: closing a closed transport is not an error. */
   close(): void
   /** Has this end finished? A closed transport never delivers another message. */

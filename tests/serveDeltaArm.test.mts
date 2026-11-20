@@ -262,21 +262,27 @@ test('the world-changed frame reaches the damage-meter overlay as well as the mo
 
 
 test('a cursor from a replaced connection, or from an engine that is not serving reads, is not forwarded', () => {
+  // The listener is registered once per client by `engineClientWiring.ts` (fork #9: the connection
+  // is reopened under the same client), and asks its two guards of the host that owns the answers.
+  const wiring = code('../src/main/dataServer/engineClientWiring.ts')
   const host = code('../src/main/dataServer/engineClientHost.ts')
-  const listener = /client\.onModuleChanged\(\(changed\) => \{([\s\S]*?)\n {2}\}\)/.exec(host)
+  const listener = /client\.onModuleChanged\(\(changed\) => \{([\s\S]*?)\n {2}\}\)/.exec(wiring)
   assert.ok(listener, 'the engine client no longer forwards moduleChanged')
   // A SUBSCRIPTION IS CONNECTION-SCOPED, NOT TURN-SCOPED, and this pin is the scar: the first draft
   // guarded with `gen !== mine`, the rule every `await` in that file is followed by. `gen` advances
   // on every world rebuild, so the listener went permanently silent the moment this process's own
   // fold landed — a loot line played into the log never reached the ledger and a watched respawn
   // never drew a clock. Identity, not generation.
-  assert.match(listener[1], /if \(live\?\.client !== client\) return/, 'the listener is turn-scoped again')
-  assert.doesNotMatch(listener[1], /gen !== mine/, 'the generation guard came back — see above')
+  assert.match(listener[1], /if \(!host\.current\(\)\) return/, 'the listener lost its connection guard')
+  assert.match(host, /const current = \(\): boolean => live\?\.client === client/, 'the guard is turn-scoped again')
+  assert.doesNotMatch(wiring, /\bgen\b/, 'the generation guard came back — see above')
   assert.match(
     listener[1],
-    /if \(!engineServeReadiness\(\)\.ok\) return/,
+    /if \(!host\.servable\(\)\) return/,
     'a cursor is forwarded while the READ path is answering from the app’s own fold'
   )
+  assert.match(host, /servable: \(\) => engineServeReadiness\(\)\.ok/, 'the readiness guard asks something else')
+  assert.match(host, /wireEngineClient\(client, \{\s*current,/, 'the host no longer hands the wiring its guards')
 })
 
 test('both edges where the serving world changes hands are announced', () => {

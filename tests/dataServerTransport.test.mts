@@ -31,11 +31,14 @@ import type { ClientMessage, EngineMessage } from '../src/shared/dataServer/prot
 import { createMemoryPair } from '../src/shared/dataServer/memoryTransport'
 import {
   DELIMITER,
+  LARGE_MESSAGE_CHARS,
   LineDecoder,
   MAX_LINE_CHARS,
+  MAX_MESSAGE_CHARS,
   createNdjsonTransport,
   decodeLine,
   encodeLine,
+  messageIdOf,
   type ByteChannel
 } from '../src/shared/dataServer/ndjson'
 import { TransportError, type Transport } from '../src/shared/dataServer/transport'
@@ -280,6 +283,164 @@ test('a blank line between frames is skipped rather than fatal', () => {
   const heard = drain(transport)
   reader.deliver('\n{"kind":"epoch","epoch":1,"reason":"attach"}\n\n')
   assert.equal(heard.length, 1)
+})
+
+// ---- 3b. size alone cannot end a connection (fork #9) -------------------------------------------
+//
+// The largest whole-log reply grows with the log, and the decoder used to close the connection for
+// good at 8 MiB. An engine message may now be up to MAX_MESSAGE_CHARS; a longer one is dropped up
+// to its delimiter and reported, and the connection carries on.
+
+const MIB = 1024 * 1024
+
+/** One reply whose result is `chars` characters of text, as its wire line (delimiter included). */
+function bigReply(id: number, chars: number): string {
+  return `{"id":${String(id)},"kind":"reply","ok":true,"result":{"text":"${'x'.repeat(chars)}"}}${DELIMITER}`
+}
+
+function feed(deliver: (chunk: string) => void, wire: string, chunkChars: number): void {
+  for (let at = 0; at < wire.length; at += chunkChars) deliver(wire.slice(at, at + chunkChars))
+}
+
+interface Seen {
+  head: string
+  chars: number
+  refused: boolean
+}
+
+function watched(limit: number, noticeChars: number): { decoder: LineDecoder; seen: Seen[] } {
+  const seen: Seen[] = []
+  return { seen, decoder: new LineDecoder(limit, { noticeChars, onLine: (s) => seen.push(s) }) }
+}
+
+test('A 9 MiB MESSAGE IS DELIVERED: the old 8 MiB limit no longer applies to engine messages', () => {
+  const reader = pipe()
+  const transport = createNdjsonTransport<EngineMessage, EngineMessage>(reader.channel)
+  const heard = drain(transport)
+  feed(reader.deliver, bigReply(7, 9 * MIB), 64 * 1024)
+  assert.equal(heard.length, 1, 'the message did not arrive as one')
+  const reply = heard[0] as { id: number; result: { text: string } }
+  assert.equal(reply.id, 7)
+  assert.equal(reply.result.text.length, 9 * MIB)
+  assert.equal(transport.closed, false)
+})
+
+test('a 32 MiB line in 4 KiB chunks is assembled inside 2 s: the partial line is not re-scanned', () => {
+  const decoder = new LineDecoder(MAX_MESSAGE_CHARS)
+  const chunk = 'y'.repeat(4096)
+  const started = performance.now()
+  let lines: string[] = []
+  for (let i = 0; i < (32 * MIB) / 4096; i++) lines = decoder.push(chunk)
+  assert.deepEqual(lines, [], 'nothing is complete before the delimiter')
+  lines = decoder.push(DELIMITER)
+  const took = performance.now() - started
+  assert.equal(lines.length, 1)
+  assert.equal(lines[0].length, 32 * MIB)
+  assert.ok(took < 2_000, `assembly took ${String(Math.round(took))} ms`)
+})
+
+test('WITH A WATCH an over-limit line is skipped and reported, and the next line is delivered', () => {
+  const { decoder, seen } = watched(64, 1_000)
+  const long = `{"id":41,"kind":"reply",${'z'.repeat(300)}`
+  assert.deepEqual(decoder.push(long.slice(0, 50)), [])
+  assert.equal(decoder.midFrame, false, 'under the limit nothing is being skipped')
+  assert.deepEqual(decoder.push(long.slice(50, 200)), [])
+  assert.equal(decoder.midFrame, true)
+  assert.equal(decoder.pending, '', 'a skipped line holds nothing')
+  assert.deepEqual(decoder.push(`${long.slice(200)}${DELIMITER}{"next":1}${DELIMITER}`), ['{"next":1}'])
+  assert.equal(decoder.midFrame, false)
+  assert.deepEqual(seen, [{ head: long.slice(0, 256), chars: long.length, refused: true }])
+  assert.equal(messageIdOf(seen[0].head), 41)
+})
+
+test('the same when the over-limit line and its delimiter arrive in one chunk', () => {
+  const { decoder, seen } = watched(64, 1_000)
+  const long = 'q'.repeat(65)
+  assert.deepEqual(decoder.push(`{"a":1}${DELIMITER}${long}${DELIMITER}{"b":2}${DELIMITER}`), ['{"a":1}', '{"b":2}'])
+  assert.deepEqual(seen, [{ head: long, chars: 65, refused: true }])
+  // Exactly at the limit is a message, not a refusal.
+  assert.deepEqual(decoder.push(`${'q'.repeat(64)}${DELIMITER}`), ['q'.repeat(64)])
+  assert.equal(seen.length, 1)
+})
+
+test('a line of noticeChars or more is reported with refused false and still delivered', () => {
+  const { decoder, seen } = watched(1_000, 32)
+  assert.deepEqual(decoder.push(`${'s'.repeat(31)}${DELIMITER}`), ['s'.repeat(31)])
+  assert.deepEqual(seen, [], 'a line under the notice size says nothing')
+  const large = `{"epoch":3,"id":12,"kind":"reset",${'r'.repeat(300)}`
+  assert.deepEqual(decoder.push(large.slice(0, 100)), [])
+  assert.deepEqual(decoder.push(`${large.slice(100)}${DELIMITER}`), [large])
+  assert.deepEqual(seen, [{ head: large.slice(0, 256), chars: large.length, refused: false }])
+})
+
+test('WITHOUT A WATCH the decoder still throws: the child-s stdout and stderr keep their guard', () => {
+  const decoder = new LineDecoder(64)
+  assert.deepEqual(decoder.push(`ok${DELIMITER}${'a'.repeat(40)}`), ['ok'])
+  assert.throws(
+    () => decoder.push('a'.repeat(40)),
+    (e: unknown) => e instanceof TransportError && e.code === 'frameTooLarge'
+  )
+  assert.equal(decoder.midFrame, false)
+  assert.equal(decoder.pending, '', 'the refused remainder is dropped, as it always was')
+})
+
+test('A MESSAGE OVER THE LIMIT IS REPORTED BY ID AND THE TRANSPORT STAYS OPEN', () => {
+  const reader = pipe()
+  const transport = createNdjsonTransport<EngineMessage, EngineMessage>(reader.channel)
+  const heard = drain(transport)
+  const sized: { id: number | null; size: number; refused: boolean }[] = []
+  transport.onOversize?.((m) => sized.push(m))
+  const wire = bigReply(9, MAX_MESSAGE_CHARS)
+  feed(reader.deliver, wire, 64 * 1024)
+  reader.deliver(`{"kind":"epoch","epoch":2,"reason":"restart"}${DELIMITER}`)
+  assert.deepEqual(sized, [{ id: 9, size: wire.length - 1, refused: true }])
+  assert.equal(heard.length, 1, 'the message after the refused one was not delivered')
+  assert.equal(heard[0].kind, 'epoch')
+  assert.equal(transport.closed, false)
+})
+
+test('a large message under the limit is reported and then delivered', () => {
+  const reader = pipe()
+  const transport = createNdjsonTransport<EngineMessage, EngineMessage>(reader.channel)
+  const order: string[] = []
+  transport.onMessage((m) => order.push(`message ${m.kind}`))
+  transport.onError((e) => {
+    throw e
+  })
+  transport.onOversize?.((m) => order.push(`sized ${String(m.id)} ${String(m.refused)}`))
+  feed(reader.deliver, bigReply(3, LARGE_MESSAGE_CHARS), 64 * 1024)
+  assert.deepEqual(order, ['sized 3 false', 'message reply'])
+})
+
+test('a stream that ends inside a skipped message is a truncated frame', () => {
+  const reader = pipe()
+  const transport = createNdjsonTransport<EngineMessage, EngineMessage>(reader.channel)
+  const errors: TransportError[] = []
+  transport.onMessage(() => assert.fail('nothing complete arrived'))
+  transport.onError((e) => errors.push(e))
+  feed(reader.deliver, bigReply(5, MAX_MESSAGE_CHARS).slice(0, -1), 64 * 1024)
+  assert.equal(transport.closed, false, 'passing the limit alone closes nothing')
+  reader.end()
+  assert.equal(errors.length, 1)
+  assert.equal(errors[0].code, 'decode')
+  assert.equal(transport.closed, true)
+})
+
+test('messageIdOf takes an id only from the top level, before any nested value', () => {
+  // The four shapes the engine writes (generated.rs: fields in declared order).
+  assert.equal(messageIdOf('{"id":17,"kind":"reply","ok":true,"result":{"module":"loot","seq":4,"sta'), 17)
+  assert.equal(messageIdOf('{"epoch":3,"id":12,"kind":"reset","rows":[{"key":"loot:1","cells":{"id":99'), 12)
+  assert.equal(messageIdOf('{"error":{"code":"notFound","message":"no"},"id":7,"kind":"error","ok":false}'), null)
+  assert.equal(messageIdOf('{"kind":"moduleChanged","module":"loot","seq":88}'), null)
+  // A row-s own id, a string id and a cut-off number are never taken for a request-s.
+  assert.equal(messageIdOf('{"rows":[{"id":5}],"id":6}'), null)
+  assert.equal(messageIdOf('{"at":1,"chips":[],"id":"con:1","kind":"conCard"}'), null)
+  assert.equal(messageIdOf('{"kind":"fire","id":"abc"}'), null)
+  assert.equal(messageIdOf('{"text":"a \\" quoted , } {\\"id\\":3","id":4}'), 4)
+  assert.equal(messageIdOf('{"id":12'), null, 'the head ends inside the number')
+  assert.equal(messageIdOf('{"id":8}'), 8)
+  assert.equal(messageIdOf('not json'), null)
+  assert.equal(messageIdOf(''), null)
 })
 
 // ---- 4. the memory transport is a real transport, not a stub ------------------------------------

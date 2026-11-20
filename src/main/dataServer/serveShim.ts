@@ -56,6 +56,7 @@ import { app } from 'electron'
 import { logInfo } from '../errorLog'
 import { engineLogMtimeMs, engineRequest, engineServeReadiness } from './engineClientHost'
 import { createReadShim, type ReadShim } from './readShim'
+import { replySizes } from './replySizes'
 import { startSlowReadLog } from './slowReads'
 import { noteCombatRead } from './logReadState'
 import { liveHistory } from '../logArchive/liveHistory'
@@ -100,6 +101,9 @@ export interface ModuleSnap {
  * reason: loopback either answers immediately or is not going to.
  */
 const SERVE_TIMEOUT_MS = 2_000
+
+/** How long a `module.snapshot` caller waits (fork #9): see `readShim()` below. */
+const MODULE_TIMEOUT_MS = 10_000
 
 /** How often the coalesced fallback sentence may be printed. Five seconds is long enough that a
  *  disconnected engine costs one line per five seconds rather than one per poll, and short enough
@@ -150,12 +154,16 @@ function readShim(): ReadShim {
     },
     now: () => Date.now(),
     timeoutMs: SERVE_TIMEOUT_MS,
+    // A module read is asked once per cursor and its null answer is not asked again, so it waits
+    // longer (still under the client's own 15 s); the meter is polled and joined, so it keeps 2 s.
+    timeoutFor: (op) => (op === 'module.snapshot' ? MODULE_TIMEOUT_MS : undefined),
+    sizeGate: replySizes,
     noteEveryMs: NOTE_EVERY_MS,
     delay,
-    observe: (op, ms, unserved) => {
+    observe: (op, ms, unserved, why) => {
       record(op, ms, unserved)
       // The last combat read's fate, for the "Reading log..." report (fork #9).
-      if (op === 'combat.snapshot') noteCombatRead(unserved ?? null, Date.now())
+      if (op === 'combat.snapshot') noteCombatRead(unserved ?? null, why ?? null, Date.now())
     }
   })
   return shim

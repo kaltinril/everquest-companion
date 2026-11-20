@@ -48,11 +48,11 @@
 // The two halves this file sits on, each of which carries the detail of its own law:
 //   * `ops.ts`        — the closed op → result registry, and the one error type a caller sees.
 //   * `viewWindow.ts` — the diff ops, applied positionally to one window. Pure.
+// …and `clientStreams.ts`, which holds the windows and applies the epoch law to them.
 import {
   PROTOCOL_VERSION,
   type ClientMessage,
   type ConCardMessage,
-  type DiffMessage,
   type EngineMessage,
   type Epoch,
   type EpochMessage,
@@ -66,16 +66,25 @@ import {
   type Reply,
   type ReplyResult,
   type RequestId,
-  type ResetMessage,
   type ViewDescriptor
 } from './protocol.generated'
 import { createBroadcasts, deliver, listen, type Broadcasts } from './broadcasts'
+import { callEach } from './listeners'
 // THE PER-REQUEST DEADLINE's timer and its number, in the one module that touches a clock — see
 // this file's header for what it is for, and that one's for why it is not written inline.
 import { REQUEST_DEADLINE_MS, armDeadline } from './deadline'
 import { TransportError, type Transport } from './transport'
 import { EngineError, RESULT_GUARDS, type ParamsFor, type RequestOp, type ResultFor } from './ops'
-import { LOADING, applyDiff, type ViewState } from './viewWindow'
+import { LOADING, type ViewState } from './viewWindow'
+// The windows and the epoch: split out at the file-size ceiling (see that file's header).
+import {
+  dropAllWindowState,
+  emit,
+  noteEpoch,
+  onDiff,
+  onReset,
+  type LiveSubscription
+} from './clientStreams'
 
 export { EngineError, OPS_ARE_EXHAUSTIVE } from './ops'
 export type { OpsAreExhaustive, ParamsFor, RequestOp, ResultFor } from './ops'
@@ -104,10 +113,24 @@ export interface EngineClientOptions {
   debug?: (note: string) => void
 }
 
+/** A message that was too large: which request (or subscription) it was for. `refused` true means
+ *  it was dropped and that request alone failed; false means it is large and was delivered. */
+export interface OversizeNote {
+  /** Null when the message named no request this client holds. */
+  readonly op: RequestOp | null
+  readonly params: unknown
+  readonly size: number
+  readonly refused: boolean
+}
+
 export interface EngineClient {
   readonly state: ConnectionState
   /** The world's generation, or null before the first frame that names one. */
   readonly epoch: Epoch | null
+  /** Why the connection failed, or null. Set before the `failed` state is announced; cleared by `attach`. */
+  readonly failure: EngineError | null
+  /** A message was too large (fork #9). The connection stays up; see {@link OversizeNote}. */
+  onOversize(listener: (note: OversizeNote) => void): () => void
   /** Take a (new) connection: re-hello, drop every window, re-subscribe everything. */
   attach(transport: Transport<ClientMessage, EngineMessage>): void
   request<O extends RequestOp>(op: O, params: ParamsFor<O>): Promise<ResultFor<O>>
@@ -167,6 +190,9 @@ export interface EngineClient {
    * put a network call in the renderer's copy of it.
    */
   onKnowledgeMiss(listener: (miss: KnowledgeMissMessage) => void): () => void
+  /** The connection ended in a way the transport does not report (a clean hang-up, fork #9):
+   *  `failed` is announced and everything in flight is rejected. A no-op once failed or closed. */
+  fail(error: EngineError): void
   close(): void
 }
 
@@ -174,19 +200,11 @@ export interface EngineClient {
 
 interface PendingRequest {
   readonly op: RequestOp
+  readonly params: unknown
   readonly resolve: (result: ReplyResult) => void
   readonly reject: (error: EngineError) => void
   /** The deadline armed for this request. Cleared by whichever settlement gets there first. */
   readonly deadline: ReturnType<typeof setTimeout>
-}
-
-interface LiveSubscription {
-  /** The id of the subscribe request that opened it — which is also the id its frames carry. */
-  id: RequestId
-  readonly descriptor: ViewDescriptor
-  readonly listener: ViewListener
-  view: ViewState
-  closed: boolean
 }
 
 interface ClientState {
@@ -202,6 +220,8 @@ interface ClientState {
   readonly subs: Map<RequestId, LiveSubscription>
   readonly stateListeners: Set<(state: ConnectionState) => void>
   readonly progressListeners: Set<(progress: FoldProgress) => void>
+  readonly oversizeListeners: Set<(note: OversizeNote) => void>
+  failure: EngineError | null
   /** The four connection-wide fan-outs, held together because they are one family — see
    *  `broadcasts.ts` for what makes them one. */
   readonly broadcasts: Broadcasts
@@ -210,12 +230,8 @@ interface ClientState {
 function setConnectionState(s: ClientState, next: ConnectionState): void {
   if (s.state === next) return
   s.state = next
-  for (const listener of s.stateListeners) listener(next)
-}
-
-function emit(sub: LiveSubscription, view: ViewState): void {
-  sub.view = view
-  if (!sub.closed) sub.listener(view)
+  // Guarded (listeners.ts): a state listener that throws must not strand the code after it.
+  callEach(s.stateListeners, next, s.debug, 'state')
 }
 
 function nextRequestId(s: ClientState): RequestId {
@@ -271,13 +287,9 @@ function rejectAllPending(s: ClientState, error: EngineError): void {
   }
 }
 
-/** THE EPOCH LAW's teeth: every window this client holds, gone, all at once. */
-function dropAllWindowState(s: ClientState): void {
-  for (const sub of s.subs.values()) emit(sub, LOADING)
-}
-
 function failConnection(s: ClientState, error: EngineError): void {
   if (s.state === 'failed' || s.state === 'closed') return
+  s.failure = error
   setConnectionState(s, 'failed')
   s.transport?.close()
   rejectAllPending(s, error)
@@ -298,10 +310,14 @@ function attach(s: ClientState, transport: Transport<ClientMessage, EngineMessag
   }
   s.transport = transport
   s.epoch = null
+  s.failure = null
   setConnectionState(s, 'connecting')
   if (reconnect) dropAllWindowState(s)
   transport.onMessage((message) => {
     receive(s, message)
+  })
+  transport.onOversize?.((sized) => {
+    onSized(s, sized)
   })
   transport.onError((error: TransportError) => {
     failConnection(s, new EngineError('unavailable', error.message, undefined, error))
@@ -361,7 +377,7 @@ function sendRequest<O extends RequestOp>(
     const deadline = armDeadline(() => {
       onDeadline(s, id, op)
     })
-    s.pending.set(id, { op, resolve, reject, deadline })
+    s.pending.set(id, { op, params, resolve, reject, deadline })
     // The registry above is what makes this cast true: `op` and `params` are drawn from the same
     // wire union this is asserting into, and TypeScript simply cannot see that through a generic.
     send(s, { id, op, params } as unknown as ClientMessage)
@@ -412,6 +428,36 @@ function onErrorReply(s: ClientState, reply: ErrorReply): void {
   pending.reject(new EngineError(reply.error.code, reply.error.message, reply.id))
 }
 
+/**
+ * A MESSAGE WAS TOO LARGE (fork #9). Refused: it was dropped below this client, so the one request
+ * or subscription it was for is failed here, by name, and the connection is left exactly as it was.
+ * Not refused: it is large and arrives next; listeners are told while its request is still pending.
+ */
+function onSized(s: ClientState, m: { id: number | null; size: number; refused: boolean }): void {
+  const pending = m.id === null ? undefined : s.pending.get(m.id)
+  const sub = m.id === null ? undefined : s.subs.get(m.id)
+  const op = pending?.op ?? (sub === undefined ? null : 'view.subscribe')
+  if (m.refused && m.id !== null) failTooLarge(s, m.id, m.size, op)
+  const params: unknown = pending?.params ?? sub?.descriptor ?? null
+  callEach(s.oversizeListeners, { op, params, size: m.size, refused: m.refused }, s.debug, 'oversize')
+}
+
+function failTooLarge(s: ClientState, id: RequestId, size: number, op: RequestOp | null): void {
+  s.debug(`a message of ${size} characters for request ${id} was too large to read - dropped`)
+  const cause = new TransportError('frameTooLarge', `a message of ${size} characters was refused`)
+  const what = op ?? 'a request'
+  const error = new EngineError('internal', `the reply to ${what} was too large to read`, id, cause)
+  const pending = takePending(s, id)
+  if (pending !== undefined) {
+    pending.reject(error)
+    return
+  }
+  const sub = s.subs.get(id)
+  // The window goes too: the engine builds its next diff against the frame this client never read,
+  // so `onDiff` must drop diffs (rows null) until a reset, and the error stays until then.
+  if (sub !== undefined) emit(sub, { ...LOADING, loading: false, error })
+}
+
 // ---- subscriptions ------------------------------------------------------------------------------
 
 function subscribe(
@@ -422,7 +468,10 @@ function subscribe(
   const sub: LiveSubscription = {
     id: nextRequestId(s),
     descriptor,
-    listener,
+    // Guarded (listeners.ts): a view listener that throws must not fail the connection.
+    listener: (view): void => {
+      callEach([listener], view, s.debug, 'view')
+    },
     view: LOADING,
     closed: false
   }
@@ -475,76 +524,12 @@ function resubscribeAll(s: ClientState): void {
   }
 }
 
-// ---- the epoch ----------------------------------------------------------------------------------
-
-/**
- * Fold one frame's epoch into the connection's. Returns false when the frame is from an epoch this
- * client has already left, which is the one case a caller must not apply.
- */
-function noteEpoch(s: ClientState, epoch: Epoch): boolean {
-  if (s.epoch === null) {
-    s.epoch = epoch
-    return true
-  }
-  if (epoch === s.epoch) return true
-  if (epoch < s.epoch) {
-    s.debug(`a frame from epoch ${epoch} arrived at epoch ${s.epoch} - dropped`)
-    return false
-  }
-  s.epoch = epoch
-  dropAllWindowState(s)
-  return true
-}
+// ---- the epoch (`noteEpoch` and the stream frames live in clientStreams.ts) -----------------------
 
 function onEpochMessage(s: ClientState, message: EpochMessage): void {
   noteEpoch(s, message.epoch)
   if (message.progress === undefined) return
-  for (const listener of s.progressListeners) listener(message.progress)
-}
-
-// ---- materializing a window ---------------------------------------------------------------------
-
-/** The subscription a stream frame names, or null with a note if this client does not hold it. */
-function subscriptionFor(s: ClientState, id: RequestId, kind: string): LiveSubscription | null {
-  const sub = s.subs.get(id)
-  if (sub === undefined) {
-    s.debug(`a ${kind} arrived for subscription ${id}, which is not open here - dropped`)
-    return null
-  }
-  return sub
-}
-
-function onReset(s: ClientState, message: ResetMessage): void {
-  // The epoch is read FIRST and from every frame, even one for a subscription this client does not
-  // hold: the generation belongs to the CONNECTION, so a bump is a bump whoever the frame was for.
-  if (!noteEpoch(s, message.epoch)) return
-  const sub = subscriptionFor(s, message.id, 'reset')
-  if (sub === null) return
-  emit(sub, {
-    rows: message.rows.slice(),
-    total: message.total,
-    epoch: message.epoch,
-    loading: false,
-    error: null
-  })
-}
-
-function onDiff(s: ClientState, message: DiffMessage): void {
-  if (!noteEpoch(s, message.epoch)) return
-  const sub = subscriptionFor(s, message.id, 'diff')
-  if (sub === null) return
-  const held = sub.view.rows
-  if (held === null) {
-    s.debug(`a diff for subscription ${message.id} arrived before its reset - dropped`)
-    return
-  }
-  emit(sub, {
-    rows: applyDiff(held, message.ops, s.debug),
-    total: message.total ?? sub.view.total,
-    epoch: message.epoch,
-    loading: false,
-    error: null
-  })
+  callEach(s.progressListeners, message.progress, s.debug, 'progress')
 }
 
 // ---- the front door -----------------------------------------------------------------------------
@@ -558,7 +543,7 @@ function receive(s: ClientState, message: EngineMessage): void {
   // THE FOUR CONNECTION-WIDE FRAMES, IN ONE BRANCH. None of them carries an id or an epoch, so none
   // of them passes through `noteEpoch` — the one place this client is entitled to drop state — and
   // `broadcasts.ts` is where that property became structural rather than repeated four times.
-  else if (deliver(s.broadcasts, message)) {
+  else if (deliver(s.broadcasts, message, s.debug)) {
     // Handled there. The predicate is what narrows the remaining frame to a diff below.
   } else onDiff(s, message)
 }
@@ -576,6 +561,8 @@ export function createEngineClient(options: EngineClientOptions): EngineClient {
     subs: new Map(),
     stateListeners: new Set(),
     progressListeners: new Set(),
+    oversizeListeners: new Set(),
+    failure: null,
     broadcasts: createBroadcasts()
   }
   return {
@@ -585,6 +572,10 @@ export function createEngineClient(options: EngineClientOptions): EngineClient {
     get epoch() {
       return s.epoch
     },
+    get failure() {
+      return s.failure
+    },
+    onOversize: (listener): (() => void) => listen(s.oversizeListeners, listener),
     attach: (transport): void => {
       attach(s, transport)
     },
@@ -610,6 +601,9 @@ export function createEngineClient(options: EngineClientOptions): EngineClient {
     onConCard: (listener): (() => void) => listen(s.broadcasts.conCard, listener),
     onModuleChanged: (listener): (() => void) => listen(s.broadcasts.moduleChanged, listener),
     onKnowledgeMiss: (listener): (() => void) => listen(s.broadcasts.knowledgeMiss, listener),
+    fail: (error): void => {
+      failConnection(s, error)
+    },
     close: (): void => {
       if (s.state === 'closed') return
       setConnectionState(s, 'closed')

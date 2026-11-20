@@ -24,6 +24,7 @@ import { CAPTURED_MODULES } from '../../shared/logArchive/modules'
 import type { SegmentSummary } from '../../shared/combat'
 import type { RespawnRow } from '../../shared/respawn'
 import { SEGMENT_VERSION, type Segment, type SegmentLog, type SegmentModule } from '../../shared/logArchive/segment'
+import { captureRead, readFailure } from './captureReads'
 
 export interface EngineHealth {
   status: string
@@ -69,7 +70,7 @@ function healthProblem(h: EngineHealth, logPath: string): string | null {
 async function snapshotAll(deps: CaptureDeps): Promise<Record<string, SegmentModule>> {
   const modules: Record<string, SegmentModule> = {}
   for (const id of CAPTURED_MODULES) {
-    const snap = await deps.snapshot(id)
+    const snap = await captureRead(id, deps.snapshot(id))
     if (snap !== null) modules[id] = snap
   }
   return modules
@@ -90,7 +91,7 @@ interface Taken {
 /** The modules and the fights, inside the before/after pair. */
 async function takeAll(deps: CaptureDeps): Promise<Taken> {
   const modules = await snapshotAll(deps)
-  const fights = await deps.fights()
+  const fights = await captureRead('the fight list', deps.fights())
   return { modules, fights, respawnHistory: null }
 }
 
@@ -143,7 +144,9 @@ export async function captureSegment(deps: CaptureDeps, expected?: Attached): Pr
     const before = await deps.health()
     const problem = healthProblem(before, a.logPath)
     if (problem !== null) return { ok: false, reason: problem }
-    const taken = await takeAll(deps)
+    // A read that failed refuses the capture: nothing is moved with a module missing (captureReads.ts).
+    const taken = await takeAll(deps).catch(readFailure)
+    if ('ok' in taken) return taken
     const after = await deps.health()
     if (after.mark?.offset !== before.mark?.offset || after.events !== before.events) continue
     const log = await deps.readPrefix(a.logPath, before.mark?.offset ?? 0)

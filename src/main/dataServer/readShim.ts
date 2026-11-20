@@ -70,8 +70,22 @@
 // pushed the last of them past the deadline. What is shared is the engine arm's OUTCOME. The
 // fallback is still each caller's own — its own `own()`, its own count in the tally — so a joined
 // read that fails fails exactly as N separate ones would, minus N−1 requests.
+//
+// AND A READ THAT TIMED OUT IS JOINED, NOT RE-SENT (fork #9). The caller's wait (2 s) is shorter
+// than the client's own deadline (15 s), and the shared outcome above settles at the caller's
+// wait. So the next poll used to send a second identical request while the first was still being
+// answered: up to seven at once, each a whole serialization for an engine that was already slow.
+// A second map, `wires`, holds the REAL request until the client settles it (reply, error or its
+// own deadline), and every `ask` races its own wait against that one request.
+//
+// ── A REPLY TOO LARGE TO SHOW (fork #9, `replySizes.ts`) ───────────────────────────────────────
+//
+// `sizeGate` is what main knows about reply sizes. A question whose reply was too large to read or
+// to show answers `tooLarge` without being asked again; one whose reply is large is sent at most
+// once per floor, and a caller's wait is extended by the hold, so main holding a request back is
+// never reported as the engine not answering.
 
-import type { ParamsFor, RequestOp, ResultFor } from '../../shared/dataServer/ops'
+import { isTooLarge, type ParamsFor, type RequestOp, type ResultFor } from '../../shared/dataServer/ops'
 import { createInFlight, stableKey } from './inFlight'
 
 /**
@@ -99,6 +113,8 @@ export type FallbackReason =
   | 'timedOut'
   /** The engine answered, and the answer was not one — see the header. */
   | 'guess'
+  /** The reply was too large for main to read or to hand to a window (`replySizes.ts`). */
+  | 'tooLarge'
 
 /** What a developer reads. One phrase per reason, in the vocabulary the rest of the dev log uses. */
 const REASON_PHRASE: Record<FallbackReason, string> = {
@@ -108,7 +124,15 @@ const REASON_PHRASE: Record<FallbackReason, string> = {
   notLive: 'the engine is still folding',
   refused: 'the engine refused',
   timedOut: 'the engine did not answer in time',
-  guess: 'the engine’s answer would have been a guess'
+  guess: 'the engine’s answer would have been a guess',
+  tooLarge: 'the reply was too large to show'
+}
+
+/** What `replySizes.ts` knows, as far as this file asks. Keyed `<op> <stableKey(params)>`. */
+export interface SizeGate {
+  blocked(key: string): boolean
+  delayFor(key: string, now: number): number
+  sent(key: string, at: number): void
 }
 
 /** Is the engine in a state where its answers may be this app's answers? */
@@ -140,10 +164,14 @@ export interface ShimDeps {
    * the main process must be `unref`'d (`serveShim.ts` knows).
    */
   delay: (ms: number) => Promise<void>
-  /** Every finished read: its op, how long it took, and the fallback phrase when it went unserved
-   *  (slowReads.ts writes the slow and unserved ones to a file a tester can send). Optional so the
-   *  unit tests need not supply it. */
-  observe?: (op: string, ms: number, unserved?: string) => void
+  /** Every finished read: its op, how long it took, and the fallback phrase and reason when it went
+   *  unserved (slowReads.ts writes the slow and unserved ones to a file a tester can send).
+   *  Optional so the unit tests need not supply it. */
+  observe?: (op: string, ms: number, unserved?: string, why?: FallbackReason) => void
+  /** How long a caller waits for `op`, when that is not `timeoutMs`. */
+  timeoutFor?: (op: RequestOp) => number | undefined
+  /** What is known about reply sizes; absent means no reply is ever too large (the header). */
+  sizeGate?: SizeGate
 }
 
 /** What `world.ts` calls. One method per shape of question, plus the two the probe seam needs. */
@@ -198,6 +226,13 @@ export interface ReadShim {
 
 /** The sentinel a raced deadline resolves with — a private object, so no result can impersonate it. */
 const DEADLINE = Symbol('deadline')
+
+/** A held request that was not sent: the engine stopped being servable during the hold. */
+class NotSent extends Error {
+  constructor(readonly why: FallbackReason) {
+    super(REASON_PHRASE[why])
+  }
+}
 
 /**
  * One rejection, as a phrase. `EngineError` carries the schema's own `code`, which is the half a
@@ -259,15 +294,65 @@ function tallyFallback(deps: ShimDeps, tally: NoteTally, why: FallbackReason): v
  * ONE ROUND TRIP, BOUNDED. Resolves to the reply or to the deadline sentinel; rejects only where
  * the client itself rejected, which the caller turns into `refused`.
  */
-function raceDeadline<T>(deps: ShimDeps, work: Promise<T>): Promise<T | typeof DEADLINE> {
+function raceDeadline<T>(deps: ShimDeps, work: Promise<T>, ms: number): Promise<T | typeof DEADLINE> {
   // The annotation is load-bearing: without it the arrow's return widens from the `unique symbol`
   // to plain `symbol`, and the race's type stops being the one the caller narrows against.
-  return Promise.race([work, deps.delay(deps.timeoutMs).then((): typeof DEADLINE => DEADLINE)])
+  return Promise.race([work, deps.delay(ms).then((): typeof DEADLINE => DEADLINE)])
 }
 
 export function createReadShim(deps: ShimDeps): ReadShim {
   const tally: NoteTally = { counts: new Map(), lastAt: Number.NEGATIVE_INFINITY }
   const inFlight = createInFlight()
+  // The real requests, each held until the client settles it (the header).
+  const wires = createInFlight()
+
+  /** One unserved read: observed, and returned as the outcome. */
+  const unserved = <T>(
+    op: RequestOp,
+    ms: number,
+    why: FallbackReason,
+    detail = REASON_PHRASE[why]
+  ): ServeOutcome<T> => {
+    deps.observe?.(op, ms, REASON_PHRASE[why], why)
+    return { served: false, why, detail }
+  }
+
+  /** THE request for this question: the one already on the wire, or a new one, sent after any
+   *  hold the size gate asks for. */
+  const wire = <O extends RequestOp>(op: O, params: ParamsFor<O>, key: string): Promise<ResultFor<O>> =>
+    wires.share(key, async () => {
+      const hold = deps.sizeGate?.delayFor(key, deps.now()) ?? 0
+      if (hold > 0) {
+        await deps.delay(hold)
+        // A character switch during the hold: sent now, it would be answered from the new read.
+        const still = deps.readiness()
+        if (!still.ok) throw new NotSent(still.why)
+      }
+      deps.sizeGate?.sent(key, deps.now())
+      return deps.request(op, params)
+    })
+
+  const blocked = (key: string): boolean => deps.sizeGate?.blocked(key) === true
+
+  /** The reply, or why this caller has none: the request was rejected, or its own wait ran out. */
+  const awaitReply = async <O extends RequestOp>(
+    op: O,
+    params: ParamsFor<O>,
+    key: string
+  ): Promise<{ reply: ResultFor<O> } | { why: FallbackReason; detail?: string }> => {
+    // The caller's own wait, plus any hold main itself puts on the request.
+    const hold = deps.sizeGate?.delayFor(key, deps.now()) ?? 0
+    const wait = (deps.timeoutFor?.(op) ?? deps.timeoutMs) + hold
+    try {
+      const reply = await raceDeadline(deps, wire(op, params, key), wait)
+      if (reply === DEADLINE) return { why: 'timedOut', detail: `${op} after ${String(wait)} ms` }
+      return { reply }
+    } catch (err) {
+      if (err instanceof NotSent) return { why: err.why }
+      if (isTooLarge(err)) return { why: 'tooLarge' }
+      return { why: 'refused', detail: `${op} — ${describe(err)}` }
+    }
+  }
 
   const ask = async <O extends RequestOp, T>(
     op: O,
@@ -278,25 +363,22 @@ export function createReadShim(deps: ShimDeps): ReadShim {
     // put on a wire that is not there would come back as `refused` anyway, but it would come back
     // saying the wrong thing about WHY — and `why` is the whole value of the note.
     const ready = deps.readiness()
-    if (!ready.ok) {
-      deps.observe?.(op, 0, REASON_PHRASE[ready.why])
-      return { served: false, why: ready.why, detail: REASON_PHRASE[ready.why] }
-    }
+    if (!ready.ok) return unserved(op, 0, ready.why)
+    const key = `${op} ${stableKey(params)}`
+    if (blocked(key)) return unserved(op, 0, 'tooLarge')
     const t0 = deps.now()
-    let reply: ResultFor<O> | typeof DEADLINE
-    try {
-      reply = await raceDeadline(deps, deps.request(op, params))
-    } catch (err) {
-      deps.observe?.(op, deps.now() - t0, REASON_PHRASE.refused)
-      return { served: false, why: 'refused', detail: `${op} — ${describe(err)}` }
-    }
-    if (reply === DEADLINE) {
-      deps.observe?.(op, deps.now() - t0, REASON_PHRASE.timedOut)
-      return { served: false, why: 'timedOut', detail: `${op} after ${String(deps.timeoutMs)} ms` }
-    }
-    const value = project(reply)
-    deps.observe?.(op, deps.now() - t0, value === null ? REASON_PHRASE.guess : undefined)
-    if (value === null) return { served: false, why: 'guess', detail: `${op} answered, unusably` }
+    const got = await awaitReply(op, params, key)
+    const ms = deps.now() - t0
+    if (!('reply' in got)) return unserved(op, ms, got.why, got.detail)
+    // ASKED AGAIN: the wait above can be seconds, and a reply that landed after the world changed
+    // hands is about the last one (or a prefix of the next).
+    const still = deps.readiness()
+    if (!still.ok) return unserved(op, ms, still.why)
+    // Main read it, but it is over what a window may be handed: the gate heard before the reply did.
+    if (blocked(key)) return unserved(op, ms, 'tooLarge')
+    const value = project(got.reply)
+    if (value === null) return unserved(op, ms, 'guess', `${op} answered, unusably`)
+    deps.observe?.(op, ms)
     return { served: true, value }
   }
 

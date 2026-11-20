@@ -12,6 +12,7 @@
 // the result side of the registry can drift at all.
 
 import type { ClientMessage, ErrorCode, Hello, ReplyResult, RequestId } from './protocol.generated'
+import { TransportError } from './transport'
 import type {
   AttachResult,
   CombatSearchFightsResult,
@@ -276,4 +277,19 @@ export class EngineError extends Error {
     super(message)
     this.name = 'EngineError'
   }
+}
+
+/** The reply was too large to read: only this request failed, and asking again gets the same answer. */
+export function isTooLarge(err: unknown): boolean {
+  if (!(err instanceof EngineError)) return false
+  return err.cause instanceof TransportError && err.cause.code === 'frameTooLarge'
+}
+
+/**
+ * The CONNECTION went away under this request (it failed, was replaced or was closed), which says
+ * nothing about the request itself. An engine's own error reply always carries its request id, so
+ * `unavailable` with none can only be the client speaking.
+ */
+export function isLinkLost(err: unknown): boolean {
+  return err instanceof EngineError && err.code === 'unavailable' && err.requestId === undefined
 }
