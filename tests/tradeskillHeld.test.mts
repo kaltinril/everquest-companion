@@ -25,13 +25,13 @@ import { indexCrafting } from '../src/shared/tradeskillHistory'
 import { haveLookup } from '../src/shared/tradeskillMaterials'
 import { planTree } from '../src/shared/tradeskillPlan'
 import { gatherFor, gatherHeld, planCanMakeTip, planHave } from '../src/shared/tradeskillPlanGather'
-import { ROUTE_GOALS, ROUTE_STEP_CAP, buildRoute, capTop, moreStepsText, routeEndText, type Route, type RouteGoal } from '../src/shared/tradeskillRoute'
+import { ROUTE_GOALS, ROUTE_STEP_CAP, buildRoute, capTop, heldOnlyApplies, moreStepsText, routeEndText, type BookGoal, type Route } from '../src/shared/tradeskillRoute'
 import { heldCoverText, isHeldGoal } from '../src/shared/tradeskillRouteHeld'
 import type { RouteFacts, RouteStep } from '../src/shared/tradeskillRouteStep'
 import { depot, ing, recipe, SEP_12 } from './tradeskillFixtures.mts'
 import { OWNER_LEVEL, ownerFacts, ownerGuides, ownerHeld, ownerIndex, ownerSnap } from './tradeskillRouteFixtures.mts'
 
-const held = (goal: RouteGoal, facts: RouteFacts = ownerFacts(), level: number | null = OWNER_LEVEL): Route =>
+const held = (goal: BookGoal, facts: RouteFacts = ownerFacts(), level: number | null = OWNER_LEVEL): Route =>
   buildRoute(facts, { tradeskill: 'Jewelcrafting', level, goal, heldOnly: true })
 
 const allSteps = (r: Route): RouteStep[] => r.groups.flatMap((group) => group.steps)
@@ -225,6 +225,8 @@ test('a long held-only route is capped with a count, and names neither the wiki 
 
 test('held only is for the two goals that climb: Explore and the community route are unchanged by it', () => {
   assert.deepEqual(ROUTE_GOALS.filter(isHeldGoal), ['cheapest', 'fastest'])
+  // Faction reads the switch too, its own way (tests/tradeskillRouteFaction.test.mts).
+  assert.deepEqual(ROUTE_GOALS.filter(heldOnlyApplies), ['cheapest', 'fastest', 'faction'])
   for (const goal of ['explore', 'guide'] as const) {
     const on = held(goal)
     const off = buildRoute(ownerFacts(), { tradeskill: 'Jewelcrafting', level: OWNER_LEVEL, goal })

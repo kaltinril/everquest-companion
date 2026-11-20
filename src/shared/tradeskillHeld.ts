@@ -79,12 +79,12 @@ export const HELD_ONLY_LABEL = 'Only use materials I have'
 
 export const HELD_ONLY_TIP = 'Builds the route only from recipes you hold every material for. A material you hold still counts at the price you last paid for it.'
 
-/** Under the switch on a goal it does not change. */
-export const HELD_ONLY_GOALS_TEXT = 'Applies to Cheapest and Fastest.'
+/** Under the switch on a goal it does not change (Explore, the community route). */
+export const HELD_ONLY_GOALS_TEXT = 'Applies to Cheapest and Fastest, and to Faction.'
 
 /**
  * Why the route's switch cannot be used, or '' when it can: nothing says what is held, or the
- * goal is not one that climbs the ladder.
+ * goal is not one the switch changes (`climbing`: `tradeskillRoute.heldOnlyApplies`).
  */
 export function heldOnlyBlockedText(known: boolean, climbing: boolean): string {
   if (!known) return HELD_UNKNOWN_SHORT

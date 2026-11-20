@@ -3,7 +3,7 @@
 // maybe it's for an item you need"; "this person should think DANG this is THE PLACE to go").
 //
 // One tradeskill, the player's level, a goal: a route from the level up, as steps the screen
-// only maps over. Four goals are built:
+// only maps over. Four goals are built here, from the recipe book alone (`BOOK_GOALS`):
 //
 //   cheapest   tradeskillRouteLevel.ts   least cost per combine at the player's own prices
 //   fastest    tradeskillRouteLevel.ts   fewest stops, bought materials only
@@ -12,10 +12,13 @@
 //
 // "Only use materials I have" (`RouteAsk.heldOnly`, tradeskillRouteHeld.ts) narrows Cheapest and
 // Fastest to recipes the player holds every material for. It never re-orders a route: holding a
-// material does not change its price (owner, 2026-11-20).
+// material does not change its price (owner, 2026-11-20). Faction reads the same switch
+// (`heldOnlyApplies`): its rows are narrowed to the recipes that can be made now.
 //
-// Faction is NOT a goal here: no record holds what a quest rewards, so there is nothing to rank
-// and no placeholder is drawn. The one-item goal is the planner's, not a workbench route.
+// Faction is the fifth goal of the switch (`ROUTE_GOALS`) and is NOT built here: it is not a
+// climb from the level but a faction's turn-ins, and it needs the quest pages and a picked
+// faction (tradeskillRouteFaction.ts `buildFactionRoute`). The one-item goal is the planner's,
+// not a workbench route.
 //
 // WHAT NO ROUTE STATES: a chance to make a combine, a chance to gain a point, a number of
 // combines to a level, a loss per point, a total cost of a stretch. Nobody has measured this
@@ -30,7 +33,13 @@ import { cheapestSteps, fastestSteps } from './tradeskillRouteLevel'
 import type { RouteCtx, RouteFacts, RouteStep } from './tradeskillRouteStep'
 import type { Tradeskill } from './tradeskills'
 
-export const ROUTE_GOALS = ['cheapest', 'fastest', 'explore', 'guide'] as const
+/** The goals `buildRoute` builds: a route from the recipe book and the player's log. */
+export const BOOK_GOALS = ['cheapest', 'fastest', 'explore', 'guide'] as const
+
+export type BookGoal = (typeof BOOK_GOALS)[number]
+
+/** Every goal of the switch, in its order. Faction is tradeskillRouteFaction.ts's. */
+export const ROUTE_GOALS = [...BOOK_GOALS, 'faction'] as const
 
 export type RouteGoal = (typeof ROUTE_GOALS)[number]
 
@@ -38,7 +47,20 @@ export const GOAL_LABELS: Record<RouteGoal, string> = {
   cheapest: 'Cheapest',
   fastest: 'Fastest',
   explore: 'Explore',
-  guide: 'Community route'
+  guide: 'Community route',
+  faction: 'Faction'
+}
+
+export function isBookGoal(goal: RouteGoal): goal is BookGoal {
+  return goal !== 'faction'
+}
+
+/**
+ * The goals "Only use materials I have" changes: the two that climb the ladder (one shared stock,
+ * tradeskillRouteHeld.ts) and Faction, whose rows it narrows to the recipes that can be made now.
+ */
+export function heldOnlyApplies(goal: RouteGoal): boolean {
+  return isHeldGoal(goal) || goal === 'faction'
 }
 
 /** A stored or typed goal, or the default: anything unreadable is Cheapest. */
@@ -59,7 +81,7 @@ export interface RouteGroup {
 }
 
 export interface Route {
-  goal: RouteGoal
+  goal: BookGoal
   /** Built only from recipes the player holds every material for (Cheapest and Fastest). */
   heldOnly: boolean
   /** What the route ranks on, in one or two plain sentences. */
@@ -81,14 +103,14 @@ export interface RouteAsk {
   tradeskill: Tradeskill
   /** Null: the log never showed the skill. Routes then start from 0, as the recipe book does. */
   level: number | null
-  goal: RouteGoal
+  goal: BookGoal
   /** "Only use materials I have". Read by Cheapest and Fastest; the other goals ignore it. */
   heldOnly?: boolean
 }
 
 const NOT_MEASURED = 'Nobody has measured how often a combine fails or raises the skill in this game, so no chance, no number of combines and no total is shown.'
 
-const BASIS: Record<RouteGoal, string> = {
+const BASIS: Record<BookGoal, string> = {
   cheapest:
     'Step by step from your level: the recipe whose one combine costs least at the prices you last paid. A made item can be sold back; a failed combine loses its materials.',
   fastest: 'Fewest stops: from your level, the highest trivial whose materials can all be bought, run to its trivial, then the next. Cost is not ranked.',
@@ -200,7 +222,7 @@ export function buildRoute(facts: RouteFacts, ask: RouteAsk): Route {
   const recipes = skillRecipes(facts.index, ask.tradeskill)
   const ctx: RouteCtx = { facts, tradeskill: ask.tradeskill, level: ask.level ?? 0, recipes }
   const top = topTrivial(recipes)
-  const builders: Record<RouteGoal, () => Built> = {
+  const builders: Record<BookGoal, () => Built> = {
     cheapest: () => cheapestRoute(ctx, top),
     fastest: () => fastestRoute(ctx, top),
     explore: () => exploreRoute(ctx),
