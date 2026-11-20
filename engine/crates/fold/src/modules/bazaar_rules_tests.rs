@@ -316,6 +316,54 @@ fn a_price_before_for_prices_only_the_item_after_it() {
     );
 }
 
+/// Bug hunt, 2026-11-19: a second, different price right after the first was dropped and the offer
+/// counted at the first. Which one holds is a guess, so the offer is listed, not counted.
+#[test]
+fn a_second_price_right_after_the_first_is_a_guess() {
+    assert_eq!(sure("WTS Fleeting Quiver 5k 6k pst"), [false]);
+    assert_eq!(sure("WTB Fleeting Quiver 4k - 5k"), [false]);
+    assert_eq!(sure("WTS Fleeting Quiver 6k now 5k"), [false]);
+    assert_eq!(sure("WTB Fleeting Quiver 4k to 5k"), [false]);
+    // Prices listed in order after the items: the second item is not the first price's.
+    assert_eq!(
+        sure("WTS Fleeting Quiver / Rain Caller 5k / 6k"),
+        [true, false]
+    );
+    assert_eq!(
+        read("WTS Fleeting Quiver / Rain Caller 5k / 6k"),
+        ["sell Fleeting Quiver", "sell Rain Caller 5000pp"]
+    );
+    // Words between the two prices: the second belongs to something else, often an item no page
+    // names, so the first still counts.
+    assert_eq!(
+        sure("WTS Fleeting Quiver 5k, Some Unlisted Thing 6k"),
+        [true]
+    );
+    assert_eq!(sure("WTS Fleeting Quiver 5k (was 6k)"), [true]);
+    assert_eq!(sure("WTS Fleeting Quiver 5k each, 9k for two"), [true]);
+    // A second price that says what it is for leaves the first the price of one (owner's log).
+    assert_eq!(
+        sure("selling Slime Blood of Cazic-Thule 2500pp, 2000pp for multiples"),
+        [true]
+    );
+    assert_eq!(
+        sure("Selling Fleeting Quiver 15k... 10k for primary RNG.  ;)"),
+        [true]
+    );
+    assert_eq!(sure("WTS Fleeting Quiver 3k, 2k if you buy two"), [true]);
+    // The same price twice is one price.
+    assert_eq!(sure("WTS Fleeting Quiver 5k 5k"), [true]);
+    // The next tier's price and the next item's price are their own.
+    assert_eq!(
+        sure("WTS Mithril Champion Arrows +7 20k, +6 11k"),
+        [true, true]
+    );
+    assert_eq!(
+        sure("WTS Fleeting Quiver 5k, Rain Caller 6k"),
+        [true, true]
+    );
+}
+
 /// A price of nothing is no price: the offer is listed with none, never counted at 0.
 #[test]
 fn a_zero_price_is_no_price() {

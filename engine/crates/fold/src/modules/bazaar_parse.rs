@@ -75,9 +75,9 @@ pub struct Offer {
     pub price_pp: Option<f64>,
     pub each: bool,
     /// False when reading it took a guess: the line offers another price or count after `or`, the
-    /// price has no unit, or a count over one and a price come with neither `each` nor `for` (the
-    /// lot, or each?). Such an offer is listed but never counted (owner, 2026-10-13: a wrong count
-    /// is worse than a missing one).
+    /// price has no unit, a second price stands right after the first ("4k - 5k"), or a count over
+    /// one and a price come with neither `each` nor `for` (the lot, or each?). Such an offer is
+    /// listed but never counted (owner, 2026-10-13: a wrong count is worse than a missing one).
     pub sure: bool,
 }
 
@@ -161,6 +161,8 @@ struct Parser<'a> {
     fresh: bool,
     /// The price on `last` was stated after it, so a tier that follows starts the next tier's offer.
     priced_here: bool,
+    /// The offer in `out` a price was last stated on, and the token just past that price.
+    price_end: Option<(usize, usize)>,
 }
 
 impl<'a> Parser<'a> {
@@ -435,6 +437,7 @@ impl<'a> Parser<'a> {
             return;
         };
         if self.out[last].price_pp.is_some() {
+            self.second_price(last, pp, at, at + used);
             return;
         }
         for (k, o) in self.out.iter_mut().enumerate() {
@@ -445,6 +448,30 @@ impl<'a> Parser<'a> {
                 o.each |= each;
                 o.sure &= !bare;
             }
+        }
+        self.price_end = Some((last, at + used));
+    }
+
+    /// A second, different price right after the first, with nothing but a separator, "to" or
+    /// "now" between ("4k - 5k", "6k now 5k", "A / B 5k / 6k"): which one holds is a guess, so the
+    /// offer is listed, not counted. Any other word between leaves the offer as it was: that price
+    /// belongs to something else, often an item no page names ("A 5k, some other thing 6k"). So
+    /// does a second price that says what it is for ("2500pp, 2000pp for multiples", 24 offers on
+    /// the owner's log, 2026-11-19): the first is the price of one. `at..end` is the second price.
+    fn second_price(&mut self, last: usize, pp: f64, at: usize, end: usize) {
+        let right_after = self.price_end.is_some_and(|(k, first_end)| {
+            k == last
+                && first_end <= at
+                && self.t[first_end..at].iter().all(|x| {
+                    SEPARATORS.contains(&x.raw.as_str()) || matches!(x.n.as_str(), "to" | "now")
+                })
+        });
+        let conditional = self
+            .t
+            .get(end)
+            .is_some_and(|x| matches!(x.n.as_str(), "for" | "if"));
+        if right_after && !conditional && self.out[last].price_pp != Some(pp) {
+            self.out[last].sure = false;
         }
     }
 
@@ -494,6 +521,7 @@ fn parse_tokens(t: Vec<Tok>, ix: &ItemIndex) -> Vec<Offer> {
         last: None,
         fresh: true,
         priced_here: false,
+        price_end: None,
     };
     let mut i = 0;
     while i < p.t.len() {
