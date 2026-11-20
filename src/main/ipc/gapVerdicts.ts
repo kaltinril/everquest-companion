@@ -13,6 +13,7 @@ import { mobKey } from '../../shared/mobKey'
 import { verdictsFrom, type KnowledgeCacheFile } from '../gapVerdictsRead'
 import { itemPageMobs } from '../gapItemMobs'
 import { itemPageForage } from '../gapItemForage'
+import { iconlessItems } from '../gapItemIcons'
 import { unknownItems, unknownSpells } from '../gapUnknownItems'
 import { itemTrades } from '../gapItemTrades'
 import { killFactionSamples } from '../gapKillFactionSamples'
@@ -82,6 +83,7 @@ export function registerGapVerdictsIpc(): void {
   ipcMain.handle(IPC.gapItemForage, (_e, names: unknown) =>
     Array.isArray(names) ? itemPageForage(names.filter((n): n is string => typeof n === 'string').slice(0, MAX_NAMES)) : {}
   )
+  ipcMain.handle(IPC.gapIconlessItems, () => iconlessItems())
   ipcMain.handle(IPC.gapItemTrades, (_e, names: unknown) =>
     Array.isArray(names) ? itemTrades(names.filter((n): n is string => typeof n === 'string').slice(0, MAX_NAMES)) : {}
   )

@@ -16,6 +16,7 @@ import NoteAddIcon from '@mui/icons-material/NoteAdd'
 import SearchIcon from '@mui/icons-material/Search'
 import { GAP_CAPTURE, mobPageOf, onMobPage, wikiCreateUrl, wikiEditUrl, wikiSearchUrl, zoneTitledPage, type GapRow } from '@shared/gaps'
 import { forageButtons } from '@shared/gapForage'
+import { iconButtons } from '@shared/gapIcons'
 import { copyText } from '../../lib/clipboard'
 import { Tooltip } from '../../lib/Tooltip'
 import { existingEditor } from '@shared/gapExistingPage'
@@ -84,12 +85,15 @@ function ActionButton({
  */
 function pageExists(row: GapRow): boolean {
   if ((row as { forageUpdate?: unknown }).forageUpdate !== undefined) return false
+  // An icon row copies one line to set, as a forage row copies the lines to add.
+  if (row.iconUpdate !== undefined) return false
   return existingEditor(row, readGapVerdict(row.domain, row.name)) !== undefined
 }
 
 /** The Copy button's words and tip for a row. */
 function copyWords(row: GapRow): { label: string; tip: string } {
   if (row.forageUpdate !== undefined) return { label: 'Copy wiki page', tip: forageButtons(row.forageUpdate).copyTip }
+  if (row.iconUpdate !== undefined) return { label: 'Copy icon line', tip: iconButtons(row.iconUpdate).copyTip }
   if (row.suggest !== undefined && (row.domain === 'item' || row.domain === 'spell' || row.domain === 'zone')) {
     return { label: 'Copy redirect', tip: `A redirect from the game's spelling to ${row.suggest.page}, so both spellings reach one page.` }
   }
@@ -153,7 +157,7 @@ function CopyPageButton({ text, row, compact }: { text: () => string; row: GapRo
   // item and it does the lookup"). A redirect (either kind: the page is known) or forage row copies only.
   const copy = (): void => {
     void copyText(text()).then(setCopied)
-    if (row.suggest === undefined && row.viaRedirect === undefined && row.forageUpdate === undefined) void lookupOnCopy(row.domain, row.name)
+    if (row.suggest === undefined && row.viaRedirect === undefined && row.forageUpdate === undefined && row.iconUpdate === undefined) void lookupOnCopy(row.domain, row.name)
   }
   const onClick = row.domain === 'quest' ? openRead : readsMobPage(row) ? openMobRead : copy
   return (
@@ -181,6 +185,10 @@ function editorOf(row: GapRow): { target: string; create: string; existing: bool
   if (row.forageUpdate !== undefined) {
     const f = forageButtons(row.forageUpdate)
     return { target: f.page, create: f.edit, existing: true }
+  }
+  if (row.iconUpdate !== undefined) {
+    const i = iconButtons(row.iconUpdate)
+    return { target: i.page, create: i.edit, existing: true }
   }
   // A notice row's page exists: it is edited, the notice off (owner, 2026-10-22).
   if (row.domain === 'notice') return { target: row.page ?? row.name, create: 'Edit page', existing: true }

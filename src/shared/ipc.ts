@@ -1179,6 +1179,9 @@ export const IPC = {
   // Item names in, `{ [name]: what its item page states of foraging | null }` out, off the committed
   // corpus (src/main/gapItemForage.ts), for the forage rows. Payload: (names: string[]).
   gapItemForage: 'gaps:itemForage',
+  // The item pages in the committed corpus that state no icon id, `{ name, page }[]`
+  // (src/main/gapItemIcons.ts), for the Items rows of the ones the player has met. No payload.
+  gapIconlessItems: 'gaps:iconlessItems',
   // Which item names the wiki data has no page for (src/main/gapUnknownItems.ts), for the rows of
   // items no log line names: the inventory export's, a capture's. Payload: (names: string[]).
   gapUnknownItems: 'gaps:unknownItems',
