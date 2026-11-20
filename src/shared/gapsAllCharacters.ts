@@ -253,11 +253,38 @@ function joinStep<T>(acc: T | null, next: T | null, rule: (a: unknown, b: unknow
   return (rule(acc, next) as T | null) ?? acc
 }
 
+/** One character's rows cut to the window, or null when its state is no gaps snapshot. */
+function cutGaps(c: CharacterInputs, cut: { stamp: string; ms: number } | null): GapsSnap | null {
+  const g = asGaps(c.gaps)
+  return g === null || cut === null ? g : gapsSince(g, cut.stamp)
+}
+
+/**
+ * A snapshot's rows with their tallies emptied: joined once more as the newest side it adds nothing
+ * and re-states each row's served fields, which `mergeGaps.ts mergeRow` takes from the newer side
+ * (`itemsSold`, `greeting`, `role`, `questFacts`). Only the rows the join still serves: one past a
+ * domain's cap must not come back as an empty row.
+ */
+function servedOnly(g: GapsSnap, joined: GapsSnap): GapsSnap {
+  const kept = new Set(joined.rows.map(seenByKey))
+  const rows = g.rows.filter((row) => kept.has(seenByKey(row))).map((row) => {
+    const { fight: _fight, ...r } = row as GapRow & { fight?: unknown }
+    return { ...r, kinds: [], count: 0, first: '', last: '', details: { samples: [] } }
+  })
+  return { rows, totals: g.totals, seen: g.seen }
+}
+
 /**
  * The characters joined one after another with the archive's merge rules, each one's rows cut to
  * the window first; loot and kills join whole, as in `ownSince`. A character whose state the rule
  * will not join (a kills shape from another build) adds nothing to that module and is not counted
  * twice. Loot is put back in time order.
+ *
+ * `inputs[0]` IS THE ATTACHED CHARACTER, and its reading of a row stands over every other
+ * character's, as the live fold's stands over its own archive: it is joined first (its spelling,
+ * kinds and first `/loc` lead) and its served fields are joined once more at the end. Without that
+ * the last character joined won them, and a merchant whose whole stock the live log quoted copied
+ * with the one item an alt once saw.
  */
 export function joinCharacters(inputs: readonly CharacterInputs[], cut: { stamp: string; ms: number } | null): JoinedGaps {
   let gaps: GapsSnap | null = null
@@ -265,14 +292,15 @@ export function joinCharacters(inputs: readonly CharacterInputs[], cut: { stamp:
   let kills: KillsSnap | null = null
   const seenBy = new Map<string, string[]>()
   for (const c of inputs) {
-    const g = asGaps(c.gaps)
-    const cutG = g === null || cut === null ? g : gapsSince(g, cut.stamp)
+    const cutG = cutGaps(c, cut)
     if (cutG !== null) noteSeen(seenBy, cutG.rows, c.label)
     gaps = joinStep(gaps, cutG, mergeGaps)
     const l = Array.isArray(c.loot) ? (c.loot as LootSnap) : null
     loot = joinStep(loot, l, mergeLoot) ?? loot
     kills = joinStep(kills, asKills(c.kills), mergeKills)
   }
+  const own = inputs.length > 1 ? cutGaps(inputs[0], cut) : null
+  if (own !== null && gaps !== null) gaps = joinStep(gaps, servedOnly(own, gaps), mergeGaps)
   return { gaps, loot: inputs.length > 1 ? [...loot].sort((x, y) => x.ts - y.ts) : loot, kills, seenBy }
 }
 

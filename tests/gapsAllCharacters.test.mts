@@ -154,6 +154,45 @@ test('the join: rows add up across characters and each row names who saw it', ()
   assert.equal(j.kills?.mobs.gnoll.count, 2)
 })
 
+test("the join keeps the attached character's merchant stock, hail answer and quest facts over another character's", () => {
+  // inputs[0] is the attached character: its live reading stands, as it does over its own archive.
+  const with_ = (r: GapRow, extra: Record<string, unknown>): GapRow => ({ ...r, ...extra }) as GapRow
+  const live = gaps([
+    with_(row('merchant', 'Kogg', 20), { kinds: ['quoted', 'hailed'], itemsSold: [{ item: 'Ale' }, { item: 'Mead' }], greeting: 'Hi', role: 'Merchant' }),
+    with_(row('item', 'Plea to Freeport', 2), { questFacts: { turnedInTo: [{ npc: 'Sir Mollin', n: 2 }] } }),
+    row('item', 'Bat Wing', 1)
+  ])
+  const alt = gaps([
+    with_(row('merchant', 'Kogg', 1), { kinds: ['quoted'], itemsSold: [{ item: 'Ale' }] }),
+    with_(row('item', 'Plea to Freeport', 1), { questFacts: { turnedInTo: [{ npc: 'Other', n: 1 }] } }),
+    with_(row('item', 'bat wing', 4), { questFacts: { turnedInTo: [{ npc: 'Only The Alt Saw', n: 1 }] } })
+  ])
+  const third = gaps([with_(row('merchant', 'Kogg', 1), { kinds: ['sold'], greeting: 'Bye', itemsSold: [] })])
+  const inputs = [{ label: 'Live', gaps: live, loot: [], kills: null }, { label: 'Alt', gaps: alt, loot: [], kills: null }, { label: 'Third', gaps: third, loot: [], kills: null }]
+  const j = joinCharacters(inputs, null)
+  const of = (domain: string, name: string): Record<string, unknown> => j.gaps?.rows.find((r) => r.domain === domain && r.name === name) as unknown as Record<string, unknown>
+  const kogg = of('merchant', 'Kogg')
+  assert.deepEqual(kogg.itemsSold, [{ item: 'Ale' }, { item: 'Mead' }])
+  assert.equal(kogg.greeting, 'Hi')
+  assert.equal(kogg.role, 'Merchant')
+  assert.deepEqual(of('item', 'Plea to Freeport').questFacts, { turnedInTo: [{ npc: 'Sir Mollin', n: 2 }] })
+  // The tallies still add up once each, the attached character's spelling and kinds still lead.
+  assert.equal(kogg.count, 22)
+  assert.deepEqual(kogg.kinds, ['quoted', 'hailed', 'sold'])
+  assert.equal(of('item', 'Bat Wing').count, 5)
+  // What only another character saw is kept: the attached character's row says nothing against it.
+  assert.deepEqual(of('item', 'Bat Wing').questFacts, { turnedInTo: [{ npc: 'Only The Alt Saw', n: 1 }] })
+  assert.deepEqual(j.seenBy.get(seenByKey({ domain: 'merchant', name: 'Kogg' })), ['Live', 'Alt', 'Third'])
+  assert.deepEqual(j.gaps?.totals.merchant, 1)
+})
+
+test("the join never brings back an attached character's row that fell past a domain's cap", () => {
+  const many = gaps(Array.from({ length: 500 }, (_, i) => row('item', `Item ${String(i).padStart(4, '0')}`, 2)))
+  const j = joinCharacters([{ label: 'Live', gaps: gaps([row('item', 'Zed', 1)]), loot: [], kills: null }, { label: 'Alt', gaps: many, loot: [], kills: null }], null)
+  assert.equal(j.gaps?.rows.some((r) => r.name === 'Zed' || r.count === 0), false)
+  assert.equal(j.gaps?.rows.length, many.rows.length)
+})
+
 test("the join cuts every character's rows to the window; loot and kills join whole", () => {
   const cut = { stamp: '2026-10-01 00:00:00', ms: 2000 }
   const k = { label: 'K', gaps: gaps([row('item', 'New', 1, '2026-10-05 00:00:00'), row('item', 'Old', 1, '2026-09-05 00:00:00')]), loot: [...loot('New', 3000), ...loot('Old', 1000)], kills: kills('rat', 1000) }
