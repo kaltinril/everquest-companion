@@ -91,7 +91,7 @@ const emptyProgress: ProgressState = {
  *  separates the store's own cost from the bundle evaluation before it in the startup summary. */
 export const STORE_OPEN_START_MS = performance.now()
 
-const schemaMigration = migrateStoreFile(join(USER_DATA, `${STORE_NAME}.json`), {
+export const schemaMigration = migrateStoreFile(join(USER_DATA, `${STORE_NAME}.json`), {
   info: (message) => logInfo(`[everquest-companion] ${message}`),
   error: (message) => logError('main:storeSchema', message)
 })
@@ -337,6 +337,11 @@ export function getActiveLogPath(): string | undefined {
 
 export function setActiveLogPath(logPath: string): void {
   store.set('activeLogPath', logPath)
+}
+
+/** Forget the saved pick: the player pointed the app at a folder with no log to track. */
+export function clearActiveLogPath(): void {
+  store.delete('activeLogPath')
 }
 
 // ----- EQ install-dir override (auto-discovery override) -----

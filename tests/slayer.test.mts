@@ -406,6 +406,27 @@ test('a level is read off the opening of the text, never out of the prose after 
   assert.deepEqual(levelSpan(undefined), { low: null, high: null })
 })
 
+test('a level range joined by a tilde, an en dash or a slash reads both ends', () => {
+  assert.deepEqual(levelSpan('8 ~ 14'), { low: 8, high: 14 })
+  assert.deepEqual(levelSpan('38~42'), { low: 38, high: 42 })
+  assert.deepEqual(levelSpan('24–25'), { low: 24, high: 25 })
+  assert.deepEqual(levelSpan('41/42'), { low: 41, high: 42 })
+  // A tilde with no second number is "about", and a comma or a bracket still ends the reading.
+  assert.deepEqual(levelSpan('~53'), { low: 53, high: 53 })
+  assert.deepEqual(levelSpan('28~'), { low: 28, high: 28 })
+  assert.deepEqual(levelSpan('4-6, ~12'), { low: 4, high: 6 })
+  assert.deepEqual(levelSpan('35 (1-10 according to Magelo)'), { low: 35, high: 35 })
+})
+
+test('a mob whose page joins its levels with a tilde shows the whole range, and its zone reaches the top', () => {
+  const drake = mob('An Emerald Drake', ['Butcherblock Mountains'], '8 ~ 14')
+  const drakes = slayerTarget(counter('You Keep Dragon Me Into This', 'Drakes, Drixies, and Fay Drakes.'))
+  const [zone] = planZones(slayerMobs([drake], () => 'Dragon'), [drakes], ANY)
+  assert.equal(zone.mobs[0].level, '8-14')
+  assert.equal(zone.low, 8)
+  assert.equal(zone.high, 14)
+})
+
 const at = (name: string, zone: string, locs: [number, number][]): MobEntry => ({
   page: name,
   name,

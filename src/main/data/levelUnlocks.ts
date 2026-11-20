@@ -649,8 +649,8 @@ export function dedupeByName(
 }
 
 let cached: LevelUnlockData | null = null
-/** Was `cached` built with the client table in hand? See `buildLevelUnlocks`. */
-let cachedWithClient = false
+/** The client table `cached` was built with, or null for none. See `buildLevelUnlocks`. */
+let cachedClient: SpellResistTable | null = null
 
 /**
  * The whole dataset, built once — and REBUILT ONCE MORE if the client's spell table shows up after
@@ -660,12 +660,13 @@ let cachedWithClient = false
  * table is not: it is parsed on a worker (`src/main/resist/spellTable.ts`), takes a moment on a cold
  * launch, and a player who opens the Leveling tab in that moment would otherwise be handed a dataset
  * with Odium's damage permanently missing — for the rest of the run, because the cache would never
- * be asked again. One boolean fixes it: a dataset folded WITHOUT the table is provisional and is
+ * be asked again. Remembering the table fixes it: a dataset folded WITHOUT the table is provisional and is
  * rebuilt the first time a read arrives with one. The rebuild costs the same ~2,000-row fold the
- * first one did and happens at most once per run, because the table never becomes null again.
+ * first one did and happens once per table: a read with no table keeps the better fold, and a
+ * DIFFERENT table (the EverQuest folder was changed, `spellTableMemo.ts`) is another install.
  */
 export function buildLevelUnlocks(client: SpellResistTable | null = null): LevelUnlockData {
-  if (cached && (cachedWithClient || !client)) return cached
+  if (cached && (!client || client === cachedClient)) return cached
   const skillTable = classesJson.skillUnlocks as Record<string, RawUnlock[]>
   const discTable = classesJson.discUnlocks as Record<string, RawUnlock[]>
   const disputed: string[] = classesJson.disputed
@@ -677,14 +678,14 @@ export function buildLevelUnlocks(client: SpellResistTable | null = null): Level
     skills[code] = skillsFor(code, [...(skillTable[code] ?? []), ...aaUnlocks(aas, code, listed)], discTable[code] ?? [], disputed)
   }
   cached = { spells: unlockSpells(client), skills, general: generalAaUnlocks(aas), scrapedAt: classesJson.scrapedAt }
-  cachedWithClient = client !== null
+  cachedClient = client
   return cached
 }
 
 /** Test seam: forget the folded dataset so the next call re-reads its inputs. */
 export function resetLevelUnlocksCache(): void {
   cached = null
-  cachedWithClient = false
+  cachedClient = null
 }
 
 /**

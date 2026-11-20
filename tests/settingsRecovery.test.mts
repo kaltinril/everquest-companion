@@ -1,0 +1,90 @@
+// What the player is told when the settings file was damaged at launch
+// (src/shared/settingsRecovery.ts). Until 2026-11-19 a recovery, a restore from an old backup and
+// a reset to defaults all looked like nothing had happened, or like a fresh install.
+
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { settingsRecoveryNotice } from '../src/shared/settingsRecovery'
+import { migrateStoreFile } from '../src/main/storeFile'
+
+const KEPT = 'C:\\Users\\me\\AppData\\Roaming\\app\\progress.corrupt.json'
+const onDay = (ms: number): string => `day ${String(ms)}`
+
+test('a store that opened normally, or a fresh install, says nothing', () => {
+  assert.equal(settingsRecoveryNotice({ wrote: false }), null)
+  assert.equal(settingsRecoveryNotice({ wrote: true }), null)
+  // A file that could not be read or moved aside was not recovered and not reset.
+  assert.equal(settingsRecoveryNotice({ wrote: false, readError: 'EPERM' }), null)
+})
+
+test('settings read back out of the damaged file: the player is told nothing was lost', () => {
+  const notice = settingsRecoveryNotice({ quarantinedPath: KEPT, salvagedFrom: 'torn-bytes', wrote: true })
+  assert.equal(notice?.kind, 'recovered')
+  assert.match(notice?.text ?? '', /All of your settings were recovered/)
+  assert.doesNotMatch(notice?.text ?? '', /missing|default/)
+})
+
+test('settings restored from a backup: the player is told its date and that later changes are gone', () => {
+  const notice = settingsRecoveryNotice(
+    { quarantinedPath: KEPT, salvagedFrom: 'backup', salvagedBackup: { savedAtMs: 42 }, wrote: true },
+    onDay
+  )
+  assert.equal(notice?.kind, 'restored-backup')
+  assert.match(notice?.text ?? '', /a copy saved on day 42\./)
+  assert.match(notice?.text ?? '', /Changes made after that are missing/)
+  assert.ok(notice?.text.includes(KEPT), 'and where the damaged file is kept')
+
+  // A backup whose date could not be read is still named as an older copy.
+  const undated = settingsRecoveryNotice({ quarantinedPath: KEPT, salvagedFrom: 'backup', wrote: true }, onDay)
+  assert.equal(undated?.kind, 'restored-backup')
+  assert.match(undated?.text ?? '', /restored from an older copy\./)
+})
+
+test('nothing could be recovered: the player is told the settings were reset and where the file is', () => {
+  const notice = settingsRecoveryNotice({ quarantinedPath: KEPT, wrote: false })
+  assert.equal(notice?.kind, 'reset')
+  assert.match(notice?.text ?? '', /started with default settings/)
+  assert.ok(notice?.text.includes(KEPT))
+})
+
+test('a recovery that could not be written back is a reset, never "recovered"', () => {
+  // The recovered settings never reached the live file, so the app is running on defaults.
+  for (const salvagedFrom of ['torn-bytes', 'backup'] as const) {
+    const notice = settingsRecoveryNotice({ quarantinedPath: KEPT, salvagedFrom, wrote: false })
+    assert.equal(notice?.kind, 'reset')
+  }
+})
+
+test('the real store-file outcomes map to the three notices', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'eqc-settings-recovery-'))
+  const path = join(dir, 'everquest-companion-progress.json')
+  const quiet = { error: () => undefined }
+  const whole = '{"schemaVersion": 1, "byCharacter": {}}'
+  try {
+    writeFileSync(path, whole, 'utf8')
+    assert.equal(settingsRecoveryNotice(migrateStoreFile(path, quiet)), null, 'a healthy store')
+
+    writeFileSync(path, `${whole}\u0000\u0000\u0000`, 'utf8')
+    assert.equal(settingsRecoveryNotice(migrateStoreFile(path, quiet))?.kind, 'recovered')
+
+    // The healthy run above left a v1 backup, so a store cut off mid-object restores from it.
+    writeFileSync(path, '{"byCharacter": {"a": 1', 'utf8')
+    assert.equal(settingsRecoveryNotice(migrateStoreFile(path, quiet))?.kind, 'restored-backup')
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
+
+  const empty = mkdtempSync(join(tmpdir(), 'eqc-settings-recovery-'))
+  try {
+    const lone = join(empty, 'everquest-companion-progress.json')
+    writeFileSync(lone, '{"byCharacter": {"a": 1', 'utf8')
+    const notice = settingsRecoveryNotice(migrateStoreFile(lone, quiet))
+    assert.equal(notice?.kind, 'reset')
+    assert.ok(notice?.text.includes(join(empty, 'everquest-companion-progress.corrupt.json')))
+  } finally {
+    rmSync(empty, { recursive: true, force: true })
+  }
+})

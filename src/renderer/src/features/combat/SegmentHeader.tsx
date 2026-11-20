@@ -10,11 +10,13 @@
 import { Stack, Typography } from '@mui/material'
 import CircleIcon from '@mui/icons-material/Circle'
 import { CopyButton, KIND_COLOR, fmtDur } from './combatShared'
+import { headlineClockSec } from './headlineClock'
 import { healTotalTitle } from './healRows'
 import { fmtElapsed } from './copyText'
 import { formatNum as fmt, formatHealRate, formatRate } from '../../lib/formatRate'
 import type { MeterMode } from './dashboardData'
 import type { SegmentView } from '@shared/combat'
+import type { HealHeadline } from '@shared/healHeadline'
 import { Tooltip } from '../../lib/Tooltip'
 
 /** The Healing dimension's accent — the heal overlays' green, so the two read as one subject. */
@@ -128,10 +130,14 @@ export function SegmentHeader({
   total,
   dps,
   activeDps,
+  healing,
   copyView
 }: {
   seg: SegmentView
   mode: MeterMode
+  /** the Healing dimension's figures for the hover (`healRows.healHeadline`): the same scoped,
+   *  drilled ones `total` and `dps` print. Null in the two damage dimensions. */
+  healing: HealHeadline | null
   /**
    * WHAT THE PANEL BELOW IS SHOWING, never the raw segment (JOS-170): the scoped ranked list at
    * level 1, the drilled subject with its nested pets at level 2 — `petRows.panelTotals`. This
@@ -149,7 +155,7 @@ export function SegmentHeader({
   // THE CLOCK THE HEADLINE RATE WAS TAKEN OVER: the fight's length at level 1, a shorter one under
   // the You scope or a drill, where the rate is over the row's own attacking time. Read back off
   // the two figures printed beside it, so rate x time is always the total shown.
-  const clockSec = mode === 'out' && dps > 0 ? total / dps : seg.durationSec
+  const clockSec = mode === 'out' ? headlineClockSec(total, dps, seg.durationSec) : seg.durationSec
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="baseline" sx={{ mb: 1, flexShrink: 0 }}>
       <Typography variant="subtitle1" noWrap>
@@ -163,7 +169,7 @@ export function SegmentHeader({
         <Typography
           variant="body2"
           sx={{ color: heal ? HEAL_COLOR : mode === 'out' ? 'primary.main' : KIND_COLOR.enemy }}
-          title={heal ? healTotalTitle(seg.healing) : undefined}
+          title={healing ? healTotalTitle(healing) : undefined}
         >
           {heal ? formatHealRate(dps) : formatRate(dps)}{' '}
           <ActiveDpsNote seg={seg} mode={mode} dps={dps} activeDps={activeDps} clockSec={clockSec} />

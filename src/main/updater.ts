@@ -146,10 +146,14 @@ import type { UpdateChannel, UpdateStatus } from '../shared/types'
 import {
   MAX_DOWNLOAD_ATTEMPTS,
   SIGNATURE_BLOCKED_PAUSED_MESSAGE,
+  checkFollowUpPhase,
   describeUpdateFailure,
   isInterruptedFailure,
+  isNewerVersion,
   isStaleVersion,
   nextCheckDelayMs,
+  rescheduleAfterUpdateError,
+  shouldRearmStagedBuild,
   shouldRetryCheck
 } from '../shared/update'
 import { logError, logInfo, logWarn } from './errorLog'
@@ -162,7 +166,12 @@ import {
   type UpdateStep
 } from './updateLog'
 import { getUpdateChannel, getUpdateLastCheckedAt, setUpdateLastCheckedAt } from './store'
-import { getAutoUpdateOff, setAutoUpdateOff } from './storeAutoUpdate'
+import {
+  getAutoUpdateOff,
+  getUpdateStagedVersion,
+  setAutoUpdateOff,
+  setUpdateStagedVersion
+} from './storeAutoUpdate'
 import { classifyFailure, recordEvent } from './telemetry'
 
 const { autoUpdater } = electronUpdater
@@ -245,6 +254,55 @@ let checkAttempts = 0
  * which both fire for the same failure — exactly like `checkInFlight`.
  */
 let retryPending = false
+/**
+ * The newer version a finished download left on disk, REMEMBERED ACROSS LAUNCHES. 'ready' itself
+ * is never persisted (a check in this session has to re-arm it, see `initUpdater`), so without
+ * this a launch with the switch off, where no check runs, forgot the build and the app read as up
+ * to date. It rides on every status as `stagedVersion`; the words are shared/update.ts's.
+ */
+let stagedVersion: string | undefined
+
+/** Set or clear the remembered build. Written only on a change; a failed write holds for the session. */
+function rememberStaged(version: string | undefined): void {
+  if (version === stagedVersion) return
+  stagedVersion = version
+  try {
+    setUpdateStagedVersion(version)
+  } catch {
+    // A store write must never break the update flow.
+  }
+}
+
+/**
+ * Checks and downloads cut short since the last check that completed. It bounds the short retry
+ * (shared/update.ts `checkFollowUpPhase`), so a network that keeps changing is not polled forever.
+ */
+let interruptedInARow = 0
+/**
+ * True once a download has landed in this session with install-on-close ON, which is the only
+ * moment electron-updater registers its quit handler (BaseUpdater.js `addQuitHandler`).
+ */
+let quitArmed = false
+
+/**
+ * THE SWITCH WAS TURNED ON WITH A BUILD ALREADY DOWNLOADED. That build landed while
+ * `autoInstallOnAppQuit` was false, so no quit handler exists, and the check the switch starts
+ * returns at once on 'ready'. `downloadUpdate()` re-resolves the cached file (no network: it
+ * validates the file on disk) and runs the callback that registers the handler. `downloading`
+ * stays unset, so the re-emitted 'update-downloaded' counts nothing and re-pushes 'ready'.
+ * The caller sets the flag first.
+ */
+function rearmApplyOnQuit(): void {
+  if (!shouldRearmStagedBuild({ quitArmed, autoUpdateOff, state: lastStatus.state })) return
+  void autoUpdater.downloadUpdate().catch(() => undefined)
+}
+
+/** Launch: read the remembered build back, and drop it once this build is that version or newer. */
+function restoreStaged(currentVersion: string): void {
+  stagedVersion = getUpdateStagedVersion()
+  if (!isNewerVersion(stagedVersion, currentVersion)) rememberStaged(undefined)
+  if (stagedVersion) lastStatus = { ...lastStatus, stagedVersion }
+}
 
 /**
  * Map our channel choice onto electron-updater's settings — which since the tags-only
@@ -325,6 +383,8 @@ interface StatusSinks {
    * about at the other end of the same wire.
    */
   retryOnResume: () => void
+  /** Re-arm the poll now, so a failure counted after the loop re-armed still gets its backoff. */
+  retrySoon: () => void
 }
 
 /**
@@ -352,7 +412,9 @@ function noteInterrupted(step: UpdateStep, err: unknown, sinks: StatusSinks): vo
   logUpdateFailure(step, 'final', err, LOG_SINKS)
   noteUpdate(step, err)
   checkInFlight = false
-  sinks.push({ state: 'idle' })
+  interruptedInARow++
+  // `interrupted` is what stops the chip reading "up to date" about a check that never finished.
+  sinks.push({ state: 'idle', interrupted: step })
   sinks.retryOnResume()
 }
 
@@ -425,7 +487,7 @@ function applyStagedUpdate(flushStore: () => void): void {
  */
 function registerUpdaterEvents(
   currentVersion: string,
-  { push, checkDone, retryOnResume }: StatusSinks
+  { push, checkDone, retryOnResume, retrySoon }: StatusSinks
 ): void {
   autoUpdater.on('checking-for-update', () => push({ state: 'checking' }))
 
@@ -433,6 +495,8 @@ function registerUpdaterEvents(
     const version: string | undefined = info?.version
     consecutiveFailures = 0 // the CHECK succeeded, whatever happens to the download
     noteUpdate('check')
+    // The feed moved on from the remembered build: its file is about to be replaced.
+    if (version !== stagedVersion) rememberStaged(undefined)
     // UPDATED-AWAY: the feed names a build we already are. Nothing to offer.
     if (isStaleVersion(version, currentVersion)) {
       checkDone({ state: 'idle' })
@@ -469,6 +533,7 @@ function registerUpdaterEvents(
     consecutiveFailures = 0
     downloading = null
     noteUpdate('check')
+    rememberStaged(undefined)
     checkDone({ state: 'idle' })
   })
 
@@ -483,6 +548,8 @@ function registerUpdaterEvents(
 
   autoUpdater.on('update-downloaded', (info) => {
     const version: string | undefined = info?.version
+    // The library adds its quit handler right after this event, and only when this flag is on.
+    if (autoUpdater.autoInstallOnAppQuit) quitArmed = true
     // COUNTED ONLY WHEN THIS PROCESS ACTUALLY DOWNLOADED IT. Research §6b: this event is
     // RE-EMITTED on every check that re-resolves an already-staged file, so counting the event
     // itself would report one download per poll for the rest of the session — the same trap that
@@ -505,6 +572,7 @@ function registerUpdaterEvents(
     // (research §6b) — which is how "restart to update" prompts turn into a nag
     // in other apps. Pushing an idempotent state instead of firing an event is
     // what makes re-emission harmless here.
+    rememberStaged(version)
     push({ state: 'ready', version })
   })
 
@@ -520,8 +588,10 @@ function registerUpdaterEvents(
     // we had a download in flight. Getting it wrong would put CDN failures in the check row.
     const step = downloading !== null ? 'download' : 'check'
     downloading = null
+    // A download only runs when no valid file is cached, so its failure leaves nothing staged.
+    if (step === 'download') rememberStaged(undefined)
     if (isInterruptedFailure(err)) {
-      noteInterrupted(step, err, { push, checkDone, retryOnResume })
+      noteInterrupted(step, err, { push, checkDone, retryOnResume, retrySoon })
       return
     }
     // JOS-211: an unreadable feed body is swallowed ONCE — no verdict, no telemetry, no
@@ -547,15 +617,20 @@ function registerUpdaterEvents(
     const kind = logUpdateFailure(step, 'final', err, LOG_SINKS)
     // A BLOCKED POWERSHELL IS NOT A REASON TO BACK OFF THE FEED (JOS-421). The check itself
     // succeeded — GitHub answered, the installer downloaded, and the failure happened afterwards in
-    // a child process on this PC. Walking `consecutiveFailures` out to four hours over it would
-    // punish the feed for the antivirus, and would slow the very re-check that is this failure's
-    // only automatic remedy. The download side stays bounded by `MAX_DOWNLOAD_ATTEMPTS`, which is
-    // what stops a hostile environment re-pulling the same installer forever; the sentence the user
-    // reads when that bound is reached names the cause (see `downloadBlocked` above).
+    // a child process on this PC. Counting it in `consecutiveFailures` would punish the feed for
+    // the antivirus, so the poll stays on its healthy spacing. The download side stays bounded by
+    // `MAX_DOWNLOAD_ATTEMPTS`, which is what stops a hostile environment re-pulling the same
+    // installer forever; the sentence the user reads when that bound is reached names the cause
+    // (see `downloadBlocked` above).
     if (kind === 'blocked') downloadBlocked = true
     else consecutiveFailures++
     noteUpdate(step, err ?? 'unknown error')
     checkDone({ state: 'error', message: describeUpdateFailure(err) })
+    // A FAILED DOWNLOAD RE-ARMS THE POLL ITSELF. The download runs after its check has returned,
+    // so the loop re-armed at the healthy spacing while `consecutiveFailures` was still 0, and the
+    // count above would never be read: the next check resets it before any delay is computed.
+    // Re-arming here, after the count, is what gives a failed download the 15 minute backoff.
+    if (rescheduleAfterUpdateError({ step, kind })) retrySoon()
   })
 }
 
@@ -622,12 +697,14 @@ export function initUpdater(
   }
 
   const currentVersion = app.getVersion()
+  restoreStaged(currentVersion)
 
   /** Record + broadcast a status. `checkedAt` rides along on every push once known. */
   const push = (status: UpdateStatus): void => {
     lastStatus = lastCheckedAt
       ? { ...status, checkedAt: lastCheckedAt, autoUpdateOff }
       : { ...status, autoUpdateOff }
+    if (stagedVersion) lastStatus.stagedVersion = stagedVersion
     const win = getMainWindow()
     if (win && !win.isDestroyed()) win.webContents.send(IPC.onUpdateStatus, lastStatus)
   }
@@ -636,6 +713,7 @@ export function initUpdater(
   const checkDone = (status: UpdateStatus): void => {
     lastCheckedAt = Date.now()
     checkInFlight = false
+    interruptedInARow = 0
     try {
       setUpdateLastCheckedAt(lastCheckedAt)
     } catch {
@@ -674,7 +752,8 @@ export function initUpdater(
   // startup check must be allowed to run and re-arm it. Also why a non-zero exit
   // code skips the install — a crash never installs anything.
   // Off when the user switched automatic updates off; electron-updater reads it again at quit,
-  // so a build staged before the switch is not applied either.
+  // so a build staged before the switch is not applied either. Switching back ON needs more than
+  // the flag: see `rearmApplyOnQuit`.
   autoUpdater.autoInstallOnAppQuit = !autoUpdateOff
   // We ship an NSIS target, never the web installer. Left at its default (false)
   // electron-updater logs a deprecation nag on EVERY download
@@ -683,11 +762,16 @@ export function initUpdater(
   applyChannel(getUpdateChannel())
 
   // THE SINKS, BUILT ONCE. Both the event handlers and `runCheck`'s rejection path route through
-  // the same three, which is what makes "one failure counts exactly once" checkable rather than
+  // the same four, which is what makes "one failure counts exactly once" checkable rather than
   // remembered. `schedule` is a `const` further down and is only ever REACHED from a timer, an IPC
   // call or an updater event — all of them after this function has finished running — so the arrow
   // closing over it can never observe the temporal dead zone.
-  const sinks: StatusSinks = { push, checkDone, retryOnResume: () => schedule('resume') }
+  const sinks: StatusSinks = {
+    push,
+    checkDone,
+    retryOnResume: () => schedule('resume'),
+    retrySoon: () => schedule('periodic')
+  }
   registerUpdaterEvents(currentVersion, sinks)
 
   // renderer -> main: apply the downloaded update NOW. Guarded on 'ready' because BaseUpdater
@@ -707,6 +791,7 @@ export function initUpdater(
   const runCheck = async (manual: boolean): Promise<UpdateStatus> => {
     if (manual) {
       consecutiveFailures = 0
+      interruptedInARow = 0
       downloadAttempts.clear()
       // The user may have just allowed PowerShell and come back to press the button — an explicit
       // retry re-asks the environment rather than repeating this session's verdict about it.
@@ -750,7 +835,8 @@ export function initUpdater(
     // Automatic updates off: no background check. The manual "Check for updates" still runs.
     if (autoUpdateOff) return
     timer = setTimeout(() => {
-      void runCheck(false).finally(() => schedule('periodic'))
+      // From the verdict, not a fixed 'periodic': that overwrote an interrupted check's short retry.
+      void runCheck(false).finally(() => schedule(checkFollowUpPhase(lastStatus, interruptedInARow)))
     }, nextCheckDelayMs({ phase, consecutiveFailures }))
   }
 
@@ -758,8 +844,8 @@ export function initUpdater(
   ipcMain.handle(IPC.checkForUpdates, async (): Promise<UpdateStatus> => {
     const res = await runCheck(true)
     // Re-anchor the background cadence off the manual check so we don't poll
-    // again three seconds later.
-    schedule('periodic')
+    // again three seconds later. An interrupted check keeps its short retry instead.
+    schedule(checkFollowUpPhase(res, interruptedInARow))
     return res
   })
 
@@ -768,6 +854,7 @@ export function initUpdater(
   // The switch flipped: re-arm or stop apply-on-quit, and the poll (switching on checks soon).
   applyAutoUpdate = () => {
     autoUpdater.autoInstallOnAppQuit = !autoUpdateOff
+    rearmApplyOnQuit()
     schedule('resume')
     push(lastStatus)
   }

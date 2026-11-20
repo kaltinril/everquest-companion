@@ -27,7 +27,7 @@ import { FOOTER_ROW } from './overlayScale'
 import { markZones, type MarkZoneInput, timerLabelLengths } from './markZones'
 import { labelRows } from '../features/maps/mobPins'
 import { useOverlayModule } from './useOverlayModule'
-import { TRACK_COLOR, trackedIn, viewFit, type ExtentFit, type TrackedPin, type TrackedPoint, type ZoneExtent } from '../features/maps/mapTrack'
+import { TRACK_COLOR, overlayExtent, trackedIn, viewFit, type ExtentFit, type TrackedPin, type TrackedPoint } from '../features/maps/mapTrack'
 import { useMapTrack } from '../features/maps/useMapTrack'
 import { withWatched } from '../features/maps/watchTrack'
 import { waypointCommand } from '../features/maps/waypoint'
@@ -35,6 +35,7 @@ import { MapPinsField } from './MapPinsField'
 import { LayerChips, usePinLayers, usePinsBg, usePinsFollow, type PinLayers } from './mapPinsLayers'
 import { useGameMapShown, useHiddenMouse } from './useGameMapFollow'
 import { useMobPlaces, useOverlayMapData, useSlayerOverlay } from './useMapPinsData'
+import { emptyNote } from './mapPinsNote'
 import { useOverlayCrawl } from './MapPinsCrawl'
 import { useOverlayView, type OverlayViewControls } from './useOverlayView'
 import { zoneMobPins, zoneTimerPins, zoneWatched } from '../features/maps/overlayPoints'
@@ -133,7 +134,7 @@ function Corner({ h, v, fit }: { h: 'left' | 'right'; v: 'top' | 'bottom'; fit: 
 /** Everything placed in the zone, through the window's whole-zone fit. */
 function useZoneMarks(zone: string | null, layers: PinLayers) {
   const { state } = useMapTrack()
-  const data = useOverlayMapData(zone)
+  const { data, loading } = useOverlayMapData(zone)
   const catalog = useMobPlaces()
   const respawn = useOverlayModule<RespawnSnap>('respawn', EMPTY_RESPAWN_SNAP)
   const tracked = useMemo<TrackedPoint[]>(
@@ -145,18 +146,12 @@ function useZoneMarks(zone: string | null, layers: PinLayers) {
     () => zoneTimerPins(zone, respawn.rows, catalog, respawn.zone),
     [zone, respawn.rows, catalog, respawn.zone]
   )
-  const ext: ZoneExtent | undefined = data?.bounds ?? (zone == null ? undefined : state.extents[zone])
+  const ext = overlayExtent(state, zone, data?.bounds)
   // The Achievements areas the main window wrote for this zone (as the Maps tab's).
   const slayer = useSlayerOverlay()
   const areas = useMemo(() => slayerOverlayAreasFor(slayer, zone), [slayer, zone])
   const slayerChip = (slayer?.picks ?? 0) > 0
-  return { data, tracked, mobs, timers, ext, areas, slayerChip }
-}
-
-function emptyNote(zone: string | null, ext: ZoneExtent | undefined): string | null {
-  if (zone == null) return 'Waiting for the log to name your zone.'
-  if (ext == null) return 'No map for this zone - install a map pack, or open it on the Maps tab.'
-  return null
+  return { data, loading, tracked, mobs, timers, ext, areas, slayerChip }
 }
 
 function useCopy(): { copied: string | null; onCopy: (name: string, pin: TrackedPin) => void } {
@@ -333,14 +328,14 @@ export default function MapPinsOverlay(): JSX.Element {
   const bg = usePinsBg()
   const { w, h } = useWindowSize()
   const zone = zoneShortName(who.zone)
-  const { data, tracked, mobs, timers, ext, areas, slayerChip } = useZoneMarks(zone, layers)
+  const { data, loading, tracked, mobs, timers, ext, areas, slayerChip } = useZoneMarks(zone, layers)
   const crawl = useOverlayCrawl(zone)
   const nowMs = useClock(layers.timers && timers.length > 0)
   const { copied, onCopy } = useCopy()
   const hostRef = useRef<HTMLDivElement>(null)
   const zoom = useOverlayView({ zone, ext, size: { w, h }, enabled: !locked, hostRef })
   const fit = useMemo(() => (ext == null ? null : viewFit(ext, w, h, zoom.view)), [ext, w, h, zoom.view])
-  const note = emptyNote(zone, ext)
+  const note = emptyNote(zone, ext, loading)
   const labels = useMemo(() => labelRows(data?.points ?? []).map((r) => r.point), [data])
   const zoneInput = useMemo(
     () => (ext == null || fit == null ? null : { ext, fit, w, h, layers, labels, mobs, timers, tracked, areas }),

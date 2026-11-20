@@ -8,7 +8,7 @@ import { overlayResetPatch, resetKinds } from '../shared/overlayReset'
 import { logInfo } from './errorLog'
 import { DEFAULT_OVERLAY_CONFIG, setOverlayConfig } from './store'
 import { raiseTopmost } from './topmost'
-import { getOverlayWindow, isOverlayOpen, overlaysParked, raiseCursorRing } from './windows'
+import { getOverlayWindow, isOverlayOpen, opaqueStripResting, overlaysParked, raiseCursorRing } from './windows'
 
 function closeAndWait(kind: OverlayKind): Promise<void> {
   const w = getOverlayWindow(kind)
@@ -32,6 +32,9 @@ export function raiseOverlays(): OverlayKind[] {
   for (const kind of raised) {
     const w = getOverlayWindow(kind)
     if (w == null || w.isDestroyed()) continue
+    // A resting opaque strip stays hidden: shown, it is a solid rectangle over the game until its
+    // next card. That card brings it up, on top (windows.ts applyOpaqueStripVisibility).
+    if (!w.isVisible() && opaqueStripResting(kind)) continue
     if (!w.isVisible()) w.showInactive()
     if (!overlaysParked()) w.setOpacity(1)
     raiseTopmost(w)

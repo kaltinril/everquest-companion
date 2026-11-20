@@ -12,3 +12,18 @@ export function getAutoUpdateOff(): boolean {
 export function setAutoUpdateOff(off: boolean): void {
   settingsStore.set('autoUpdateOff', off)
 }
+
+/**
+ * The version a finished download left on disk. Kept so the next launch can say a newer build is
+ * downloaded but not installed; the 'ready' state itself is never persisted (updater.ts). Additive
+ * and optional like the switch: an absent key means nothing is waiting.
+ */
+export function getUpdateStagedVersion(): string | undefined {
+  const version = settingsStore.get('updateStagedVersion')
+  return typeof version === 'string' && version.length > 0 ? version : undefined
+}
+
+export function setUpdateStagedVersion(version: string | undefined): void {
+  if (version === undefined) settingsStore.delete('updateStagedVersion')
+  else settingsStore.set('updateStagedVersion', version)
+}

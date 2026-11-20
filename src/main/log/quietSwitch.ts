@@ -130,6 +130,24 @@ export function logIsQuiet(lastLineAt: number, now: number, quietMs: number = QU
   return now - lastLineAt >= quietMs
 }
 
+/** The attached log's size as one sample of the Logs dir found it, and when. */
+export interface AttachedSample {
+  readonly size: number
+  readonly at: number
+}
+
+/**
+ * THE FILE'S OWN WORD THAT IT IS BEING WRITTEN (2026-11-19). `lastLineAt` is fed by the engine's
+ * cursors, and those stop while the engine is down or restarting and the game writes on, so a log
+ * in active use read as quiet. The attached log's size is the backstop: growth since a sample
+ * taken at or after the last line heard is bytes no cursor reported. A sample older than the last
+ * line proves nothing (those bytes may be the lines already heard), and a first sight is not
+ * growth, the rule `pickGrowing` holds siblings to.
+ */
+export function attachedWroteSince(lastLineAt: number, before: AttachedSample | null, size: number): boolean {
+  return before !== null && before.at >= lastLineAt && size > before.size
+}
+
 /** Windows paths are case-insensitive; the memory of "we asked about this log" must be too. */
 function key(path: string): string {
   return path.toLowerCase()

@@ -110,6 +110,13 @@ function standingRace(name: string, key: string): string {
   return said !== null && yielded.has(said) ? '' : key
 }
 
+/** Whether the page's race gives way to the mob's name (`yieldsTo`): a drake filed as Dragon. */
+export function raceYields(name: string, race: string | undefined): boolean {
+  if (race === undefined) return false
+  const key = raceKey(race)
+  return standingRace(name, key) !== key
+}
+
 export function mobFacts(name: string, race: string | undefined): MobFacts {
   const key = standingRace(name, race === undefined ? '' : raceKey(race))
   const nameKey = mobNameKey(name)

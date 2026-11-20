@@ -37,6 +37,8 @@ import {
   UNSTATED_NOTE,
   hasAbsorbCounts,
   healPanel,
+  healEmptyNote,
+  healHeadline,
   healRange,
   healTotalTitle,
   healerAmount,
@@ -48,6 +50,8 @@ import {
   spellStat,
   spellTitle
 } from '../src/renderer/src/features/combat/healRows'
+import { scopeHealing } from '../src/renderer/src/features/combat/meterScope'
+import type { RosterSnap } from '../src/shared/roster'
 import type {
   HealSourceView,
   HealSpellView,
@@ -252,6 +256,92 @@ test('the headline title states the restored/absorbed split only when there is o
   assert.match(pure, /900 healing restored/)
   assert.doesNotMatch(pure, /absorbed/)
   assert.equal(healTotalTitle(undefined), '')
+})
+
+// ── the headline over a scoped or drilled list ─────────────────────────────────────────
+//
+// The Combat tab's Healing header carries no label, so it has to be what the rows under it add
+// up to (the damage header's rule, JOS-170). It used to print the whole segment's healing over a
+// list the scope had cut down, and over one drilled healer's lanes.
+
+const CLERIC = healer('heal:cleric', { name: 'Cleric', kind: 'other', total: 5000, hps: 50, pct: 100, count: 5, max: 1200 })
+const MINE = healer('you', { name: 'You', total: 1000, absorbedTotal: 200, hps: 10, pct: 20, count: 4, max: 300 })
+const FLUFFY = healer('heal:fluffy', { name: 'Fluffy', kind: 'pet', total: 100, hps: 1, pct: 2, count: 1, max: 100 })
+const GROUPED = healing({
+  healers: [CLERIC, MINE, FLUFFY],
+  total: 6100,
+  hps: 61,
+  restoredTotal: 5900,
+  absorbedTotal: 200
+})
+/** A roster that has heard signals and names nobody: the cleric is not in your group. */
+const NO_CLERIC: RosterSnap = { members: [], seen: true, lastSignalTs: 1 }
+const near = (a: number, b: number): boolean => Math.abs(a - b) < 1e-9
+
+test('the Healing headline is the sum of the healers the scope kept', () => {
+  const h = healHeadline(healPanel(scopeHealing(GROUPED, 'you', NO_CLERIC), null), GROUPED)
+  assert.equal(h.total, 1100, 'you + your pet, not the cleric')
+  assert.ok(near(h.hps, 11), 'the rate shrinks by the same share: one clock, the segment')
+  assert.equal(h.restoredTotal, 900)
+  assert.equal(h.absorbedTotal, 200)
+  assert.equal(h.restoredTotal + h.absorbedTotal, h.total)
+})
+
+test('the Healing headline is zero when the scope hid every healer', () => {
+  const onlyCleric = healing({ healers: [CLERIC], total: 5000, hps: 50, restoredTotal: 5000 })
+  const panel = healPanel(scopeHealing(onlyCleric, 'you', NO_CLERIC), null)
+  assert.equal(panel.level === 1 && panel.empty, true)
+  assert.deepEqual(healHeadline(panel, onlyCleric), { total: 0, hps: 0, restoredTotal: 0, absorbedTotal: 0 })
+})
+
+test('the Healing headline over a drilled healer is that healer, not the fight', () => {
+  const h = healHeadline(healPanel(scopeHealing(GROUPED, 'everyone', NO_CLERIC), 'heal:cleric'), GROUPED)
+  assert.deepEqual(h, { total: 5000, hps: 50, restoredTotal: 5000, absorbedTotal: 0 })
+  const mine = healHeadline(healPanel(GROUPED, 'you'), GROUPED)
+  assert.deepEqual(mine, { total: 1000, hps: 10, restoredTotal: 800, absorbedTotal: 200 })
+})
+
+test('an unscoped, undrilled Healing headline is the model’s own figures, to the bit', () => {
+  // THE SOLO INVARIANT (meterScope.ts): nothing filtered, nothing recomputed.
+  const h = healHeadline(healPanel(scopeHealing(GROUPED, 'everyone', NO_CLERIC), null), GROUPED)
+  assert.deepEqual(h, { total: 6100, hps: 61, restoredTotal: 5900, absorbedTotal: 200 })
+  assert.deepEqual(healHeadline(healPanel(undefined, null), undefined), {
+    total: 0,
+    hps: 0,
+    restoredTotal: 0,
+    absorbedTotal: 0
+  })
+})
+
+test('a stale drill headlines the scoped list it falls back to', () => {
+  const h = healHeadline(healPanel(scopeHealing(GROUPED, 'you', NO_CLERIC), 'pet:fluffy#1'), GROUPED)
+  assert.equal(h.total, 1100)
+})
+
+test('the headline hover states the same scoped figures the headline prints', () => {
+  const h = healHeadline(healPanel(scopeHealing(GROUPED, 'you', NO_CLERIC), null), GROUPED)
+  const title = healTotalTitle(h)
+  assert.match(title, /^1\.1k total · 900 restored \+ 200 absorbed\./)
+  assert.doesNotMatch(title, /6\.1k|5\.9k/)
+})
+
+test('an empty list says so, and names the scope when the scope is what emptied it', () => {
+  const onlyCleric = healing({ healers: [CLERIC], total: 5000 })
+  assert.equal(healEmptyNote(healing(), 'you'), 'No healing in this segment.')
+  assert.equal(healEmptyNote(undefined, 'group'), 'No healing in this segment.')
+  assert.equal(healEmptyNote(onlyCleric, 'everyone'), 'No healing in this segment.')
+  assert.match(healEmptyNote(onlyCleric, 'you'), /^No healing from you or your pets in this segment\./)
+  assert.match(healEmptyNote(onlyCleric, 'group'), /^No healing from your group in this segment\./)
+  assert.match(healEmptyNote(onlyCleric, 'you'), /Everyone/)
+})
+
+test('the Combat tab header takes its Healing figures from the scoped, drilled list', () => {
+  const read = (rel: string): string => readFileSync(new URL(rel, import.meta.url), 'utf8')
+  const panelText = read('../src/renderer/src/features/combat/SegmentPanel.tsx')
+  assert.match(panelText, /\bhealHeadline\s*\(/, 'the panel does not build the heal headline')
+  // The header's hover used to read the raw segment, whatever the rows below it showed.
+  const headerText = read('../src/renderer/src/features/combat/SegmentHeader.tsx')
+  assert.doesNotMatch(headerText, /seg\.healing/, 'the header reads the unscoped model again')
 })
 
 test('a lane the log named no spell for is LABELED, never folded into a real spell', () => {

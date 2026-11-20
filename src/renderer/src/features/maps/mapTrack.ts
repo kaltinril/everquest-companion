@@ -159,6 +159,22 @@ export function withExtent(state: TrackState, zone: string, b: ZoneExtent): Trac
   return { ...state, extents: { ...state.extents, [zone]: ext } }
 }
 
+/**
+ * A loaded map's bounds as an extent the overlay can fit, or null. An empty map file states all-zero
+ * bounds and a one-label zone a single point: no span either way, so nothing can be placed in it.
+ * One straight line has a span one way and still fits.
+ */
+export function usableExtent(b: ZoneExtent | null | undefined): ZoneExtent | null {
+  if (b == null || !num(b.minX) || !num(b.maxX) || !num(b.minY) || !num(b.maxY)) return null
+  if (b.maxX <= b.minX && b.maxY <= b.minY) return null
+  return b
+}
+
+/** The extent the overlay fits: the loaded map's own when usable, else the one the Maps tab stored. */
+export function overlayExtent(state: TrackState, zone: string | null, bounds: ZoneExtent | null | undefined): ZoneExtent | undefined {
+  return usableExtent(bounds) ?? (zone == null ? undefined : state.extents[zone])
+}
+
 /** Where the zone lands in a w x h window: its top-left pixel, its size, and the scale. */
 export interface ExtentFit {
   left: number
@@ -177,7 +193,9 @@ export interface ExtentFit {
 export function fitExtent(ext: ZoneExtent, w: number, h: number): ExtentFit {
   const ew = ext.maxX - ext.minX
   const eh = ext.maxY - ext.minY
-  const scale = Math.min(w / ew, h / eh)
+  // One map unit is the floor for the division (mapGeometry.ts `MIN_SPAN`): a zero span on both
+  // axes would fit at an infinite scale and place everything at NaN.
+  const scale = Math.min(w / Math.max(1, ew), h / Math.max(1, eh))
   const width = ew * scale
   const height = eh * scale
   return { left: (w - width) / 2, top: (h - height) / 2, width, height, scale }
@@ -197,6 +215,29 @@ export interface OverlayView {
   k: number
   cx: number
   cy: number
+}
+
+function readView(v: unknown): OverlayView | null {
+  if (typeof v !== 'object' || v === null) return null
+  const { k, cx, cy } = v as Record<string, unknown>
+  return num(k) && k > 0 && num(cx) && num(cy) ? { k, cx, cy } : null
+}
+
+/** The stored per-zone views. A view that is not three usable numbers folds away on its own. */
+export function parseOverlayViews(raw: string | null): Record<string, OverlayView> {
+  const out: Record<string, OverlayView> = {}
+  if (raw == null || raw === '') return out
+  try {
+    const parsed: unknown = JSON.parse(raw)
+    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) return out
+    for (const [zone, v] of Object.entries(parsed as Record<string, unknown>)) {
+      const view = readView(v)
+      if (view != null) out[zone] = view
+    }
+    return out
+  } catch {
+    return {}
+  }
 }
 
 /** The fit for a view: the whole-zone fit when `view` is null, else zoomed and re-centred. */

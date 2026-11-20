@@ -5,7 +5,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync, readdirSync } from 'node:fs'
-import { acceleratorOf, hotkeyProblem } from '../src/shared/overlayHotkey.ts'
+import { acceleratorOf, hotkeyProblem, makeRecoverHotkey, type RecoverHotkey } from '../src/shared/overlayHotkey.ts'
 
 const press = (code: string, mods: Partial<{ ctrlKey: boolean; altKey: boolean; shiftKey: boolean; metaKey: boolean }> = {}): string | undefined =>
   acceleratorOf({ ctrlKey: false, altKey: false, shiftKey: false, metaKey: false, code, ...mods })
@@ -31,8 +31,101 @@ test('off until the player sets one: nothing is registered at start but the save
   const code = readFileSync(new URL('../src/main/overlayRecover.ts', import.meta.url), 'utf8')
   const register = [...code.matchAll(/globalShortcut\.register\(/g)]
   assert.equal(register.length, 1, 'one register call, in the setter')
-  assert.match(code, /settingsStore\.get\('overlayRecoverHotkey'\)/)
-  assert.match(code, /if \(typeof saved === 'string'\) setRecoverHotkey\(saved\)/)
+  assert.ok(code.includes("load: () => settingsStore.get('overlayRecoverHotkey')"), 'the saved key is the one read at start')
+  const fake = fakeKeys({ saved: undefined })
+  fake.hotkey.start()
+  assert.deepEqual(fake.calls, [], 'nothing saved: nothing is taken and nothing is written')
+  assert.deepEqual(fake.hotkey.get(), { hotkey: null })
+})
+
+/** The system's keys and the settings store, as the key's owner sees them, with a call log. */
+function fakeKeys(opts: { saved: unknown; taken?: string[] }): { hotkey: RecoverHotkey; calls: string[]; taken: Set<string> } {
+  const calls: string[] = []
+  const taken = new Set(opts.taken ?? [])
+  const hotkey = makeRecoverHotkey({
+    register: (accel) => {
+      calls.push(`register ${accel}`)
+      return !taken.has(accel)
+    },
+    unregister: (accel) => calls.push(`unregister ${accel}`),
+    load: () => opts.saved,
+    save: (accel) => calls.push(`save ${accel}`),
+    clear: () => calls.push('clear')
+  })
+  return { hotkey, calls, taken }
+}
+
+test('a saved key that is free at start is taken again, with nothing to say', () => {
+  const { hotkey, calls } = fakeKeys({ saved: 'Ctrl+Alt+R' })
+  hotkey.start()
+  assert.deepEqual(hotkey.get(), { hotkey: 'Ctrl+Alt+R' })
+  assert.equal(calls[0], 'register Ctrl+Alt+R')
+  assert.ok(!calls.includes('clear'))
+})
+
+test('a saved key another program holds at start is off, kept, and Preferences is told why', () => {
+  const { hotkey, calls } = fakeKeys({ saved: 'Ctrl+Alt+R', taken: ['Ctrl+Alt+R'] })
+  hotkey.start()
+  const answer = hotkey.get()
+  assert.equal(answer.hotkey, null, 'the key is not in force')
+  assert.match(answer.message ?? '', /Ctrl\+Alt\+R/)
+  assert.match(answer.message ?? '', /another program/)
+  assert.doesNotMatch(answer.message ?? '', /[–—]/)
+  assert.deepEqual(calls, ['register Ctrl+Alt+R'], 'the saved key is neither cleared nor rewritten')
+  assert.deepEqual(hotkey.get(), answer, 'and it is said every time Preferences asks')
+})
+
+test('the reason goes away with the state it describes', () => {
+  const picked = fakeKeys({ saved: 'Ctrl+Alt+R', taken: ['Ctrl+Alt+R'] })
+  picked.hotkey.start()
+  assert.deepEqual(picked.hotkey.set('Ctrl+Alt+O'), { hotkey: 'Ctrl+Alt+O' })
+  assert.deepEqual(picked.hotkey.get(), { hotkey: 'Ctrl+Alt+O' })
+  assert.ok(picked.calls.includes('save Ctrl+Alt+O'))
+
+  const off = fakeKeys({ saved: 'Ctrl+Alt+R', taken: ['Ctrl+Alt+R'] })
+  off.hotkey.start()
+  assert.deepEqual(off.hotkey.set(null), { hotkey: null })
+  assert.ok(off.calls.includes('clear'), 'turning it off forgets the saved key')
+  assert.deepEqual(off.hotkey.get(), { hotkey: null })
+})
+
+test('a key refused while the app runs leaves the old key working, and the answer says why', () => {
+  const { hotkey, calls, taken } = fakeKeys({ saved: 'Ctrl+Alt+R' })
+  hotkey.start()
+  taken.add('Ctrl+Alt+O')
+  const refused = hotkey.set('Ctrl+Alt+O')
+  assert.equal(refused.hotkey, 'Ctrl+Alt+R')
+  assert.equal(refused.message, 'Ctrl+Alt+O is taken by Windows or another program.')
+  assert.ok(!calls.includes('unregister Ctrl+Alt+R'), 'the old key was never let go')
+  assert.deepEqual(hotkey.get(), { hotkey: 'Ctrl+Alt+R' }, 'a refused pick leaves nothing to say later')
+  // A new key is taken before the old one is let go.
+  assert.deepEqual(hotkey.set('Ctrl+Alt+P'), { hotkey: 'Ctrl+Alt+P' })
+  assert.deepEqual(calls.slice(-3), ['register Ctrl+Alt+P', 'unregister Ctrl+Alt+R', 'save Ctrl+Alt+P'])
+  // A key that breaks the rules is refused before the system is asked.
+  assert.match(hotkey.set('F9').message ?? '', /Ctrl, Alt or Win/)
+  assert.ok(!calls.includes('register F9'))
+})
+
+test('a register call that throws is a refusal, not a crash', () => {
+  const hotkey = makeRecoverHotkey({
+    register: () => {
+      throw new Error('bad accelerator')
+    },
+    unregister: () => undefined,
+    load: () => 'Ctrl+Alt+R',
+    save: () => undefined,
+    clear: () => undefined
+  })
+  hotkey.start()
+  assert.equal(hotkey.get().hotkey, null)
+  assert.match(hotkey.set('Ctrl+Alt+O').message ?? '', /taken/)
+})
+
+test('Preferences shows the reason it is given when it opens', () => {
+  const code = readFileSync(new URL('../src/renderer/src/features/preferences/OverlayRecoverSetting.tsx', import.meta.url), 'utf8')
+  const get = code.slice(code.indexOf("overlayRecoverHotkey('get')"), code.indexOf('const set ='))
+  assert.match(get, /setHotkey\(r\.hotkey\)/)
+  assert.match(get, /setNote\(r\.message\)/)
 })
 
 test('the recover key is the only globalShortcut in the app', () => {

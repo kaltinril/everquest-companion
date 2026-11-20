@@ -4,7 +4,7 @@
 // way the game keeps its own zoom, in localStorage for this machine.
 
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
-import { panView, zoomView, type OverlayView, type ZoneExtent } from '../features/maps/mapTrack'
+import { panView, parseOverlayViews, zoomView, type OverlayView, type ZoneExtent } from '../features/maps/mapTrack'
 
 const KEY = 'eq.maps.overlayView'
 /** One scroll notch: fine, because the point is matching another map to the pixel. */
@@ -15,8 +15,7 @@ type Views = Record<string, OverlayView>
 
 function load(): Views {
   try {
-    const v = JSON.parse(localStorage.getItem(KEY) ?? '{}') as unknown
-    return typeof v === 'object' && v !== null ? (v as Views) : {}
+    return parseOverlayViews(localStorage.getItem(KEY))
   } catch {
     return {}
   }

@@ -116,6 +116,7 @@ import { engineBridge } from './engine'
 // What's new (JOS-73): the one store key behind the release-notes panel and its teaser strip.
 // The NOTES are committed source the renderer imports directly — see ./releaseNotes.ts.
 import { releaseNotesBridge } from './releaseNotes'
+import type { SettingsRecoveryNotice } from '../shared/settingsRecovery'
 // The DEV-ONLY triage surface (see the banner above its methods, below). Types only — the
 // contract lives in src/shared so main, preload and the renderer name one definition.
 import type {
@@ -321,6 +322,13 @@ const api = {
   ...engineBridge,
   // …and the two what's-new methods (./releaseNotes.ts), for the same file-size reason.
   ...releaseNotesBridge,
+  /** What happened to a damaged settings file at this launch; null when it opened normally. */
+  getSettingsRecoveryNotice: (): Promise<SettingsRecoveryNotice | null> =>
+    ipcRenderer.invoke(IPC.settingsRecoveryGet),
+  /** The player closed that notice: main stops answering with it for this run. */
+  settingsRecoverySeen: (): void => {
+    ipcRenderer.send(IPC.settingsRecoverySeen)
+  },
 
   /**
    * Is this the headless integration-test channel (`EQ_E2E=1`, src/main/e2e.ts)?

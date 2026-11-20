@@ -25,8 +25,10 @@ import {
   POLL_MS,
   QUIET_MS,
   QuietSwitchWatcher,
+  attachedWroteSince,
   logIsQuiet,
   worldEntryAt,
+  type AttachedSample,
   type QuietSwitchObservation,
   type QuietSwitchOutcome
 } from '../src/main/log/quietSwitch'
@@ -285,4 +287,70 @@ test('the world-entry line is read with its own timestamp; a log without one has
   assert.equal(worldEntryAt(text), new Date(2026, 9, 18, 23, 53, 54).getTime())
   // Someone SAYING it is not the game writing it.
   assert.equal(worldEntryAt("[Sun Oct 18 20:37:44 2026] You say to your guild, 'Welcome to EverQuest'\n"), null)
+})
+
+// ---- the attached log's own size is evidence it is being written (2026-11-19) ----
+//
+// The quiet clock hears the engine's cursors. With the engine down or restarting no cursor
+// arrives, so a log the player was actively writing to read as quiet, and the card said so.
+
+test('the attached log growing since a sample taken after the last line heard is a write', () => {
+  assert.equal(attachedWroteSince(T0, null, 500), false, 'a first sight is not growth')
+  assert.equal(attachedWroteSince(T0, { size: 500, at: T0 + 1 }, 500), false)
+  assert.equal(attachedWroteSince(T0, { size: 500, at: T0 + 1 }, 900), true)
+  assert.equal(attachedWroteSince(T0, { size: 900, at: T0 + 1 }, 500), false, 'truncated or rotated')
+  // A sample older than the last line proves nothing: those bytes may be the lines already heard.
+  assert.equal(attachedWroteSince(T0, { size: 500, at: T0 - 1 }, 900), false)
+  assert.equal(attachedWroteSince(T0, { size: 500, at: T0 }, 900), true)
+})
+
+/** The binding's poll (switchNudge.ts `poll`), with the Logs dir read replaced by the sizes given. */
+function bindingPoll(
+  w: QuietSwitchWatcher,
+  clock: { lastLineAt: number; seen: AttachedSample | null },
+  now: number,
+  sizes: Readonly<Record<string, number>>
+): QuietSwitchOutcome {
+  if (!logIsQuiet(clock.lastLineAt, now, w.samplingQuietMs)) return poll(w, { now, lastLineAt: clock.lastLineAt, sizes: {} })
+  if (attachedWroteSince(clock.lastLineAt, clock.seen, sizes[MINE])) clock.lastLineAt = now
+  clock.seen = { size: sizes[MINE], at: now }
+  return poll(w, { now, lastLineAt: clock.lastLineAt, sizes })
+}
+
+test('no cursors while BOTH logs keep growing: the attached log is not called quiet, and nothing is asked', () => {
+  const w = new QuietSwitchWatcher()
+  const clock = { lastLineAt: T0, seen: null as AttachedSample | null }
+  const sizes: Record<string, number> = { [MINE]: 1_000, [THEIRS]: 1_000 }
+  // Twelve minutes with the engine silent, both accounts being played the whole time.
+  for (let now = T0 + POLL_MS; now <= T0 + 12 * 60_000; now += POLL_MS) {
+    sizes[MINE] += 120
+    sizes[THEIRS] += 300
+    assert.notEqual(bindingPoll(w, clock, now, sizes).kind, 'nudge')
+  }
+  assert.equal(w.asked(THEIRS), false)
+})
+
+test('no cursors and the attached log really is flat: the offer still arrives at five minutes', () => {
+  const w = new QuietSwitchWatcher()
+  const clock = { lastLineAt: T0, seen: null as AttachedSample | null }
+  const sizes: Record<string, number> = { [MINE]: 1_000, [THEIRS]: 1_000 }
+  let askedAt = 0
+  for (let now = T0 + POLL_MS; now <= T0 + 12 * 60_000 && askedAt === 0; now += POLL_MS) {
+    sizes[THEIRS] += 300
+    if (bindingPoll(w, clock, now, sizes).kind === 'nudge') askedAt = now
+  }
+  assert.equal(askedAt, T0 + QUIET_MS)
+})
+
+test('a size remembered from an earlier quiet stretch does not delay the offer', () => {
+  const w = new QuietSwitchWatcher()
+  // An earlier AFK stretch left a sample behind; the player then played on (cursors) until T0.
+  const clock = { lastLineAt: T0, seen: { size: 200, at: T0 - 3_600_000 } as AttachedSample | null }
+  const sizes: Record<string, number> = { [MINE]: 1_000, [THEIRS]: 1_000 }
+  let askedAt = 0
+  for (let now = T0 + POLL_MS; now <= T0 + 12 * 60_000 && askedAt === 0; now += POLL_MS) {
+    sizes[THEIRS] += 300
+    if (bindingPoll(w, clock, now, sizes).kind === 'nudge') askedAt = now
+  }
+  assert.equal(askedAt, T0 + QUIET_MS)
 })
