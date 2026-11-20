@@ -32,6 +32,7 @@ import { handCountProblem, parseHandCount } from '@shared/itemOverrides'
 import type { ItemProgress } from './useProgress'
 // The one caveat that belongs in this cell without being about a statement (JOS-409) — see below.
 import { DUMP_BLIND_ITEM_NOTE, isDumpBlindItem } from './dumpBlindItems'
+import { handCountChipTitle } from './handCountWords'
 
 /** State this item's count, or take the statement back with `null`. The name is what was drawn. */
 export type SetItemCount = (name: string, count: number | null) => void
@@ -71,7 +72,7 @@ export function OverrideChip({
       variant="outlined"
       data-testid={testId}
       data-count={o.count}
-      title={`You stated ${String(o.count)} of these on ${statedOn(o)}. Anything looted since then is counted on top, and any turn-in recorded since then is taken off. Remove this to go back to counting from the log and the export.`}
+      title={handCountChipTitle(o.count, statedOn(o))}
       label={label ?? `By hand: ${String(o.count)}`}
       onDelete={onClear}
       sx={{ height: 20, fontSize: 11 }}

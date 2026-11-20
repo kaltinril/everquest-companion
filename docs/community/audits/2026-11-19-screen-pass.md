@@ -360,7 +360,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   summary chip '1 count set by hand', and the line 'Off this list by a count you set:' + chip
   'Azarack Skin: 1'. The number shown is the count stated, not the count now held (0); it was the
   turn-in ...
-- CONFIRMED [low, untrue-words] The hand-count chip's hover says removing it goes back to 'the log
+- FIXED 2026-11-19 (`handCountChipTitle` names the "Count items from" setting, not the witnesses) [low, untrue-words] The hand-count chip's hover says removing it goes back to 'the log
   and the export' under sources that read only one of them Seen: [data-testid=posky-item-override]
   title ends 'Remove this to go back to counting from the log and the export.' under all five
   sources. Removing it under Export only left 'no row' although the log had looted 5 skins by then
