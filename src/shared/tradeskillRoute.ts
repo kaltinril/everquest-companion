@@ -10,6 +10,10 @@
 //   explore    tradeskillRouteExplore.ts never-made recipes, grouped by what the data says
 //   guide      tradeskillRouteExplore.ts the community leveling guide's steps, credited
 //
+// "Only use materials I have" (`RouteAsk.heldOnly`, tradeskillRouteHeld.ts) narrows Cheapest and
+// Fastest to recipes the player holds every material for. It never re-orders a route: holding a
+// material does not change its price (owner, 2026-11-20).
+//
 // Faction is NOT a goal here: no record holds what a quest rewards, so there is nothing to rank
 // and no placeholder is drawn. The one-item goal is the planner's, not a workbench route.
 //
@@ -21,6 +25,7 @@
 import { skillRecipes, type BookRecipe } from './tradeskillBook'
 import { LEVELING_GUIDE_ID, RECIPE_GUIDE_ID, guideCreditOf, levelingCreditText, noRouteText } from './tradeskillGuide'
 import { communitySteps, explore, type Explored } from './tradeskillRouteExplore'
+import { HELD_BASIS, HELD_NOT_MEASURED, HELD_SHARED, heldEmptyText, heldEndText, heldSteps, isHeldGoal, type HeldGoal } from './tradeskillRouteHeld'
 import { cheapestSteps, fastestSteps } from './tradeskillRouteLevel'
 import type { RouteCtx, RouteFacts, RouteStep } from './tradeskillRouteStep'
 import type { Tradeskill } from './tradeskills'
@@ -55,6 +60,8 @@ export interface RouteGroup {
 
 export interface Route {
   goal: RouteGoal
+  /** Built only from recipes the player holds every material for (Cheapest and Fastest). */
+  heldOnly: boolean
   /** What the route ranks on, in one or two plain sentences. */
   basis: string
   /** What it does not know or does not rank on, each a sentence of its own. */
@@ -75,6 +82,8 @@ export interface RouteAsk {
   /** Null: the log never showed the skill. Routes then start from 0, as the recipe book does. */
   level: number | null
   goal: RouteGoal
+  /** "Only use materials I have". Read by Cheapest and Fastest; the other goals ignore it. */
+  heldOnly?: boolean
 }
 
 const NOT_MEASURED = 'Nobody has measured how often a combine fails or raises the skill in this game, so no chance, no number of combines and no total is shown.'
@@ -158,6 +167,15 @@ function fastestRoute(ctx: RouteCtx, top: number | null): Built {
   return { groups: capped(steps), basis: BASIS.fastest, caveats: [FAR_BELOW, NOT_MEASURED], credits: [], empty: steps.length === 0 ? ladderEmpty(ctx, top) : '' }
 }
 
+/** Cheapest or Fastest from what is held alone. Past the top of the ladder it says that, as the open route does. */
+function heldRoute(ctx: RouteCtx, goal: HeldGoal, top: number | null): Built {
+  const steps = heldSteps(ctx, goal)
+  const built = { groups: capped(steps), basis: HELD_BASIS[goal], caveats: [HELD_SHARED, FAR_BELOW, HELD_NOT_MEASURED], credits: [] }
+  if (steps.length > 0) return { ...built, empty: '' }
+  const past = top === null || ctx.level >= top
+  return { ...built, empty: past ? ladderEmpty(ctx, top) : heldEmptyText(ctx) }
+}
+
 function exploreRoute(ctx: RouteCtx): Built {
   const found = explore(ctx)
   const drewGuide = found.groups.some((group) => group.id === 'guide')
@@ -188,8 +206,9 @@ export function buildRoute(facts: RouteFacts, ask: RouteAsk): Route {
     explore: () => exploreRoute(ctx),
     guide: () => guideRoute(ctx, ask.level)
   }
-  const built = builders[ask.goal]()
-  return { goal: ask.goal, ...built, next: built.groups.at(0)?.steps.at(0) ?? null, top }
+  const held = ask.heldOnly === true && isHeldGoal(ask.goal) ? ask.goal : null
+  const built = held === null ? builders[ask.goal]() : heldRoute(ctx, held, top)
+  return { goal: ask.goal, heldOnly: held !== null, ...built, next: built.groups.at(0)?.steps.at(0) ?? null, top }
 }
 
 // ---- the words on screen --------------------------------------------------------------------------
@@ -202,9 +221,16 @@ export function moreStepsText(group: RouteGroup, top: number | null): string {
   return top === null ? `${steps}, not listed.` : `${steps}, up to ${String(top)}, not listed.`
 }
 
+/** The top `moreStepsText` names for a route's capped steps: the wiki's, or none on a held-only route, which stops earlier. */
+export function capTop(route: Route): number | null {
+  return route.heldOnly ? null : route.top
+}
+
 /** The foot of a climbing route: where the data ends. '' for a route that does not climb. */
 export function routeEndText(route: Route, tradeskill: Tradeskill): string {
-  if (route.top === null || route.empty !== '' || (route.goal !== 'cheapest' && route.goal !== 'fastest')) return ''
+  if (route.top === null || route.empty !== '' || !isHeldGoal(route.goal)) return ''
+  // A held-only route ends where the held materials do. With steps past the cap the listed ones are not its end.
+  if (route.heldOnly) return route.groups.some((group) => group.more > 0) ? '' : heldEndText(route.groups.flatMap((group) => group.steps))
   return `The route stops at ${String(route.top)}: the highest ${tradeskill} trivial the wiki holds.`
 }
 

@@ -71,6 +71,8 @@ function bookRecipe(entry: ItemDbEntry, recipe: ItemCraftRecipe, nth: number, de
     id: `${itemKey(entry.page)}#${String(nth)}`,
     key: itemKey(item),
     item,
+    // The page's own title, for the wiki link, where the item's name is not it.
+    ...(entry.page === item ? {} : { page: entry.page }),
     ...(tradeskill === undefined ? {} : { tradeskill }),
     ...(tradeskill === undefined && recipe.tradeskill !== undefined ? { skillWord: recipe.tradeskill } : {}),
     ...statedFields(recipe),
