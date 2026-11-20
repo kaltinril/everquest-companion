@@ -1841,7 +1841,8 @@ only: no engine, parser, protocol, network or dependency change.
 - Back: `openLoot(item)` and `openMob(...)` are anchored links, so their Back returns to the
   Tradeskills view, which reopens the workbench and the picked recipe from storage. Only the
   Loot page's Back calls `noteBack`, so the exact scroll position is restored after Loot and the
-  table opens on the picked recipe after Mobs. Maps has no Back: the nav row reopens the workbench.
+  table opens on the picked recipe after Mobs. Maps has no Back for a zone link (`openMapZone`): the
+  nav row reopens the workbench. A merchant's "Show on map" (`openMapAt`, slice 4 below) does.
 - e2e: `tests/e2e/tradeskills.e2e.mts`. Its claims are properties of what is on screen (the line
   marked next is the first above the level), never a name or count from the wiki data.
 - Left menu: with this row the menu's blocks take 774 px of the 820 px drawer (MEASURED.md). One
@@ -1901,7 +1902,7 @@ only: no engine, parser, protocol, network or dependency change.
   | Recommended (Plan) | none | not built | The plan's targets are mob drops and quest rewards (`progressionPlan.ts` reads no `playerCrafted`): a made item is never on it, so there is nothing to link. A crafted lane is a feature, not a link |
   | Character sheet depot rows | none | not built | `CarryAll.tsx` is read-only by its own header ("no row click ... a row is text") and the Character tab has no door to any other tab. A link there is a new pattern for that screen: the owner's call |
   | Factions turn-ins | none | blocked | No quest reward data |
-  | Maps merchant waypoints | none | blocked | No merchant data (the guides, or the log's purchases) |
+  | Maps merchant waypoints | none | blocked | No merchant data (the guides, or the log's purchases). Superseded 2026-11-20: the link OUT to a merchant's pin is built (slice 4 below); a waypoint list on the Maps tab itself is still not |
 
 - "Gear that raises this skill" (`SkillGearPanel.tsx`, under the workbench's head): the Gear
   index rows whose `skillMods` name the tradeskill, by `shared/tradeskillGear.skillGear` (fold by
@@ -1993,6 +1994,69 @@ only: no engine, parser, protocol, network or dependency change.
   - What's new line: "A Tradeskills workbench now shows your own combines, what a recipe costs at
     the prices you last paid, where you bought each material, and the two community guides: the
     leveling route with your level on it, and merchants with their locations."
+- Slice 4, Make an item and Maps at a merchant (2026-11-20, branch `tradeskill-planner` off
+  `tradeskills-batch2`; not merged, not tried by the owner). TypeScript only; no engine, protocol,
+  network, data or dependency change.
+  - Third screen: `Planner.tsx`, over Home or a workbench. Which screen is up: `eq.tradeskills.planOpen`
+    (localStorage) over `eq.tradeskills.skill`; `TradeskillsView.useScreens` holds the three moves.
+    A link in from another tab closes the planner. The planner's Back names what it was opened over.
+  - Memory (`plannerMemory.ts`, parse and transitions in `shared/tradeskillPlanMemory.ts`):
+    `eq.tradeskills.plan` in localStorage = item key, picked recipe id, count, keys marked "get it
+    instead"; the search text in sessionStorage (`eq.tradeskills.planSearch`). Another item keeps
+    the count and drops the rest. The scroll position rides `lib/navReturn` as `PlanReturn`
+    (`{ planner: true, scrollTop }`): same one slot as the recipe table, same trap.
+  - Doors: `TradeskillDoors` gained `onOpenMapAt` (the router's) and `onPlanRecipe` (the section's
+    own, added in `TradeskillsView`, so `Workbench.tsx` threads nothing). `RecipePanel` draws "Plan
+    this item" from it and exports `WhereCell`, which the planner's tree and gather list reuse.
+  - Folds, all in shared, tested in `tests/tradeskillPlan.test.mts` (fixtures, then Fleeting Quiver
+    from the committed data): `tradeskillPlan.ts` (`planChoices`, `searchChoices`, `itemRecipes`,
+    `pickRecipe`, `planTree`), `tradeskillPlanLevels.ts` (`skillNeeds`, `skillRoutes`),
+    `tradeskillPlanGather.ts` (`gatherFor`, `planHave`, `planPrice`).
+  - Which recipe: `planOrder` = lists materials (wiki's, or the guide's) first, names a tradeskill
+    first, then ladder order. The root is the reader's pick; a made material opens the first in
+    that order that lists materials and says "the first of N".
+  - Tree: depth and loop are `subRecipes`'s (`MAX_RECIPE_DEPTH`). A made material is a leaf when:
+    the reader closed it, it is already open above, it is past the depth, or no recipe for it lists
+    materials (Water Flask: a Brewing recipe with none). `closedText` says which. A guide spelling
+    that names no wiki item is a text leaf with no link and no Have.
+  - Search: every key of `BookIndex.byItem` (2,384 items, 70 with several recipes, 2026-11-20),
+    combines that name no tradeskill included. Under the era toggle an item is left out, and
+    counted, only when every recipe that makes it is hidden. A remembered plan is shown whatever
+    its era, with the chip. Nothing is listed until something is typed; 40 results, then a count.
+  - Levels: a tradeskill is needed at the highest trivial of its recipes in the tree. Stands:
+    met, short, unseen (not in the log), unrated (no trivial on the wiki). A combine that names no
+    tradeskill is said in words and needs no level.
+  - Way there: the leveling guide's steps that cover any of (level, trivial], credited through
+    `guideCreditOf`; no step there, then the wiki ladder's recipes that go trivial inside the
+    stretch, lowest first, 10 then a count. A skill the log never showed starts at 0 and says so.
+    Never shown (the job's brief, 2026-11-20): a success chance, a number of combines to a level,
+    anything added for failures. No rate is measured for this game, and nothing resting on a
+    guessed formula may be drawn (`CHANCE_NOTE` and `GATHER_NOTE` say so on screen).
+  - Gather: leaves times combines; a returned tool once; a held made material is used before any
+    is made (so its own materials are not gathered); a combine that yields several leaves the
+    spare for the next branch. The total is stated only when every line still to get has a
+    purchase price; else the lines without are named.
+  - Maps at a merchant: `appRouting.openMapAt({ zone, page })` = the zone pick (`openMapZone`'s
+    write) + a one-shot ask in `features/maps/mapFocus.ts` + an ANCHORED link. `useMapFocus` takes
+    the ask in a state initializer (the view remounts on arrival), waits for `data.zone` to match
+    and the host to have a size (`useSearchJump`'s rule), then `pane.reveal()` (sidebar open for
+    this visit, `eq.maps.pane` untouched: pins draw only while it is open) and `pane.select(row)`.
+    `MapBack.tsx` draws "Back to <tab>" only while an origin is parked, which only `openMapAt` does.
+    `MapsView` takes `nav` (one changed line in `App.tsx`).
+  - When "Show on map" is drawn: `mapFocus.pinTarget(entry, statedZone, eraOnly)` asks `mobRows`
+    itself, so it is the Maps tab's own answer (in the zone, in era under `eq.maps.travelEra`, one
+    zone on the page, not a common spawn, a stated loc). A stated zone the table cannot place
+    ("New Sebi") falls back to the one zone the mob's page names. Measured 2026-11-20: 24 of the
+    recipe guide's 27 merchants (21 by the guide's zone, 3 New Sebilis by the page's; the other 3
+    are not in the catalog). `tests/mapFocus.test.mts` holds the counts as floors.
+  - Seen in the data, not acted on: the leveling guide's Fleeting quiver step lists five materials
+    (it adds Vial of distilled mana); the recipe guide lists four. The tree draws the recipe
+    guide's; the route line prints the leveling guide's words as written.
+  - e2e: `tests/e2e/tradeskillPlanSteps.mts` (`stepPlanner`), called last from
+    `tradeskills.e2e.mts`; written, NOT run.
+  - What's new line: "Tradeskills has Make an item: search any craftable item to see every
+    material down to its leaves, the skills it takes with your levels, what to make on the way,
+    and what to gather. A merchant's line can open the Maps tab on that merchant."
 
 ## Tradeskill guides as data (fork #6, requirements/skills-tab.md)
 

@@ -50,6 +50,7 @@ import type { CharacterSnap } from '@shared/types'
 import type { MapBounds, MapData, MapPackPrefs, ZoneShort } from '@shared/maps'
 import { zoneShortName } from '@shared/zones'
 import type { MobTarget } from '../mobs/mobTarget'
+import type { NavBack } from '../../appRouting'
 import { useModule } from '../../lib/useModule'
 import { trackFeature } from '../../lib/telemetry'
 import MapBody, { useSearchJump } from './MapBody'
@@ -63,6 +64,8 @@ import { loadPackPrefs, savePackPrefs, useMapData, useMapPacks } from './useMapD
 import { useLocMarker } from './useLocMarker'
 import MapTravelCard from './MapTravelCard'
 import MapsTabs from './MapsTabs'
+import { MapBack } from './MapBack'
+import { useMapFocus } from './useMapFocus'
 import { useZoneTravel } from './useZoneTravel'
 import {
   loadZoneSelection,
@@ -429,6 +432,9 @@ function MapTab({
   // filtered rows are derived ONCE and read by both the list and the surface's pins.
   const zoneName = zoneLongName(zone, raw)
   const pane = useZonePane({ vp, data, zoneName, prefs, zones })
+  // A link that asked for one mob's pin (appRouting `openMapAt`): ringed and centred once this
+  // zone is drawn. Every other arrival parked nothing and this does nothing (useMapFocus.ts).
+  useMapFocus({ pane, zone: data?.zone, sized: vp.size.w > 0 })
   // The zone's own level band and the ports that reach it — joined on the LONG name, the same key
   // the pins use, because the bestiary spells zones that way.
   const travel = useZoneTravel(zone, zoneName, data)
@@ -502,9 +508,12 @@ function MapTab({
 }
 
 export default function MapsView({
+  nav,
   onOpenMob,
   onOpenLoot
 }: {
+  /** The app's Back contract. An origin is parked only by `openMapAt`; see MapBack.tsx. */
+  nav: NavBack
   onOpenMob: (t: MobTarget) => void
   onOpenLoot: (name: string) => void
 }): JSX.Element {
@@ -514,6 +523,8 @@ export default function MapsView({
   const sel = useZoneSelection(raw)
   return (
     <Stack spacing={1.5} sx={{ height: '100%' }}>
+      {/* Drawn only for an arrival that parked an origin; nothing for any other. */}
+      <MapBack nav={nav} />
       {/* THE MAP TAB HOLDS EVERYTHING BELOW, the header included (owner, 2026-09-12: *"shouldn't
           the top section be inside the map subtab and not above the tab names?"* - it names the
           zone on the map, so it is the map's). The advice list is the other tab. `MapsTabs` owns

@@ -238,6 +238,12 @@ export interface ZonePaneState extends MapPaneState {
   /** Is the sidebar on screen? ON by default, remembered in `eq.maps.pane`. */
   open: boolean
   setOpen: (open: boolean) => void
+  /**
+   * Open the sidebar for THIS VISIT without remembering it: an arrival that asks for a mob's pin
+   * (mapFocus.ts) needs the pins on screen, and they draw only while the sidebar is open. The
+   * stored choice (`eq.maps.pane`) is left as the user set it, so the next visit opens as before.
+   */
+  reveal: () => void
   /** Matches in every OTHER zone - map labels and wiki mobs alike. Empty until the box has text. */
   hits: CrossZoneRow[]
   /** The track list for this map (map-waypoints). */
@@ -273,6 +279,9 @@ export function useZonePane(args: {
     setOpenState(next)
     savePaneOpen(next)
   }, [])
+  const reveal = useCallback(() => {
+    setOpenState(true)
+  }, [])
 
   const { centerOn, zoomedIn, view } = vp
   // The view read through a ref, so `onCenter` (and the pane's `select` built on it) keeps one
@@ -307,7 +316,7 @@ export function useZonePane(args: {
   })
   const track = useZoneTrack(data)
   const crawl = useCrawlMode(data?.zone ?? null)
-  return { ...pane, open, setOpen, hits, track, center: onCenter, crawl }
+  return { ...pane, open, setOpen, reveal, hits, track, center: onCenter, crawl }
 }
 
 /** What the surface needs from the pane: the pins, the selection, the wish-list join, and the
