@@ -43,6 +43,7 @@ import type {
 import {
   alertBannerText,
   alertShowsOnScreen,
+  makeAlertBannerIds,
   type AlertBannerPayload
 } from '@shared/alertBanner'
 import { playSound } from './soundCache'
@@ -114,16 +115,19 @@ function effectiveVolume(def: AlertDef): number {
  * way a spoken phrase's do (upstream issue #53). Null means there was nothing truthful to print,
  * and nothing is sent.
  *
- * EVERY FIRING IS ITS OWN LINE. The queue's dedupe key carries the timestamp, so a second landing
- * of the same alert stacks a second line rather than re-clocking the first — which is what the
- * reporter asked for: a banner is a short-lived record of what just happened, not a status field.
+ * EVERY FIRING IS ITS OWN LINE. The queue's dedupe key carries the timestamp and a per-firing
+ * count (`makeAlertBannerIds`), so a second landing of the same alert stacks a second line rather
+ * than re-clocking the first, even in the same millisecond — which is what the reporter asked
+ * for: a banner is a short-lived record of what just happened, not a status field.
  */
+const bannerId = makeAlertBannerIds()
+
 function showAlertBanner(def: AlertDef, firing?: Pick<FiredAlert, 'spell' | 'captures' | 'dueAt'>): void {
   if (!alertShowsOnScreen(def)) return
   const text = alertBannerText(def, firing?.captures)
   if (!text) return
   const ts = Date.now()
-  const payload: AlertBannerPayload = { id: `${def.id}:${String(ts)}`, alertId: def.id, ts, text }
+  const payload: AlertBannerPayload = { id: bannerId(def.id, ts), alertId: def.id, ts, text }
   if (def.bannerColor) payload.color = def.bannerColor
   // The COUNTDOWN, where the firing has one (JOS-216 early warnings): the card prints "… in 12s"
   // and leaves when it reaches zero instead of on the configured hold. Passed straight through —
