@@ -291,6 +291,24 @@ export function tailSurvivesRootChange(
 }
 
 /**
+ * THE SAVED PICK AT LAUNCH, pure: may the log this person last tracked be started from? It must
+ * still exist. When the player chose the EQ folder (`chosen`), it must also sit in that folder's
+ * Logs dir: the old folder's log is still readable, and honouring it brought the app back up on
+ * the folder the player had moved away from (the launch half of bug 01KZ9BF43KYH). With no chosen
+ * folder the pick is kept on existence alone, since it is what rescues a launch where
+ * auto-discovery found nothing.
+ */
+export function savedLogHonoured(
+  savedPath: string | undefined,
+  logsDir: string,
+  chosen: boolean,
+  exists: (p: string) => boolean
+): boolean {
+  if (!savedPath || !exists(savedPath)) return false
+  return !chosen || logIsUnderLogsDir(savedPath, logsDir)
+}
+
+/**
  * THE LAUNCH CHOICE, pure: the character last PLAYED, not the one last picked. The saved pick holds
  * unless another log was written after it, which means another character was played since (2026-10-19:
  * a new character on a new server stayed behind Drywrought at every launch). `savedWrittenAt` is the

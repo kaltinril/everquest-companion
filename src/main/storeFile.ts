@@ -9,7 +9,8 @@
 //
 // FAILURE POLICY (the whole of it — storeMigrations.ts's header states the rest of the contract):
 //   * unreadable file  → leave it alone, no stamp (electron-store will raise its own error)
-//   * unparseable file → QUARANTINE it to `<name>.corrupt.json`, then TRY TO SALVAGE it (below)
+//   * unparseable file → QUARANTINE it to `<name>.corrupt.json` (a later one to the next free
+//     `.corrupt.<n>.json`, never over the first copy: `quarantineSlots`), then TRY TO SALVAGE it (below)
 //     and only start fresh if nothing could be recovered. conf's `clearInvalidConfig` defaults to
 //     false, so a truncated write (power loss mid-save, an update's force-quit) otherwise throws on
 //     EVERY read forever — an app bricked by one bad byte.
@@ -52,7 +53,7 @@
 // a second, redundant, competing writer. What was actually missing was this module's own writes and
 // the RECOVERY below them.
 
-import { existsSync, readdirSync, readFileSync, renameSync } from 'fs'
+import { existsSync, readdirSync, readFileSync, renameSync, statSync } from 'fs'
 import { basename, dirname, join } from 'path'
 // THE ATOMIC WRITE, REUSED RATHER THAN RE-SPELLED (JOS-272). `telemetry/durableWrite.ts` imports
 // `node:fs` and nothing else — no Electron, no app paths, no logger — which is exactly the property
@@ -66,7 +67,7 @@ import { writeFileDurable } from './telemetry/durableWrite'
 // de-padding, the balanced-prefix scan, the parse-if-acceptable wrapper, the `.corrupt.json` name —
 // moved to `tornJson.ts` verbatim and both callers read it from there. The POLICY (what counts as
 // this app's store, and the ladder that falls back to a backup) stayed here, where it belongs.
-import { quarantinePathFor, salvageJsonObject } from './tornJson'
+import { quarantinePathFor, quarantineSlots, salvageJsonObject } from './tornJson'
 import {
   CURRENT_SCHEMA_VERSION,
   SCHEMA_VERSION_KEY,
@@ -94,8 +95,16 @@ export interface StoreFileMigration extends MigrationOutcome {
   quarantinedPath?: string
   /** Set when a quarantined store was RECOVERED rather than abandoned (JOS-272). */
   salvagedFrom?: SalvageSource
+  /** Which backup a `backup` salvage restored, so the player can be told how old it is. */
+  salvagedBackup?: SalvagedBackup
   /** The file exists but could not be read. Nothing was touched and nothing may be stamped. */
   readError?: string
+}
+
+/** A restored backup: the schema version it was taken at, and when its file was written. */
+export interface SalvagedBackup {
+  version: number
+  savedAtMs?: number
 }
 
 /**
@@ -191,6 +200,7 @@ interface Salvage {
   data: StoreData
   from: SalvageSource
   detail: string
+  backup?: SalvagedBackup
 }
 
 /** Recover a complete store from torn bytes, or answer undefined. Lossless only — header. The scan
@@ -216,6 +226,16 @@ function backupCandidates(storePath: string): { path: string; v: number }[] {
     return []
   }
   return found.sort((a, b) => b.v - a.v)
+}
+
+/** What the player is told about a restored backup. A date that cannot be read is left out: it
+ *  must never cost the restore. */
+function backupFacts(candidate: { path: string; v: number }): SalvagedBackup {
+  try {
+    return { version: candidate.v, savedAtMs: statSync(candidate.path).mtimeMs }
+  } catch {
+    return { version: candidate.v }
+  }
 }
 
 /**
@@ -245,7 +265,8 @@ function salvageStore(storePath: string, raw: string): Salvage | undefined {
     const backup = salvageBytes(bytes)
     if (backup) {
       const count = Object.keys(backup.data).length
-      return { data: backup.data, from: 'backup', detail: `${count} settings out of the v${candidate.v} backup` }
+      const detail = `${count} settings out of the v${candidate.v} backup`
+      return { data: backup.data, from: 'backup', detail, backup: backupFacts(candidate) }
     }
   }
   return undefined
@@ -264,9 +285,13 @@ function writeStoreFile(path: string, data: StoreData): void {
 }
 
 /** Unparseable (or not an object): conf would throw on every single read from here on. Moves the
- *  file aside and answers where it went, or the finished (failed) outcome. */
+ *  file aside and answers where it went, or the finished (failed) outcome.
+ *
+ *  Onto the first FREE slot: a rename replaces an existing file, and with no backup to fall back
+ *  on an earlier quarantined copy is the only copy of the player's real settings. */
 function quarantineStore(storePath: string, hooks: MigrationHooks): string | StoreFileMigration {
-  const quarantine = quarantinePathFor(storePath)
+  const slots = quarantineSlots(storePath)
+  const quarantine = slots.find((slot) => !existsSync(slot)) ?? slots[slots.length - 1]
   try {
     renameSync(storePath, quarantine)
     return quarantine
@@ -359,6 +384,7 @@ interface StoreSource {
   /** Set when `data` was RECOVERED from a quarantined file rather than simply read. */
   quarantinedPath?: string
   salvagedFrom?: SalvageSource
+  salvagedBackup?: SalvagedBackup
 }
 
 /** Run the chain over one source, back it up and write the result. The whole of the old
@@ -368,6 +394,7 @@ function runMigration(storePath: string, source: StoreSource, hooks: MigrationHo
   const result: StoreFileMigration = { ...outcome, path: storePath, wrote: false, fileMissing: false }
   if (source.quarantinedPath !== undefined) result.quarantinedPath = source.quarantinedPath
   if (source.salvagedFrom !== undefined) result.salvagedFrom = source.salvagedFrom
+  if (source.salvagedBackup !== undefined) result.salvagedBackup = source.salvagedBackup
   const salvaged = source.salvagedFrom !== undefined
 
   if (outcome.status === 'up-to-date') {
@@ -440,7 +467,8 @@ export function migrateStoreFile(storePath: string, hooks: MigrationHooks = {}):
       data: salvage.data,
       raw: JSON.stringify(salvage.data, undefined, '\t'),
       quarantinedPath: quarantine,
-      salvagedFrom: salvage.from
+      salvagedFrom: salvage.from,
+      ...(salvage.backup ? { salvagedBackup: salvage.backup } : {})
     },
     hooks
   )
