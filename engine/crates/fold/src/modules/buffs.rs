@@ -72,9 +72,9 @@ pub struct BuffsModule {
     pub(crate) seq: i64,
     pub(crate) core: SharedCore,
     /// The pet/charm/target identity slots (the who/what).
-    pets: PetEntities,
+    pub(crate) pets: PetEntities,
     /// The live (spell, entity) instances + every mutation over them.
-    inst: BuffInstances,
+    pub(crate) inst: BuffInstances,
     /// ts from which the Permanent Illusion AA is owned (self illusions become permanent).
     permanent_illusion_owned_ts: Option<i64>,
     /// Emote learning: recognize real landing-emote texts.

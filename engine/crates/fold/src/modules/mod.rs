@@ -40,6 +40,7 @@ pub mod buffs_mining;
 /// `messageOverlay`: the mined message overlay, served apart from `buffs`.
 pub mod buffs_overlay;
 pub mod buffs_overrides;
+pub mod buffs_restat;
 pub mod buffs_session;
 pub mod buffs_shapes;
 pub mod buffs_stats;
