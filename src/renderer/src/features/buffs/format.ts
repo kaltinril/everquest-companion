@@ -103,3 +103,38 @@ export function groupKey(b: ActiveBuff): string {
 export function groupLabel(key: string): string {
   return key === 'self' ? 'Your buffs' : key === 'other' ? 'Other targets' : key
 }
+
+/** Everything the countdown bar needs, resolved once so nothing downstream re-derives it. */
+export interface EstimateState {
+  /** the estimated duration when we HAVE one (>0), else null — the whole bar hinges on it */
+  est: number | null
+  /** ± spread from the p25/p75 IQR around the estimate */
+  spread: number | null
+  overdue: boolean
+}
+
+/**
+ * Overdue (Task #30 + #34): run past the estimated window → show "past estimate" instead
+ * of a bottomed-out countdown. Past p75 with n≥2 counts, and so does being past the estimate
+ * itself, whatever its source (expiry is message-driven, so the card sits "past estimate" until
+ * the wear-off line lands).
+ *
+ * The second arm used to cover only the stated sources (db, deathBound, manual). "From my log" is
+ * a median, which about half of casts outlive and which sits under p75, and one logged cast never
+ * reaches n≥2: both left the card on a countdown with nothing left to count.
+ */
+export function estimateState(buff: ActiveBuff, elapsed: number): EstimateState {
+  const est = buff.estimatedMs != null && buff.estimatedMs > 0 ? buff.estimatedMs : null
+  const spread = buff.p25 != null && buff.p75 != null ? (buff.p75 - buff.p25) / 2 : null
+  const overdue = isOverdue(elapsed, buff.p75, buff.n) || (est != null && elapsed > est)
+  return { est, spread, overdue }
+}
+
+/**
+ * The countdown caption's time-left half: `~12s left`, or `≥ 12s left` for a bound. The second the
+ * estimate runs out prints `0s`, as the overlay does, never fmtDuration's blank dash.
+ */
+export function leftCaption(src: string | undefined, remainingMs: number): string {
+  const boundPrefix = estimatePrefix(src)
+  return `${boundPrefix === '' ? '~' : boundPrefix}${remainingMs > 0 ? fmtDuration(remainingMs) : '0s'} left`
+}
