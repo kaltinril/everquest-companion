@@ -5,6 +5,7 @@ import { charactersIn, newestCharacterIn, parseLogName } from './characterLogs'
 import { clearEqDiscoveredRoot, getEqDiscoveredRoot, getEqInstallDir, setEqDiscoveredRoot } from '../store'
 import {
   EQ_ROOT,
+  NO_DISCOVERY,
   countCharacterLogs,
   dirHasCharacterLogs,
   discoverEqRoot,
@@ -13,10 +14,11 @@ import {
   normalizeEqDirOverride,
   readLogsDir,
   realOverrideProbes,
+  recheckDiscoveredRoot,
   registryInstallCandidates,
-  resolveDiscoveredRoot,
   rootHasLogs,
   tailSurvivesRootChange,
+  type DiscoveryMemo,
   type DiscoveryProbes,
   type LogsDirRead,
   type NormalizedEqDir,
@@ -113,9 +115,11 @@ function realProbes(): DiscoveryProbes {
  * `presence.ts` runs it on every watcher tick.
  *
  * TWO CACHE LAYERS (JOS-112), each with a self-heal:
- *   * IN-PROCESS: `discoveredRoot` memoizes the answer for this process. A cached hit is
+ *   * IN-PROCESS: `discovery` memoizes the answer for this process. A cached hit is
  *     RE-VALIDATED with `rootHasLogs` — one readdir — so an install that moves or is uninstalled
- *     under us re-probes immediately rather than serving a dead path forever.
+ *     under us re-probes immediately rather than serving a dead path forever. A root that fails
+ *     that re-check is KEPT unless the sweep finds another (fork #9: a drive that drops out for a
+ *     moment comes back), and the sweep is not repeated inside a minute.
  *   * ACROSS LAUNCHES: a POSITIVE result is persisted (`eqDiscoveredRoot` in the store) so the very
  *     next launch skips the whole sweep — `resolveDiscoveredRoot` (discovery.ts) revalidates it
  *     with the same one readdir, drops it if it no longer holds, and NEVER persists a null.
@@ -125,29 +129,29 @@ function realProbes(): DiscoveryProbes {
  * lives has changed. Nothing else is cached: `countCharacterLogs` still reads the directory on
  * every call, because "how many characters are there" changes while the app runs.
  */
-let discoveredRoot: string | null | undefined
+let discovery: DiscoveryMemo = NO_DISCOVERY
 
+/**
+ * The discovered root, by `recheckDiscoveredRoot`'s rule (discovery.ts, fork #9): the first look
+ * of a run is the cross-launch cache and then the sweep; after that a root that was good in this
+ * run is KEPT across a failed re-check, and the sweep is tried again at most once a minute.
+ */
 function discoverOnce(): string | null {
-  if (discoveredRoot !== undefined) {
-    if (discoveredRoot === null) return null
-    if (rootHasLogs(discoveredRoot)) return discoveredRoot
-  }
-  // Cross-launch layer: prefer a persisted positive hit that still validates (skips the sweep);
-  // else run the ceiling-bounded sweep and persist only a positive result.
-  discoveredRoot = resolveDiscoveredRoot({
+  discovery = recheckDiscoveredRoot(discovery, {
     persisted: getEqDiscoveredRoot() ?? null,
     hasLogs: rootHasLogs,
     sweep: () => discoverEqRoot(realProbes()),
     persist: setEqDiscoveredRoot,
-    dropPersisted: clearEqDiscoveredRoot
+    dropPersisted: clearEqDiscoveredRoot,
+    now: () => Date.now()
   })
-  return discoveredRoot
+  return discovery.root ?? null
 }
 
 /** Forget the discovered root — BOTH the in-process memo and the persisted value — so the next
  *  resolution probes the machine again. Called when the manual override changes. */
 export function invalidateEqDiscovery(): void {
-  discoveredRoot = undefined
+  discovery = NO_DISCOVERY
   rootsMemo = undefined
   clearEqDiscoveredRoot()
 }
@@ -166,7 +170,7 @@ export function invalidateEqDiscovery(): void {
  */
 export function refreshEqDiscoveryCheaply(): void {
   if (getEqInstallDir()?.trim()) return
-  if (discoveredRoot && rootHasLogs(discoveredRoot)) return
+  if (discovery.root && rootHasLogs(discovery.root)) return
   const found = discoverEqRoot({
     hasLogs: rootHasLogs,
     extraCandidates: envCandidates,
@@ -176,7 +180,7 @@ export function refreshEqDiscoveryCheaply(): void {
   // A positive find is persisted too (JOS-112), so the install this rescan finally caught is
   // skipped-to directly on the next launch rather than re-swept.
   if (found) {
-    discoveredRoot = found
+    discovery = { root: found, sweptAt: null }
     rootsMemo = undefined
     setEqDiscoveredRoot(found)
   }

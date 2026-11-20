@@ -404,6 +404,54 @@ export function resolveDiscoveredRoot(deps: CachedRootDeps): string | null {
 }
 
 // ---------------------------------------------------------------------------
+// WITHIN ONE RUN (fork #9). The in-process half of the same cache: config.ts holds one
+// `DiscoveryMemo` and asks this on every resolution (at most once per its 5 s roots memo).
+// ---------------------------------------------------------------------------
+
+/** While a root that was good in this run keeps failing its re-check, the full sweep
+ *  (synchronous, with a 6 s ceiling) runs at most this often. */
+export const SWEEP_AGAIN_MS = 60_000
+
+/** What one run remembers about discovery. */
+export interface DiscoveryMemo {
+  /** Undefined before the first look; null when no root was ever found; else the root in use. */
+  readonly root: string | null | undefined
+  /** When the sweep last ran because `root` failed its re-check; null while it is good. */
+  readonly sweptAt: number | null
+}
+
+/** A run that has not looked yet. */
+export const NO_DISCOVERY: DiscoveryMemo = { root: undefined, sweptAt: null }
+
+/** `CachedRootDeps`, and the clock the 60 s floor is counted on. */
+export type RecheckDeps = CachedRootDeps & { readonly now: () => number }
+
+/**
+ * One resolution of the discovered root, given what this run remembers.
+ *
+ *   1. the first look is `resolveDiscoveredRoot`: the cross-launch cache, then the sweep;
+ *   2. a run that found nothing remembers that (the idle rescan is what looks again);
+ *   3. a root that still has logs (one readdir) is the answer;
+ *   4. A ROOT THAT WAS GOOD IN THIS RUN AND FAILS ITS RE-CHECK IS KEPT. It used to be replaced by
+ *      whatever the sweep found, and a sweep that found nothing was remembered as null until
+ *      restart: a drive that dropped out for a moment left the app on the default path. The sweep
+ *      still runs, at most once per `SWEEP_AGAIN_MS`, and only a root it FINDS replaces the kept
+ *      one. The persisted root is left alone: the next launch re-validates it by itself.
+ */
+export function recheckDiscoveredRoot(memo: DiscoveryMemo, deps: RecheckDeps): DiscoveryMemo {
+  const kept = memo.root
+  if (kept === undefined) return { root: resolveDiscoveredRoot(deps), sweptAt: null }
+  if (kept === null) return memo
+  if (deps.hasLogs(kept)) return memo.sweptAt === null ? memo : { root: kept, sweptAt: null }
+  if (memo.sweptAt !== null && deps.now() - memo.sweptAt < SWEEP_AGAIN_MS) return memo
+  const found = deps.sweep()
+  // Stamped after the sweep: a sweep that ran out its ceiling is not due again 54 s later.
+  if (found === null) return { root: kept, sweptAt: deps.now() }
+  deps.persist(found)
+  return { root: found, sweptAt: null }
+}
+
+// ---------------------------------------------------------------------------
 // Real-environment probes (fs + registry). Defensive: absent keys / drives are
 // fine and never throw.
 // ---------------------------------------------------------------------------

@@ -16,9 +16,13 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
+  NO_DISCOVERY,
+  SWEEP_AGAIN_MS,
   discoverEqRoot,
+  recheckDiscoveredRoot,
   resolveDiscoveredRoot,
-  type CachedRootDeps
+  type CachedRootDeps,
+  type DiscoveryMemo
 } from '../src/main/log/discovery'
 
 const lc = (s: string): string => s.replace(/[\\/]+$/, '').toLowerCase()
@@ -168,4 +172,115 @@ test('discoverEqRoot: a filtered (non-fixed) drive is never probed at all', () =
   })
   assert.equal(root, target)
   assert.ok(!probed.some((p) => /^z:/i.test(p)), 'no Z: candidate is ever probed')
+})
+
+// --- WITHIN ONE RUN: a root that was good is kept across a failed re-check (fork #9) ------------
+//
+// The in-process memo used to replace a root that failed ONE re-check with whatever the sweep
+// found, and a sweep that found nothing was remembered as null for the rest of the run: a drive
+// that dropped out for a moment left the app on the default path, with the no-logs screen over a
+// working session, until restart. `recheckDiscoveredRoot` is that memo's rule, with its clock and
+// probes injected.
+
+/** A run of re-checks over one mutable world: which roots have logs now, and what a sweep finds. */
+function run(start: { good: string[]; sweepFinds?: string | null; persisted?: string | null }): {
+  world: { good: string[]; sweepFinds: string | null; clock: number }
+  log: { swept: number; persisted: string[]; dropped: number }
+  check(): string | null
+} {
+  const world = { good: start.good, sweepFinds: start.sweepFinds ?? null, clock: 1_000_000 }
+  const log = { swept: 0, persisted: [] as string[], dropped: 0 }
+  let memo: DiscoveryMemo = NO_DISCOVERY
+  return {
+    world,
+    log,
+    check: () => {
+      memo = recheckDiscoveredRoot(memo, {
+        persisted: start.persisted ?? null,
+        hasLogs: (root) => world.good.includes(root),
+        sweep: () => {
+          log.swept++
+          return world.sweepFinds
+        },
+        persist: (root) => void log.persisted.push(root),
+        dropPersisted: () => void log.dropped++,
+        now: () => world.clock
+      })
+      return memo.root ?? null
+    }
+  }
+}
+
+const D_ROOT = 'D:\\Games\\EverQuest Legends'
+const E_ROOT = 'E:\\EQ'
+
+test('recheckDiscoveredRoot: the first look of a run is the cross-launch cache, then the sweep', () => {
+  const cached = run({ good: [D_ROOT], persisted: D_ROOT })
+  assert.equal(cached.check(), D_ROOT)
+  assert.equal(cached.log.swept, 0)
+  const fresh = run({ good: [E_ROOT], sweepFinds: E_ROOT })
+  assert.equal(fresh.check(), E_ROOT)
+  assert.deepEqual(fresh.log.persisted, [E_ROOT])
+  // A good root costs one re-check per cycle and never a sweep.
+  fresh.check()
+  fresh.check()
+  assert.equal(fresh.log.swept, 1)
+})
+
+test('recheckDiscoveredRoot: A ROOT THAT FAILS ONE RE-CHECK IS KEPT, and is found again on the next cycle', () => {
+  const r = run({ good: [D_ROOT], persisted: D_ROOT })
+  assert.equal(r.check(), D_ROOT)
+  // The drive drops out: the re-check fails and the sweep finds nothing.
+  r.world.good = []
+  assert.equal(r.check(), D_ROOT, 'a drive that dropped out for a moment sent the app to the default path')
+  assert.equal(r.log.swept, 1, 'the machine is still swept once, in case the install moved')
+  assert.equal(r.log.dropped, 0, 'the remembered root was thrown away over one failed look')
+  // It comes back: the next cycle's one readdir finds it, with no sweep.
+  r.world.good = [D_ROOT]
+  r.world.clock += 5_000
+  assert.equal(r.check(), D_ROOT)
+  assert.equal(r.log.swept, 1)
+})
+
+test('recheckDiscoveredRoot: THE SWEEP IS NOT RUN TWICE INSIDE 60 s while the root stays bad', () => {
+  const r = run({ good: [D_ROOT], persisted: D_ROOT })
+  r.check()
+  r.world.good = []
+  // The 5 s cycle, for a minute: one sweep, however many re-checks.
+  for (let i = 0; i < 12; i += 1) {
+    assert.equal(r.check(), D_ROOT)
+    r.world.clock += 5_000
+  }
+  assert.equal(r.log.swept, 1, 'a synchronous sweep with a 6 s ceiling ran on every cycle')
+  assert.equal(SWEEP_AGAIN_MS, 60_000)
+  // A minute after the last sweep it may look again.
+  assert.equal(r.check(), D_ROOT)
+  assert.equal(r.log.swept, 2)
+  // A root that came good and went bad again is a new failure: the clock starts over.
+  r.world.good = [D_ROOT]
+  r.check()
+  r.world.good = []
+  r.check()
+  assert.equal(r.log.swept, 3)
+})
+
+test('recheckDiscoveredRoot: A SWEEP THAT FINDS A DIFFERENT ROOT REPLACES THE KEPT ONE', () => {
+  const r = run({ good: [D_ROOT], persisted: D_ROOT })
+  r.check()
+  // The install really moved.
+  r.world.good = [E_ROOT]
+  r.world.sweepFinds = E_ROOT
+  assert.equal(r.check(), E_ROOT)
+  assert.deepEqual(r.log.persisted, [E_ROOT], 'the new root is what the next launch should skip to')
+  r.check()
+  assert.equal(r.log.swept, 1)
+})
+
+test('recheckDiscoveredRoot: a run that never found a root remembers that, and sweeps once', () => {
+  const r = run({ good: [] })
+  assert.equal(r.check(), null)
+  r.world.clock += 120_000
+  assert.equal(r.check(), null)
+  assert.equal(r.log.swept, 1, 'the idle rescan is what looks again, not a sweep per cycle')
+  assert.equal(r.log.persisted.length, 0)
 })
