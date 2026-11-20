@@ -46,6 +46,7 @@ import {
   makeAlertBannerIds,
   type AlertBannerPayload
 } from '@shared/alertBanner'
+import { cooldownOver } from '@shared/alertCooldown'
 import { playSound } from './soundCache'
 import { currentVoicePrefs, loadVoicePrefs, speak, speechPlan } from '../../lib/speech'
 import { audioIdentity, coalesceAudio, type AudioWindow } from './audioThrottle'
@@ -56,7 +57,6 @@ import { previewDef, previewFiring } from './preview'
 let defs: AlertDef[] = []
 let prefs: AlertPrefs = { globalVolume: 0.7, muted: false }
 const appCooldown = new Map<string, number>()
-const DEFAULT_COOLDOWN_MS = 2000
 /**
  * The audio channel's current occupancy — when it was last opened, and everything already heard
  * inside that window (audioThrottle.ts). One cell for the whole app on purpose: coalescing is
@@ -214,9 +214,7 @@ export function fireAppSignal(signal: AppSignal, context = '', captures?: Record
   for (const def of defs) {
     if (!def.enabled) continue
     if (def.trigger.type !== 'app' || def.trigger.signal !== signal) continue
-    const cd = def.cooldownMs ?? DEFAULT_COOLDOWN_MS
-    const last = appCooldown.get(def.id)
-    if (last !== undefined && now - last < cd) continue
+    if (!cooldownOver(def, appCooldown.get(def.id), now)) continue
     appCooldown.set(def.id, now)
     playAlertNow(def, captures ? { captures } : undefined)
     // Route the fire through main so history stays the single source of truth.
