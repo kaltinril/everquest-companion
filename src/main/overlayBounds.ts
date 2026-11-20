@@ -94,6 +94,7 @@ import {
   fittedOverlayHeight,
   isStripKind,
   overlayDefaultSize,
+  placedOverlayBounds,
   scaledStripBounds,
   stripLayoutBounds
 } from './overlayLayout'
@@ -264,11 +265,20 @@ export function overlayAppliedBounds(kind: OverlayKind): Rectangle | null {
  * on every render and the zoom just changed, so the real height arrives on its own (`fitOverlayHeight`).
  */
 export function refitStripsForTextScale(): void {
-  for (const kind of STRIP_KINDS) {
-    const w = overlayWindows.get(kind)
-    if (!w || w.isDestroyed()) continue
-    const next = overlayAppliedBounds(kind)
-    if (!next) continue
-    applyOverlayBounds(kind, fitsHeightToContent(kind) ? { ...next, height: w.getBounds().height } : next)
-  }
+  for (const kind of STRIP_KINDS) replaceOverlay(kind)
+}
+
+/**
+ * Put one open overlay where it belongs now: the one rule for a text-size change, a monitor change
+ * and the Recover key (windows.ts `reconcileOverlayDisplays`). A fit kind keeps the height it is
+ * wearing (`placedOverlayBounds`); the fit then runs again, because a new screen can leave less
+ * room below the window's top edge than its card was given on the old one.
+ */
+export function replaceOverlay(kind: OverlayKind): void {
+  const w = overlayWindows.get(kind)
+  if (!w || w.isDestroyed()) return
+  const next = overlayAppliedBounds(kind)
+  if (!next) return
+  applyOverlayBounds(kind, placedOverlayBounds(kind, next, w.getBounds().height))
+  refitOverlay(kind)
 }

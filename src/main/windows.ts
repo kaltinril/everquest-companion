@@ -27,16 +27,16 @@ import { IPC } from '../shared/ipc'
 import { installBackButton } from './appBack'
 import { E2E } from './e2e'
 import { logError, logInfo } from './errorLog'
-import { OVERLAY_MIN_SIZE, OVERLAY_TITLE, isStripKind, overlayDefaultSize } from './overlayLayout'
+import { OVERLAY_MIN_SIZE, OVERLAY_TITLE, isStripKind, opaqueStripRests, overlayDefaultSize } from './overlayLayout'
 // WHERE AN OVERLAY IS, HOW TALL IT IS, AND WHICH OF THAT IS WRITTEN DOWN (JOS-187 + JOS-386). Its
 // own module for the reason overlaySnapDrag.ts and OVERLAY_TITLE are: this file is at the
 // 400-code-line ceiling, and a persistence policy over pure geometry was never its subject.
 import {
   RECT_KEYS,
-  applyOverlayBounds,
   installOverlayBounds,
   markAppliedBounds,
-  overlayAppliedBounds
+  overlayAppliedBounds,
+  replaceOverlay
 } from './overlayBounds'
 // THE CURSOR WATCHDOG, and it is two modules for the reason this one is (JOS-381): the DECISION is
 // electron-free and node-tested (pointerWatch.ts, which also states the whole performance
@@ -114,9 +114,15 @@ const opaqueStripWindow: Partial<Record<OverlayKind, boolean>> = {}
 
 /** Is that opaque strip window currently drawing nothing? Only ever consulted while its
  *  `opaqueStripWindow` entry is true — see `applyOpaqueStripVisibility`, which owns this value.
- *  ABSENT READS AS IDLE (hence every check spells `!== false`), because an empty window is a
+ *  ABSENT READS AS IDLE (overlayLayout.ts `opaqueStripRests`), because an empty window is a
  *  strip's resting state and nothing has told us otherwise until its renderer's first signal. */
 const opaqueStripIdle: Partial<Record<OverlayKind, boolean>> = {}
+
+/** Is this kind's live window an opaque strip with nothing to draw? Only its own queue may show
+ *  it then; every other show (the un-hide pass, "Bring overlays to front") asks here first. */
+export function opaqueStripResting(kind: OverlayKind): boolean {
+  return opaqueStripRests(kind, opaqueStripWindow[kind], opaqueStripIdle[kind])
+}
 
 /** The main window while it exists (null before creation / after close). */
 export function getMainWindow(): BrowserWindow | null {
@@ -749,15 +755,11 @@ function overlayPlacement(kind: OverlayKind) {
  *
  * It re-fits the STORED rectangle rather than the window's current one, which is what lets a
  * re-plugged monitor take its overlays back: the correction applied while that display was gone was
- * never written down, so the user's own position is still there to return to.
+ * never written down, so the user's own position is still there to return to. A con card keeps the
+ * height its card gave it (`replaceOverlay`): the stored height is only a placeholder.
  */
 export function reconcileOverlayDisplays(): void {
-  for (const kind of OVERLAY_KINDS) {
-    const w = overlayWindows[kind]
-    if (!w || w.isDestroyed()) continue
-    const b = overlayAppliedBounds(kind)
-    if (b) applyOverlayBounds(kind, b)
-  }
+  for (const kind of OVERLAY_KINDS) replaceOverlay(kind)
   // A monitor came or went, so every locked overlay's hot zone moved with its window (JOS-370).
   // This is the one bounds change a LOCKED overlay can have — it has no drag region, so the user
   // cannot move it — which is why the publisher does not watch 'moved'/'resized' as well.
@@ -1091,7 +1093,7 @@ export function setOverlaysHidden(hidden: boolean): void {
     if (E2E || w.isVisible()) continue
     // An OPAQUE strip with nothing queued must not come back as a solid rectangle: its
     // visibility belongs to its queue, and the next card brings it up (JOS-40).
-    if (isStripKind(kind) && opaqueStripWindow[kind] === true && opaqueStripIdle[kind] !== false) continue
+    if (opaqueStripResting(kind)) continue
     w.showInactive()
     // A gate restore can land while presence has the overlays PARKED (JOS-427) — the user may be
     // alt-tabbed away while a character-switch fold ends. The show must come up at the park's
