@@ -7,6 +7,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
 import type { GridButton } from '@shared/macros/buttons'
 import { firstLine } from '@shared/macros/library'
+import { ColorMark } from './MacroColor'
 import { MARK_COLOR, MONO_SX } from './macroParts'
 
 interface CellProps {
@@ -39,9 +40,12 @@ function CellBody({ cell }: { cell: GridButton }): JSX.Element {
     const line = firstLine(macro)
     return (
       <>
-        <Typography variant="body2" noWrap sx={{ fontWeight: 600 }}>
-          {macro.name === '' ? 'Unnamed' : macro.name}
-        </Typography>
+        <Stack direction="row" spacing={0.5} alignItems="center" sx={{ minWidth: 0 }}>
+          <ColorMark color={macro.color} />
+          <Typography variant="body2" noWrap sx={{ fontWeight: 600 }}>
+            {macro.name === '' ? 'Unnamed' : macro.name}
+          </Typography>
+        </Stack>
         <Typography variant="caption" color="text.secondary" noWrap component="div" sx={MONO_SX}>
           {line === '' ? 'no commands yet' : line}
         </Typography>

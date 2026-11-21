@@ -10,7 +10,7 @@ import { type JSX, useEffect, useState } from 'react'
 import { Alert, Box, Stack, Tab, Tabs, Typography } from '@mui/material'
 import { historyKey } from '@shared/macros/history'
 import { mergeGameFiles, mergeText } from '@shared/macros/gameMerge'
-import { BUTTONS_PER_PAGE, LINES, LINE_MAX } from '@shared/macros/limits'
+import { PAGES } from '@shared/macros/limits'
 import type { CharacterFileMacros } from '@shared/macros/types'
 import type { View } from '../../appViews'
 import { formatTime } from '../../lib/formatDate'
@@ -29,7 +29,7 @@ const CHARACTER_KEY = 'eq.macros.character'
 
 const NO_FILES: readonly CharacterFileMacros[] = []
 
-const LIMITS_NOTE = `Limits shown (${String(LINES)} lines, ${String(LINE_MAX)} characters, ${String(BUTTONS_PER_PAGE)} buttons a page) are not all confirmed in game yet`
+const LIMITS_NOTE = `The page count (${String(PAGES)}) is not confirmed in game yet`
 
 function Footer({ game, saveFailed }: { game: GameFilesState; saveFailed: boolean }): JSX.Element {
   return (

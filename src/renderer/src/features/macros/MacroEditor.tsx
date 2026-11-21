@@ -4,14 +4,15 @@
 // stop an edit.
 
 import { type JSX, type ReactNode, useRef, useState } from 'react'
-import { Box, Button, Chip, InputAdornment, MenuItem, Stack, TextField, Typography } from '@mui/material'
+import { Box, Button, Chip, InputAdornment, Stack, TextField, Typography } from '@mui/material'
 import { duplicateMacro, removeMacro, restoreMacro, systemMint, updateMacro } from '@shared/macros/library'
-import { COLOR_MAX, COLOR_MIN, LINES, LINE_MAX, NAME_MAX } from '@shared/macros/limits'
+import { LINES, LINE_MAX, NAME_MAX } from '@shared/macros/limits'
 import { type SpellNames, insertSpellId, memSpellHint } from '@shared/macros/memSpell'
 import { addOwnTag, normalizeTag, tagList, toggleTag } from '@shared/macros/tags'
 import { macrosToText } from '@shared/macros/text'
 import type { Macro } from '@shared/macros/types'
 import { lineHint, validateMacro, type Warning } from '@shared/macros/validate'
+import { ColorPicker } from './MacroColor'
 import { MONO_SX } from './macroParts'
 import { SpellFinder, useSpellNames } from './SpellFinder'
 import { useMacroUi } from './macroUi'
@@ -22,8 +23,6 @@ type Patch = (patch: Partial<Omit<Macro, 'id'>>, field?: string) => void
 
 /** A field's helper text is a warning, never an error: it is drawn in the warning colour. */
 const WARNING_HELPER = { formHelperText: { sx: { color: 'warning.main' } } } as const
-
-const COLORS = Array.from({ length: COLOR_MAX - COLOR_MIN + 1 }, (_, i) => COLOR_MIN + i)
 
 interface EditorProps {
   store: MacroStore
@@ -103,10 +102,8 @@ export function LibraryActions({ store, macro, onSelect, onPlace }: LibraryActio
 function NameAndColor({ macro, patch, warnings, focusName }: { macro: Macro; patch: Patch; warnings: Warning[]; focusName: boolean }): JSX.Element {
   const nameWarning = warnings.find((w) => w.field === 'name')?.text
   const colorWarning = warnings.find((w) => w.field === 'color')?.text
-  // A colour number the game's twenty buttons do not have still shows, with its warning.
-  const colors = COLORS.includes(macro.color) ? COLORS : [...COLORS, macro.color]
   return (
-    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'minmax(0, 1fr)', sm: 'minmax(0, 1fr) 200px' }, gap: 1.5 }}>
+    <Stack spacing={1.5}>
       <TextField
         size="small"
         label="Name"
@@ -135,25 +132,14 @@ function NameAndColor({ macro, patch, warnings, focusName }: { macro: Macro; pat
         }}
         data-testid="macro-name"
       />
-      <TextField
-        select
-        size="small"
-        label={`Text colour (${String(COLOR_MIN)} to ${String(COLOR_MAX)})`}
+      <ColorPicker
         value={macro.color}
-        onChange={(e) => {
-          patch({ color: Number(e.target.value) })
+        warning={colorWarning}
+        onPick={(color) => {
+          patch({ color })
         }}
-        helperText={colorWarning}
-        slotProps={WARNING_HELPER}
-        data-testid="macro-color"
-      >
-        {colors.map((n) => (
-          <MenuItem key={n} value={n}>
-            {n}
-          </MenuItem>
-        ))}
-      </TextField>
-    </Box>
+      />
+    </Stack>
   )
 }
 

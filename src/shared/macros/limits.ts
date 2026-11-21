@@ -3,11 +3,11 @@
 
 /** MEASURED: the game's edit window has five line boxes, and the file has Line1 to Line5. */
 export const LINES = 5
-/** ASSUMED: twelve buttons a page, from the older game. */
+/** MEASURED (2026-11-20): the game's list shows Index 1 to 12 a page; its Index is our button number. */
 export const BUTTONS_PER_PAGE = 12
 /** ASSUMED: ten pages, from the older game. */
 export const PAGES = 10
-/** ASSUMED: page 1 is the game's built-in set. It is never in the file (that part is measured). */
+/** MEASURED (2026-11-20): page 1 holds the game's built-in macros, not in the file unless changed. Left alone. */
 export const FIRST_EDITABLE_PAGE = 2
 /** MEASURED (2026-11-20): the game's name box stopped at "abcdefghijklmno". */
 export const NAME_MAX = 15
