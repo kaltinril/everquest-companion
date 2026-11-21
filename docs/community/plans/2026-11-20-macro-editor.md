@@ -71,6 +71,31 @@ Opened 2026-11-20. Requirements: `../requirements/macro-editor.md`. Status at th
 - **Limits** are constants in one file, each marked measured or assumed: 5 lines, 12 buttons a
   page, 10 pages, 255 characters a line, colours 0 to 19.
 
+## Character-first flow (owner, 2026-11-20, after first use of the three-tab screen)
+
+The owner found Library / Sets / Characters clunky ("feels random"). The page is reworked around
+one sentence a player can follow with no explanation: **pick a character, click a button to edit
+it, press Send.**
+
+- **Two sections only: "Characters" (first, the default) and "Library".** The Sets tab is gone.
+- **A character's buttons are just there.** Every character file gets its own layout the first
+  time the tab sees it, made from what the game holds; its macros go into the library (identical
+  ones once). No "make a set" step. A one-time line says what was brought in.
+- **The grid is the editor.** Pages 2 to 10, twelve buttons a page. Click a filled button: the
+  macro's editor opens beside the grid. Click an empty one: "New macro" or pick from the library,
+  right there. Drag a button onto another to move or swap.
+- **One macro, many places, said out loud.** An edit changes that macro everywhere it sits; the
+  editor names where else it is and offers "Change only here" (a copy for this button).
+- **Changes are visible before they are sent.** A button that differs from the game is marked
+  (new, changed); a slot the game has and the layout does not is marked removed. A bar at the
+  bottom counts the changes and holds "Review and send". Nothing reaches the game until Send.
+- **Layouts replace sets,** behind one menu on the character's page: save these buttons as a named
+  layout, load a layout, copy another character's buttons, reset to what the game has. That is how
+  macros move between characters and loadouts, and how a set is swapped in at the game's limit.
+- **Undo and Redo** for every change to the library and the layouts (not for a send or a restore:
+  those have the dated copies).
+- The Library section stays the place to see every macro, tag, paste in and delete.
+
 ## Phases
 
 - **P0, proof of concept (no game write):** library, tags, editor, sets, per-character choice,
@@ -156,4 +181,6 @@ Opened 2026-11-20. Requirements: `../requirements/macro-editor.md`. Status at th
     copy and rename can leave `<file>.companion-write.tmp`, removed by the next send.
   - Not built: hotbar links (P3). A set that moves a macro may leave a hotbar button pointing at
     the wrong slot; in-game test 3 decides what to do.
-
+- 2026-11-20: the owner used P0 in the dev app, found the three tabs clunky and asked for the
+  character-first flow (above). Being built on `macro-flow`. No mockup first this time: the owner's
+  word was "build A, B, and C".
