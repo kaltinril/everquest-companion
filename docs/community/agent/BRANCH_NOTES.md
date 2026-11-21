@@ -2589,6 +2589,26 @@ only: no engine, parser, protocol, network or dependency change.
   and `ItemPlanSkills` is not drawn. A material whose wiki words include Bought lists two mobs
   (`dropCap`), others four.
 
+### The held-materials route chains (2026-11-20, branch `route-held-chain`)
+
+- `tradeskillRouteHeld.ts` no longer asks `onHand` per recipe. `tryCover` takes each material from
+  one running count and, when the stock is short, makes it first with this tradeskill's own
+  lowest-trivial recipe for it if that recipe's materials are held (one level deep). `coverOf`
+  finds the most combines by doubling then halving. `take` commits what the step used and adds
+  what it makes (`combines x yield`), so a later step can use it; that step's count says it rests
+  on the steps above succeeding.
+- Equals (same trivial, same cost) are named in the step's `aside`; between them the order is how
+  many later recipes use the item (`feedCounter`), then the name.
+- Not counted: what was made since the last inventory dump. Have is the dump or a newer depot
+  line; a combine's output in the bags is in neither until the next `/outputfile inventory`.
+- **A starred line is an ingredient only when a quantity follows it.** The first cut of the `**:`
+  fix also took `:*See [[Patchwork Armor]]` as a material on five pages. The re-patch tool now
+  compares every crafted record against a fresh parse of its cached page: after the fix, exactly
+  those five differed and nothing else, which is the check to repeat after any parser change.
+- A guide step no wiki recipe is joined to carries `guideMaterialsLine` in its `aside`. Its `why`
+  says "No wiki item has this exact name": true for a missing page (Woven Mandrake) and for a
+  guide's shorthand (Platinum ruby), so it never claims the wiki lacks a page.
+
 ## Tradeskill guides as data (fork #6, requirements/skills-tab.md)
 
 - Two community guides are pulled at release time by `scripts/community/guides-pull.mts` and
