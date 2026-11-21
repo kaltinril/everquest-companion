@@ -81,10 +81,10 @@ export const WIKI_GAP_FILTER: LadderFilter = {
 
 /** The switch's words, with how many of the tradeskill's recipes it keeps. */
 export function wikiGapSwitchLabel(count: number): string {
-  return `Missing on the wiki (${String(count)})`
+  return `Wiki is missing info (${String(count)})`
 }
 
-export const WIKI_GAP_TIP = 'Only recipes the wiki lists no materials or no trivial for. Each one links to its wiki page, where a player who knows can add them.'
+export const WIKI_GAP_TIP = 'Shows only the recipes the wiki has not finished: no materials listed, or no trivial. Each has a link to its wiki page so you can add what is missing.'
 
 /**
  * What a screen does about materials the wiki page does not list, said IN the gap line: the
