@@ -30,6 +30,7 @@ import { spellTable } from '../resist/spellTable'
 // The stacking rows, and what each one casts with itself - a join, so it lives where a test can
 // drive it (resist/stackSources.ts).
 import { stackViewsFor } from '../resist/stackSources'
+import { spellIdLookup } from '../spellIds'
 
 /** The most spell names one `spells:stackViews` call may ask about. See the handler. */
 const MAX_STACK_VIEW_NAMES = 400
@@ -198,6 +199,7 @@ export function registerKnowledgeIpc(): void {
     const table = await spellTable()
     return table ? stackViewsFor(table, names) : {}
   })
+  ipcMain.handle(IPC.spellIdLookup, (_e, ask: unknown) => spellIdLookup(ask))
 
   // ---- item knowledge ("what's this lore/quest item for", Task #53) ----
   // The committed DB, the local quest sources and what a Copy lookup cached; never the wiki

@@ -165,6 +165,8 @@ export const IPC = {
   // that as "no exact verdict for this one" rather than as an error: a machine with no EverQuest
   // install answers an empty map, and the tab degrades to its flagged tier and says so.
   spellsStackViews: 'spells:stackViews',
+  // The macro editor's spell lookup: real ids from the player's spells_us.txt (src/main/spellIds.ts).
+  spellIdLookup: 'spells:idLookup',
 
   // ---- voice alerts / TTS (docs/plans/voice-alerts.md §3) ----
   // The 'system' engine tier needs NO channel at all: Chromium's own `speechSynthesis` lives in
