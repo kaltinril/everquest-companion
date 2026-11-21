@@ -21,30 +21,58 @@ interface Bridge {
   eq: { getUiScale: () => Promise<number>; setUiScale: (s: number) => Promise<number> }
 }
 
-/** What cuts the readout: '' when all of it is drawn, null when there is no readout. */
-function tooltipCut(page: Page): Promise<string | null> {
+interface Box {
+  left: number
+  top: number
+  right: number
+  bottom: number
+}
+interface Seen {
+  card: Box
+  window: Box
+  /** Every ancestor of the card that clips its content, innermost first. */
+  clips: (Box & { tag: string })[]
+}
+
+/** The card's box, the window's, and every clipping ancestor's. The page does no judging: a named
+ *  helper inside `evaluate` does not survive the test loader (it wraps it in `__name`). */
+function tooltipSeen(page: Page): Promise<Seen | null> {
   return page.evaluate((sel) => {
     const el = document.querySelector(sel)
     if (!el) return null
     const r = el.getBoundingClientRect()
-    if (r.width < 1 || r.height < 1) return 'it has no size'
-    const slack = 0.5
-    /** True when `r` reaches outside the box. */
-    const outside = (left: number, top: number, right: number, bottom: number): boolean =>
-      r.left < left - slack || r.top < top - slack || r.right > right + slack || r.bottom > bottom + slack
-    if (outside(0, 0, window.innerWidth, window.innerHeight)) {
-      return `the window (${Math.round(r.left)},${Math.round(r.top)} to ${Math.round(r.right)},${Math.round(r.bottom)} in ${window.innerWidth}x${window.innerHeight})`
-    }
+    const clips: { left: number; top: number; right: number; bottom: number; tag: string }[] = []
     for (let p = el.parentElement; p !== null && p !== document.body; p = p.parentElement) {
       const s = getComputedStyle(p)
+      if (s.overflowX === 'visible' && s.overflowY === 'visible') continue
       const c = p.getBoundingClientRect()
-      const clips = s.overflowX !== 'visible' || s.overflowY !== 'visible'
-      if (clips && outside(c.left, c.top, c.right, c.bottom)) {
-        return `a clipping ancestor (${p.tagName.toLowerCase()}, ${Math.round(c.width)}x${Math.round(c.height)})`
-      }
+      clips.push({ left: c.left, top: c.top, right: c.right, bottom: c.bottom, tag: p.tagName.toLowerCase() })
     }
-    return ''
+    return {
+      card: { left: r.left, top: r.top, right: r.right, bottom: r.bottom },
+      window: { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight },
+      clips
+    }
   }, TOOLTIP)
+}
+
+const SLACK = 0.5
+function outside(card: Box, box: Box): boolean {
+  return card.left < box.left - SLACK || card.top < box.top - SLACK || card.right > box.right + SLACK || card.bottom > box.bottom + SLACK
+}
+const size = (b: Box): string => `${String(Math.round(b.right - b.left))}x${String(Math.round(b.bottom - b.top))}`
+
+/** What cuts the readout: '' when all of it is drawn, null when there is no readout. */
+async function tooltipCut(page: Page): Promise<string | null> {
+  const seen = await tooltipSeen(page)
+  if (seen === null) return null
+  const { card } = seen
+  if (card.right - card.left < 1 || card.bottom - card.top < 1) return 'it has no size'
+  if (outside(card, seen.window)) {
+    return `the window (${String(Math.round(card.left))},${String(Math.round(card.top))} to ${String(Math.round(card.right))},${String(Math.round(card.bottom))} in ${size(seen.window)})`
+  }
+  const clip = seen.clips.find((c) => outside(card, c))
+  return clip === undefined ? '' : `a clipping ancestor (${clip.tag}, ${size(clip)})`
 }
 
 async function setScale(page: Page, scale: number): Promise<void> {
