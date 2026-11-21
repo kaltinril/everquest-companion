@@ -185,9 +185,6 @@ test('THE WIRING: a blocked PowerShell walks no backoff and names its cause', ()
     handler,
     /if \(kind === 'blocked'\) downloadBlocked = true\s*\n\s*else consecutiveFailures\+\+/
   )
-  // The bounded telemetry outcome is NOT skipped: a frozen cohort has to stay countable somewhere,
-  // and `updateOutcome` is the honest home the demotion leaves the count in (JOS-310's rule).
-  assert.ok(handler.indexOf('noteUpdate(step,') > handler.indexOf("if (kind === 'blocked')"))
   // …and the sentence a stuck user sits with once the bounded retries are spent names the cause
   // rather than the symptom.
   const available = src.slice(src.indexOf("autoUpdater.on('update-available'"))

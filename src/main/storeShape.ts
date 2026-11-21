@@ -212,9 +212,9 @@ export interface StoreShape {
   // note it remembered — the game's Fullscreen setting is a borderless window on this client, so
   // the advice could never be true. Migration 12 → 13 deletes the key from any store that has it.
   /**
-   * Usage-analytics prefs (schema migration 5→6; docs/plans/usage-analytics.md). Opt-OUT
-   * (`enabled:true`) but `noticeShown:false` — the network gate requires BOTH — and no
-   * `analyticsId` until the collector mints one on its first start.
+   * Usage-analytics prefs (schema migration 5→6). NOTHING READS THIS ANY MORE: usage analytics
+   * was removed on 2026-11-20. The key stays in the shape because settings files already on
+   * players' disks carry it and migration 5→6 still writes it; it is carried along untouched.
    */
   telemetry?: TelemetryPrefs
   /**

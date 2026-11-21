@@ -6,7 +6,8 @@
 // one thread, on a path that runs for as long as the app is open:
 //
 //   * `errorLog.ts` — `appendFileSync` + `statSync` PER LINE, on the app's error path.
-//   * `telemetry/ring.ts` — a temp+fsync+rename per recorded event, up to every 5 minutes.
+//   * the usage-analytics ring — a temp+fsync+rename per recorded event. (Removed with that
+//     service on 2026-11-20; its pins here went with it.)
 //   * `data/overlayPersistence.ts` — the same, every 60 seconds, from session.ts's tick.
 //   * `resist/ledgerFile.ts` — the same, on the resist module's own tick.
 //
@@ -18,7 +19,7 @@
 // WHAT IS PINNED HERE is the LAW rather than any one mechanism (each mechanism is driven for real
 // in its own suite: tests/errorFlood, tests/telemetryRingDurability, tests/resistLedgerDurability):
 //
-//   1. Each of the four live-path writers reaches disk asynchronously.
+//   1. Each of the live-path writers reaches disk asynchronously.
 //   2. Each SYNC survivor is a named, documented final — the quit path or the crash guard — and
 //      there are no others hiding in those files.
 //   3. `storeFile.ts` is the OVERTURN, and it is asserted so that nobody re-opens it by accident:
@@ -26,9 +27,8 @@
 //      a routine `store.set` never comes through it (conf's own `atomically` writer does that job,
 //      inside node_modules, where this repo cannot move it off the thread by editing its source).
 //
-// Source pins, not behaviour: three of the four modules import `electron` and cannot be loaded
-// outside it, so this suite reads the tree — the technique tests/healthCounters.test.mts uses on
-// the same kind of wiring, and for the same honest reason. No Electron, never skips.
+// Source pins, not behaviour: most of these modules import `electron` and cannot be loaded
+// outside it, so this suite reads the tree. No Electron, never skips.
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
@@ -54,15 +54,11 @@ function syncWrites(src: string): string[] {
   return src.match(WRITING_SYNC)?.map((s) => s.replace(/\s*\($/, '')) ?? []
 }
 
-test('THE FOUR LIVE-PATH WRITERS all reach disk asynchronously', () => {
+test('THE LIVE-PATH WRITERS all reach disk asynchronously', () => {
   // The error log: one queue, one drain, one batched append.
   assert.match(read('src/main/errorLog.ts'), /await appendFile\(path,/)
-  // The three durable writers, through the one async temp+fsync+rename this repo owns.
-  for (const file of [
-    'src/main/telemetry/ring.ts',
-    'src/main/data/overlayPersistence.ts',
-    'src/main/resist/ledgerFile.ts'
-  ]) {
+  // The two durable writers, through the one async temp+fsync+rename this repo owns.
+  for (const file of ['src/main/data/overlayPersistence.ts', 'src/main/resist/ledgerFile.ts']) {
     assert.match(read(file), /writeFileDurableAsync\(/, `${file} writes through the async door`)
   }
   // …and the async door really is the same write: temp, FSYNC, rename, in that order. The fsync is
@@ -126,13 +122,6 @@ test('EVERY SYNC SURVIVOR ON THESE PATHS IS A NAMED FINAL, and there are no othe
   const flush = errorLog.slice(errorLog.indexOf('export function flushErrorLogSync('))
   assert.deepEqual(syncWrites(flush).sort(), ['appendFileSync', 'writeFileSync'], 'both live in the final')
 
-  // ring: no raw sync write at all, and the ONE synchronous durable write is the quit final's.
-  const ring = read('src/main/telemetry/ring.ts')
-  assert.deepEqual(syncWrites(ring), [])
-  const ringFinal = ring.slice(ring.indexOf('export function flushRingSync('))
-  assert.match(ringFinal, /writeFileDurableFinal\(/)
-  assert.equal(ring.match(/writeFileDurableFinal\(/g)?.length, 1, 'exactly one sync durable write')
-
   // overlay: the same shape — one sync durable write, inside the quit final.
   const overlay = read('src/main/data/overlayPersistence.ts')
   assert.deepEqual(syncWrites(overlay), [])
@@ -150,12 +139,6 @@ test('A QUIT FINAL WRITES THROUGH ITS OWN SCRATCH FILE — never a torn file for
   assert.match(durable, /export const FINAL_TEMP_TAG = 'quit'/)
   assert.match(durable, /tmp: tempPathFor\(path, FINAL_TEMP_TAG\)/)
   assert.match(durable, /export function tempPathFor\(path: string, tag\?: string\)/)
-  // And whoever deletes the plain temp deletes the tagged one — "off" that leaves events in a
-  // sibling file is the switch lying in a different filename.
-  const ring = read('src/main/telemetry/ring.ts')
-  const remove = ring.slice(ring.indexOf('function removeRingFiles('), ring.indexOf('export function dropRing('))
-  assert.match(remove, /rmSync\(tempPathFor\(path\), \{ force: true \}\)/)
-  assert.match(remove, /rmSync\(tempPathFor\(path, FINAL_TEMP_TAG\), \{ force: true \}\)/)
   // The two writers that CAN be dropped are dropped instead of racing: the overlay's periodic saver
   // and the ledger's writer both refuse while one is in flight, and both losses are bounded by a
   // cadence that was already their accepted loss.
@@ -172,32 +155,16 @@ test('A QUIT FINAL WRITES THROUGH ITS OWN SCRATCH FILE — never a torn file for
   assert.match(read('src/main/resist/ledgerFile.ts'), /if \(writing\) return \{ status: 'busy' \}/)
 })
 
-test('WHAT IS OWED STAYS OWED UNTIL THE BYTES ARE DOWN — the quit final must have something to write', () => {
-  // MEASURED THE HARD WAY. The drain first cleared `owed` on the way IN, which looked equivalent
-  // and was not: `drainWrites()` runs synchronously up to its first `await`, so a `writeRing`
-  // during `window-all-closed` emptied `owed` in the same tick, `before-quit` found nothing
-  // outstanding, and the process exited before the threadpool write landed. The telemetry e2e's
-  // restart assertions went red on exactly that — the heartbeat's records never reached disk.
-  const ring = read('src/main/telemetry/ring.ts')
-  const drain = ring.slice(ring.indexOf('async function drainWrites('), ring.indexOf('export function writeRing('))
-  assert.match(drain, /const pending = owed/)
-  assert.equal(drain.match(/if \(owed === pending\) owed = null/g)?.length, 2, 'discharged on both settle arms')
-  assert.ok(
-    drain.indexOf('await writeFileDurableAsync') < drain.indexOf('if (owed === pending) owed = null'),
-    'owed is discharged AFTER the bytes are down, never before'
-  )
-})
-
 test('THE FINALS ARE WIRED WHERE THE APP ACTUALLY ENDS', () => {
   const index = read('src/main/index.ts')
   const beforeQuit = index.slice(index.indexOf("app.on('before-quit'"))
   const body = beforeQuit.slice(0, beforeQuit.indexOf('\n})'))
-  // The ring's final and the error log's, on the ONE event every quit path reaches — an
+  // The store's final and the error log's, on the ONE event every quit path reaches — an
   // auto-updater's `quitAndInstall` and an OS logoff never emit `window-all-closed`.
-  assert.match(body, /flushRingSync/)
+  assert.match(body, /flushStoreForQuit\(\)/)
   assert.match(body, /flushErrorLogSync\(\)/)
   // The error log goes LAST, so a line any step above it just wrote is in the batch.
-  assert.ok(body.lastIndexOf('flushErrorLogSync()') > body.indexOf('flushRingSync'))
+  assert.ok(body.lastIndexOf('flushErrorLogSync()') > body.indexOf('flushStoreForQuit()'))
   // THE OVERLAY REGISTER HAS NO APP-SIDE FINAL ANY MORE (JOS-499, boundary verdict 4). Both its
   // writers lived here — the quit-time `saveUserOverlaySync` teardown step and the 60-tick
   // `saveUserOverlay` rider on session.ts's heartbeat — and both read the register off this

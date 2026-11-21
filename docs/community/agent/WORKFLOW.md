@@ -195,8 +195,8 @@ disagree, RULES.md wins; fix this file.
 - **Known e2e reds/flakes:** `respawn-timers.e2e.mts` fails one step ("never claims the mob is
   standing there") on plain upstream main since 2026-08-17. `maps.e2e`, `engine-boots`,
   `engine-absent`, `sky-achievements`, `sky-reward-inference` can flake under parallel load; run
-  serially. `feedback.e2e.mts` is red on the TEST build by design (the TEST build disables the
-  feedback controls).
+  serially. The `feedback` and `telemetry` specs, the runner's skip list and the first-run notice
+  were removed 2026-11-20; the measurements below that name them are history.
   Measured 2026-10-18 (full run on main_community, then serial, then the same specs on test.26):
   58/68 green; the 10 reds were identical on test.26. By design on the TEST build: `feedback`,
   `telemetry` (no analytics compiled in), `spells-gate` (the old gate forced open; since 2026-10-29
@@ -253,10 +253,13 @@ disagree, RULES.md wins; fix this file.
 
 - **No unreleased tabs** (owner, 2026-10-28: "no reason to hide them ever just always show the
   tabs"; 2026-10-29: "everyone should always see all tabs"). The `UNRELEASED` gate is removed
-  outright (no flag, no `EQ_UNRELEASED`); a new surface ships visible. A view not yet in
-  `TELEMETRY_VIEWS` goes in `NOT_YET_REPORTED` (`tests/telemetryContract.test.mts`) so the
-  contract test passes. The build sends no telemetry; whether those lists are kept is the owner's
-  decision, still open.
+  outright (no flag, no `EQ_UNRELEASED`); a new surface ships visible.
+
+- **No feedback or usage analytics** (owner, 2026-11-20: "Remove all code associated with feedback
+  and usage analytics"). Players report through this repo's GitHub issues (`shared/issueLink.ts`).
+  A new view or overlay has no reporting list to join. `src/main/telemetry/` (`durableWrite`, the
+  error budget's fingerprint) and `src/main/feedback/slice.ts` keep their old paths and are local
+  helpers. The `telemetry` key stays in the store shape so old settings files load.
 
 - **The fork has taken over the project** (owner, 2026-09-28). A decision that used to wait on the
   creator (a new tab, a new data file, a departure from AGENTS.md design) is the owner's alone; do

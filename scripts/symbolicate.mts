@@ -1,10 +1,11 @@
 /**
- * symbolicate.mts — turn an error report's `out/…:line:col` frames back into source terms.
+ * symbolicate.mts — turn an error's `out/…:line:col` stack frames back into source terms.
  *
  *   npx tsx scripts/symbolicate.mts --maps <dir> --frames <file.json>
  *   npx tsx scripts/symbolicate.mts --maps out --frames -        (frames JSON on stdin)
  *
- * An `errorReport` frame names a BUNDLE position: `out/renderer/assets/index-a1b2.js:1:48213`.
+ * A stack frame in a packaged build's errors.log names a BUNDLE position:
+ * `out/renderer/assets/index-a1b2.js:1:48213`.
  * That is a fingerprint, not a diagnosis — the file is minified onto a handful of lines and the
  * column is the only real information in it. This resolves each frame through the `.map` beside
  * it and prints `src/renderer/src/features/combat/CombatView.tsx:214:9`, which is a place a
@@ -25,16 +26,14 @@
  * or before it is the segment it belongs to. A position before the first mapping on its line
  * resolves to nothing and is reported as unmapped rather than guessed at.
  *
- * IT IS ALSO A LIBRARY. `scripts/triage-feedback.mts errors` imports `symbolicateFrames` to
- * annotate an exemplar in place, so the CLI and this command can never disagree about what a
- * frame means.
+ * IT IS ALSO A LIBRARY: `symbolicateFrames` is exported for a caller that already holds frames.
  */
 
 import { readFileSync, existsSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import process from 'node:process'
 
-/** One frame as an `errorReport` carries it. */
+/** One frame: a bundle file, a position and the function name the stack printed. */
 export interface Frame {
   file: string
   line: number

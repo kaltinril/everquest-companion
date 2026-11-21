@@ -43,7 +43,6 @@ import { Worker } from 'node:worker_threads'
 import { screen } from 'electron'
 import { E2E } from './e2e'
 import { logError, logInfo } from './errorLog'
-import { notePresenceRestart } from './telemetry'
 import { effectiveEqRoot } from './log/config'
 import {
   type FocusTransitionDriver,
@@ -535,11 +534,8 @@ function clearStaleWatchdog(): void {
  * thread away and started another, and the user's overlays came back on their own. Reported as an
  * error, it and its restart family were the TOP LINE of the fleet's error store on every version
  * through 0.26.0 — a wall of identical, true, unactionable rows that buried the ones that were
- * neither. It is `logInfo` now (dev stdout, never errors.log, never the error store), it carries
- * the whole cause rather than one number, and the OCCURRENCE is still counted where a handled
- * self-healing condition belongs: `notePresenceRestart` in `scheduleRestart`, i.e. the
- * `presenceRestarts` health counter. A machine that starts doing this is still visible; it is
- * simply no longer visible as a defect in the build.
+ * neither. It is `logInfo` now (dev stdout, never errors.log), and it carries
+ * the whole cause rather than one number.
  *
  * The genuinely fatal version of this same condition is untouched and is still an error: three
  * threads wedged and never recovered surrenders the feature for the session, loudly, in
@@ -589,13 +585,6 @@ function scheduleRestart(): void {
     }
     return
   }
-  // COUNTED WHERE THE RESTART IS COMMITTED TO (JOS-96), after the guard rather than before it: a
-  // call that is refused because a restart is already pending, or because nobody is listening any
-  // more, did not restart anything and must not read as a health event. All three restart causes
-  // (the stale-watcher watchdog, the watcher-gone handler, a failed start) funnel through here, so
-  // this is the one increment site. `restartFailures` cannot serve — it is a backoff index that
-  // resets to 0 on a healthy watcher.
-  notePresenceRestart()
   restartTimer = setTimeout(() => {
     restartTimer = null
     if (listeners.size === 0 || watcher) return

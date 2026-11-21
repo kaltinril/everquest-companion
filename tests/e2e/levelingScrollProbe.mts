@@ -56,7 +56,6 @@ import { buildEngineIfStale, buildIfStale } from './build.mjs'
 import { launchOnRealInstall, mainWindow } from './appWindow.mjs'
 import { launchOnFixture, type FixtureLog } from './logFixture.mjs'
 import { waitHydrated } from './appHarness.mjs'
-import { dismissFirstRunNotice } from './levelingLayoutSteps.mjs'
 
 /**
  * `--real` launches on the OWNER'S OWN INSTALL instead of the staged fixture.
@@ -465,9 +464,6 @@ async function main(): Promise<void> {
     await page.waitForSelector(NAV, { timeout: 60_000 })
     await page.click(NAV, { timeout: 15_000 })
     await page.waitForSelector(VIEW, { timeout: 30_000 })
-    // The analytics first-run notice is a fixed overlay across the bottom and would eat wheel
-    // events; the leveling spec dismisses it first for the same reason.
-    await dismissFirstRunNotice(page)
     await page.evaluate((ms) => new Promise((r) => setTimeout(r, ms)), 2_000)
 
     const hooked = await page.evaluate(() => (window as unknown as Record<string, number>).__probeCommits ?? -1)

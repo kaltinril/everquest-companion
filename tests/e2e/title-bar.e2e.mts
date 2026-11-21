@@ -101,15 +101,6 @@ async function checkAsks(app: ElectronApplication, name: string, want: number): 
   check(name, delta === want, `asked ${String(delta)}x, expected ${String(want)}`)
 }
 
-/** Answer the analytics first-run notice, which a fresh userData always shows over the window. */
-async function dismissFirstRunNotice(page: Page): Promise<void> {
-  const notice = '[data-testid="telemetry-notice"]'
-  await page.waitForSelector(notice, { timeout: 30_000 }).catch(() => undefined)
-  if ((await countOf(page, notice)) === 0) return
-  await page.click('[data-testid="telemetry-notice-off"]')
-  await settleGone(page, notice, { timeoutMs: 8_000 })
-}
-
 /** Is `sel` a DOM descendant of the title bar? The portal question, asked of the real DOM. */
 function insideBar(page: Page, sel: string): Promise<boolean> {
   return page.evaluate(
@@ -238,7 +229,6 @@ async function main(): Promise<void> {
     })
     page.on('pageerror', (e) => consoleErrors.push(String(e)))
 
-    await dismissFirstRunNotice(page)
     await page.waitForSelector(BAR, { timeout: 60_000 })
     await instrumentMaximize(launched.app)
 

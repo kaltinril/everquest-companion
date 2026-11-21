@@ -22,8 +22,16 @@
 //! charmers armed over one broadcast, a bard charm (a different sentence, never the cast a broadcast
 //! resolved), a non-player-shaped caster.
 //!
+//! A THIRD BIND, the weakest (2026-11-20, requirements/pet-rules.md rule 3): a group mate casts a
+//! pet summon, and a name from the game's summoned-pet table then acts for the first time against
+//! something the group is fighting. No line names the pet a summon makes, so this is a guess and
+//! the row says so. It is made only when exactly ONE summon is waiting (two group mates, or a
+//! group mate and you, summoning inside the same window leaves the pet unowned), and any leader
+//! line or claim replaces it. That rule lives in `ally_summon.rs`.
+//!
 //! Pure + clock-injected, like `charm.rs`.
 
+use crate::combat::ally_summon::SummonWatch;
 use crate::combat::spellfacts::{
     arm_window_ms, is_charm_broadcast_spell, is_pet_summon_spell, is_player_shaped_name,
     provisional_window_ms, DEFAULT_CHARM_DURATION_MS, DURATION_SLACK_MS,
@@ -44,12 +52,14 @@ pub enum AllyKind {
 pub enum AllyVia {
     Cast,
     Leader,
+    /// Guessed from a group mate's summon (`infer_summon_owner`). Never a charm.
+    Summon,
 }
 
 /// `Number.POSITIVE_INFINITY` as a log clock can hold it — a `Summon` bind has no clock at all.
 /// Every arithmetic site below saturates rather than wrapping, which is what makes
 /// `note_activity`'s `ts + window_ms` the no-op the TS gets for free.
-const NO_CLOCK: i64 = i64::MAX;
+pub(super) const NO_CLOCK: i64 = i64::MAX;
 
 /// One live third-party charm bind.
 #[derive(Debug, Clone)]
@@ -113,6 +123,8 @@ pub struct AllyCastLine<'a> {
     pub ts: i64,
     /// `EngineState::ally_caster_allowed` — the behavioural half of the caster gate.
     pub allowed: bool,
+    /// The caster is on the group roster right now. Only a group mate's summon is waited on.
+    pub member: bool,
 }
 
 /// One `<PetName> says, 'My leader is <Player>.'` line about somebody else.
@@ -144,12 +156,12 @@ pub struct AllyCharms {
     /// broadcasts look like the last caster's.
     arms: JsMap<AllyArm>,
     /// nameKey → the live bind. Insertion-ordered because `bound_names` and `sweep` publish it.
-    binds: JsMap<AllyBind>,
+    pub(super) binds: JsMap<AllyBind>,
     /// Player-shaped names seen casting (any spell) plus every charmer this model has bound for.
     /// For the soft-hostile proof and nothing else — never attribution, never merged into
     /// `known_players`. Its job is to stop a stranger's DPS being inflated with the damage their
     /// ex-pet is doing to their own group.
-    friendlies: HashSet<String>,
+    pub(super) friendlies: HashSet<String>,
     /// casterKey → ts this ally was last seen casting a pet summon. The weaker half of the lifecycle
     /// question on purpose: no summon line names the pet it makes, so it can say "this ally has a
     /// summoned pet", never "this is it".
@@ -157,6 +169,8 @@ pub struct AllyCharms {
     /// Survives a zone, like `friendlies` and unlike the binds: a summoned pet walks through the
     /// door with its owner.
     summons: HashMap<String, i64>,
+    /// The summons no pet has been tied to yet (`ally_summon.rs`).
+    pub watch: SummonWatch,
 }
 
 impl AllyCharms {
@@ -169,6 +183,7 @@ impl AllyCharms {
         self.binds.clear();
         self.friendlies.clear();
         self.summons.clear();
+        self.watch.reset();
     }
 
     /// `<Name> begins casting <Spell>.` — remember a player-shaped caster, and arm the join when the
@@ -182,6 +197,9 @@ impl AllyCharms {
         // test about a different spell family. It arms nothing; only a later leader say reads it.
         if is_pet_summon_spell(c.spell) {
             self.summons.insert(c.caster_key.to_string(), c.ts);
+            if c.member {
+                self.watch.note_group_summon(c.caster_key, c.caster, c.ts);
+            }
         }
         if !is_charm_broadcast_spell(c.spell) {
             return;
@@ -305,6 +323,8 @@ impl AllyCharms {
         };
         self.binds.insert(l.pet_key.to_string(), bind.clone());
         self.friendlies.insert(l.owner_key.to_string());
+        // The owner's pet has a name now: their summon is explained.
+        self.watch.explained(l.owner_key, l.pet_key);
         bind
     }
 
@@ -380,6 +400,7 @@ impl AllyCharms {
     /// The soft-hostile proof does not come through here: it is the one ending that depends on which
     /// creature this is.
     pub fn release(&mut self, name_key: &str) -> Option<AllyBind> {
+        self.watch.forget_pet(name_key);
         let b = self.binds.get(name_key).cloned();
         if b.is_some() {
             self.binds.remove(name_key);
@@ -468,6 +489,7 @@ mod tests {
             spell,
             ts,
             allowed: true,
+            member: false,
         }
     }
 

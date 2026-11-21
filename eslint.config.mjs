@@ -170,10 +170,6 @@ const IGNORES = [
   'out/**',
   'out-e2e/**',
   'dist/**',
-  // esbuild bundle output for the feedback Lambda (infra/build.mjs) — generated,
-  // 5.8k phantom no-var errors if linted. gitignored too; both lists need it.
-  'infra/dist/**',
-  'infra/.terraform/**',
   'release/**',
   'node_modules/**',
   'build/**',
@@ -190,8 +186,8 @@ const IGNORES = [
   // renderer asset mid-run). Their own lint runs happen inside the worktree,
   // where this entry matches nothing.
   '.claude/worktrees/**',
-  // Local triage material: gitignored per-machine scratch (Linear API one-offs,
-  // feedback slices, linear.env). Never in git, never in CI — same standing as
+  // Gitignored per-machine scratch (Linear API one-offs, linear.env).
+  // Never in git, never in CI — same standing as
   // scripts/_* above. ESLint flat config does not read .gitignore, so the two
   // lists both need the entry.
   '.triage/**',
@@ -205,8 +201,8 @@ const IGNORES = [
   '**/*.json',
   'eslint.ratchet.mjs',
   // THE WIRE CONTRACT'S TYPESCRIPT HALF (JOS-464), written by `npm run gen:protocol` from
-  // protocol/schema and pinned byte-for-byte by tests/protocolSchema.test.mts. Same standing as
-  // infra/dist above: a file nobody edits cannot carry lint debt, and the alternative — ratchet
+  // protocol/schema and pinned byte-for-byte by tests/protocolSchema.test.mts. A file nobody
+  // edits cannot carry lint debt, and the alternative — ratchet
   // entries for json-schema-to-typescript's house style (empty interfaces for parameterless ops,
   // index signatures for the open maps the schema deliberately declares) — would be a debt
   // register for a file that is rewritten wholesale on every schema change. tsc still checks it:

@@ -11,28 +11,25 @@
 //
 // TWO CHANGES, ONE ARGUMENT, and this file covers both because they only make sense together:
 //
-//   A. THE CACHE MISS BECOMES A COUNTER. The network leg of an image fetch bumps
-//      `imageFetchFailures` and warns once per host per session, instead of filing an error. The
-//      HTTP-STATUS branch beside it stays an error, and the difference is the whole point: a host
-//      that never answered is somebody else's outage, a host that answered 404 means this app
-//      asked for something that is not there.
+//   A. THE CACHE MISS IS NOT AN ERROR. The network leg of an image fetch warns once per host per
+//      session, instead of filing an error. The HTTP-STATUS branch beside it stays an error, and
+//      the difference is the whole point: a host that never answered is somebody else's outage,
+//      a host that answered 404 means this app asked for something that is not there.
 //   B. IDENTICAL LINES ARE CAPPED. The first five copies of one line are written as always; after
-//      that one notice replaces the next and the rest become `suppressedErrorLines`. The counter is
-//      what makes the cap allowable at all — `mainErrorLogLines + suppressedErrorLines` is still
-//      exactly how many times the thing happened, so a build that starts looping cannot look like a
-//      build that got better.
+//      that one notice replaces the next and the rest are withheld. The decision says which
+//      (`suppressed`), so a caller can account for every occurrence.
 //
 // A THIRD CASE JOINED THEM (JOS-266) and is covered where it belongs — the cache-read failure that
 // heals itself lives in `tests/imageCacheHeal.test.mts`, because it is a behaviour of the request
-// path rather than of the error funnel. What is asserted HERE is the two decisions this file owns
-// for every demotion: that the field is exempt from the release error rate, and that TELEMETRY.md
-// says what the counter means.
+// path rather than of the error funnel.
+//
+// (Until 2026-11-20 both cases also bumped a usage-analytics health counter, and this suite pinned
+// those counts and their row in TELEMETRY.md. The counters went with that service.)
 //
 // WHAT IS DRIVEN AND WHAT IS PINNED. `errorRepeat` and the image-cache warn gate are LEAVES (they
 // import nothing, or nothing but other leaves), so this suite drives the real production code with
 // no Electron in the process — `tests/errorCounterHygiene.test.mts`'s technique, for its reason.
-// The WIRING inside `logError` needs `electron`, so it is pinned as source there and in
-// `tests/healthCounters.test.mts`, which owns the counter half.
+// The WIRING inside `logError` needs `electron`, so it is pinned as source.
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
@@ -54,24 +51,23 @@ import {
   resetImageFetchWarnings,
   takeImageFetchWarning
 } from '../src/main/imageCache'
-import {
-  noteImageFetchFailure,
-  noteSuppressedErrorLine,
-  resetHealth,
-  takeHealth
-} from '../src/main/telemetry/health'
-import { HEALTH_NON_ERROR_FIELDS, isErrorHealthField } from '../src/shared/telemetryRollup'
 
 const TEST_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const read = (p: string): string => readFileSync(join(TEST_ROOT, p), 'utf8')
 
-/** The production sink, as `logError` runs it: count the suppression, then decide what to write.
+/** How many occurrences the rule said it withheld since the last `resetSuppressed()`. */
+let suppressed = 0
+const resetSuppressed = (): void => {
+  suppressed = 0
+}
+
+/** The production sink, as `logError` runs it: ask the rule, then decide what to write.
  *  Returns the file lines that would have been appended. Pinned to the real source below. */
 function drive(source: string, body: string, times: number): string[] {
   const written: string[] = []
   for (let i = 0; i < times; i++) {
     const r = errorRepeat(source, body)
-    if (r.suppressed) noteSuppressedErrorLine()
+    if (r.suppressed) suppressed++
     if (r.write) written.push(body)
     else if (r.notice !== null) written.push(r.notice)
   }
@@ -82,7 +78,7 @@ function drive(source: string, body: string, times: number): string[] {
 
 test('the first five copies are written, then one notice, then nothing — and every one is counted', () => {
   resetErrorRepeat()
-  resetHealth()
+  resetSuppressed()
   const lines = drive('main:uncaughtException', 'TypeError: x is not a function\n  at foo', 10_000)
 
   // FIVE payload lines plus ONE notice. Ten thousand occurrences cost six lines of a 1 MB file
@@ -93,9 +89,8 @@ test('the first five copies are written, then one notice, then nothing — and e
 
   // THE HONEST TOTAL. 10,000 occurrences = 5 written + 9,995 suppressed. The notice is not one of
   // the 9,995: it replaced the sixth occurrence, and that occurrence is counted as suppressed.
-  const health = takeHealth()
-  assert.equal(health.suppressedErrorLines, 10_000 - MAX_IDENTICAL_ERROR_LINES)
-  resetHealth()
+  assert.equal(suppressed, 10_000 - MAX_IDENTICAL_ERROR_LINES)
+  resetSuppressed()
   resetErrorRepeat()
 })
 
@@ -103,25 +98,25 @@ test('the notice is written EXACTLY once — a repeat cannot re-announce itself 
   // The failure this pins is a cap that emits its own explanation every time, which would trade
   // one flood for a slightly cheaper flood.
   resetErrorRepeat()
-  resetHealth()
+  resetSuppressed()
   const lines = drive('main:x', 'boom', 500)
   assert.equal(lines.filter((l) => l.includes('errorRepeat')).length, 1)
-  resetHealth()
+  resetSuppressed()
   resetErrorRepeat()
 })
 
 test('"identical" means source AND payload — two different faults do not share a budget', () => {
   resetErrorRepeat()
-  resetHealth()
+  resetSuppressed()
   // The same message from two sources is two facts about where the app broke.
   assert.equal(drive('main:uncaughtException', 'boom', 5).length, 5)
   assert.equal(drive('renderer:ErrorBoundary', 'boom', 5).length, 5)
   // …and two messages from one source are two faults.
   assert.equal(drive('main:x', 'first', 5).length, 5)
   assert.equal(drive('main:x', 'second', 5).length, 5)
-  assert.equal(takeHealth().suppressedErrorLines, 0, 'nothing was suppressed — none of them repeated')
+  assert.equal(suppressed, 0, 'nothing was suppressed — none of them repeated')
   assert.equal(errorRepeatTracked(), 4)
-  resetHealth()
+  resetSuppressed()
   resetErrorRepeat()
 })
 
@@ -145,31 +140,28 @@ test('past the key ceiling nothing is suppressed — the failure direction is MO
   // it is full, a new key is not tracked and is written every time: this module may cost the file
   // lines it did not have to, and may never cost it a line it cannot account for.
   resetErrorRepeat()
-  resetHealth()
+  resetSuppressed()
   for (let i = 0; i < MAX_TRACKED_ERROR_KEYS; i++) errorRepeat('main:x', `distinct ${String(i)}`)
   assert.equal(errorRepeatTracked(), MAX_TRACKED_ERROR_KEYS)
   // The 501st line, a thousand times over: written a thousand times, suppressed zero times.
   assert.equal(drive('main:x', 'the one that did not fit', 1_000).length, 1_000)
-  assert.equal(takeHealth().suppressedErrorLines, 0)
+  assert.equal(suppressed, 0)
   assert.equal(errorRepeatTracked(), MAX_TRACKED_ERROR_KEYS, 'and the map did not grow')
   // A key ALREADY tracked still caps normally when the map is full — the ceiling gates insertion,
   // not the rule.
   assert.equal(drive('main:x', 'distinct 0', 10).length, MAX_IDENTICAL_ERROR_LINES)
-  resetHealth()
+  resetSuppressed()
   resetErrorRepeat()
 })
 
-test('THE WIRING: logError asks the rule, counts the suppression, and never touches the report', () => {
+test('THE WIRING: logError asks the budget, then the rule, and both sinks obey one verdict', () => {
   const src = read('src/main/errorLog.ts')
-  // The report is taken FIRST, so a suppressed line still produces its error report — the fleet
-  // loses no observation, only the local file gets shorter.
+  // The session budget is asked FIRST (it is the outer bound), then the identical-line cap.
   //
-  // THIS ASSERTION USED TO PASS VACUOUSLY (found while fixing JOS-197). `logError` has called
-  // `noteError(source, payload, Date.now(), captureSite)` since JOS-111, so the literal it looked
-  // for was absent, `indexOf` returned -1, and `-1 < anything` is true — it would have gone on
-  // being green with the two calls in either order, or with `noteError` deleted outright. The
-  // prefix is matched now, and BOTH orderings that matter are checked.
-  assert.ok(src.includes('noteError(source, payload, Date.now(), captureSite)'))
+  // THIS ASSERTION USED TO PASS VACUOUSLY (found while fixing JOS-197): the literal it looked
+  // for was absent, `indexOf` returned -1, and `-1 < anything` is true. The call is matched
+  // whole now, and the ordering that matters is checked.
+  assert.ok(src.includes('noteError(source, payload, captureSite)'))
   assert.ok(src.indexOf('noteError(source, payload,') < src.indexOf('const repeat = errorRepeat('))
   // Both sinks obey one verdict: a dev watching stdout reads the same flood errors.log does. Since
   // JOS-197 they obey it through ONE writer, which is also the only door to the console.
@@ -179,7 +171,7 @@ test('THE WIRING: logError asks the rule, counts the suppression, and never touc
   // The line is built from `source` + `body`, which is what keeps the timestamp out of the key.
   assert.match(src, /errorRepeat\(source, body\)/)
   // The rule is a LEAF — no imports at all — so it cannot close a cycle on the app's error path
-  // (`telemetry/health.ts`'s argument, for its reason) and this suite can drive the real thing.
+  // and this suite can drive the real thing.
   assert.doesNotMatch(read('src/main/errorRepeat.ts'), /^\s*import\s/m)
 })
 
@@ -216,14 +208,7 @@ test('the host gate and the failure description are TOTAL — they run inside a 
   }
 })
 
-test('the demoted branch counts, and the branch beside it is still an error', () => {
-  // The COUNTER half, driven for real. The source pin for the two branches lives in
-  // tests/healthCounters.test.mts (it is a counter-wiring assertion); what is asserted here is the
-  // number that replaced the error, and that it is a plain count with nowhere to put a URL.
-  resetHealth()
-  for (let i = 0; i < 17_632; i++) noteImageFetchFailure()
-  assert.equal(takeHealth().imageFetchFailures, 17_632)
-  resetHealth()
+test('the demoted branch warns on the console only, and never writes errors.log', () => {
   // The warn line is CONSOLE ONLY, and the option that carries it defaults to `logWarn` — which
   // writes to stdout and never to errors.log, so a demoted condition cannot re-enter the error
   // count through the back door.
@@ -232,57 +217,16 @@ test('the demoted branch counts, and the branch beside it is still an error', ()
   assert.equal(img.match(/logError\(/g), null, 'imageCache never writes errors.log directly')
   assert.equal(img.match(/from '\.\/errorLog'/g)?.length, 1)
   assert.match(img, /import \{ logConsoleError, logInfo, logWarn \} from '\.\/errorLog'/)
-})
 
-test('an image fetch failure is COUNTED but is not an ERROR — the release rate excludes it', () => {
-  // The reading decision, pinned where it can be argued with. `errors / healthReports` per build
-  // answers "did I release buggy code"; 17,632 failed downloads of somebody else's images would
-  // swamp every real signal in it and would move with a wiki's uptime rather than with a release.
-  assert.deepEqual(
-    [...HEALTH_NON_ERROR_FIELDS],
-    ['imageFetchFailures', 'imageCacheReadFailures', 'utilityProcessGone']
-  )
-  assert.equal(isErrorHealthField('imageFetchFailures'), false)
-  // JOS-266's, exempt for the same reason with a stronger claim: a cached image that will not read
-  // back is evicted and re-fetched, so the condition ends with the user seeing the picture. What it
-  // measures is a machine whose cache folder is being fought over, not a build that went wrong.
-  assert.equal(isErrorHealthField('imageCacheReadFailures'), false)
-  // JOS-364's utility-process counter, exempt on the same shape of argument: Chromium starts and
-  // stops audio/network/storage helpers by design, so a rate that summed them would report an
-  // ordinary browser as a bad release. Its GPU sibling is NOT exempt — that one took every
-  // window's compositor with it, which is `rendererCrashes` about a different process.
-  assert.equal(isErrorHealthField('utilityProcessGone'), false)
-  assert.equal(isErrorHealthField('gpuProcessGone'), true)
-  // A DENY LIST, so a field added later and forgotten counts as an error — noisy and visible,
-  // rather than silently vanishing from the rate.
-  assert.equal(isErrorHealthField('somethingAddedNextYear'), true)
-  // And the one that must NOT be excluded, ever: suppressed lines are real errors that a cap
-  // withheld from the file, so leaving them out would let the cap flatter a looping build.
-  assert.equal(isErrorHealthField('suppressedErrorLines'), true)
-  assert.equal(isErrorHealthField('mainErrorLogLines'), true)
-  // The reader honors it in BOTH places it sums: the per-day series and the per-build total.
-  const rh = read('src/main/triage/releaseHealth.ts')
-  assert.match(rh, /!isErrorHealthField\(split\.field\)/)
-  assert.match(rh, /byField\.filter\(\(f\) => isErrorHealthField\(f\.id\)\)/)
-})
-
-test('THE DOC says both new counters in the file users are pointed at', () => {
-  // TELEMETRY.md is generated from the schema (tests/telemetryDoc.test.mts pins the parity), so the
-  // promise about each field is asserted where a user would read it. The image row must not read
-  // as a fault the user should do something about, and neither row may promise more than a count.
-  const rows = read('TELEMETRY.md').split(/\r?\n/)
-  const image = rows.find((l) => l.includes('`imageFetchFailures`'))
-  assert.ok(image, 'TELEMETRY.md documents the image counter')
-  assert.match(image, /hidden and the app carries on/)
-  assert.match(image, /Never which picture/)
-  const suppressed = rows.find((l) => l.includes('`suppressedErrorLines`'))
-  assert.ok(suppressed, 'TELEMETRY.md documents the suppression counter')
-  assert.match(suppressed, /A count only/)
-  // JOS-266's row, held to the same standard: it must read as something that FIXED ITSELF, and it
-  // must promise a count and nothing about which image or where it was kept.
-  const reread = rows.find((l) => l.includes('`imageCacheReadFailures`'))
-  assert.ok(reread, 'TELEMETRY.md documents the cache-read counter')
-  assert.match(reread, /downloaded again/)
-  assert.match(reread, /still shown/)
-  assert.match(reread, /Never which picture, and never where it was kept/)
+  // THE TWO BRANCHES ARE TWO DECISIONS. The NETWORK catch goes one way, shared with a body cut
+  // off mid-read, and that way files no error…
+  const netCatch = img.slice(img.indexOf('} catch (err) {', img.indexOf('res = await doFetch')), img.indexOf('if (!res.ok)'))
+  assert.match(netCatch, /return fetchUnreachable\(url, err, warn\)/, 'the network leg goes one way')
+  const netLeg = img.slice(img.indexOf('function fetchUnreachable'), img.indexOf('export function installImageCacheProtocol'))
+  assert.doesNotMatch(netLeg, /onError\(/, 'and it files no error')
+  // …while the branch beside it, where a host ANSWERED, still does.
+  const statusBranch = img.slice(img.indexOf('if (!res.ok)'), img.indexOf('bytes = new Uint8Array'))
+  assert.match(statusBranch, /onError\(/, 'an HTTP status is still ours to fix, and still an error')
+  // So does a cache directory this app cannot write to: a fact about the install nothing heals.
+  assert.match(img, /onError\(`\[everquest-companion:error\] image cache: could not store/)
 })

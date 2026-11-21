@@ -32,12 +32,9 @@ import { CHANNEL, USER_DATA } from './channel'
 // module body below can throw. See crashGuards.ts.
 import './crashGuards'
 import { E2E } from './e2e'
-import { OWNER_TOOLS } from './ownerTools'
 import { app, BrowserWindow, protocol, session } from 'electron'
 import { IPC } from '../shared/ipc'
 import { errorLogPath, flushErrorLogSync, logError, logInfo } from './errorLog'
-import { startQueueFlush, stopQueueFlush } from './feedback'
-import { flushRingSync, startTelemetry, stopTelemetry } from './telemetry'
 import { registerAppSchemes } from './appSchemes'
 import { applyGraphicsCompatibilityFlags, applyGraphicsSafeMode } from './graphics'
 import { installImageCacheProtocol } from './imageCache'
@@ -65,7 +62,6 @@ import { removedPackIds } from './storeSoundPacks'
 // Item icons from the wiki's GitHub data pack, before the wiki (imageCache.ts asks it on a miss).
 import { scheduleResistWarm } from './resist/warm'
 import { startTailing, stopSession } from './session'
-import { runSmokeFeedback } from './smokeFeedback'
 import { STORE_OPEN_START_MS, STORE_READY_MS, getOverlayConfig, getPerfHudPrefs } from './store'
 // The z-order guard's tally, read once at quit (JOS-368; see `logTopmostSavings`).
 import { topmostStats } from './topmost'
@@ -113,11 +109,6 @@ applyGraphicsSafeMode()
 // on a software renderer Wine does not implement (shared/wineDetect.ts WINE_CHROMIUM_FLAGS).
 applyGraphicsCompatibilityFlags()
 
-// Cold-start stopwatch: module scope is the earliest this process can measure from, and the
-// number is bucketed (never sent raw) into `sessionStart` when the window exists. See
-// src/shared/telemetry.ts COLD_START_MS_EDGES.
-const PROCESS_START_MS = Date.now()
-
 /** How long after `ready` the gear index starts building on its own (see where it is armed). */
 const GEAR_PREWARM_DELAY_MS = 5_000
 
@@ -163,46 +154,6 @@ noteHeapAfterData()
 // re-read without needing a special signal from here.
 
 
-// ---------------------------------------------------------------------------------------
-// DEV-ONLY: the feedback-triage IPC surface (src/main/triage/**).
-// ---------------------------------------------------------------------------------------
-//
-// This is the operator's window onto the feedback backlog — the same Aurora DSQL rows and S3
-// slices `scripts/triage-feedback.mts` reads, over the same IAM door. It exists in the OWNER's
-// dev app and nowhere else, and there are THREE independent reasons a shipped build cannot
-// reach it:
-//
-//   1. THIS GATE, which is `OWNER_TOOLS` since JOS-72 (src/shared/ownerTools.ts) and no longer
-//      "am I a dev build?". `app.isPackaged` is false in a dev run — but it is also false in a
-//      SELF-COMPILED build from this public repo, which is how a stranger's macOS recompile
-//      ended up with the owner's backlog tab in its nav drawer. So the predicate now also
-//      requires `EQ_OWNER_TOOLS=1`, which no fresh checkout has; `E2E` still excludes the
-//      headless harness, which builds production-shaped and must stay off the network. The
-//      import is DYNAMIC, so a build without the opt-in never even evaluates the module.
-//   2. THE DEPENDENCIES. That module reaches `pg` and `@aws-sdk/*` — devDependencies, which
-//      electron-builder never packages. A build with this gate patched out still could not
-//      resolve them. The property is structural, not a runtime check.
-//   3. THE CREDENTIALS. Auth is an IAM token derived locally from the LAUNCHING SHELL's AWS
-//      profile (AWS_PROFILE, default 'eqc'). There is no password to leak, and a shell without
-//      the owner's credentials gets IAM denials on the first statement.
-//
-// Failure to load is logged and startup continues: a dev tool must never be able to take the
-// app down. `closeDevTriage` is the teardown — a live DSQL socket would otherwise hold the
-// process open, the same hang the CLI's `finally` exists for.
-let closeDevTriage: (() => Promise<void>) | null = null
-
-function registerDevTriageIpc(): void {
-  if (!OWNER_TOOLS) return
-  void import('./triage/ipc')
-    .then(({ registerTriageIpc }) => {
-      closeDevTriage = registerTriageIpc()
-      logInfo(
-        '[everquest-companion] Owner triage IPC registered (EQ_OWNER_TOOLS=1, AWS profile auth).'
-      )
-    })
-    .catch((err: unknown) => logError('main:triage', err))
-}
-
 // Single-instance lock (Task #23): a second launch (e.g. re-running the installed
 // app, or an auto-update restart) must not spin up a second window tailing the same
 // log. If we don't get the lock, quit immediately; the primary instance receives a
@@ -243,7 +194,6 @@ if (!gotSingleInstanceLock) {
     // This machine's wiki ledger (wikiUsage.ts): every wiki request the app sends, one line each.
     setWikiUsageFile(`${USER_DATA}/wiki-requests.jsonl`)
     registerIpc()
-    registerDevTriageIpc()
     // Trust boundary, installed BEFORE the first window exists: the catch-all fires for every
     // webContents this process will ever create (main window, each overlay, anything a future
     // feature adds), which is the only placement that can't be forgotten later.
@@ -354,18 +304,6 @@ if (!gotSingleInstanceLock) {
         markStartupPhase('replayDone')
         logError('main:startTailing', err)
       })
-      // The post-release smoke hook (src/main/smokeFeedback.ts). A NO-OP on every launch that
-      // is not one: without `EQ_SMOKE_FEEDBACK` in the environment it returns before touching
-      // anything, and it refuses outright under EQ_E2E. When it IS armed it files exactly one
-      // bug report through `submitFeedback` — the same call the dialog's Send button makes,
-      // through every normal layer — and then quits.
-      // HERE, chained off `startTailing`, because the report attaches a LOG SLICE: the active
-      // character has to be resolved and the first scan settled before there is anything to
-      // slice. `.finally` rather than `.then` so a scan that failed still leaves the harness a
-      // verdict instead of a VM that hangs until the host's timeout.
-      .finally(() => {
-        void runSmokeFeedback()
-      })
     markStartupPhase('tailAttached')
     // THE DATA-SERVER ENGINE (JOS-459, docs/plans/data-server.md), and since JOS-495 THIS IS THE
     // ORDINARY PATH: `EQC_ENGINE=0` is what makes it return before touching anything, and nothing
@@ -390,29 +328,6 @@ if (!gotSingleInstanceLock) {
     // (both inside 1.5 s on the owner's 79 MB log) and the engine's own fold is a separate process.
     // Unref'd, so it can never hold a quitting process open.
     setTimeout(prewarmGearIndex, GEAR_PREWARM_DELAY_MS).unref()
-    // Drain the offline feedback queue (feedback/queue.ts). A report filed while the user's
-    // network was unhappy is spooled to <userData>/feedback.json + feedback-pending/*.gz and
-    // sent later over the same wire, carrying the same idempotency key; without this call it
-    // would spool until it aged out unsent. Started HERE, right after the tail attaches,
-    // because the first drain is deliberately +30 s behind startup (then every 30 min) and the
-    // timers are unref'd, so it can neither compete with the replay nor hold the process open.
-    // The E2E / no-endpoint guards live inside `startQueueFlush` (one predicate,
-    // `queueFlushEnabled` in net.ts, shared with `flushQueue`) rather than being restated
-    // here — two copies of a network gate is how one of them drifts.
-    startQueueFlush()
-    // Usage analytics (docs/plans/usage-analytics.md wave A1), started right beside the feedback
-    // drain and for the same reasons: after the window exists, timers unref'd, and every gate
-    // inside `startTelemetry` rather than restated here.
-    //
-    // WHAT THIS STARTS: an analytics id if the user's switch is on, a `sessionStart` record, a
-    // 10-minute heartbeat into the ring at <userData>/telemetry.json — and, ONLY once every gate
-    // is open, the 5-minute flush loop that POSTs to the compiled-in endpoint (JOS-269 stretched
-    // both; flush.ts holds the cost ruling and what it does and does not cost). The flush timer is
-    // not created at all under `EQ_E2E=1`, with the switch off, or before the first-run notice
-    // has rendered (`telemetryFlushEnabled`, telemetry/net.ts); when the notice is answered
-    // mid-session the loop starts then, not next launch. Same predicate discipline as
-    // `queueFlushEnabled` — one gate, in one place.
-    startTelemetry(Date.now() - PROCESS_START_MS)
     // Self-provision the shipped voice packs (Task #39): a CI-built installer ships
     // WITHOUT the gitignored peon/sc_marine packs, so a fresh install's seeded
     // charm-break alert would reference a missing sound. Download any missing default
@@ -491,13 +406,6 @@ app.on('before-quit', () => {
   // it does not block, and the escalation to `kill` rides an unref'd timer.
   teardownStep('main:stopEngine', stopEngineSupervisor)
   flushStoreForQuit()
-  // …and the analytics ring, for the same reason and on the same event (JOS-371). `sessionEnd` is
-  // recorded as the last window closes and its durable write is asynchronous now, so without this
-  // the last session's duration would be lost on every launch. A no-op when the previous write
-  // already landed. `before-quit` fires on EVERY quit path — `window-all-closed`'s own `app.quit()`,
-  // an auto-updater's `quitAndInstall`, an OS logoff — which is why it is here and not beside
-  // `stopTelemetry` in `window-all-closed`.
-  teardownStep('main:flushTelemetryRing', flushRingSync)
   logTopmostSavings()
   // The session's wiki requests, so a dev run says how often it hit the wiki (owner, 2026-10-23).
   const wikiUse = wikiUsageSummary()
@@ -583,14 +491,6 @@ app.on('window-all-closed', () => {
   // an already-closed pipe — and here for the same belt-and-braces reason every other teardown is
   // on both events.
   teardownStep('main:stopEngine', stopEngineSupervisor)
-  // Stop the feedback drain's timers. They are unref'd, so they cannot be the reason the
-  // process lives on; this is about not starting an attempt into a process that is quitting.
-  teardownStep('main:stopQueueFlush', stopQueueFlush)
-  // Close the analytics session: records `sessionEnd` into the LOCAL ring (duration + how many
-  // tabs were visited) and stops the heartbeat. Nothing is transmitted — there is nowhere to
-  // transmit to — and the timers were unref'd anyway, so this is about writing the last record
-  // before the process goes, not about letting it go.
-  teardownStep('main:stopTelemetry', stopTelemetry)
   // Stop the HUD's sampler and make sure this launch left a startup profile behind. The timers
   // are unref'd, so this is about not sampling a process that is quitting — and about the launch
   // that never reached `rendererHydrated` still writing what it DID reach, which is exactly the
@@ -608,10 +508,5 @@ app.on('window-all-closed', () => {
   // no app-side register to flush, and writing one here would be this process publishing its own
   // (empty) opinion over the file the engine has been maintaining, at the one moment nothing is
   // left to correct it. That is the exact asymmetry `stopEngineClient` refuses for the same file.
-  // Dev only, and null in every other build: a live DSQL socket is not a timer and would hold
-  // the process open long past the last window.
-  teardownStep('main:triage', () => {
-    if (closeDevTriage) void closeDevTriage().catch((err: unknown) => logError('main:triage', err))
-  })
   if (process.platform !== 'darwin') app.quit()
 })

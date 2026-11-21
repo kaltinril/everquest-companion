@@ -93,10 +93,6 @@ import { basename, join } from 'node:path'
 // the console. The default sinks below stay byte-identical to the console.* calls they were.
 import { E2E } from './e2e'
 import { logConsoleError, logInfo, logWarn } from './errorLog'
-// The health counters a failed network fetch (JOS-133) and a failed cache READ (JOS-266) bump
-// instead of logging an error. `telemetry/health.ts` imports nothing at all, so this cannot close
-// a cycle; see its header.
-import { noteImageCacheReadFailure, noteImageFetchFailure } from './telemetry/health'
 import { recordAppWikiCall, WIKI_UA } from './wikiUsage'
 
 /** The scheme the renderer asks for. */
@@ -701,7 +697,7 @@ export function resetImageReadWarnings(): void {
 }
 
 /**
- * EVERYTHING A FAILED CACHE READ CAUSES, in the order it causes it: evict (userData only), count,
+ * EVERYTHING A FAILED CACHE READ CAUSES, in the order it causes it: evict (userData only),
  * and — the first time this session for this code — say so on the console. Returns nothing, because
  * there is nothing for the caller to decide: `serveFromDisk` goes on to the next candidate and
  * then, having found none, returns the same null a plain miss returns.
@@ -716,7 +712,6 @@ async function healUnreadableEntry(
   warn: (msg: string) => void
 ): Promise<void> {
   if (repair) await unlink(path).catch(ignoreCleanupFailure)
-  noteImageCacheReadFailure()
   const code = describeReadFailure(err)
   if (takeImageReadWarning(code)) {
     warn(
@@ -728,11 +723,10 @@ async function healUnreadableEntry(
 
 /**
  * NETWORK LEG: no response at all (offline, DNS, TLS, the 10 s timeout), or a body cut off
- * mid-read. A counter and, the first time this session for this host, one warn line. See the
+ * mid-read. The first time this session for this host, one warn line. See the
  * section above `warnedFetchHosts`. Always null, so a caller can return it.
  */
 function fetchUnreachable(url: string, err: unknown, warn: (m: string) => void): null {
-  noteImageFetchFailure()
   const host = imageFetchHost(url)
   if (takeImageFetchWarning(host)) {
     warn(

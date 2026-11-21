@@ -38,7 +38,6 @@ import type { CloseToTrayPrefs } from '@shared/closeToTray'
 import type { PerfHudPrefs, StartupProfile } from '@shared/perf'
 import type { ProcessPriorityPrefs } from '@shared/processPriority'
 import type { ResistPrefs } from '@shared/resistPrefs'
-import type { TelemetryPayloadView } from '@shared/telemetry'
 import type { AlertDef, EqConfig, OverlayConfig, OverlayKind, UpdateStatus, VoicePrefs } from '@shared/types'
 
 /** The toast overlay's two facts, which come from two different reads and are one control pair. */
@@ -152,8 +151,6 @@ export interface PrefsSnapshot {
   cursorRing: CursorRingPrefs
   /** Voice — engine, voice, speed, volume. */
   voice: VoicePrefs
-  /** Usage analytics — the switch, the id, and the payload viewer, all in one read. */
-  telemetry: TelemetryPayloadView
   /** Performance — the HUD switch and this launch's startup breakdown. */
   perfHud: PerfHudPrefs
   startup: StartupProfile
@@ -199,7 +196,6 @@ export interface PrefsReader {
   getBuffTrust: () => Promise<BuffTrustPrefs>
   getCursorRing: () => Promise<CursorRingPrefs>
   getVoicePrefs: () => Promise<VoicePrefs>
-  getTelemetryPayload: () => Promise<TelemetryPayloadView>
   getPerfPrefs: () => Promise<PerfHudPrefs>
   getStartupProfile: () => Promise<StartupProfile>
   getProcessPriority: () => Promise<ProcessPriorityPrefs>
@@ -237,7 +233,6 @@ export async function readPrefsSnapshot(eq: PrefsReader): Promise<PrefsSnapshot>
     buffTrust,
     cursorRing,
     voice,
-    telemetry,
     perfHud,
     startup,
     processPriority,
@@ -264,7 +259,6 @@ export async function readPrefsSnapshot(eq: PrefsReader): Promise<PrefsSnapshot>
     eq.getBuffTrust(),
     eq.getCursorRing(),
     eq.getVoicePrefs(),
-    eq.getTelemetryPayload(),
     eq.getPerfPrefs(),
     eq.getStartupProfile(),
     eq.getProcessPriority(),
@@ -307,7 +301,6 @@ export async function readPrefsSnapshot(eq: PrefsReader): Promise<PrefsSnapshot>
     buffTrust,
     cursorRing,
     voice,
-    telemetry,
     perfHud,
     startup,
     processPriority,

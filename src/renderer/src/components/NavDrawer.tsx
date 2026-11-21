@@ -34,9 +34,6 @@ import MapIcon from '@mui/icons-material/Map'
 import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard'
 import CheckroomIcon from '@mui/icons-material/Checkroom'
 import GitHubIcon from '@mui/icons-material/GitHub'
-// Dev-only, and its import goes with it: MUI's icon packages declare `sideEffects: false`, so
-// an icon whose only use sits inside a `false &&` branch is tree-shaken out with the branch.
-import RuleFolderIcon from '@mui/icons-material/RuleFolder'
 import HandshakeIcon from '@mui/icons-material/Handshake'
 import AutoStoriesIcon from '@mui/icons-material/AutoStories'
 import UpdateChip from './UpdateChip'
@@ -44,7 +41,6 @@ import { useNavMenu } from './useNavMenu'
 import { navPx } from '@shared/navMenu'
 import { useBoolPref } from '../features/combat/useCombatPrefs'
 import { NEW_ISSUE_URL } from '@shared/issueLink'
-import { OWNER_TOOLS } from '../devFlags'
 import type { PrefsRouting } from '../appRouting'
 import {
   GEAR_AREA_VIEWS,
@@ -353,35 +349,6 @@ export default function NavDrawer({
         ))}
         {/* THE CHARACTER SHEET (JOS-45) USED TO HAVE A ROW HERE, and JOS-324 moved it INTO the gear
             area: it is now the area's last TAB. */}
-        {/* OWNER-ONLY: the feedback-triage tab. `OWNER_TOOLS` (JOS-72) is `DEV_TOOLS` AND the
-            `EQ_OWNER_TOOLS=1` opt-in, so this row is absent from a fresh checkout's `npm run
-            dev` as well as from every build — the tab reads the owner's AWS backlog, and a
-            self-compiled copy of this public repo used to show it. `DEV_TOOLS` is still the
-            left-hand term, so in `electron-vite build` this reads `false && …` and rollup
-            deletes the branch: the row, its label, its chip and its icon are not in the shipped
-            bundle at all. Built INSIDE the branch rather than hoisted to a module const on
-            purpose: a top-level `jsx()` call is not something rollup can prove is side-effect
-            free, and it would keep the strings alive. The e2e suite asserts `nav-triage` is
-            ABSENT in a production-shaped build. */}
-        {OWNER_TOOLS && (
-          <NavRowButton
-            row={{
-              view: 'triage',
-              icon: <RuleFolderIcon />,
-              badge: (
-                <Chip
-                  size="small"
-                  label="owner only"
-                  variant="outlined"
-                  color="warning"
-                  sx={{ height: 18, fontSize: 10, '& .MuiChip-label': { px: 0.75 } }}
-                />
-              )
-            }}
-            view={view}
-            onSelect={onSelect}
-          />
-        )}
       </List>
 
       {/* Bottom-aligned Preferences (Task #55) — replaces the old update-channel block. */}

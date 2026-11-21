@@ -28,7 +28,6 @@ import {
   type CursorRingPrefs,
   type OverlayAutoHidePrefs
 } from '../shared/presencePrefs'
-import { normalizeTelemetryPrefs, type TelemetryPrefs } from '../shared/telemetry'
 import { DEFAULT_TOAST_CONFIG, normalizeToastConfig } from '../shared/toast'
 import { DEFAULT_ALERT_BANNER_CONFIG, normalizeAlertBannerConfig } from '../shared/alertBanner'
 import { DEFAULT_CON_CARD_CONFIG, applyConCardKnob } from '../shared/conCard'
@@ -82,10 +81,8 @@ const emptyProgress: ProgressState = {
  * use, whichever build wrote it. Never throws; the failure policy — including the SALVAGE that
  * stands between a torn write and a defaults boot (JOS-272) — is in storeFile.ts's header.
  *
- * ITS `error` HOOK IS THE ONE FLEET INSTRUMENT FOR A SETTINGS RESET, and it fires from HERE, at
- * module scope, minutes before `startTelemetry` exists. That is why `telemetry/errorReports.ts`
- * keeps what it holds across the first session boundary rather than clearing it: until JOS-272 this
- * line was recorded and then thrown away, every launch, on every install in the fleet.
+ * ITS `error` HOOK IS THE ONE RECORD OF A SETTINGS RESET (an errors.log line), and it fires from
+ * HERE, at module scope.
  */
 /** When the store's open began (migration, then `new Store()`), ms since process start: what
  *  separates the store's own cost from the bundle evaluation before it in the startup summary. */
@@ -813,28 +810,6 @@ export function getOverlayAutoHide(): OverlayAutoHidePrefs {
 export function setOverlayAutoHide(patch: Partial<OverlayAutoHidePrefs>): OverlayAutoHidePrefs {
   const next = normalizeOverlayAutoHide({ ...getOverlayAutoHide(), ...patch })
   store.set('overlayAutoHide', next)
-  return next
-}
-
-// ----- Usage analytics (schema v6; shared/telemetry.ts) -----
-//
-// Same shape as the two blobs above: read through the normalizer, write through the SAME
-// normalizer, and PATCH rather than replace — the toggle, the notice modal and the rotate
-// button each own one field and must not clobber the others by round-tripping a stale copy.
-//
-// These prefs are the ONLY part of this feature that is not disposable. The buffered events
-// live in `<userData>/telemetry.json` (src/main/telemetry/ring.ts) precisely because they can
-// be thrown away; forgetting that a user turned analytics OFF could not be.
-
-/** The telemetry prefs, defaulted field by field. Never throws, never returns a partial. */
-export function getTelemetryPrefs(): TelemetryPrefs {
-  return normalizeTelemetryPrefs(store.get('telemetry'))
-}
-
-/** Merge-patch the telemetry prefs; returns the stored (re-normalized) value. */
-export function setTelemetryPrefs(patch: Partial<TelemetryPrefs>): TelemetryPrefs {
-  const next = normalizeTelemetryPrefs({ ...getTelemetryPrefs(), ...patch })
-  store.set('telemetry', next)
   return next
 }
 

@@ -52,7 +52,6 @@ import { zoneShortName } from '@shared/zones'
 import type { MobTarget } from '../mobs/mobTarget'
 import type { NavBack } from '../../appRouting'
 import { useModule } from '../../lib/useModule'
-import { trackFeature } from '../../lib/telemetry'
 import MapBody, { useSearchJump } from './MapBody'
 import { useZonePane } from './useMapPane'
 import { DEFAULT_LAYERS, type LayerMask } from './mapGeometry'
@@ -353,21 +352,6 @@ function MapCredits({ data, reserve }: { data: MapData | null; reserve: boolean 
   )
 }
 
-/**
- * usage-analytics `featureUse: mapOpen` — a map that actually RENDERED, which is a different
- * fact from "the Maps tab was visited" (`viewDwell` already carries that, including the
- * zero-maps case where this view only ever shows the picker). Fires once per loaded zone.
- *
- * The zone itself is never carried: the schema has no field a zone name could go in, and this
- * hook takes the whole `MapData` precisely so the caller never has to reach for one.
- */
-function useMapOpenTracking(data: MapData | null): void {
-  const loaded = data?.zone
-  useEffect(() => {
-    if (loaded !== undefined) trackFeature('mapOpen')
-  }, [loaded])
-}
-
 // The parts of the Map tab that do not move with the map, memoized so a pan or zoom frame does
 // not redraw them (owner, 2026-10-13). Their props are kept stable across view changes.
 const HeaderMemo = memo(MapsHeader)
@@ -418,7 +402,6 @@ function MapTab({
   // bands: keyed on the zone alone, a kept index read "Level 5 of 3".
   useEffect(() => setFloor(null), [data?.zone, bands.length])
 
-  useMapOpenTracking(data)
 
   const hostRef = useRef<HTMLDivElement>(null)
   const vp = useMapViewport({ bounds: data?.bounds ?? EMPTY_BOUNDS, id: data?.zone ?? '', hostRef })

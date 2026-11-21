@@ -61,20 +61,6 @@ function textOf(page: Page, selector: string): Promise<string> {
   )
 }
 
-/**
- * Answer the analytics first-run notice, which a FRESH userData always shows (usage-analytics
- * T1) and which sits over the whole window until it is answered. "Turn it off" keeps this run
- * quiet — nothing about performance depends on analytics, and a spec should not leave a second
- * feature collecting in the background while it measures a third.
- */
-async function dismissFirstRunNotice(page: Page): Promise<void> {
-  const notice = '[data-testid="telemetry-notice"]'
-  await page.waitForSelector(notice, { timeout: 30_000 }).catch(() => undefined)
-  if ((await countOf(page, notice)) === 0) return
-  await page.click('[data-testid="telemetry-notice-off"]')
-  check('the analytics first-run notice can be answered out of the way', await settleGone(page, notice, { timeoutMs: 8_000 }))
-}
-
 /** THE DEFAULT-OFF ASSERTION. The HUD costs a metrics poll and a 500 ms probe; a user who never
  *  asked for one must not be paying for it, and must not see it either. */
 async function stepAbsentByDefault(page: Page): Promise<void> {
@@ -403,7 +389,6 @@ async function main(): Promise<void> {
     })
     page.on('pageerror', (e) => consoleErrors.push(String(e)))
 
-    await dismissFirstRunNotice(page)
     await stepAbsentByDefault(page)
     if (await stepEnable(page)) {
       await stepChipReadsNumbers(page)

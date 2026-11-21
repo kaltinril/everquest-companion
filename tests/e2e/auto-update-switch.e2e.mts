@@ -11,7 +11,7 @@
  * Run: `npm run test:e2e -- auto-update-switch`
  */
 import type { Page } from 'playwright-core'
-import { buildIfStale, check, dumpArtifacts, failures, reportRun, settle, settleGone, countOf } from './appHarness.mjs'
+import { buildIfStale, check, dumpArtifacts, failures, reportRun, settle } from './appHarness.mjs'
 import { mainWindow, makeUserData, removeUserData } from './appWindow.mjs'
 import { launchOnFixture, stageFixture } from './logFixture.mjs'
 import { openPrefs, openSection, setSwitch } from './prefsFirstPaintSteps.mjs'
@@ -26,16 +26,7 @@ async function storedOff(page: Page): Promise<boolean> {
   return s.autoUpdateOff === true
 }
 
-async function dismissFirstRunNotice(page: Page): Promise<void> {
-  const notice = '[data-testid="telemetry-notice"]'
-  await page.waitForSelector(notice, { timeout: 30_000 }).catch(() => undefined)
-  if ((await countOf(page, notice)) === 0) return
-  await page.click('[data-testid="telemetry-notice-off"]')
-  await settleGone(page, notice, { timeoutMs: 8_000 })
-}
-
 async function openUpdates(page: Page): Promise<void> {
-  await dismissFirstRunNotice(page)
   await openPrefs(page)
   await openSection(page, 'updates', `[data-testid="${SWITCH}"]`)
 }

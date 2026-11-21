@@ -67,8 +67,7 @@ import {
 import type {
   KnowledgeRecord,
   PerfBudgetsResult,
-  PerfSnapshotResult,
-  PerfTimelineResult
+  PerfSnapshotResult
 } from '../../shared/dataServer/protocol.generated'
 import { withOwnDefs } from './ownFires'
 // WHAT THE CLIENT IS LISTENED TO FOR (fires, progress, con cards, cursors, wiki misses, large
@@ -100,7 +99,6 @@ import { installMirrors, primeMirrors, resetMirrors } from './serveMirrors'
 // The leaf is electron-free and takes its capabilities here — see its header.
 import { asKnowledgeRecord, installKnowledgeMissFetch } from './knowledgeMissFetch'
 import { knownItem } from '../itemLookup'
-import { noteEngineEdge } from '../telemetry/breadcrumbs'
 import { knownMob } from '../mobLookup'
 import { attachStateDir, takeArtifactsBack } from './artifactOwner'
 import { hostClockHint, resolvedTimeZone } from './hostClock'
@@ -656,12 +654,6 @@ function sawHealth(l: LiveEngine, health: FoldHealth): void {
     // count and byte mark. Those come off the health round trip this loop was making anyway, so
     // the line costs nothing and is evidence rather than an announcement.
     debug(servingLine(l.attachedTo, health))
-    // …AND A BREADCRUMB FOR THE SAME EDGE (JOS-501). It is the last of the four the ring gets
-    // from the engine's lifecycle, and the most diagnostic of them: it is the moment every
-    // read in the product changes hands, so a crash report whose ring stops at `engine:ready`
-    // says the fold never landed, which is a completely different investigation from one whose
-    // ring shows `engine:live` followed by module cursors.
-    noteEngineEdge('engine:live')
     // What the read made of the log, for the status's notes (logReadState.ts decides).
     noteLogReadLanded(health.events, health.mark?.offset)
   }
@@ -754,7 +746,7 @@ export async function enginePerfSnapshot(): Promise<PerfSnapshotResult | null> {
  * below rejects rather than answering `null`, and the line between them is stated there: a READ
  * whose answer a user sees owes its caller a reason, while a DIAGNOSTIC that cannot be taken has
  * nothing to say. These two are diagnostics — the panel draws an absent section rather than an
- * error, and a bug report omits a block rather than failing to send.
+ * error.
  */
 export async function enginePerfBudgets(): Promise<PerfBudgetsResult | null> {
   const l = live
@@ -763,18 +755,6 @@ export async function enginePerfBudgets(): Promise<PerfBudgetsResult | null> {
     return await l.client.request('perf.budgets', {})
   } catch (err) {
     debug(`data-server client: perf.budgets was refused (${describeErr(err)})`)
-    return null
-  }
-}
-
-/** Ask the engine for its bounded recent history (JOS-502). `null` on the same terms. */
-export async function enginePerfTimeline(): Promise<PerfTimelineResult | null> {
-  const l = live
-  if (l === null) return null
-  try {
-    return await l.client.request('perf.timeline', {})
-  } catch (err) {
-    debug(`data-server client: perf.timeline was refused (${describeErr(err)})`)
     return null
   }
 }

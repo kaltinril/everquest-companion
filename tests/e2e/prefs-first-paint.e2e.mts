@@ -49,8 +49,7 @@ import {
   dumpArtifacts,
   failures,
   note,
-  reportRun,
-  settleGone
+  reportRun
 } from './appHarness.mjs'
 import { mainWindow, makeUserData, removeUserData } from './appWindow.mjs'
 import { launchOnFixture, stageFixture } from './logFixture.mjs'
@@ -79,15 +78,6 @@ const GAME = '[data-testid="eq-folder-path"]'
  */
 const CHOSEN_SCALE = 1.1
 const CHOSEN_LABEL = uiScalePercent(CHOSEN_SCALE)
-
-/** The first-run analytics bar sits over the content area; every other spec clears it the same way. */
-async function dismissFirstRunNotice(page: Page): Promise<void> {
-  const notice = '[data-testid="telemetry-notice"]'
-  await page.waitForSelector(notice, { timeout: 30_000 }).catch(() => undefined)
-  if ((await countOf(page, notice)) === 0) return
-  await page.click('[data-testid="telemetry-notice-off"]')
-  await settleGone(page, notice, { timeoutMs: 8_000 })
-}
 
 /**
  * ARRANGE: put all three controls somewhere their DEFAULTS are not, through the real UI.
@@ -191,7 +181,6 @@ async function stepSectionSwitch(page: Page): Promise<void> {
  */
 async function stepColdRenderer(page: Page): Promise<void> {
   await page.reload({ waitUntil: 'domcontentloaded', timeout: 60_000 })
-  await dismissFirstRunNotice(page)
   await openPrefs(page)
   await openSection(page, 'overlays', OVERLAYS)
 
@@ -238,7 +227,6 @@ async function main(): Promise<void> {
     // registered. A reload right here puts the app and the instrument in the same world.
     await page.reload({ waitUntil: 'domcontentloaded', timeout: 60_000 })
 
-    await dismissFirstRunNotice(page)
     await stepArrange(page)
     await stepSectionSwitch(page)
     await stepColdRenderer(page)

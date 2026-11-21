@@ -38,8 +38,7 @@ import {
   note,
   pageOverflow,
   reportRun,
-  settle,
-  settleGone
+  settle
 } from './appHarness.mjs'
 import { mainWindow } from './appWindow.mjs'
 import { launchOnFixture } from './logFixture.mjs'
@@ -102,18 +101,6 @@ function textOf(page: Page, sel: string): Promise<string> {
     (s) => (document.querySelector(s) as HTMLElement | null)?.innerText ?? '',
     sel
   )
-}
-
-/**
- * Answer the analytics first-run notice. A fresh `userData` always shows it, it sits along the
- * bottom edge, and this spec clicks chips and types into a box — a hit test that lands on the
- * notice is a true report about a first-run overlay and nothing at all about the ledger.
- */
-async function answerNotice(page: Page): Promise<void> {
-  const notice = '[data-testid="telemetry-notice"]'
-  if ((await countOf(page, notice)) === 0) return
-  await page.click('[data-testid="telemetry-notice-off"]')
-  check('the analytics first-run notice can be answered out of the way', await settleGone(page, notice, { timeoutMs: 8_000 }))
 }
 
 /** What `character:sheet` answers with — the transport, read directly. */
@@ -431,7 +418,6 @@ async function main(): Promise<void> {
     page.on('pageerror', (e) => consoleErrors.push(String(e)))
 
     await page.waitForSelector('[data-testid="nav-overview"]', { timeout: 60_000 })
-    await answerNotice(page)
 
     if (await stepReleased(page)) {
       await stepSheet(page)

@@ -12,8 +12,7 @@ import { AppBackProvider } from './appBack'
 // NULL on every launch without `EQC_ENGINE=1` — which is every launch a user makes — and the
 // surfaces behind it draw nothing when it is. See lib/engineProvider.tsx.
 import { EngineProvider } from './lib/engineProvider'
-import { DEV_TOOLS, DEV_TOOLS_DEFINE, OWNER_TOOLS } from './devFlags'
-import { currentViewId } from './lib/currentView'
+import { DEV_TOOLS, DEV_TOOLS_DEFINE } from './devFlags'
 // THE RENDER METER (JOS-513) — dev-only. The gate below is spelled `import.meta.env.DEV` INLINE
 // rather than imported as a named constant, and that is measured rather than stylistic: vite
 // substitutes the builtin per-module at transform time, so the ternary is already `false ? … : …`
@@ -22,20 +21,15 @@ import { currentViewId } from './lib/currentView'
 import { APP_PROFILER_ID, RenderProfiler } from './lib/renderMeter'
 
 // --- The dev-tools flags, stated out loud (dev only) ---
-// "The Triage tab is missing" has twice been a stale `npm run dev` whose bundle predates the
+// "A dev-only surface is missing" has twice been a stale `npm run dev` whose bundle predates the
 // `__EQ_DEV_TOOLS__` define, and twice it was invisible: no error, no tab, nothing to grep. One
 // line at boot turns that into a glance at the console. `import.meta.env.DEV` is a literal
 // `false` in a build, so this whole block — and the string — is deleted from every installer;
 // production stays silent, exactly like the rest of the renderer.
-//
-// `OWNER_TOOLS` rides along for the same reason, and it is now the likelier answer (JOS-72): a
-// missing Triage tab in a dev app is USUALLY a shell without `EQ_OWNER_TOOLS=1`, which is
-// working as designed and would otherwise look identical to the stale-server failure above.
 if (import.meta.env.DEV) {
   // eslint-disable-next-line no-console
   console.info(
-    `[everquest-companion] dev-tools: DEV_TOOLS=${String(DEV_TOOLS)}, ` +
-      `OWNER_TOOLS=${String(OWNER_TOOLS)}${OWNER_TOOLS ? '' : ' (set EQ_OWNER_TOOLS=1 and relaunch for the owner-only surfaces)'}` +
+    `[everquest-companion] dev-tools: DEV_TOOLS=${String(DEV_TOOLS)}` +
       ', __EQ_DEV_TOOLS__ define ' +
       (DEV_TOOLS_DEFINE === undefined
         ? 'ABSENT - this dev server booted before the define existed; restart `npm run dev` if a dev-only surface misbehaves'
@@ -47,13 +41,12 @@ if (import.meta.env.DEV) {
 // Install global handlers BEFORE React mounts so even a failure during the very
 // first render (or a bad theme) is reported to main → errors.log + dev stdout.
 // Fire-and-forget over the `error:report` IPC channel via the preload bridge.
-// `name` and `view` ride along since JOS-100. The NAME is half the error report's grouping key
+// `name` rides along since JOS-100. The NAME is half the error's grouping key
 // (`hash(name + top frames)`), and folding it into the message — as this did — collapsed every
-// distinct bug in one function into one issue. The VIEW is state only this process has; main
-// checks it against the closed enum before it is stored (renderer input is untrusted, always).
+// distinct bug in one function into one issue.
 function report(source: string, err: { name?: string; message: string; stack?: string }): void {
   try {
-    window.eq?.reportError({ ...err, source, view: currentViewId() })
+    window.eq?.reportError({ ...err, source })
   } catch {
     // Preload bridge missing (itself an error already logged in main) — ignore.
   }
