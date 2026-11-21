@@ -171,6 +171,111 @@ pub fn is_player_shaped_name(name: &str) -> bool {
     word.is_match(n)
 }
 
+/// The four parts the game builds a summoned pet's name from, in order. The second and third may
+/// be empty. 7 x 9 x 5 x 4 combinations, 1,204 different names (`ar` and `ob` can come from
+/// either middle part).
+const PET_NAME_FIRST: &[u8] = b"gjklvxz";
+const PET_NAME_SECOND: &[&str] = &["", "ab", "ar", "as", "eb", "en", "ib", "ob", "on"];
+const PET_NAME_THIRD: &[&str] = &["", "an", "ar", "ek", "ob"];
+const PET_NAME_LAST: &[&str] = &["ab", "er", "n", "tik"];
+
+/// Is this a name the game gives a SUMMONED pet (`Xabantik`, `Gebarn`, `Xekn`)?
+///
+/// The game draws those names from the fixed table above, so the same few names come round again
+/// and again, for your pets and for everyone else's. Measured on the owner's logs, 2026-11-20:
+/// all 57 different names that ever said `My leader is ...` are in the table, and none of the
+/// names that spoke in a channel or joined a group is.
+///
+/// It is evidence, not proof: a player may pick `Karn` or `Garn`, which the table also holds. So a
+/// caller uses it to refuse a GUESS (a name admitted to the group because a buff landed on it),
+/// never to overrule a statement the log made outright (a join line, a `/who` line, a leader
+/// line). A charmed pet keeps its mob name and is not asked about here.
+///
+/// Case is ignored, so a display name and an identity key give the same answer.
+pub fn is_summoned_pet_name(name: &str) -> bool {
+    let n = js_trim(name);
+    let bytes = n.as_bytes();
+    // The longest name is 1 + 2 + 2 + 3 letters.
+    if bytes.len() < 2 || bytes.len() > 8 || !n.is_ascii() {
+        return false;
+    }
+    if !PET_NAME_FIRST.contains(&bytes[0].to_ascii_lowercase()) {
+        return false;
+    }
+    let rest = n[1..].to_ascii_lowercase();
+    PET_NAME_SECOND.iter().any(|second| {
+        rest.strip_prefix(second).is_some_and(|after| {
+            PET_NAME_THIRD.iter().any(|third| {
+                after
+                    .strip_prefix(third)
+                    .is_some_and(|last| PET_NAME_LAST.contains(&last))
+            })
+        })
+    })
+}
+
+#[cfg(test)]
+mod pet_name_tests {
+    use super::is_summoned_pet_name;
+
+    #[test]
+    fn the_pets_the_owner_reported_are_all_pet_names() {
+        // The four that were listed as group members on 2026-11-19, and Malkil's pet.
+        for name in ["Jasekab", "Gebarn", "Genober", "Xekn", "Xabantik"] {
+            assert!(is_summoned_pet_name(name), "{name}");
+        }
+    }
+
+    #[test]
+    fn the_shortest_and_the_longest_names_fit() {
+        assert!(is_summoned_pet_name("Zn"));
+        assert!(is_summoned_pet_name("Xabantik"));
+        assert!(is_summoned_pet_name("Gonobtik"));
+    }
+
+    #[test]
+    fn a_key_and_a_display_name_agree() {
+        assert!(is_summoned_pet_name("xabantik"));
+        assert!(is_summoned_pet_name(" Xabantik "));
+    }
+
+    #[test]
+    fn players_and_mobs_are_not_pet_names() {
+        for name in [
+            "Malkil",
+            "Drywrought",
+            "Primitive",
+            "Scooba",
+            "T`Kail",
+            "a gnoll",
+            "Gabe",
+            "Xabanti",
+            "Xabantiks",
+            "Babantik",
+            "",
+        ] {
+            assert!(!is_summoned_pet_name(name), "{name}");
+        }
+    }
+
+    #[test]
+    fn the_table_holds_1204_different_names() {
+        let mut names = std::collections::HashSet::new();
+        for first in super::PET_NAME_FIRST {
+            for second in super::PET_NAME_SECOND {
+                for third in super::PET_NAME_THIRD {
+                    for last in super::PET_NAME_LAST {
+                        let name = format!("{}{second}{third}{last}", *first as char);
+                        assert!(is_summoned_pet_name(&name), "{name}");
+                        names.insert(name);
+                    }
+                }
+            }
+        }
+        assert_eq!(names.len(), 1204);
+    }
+}
+
 #[cfg(test)]
 mod id_key_tests {
     use super::{id_key, id_key_ref};

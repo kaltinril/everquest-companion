@@ -104,3 +104,95 @@ fn your_live_pet_is_not_handed_to_whoever_a_say_line_names() {
         .sum();
     assert_eq!(mine, 300, "{rows:?}");
 }
+
+const THEIR_PET_HITS_EARLY: &str =
+    "[Thu Nov 19 23:01:10 2026] Xabantik slashes a rock golem for 120 points of damage.";
+
+/// What the pet did BEFORE its leader line is counted too (2026-11-20). Until then the name was
+/// refused for having once been your pet, so those swings were shown nowhere.
+#[test]
+fn what_it_did_before_its_leader_line_is_counted_and_moves_to_its_owner() {
+    let before = fold(&[
+        ENTER,
+        MY_CLAIM,
+        MY_PET_HITS,
+        MY_PET_DIES,
+        LATER_ZONE,
+        MINE,
+        THEIR_PET_HITS_EARLY,
+    ]);
+    let unclaimed = (
+        "other".to_string(),
+        "Pet (Xabantik) - owner unknown".to_string(),
+        120,
+    );
+    assert!(rows(&before).contains(&unclaimed), "{:?}", rows(&before));
+
+    let after = fold(&[
+        ENTER,
+        MY_CLAIM,
+        MY_PET_HITS,
+        MY_PET_DIES,
+        LATER_ZONE,
+        MINE,
+        THEIR_PET_HITS_EARLY,
+        THEIR_CLAIM,
+        THEIR_PET_HITS,
+    ]);
+    let rows = rows(&after);
+    let theirs = (
+        "allyPet".to_string(),
+        "Pet (Xabantik) - Malkil".to_string(),
+        420,
+    );
+    assert!(rows.contains(&theirs), "{rows:?}");
+    assert!(rows.iter().all(|r| r.0 != "other"), "{rows:?}");
+}
+
+/// The same name a THIRD time: after Malkil's pet is bound and gone, the next Xabantik is again a
+/// pet nobody has claimed, not a name the meter refuses for good.
+#[test]
+fn the_name_coming_round_again_is_recorded_again() {
+    let snap = fold(&[
+        ENTER,
+        MY_CLAIM,
+        MY_PET_HITS,
+        MY_PET_DIES,
+        LATER_ZONE,
+        MINE,
+        THEIR_CLAIM,
+        THEIR_PET_HITS,
+        "[Thu Nov 19 23:10:00 2026] Xabantik has been slain by a rock golem!",
+        "[Thu Nov 19 23:40:00 2026] Xabantik slashes a rock golem for 70 points of damage.",
+    ]);
+    let rows = rows(&snap);
+    let again = (
+        "other".to_string(),
+        "Pet (Xabantik) - owner unknown".to_string(),
+        70,
+    );
+    assert!(rows.contains(&again), "{rows:?}");
+}
+
+/// Your own next pet with your old pet's name: its swings before it names you are kept and move
+/// to your pet's row when it does.
+#[test]
+fn your_own_new_pet_with_the_old_name_keeps_its_first_swings() {
+    let snap = fold(&[
+        ENTER,
+        MY_CLAIM,
+        MY_PET_HITS,
+        MY_PET_DIES,
+        LATER_ZONE,
+        "[Thu Nov 19 23:01:10 2026] Xabantik slashes a rock golem for 120 points of damage.",
+        "[Thu Nov 19 23:01:20 2026] Xabantik says, 'My leader is Primitive.'",
+        "[Thu Nov 19 23:01:25 2026] Xabantik slashes a rock golem for 30 points of damage.",
+    ]);
+    let rows = rows(&snap);
+    let mine: i64 = (rows.iter())
+        .filter(|r| r.0 == "pet" && r.1.contains("Xabantik"))
+        .map(|r| r.2)
+        .sum();
+    assert_eq!(mine, 150, "{rows:?}");
+    assert!(rows.iter().all(|r| r.0 != "other"), "{rows:?}");
+}

@@ -125,7 +125,13 @@ it, press Send.**
    edit still in the file?
 3. Hotbar link: drag the macro at page 2 button 3 to a hotbar. Which `E<n>` is written? Then move
    the macro to another slot in game: does the hotbar button follow?
-4. Loadouts: switch loadout once. Does a `_LO2` file appear, and does it start with the same macros?
+4. ~~Loadouts: switch loadout once.~~ **Answered 2026-11-20** by the owner's files: switching to a
+   new fourth loadout on Drywrought made `Drywrought_oggok_LO4.ini` and `UI_Drywrought_oggok_LO4.ini`
+   at 18:39, and the new file opens with the same macros and hotbar buttons as `_LO1` (a copy). So
+   each loadout has its own macro file, numbered from 1 (`AutoSkillsLO0` to `LO3` in the file are
+   the same four, numbered from 0). Loadouts 2 and 3 exist in the game and have no file: a file
+   seems to appear only once a loadout is played (inferred). No text file read, and nothing the log
+   printed in those minutes, names a loadout or its classes.
 5. Limits: how many characters the name box and a line box take; how many pages, and buttons a
    page; what happens at the reporter's 100.
 6. Page 1: are its macros editable, and does an edit to one get written to the file?

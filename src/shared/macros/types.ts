@@ -35,6 +35,8 @@ export interface MacroLibrary {
   chosen: Record<string, string>
   /** The player's own tags, beside the starter ones. */
   tags: string[]
+  /** Character file key to the name the player gave that loadout (characters.ts). */
+  labels?: Record<string, string>
 }
 
 /** One slot of a character file's `[Socials]` section. */

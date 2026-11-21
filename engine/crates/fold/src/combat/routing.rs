@@ -29,7 +29,7 @@ use crate::combat::lifecycle::encounter_for;
 use crate::combat::procdetect::base_lane_name;
 use crate::combat::state::EngineState;
 use crate::combat::world::Resolved;
-use eqlog::names::id_key_ref;
+use eqlog::names::{id_key_ref, is_summoned_pet_name};
 use std::borrow::Cow;
 
 /// How a damage event `A → B` is attributed given the pet-name set.
@@ -139,14 +139,18 @@ pub fn classify(st: &EngineState, attacker: &str, target: &str) -> Attribution {
 /// The name prefers the roster's spelling (the one a user has seen in the popover), then the
 /// recorded spelling, then the line's own — world-model law 2 in ladder form.
 fn other_source(st: &EngineState, attacker: &str, key: &str, member: bool) -> SourceRef {
-    let name = st
-        .roster
-        .names
-        .get(key)
-        .map(String::as_str)
+    let listed = st.roster.names.get(key).map(String::as_str);
+    let spelled = listed
         .or_else(|| st.others.name_of(key))
-        .unwrap_or(attacker)
-        .to_string();
+        .unwrap_or(attacker);
+    // A name from the game's summoned-pet table that nobody has claimed is shown as what it is,
+    // not as a person (2026-11-20). The roster's word wins: a name it lists is somebody the game
+    // or the user called a group member, whatever the name looks like.
+    let name = if !member && listed.is_none() && is_summoned_pet_name(key) {
+        unclaimed_pet_label(spelled)
+    } else {
+        spelled.to_string()
+    };
     SourceRef {
         id: format!("member:{key}"),
         name,
@@ -156,6 +160,12 @@ fn other_source(st: &EngineState, attacker: &str, key: &str, member: bool) -> So
             SourceKind::Other
         },
     }
+}
+
+/// The row label of a summoned pet no line has given an owner. The ally-pet row reads
+/// `Pet (Jeber) - Malkil`; this is the same row before anyone is named.
+pub fn unclaimed_pet_label(name: &str) -> String {
+    format!("Pet ({name}) - owner unknown")
 }
 
 /// The outgoing meter row for an attributed you/pet/member action — the triple the damage, miss and
@@ -931,10 +941,21 @@ fn recordable_attacker(st: &mut EngineState, attacker: &str, key: &str) -> bool 
     if key.is_empty() || key == "you" || Some(key) == st.player_key.as_deref() {
         return false;
     }
-    if st.pet_names.contains(key) || st.ever_pet.contains(key) {
+    // The pet you have NOW has its own row, under you.
+    if st.pet_names.contains(key) {
         return false;
     }
-    if st.others.is_pet(key) || st.others.is_hostile(key) {
+    // A name that was a pet ONCE (yours, or one a leader line or a charm bound) is refused, with
+    // one exception: a name from the game's summoned-pet table. Those names come round again, so
+    // the same name acting with no live bind is a NEW pet, yours or anybody's, and its damage is
+    // real. Refusing it dropped everything a group mate's pet did before its leader line when the
+    // name was one your own pet once had (owner, 2026-11-19: Malkil's Xabantik). It is recorded
+    // as a pet nobody has claimed, and a claim or a leader line moves the row (`rekey_other`).
+    let was_pet = st.ever_pet.contains(key) || st.others.is_pet(key);
+    if was_pet && !is_summoned_pet_name(key) {
+        return false;
+    }
+    if st.others.is_hostile(key) {
         return false;
     }
     if st.ever_struck.contains(key) || st.charm.ever_charmed(key) {

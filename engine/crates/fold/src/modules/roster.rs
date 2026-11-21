@@ -29,11 +29,15 @@
 //! So the weakest rung is refused for the tailed character, every charmed mob and every claimed pet
 //! — RETROACTIVELY for that rung only, because the claim tell routinely lands after you finished
 //! buffing. `joined` / `stated` / `user` are never touched: those the game or the user said outright.
+//!
+//! The same rung also refuses any name the game gives SUMMONED pets (`eqlog::names::
+//! is_summoned_pet_name`, a fixed table of 1,204 names), claimed or not: a group mate's pet never
+//! names you its leader, and it caught the burst all the same.
 
 use crate::event::{Event, Kind};
 use crate::jsmap::JsMap;
 use crate::EqModule;
-use eqlog::names::id_key;
+use eqlog::names::{id_key, is_summoned_pet_name};
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::HashSet;
@@ -277,6 +281,15 @@ impl RosterModule {
         for name in reached {
             let key = id_key(&name);
             if key == self.self_key || key == "you" || self.never_member.contains(&key) {
+                continue;
+            }
+            // A name the game gives summoned pets is not GUESSED into the group (2026-11-20). The
+            // refusal above knows only the pets that named YOU their leader; a group mate's pet,
+            // and one of yours that never said its leader, caught the same burst and were listed
+            // as people (owner, 2026-11-19: Jasekab, Gebarn, Genober and Xekn in the group list).
+            // A player who really has such a name still gets in by a join line, a stated
+            // membership, group chat or the user's own add: those rungs are not asked this.
+            if is_summoned_pet_name(&name) {
                 continue;
             }
             // A burst comes WITH NAMES, unlike the party-exp line, and a roster with names in it is

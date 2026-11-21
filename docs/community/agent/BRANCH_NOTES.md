@@ -329,9 +329,23 @@ where one exists.
 - `ever_pet` (every name that was ever YOUR pet, kept for the whole log) no longer refuses a
   leader line that names somebody else: only a pet you have now (`pet_names`) does. Summoned pet
   names come round, and a group mate's pet with a name your own once had was credited to nobody
-  (owner, 2026-11-19: Malkil's Xabantik; `fold/tests/ally_pet_reused_name.rs`). Still in force: a
-  name in `ever_pet` is never RECORDED as another player (`recordable_attacker`), so such a pet's
-  damage before its leader line is not kept, where another name's would move to the pet's row.
+  (owner, 2026-11-19: Malkil's Xabantik; `fold/tests/ally_pet_reused_name.rs`).
+- Pet rules, batch 1 (2026-11-20, requirements/pet-rules.md). `eqlog::names::is_summoned_pet_name`
+  is the game's own table of summoned-pet names (7 first letters x 9 x 5 x 4 endings, 1,204
+  names; all 57 names that said `My leader is` in the owner's logs are in it). Three uses:
+  - The roster's `buffed` rung refuses a table name (`roster.rs fold_heal`), so a pet that caught
+    a buff burst is no longer listed as a group member. `joined`, `stated`, `confirmed` and `user`
+    are not asked: a player may really be called Karn or Garn, which the table also holds.
+  - `routing.rs recordable_attacker`: a name that was a pet once (`ever_pet`, `others.pets`) is
+    refused UNLESS it is a table name. A table name with no live bind is a new pet and is recorded;
+    `rekey_other` / `retract_other` no longer stop at "already called a pet", so its row moves on
+    the next claim or leader line. This ended the test.52 known issue (damage before the leader
+    line dropped for a reused name).
+  - `routing.rs other_source`: an unclaimed table name's row reads `Pet (Xabantik) - owner
+    unknown` (kind still `other`, id still `member:<key>`), unless the roster lists the name.
+  - Kind `other` is hidden by the Group scope, so an unclaimed pet shows under Everyone only until
+    it is tied to a group member. NOT built yet: inferring the owner from a group mate's summon
+    (rule 3), and ending your own claim on a name (rule 4).
 - To see what the engine does with a real log: copy it as `eqlog_<Name>_<server>.<anything>.txt`
   (the replay tool reads the character from that shape), then
   `engine/target/release/parity <copy> --snapshots > out.json` (`cargo build --release -p parity`
