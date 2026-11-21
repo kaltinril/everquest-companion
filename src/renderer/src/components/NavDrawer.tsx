@@ -27,6 +27,7 @@ import MilitaryTechIcon from '@mui/icons-material/MilitaryTech'
 import LockOpenIcon from '@mui/icons-material/LockOpen'
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import TimerIcon from '@mui/icons-material/Timer'
+import TerminalIcon from '@mui/icons-material/Terminal'
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh'
 import PetsIcon from '@mui/icons-material/Pets'
 import MapIcon from '@mui/icons-material/Map'
@@ -199,6 +200,8 @@ const GROUPS: NavGroup[] = [
     heading: 'Config',
     rows: [
       { view: 'alerts', icon: <NotificationsActiveIcon /> },
+      // MACROS sits under Alerts: the other thing you set up here for the game to use.
+      { view: 'macros', icon: <TerminalIcon /> },
       // Respawn clocks (JOS-194): a list of things counting down, like Buffs, but it is the tab
       // where you SET them, so it sits with the app's other configuration rather than the data.
       { view: 'timers', icon: <TimerIcon /> }

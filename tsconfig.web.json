@@ -60,6 +60,8 @@
     "src/preload/logArchive.ts",
     // …and `gapsCharacters.ts` (the Gaps tab's All characters), likewise.
     "src/preload/gapsCharacters.ts",
+    // …and `macros.ts` (the Macros tab's library and game-file reads, fork #11), likewise.
+    "src/preload/macros.ts",
     // …and `presencePrefs.ts` (cursor ring + overlay auto-hide, moved for the line ceiling), likewise.
     "src/preload/presencePrefs.ts",
     // …and `planner.ts` (the exaltation planner + the Gear tab's reads, JOS-285), likewise.

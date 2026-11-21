@@ -586,6 +586,16 @@ export const IPC = {
   // committed item database. Returns TradeskillBookPayload (shared/tradeskillBook.ts). Built on
   // the first ask and kept; the renderer fetches it once per window.
   tradeskillBook: 'tradeskills:book',
+  // renderer -> main: the Macros tab (fork #11; src/main/ipc/macros.ts). The app's own macro
+  // library, `<userData>/macros.json`. Returns MacroLibrary (shared/macros/types.ts); a missing
+  // file is an empty library.
+  macrosLoad: 'macros:load',
+  // renderer -> main: save the whole library. Payload: (library: MacroLibrary). Returns boolean
+  // (written); a value that is not a library is refused.
+  macrosSave: 'macros:save',
+  // renderer -> main: the game folder's character files, each with the macros of its [Socials]
+  // section, read fresh on every call. READ ONLY: nothing is written there. Returns GameMacroFiles.
+  macrosGameFiles: 'macros:gameFiles',
 
   // ---- mob knowledge ("what does this thing drop", Task #63) ----
   // renderer -> main: look up a mob's drop knowledge (own loot history + local quest catalog
