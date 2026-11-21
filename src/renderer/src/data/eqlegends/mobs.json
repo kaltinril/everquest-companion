@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-20T10:12:58.967Z",
+  "scrapedAt": "2026-11-21T07:52:34.249Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -129371,8 +129371,7 @@
       "image": "npc_gallin_woodwind.png",
       "relatedQuests": [
         "Shark Meat Quest"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Galoxia Rumbad",
@@ -192753,8 +192752,7 @@
         "Night Shade",
         "Sage Leaf",
         "Water Flask"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Meljemor",

@@ -138,7 +138,9 @@ With low level pets, who typically have poor dual wielding - you'll generally ge
 Pet attacks use a weapon damage and delay, much like players, when performing melee attacks. 
 
 ==== Delay ====
-Pet attack delays are <em>fixed</em>. So a level 50 water pet will always attack with a delay of 28 (2.8 seconds) no matter what kind of weapon it has. In the early months of EQ Legends, different pets had different delays and so far it appears that the pets' base delay and damage values are unchanged. But testing needs to be done to reconfirm, and fill out the damage and delay values in the class specific pet lists below.
+Pet attack delays are <em>fixed</em> - meaning the delay of the weapons you give your pet has no impact on the pet's attack speed. So a level 50 water pet will always attack with a delay of 28 (2.8 seconds) no matter what kind of weapon it has. Different pets have different delays.
+
+Delay can only be reduced by [[Haste_Guide|haste]] effects and the Beastlord Reincarnation AA that reduces pet delay.
 
 ==== Damage ====
 
@@ -170,10 +172,14 @@ As players determine which level pets actually start dual wielding, they can be 
 '''Note:''' Pets attempt to equip weapons in the order you place them in the inventory. If you have two one-handed weapons, and one of them is Primary only and the other is Primary/Secondary only you need to equip them in the correct order to get your pet to dual wield. If you equip the Primary/Secondary weapon first, the pet will put it in their primary slot. When you then give them the Primary only weapon, they will refuse to use it. You must give them the Primary only weapon first, and then the Secondary weapon.
 
 ==== Dual Wield Measurements ====
-Dual Wield measurements on the class pet charts below represent how many additional off hand attacks are made relative to main hand attacks using identical delay. A dual wield of 100% would mean the pet makes an equal number of attacks with both hands - including double and triple attacks for each hand.
+Dual Wield measurements on the class pet charts below represent how many additional off hand attacks are made relative to main hand attacks. A dual wield rating of 100% would mean the pet makes an equal number of attacks with both hands - including double and triple attacks for each hand.
 
 === Weapon Procs ===
-Pets will use the procs on most weapons, so long as they meet the minimum required level to do so. However, they are blocked from proccing AoE effect procs, such as the [[Earthquake]] proc on [[Earthshaker]] or [[Hierophant`s Crook]].
+Pets will use the procs on most weapons, so long as they meet the minimum required level to do so.
+
+Initially, pets were blocked from proccing AoE effects like [[Earthquake]]. ''This is no longer the case - pets can now use AoE procs.'' 
+
+There are a limited number of weapon procs that pets cannot use - however, to help avoid further confusion these weapons/exaltations are now labeled "No Pet".  The pet can still wield the weapon, but it cannot use the proc. [[Scimitar of the Mistwalker]] is an example of this.
 
 === Backstab Damage ===
 For [[Magician]] Water Pets, who are Rogues, their maximum backstab damage is 8 * pet's backstab damage. A pet's base backstab damage is equal to their base weapon damage. If you give a pet a weapon with backstab damage, it will use the weapon's backstab damage, but only if that weapon's backstab damage is greater than their own base backstab damage.  However, since the highest backstab weapon in the current game is [[Serpent's Tooth]], with 13, and pets surpass an unarmed weapon damage of 13 at level 22 - there really isn't much reason to worry about the backstab damage of weapons you give your pets.
@@ -192,7 +198,7 @@ When starting out, just give your pets the best ratio weapons you can find that 
 <li>{{:Gnoll Hide Lariat}} - Stun</li>
 <li>{{:Dagger of Dropping}} - Weaken</li>
 <li>{{:Serrated Bone Dirk}} - Snare Dot</li>
-<li>{{:Dagas}} - Warrior Plane of Sky sword that gives very big AC and Hit Point boost and can be used in the pet's off-hand.</li>
+<li>{{:Dagas}} - Warrior Plane of Sky sword that gives very big AC and Hit Point boost and can be used in all pets' off-hand.</li>
 </ul>
 
 <strong>Two handed weapons</strong>
@@ -222,8 +228,6 @@ Essentially, every method of increasing your pets' hit points work together to m
 The following information is still being collected and updated for Everquest Legends.
 
 == [[Beastlord]] Pets ==
-
-There was a patch on 8/18/2026 that was a pretty big change to Beastlord pets. Currently the only data in the chart below that is confirmed is for Spirit of Kashek.  Other pets still need retested.
 
 {| class="wikitable"
 !Character Level
