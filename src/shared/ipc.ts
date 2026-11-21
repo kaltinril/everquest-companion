@@ -594,8 +594,19 @@ export const IPC = {
   // (written); a value that is not a library is refused.
   macrosSave: 'macros:save',
   // renderer -> main: the game folder's character files, each with the macros of its [Socials]
-  // section, read fresh on every call. READ ONLY: nothing is written there. Returns GameMacroFiles.
+  // section, a stamp of its bytes and the copies kept beside it, read fresh on every call. Reads
+  // only. Returns GameMacroFiles.
   macrosGameFiles: 'macros:gameFiles',
+  // renderer -> main: write a set into one character file's [Socials] section (the app's only
+  // write into the game folder; main/macros/gameFileSend.ts). Payload: (file: string, a file NAME;
+  // macros: GameMacro[]; expect: string, the file's stamp as read). Returns GameWriteResult.
+  macrosSend: 'macros:send',
+  // renderer -> main: the copies kept beside one character file. Payload: (file: string).
+  // Returns FileBackups (shared/macros/backups.ts).
+  macrosBackups: 'macros:backups',
+  // renderer -> main: put a kept copy back, whole. Payload: (file: string, which: 'original' |
+  // 'last'). Returns GameWriteResult.
+  macrosRestore: 'macros:restore',
 
   // ---- mob knowledge ("what does this thing drop", Task #63) ----
   // renderer -> main: look up a mob's drop knowledge (own loot history + local quest catalog

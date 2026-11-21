@@ -1,4 +1,4 @@
-// macros/useGameFiles.ts — the game's character files as main read them (read only), and when.
+// macros/useGameFiles.ts — the game's character files as main read them, and when.
 // Read once when the tab opens and again on every `reload`.
 
 import { useCallback, useEffect, useState } from 'react'

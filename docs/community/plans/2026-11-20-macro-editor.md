@@ -82,10 +82,14 @@ Opened 2026-11-20. Requirements: `../requirements/macro-editor.md`. Status at th
     it"):** before the FIRST write the app ever makes to a given game ini, it copies the file as it
     was. That first copy is never overwritten by a later one. A write does not go ahead when the
     copy could not be made. The same holds for an agent editing a game ini by hand for a test.
-  - Default taken, the owner has not ruled: the copy sits beside the file in the game folder under
-    a name that does not end in `.ini` (so neither the game nor `pickCharacterFiles` reads it), and
-    a further copy is kept before each later write. Needs the owner's ruling (the standing ruling of
-  2026-10-13 lets the app READ the game's ini, nothing more).
+  - **Owner ruling (2026-11-20: "Original copy and last version. Dated or something yeah in
+    folder. Build it"):** two copies, in the game folder beside the ini, each with its date in the
+    name: the ORIGINAL (made once, never replaced) and the LAST (the file just before the latest
+    write; the one before it is removed). "Build it" is taken as the word to build this step, and
+    so as leave for the app to write `[Socials]` in a character ini. Nothing else in the game
+    folder is written: not the `UI_` file, not the hotbar sections.
+  - Built before the in-game tests, so what the game does with the file is still unproven: the
+    screen says so, and the write is refused while the game runs.
 - **P3:** keep hotbar buttons pointing at a macro that moved slot; copy a set between loadouts in
   one step; a share code between players.
 
@@ -128,3 +132,24 @@ Opened 2026-11-20. Requirements: `../requirements/macro-editor.md`. Status at th
   slot with only a colour is empty; a colour that is not a number reads as 0; character and server
   names hold no underscore; files are read as latin1. The pause hint (runs the command, then
   waits, tenths of a second) is from guides for the older game.
+- 2026-11-20: P2 built (`src/shared/macros/socialsWrite.ts`, `backups.ts`, `unsavable.ts`;
+  `src/main/macros/gameFileSend.ts`, the one module that writes in the game folder, and
+  `gameRunning.ts`). 31 new unit tests, 15 of them on real files in a temp folder. **Not yet seen
+  on screen and never run against a real game folder.**
+  - A send: the name must be a character file of the folder's own listing; macros that cannot be
+    written faithfully block it (a character above U+00FF, a control character, an empty name, a
+    slot off the grid); refused while `eqgame.exe` is in `tasklist`, and when the list cannot be
+    trusted (it must hold the app's own pid); refused when the file's sha256 is not the one the
+    screen read; the copy is made and read back; temp file + flush + rename; read back and checked
+    (the macros parse as sent, every byte outside `[Socials]` unchanged), put back from the copy
+    when wrong.
+  - Kept inside `[Socials]`: page 1's keys and any line that is not a macro key. The file is read
+    and written as latin1, in its own line ending.
+  - A restore puts the WHOLE file back (hotbars too) and first keeps the current file as the last
+    copy, so it can be undone. The original copy is never removed.
+  - Known edges: a renamed game client is not seen; the game could start between the check and the
+    rename; a refused send can leave an extra last copy until the next good one; a crash between
+    copy and rename can leave `<file>.companion-write.tmp`, removed by the next send.
+  - Not built: hotbar links (P3). A set that moves a macro may leave a hotbar button pointing at
+    the wrong slot; in-game test 3 decides what to do.
+

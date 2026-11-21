@@ -79,6 +79,8 @@ export default defineConfig({
         //   * jsonChunkWorker — a big JSON file (the resist cache, the resist ledger) read and
         //     parsed off main and handed back in slices (jsonChunks.ts), so no single turn of
         //     the main thread parses more than ~512 KB of it.
+        //   * gameRunningWorker — the Macros tab's one-shot "is the game running" scan before a
+        //     write to a game file (macros/gameRunning.ts). It loads koffi, which main never does.
         input: {
           index: resolve(__dirname, 'src/main/index.ts'),
           speechWorker: resolve(__dirname, 'src/main/speech/worker.ts'),
@@ -86,7 +88,8 @@ export default defineConfig({
           perfProbeWorker: resolve(__dirname, 'src/main/perfProbeWorker.ts'),
           resistTableWorker: resolve(__dirname, 'src/main/resistTableWorker.ts'),
           fontReaderWorker: resolve(__dirname, 'src/main/fontReaderWorker.ts'),
-          jsonChunkWorker: resolve(__dirname, 'src/main/jsonChunkWorker.ts')
+          jsonChunkWorker: resolve(__dirname, 'src/main/jsonChunkWorker.ts'),
+          gameRunningWorker: resolve(__dirname, 'src/main/macros/gameRunningWorker.ts')
         }
       }
     }

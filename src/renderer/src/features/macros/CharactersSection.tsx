@@ -1,6 +1,7 @@
 // macros/CharactersSection.tsx — the Characters section: the character files found in the game
 // folder, what the game holds in the picked one, and the set chosen for it with what that set
-// would change. The game's files are only read: Copy is the way out until the in-game tests are done.
+// would change. Send (GameFileSend.tsx) writes the set into the file's macros section; Copy is
+// the same text to carry there by hand.
 
 import type { JSX } from 'react'
 import {
@@ -31,10 +32,11 @@ import {
 } from '@shared/macros/sets'
 import { characterFileKey, renderSocials } from '@shared/macros/socials'
 import type { CharacterFileMacros, GameFilesReason, MacroSet } from '@shared/macros/types'
-import { Tooltip } from '../../lib/Tooltip'
+import { BackupsLine, SendOutcome, SendToGame } from './GameFileSend'
 import { MONO_SX, Quiet, TwoPane } from './macroParts'
 import { useMacroUi } from './macroUi'
 import type { GameFilesState } from './useGameFiles'
+import { type GameWriter, useGameWriter } from './useGameWriter'
 import type { MacroStore } from './useMacroLibrary'
 
 const NO_FOLDER: Record<GameFilesReason, string> = {
@@ -188,8 +190,15 @@ function DiffTable({ diff }: { diff: SlotDiff[] }): JSX.Element {
   )
 }
 
-/** What the chosen set would change in the file, and the text to carry there by hand. */
-function SetChanges({ store, file, set }: { store: MacroStore; file: CharacterFileMacros; set: MacroSet }): JSX.Element {
+interface SetChangesProps {
+  store: MacroStore
+  file: CharacterFileMacros
+  set: MacroSet
+  writer: GameWriter
+}
+
+/** What the chosen set would change in the file, and the two ways to get it there. */
+function SetChanges({ store, file, set, writer }: SetChangesProps): JSX.Element {
   const ui = useMacroUi()
   const setMacros = setToGameMacros(store.library, set)
   const diff = diffSetAgainstFile(setMacros, file.macros)
@@ -211,7 +220,7 @@ function SetChanges({ store, file, set }: { store: MacroStore; file: CharacterFi
         {`, ${String(counts.same)} the same.`}
       </Typography>
       <DiffTable diff={diff} />
-      <Stack direction="row" spacing={1}>
+      <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
         <Button
           size="small"
           variant="contained"
@@ -222,24 +231,18 @@ function SetChanges({ store, file, set }: { store: MacroStore; file: CharacterFi
         >
           Copy [Socials] text
         </Button>
-        <Tooltip title="Not built yet: it waits on tests in the game.">
-          <span>
-            <Button size="small" variant="outlined" disabled data-testid="macro-file-send">
-              Send to the game file
-            </Button>
-          </span>
-        </Tooltip>
+        <SendToGame file={file} macros={setMacros} counts={counts} writer={writer} />
       </Stack>
-      <Quiet testid="macro-file-by-hand">
-        Today you paste the copied text into {file.file} with the game closed. Sending it for you waits on tests in the game.
-      </Quiet>
+      <SendOutcome writer={writer} />
+      <Quiet testid="macro-file-send-note">Send changes only the macros section of {file.file} and keeps copies beside it.</Quiet>
     </>
   )
 }
 
-function FileDetail({ store, file }: { store: MacroStore; file: CharacterFileMacros }): JSX.Element {
+function FileDetail({ store, file, reload }: { store: MacroStore; file: CharacterFileMacros; reload: () => void }): JSX.Element {
   const key = characterFileKey(file)
   const set = chosenSet(store.library, key)
+  const writer = useGameWriter(file.file, reload)
   return (
     <Stack spacing={1.5} data-testid="macro-file-detail">
       <Stack direction="row" spacing={1} alignItems="baseline" justifyContent="space-between" useFlexGap flexWrap="wrap">
@@ -253,6 +256,7 @@ function FileDetail({ store, file }: { store: MacroStore; file: CharacterFileMac
           {file.file}
         </Typography>
       </Stack>
+      <BackupsLine file={file} writer={writer} />
       <Typography variant="subtitle2">In the game now</Typography>
       <InGameNow store={store} file={file} />
       <Typography variant="subtitle2">Set for this character</Typography>
@@ -277,7 +281,7 @@ function FileDetail({ store, file }: { store: MacroStore; file: CharacterFileMac
       {set === null ? (
         <Quiet testid="macro-file-no-set">Choose a set to see what would change for this character.</Quiet>
       ) : (
-        <SetChanges store={store} file={file} set={set} />
+        <SetChanges store={store} file={file} set={set} writer={writer} />
       )}
     </Stack>
   )
@@ -286,6 +290,6 @@ function FileDetail({ store, file }: { store: MacroStore; file: CharacterFileMac
 export function CharactersSection({ store, game, selected, onSelect }: CharactersProps): JSX.Element {
   const files = game.reply?.files ?? []
   const picked = files.find((f) => characterFileKey(f) === selected) ?? files.at(0) ?? null
-  const right = picked === null ? <Quiet testid="macro-file-none">No character file to show.</Quiet> : <FileDetail key={picked.file} store={store} file={picked} />
+  const right = picked === null ? <Quiet testid="macro-file-none">No character file to show.</Quiet> : <FileDetail key={picked.file} store={store} file={picked} reload={game.reload} />
   return <TwoPane left={<FileList game={game} picked={picked} onSelect={onSelect} />} right={right} />
 }

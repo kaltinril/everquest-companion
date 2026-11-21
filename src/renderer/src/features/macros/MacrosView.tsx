@@ -2,8 +2,8 @@
 // library the app keeps for itself: Library (every macro), Sets (which macro sits on which
 // button) and Characters (what the game holds per character file, and the set chosen for each).
 //
-// The game's files are only READ here. What a set would change is shown and copied as text; the
-// write waits on the in-game tests (docs/community/plans/2026-11-20-macro-editor.md).
+// What a set would change in a character file is shown, copied as text, or sent into the file's
+// macros section (Characters; docs/community/plans/2026-11-20-macro-editor.md, P2).
 
 import { type JSX, useState } from 'react'
 import { Box, Stack, Tab, Tabs, Typography } from '@mui/material'
@@ -33,7 +33,7 @@ function Footer({ game, saveFailed }: { game: GameFilesState; saveFailed: boolea
   return (
     <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap" justifyContent="space-between" sx={{ flexShrink: 0, pt: 1 }}>
       <Typography variant="caption" color="text.secondary" data-testid="macros-read-at">
-        {game.readAt === null ? 'Game files are read only' : `Game files read ${formatTime(game.readAt)}, read only`}
+        {game.readAt === null ? 'Game files not read yet' : `Game files read ${formatTime(game.readAt)}`}
       </Typography>
       {saveFailed && (
         <Typography variant="caption" color="warning.main" data-testid="macros-save-failed">
