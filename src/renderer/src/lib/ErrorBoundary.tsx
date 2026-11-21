@@ -25,35 +25,23 @@ interface State {
 }
 
 /**
- * Where "Report this" parks the crash before reloading (Task #65).
+ * Where "Report on GitHub" goes: this project's new-issue page, in the player's browser.
  *
- * The fallback below replaces the WHOLE app — App.tsx is unmounted, so there is no dialog left
- * to open. So the action stashes the crash in `sessionStorage` (which survives a reload) and
- * reloads; App.tsx picks it up on mount and opens the feedback dialog prefilled as a bug. That
- * also matches what the user has to do anyway: the app is broken, it needs reloading.
- *
- * The key is exported FROM here rather than imported INTO here on purpose — this file
- * deliberately imports no app code, because the app (or the theme) may be the crash source.
+ * Spelled here rather than imported from `shared/issueLink.ts` on purpose: this file deliberately
+ * imports no app code, because the app (or the theme) may be the crash source.
+ * `tests/issueLink.test.mts` holds the two spellings together.
  */
-export const CRASH_REPORT_KEY = 'eq.crashReport'
+export const CRASH_ISSUE_URL = 'https://github.com/kaltinril/everquest-companion/issues/new'
 
-/** Stash the crash for App.tsx, then reload. Never throws: a refusing sessionStorage (or a
- *  quota) must still get the user their working app back. */
-function reportAndReload(error: Error, info: React.ErrorInfo | null): void {
-  try {
-    sessionStorage.setItem(
-      CRASH_REPORT_KEY,
-      JSON.stringify({
-        message: `${error.name}: ${error.message}`,
-        stack: `${error.stack ?? ''}${
-          info?.componentStack ? `\n\nComponent stack:${info.componentStack}` : ''
-        }`
-      })
-    )
-  } catch {
-    // Reload anyway — a report we could not prefill is better than a stuck window.
-  }
-  location.reload()
+/**
+ * The new-issue link with the crash's one-line message as its title. The stack is NOT sent: its
+ * file paths carry the player's Windows user name, and an issue is public. It stays on screen and
+ * in errors.log for the player to paste if they choose.
+ */
+export function crashIssueUrl(error: Error): string {
+  const title = `Crash: ${error.name}: ${error.message}`.slice(0, 160)
+  const body = 'What I was doing when the app broke:\n'
+  return `${CRASH_ISSUE_URL}?${new URLSearchParams({ title, body }).toString()}`
 }
 
 const BUTTON: React.CSSProperties = {
@@ -65,17 +53,18 @@ const BUTTON: React.CSSProperties = {
 }
 
 /** The two actions. Reporting is offered FIRST — the crash is most useful to us right now. */
-function CrashActions({ onReport }: { onReport: () => void }): React.ReactElement {
+function CrashActions({ reportUrl }: { reportUrl: string }): React.ReactElement {
   return (
     <div style={{ display: 'flex', gap: 10 }}>
-      <button
-        type="button"
+      <a
+        href={reportUrl}
+        target="_blank"
+        rel="noreferrer"
         data-testid="crash-report"
-        onClick={onReport}
-        style={{ ...BUTTON, background: '#3b82f6', color: '#fff' }}
+        style={{ ...BUTTON, background: '#3b82f6', color: '#fff', textDecoration: 'none' }}
       >
-        Report this
-      </button>
+        Report on GitHub
+      </a>
       <button
         type="button"
         onClick={() => location.reload()}
@@ -157,8 +146,8 @@ export class ErrorBoundary extends React.Component<Props, State> {
           <h1 style={{ fontSize: 22, margin: '0 0 8px', color: '#ff6b6b' }}>Something broke</h1>
           <p style={{ margin: '0 0 16px', color: '#b9b9b9' }}>
             The app hit an unrecoverable render error. It has been written to{' '}
-            <code style={{ color: '#e6e6e6' }}>errors.log</code>. Reporting it reloads the app and
-            opens a bug report with this crash filled in.
+            <code style={{ color: '#e6e6e6' }}>errors.log</code>. Reporting it opens a GitHub issue in
+            your browser with this error as its title.
           </p>
           <div
             style={{
@@ -195,7 +184,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
               {detail}
             </pre>
           </details>
-          <CrashActions onReport={() => reportAndReload(error, info)} />
+          <CrashActions reportUrl={crashIssueUrl(error)} />
         </div>
       </div>
     )

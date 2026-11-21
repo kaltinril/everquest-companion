@@ -1,51 +1,46 @@
-// FeedbackSetting — the Preferences card that opens the feedback dialog (Task #65, §4.4).
-//
-// Its own file for the same reason UpdateSetting.tsx is: PreferencesView.tsx is the settings
-// TABLE, and a section's actual UI lives beside it rather than inside it.
-//
-// Feedback is a DIALOG, not a view (appViews.ts is untouched), so this card owns no state — it
-// only calls up to App.tsx, which hosts the dialog. Two buttons rather than one because TYPE is
-// the first thing the dialog asks, and a user who came here to report a problem already knows.
+// FeedbackSetting: the Preferences card that says where reports go. This project takes problems
+// and ideas as GitHub issues (RULES.md rule 20), so the card is one sentence and two links; a
+// link opens in the player's browser through the window's external-link check (main/security.ts).
 
 import type { JSX } from 'react'
 import { Button, Stack, Typography } from '@mui/material'
 import BugReportIcon from '@mui/icons-material/BugReport'
-import LightbulbIcon from '@mui/icons-material/Lightbulb'
-import type { FeedbackPrefill } from '../feedback/useFeedback'
-import { FORK_FEEDBACK_OFF } from '../feedback/forkFeedback'
+import ListAltIcon from '@mui/icons-material/ListAlt'
+import { ISSUES_URL, NEW_ISSUE_URL } from '@shared/issueLink'
 
-/** Opens the app-level feedback dialog, optionally preselecting a type. */
-export type OpenFeedback = (prefill?: FeedbackPrefill) => void
-
-// TEST-BUILD NEUTERING (this branch only, never a PR): both buttons are disabled and the caption
-// says where reports go instead (features/feedback/forkFeedback.ts).
-export function FeedbackSetting({ onSend }: { onSend: OpenFeedback }): JSX.Element {
+export function FeedbackSetting(): JSX.Element {
   return (
     <Stack spacing={1}>
-      <Stack direction="row" spacing={1} flexWrap="wrap">
+      <Typography variant="body2" data-testid="prefs-feedback-note">
+        Found a problem or have an idea? Open an issue on this project&apos;s GitHub page and say
+        what you saw.
+      </Typography>
+      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
         <Button
           size="small"
-          variant="outlined"
-          startIcon={<LightbulbIcon />}
-          data-testid="prefs-feedback-feature"
-          disabled
-          onClick={() => onSend({ type: 'feature' })}
+          variant="contained"
+          startIcon={<BugReportIcon />}
+          href={NEW_ISSUE_URL}
+          target="_blank"
+          rel="noreferrer"
+          data-testid="prefs-feedback-new-issue"
         >
-          Request a feature
+          Open a GitHub issue
         </Button>
         <Button
           size="small"
           variant="outlined"
-          startIcon={<BugReportIcon />}
-          data-testid="prefs-feedback-bug"
-          disabled
-          onClick={() => onSend({ type: 'bug' })}
+          startIcon={<ListAltIcon />}
+          href={ISSUES_URL}
+          target="_blank"
+          rel="noreferrer"
+          data-testid="prefs-feedback-issues"
         >
-          Report a problem
+          See open issues
         </Button>
       </Stack>
-      <Typography variant="caption" color="text.secondary" data-testid="prefs-feedback-fork-note">
-        {FORK_FEEDBACK_OFF}
+      <Typography variant="caption" color="text.secondary">
+        Opens github.com in your browser. Posting needs a free GitHub account.
       </Typography>
     </Stack>
   )
