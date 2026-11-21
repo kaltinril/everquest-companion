@@ -17,6 +17,7 @@
 
 pub mod aggregate;
 pub mod ally;
+pub mod ally_summon;
 pub mod charm;
 pub mod collate;
 pub mod deathrecap;

@@ -344,8 +344,17 @@ where one exists.
   - `routing.rs other_source`: an unclaimed table name's row reads `Pet (Xabantik) - owner
     unknown` (kind still `other`, id still `member:<key>`), unless the roster lists the name.
   - Kind `other` is hidden by the Group scope, so an unclaimed pet shows under Everyone only until
-    it is tied to a group member. NOT built yet: inferring the owner from a group mate's summon
-    (rule 3), and ending your own claim on a name (rule 4).
+    it is tied to a group member. NOT reviewed yet: ending your own claim on a name (rule 4).
+- Pet rules, batch 2 (2026-11-20): the owner guessed from a group mate's summon.
+  `ally_summon.rs` (`SummonWatch`, `AllyCharms::infer_summon_owner`) makes an `AllyVia::Summon` bind (kind `Summon`, no clock, no break rule);
+  `routing.rs infer_summoned_pet` asks it on every `Attribution::Ignore` damage and miss line,
+  BEFORE `route_other_*`, so the line that makes the bind is credited by it. State: `waiting`
+  (group mates' unanswered summons, 10 minutes), `own_waiting` (yours; blocks every guess),
+  `first_unbound` (when a table name first acted with no bind, stamped whatever it swung at).
+  The label is `Pet (X) - Owner (guessed)` (`ally_pet_label`). A leader line or a claim settles
+  it: `rekey.rs settle_guessed_pet` moves the guessed row (`move_recorded`, which also renames a
+  row in place). The target must be an engaged hostile, so a fight that has gone stale guesses
+  nothing until someone in the group swings again.
 - To see what the engine does with a real log: copy it as `eqlog_<Name>_<server>.<anything>.txt`
   (the replay tool reads the character from that shape), then
   `engine/target/release/parity <copy> --snapshots > out.json` (`cargo build --release -p parity`

@@ -55,17 +55,7 @@ impl EngineState {
             return;
         }
         self.others.forget(name_key);
-        self.zone_agg.move_out(&id, to);
-        if let Some(enc) = self.current.as_mut() {
-            if enc.agg.move_out(&id, to) {
-                enc.summary = None;
-            }
-        }
-        for enc in &mut self.history {
-            if enc.agg.move_out(&id, to) {
-                enc.summary = None;
-            }
-        }
+        self.move_recorded(&id, to);
         let ts = self.last_activity_ts;
         self.log_lazy(ts, "charm", "info", || {
             format!(
@@ -73,6 +63,40 @@ impl EngineState {
                 to.name
             )
         });
+    }
+}
+
+impl EngineState {
+    /// Move the row `from_id` to `to` in the zone session, the open fight and every finished one.
+    /// The same id with another name is a rename. True when the zone session had the row.
+    pub fn move_recorded(&mut self, from_id: &str, to: &SourceRef) -> bool {
+        let moved = self.zone_agg.move_out(from_id, to);
+        if let Some(enc) = self.current.as_mut() {
+            if enc.agg.move_out(from_id, to) {
+                enc.summary = None;
+            }
+        }
+        for enc in &mut self.history {
+            if enc.agg.move_out(from_id, to) {
+                enc.summary = None;
+            }
+        }
+        moved
+    }
+
+    /// A guessed owner (`AllyVia::Summon`) has been replaced by a statement: the guessed row goes
+    /// to the row the statement names. `guess` is the bind as it was before the statement.
+    pub fn settle_guessed_pet(&mut self, guess: &super::ally::AllyBind, to: &SourceRef) {
+        if guess.via != super::ally::AllyVia::Summon {
+            return;
+        }
+        let from = super::routing::ally_pet_source(guess);
+        if self.move_recorded(&from.id, to) {
+            let ts = self.last_activity_ts;
+            self.log_lazy(ts, "charm", "info", || {
+                format!("➜ {}: the guess is settled - now {}", from.name, to.name)
+            });
+        }
     }
 }
 
