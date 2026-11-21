@@ -66,6 +66,11 @@ export function tagList(library: Pick<MacroLibrary, 'macros' | 'tags'>): TagCoun
   ]
 }
 
+/** The tags some macro carries, in `tagList` order: the short list a picker offers. */
+export function usedTagList(library: Pick<MacroLibrary, 'macros' | 'tags'>): TagCount[] {
+  return tagList(library).filter((t) => t.count > 0)
+}
+
 /** One tag put on or taken off a macro's tag list. */
 export function toggleTag(tags: readonly string[], raw: string): string[] {
   const tag = normalizeTag(raw)

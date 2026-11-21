@@ -166,9 +166,9 @@ async function checkWish(page: Page): Promise<void> {
   const listed = await settle(() => textOf(page, `${WISHED_ROW} ${NAME}`), (t) => t !== '', { timeoutMs: 20_000 })
   check('Home lists it under Working towards, by the item link', listed === item, `${listed} / ${item}`)
   check('…with what one takes', (await textOf(page, `${WISHED_ROW} ${sel('tradeskills-wished-materials')}`)) !== '')
-  await page.click(`${WISHED_ROW} ${sel('tradeskills-wished-plan')} [role="button"]`)
+  await page.click(`${WISHED_ROW} ${sel('tradeskills-wished-plan')} ${NAME}`)
   const planned = await settle(() => textOf(page, `${sel('tradeskill-plan-head')} ${NAME}`), (t) => t === item, { timeoutMs: 20_000 })
-  check('its link opens Make an item on that item', planned === item, `${planned} / ${item}`)
+  check('a click on its name opens Make an item on that item', planned === item, `${planned} / ${item}`)
 
   const planWish = sel('tradeskill-plan-wish')
   const lit = await settle(() => dataOf(page, planWish, 'wished'), (w) => w === 'true', { timeoutMs: 10_000 })

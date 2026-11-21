@@ -451,6 +451,12 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
   141.75 pp of Gold Bar (10.50) and Ruby (131.25), sold for 141.75; Fire Emerald Golden Bracelet
   99.75 and 99.75; Golden Jaded Bracelet 14.88 and 14.17. Over the four crafting days: about
   28,823 pp paid, 13,452 pp received. The money lost is the failed combines.
+- The in-game Tradeskill Window's search (owner, in game, 2026-11-20, Tailoring 1 in a Large
+  Sewing Kit, Max Trivial 300): it lists only recipes within about 30 of the skill. "cloak" gave
+  seven recipes at trivial 26 and 36 and none of the wiki's cloaks at 56 and up; "quiver" (wiki
+  trivials 115, 115, 222) gave nothing. A search with no name lists nothing. So a recipe far above
+  the player's skill cannot be checked in that window. The list named Leather Cloak and Small
+  Leather Cloak at 36, which the wiki's Tailoring recipes do not have (not followed up).
 - `/outputfile recipes Jewelcrafting` (owner, in game, 2026-11-20): the game prints `You haven't
   learned any notable Jewelry Making recipes, yet...` and writes no file, at skill 205 with 31
   recipes made. The dump is for "notable" learned recipes, not ordinary ones.

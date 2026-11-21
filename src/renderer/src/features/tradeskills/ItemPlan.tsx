@@ -1,7 +1,8 @@
 // tradeskills/ItemPlan.tsx — one planned item, the mockup's "Make an item" layout: a head with
 // the item and the recipe shown (picked from several when several make it, with how many there
 // are), then "What it takes" beside "Where you stand" and "Shortest way there", then "What to
-// gather" for N.
+// gather" for N. When every skill the plan needs is already met, "Where you stand" is one line in
+// the head instead and "What it takes" has the full width.
 //
 // The tree, the skills, the routes and the roll-up are shared/tradeskillPlan*.ts; this file only
 // calls them with the section's facts and lays the panels out.
@@ -13,7 +14,7 @@ import { recipeGuideCreditText } from '@shared/tradeskillGuide'
 import { haveSourceText, logCountsInUse } from '@shared/tradeskillHistory'
 import { planTree, recipeCountText, recipeOptionText, treeDrawsGuide, type PlanDeps } from '@shared/tradeskillPlan'
 import { PLAN_CAN_MAKE_LABEL, gatherFor, gatherHeld, planCanMakeTip, planHave, planPrice } from '@shared/tradeskillPlanGather'
-import { skillNeeds, skillRoutes } from '@shared/tradeskillPlanLevels'
+import { skillNeeds, skillRoutes, skillsAllMet } from '@shared/tradeskillPlanLevels'
 import { withClosed, withCount, withRecipe, type PlanMemory } from '@shared/tradeskillPlanMemory'
 import OutputKindLine from '../../components/OutputKindLine'
 import { formatDate } from '../../lib/formatDate'
@@ -21,7 +22,7 @@ import { Tooltip } from '../../lib/Tooltip'
 import { EraChip } from '../planner/PlannerChips'
 import { FactsProvider, type BenchFacts } from './benchFacts'
 import { ItemPlanGather } from './ItemPlanGather'
-import { ItemPlanSkills, type OpenBench } from './ItemPlanSkills'
+import { ItemPlanSkills, PlanStandLine, type OpenBench } from './ItemPlanSkills'
 import { ItemPlanTree } from './ItemPlanTree'
 import { RecipeWish } from './RecipeWish'
 import type { SkillLevels } from './tradeskillData'
@@ -100,6 +101,8 @@ export function ItemPlan({ recipe, recipes, deps, facts, levels, plan, setPlan, 
     return gatherFor(tree, { count: plan.count, have, price: planPrice(craft) })
   }, [tree, plan.count, held.index, held.dumpedAt, craft])
   const credited = useMemo(() => treeDrawsGuide(deps, tree), [deps, tree])
+  // Nothing short and nothing to route: the standing is one line in the head, and the tree has the width.
+  const clear = levels.served && routes.length === 0 && skillsAllMet(skills)
   return (
     <FactsProvider value={facts}>
       <Stack spacing={1.5} data-testid="tradeskill-plan">
@@ -129,15 +132,16 @@ export function ItemPlan({ recipe, recipes, deps, facts, levels, plan, setPlan, 
               setPlan(withRecipe(plan, id))
             }}
           />
+          {clear && <PlanStandLine skills={skills} onOpenBench={onOpenBench} />}
         </Paper>
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'minmax(0, 1fr)', lg: 'minmax(0, 3fr) minmax(0, 2fr)' }, gap: 1.5, alignItems: 'start' }}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'minmax(0, 1fr)', lg: clear ? 'minmax(0, 1fr)' : 'minmax(0, 3fr) minmax(0, 2fr)' }, gap: 1.5, alignItems: 'start' }}>
           <ItemPlanTree
             tree={tree}
             setClosed={(key, closed) => {
               setPlan(withClosed(plan, key, closed))
             }}
           />
-          <ItemPlanSkills skills={skills} routes={routes} served={levels.served} onOpenBench={onOpenBench} />
+          {!clear && <ItemPlanSkills skills={skills} routes={routes} served={levels.served} onOpenBench={onOpenBench} />}
         </Box>
         <ItemPlanGather
           gather={gather}
