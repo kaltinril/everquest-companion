@@ -583,3 +583,17 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
   Idle.
 - The e2e harness switches the app's lowered priority off, so no e2e run exercises the BelowNormal
   engine a real install runs.
+
+## In-game macros (2026-11-20, owner's game window and files)
+
+- A character's macros are in `<Character>_<server>_LO<n>.ini`, `[Socials]`: one file per class
+  loadout, numbered from 1. A new loadout's file starts as a copy of the first (macros and hotbars).
+- Name 15 characters, five lines, 255 characters a line (typed to the stop, read back from the file).
+- 10 pages of 12 buttons = 120 macros. Page 1 is 12 built-ins (Assist Main ... Who) and is not in the
+  file; pages 2 to 10 are the player's 108.
+- Colour numbers 0 to 19, top row then bottom row of the edit window; RGB in `EQUI_SocialEditWnd.xml`.
+- A hotbar button stores `E<n>`, a zero-based macro slot, `n = (page - 1) * 12 + (button - 1)`, 0 to
+  119 (five buttons on the owner's bar). No name is stored. Values of 120 and up are something else.
+- The game rewrites the character file within seconds of a macro being saved, while logged in.
+- No text file read names a loadout or its classes, and the log printed nothing on a loadout switch.
+- Not measured: whether the game picks up an outside edit of `[Socials]` at login.
