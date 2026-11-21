@@ -2,10 +2,10 @@
 // tree (shared/tradeskillPlan.ts `planTree`: depth-limited, loop-guarded, the guide's materials
 // where the wiki lists none).
 //
-// A material that can be bought is a leaf: the plan buys it, with "Make it instead" beside it. A
-// material only a recipe gets is a made one, with an arrow that shows its own materials; those
-// start hidden (owner, 2026-11-20: "can we get collapsing on these things so i don't have to look
-// at 400 indented sub-items?"), and "What to gather" below always adds up the whole tree.
+// A material a recipe makes has an arrow that shows its own materials, whether or not it can also
+// be bought (owner, 2026-11-21: "always show how to make something"); a bought one keeps its source
+// lines. The materials start hidden (owner, 2026-11-20: "can we get collapsing on these things so i
+// don't have to look at 400 indented sub-items?"), and "What to gather" below adds up the whole tree.
 //
 // Every row is the shared material table (`materialGrid`): nesting indents the name only, so Need,
 // Have and Where stay in their columns at any depth.
@@ -18,19 +18,14 @@ import type { JSX } from 'react'
 import { Box, Paper, Typography } from '@mui/material'
 import { guideMaterialTail } from '@shared/tradeskillGuide'
 import { closedText, madeWithText, type PlanNode, type PlanRecipe } from '@shared/tradeskillPlan'
-import { CellLink } from '../../lib/CellLink'
 import { DEPTH_INDENT, GRID_SX, NAME_INDENT, NUMBER_SX, OPEN_COL, ROW_SX, WHERE_SX, nameCell } from './materialGrid'
 import { GuideSourceLine, Have, MATERIAL_LINE } from './MaterialWhere'
 import { OpenToggle, WhereCell } from './RecipePanel'
 import { ItemLabel } from './tradeskillLinks'
 import { WikiGapLine } from './WikiGap'
 
-/** Closes a made material (the reader gets it instead) or chooses to make it. */
-export type SetClosed = (key: string, closed: boolean) => void
-
 /** What the reader can change in the tree. */
 export interface TreeControls {
-  setClosed: SetClosed
   /** Item keys of the made materials whose own materials are showing. */
   expanded: ReadonlySet<string>
   setExpanded: (key: string, open: boolean) => void
@@ -52,7 +47,7 @@ function NodeName({ node }: { node: PlanNode }): JSX.Element {
 }
 
 /** A leaf's sources, and why it is a leaf when some recipe makes it. */
-function LeafWhere({ node, setClosed }: { node: PlanNode; setClosed: SetClosed }): JSX.Element {
+function LeafWhere({ node }: { node: PlanNode }): JSX.Element {
   const why = closedText(node)
   return (
     <Box sx={{ minWidth: 0 }}>
@@ -60,38 +55,22 @@ function LeafWhere({ node, setClosed }: { node: PlanNode; setClosed: SetClosed }
       {!node.linked && node.guide !== null && <GuideSourceLine source={node.guide.source} />}
       {why !== '' && (
         <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-plan-closed">
-          {why}{' '}
-          {node.makeable !== null && (
-            <span data-testid="tradeskill-plan-make">
-              <CellLink
-                text="Make it instead"
-                onOpen={() => {
-                  setClosed(node.key, false)
-                }}
-              />
-            </span>
-          )}
+          {why}
         </Typography>
       )}
     </Box>
   )
 }
 
-/** A made material's line: which recipe is opened under it, and the way to close it. */
-function MadeWhere({ node, setClosed }: { node: PlanNode; setClosed: SetClosed }): JSX.Element {
+/** A made material's line: which recipe is under its arrow, after its source lines when it can be bought. */
+function MadeWhere({ node }: { node: PlanNode }): JSX.Element {
   return (
-    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', minWidth: 0 }} data-testid="tradeskill-plan-made-with">
-      {madeWithText(node)}
-      {' · '}
-      <span data-testid="tradeskill-plan-get">
-        <CellLink
-          text="Get it instead"
-          onOpen={() => {
-            setClosed(node.key, true)
-          }}
-        />
-      </span>
-    </Typography>
+    <Box sx={{ minWidth: 0 }}>
+      {node.bought && <WhereCell ingredient={node.ingredient} own={node.guide ?? undefined} />}
+      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', minWidth: 0 }} data-testid="tradeskill-plan-made-with">
+        {madeWithText(node)}
+      </Typography>
+    </Box>
   )
 }
 
@@ -119,7 +98,7 @@ function NodeRow({ node, depth, controls }: { node: PlanNode; depth: number; con
         </Typography>
         {node.linked ? <Have ingredient={node.ingredient} line={MATERIAL_LINE} /> : <span />}
         <Box sx={WHERE_SX}>
-          {node.made === null ? <LeafWhere node={node} setClosed={controls.setClosed} /> : <MadeWhere node={node} setClosed={controls.setClosed} />}
+          {node.made === null ? <LeafWhere node={node} /> : <MadeWhere node={node} />}
         </Box>
       </Box>
       {showing && node.made !== null && (

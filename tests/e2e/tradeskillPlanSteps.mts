@@ -179,16 +179,8 @@ async function stepQuiverAndMap(page: Page): Promise<void> {
   if ((await countOf(page, `${sel('tradeskill-plan-tree')} ${sel('tradeskill-wiki-gap')}[data-guide="true"]`)) > 0) {
     check('materials taken from the guide carry its credit', (await countOf(page, sel('tradeskill-plan-guide-credit'))) === 1)
   }
-  // Water Flask, under the oil: the wiki says it is bought, so the plan buys it until told otherwise.
-  const buying = await countOf(page, sel('tradeskill-plan-make'))
-  check('a material that can be bought is bought, with a way to make it', buying === 1, String(buying))
-  const made = await countOf(page, sel('tradeskill-plan-get'))
-  await page.click(`${sel('tradeskill-plan-make')} [role="button"]`)
-  const making = await settle(() => countOf(page, sel('tradeskill-plan-get')), (n) => n === made + 1, { timeoutMs: 15_000 })
-  check('…Make it instead opens its recipe', making === made + 1 && (await countOf(page, sel('tradeskill-plan-make'))) === 0)
-  await page.click(`${sel('tradeskill-plan-get')} [role="button"] >> nth=1`)
-  const reclosed = await settle(() => countOf(page, sel('tradeskill-plan-make')), (n) => n === 1, { timeoutMs: 15_000 })
-  check('…and Get it instead closes it again', reclosed === 1 && (await countOf(page, sel('tradeskill-plan-get'))) === made)
+  // A material with a recipe always shows it; "Bought" in its source words is all that says it is sold.
+  check('no material offers a make-or-get switch', (await page.locator(PLAN).getByText(/(Make|Get) it instead/).count()) === 0)
 
   const link = `${sel('tradeskill-plan-tree')} ${sel('tradeskill-map-link')} [role="button"]`
   if ((await countOf(page, link)) === 0) {

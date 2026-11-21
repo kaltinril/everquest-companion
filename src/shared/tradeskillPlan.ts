@@ -7,7 +7,7 @@
 //   for the same tradeskill and item (`tradeskillGuide.guideMaterialsFor`; Fleeting Quiver).
 // - A material some recipe makes is opened to the first such recipe that lists materials, in
 //   `planOrder`. The depth limit and the loop guard are `tradeskillBook.subRecipes`'s.
-// - The reader can close a made material (get it instead of making it): `PlanAsk.closed`.
+// - A made material that can be bought still shows its recipe; the gather list buys it (`PlanNode.bought`).
 // - A guide's spelling that names no wiki item stays the text its author wrote: a leaf, no link.
 //
 // The skills the tree needs and the way to them are tradeskillPlanLevels.ts; what to gather for
@@ -140,13 +140,10 @@ export interface PlanRecipe {
 }
 
 /**
- * Why a material some recipe makes is not opened:
- * `bought` it can be bought, so the plan does not craft it unless the reader says to (owner,
- * 2026-11-20, of Water Flask: "isn't water flask purchaseable???"; the shopping list's rule);
- * `reader` the reader gets it instead of making it; `loop` it is already open above (Water Flask
+ * Why a material some recipe makes is not opened: `loop` it is already open above (Water Flask
  * from Water Flask); `depth` past the depth limit; `unlisted` no recipe for it lists materials.
  */
-export type ClosedWhy = 'bought' | 'reader' | 'loop' | 'depth' | 'unlisted'
+export type ClosedWhy = 'loop' | 'depth' | 'unlisted'
 
 /** One material of a recipe in the tree. */
 export interface PlanNode {
@@ -171,15 +168,15 @@ export interface PlanNode {
   made: PlanRecipe | null
   /** Why it is a leaf although a recipe makes it; null when opened, or when nothing makes it. */
   closed: ClosedWhy | null
-  /** The recipe that opens when the reader chooses to make it; set with `closed: 'reader'` or `'bought'`. */
-  makeable: BookRecipe | null
+  /**
+   * Its recipe is shown and something says it is sold, so the gather list and the skills buy it
+   * rather than make it (owner, 2026-11-20: "if you can buy it why make it?"; 2026-11-21: "always
+   * show how to make something").
+   */
+  bought: boolean
 }
 
 export interface PlanAsk {
-  /** Item keys of made materials the reader gets instead of making. */
-  closed?: ReadonlySet<string>
-  /** Item keys of materials that can be bought and that the reader chose to make anyway. */
-  opened?: ReadonlySet<string>
   /** The player's log shows a purchase of this item. */
   paid?: (key: string) => boolean
 }
@@ -218,13 +215,12 @@ function linesOf(deps: PlanDeps, recipe: BookRecipe): { from: MaterialsFrom; lin
   return guide.length > 0 ? { from: 'guide', lines: guide.map(guideLine) } : { from: 'none', lines: [] }
 }
 
-type Opened = Pick<PlanNode, 'recipes' | 'made' | 'closed' | 'makeable'>
+type Opened = Pick<PlanNode, 'recipes' | 'made' | 'closed' | 'bought'>
 
-const LEAF: Opened = { recipes: 0, made: null, closed: null, makeable: null }
+const LEAF: Opened = { recipes: 0, made: null, closed: null, bought: false }
 
-/** The plan buys this material: something says it is sold, and the reader has not chosen to make it. */
+/** The plan buys this material: the log, the wiki or a guide says it is sold. */
 function buysIt(deps: PlanDeps, ask: PlanAsk, line: Line): boolean {
-  if (ask.opened?.has(line.key) === true) return false
   return ask.paid?.(line.key) === true || soldByMerchant(deps.guides, line.ingredient, line.guide?.source)
 }
 
@@ -232,14 +228,12 @@ function buysIt(deps: PlanDeps, ask: PlanAsk, line: Line): boolean {
 function openOf(deps: PlanDeps, ask: PlanAsk, line: Line, trail: readonly string[]): Opened {
   const all = line.linked ? (deps.index.byItem.get(line.key) ?? NO_RECIPES) : NO_RECIPES
   if (all.length === 0) return LEAF
-  const shut = (closed: ClosedWhy, makeable: BookRecipe | null = null): Opened => ({ recipes: all.length, made: null, closed, makeable })
+  const shut = (closed: ClosedWhy): Opened => ({ recipes: all.length, made: null, closed, bought: false })
   if (trail.includes(line.key)) return shut('loop')
   if (subRecipes(deps.index, line.key, trail).length === 0) return shut('depth')
   const first = itemRecipes(deps, line.key).find((r) => hasMaterials(deps, r))
   if (first === undefined) return shut('unlisted')
-  if (ask.closed?.has(line.key) === true) return shut('reader', first)
-  if (buysIt(deps, ask, line)) return shut('bought', first)
-  return { recipes: all.length, made: build(deps, ask, first, [...trail, line.key]), closed: null, makeable: null }
+  return { recipes: all.length, made: build(deps, ask, first, [...trail, line.key]), closed: null, bought: buysIt(deps, ask, line) }
 }
 
 function build(deps: PlanDeps, ask: PlanAsk, recipe: BookRecipe, trail: readonly string[]): PlanRecipe {
@@ -254,12 +248,12 @@ export function planTree(deps: PlanDeps, recipe: BookRecipe, ask: PlanAsk = {}):
   return build(deps, ask, recipe, [recipe.key])
 }
 
-/** Every recipe in the tree, the root's first, each once. */
+/** Every recipe the plan has the player combine, the root's first, each once: a bought material's is not one. */
 export function treeRecipes(root: PlanRecipe): BookRecipe[] {
   const out = new Map<string, BookRecipe>()
   const walk = (plan: PlanRecipe): void => {
     if (!out.has(plan.recipe.id)) out.set(plan.recipe.id, plan.recipe)
-    for (const node of plan.materials) if (node.made !== null) walk(node.made)
+    for (const node of plan.materials) if (node.made !== null && !node.bought) walk(node.made)
   }
   walk(root)
   return [...out.values()]
@@ -310,9 +304,7 @@ export function madeWithText(node: PlanNode): string {
 }
 
 const CLOSED_TEXT: Record<ClosedWhy, string> = {
-  bought: 'Can be bought, so the plan does not make it.',
-  reader: 'You chose to get this one instead of making it.',
-  loop: 'Also made by a recipe, which is already open above.',
+  loop:'Also made by a recipe, which is already open above.',
   depth: 'Also made by a recipe. It is not opened this deep: plan that item on its own.',
   unlisted: 'Also made by a recipe, but neither the wiki nor the guide lists its materials.'
 }

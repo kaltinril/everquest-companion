@@ -144,7 +144,7 @@ function noteMade(t: Tally, node: PlanNode, made: PlanRecipe, qty: number): void
 function walk(t: Tally, plan: PlanRecipe, combines: number): void {
   for (const node of plan.materials) {
     const qty = wanted(node, combines)
-    if (node.made === null) noteLeaf(t, node, qty)
+    if (node.made === null || node.bought) noteLeaf(t, node, qty)
     else noteMade(t, node, node.made, qty)
   }
 }
