@@ -52,6 +52,8 @@ export interface WishedAsk {
   rows: readonly SkillRow[]
   /** Null when nothing says what is held (no inventory dump, no depot line). */
   have: PlanHave | null
+  /** The player's log shows a purchase of this item: the plan then buys it rather than makes it. */
+  paid?: (key: string) => boolean
 }
 
 function coverage(gather: Gather, known: boolean): Pick<WishedCraft, 'materials' | 'covered' | 'missing'> {
@@ -63,7 +65,7 @@ function coverage(gather: Gather, known: boolean): Pick<WishedCraft, 'materials'
 
 function wishedCraft(ask: WishedAsk, key: string, recipes: readonly BookRecipe[], recipe: BookRecipe): WishedCraft {
   const have: PlanHave = ask.have ?? (() => null)
-  const gather = gatherFor(planTree(ask.deps, recipe), { count: 1, have, price: () => null })
+  const gather = gatherFor(planTree(ask.deps, recipe, { paid: ask.paid }), { count: 1, have, price: () => null })
   return {
     key,
     recipe,
