@@ -314,7 +314,7 @@ fn bind_pet_claim(st: &mut EngineState, name: &str, ts: i64, via: &str) {
     // first-person and ownership-definitive; an ally bind rests on a broadcast, which is weaker by
     // construction, so this override needs no tie-break.
     let guess = st.ally.release(&key);
-    st.ally.clear_own_summon();
+    st.ally.watch.clear_own();
     let promote = st.world.pet_instance(name).is_none() && st.charm.claim_is_charmed(&key, ts);
     let inst = if promote {
         st.world.charm(name, ts)
@@ -930,9 +930,9 @@ fn ingest_cast(st: &mut EngineState, ev: &Event) -> bool {
                 }
             }
             // Replayed or live: while a summon of YOURS has no pet to its name, a new pet name
-            // may be yours, so none is guessed for a group mate (`ally.rs infer_summon_owner`).
+            // may be yours, so none is guessed for a group mate (`ally_summon.rs`).
             if ev.str(Key::Spell).is_some_and(is_pet_summon_spell) {
-                st.ally.note_own_summon(ev.ts());
+                st.ally.watch.note_own(ev.ts());
             }
             true
         }
@@ -949,7 +949,7 @@ fn ingest_cast(st: &mut EngineState, ev: &Event) -> bool {
                     // A fizzle summoned nothing. An interrupt can still recover, so it is left
                     // waiting: the side that guesses less.
                     if ev.kind_of() == Kind::CastFizzle {
-                        st.ally.clear_own_summon();
+                        st.ally.watch.clear_own();
                     }
                 }
             }

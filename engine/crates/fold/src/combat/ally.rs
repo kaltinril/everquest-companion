@@ -27,10 +27,11 @@
 //! something the group is fighting. No line names the pet a summon makes, so this is a guess and
 //! the row says so. It is made only when exactly ONE summon is waiting (two group mates, or a
 //! group mate and you, summoning inside the same window leaves the pet unowned), and any leader
-//! line or claim replaces it.
+//! line or claim replaces it. That rule lives in `ally_summon.rs`.
 //!
 //! Pure + clock-injected, like `charm.rs`.
 
+use crate::combat::ally_summon::SummonWatch;
 use crate::combat::spellfacts::{
     arm_window_ms, is_charm_broadcast_spell, is_pet_summon_spell, is_player_shaped_name,
     provisional_window_ms, DEFAULT_CHARM_DURATION_MS, DURATION_SLACK_MS,
@@ -55,16 +56,10 @@ pub enum AllyVia {
     Summon,
 }
 
-/// How long after a group mate's `begins casting <a pet summon>` a first-seen pet name may still
-/// be that summon's pet. A pet is summoned at camp and may not swing until the next pull.
-pub const SUMMON_INFER_WINDOW_MS: i64 = 10 * 60_000;
-/// A pet cannot act before its summon has finished casting. The shortest summon is longer.
-pub const SUMMON_INFER_MIN_MS: i64 = 2_000;
-
 /// `Number.POSITIVE_INFINITY` as a log clock can hold it — a `Summon` bind has no clock at all.
 /// Every arithmetic site below saturates rather than wrapping, which is what makes
 /// `note_activity`'s `ts + window_ms` the no-op the TS gets for free.
-const NO_CLOCK: i64 = i64::MAX;
+pub(super) const NO_CLOCK: i64 = i64::MAX;
 
 /// One live third-party charm bind.
 #[derive(Debug, Clone)]
@@ -161,12 +156,12 @@ pub struct AllyCharms {
     /// broadcasts look like the last caster's.
     arms: JsMap<AllyArm>,
     /// nameKey → the live bind. Insertion-ordered because `bound_names` and `sweep` publish it.
-    binds: JsMap<AllyBind>,
+    pub(super) binds: JsMap<AllyBind>,
     /// Player-shaped names seen casting (any spell) plus every charmer this model has bound for.
     /// For the soft-hostile proof and nothing else — never attribution, never merged into
     /// `known_players`. Its job is to stop a stranger's DPS being inflated with the damage their
     /// ex-pet is doing to their own group.
-    friendlies: HashSet<String>,
+    pub(super) friendlies: HashSet<String>,
     /// casterKey → ts this ally was last seen casting a pet summon. The weaker half of the lifecycle
     /// question on purpose: no summon line names the pet it makes, so it can say "this ally has a
     /// summoned pet", never "this is it".
@@ -174,15 +169,8 @@ pub struct AllyCharms {
     /// Survives a zone, like `friendlies` and unlike the binds: a summoned pet walks through the
     /// door with its owner.
     summons: HashMap<String, i64>,
-    /// casterKey → (display, ts) of a GROUP MATE's pet summon no pet has been tied to yet. Spent by
-    /// the bind it explains, by that owner's leader line, and by `SUMMON_INFER_WINDOW_MS`.
-    waiting: JsMap<(String, i64)>,
-    /// When YOU last began a pet summon no claim has answered. Your pet names you sooner or later;
-    /// until it does, a new pet name may be yours, so nothing is guessed for a group mate.
-    own_waiting: Option<i64>,
-    /// petKey → when a summoned-pet name first acted with no bind. A name already fighting before
-    /// a summon was cast is not that summon's pet.
-    first_unbound: HashMap<String, i64>,
+    /// The summons no pet has been tied to yet (`ally_summon.rs`).
+    pub watch: SummonWatch,
 }
 
 impl AllyCharms {
@@ -195,9 +183,7 @@ impl AllyCharms {
         self.binds.clear();
         self.friendlies.clear();
         self.summons.clear();
-        self.waiting.clear();
-        self.own_waiting = None;
-        self.first_unbound.clear();
+        self.watch.reset();
     }
 
     /// `<Name> begins casting <Spell>.` — remember a player-shaped caster, and arm the join when the
@@ -212,8 +198,7 @@ impl AllyCharms {
         if is_pet_summon_spell(c.spell) {
             self.summons.insert(c.caster_key.to_string(), c.ts);
             if c.member {
-                self.waiting
-                    .insert(c.caster_key.to_string(), (c.caster.to_string(), c.ts));
+                self.watch.note_group_summon(c.caster_key, c.caster, c.ts);
             }
         }
         if !is_charm_broadcast_spell(c.spell) {
@@ -339,90 +324,8 @@ impl AllyCharms {
         self.binds.insert(l.pet_key.to_string(), bind.clone());
         self.friendlies.insert(l.owner_key.to_string());
         // The owner's pet has a name now: their summon is explained.
-        self.waiting.remove(l.owner_key);
-        self.first_unbound.remove(l.pet_key);
+        self.watch.explained(l.owner_key, l.pet_key);
         bind
-    }
-
-    /// A summoned-pet name acted with no bind, whatever it swung at. The first such moment is kept:
-    /// a pet seen fighting elsewhere before a summon was cast is not that summon's pet.
-    pub fn note_unbound_pet(&mut self, pet_key: &str, ts: i64) -> i64 {
-        *self.first_unbound.entry(pet_key.to_string()).or_insert(ts)
-    }
-
-    /// `You begin casting <a pet summon>.`
-    pub fn note_own_summon(&mut self, ts: i64) {
-        self.own_waiting = Some(ts);
-    }
-
-    /// Your summon failed, or a pet has named you: nothing of yours is waiting for a name.
-    pub fn clear_own_summon(&mut self) {
-        self.own_waiting = None;
-    }
-
-    /// A summoned-pet name acted with no bind, against something the group is fighting. Whose is
-    /// it? `Some` when exactly one group mate's summon is waiting and the name first acted after
-    /// that cast; the bind is made here. `still_member` is asked of each waiting caster, because a
-    /// group mate who left is no longer guessed for.
-    pub fn infer_summon_owner(
-        &mut self,
-        pet_key: &str,
-        pet: &str,
-        ts: i64,
-        still_member: impl Fn(&str) -> bool,
-    ) -> Option<AllyBind> {
-        if self.binds.contains_key(pet_key) {
-            return None;
-        }
-        let first = self.note_unbound_pet(pet_key, ts);
-        let floor = ts.saturating_sub(SUMMON_INFER_WINDOW_MS);
-        let stale: Vec<String> = (self.waiting.iter())
-            .filter(|(k, (_, at))| *at < floor || !still_member(k))
-            .map(|(k, _)| k.to_string())
-            .collect();
-        for k in stale {
-            self.waiting.remove(&k);
-        }
-        if self.own_waiting.is_some_and(|at| at < floor) {
-            self.own_waiting = None;
-        }
-        if self.own_waiting.is_some() || self.waiting.len() != 1 {
-            return None;
-        }
-        let (owner_key, (owner, cast_ts)) = {
-            let (k, v) = self.waiting.iter().next().expect("one");
-            (k.to_string(), v.clone())
-        };
-        // Already acting before the cast could have finished: somebody else's pet.
-        if first < cast_ts.saturating_add(SUMMON_INFER_MIN_MS) {
-            return None;
-        }
-        self.waiting.remove(&owner_key);
-        self.first_unbound.remove(pet_key);
-        // One pet at a time: an earlier guess for this owner is over.
-        let old: Vec<String> = (self.binds.values())
-            .filter(|b| b.via == AllyVia::Summon && b.charmer_key == owner_key)
-            .map(|b| b.name_key.clone())
-            .collect();
-        for k in old {
-            self.binds.remove(&k);
-        }
-        let bind = AllyBind {
-            name_key: pet_key.to_string(),
-            display: pet.to_string(),
-            charmer_key: owner_key.clone(),
-            charmer: owner,
-            bound_ts: ts,
-            hold_until: NO_CLOCK,
-            window_ms: NO_CLOCK,
-            ambiguous: false,
-            via: AllyVia::Summon,
-            kind: AllyKind::Summon,
-            defaulted: false,
-        };
-        self.binds.insert(pet_key.to_string(), bind.clone());
-        self.friendlies.insert(owner_key);
-        Some(bind)
     }
 
     /// What kind of creature a leader say is about — three rungs, strongest first.
@@ -497,8 +400,7 @@ impl AllyCharms {
     /// The soft-hostile proof does not come through here: it is the one ending that depends on which
     /// creature this is.
     pub fn release(&mut self, name_key: &str) -> Option<AllyBind> {
-        // The next pet with this name is a new one.
-        self.first_unbound.remove(name_key);
+        self.watch.forget_pet(name_key);
         let b = self.binds.get(name_key).cloned();
         if b.is_some() {
             self.binds.remove(name_key);

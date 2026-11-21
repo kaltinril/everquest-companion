@@ -1138,7 +1138,7 @@ fn infer_summoned_pet(st: &mut EngineState, attacker: &str, target: &str, ts: i6
         return;
     }
     // Stamped whatever it swung at: a pet seen before the cast is nobody's new pet.
-    st.ally.note_unbound_pet(&key, ts);
+    st.ally.watch.note_unbound(&key, ts);
     if !st.is_engaged_hostile(&id_key_ref(target)) {
         return;
     }

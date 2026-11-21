@@ -345,8 +345,8 @@ where one exists.
     unknown` (kind still `other`, id still `member:<key>`), unless the roster lists the name.
   - Kind `other` is hidden by the Group scope, so an unclaimed pet shows under Everyone only until
     it is tied to a group member. NOT reviewed yet: ending your own claim on a name (rule 4).
-- Pet rules, batch 2 (2026-11-20): the owner guessed from a group mate's summon. `ally.rs`
-  `infer_summon_owner` makes an `AllyVia::Summon` bind (kind `Summon`, no clock, no break rule);
+- Pet rules, batch 2 (2026-11-20): the owner guessed from a group mate's summon.
+  `ally_summon.rs` (`SummonWatch`, `AllyCharms::infer_summon_owner`) makes an `AllyVia::Summon` bind (kind `Summon`, no clock, no break rule);
   `routing.rs infer_summoned_pet` asks it on every `Attribution::Ignore` damage and miss line,
   BEFORE `route_other_*`, so the line that makes the bind is credited by it. State: `waiting`
   (group mates' unanswered summons, 10 minutes), `own_waiting` (yours; blocks every guess),
