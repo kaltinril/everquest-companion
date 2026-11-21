@@ -23,7 +23,7 @@
  * tabs' own reason, one step stronger: it is a fixed band, so inside the scroller it would slide
  * away under a long table and eat the height every `height: 100%` is measured against. In the
  * COLUMN rather than full-width under the title bar because the nav drawer is the one thing that
- * must stay whole while the app cannot answer — Preferences and "Send feedback" live in it — and
+ * must stay whole while the app cannot answer — Preferences and "Open GitHub issue" live in it — and
  * because both states are statements about the CONTENT area, which is the part that is empty. It
  * renders nothing at all in every phase but those two, so it costs no layout for the rest of a
  * session.
@@ -48,13 +48,10 @@ import { RenderProfiler } from '../lib/renderMeter'
 export default function MainColumn({
   view,
   onSelect,
-  onReport,
   children
 }: {
   view: View
   onSelect: (v: View) => void
-  /** `useFeedbackDialog().openFeedback`, for the failure card's "Report this". */
-  onReport: (prefill: { readonly type: 'bug'; readonly description: string }) => void
   children: JSX.Element
 }): JSX.Element {
   return (
@@ -62,7 +59,7 @@ export default function MainColumn({
       component="main"
       sx={{ flexGrow: 1, minWidth: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
     >
-      <EngineLaunchBanner onReport={onReport} />
+      <EngineLaunchBanner />
       {/* AT MOST ONE BAR IS EVER UP: the areas are disjoint sets of views and exactly one view is
           mounted, so these two tests cannot both pass. Written as two independent lines rather than
           a lookup because that is what a third area should also be - one line, obvious to add. */}
