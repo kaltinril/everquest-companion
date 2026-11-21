@@ -10,6 +10,7 @@ import type { SlotDiff } from '@shared/macros/sets'
 import type { CharacterFileMacros } from '@shared/macros/types'
 import { unsavable } from '@shared/macros/unsavable'
 import { Tooltip } from '../../lib/Tooltip'
+import { GameNow } from './GameNow'
 import { MARK_COLOR, MONO_SX, Quiet } from './macroParts'
 import type { GameFilesState } from './useGameFiles'
 import type { GameWriter } from './useGameWriter'
@@ -285,6 +286,7 @@ export function GameBar({ file, changes, writer, game }: BarProps): JSX.Element 
               </Button>
             </span>
           </Tooltip>
+          <GameNow file={file} />
           <Backups file={file} writer={writer} />
         </Stack>
       </Paper>
