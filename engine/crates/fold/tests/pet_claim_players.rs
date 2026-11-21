@@ -229,3 +229,35 @@ fn your_pets_swings_before_its_claim_move_to_its_row() {
         "{rows:?}"
     );
 }
+
+/// Owner, 2026-11-19: four pets were listed as members of his group (Jasekab, Gebarn, Genober,
+/// Xekn), each admitted because a buff burst landed on it. A name from the game's pet-name table
+/// is not guessed into the group; the player in the same burst still is.
+#[test]
+fn a_burst_admits_the_player_and_not_the_pet_beside_them() {
+    let snap = fold_with_roster(&BURST);
+    let members: Vec<&str> = snap["roster"]["members"]
+        .as_array()
+        .expect("members")
+        .iter()
+        .map(|m| m["name"].as_str().unwrap())
+        .collect();
+    assert_eq!(members, ["Malkil"], "{}", snap["roster"]);
+}
+
+/// The pet's damage is not lost by keeping it out of the group: before its leader line it is
+/// somebody's row, and the leader line moves all of it to its owner's pet row.
+#[test]
+fn a_pet_kept_out_of_the_group_still_has_its_damage_counted() {
+    let mut lines = BURST.to_vec();
+    lines.push("[Sat Oct 10 18:13:50 2026] Jeber bites a gnoll for 50 points of damage.");
+    let before = rows(&fold_with_roster(&lines));
+    assert!(
+        before.iter().any(|r| r.1.contains("Jeber") && r.2 == 50),
+        "{before:?}"
+    );
+    assert!(
+        !before.iter().any(|r| r.0 == "member" && r.1 == "Jeber"),
+        "a pet is not a group member: {before:?}"
+    );
+}
