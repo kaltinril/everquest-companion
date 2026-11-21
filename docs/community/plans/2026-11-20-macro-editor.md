@@ -138,8 +138,10 @@ Opened 2026-11-20. Requirements: `../requirements/macro-editor.md`. Status at th
   on screen and never run against a real game folder.**
   - A send: the name must be a character file of the folder's own listing; macros that cannot be
     written faithfully block it (a character above U+00FF, a control character, an empty name, a
-    slot off the grid); refused while `eqgame.exe` is in `tasklist`, and when the list cannot be
-    trusted (it must hold the app's own pid); refused when the file's sha256 is not the one the
+    slot off the grid); refused while a game client runs, asked once on the click through the app's own in-process
+    scan (`presenceNative.ts` `eqRunning`, on a one-shot worker thread; no process is started:
+    `tests/noChildProcess.test.mts` forbids one, and a first cut that ran `tasklist` was caught by
+    it), and refused when the scan cannot tell; refused when the file's sha256 is not the one the
     screen read; the copy is made and read back; temp file + flush + rename; read back and checked
     (the macros parse as sent, every byte outside `[Socials]` unchanged), put back from the copy
     when wrong.
@@ -147,8 +149,10 @@ Opened 2026-11-20. Requirements: `../requirements/macro-editor.md`. Status at th
     and written as latin1, in its own line ending.
   - A restore puts the WHOLE file back (hotbars too) and first keeps the current file as the last
     copy, so it can be undone. The original copy is never removed.
-  - Known edges: a renamed game client is not seen; the game could start between the check and the
-    rename; a refused send can leave an extra last copy until the next good one; a crash between
+  - Known edges: any program running from the game folder counts as the game, the launcher
+    included; a client the scan may not inspect (another Windows user's) is not seen; the game
+    could start between the check and the rename; the worker thread has run under Node in a test
+    and in no Electron build yet; a refused send can leave an extra last copy until the next good one; a crash between
     copy and rename can leave `<file>.companion-write.tmp`, removed by the next send.
   - Not built: hotbar links (P3). A set that moves a macro may leave a hotbar button pointing at
     the wrong slot; in-game test 3 decides what to do.
