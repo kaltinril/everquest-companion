@@ -7,7 +7,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import type { ActiveBuff } from '../src/shared/buffTypes'
-import { estimateState, estimateText, fmtPrecise, leftCaption, statCells } from '../src/renderer/src/features/buffs/format'
+import { estimateState, estimateText, fmtElapsed, fmtPrecise, leftCaption, statCells } from '../src/renderer/src/features/buffs/format'
 
 function buff(over: Partial<ActiveBuff>): ActiveBuff {
   return { spell: 'Swift Like the Wind', cls: 'buff', self: true, startedTs: 0, estimatedMs: null, p25: null, p75: null, n: 0, ...over }
@@ -101,4 +101,10 @@ test('a card`s elapsed caption is one line that a long spell name cannot squeeze
   assert.ok(at > 0, 'the elapsed caption lost its handle')
   const tag = src.slice(src.lastIndexOf('<Typography', at), src.indexOf('>', at))
   assert.ok(tag.includes("whiteSpace: 'nowrap'") && tag.includes('flexShrink: 0'), tag)
+})
+
+test('a card that has just landed reads 0s elapsed, never a dash', () => {
+  assert.equal(fmtElapsed(0), '0s')
+  assert.equal(fmtElapsed(400), '0s')
+  assert.equal(fmtElapsed(8_000), '8s')
 })

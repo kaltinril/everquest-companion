@@ -233,7 +233,13 @@ export default function VoidMotePanel({ compare, indexReady, indexRefused, class
           Void motes
         </Typography>
         {/* The week's answer first; the list under it is the working. */}
-        <Typography variant="body2" data-testid="gear-motes-plan" title={HINT} noWrap sx={{ flex: '1 1 0', minWidth: 160 }}>
+        <Typography
+          variant="body2"
+          data-testid="gear-motes-plan"
+          title={list.length === 0 ? HINT : `${motePlanLine(plan)}. ${HINT}`}
+          noWrap
+          sx={{ flex: '1 1 0', minWidth: 160 }}
+        >
           {list.length === 0 ? 'One lifts a worn item a full tier' : motePlanLine(plan)}
         </Typography>
         <MoteControls motes={motes} setMotes={setMotes} />

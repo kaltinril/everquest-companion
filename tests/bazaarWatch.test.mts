@@ -9,6 +9,7 @@ import {
   freshWatchAlerts,
   normalizeBazaarWatchlist,
   removeWatch,
+  sharePercent,
   setWatch,
   watchAlertCaptures,
   watchAlertReason,
@@ -336,4 +337,12 @@ test('the watch chip names every threshold that can alert: a price and a share o
   assert.equal(watchChipLabel(watch({ ...q, wtb: true })), 'Watch: WTB')
   // A side that is off is not named, whatever thresholds it still holds.
   assert.equal(watchChipLabel(watch({ ...q, wtsMax: 12500, wtsShare: 0.8 })), 'Watch')
+})
+
+test('a typed share of the median reads as typed, in the field and on the chip', () => {
+  assert.equal(sharePercent(0.125), 12.5)
+  assert.equal(sharePercent(0.8), 80)
+  assert.equal(sharePercent(0.07), 7)
+  const w = { item: 'Fleeting Quiver', tier: 4, wts: true, wtb: false, wtsMax: null, wtsShare: 0.125, wtbMin: null }
+  assert.equal(watchChipLabel(w), 'Watch: WTS ≤ 12.5% median')
 })

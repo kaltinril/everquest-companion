@@ -5,7 +5,7 @@
 
 import { type JSX, useEffect, useState } from 'react'
 import { Checkbox, FormControlLabel, Stack, Switch, TextField, Typography } from '@mui/material'
-import { findWatch, watchOnItem } from '@shared/bazaarWatch'
+import { findWatch, sharePercent, watchOnItem } from '@shared/bazaarWatch'
 import { formatPlatExact, platFieldCommit, type BazaarItem } from '@shared/bazaar'
 import { useBazaarWatch } from './useBazaarWatch'
 
@@ -80,7 +80,7 @@ export default function BazaarWatchPanel({ item }: { item: BazaarItem }): JSX.El
                   label="or under % of 7-day median"
                   placeholder="e.g. 80"
                   type="number"
-                  value={w.wtsShare === null ? '' : Math.round(w.wtsShare * 100)}
+                  value={w.wtsShare === null ? '' : sharePercent(w.wtsShare)}
                   onChange={(ev) => {
                     const pct = Number(ev.target.value)
                     put({ ...w, wtsShare: ev.target.value === '' || !(pct > 0) ? null : Math.min(pct, 100) / 100 })

@@ -16,6 +16,11 @@ export function fmtDuration(ms: number | null | undefined): string {
   return `${hr}h ${min.toString().padStart(2, '0')}m`
 }
 
+/** The card's elapsed time. Zero is a real reading here: the buff has just landed. */
+export function fmtElapsed(ms: number): string {
+  return ms > 0 ? fmtDuration(ms) : '0s'
+}
+
 /** A duration with tenths under a minute (`7.5s`) — these spells are short and 7.5 is not 8. */
 export function fmtPrecise(ms: number | null | undefined): string {
   if (ms == null || ms <= 0 || ms >= 60_000) return fmtDuration(ms)

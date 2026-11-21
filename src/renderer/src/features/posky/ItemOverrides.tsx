@@ -21,7 +21,7 @@
 // there is no floating layer to land on the toolbar's dropdowns. Every sentence rides a native
 // `title`, which is an OS tooltip with no hit area at all.
 
-import { type JSX, type ReactNode, useState } from 'react'
+import { type JSX, type ReactNode, useRef, useState } from 'react'
 import { Box, Chip, IconButton, Stack, TextField, Typography } from '@mui/material'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
@@ -194,6 +194,14 @@ export function HandCountCell({
   const [editing, setEditing] = useState(false)
   const [text, setText] = useState('')
   const [problem, setProblem] = useState<string | null>(null)
+  // The box is gone when it closes, and the keyboard with it: the pencil takes the focus back, so a
+  // keyboard user does not restart from the top of the page. A row the count took off the list
+  // has no pencil left to focus.
+  const refocus = useRef(false)
+  const close = (): void => {
+    refocus.current = true
+    setEditing(false)
+  }
   const commit = (): void => {
     // A count the box cannot take keeps the box open and says why. Blank is a changed mind.
     const why = handCountProblem(text)
@@ -201,7 +209,7 @@ export function HandCountCell({
     if (why !== null) return
     const n = parseHandCount(text)
     if (n !== null) onSetItemCount?.(name, n)
-    setEditing(false)
+    close()
   }
   if (editing && onSetItemCount) {
     return (
@@ -213,7 +221,7 @@ export function HandCountCell({
           setProblem(null)
         }}
         onCommit={commit}
-        onCancel={() => setEditing(false)}
+        onCancel={close}
       />
     )
   }
@@ -225,6 +233,11 @@ export function HandCountCell({
       )}
       {onSetItemCount && (
         <IconButton
+          ref={(el: HTMLButtonElement | null) => {
+            if (el === null || !refocus.current) return
+            refocus.current = false
+            el.focus()
+          }}
           size="small"
           data-testid="posky-item-count-edit"
           title="Set how many you hold when the log and export are wrong."
