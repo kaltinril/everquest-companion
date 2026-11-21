@@ -510,5 +510,6 @@ test("COMMITTED DATA: Fleeting Quiver takes the wiki's five materials, and Aviak
   assert.equal(need['Griffon Feathers'], 2)
   assert.equal(need['Aviak Eggs'], 2)
   assert.equal(need['Vial of Distilled Mana'], 2)
+  assert.equal(need['Water Flask'], 2)
   assert.equal(gather.total, null, 'no price is known, so no total is stated')
 })

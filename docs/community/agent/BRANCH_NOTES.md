@@ -2607,6 +2607,17 @@ only: no engine, parser, protocol, network or dependency change.
   says "No wiki item has this exact name": true for a missing page (Woven Mandrake) and for a
   guide's shorthand (Platinum ruby), so it never claims the wiki lacks a page.
 
+### The plan buys first, folds, and keeps its columns (2026-11-20, branch `plan-buy-first`)
+
+- `planTree` shuts a material with a recipe as `closed: 'bought'` when the wiki's words, a guide's
+  merchant (`soldByMerchant`) or the log (`PlanAsk.paid`) say it can be bought. `PlanAsk.opened` /
+  `PlanMemory.opened` is the reader's "Make it instead". Pass `paid` wherever a tree is built for
+  the player, or Home's "Working towards" count and the plan disagree.
+- Unfolded made materials are `PlanMemory.expanded`, by item key, so they survive a Back from a
+  link out. A new item starts folded. "What to gather" reads the tree, not what is unfolded.
+- `materialGrid.ts` is the one material table. Nesting goes in `nameCell(depth)` only; do not wrap
+  nested rows in a margin, which is what pushed Need and Have out of line.
+
 ## Tradeskill guides as data (fork #6, requirements/skills-tab.md)
 
 - Two community guides are pulled at release time by `scripts/community/guides-pull.mts` and
