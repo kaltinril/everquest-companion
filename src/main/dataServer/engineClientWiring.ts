@@ -27,7 +27,7 @@ import { takeOwnFire } from './ownFires'
 import { conCardServeLine, noteConCardServe, openEngineConCard } from './conCardServe'
 import { noteFoldProgress } from './engineLaunchState'
 import { onKnowledgeMiss } from './knowledgeMissFetch'
-import { noteLogReadTouched, noteReplySize } from './logReadState'
+import { noteEngineHeard, noteLogReadTouched, noteReplySize } from './logReadState'
 import { replySizes, sizedReply } from './replySizes'
 import { pushModuleChanged } from './serveDeltas'
 import { noteMirrorChanged } from './serveMirrors'
@@ -122,6 +122,8 @@ export function wireEngineClient(client: EngineClient, host: WiringHost): void {
   // test. A live-tail frame is dropped by `noteFoldProgress` itself — see its header.
   client.onProgress((progress) => {
     if (!host.current()) return
+    // Proof of life for the watchdog: the engine is talking on this connection (logReadState.ts).
+    noteEngineHeard(Date.now())
     // THE DENOMINATOR, KEPT (JOS-518) — see `engineClientHost.ts lastFoldLogSize`. Taken from every
     // frame including a live-tail one, because what it states is how big the engine believes the
     // FILE to be, which is true of the log whichever loop measured it; the banner's own live-frame
@@ -173,6 +175,9 @@ export function wireEngineClient(client: EngineClient, host: WiringHost): void {
   //     asked here of the one function that owns it.
   client.onModuleChanged((changed) => {
     if (!host.current()) return
+    // Proof of life, taken before the servable check: a frame the windows may not use yet still
+    // says the engine is running.
+    noteEngineHeard(Date.now())
     if (!host.servable()) return
     pushModuleChanged(changed.module, changed.seq)
     // …and main's own synchronous readers, which ride the same cursor for the same reason the

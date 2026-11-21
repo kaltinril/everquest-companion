@@ -16,7 +16,15 @@ import { FakeChild, connectError, fakeClock, scriptedChannel, type ChannelBehavi
 
 /** Everything one supervisor-under-test is wired to, and everything it said. */
 export function harness(
-  opts: { binary?: string | null; behaviour?: ChannelBehaviour; spawnThrows?: Error; deaf?: boolean } = {}
+  opts: {
+    binary?: string | null
+    behaviour?: ChannelBehaviour
+    spawnThrows?: Error
+    deaf?: boolean
+    /** PROOF OF LIFE (supervisorHealth.ts): when the app's own connection last heard the engine,
+     *  and whether the log is live. Absent, the watchdog is the two-strike rule alone. */
+    proof?: { heardAt: () => number | null; live: () => boolean }
+  } = {}
 ) {
   const clock = fakeClock()
   const children: FakeChild[] = []
@@ -76,6 +84,7 @@ export function harness(
     onFault: (fault) => faults.push(fault),
     onServedExit: () => servedExits.push(clock.now()),
     ...(opts.deaf === true ? {} : { onEngineSaid: (line: string) => said.push(line) }),
+    ...(opts.proof === undefined ? {} : { engineHeardAt: opts.proof.heardAt, engineIsLive: opts.proof.live }),
     powerEvents: (handlers) => (power = handlers)
   }
   return {
