@@ -48,8 +48,8 @@ interface Fixture {
   root: string
   folder: string
   deps: GameFileDeps
-  /** Set the clock the copies are dated with. */
-  at: (...ymdhms: [number, number, number, number, number, number]) => void
+  /** Set the clock the copies are dated with: local time, as `2026-11-20T14:30:15`. */
+  at: (when: string) => void
   bytes: (name: string) => Buffer
   stamp: () => string
   send: (macros: GameMacro[], extra?: Partial<GameFileDeps>) => Promise<GameWriteResult>
@@ -72,8 +72,8 @@ function fixture(t: TestContext, text = FIRST_TEXT): Fixture {
     root,
     folder,
     deps,
-    at: (y, mo, d, h, mi, s) => {
-      clock = new Date(y, mo - 1, d, h, mi, s)
+    at: (when) => {
+      clock = new Date(when)
     },
     bytes,
     stamp,
@@ -125,14 +125,14 @@ test('second send makes a last copy; the third replaces it; the original stays t
   await f.send(SET_A)
   const afterFirst = f.bytes(INI)
 
-  f.at(2026, 11, 20, 14, 30, 15)
+  f.at('2026-11-20T14:30:15')
   assert.deepEqual(await f.send(SET_B), { ok: true, backup: LAST_1, removed: [] })
   assert.deepEqual(copies(f.folder), [LAST_1, ORIGINAL])
   assert.equal(f.bytes(LAST_1).equals(afterFirst), true)
   const afterSecond = f.bytes(INI)
   assert.deepEqual(parseSocials(afterSecond.toString('latin1')), SET_B)
 
-  f.at(2026, 11, 21, 8, 0, 0)
+  f.at('2026-11-21T08:00:00')
   assert.deepEqual(await f.send([]), { ok: true, backup: LAST_2, removed: [LAST_1] })
   assert.deepEqual(copies(f.folder), [LAST_2, ORIGINAL])
   assert.equal(f.bytes(LAST_2).equals(afterSecond), true)
@@ -223,7 +223,7 @@ test('no copy, no write: a copy that cannot be made or read back stops the send'
 
   // Two sends inside one second: the second last copy's name is taken, so it is refused.
   await failing.send(SET_A)
-  failing.at(2026, 11, 20, 14, 30, 15)
+  failing.at('2026-11-20T14:30:15')
   await failing.send(SET_B)
   const twice = snapshot(failing.root)
   assert.deepEqual(await failing.send(SET_A), { ok: false, reason: 'backup-failed' })
@@ -240,7 +240,7 @@ test('a write that fails leaves the file as it was and no scratch file', async (
   assert.equal(f.bytes(ORIGINAL).equals(first), true)
   rmSync(scratchPathFor(join(f.folder, INI)), { recursive: true })
 
-  f.at(2026, 11, 20, 14, 30, 15)
+  f.at('2026-11-20T14:30:15')
   assert.deepEqual(await f.send(SET_A), { ok: true, backup: LAST_1, removed: [] })
   assert.equal(readdirSync(f.folder).some((name) => name.endsWith('.tmp')), false)
 })
@@ -279,7 +279,7 @@ test('a write that does not read back right is put back from the copy', async (t
   let tries = 0
   const stuck: GameFileIo = {
     ...nodeGameFileIo,
-    replace: (path, bytes) => (++tries === 1 ? nodeGameFileIo.replace(path, Buffer.from('torn')) : Promise.reject(new Error('EPERM')))
+    replace: (path) => (++tries === 1 ? nodeGameFileIo.replace(path, Buffer.from('torn')) : Promise.reject(new Error('EPERM')))
   }
   assert.deepEqual(await g.send(SET_A, { io: stuck }), { ok: false, reason: 'verify-failed', putBack: false, backup: ORIGINAL })
   assert.equal(g.bytes(ORIGINAL).equals(good), true)
@@ -288,9 +288,9 @@ test('a write that does not read back right is put back from the copy', async (t
 test('an older copy that will not delete is a note, not a failed send', async (t) => {
   const f = fixture(t)
   await f.send(SET_A)
-  f.at(2026, 11, 20, 14, 30, 15)
+  f.at('2026-11-20T14:30:15')
   await f.send(SET_B)
-  f.at(2026, 11, 21, 8, 0, 0)
+  f.at('2026-11-21T08:00:00')
   const locked: GameFileIo = { ...nodeGameFileIo, remove: () => Promise.reject(new Error('EBUSY')) }
   assert.deepEqual(await f.send(SET_A, { io: locked }), { ok: true, backup: LAST_2, removed: [], note: `An older copy could not be removed: ${LAST_1}` })
   assert.deepEqual(copies(f.folder), [LAST_1, LAST_2, ORIGINAL])
@@ -301,7 +301,7 @@ test('restore the original: the whole first file is back, and the restore can be
   const f = fixture(t)
   const first = f.bytes(INI)
   await f.send(SET_A)
-  f.at(2026, 11, 20, 14, 30, 15)
+  f.at('2026-11-20T14:30:15')
   // A change outside the section, as the game would make: a restore puts the whole file back.
   writeFileSync(join(f.folder, INI), Buffer.from(TEXT_A.replace('E13', 'E14'), 'latin1'))
   const edited = f.bytes(INI)
@@ -311,7 +311,7 @@ test('restore the original: the whole first file is back, and the restore can be
   assert.equal(f.bytes(LAST_1).equals(edited), true)
   assert.equal(f.bytes(ORIGINAL).equals(first), true)
 
-  f.at(2026, 11, 21, 8, 0, 0)
+  f.at('2026-11-21T08:00:00')
   assert.deepEqual(await restoreBackup({ folder: f.folder, file: INI, which: 'last' }, f.deps), { ok: true, backup: LAST_2, removed: [LAST_1] })
   assert.equal(f.bytes(INI).equals(edited), true)
   assert.equal(f.bytes(LAST_2).equals(first), true)
@@ -324,14 +324,14 @@ test('restore the last copy: the send before it is undone, then redone', async (
   const f = fixture(t)
   await f.send(SET_A)
   const withA = f.bytes(INI)
-  f.at(2026, 11, 20, 14, 30, 15)
+  f.at('2026-11-20T14:30:15')
   await f.send(SET_B)
   const withB = f.bytes(INI)
 
-  f.at(2026, 11, 21, 8, 0, 0)
+  f.at('2026-11-21T08:00:00')
   assert.deepEqual(await restoreBackup({ folder: f.folder, file: INI, which: 'last' }, f.deps), { ok: true, backup: LAST_2, removed: [LAST_1] })
   assert.equal(f.bytes(INI).equals(withA), true)
-  f.at(2026, 11, 21, 8, 0, 1)
+  f.at('2026-11-21T08:00:01')
   assert.equal((await restoreBackup({ folder: f.folder, file: INI, which: 'last' }, f.deps)).ok, true)
   assert.equal(f.bytes(INI).equals(withB), true)
   assert.equal(copies(f.folder).length, 2)
@@ -341,10 +341,10 @@ test('a restore that fails its check keeps the copy it was restoring from', asyn
   const f = fixture(t)
   await f.send(SET_A)
   const withA = f.bytes(INI)
-  f.at(2026, 11, 20, 14, 30, 15)
+  f.at('2026-11-20T14:30:15')
   await f.send(SET_B)
   const withB = f.bytes(INI)
-  f.at(2026, 11, 21, 8, 0, 0)
+  f.at('2026-11-21T08:00:00')
   let calls = 0
   const garbles: GameFileIo = { ...nodeGameFileIo, replace: (path, bytes) => nodeGameFileIo.replace(path, ++calls === 1 ? Buffer.from('torn') : bytes) }
   const result = await restoreBackup({ folder: f.folder, file: INI, which: 'last' }, { ...f.deps, io: garbles })

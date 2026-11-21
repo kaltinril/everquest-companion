@@ -200,7 +200,7 @@ async function writeChecked(job: WriteJob): Promise<GameWriteResult> {
   const path = join(job.folder, job.file)
   // The copy holds `before`; the file must still be that.
   const still = await readOrNull(job.io, path)
-  if (still === null || !still.equals(job.before)) return refuse('changed-since-read')
+  if (!still?.equals(job.before)) return refuse('changed-since-read')
   try {
     await job.io.replace(path, job.next)
   } catch {
