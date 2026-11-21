@@ -127,7 +127,8 @@ Answered 2026-11-20 (the owner's screenshots and files; numbers in `agent/MEASUR
 - Colours: 0 to 19, top row then bottom row, RGB in the game's `EQUI_SocialEditWnd.xml`.
 - Loadouts: one file per loadout, numbered from 1. Switching to a new fourth loadout made
   `Drywrought_oggok_LO4.ini` at 18:39, a copy of `_LO1` (macros and hotbars). A loadout never played
-  has no file (inferred). No text file read, and nothing in the log, names a loadout or its classes.
+  has no file (inferred). No ini names a loadout's classes. The player's own `/who` row in the log
+  names classes and race, but not the loadout; pairing the two is not built or proven.
 - Hotbars: a button stores a slot number (above). Not watched in game: a macro moved to another slot.
 - The game rewrites the character file within seconds of a macro being saved, while logged in.
 - Page 1's macros open in the edit window. Whether an edit is written was not tried; the app leaves
