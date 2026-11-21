@@ -63,12 +63,6 @@ import { formatDataWeight } from '../shared/dataWeight'
 // table plus this launch's own heap reading.
 import { dataWeightLedger } from './dataWeight'
 import { logError, logInfo } from './errorLog'
-// THE LIVE HALF of the same subject (JOS-367), in its own leaf module: plain data in memory.
-import { setLiveProbeDemand, stopLiveProbe } from './livePerfProbe'
-// …and the half that says WHO (JOS-458), started and stopped in lockstep with it and a leaf for
-// the identical two reasons. The two measurements are one window on purpose: a stall's magnitude
-// and its owner have to describe the same seconds or neither can explain the other.
-import { startStallAttribution, stopStallAttribution } from './perfAttribution'
 import { sendToMain } from './windows'
 
 const PROFILE_FILE = 'perf-startup.json'
@@ -238,27 +232,6 @@ export function markStartupPhase(phase: StartupPhase, opts: MarkOptions = {}): v
     // probes' lifetime does — they cannot drift from the phase.
     stopStartupBlockProbe()
     stopStutterProbe()
-    // …and the LIVE probes take over from the startup ones at the same instant (JOS-367). The
-    // handover is the point: the two startup probes have just been closed, and everything after
-    // this mark is a running app rather than a boot. Two clocks from here to quit — main's, and
-    // one on a thread of its own — because a single clock can prove it was late and can never say
-    // who made it late, and the freezes this hunts are reported on a machine we do not own.
-    //
-    // …WHEN SOMEBODY IS LISTENING (audit item 8): the probes run only while the HUD is open,
-    // and `livePerfProbe.ts` holds that rule. Armed here, because a
-    // boot is not a running session; the HUD reports its half.
-    setLiveProbeDemand('armed', true)
-    // …and with them the GC half of the instrument that answers WHO (JOS-458). Same instant, same
-    // window, same argument as the probes beside it: a 1.4M-event fold's garbage is nothing like
-    // a running session's, so a boot is kept out of it.
-    //
-    // THE SEAM BRACKETS ARE NOT STARTED HERE AND DO NOT NEED TO BE — they record from process
-    // start, deliberately, because a per-seam max is not a distribution and because the launch's
-    // own first `registryFlush` and `worldRebuilt` fire one statement before THIS MARK is reached.
-    // Gating them on it would have excluded the cold fan-out, which is the single most interesting
-    // instance of the seam the ticket suspects most. `perfAttribution.ts`'s header has the full
-    // argument.
-    startStallAttribution()
   }
   if (startupProfile().complete) writeStartupProfile()
 }
@@ -498,7 +471,6 @@ export function startPerfSampler(): void {
   emitSample()
   sampleTimer = setInterval(emitSample, PERF_SAMPLE_INTERVAL_MS)
   sampleTimer.unref()
-  setLiveProbeDemand('hud', true)
   logInfo('[everquest-companion] perf HUD: sampler started (2s metrics, 500ms lag probe)')
 }
 
@@ -514,17 +486,11 @@ export function stopPerfSampler(): void {
   sampleTimer = null
   lagTimer = null
   drifts = []
-  setLiveProbeDemand('hud', false)
   if (wasRunning) sendToMain(IPC.onPerfSample, null)
 }
 
-/** Teardown from `window-all-closed`: stop the timers and make sure the launch left a profile.
- *  The live probes go with them — including the worker thread, which `stopLiveProbe` terminates
- *  rather than leaving to an `unref`'d handle nobody closed. */
+/** Teardown from `window-all-closed`: stop the timers and make sure the launch left a profile. */
 export function stopPerf(): void {
   stopPerfSampler()
-  stopLiveProbe()
-  // The GC observer goes with them (JOS-458). It disconnects only.
-  stopStallAttribution()
   flushStartupProfile()
 }
