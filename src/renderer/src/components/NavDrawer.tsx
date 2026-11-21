@@ -33,7 +33,7 @@ import PetsIcon from '@mui/icons-material/Pets'
 import MapIcon from '@mui/icons-material/Map'
 import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard'
 import CheckroomIcon from '@mui/icons-material/Checkroom'
-import FeedbackIcon from '@mui/icons-material/Feedback'
+import GitHubIcon from '@mui/icons-material/GitHub'
 // Dev-only, and its import goes with it: MUI's icon packages declare `sideEffects: false`, so
 // an icon whose only use sits inside a `false &&` branch is tree-shaken out with the branch.
 import RuleFolderIcon from '@mui/icons-material/RuleFolder'
@@ -43,7 +43,7 @@ import UpdateChip from './UpdateChip'
 import { useNavMenu } from './useNavMenu'
 import { navPx } from '@shared/navMenu'
 import { useBoolPref } from '../features/combat/useCombatPrefs'
-import { FORK_FEEDBACK_OFF } from '../features/feedback/forkFeedback'
+import { NEW_ISSUE_URL } from '@shared/issueLink'
 import { OWNER_TOOLS } from '../devFlags'
 import type { PrefsRouting } from '../appRouting'
 import {
@@ -223,12 +223,6 @@ const NAV_TEXT_SX = {
   my: 0,
   '& .MuiListItemText-primary': { fontSize: 'var(--nav-text)', lineHeight: 1.3 }
 } as const
-/** The two-line feedback row: the same metrics, a little air, a smaller second line. */
-const NAV_FEEDBACK_ROW_SX = { ...NAV_ROW_SX, py: 0.5 } as const
-const NAV_FEEDBACK_TEXT_SX = {
-  ...NAV_TEXT_SX,
-  '& .MuiListItemText-secondary': { fontSize: 12, lineHeight: 1.3 }
-} as const
 
 /** The fold's key. '1'/'0' via `useBoolPref`; absent means OPEN, the state a new user starts in. */
 const groupOpenKey = (id: string): string => `eq.nav.open.${id}`
@@ -322,14 +316,10 @@ function NavGroupSection({
 export default function NavDrawer({
   view,
   onSelect,
-  onSendFeedback,
   prefs
 }: {
   view: View
   onSelect: (v: View) => void
-  /** Opens the feedback DIALOG (Task #65). Feedback is not a view — appViews.ts is untouched —
-   *  so this row carries a callback instead of a `View`, and never shows a selected state. */
-  onSendFeedback: () => void
   /** The Preferences SECTION router (JOS-254), for the patch-notes icon beside the version
    *  number in the chip below. A section is not a view, so it cannot travel through `onSelect`
    *  — and the drawer names its own destination the way `BottomStrips` does in App.tsx rather
@@ -398,25 +388,20 @@ export default function NavDrawer({
       <Box sx={{ mt: 'auto' }}>
         <Divider />
         <List disablePadding>
-          {/* Send feedback (Task #65): a dialog, so it is a plain action row — no `selected`
-              state to own, because nothing in the nav stays "on" while it is open. */}
-          {/* TEST-BUILD NEUTERING (this branch only): disabled, and named for why, since a
-              disabled row draws no tooltip (features/feedback/forkFeedback.ts). */}
+          {/* Reports go to this project's GitHub issues (RULES.md rule 20). A link, not a view, so
+              the row has no `selected` state; it opens in the player's browser. */}
           <ListItemButton
+            component="a"
+            href={NEW_ISSUE_URL}
+            target="_blank"
+            rel="noreferrer"
             data-testid="nav-feedback"
-            onClick={onSendFeedback}
-            disabled
-            aria-label={FORK_FEEDBACK_OFF}
-            sx={NAV_FEEDBACK_ROW_SX}
+            sx={NAV_ROW_SX}
           >
             <ListItemIcon sx={NAV_ICON_SX}>
-              <FeedbackIcon />
+              <GitHubIcon />
             </ListItemIcon>
-            <ListItemText
-              primary="Send feedback"
-              secondary="Off in the community build"
-              sx={NAV_FEEDBACK_TEXT_SX}
-            />
+            <ListItemText primary="Open GitHub issue" sx={NAV_TEXT_SX} />
           </ListItemButton>
           <NavRowButton row={PREFERENCES} view={view} onSelect={onSelect} />
         </List>

@@ -38,7 +38,7 @@
 // IT NEVER SENDS THE PATHS. "Where it looked" draws behind a disclosure because it is how somebody
 // discovers their antivirus took the executable out of a directory they can go and check; it is
 // deliberately NOT part of the report prefill, because those strings carry the user's own home
-// directory and gameplay-adjacent machine detail never leaves a client on the app's initiative.
+// directory, and "Report this" fills in a GitHub issue anyone can read.
 
 import { type JSX, useState } from 'react'
 import { Box, Button, Collapse, LinearProgress, Stack, Typography, useTheme } from '@mui/material'
@@ -47,19 +47,8 @@ import type { EngineFaultSay, FoldReadout } from '../../../shared/engineLaunch'
 import { NO_ENGINE_CONSEQUENCE, bannerFor, failureWords, reportPrefill } from '../../../shared/engineLaunch'
 import { useEngineLaunch } from '../lib/engineLaunchHud'
 import { useLogReadReport } from '../lib/logReadReportHud'
+import { newIssueUrl } from '@shared/issueLink'
 import { LogReadBand } from './LogReadBand'
-
-export interface EngineLaunchBannerProps {
-  /**
-   * Open the feedback dialog, seeded — `useFeedbackDialog().openFeedback`, passed straight through.
-   *
-   * THE PARAMETER IS SPELLED STRUCTURALLY rather than imported as `FeedbackPrefill`, and the
-   * narrowing to `'bug'` is the point: a shell banner may not choose to file a FEATURE request, and
-   * a type that says so is one fewer thing to review. `FeedbackSetting.tsx` already establishes that
-   * a component seeds this shape itself (`onSend({ type: 'bug' })`), so nothing new is coupled.
-   */
-  onReport: (prefill: { readonly type: 'bug'; readonly description: string }) => void
-}
 
 /**
  * WHICH OF THEM IS DRAWN IS ONE DECISION (fork #9): `bannerFor`, from the log-read status every
@@ -67,11 +56,11 @@ export interface EngineLaunchBannerProps {
  * phase and the box a third source, so a bar could sit frozen over a box that said the read had
  * stopped. The band is the third thing this seam draws: the status, on every tab.
  */
-export function EngineLaunchBanner({ onReport }: EngineLaunchBannerProps): JSX.Element | null {
+export function EngineLaunchBanner(): JSX.Element | null {
   const { say, readout } = useEngineLaunch()
   const report = useLogReadReport()
   const banner = bannerFor(report, say, readout !== null)
-  if (banner === 'card' && say.fault !== null) return <FailureCard fault={say.fault} onReport={onReport} />
+  if (banner === 'card' && say.fault !== null) return <FailureCard fault={say.fault} />
   if (banner === 'bar' && readout !== null) return <FoldBar readout={readout} />
   if ((banner === 'band' || banner === 'notes') && report !== null) {
     return <LogReadBand report={report} kind={banner} />
@@ -140,7 +129,7 @@ function FoldBar({ readout }: { readout: FoldReadout }): JSX.Element {
  * the same way the fault edge simply puts a fresh count on this card. What the disable actually
  * buys is that a frustrated double-click is one ask rather than two.
  */
-function FailureCard({ fault, onReport }: EngineLaunchBannerProps & { fault: EngineFaultSay }): JSX.Element {
+function FailureCard({ fault }: { fault: EngineFaultSay }): JSX.Element {
   const theme = useTheme()
   const [showPaths, setShowPaths] = useState(false)
   const words = failureWords(fault)
@@ -193,7 +182,6 @@ function FailureCard({ fault, onReport }: EngineLaunchBannerProps & { fault: Eng
           )}
           <CardActions
             fault={fault}
-            onReport={onReport}
             showPaths={showPaths}
             onTogglePaths={() => {
               setShowPaths((was) => !was)
@@ -235,10 +223,9 @@ function FailureCard({ fault, onReport }: EngineLaunchBannerProps & { fault: Eng
  */
 function CardActions({
   fault,
-  onReport,
   showPaths,
   onTogglePaths
-}: EngineLaunchBannerProps & {
+}: {
   fault: EngineFaultSay
   showPaths: boolean
   onTogglePaths: () => void
@@ -264,11 +251,11 @@ function CardActions({
         size="small"
         variant="outlined"
         data-testid="engine-launch-report"
-        onClick={() => {
-          onReport({ type: 'bug', description: reportPrefill(fault) })
-        }}
+        href={newIssueUrl(`Data engine did not start: ${fault.kind}`, reportPrefill(fault))}
+        target="_blank"
+        rel="noreferrer"
       >
-        Report this
+        Report on GitHub
       </Button>
       {fault.lookedIn.length > 0 && (
         <Button

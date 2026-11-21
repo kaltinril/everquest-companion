@@ -53,7 +53,6 @@ import PreferencesView from './features/preferences/PreferencesView'
 // menu opens them, and the Appearance rows tag a closed one). Both are recorded HERE, at the root.
 // See the effect.
 import { peekPrefsSnapshot, recordPref } from './features/preferences/prefsSnapshot'
-import FeedbackDialog from './features/feedback/FeedbackDialog'
 // OWNER-ONLY. `devTriage` holds the single `DEV_TOOLS ? lazy(() => import(…)) : null` — the
 // STRIP, which is a compile-time question and stays on `DEV_TOOLS`; in a build without the flag
 // its only use below is dead code, so rollup drops the import and the entire triage feature with
@@ -84,15 +83,9 @@ import { UnlockLinkProvider, useOpenUnlock } from './lib/unlockLink'
 import UnreleasedSlayerView from './unreleasedSlayer'
 import UnreleasedUnlocksView from './unreleasedUnlocks'
 import { OWNER_TOOLS } from './devFlags'
-import { useFeedbackDialog, type FeedbackPrefill } from './features/feedback/useFeedback'
-// Usage analytics (docs/plans/usage-analytics.md). The notice is mounted unconditionally and
-// renders nothing once it has been answered; `useViewDwell` reports how long each tab was on
-// screen. Both are local: the renderer only ever records into main's ring, and main decides —
-// behind the consent gates — whether anything is ever sent.
-import { TelemetryNotice } from './features/preferences/TelemetryNotice'
-// What's new (JOS-73). The teaser strip is the telemetry notice's twin — one quiet line along
-// the bottom edge, never a modal — and renders nothing unless this launch is the first one after
-// an update. See features/whatsnew/WhatsNewTeaser.tsx.
+// What's new (JOS-73). The teaser strip is one quiet line along the bottom edge, never a modal,
+// and renders nothing unless this launch is the first one after an update. See
+// features/whatsnew/WhatsNewTeaser.tsx.
 import { WhatsNewTeaser } from './features/whatsnew/WhatsNewTeaser'
 import { setCurrentView } from './lib/currentView'
 import { dwellView, useViewDwell } from './lib/telemetry'
@@ -231,7 +224,6 @@ function ViewContent({
   routing,
   onOpenPreferences,
   onOpenLeveling,
-  onSendFeedback,
   prefs
 }: {
   view: View
@@ -239,8 +231,6 @@ function ViewContent({
   viewKey: string
   routing: AppRouting
   onOpenPreferences: () => void
-  /** Preferences' Feedback section opens the app-level dialog, preselecting a type. */
-  onSendFeedback: (prefill?: FeedbackPrefill) => void
   /** Overview's leveling card → the Leveling tab, carrying no level (`openLoot`'s idiom: ONE
    *  opener, with or without a payload). It went through `AppRouting` the day the tab gained a
    *  deep link of its own — two openers for one destination is how they drift apart. */
@@ -255,9 +245,7 @@ function ViewContent({
   const onOpenVoicePrefs = useCallback(() => openSection('voice'), [openSection])
   const onOpenOverlayPrefs = useCallback(() => openSection('overlays'), [openSection])
   if (view === 'preferences') {
-    return (
-      <PreferencesView key={prefs.section ?? 'prefs'} onSendFeedback={onSendFeedback} section={prefs.section} />
-    )
+    return <PreferencesView key={prefs.section ?? 'prefs'} section={prefs.section} />
   }
   // OWNER-ONLY (`OWNER_TOOLS` = DEV **and** `EQ_OWNER_TOOLS=1`, JOS-72), and ABOVE the
   // no-characters gate on purpose: the triage tab reads the cloud backlog, not the game log, so
@@ -350,9 +338,7 @@ function ViewContent({
  * here and the entire content subtree is skipped.
  *
  * WHAT THAT ACTUALLY BUYS, concretely. App still re-renders for its own reasons — the character
- * list arriving, the live dot, the feedback dialog opening and closing — and every one of those
- * used to walk the whole tree. Opening the feedback dialog is the clearest case: a dialog that
- * renders in a portal was re-rendering the Combat meter behind it.
+ * list arriving, the live dot — and every one of those used to walk the whole tree.
  *
  * `PlainView` deliberately gets NO memo of its own. It sits inside this boundary and takes the
  * same `routing` and `viewKey` this does, so by the time it renders at all one of its own props
@@ -361,24 +347,17 @@ function ViewContent({
 const ViewContentMemo = memo(ViewContent)
 
 /**
- * THE BOTTOM EDGE, and both of the things allowed to occupy it.
+ * THE BOTTOM EDGE, and the one thing allowed to occupy it.
  *
- * Two one-line strips, same shape, same rule: fixed-position and portalled, so they float over
- * the content area without reflowing anything, and NEITHER is ever a modal — this app must never
- * interrupt play. Each renders null unless it has something to say, and the two can never say it
- * at the same time: the telemetry notice is a FIRST-RUN event and the what's-new teaser is
- * suppressed on a fresh install by construction (shared/releaseNotes.ts).
+ * A one-line strip: fixed-position and portalled, so it floats over the content area without
+ * reflowing anything, and it is never a modal — this app must never interrupt play. It renders
+ * null unless it has something to say (the first launch after an update).
  *
- * A component rather than two lines in App because App is at its factoring ceiling — and because
+ * A component rather than a line in App because App is at its factoring ceiling — and because
  * "what may appear along the bottom" is a real thing to be able to read in one place.
  */
 function BottomStrips({ prefs }: { prefs: PrefsRouting }): JSX.Element {
-  return (
-    <>
-      <TelemetryNotice onOpenDetails={() => prefs.openSection('analytics')} />
-      <WhatsNewTeaser onOpen={() => prefs.openSection('whatsnew')} />
-    </>
-  )
+  return <WhatsNewTeaser onOpen={() => prefs.openSection('whatsnew')} />
 }
 
 /**
@@ -485,9 +464,6 @@ export default function App(): JSX.Element {
   // log-read status is not ok (lib/useLiveDot.ts). It clears itself on a rebuild.
   const { live, clear: clearLive } = useLiveDot()
   const [rebuild, setRebuild] = useState(0)
-  // The feedback dialog's open-state + seed (Task #65). Also picks up a crash parked by the
-  // ErrorBoundary's "Report this", which reloads the window to get here.
-  const feedback = useFeedbackDialog()
 
   // `view` goes IN as well as out: the router parks the tab a cross-view deep link is leaving, so
   // the drill it opens can offer a Back that returns there (JOS-43, navOrigin.ts).
@@ -602,9 +578,9 @@ export default function App(): JSX.Element {
         {/* …and it takes the prefs router the way `BottomStrips` does (JOS-254): the patch-notes
             icon beside the version number in the chip at its foot opens a Preferences SECTION,
             which is not a view, so the destination travels as the router rather than as a tab. */}
-        <NavDrawer view={view} onSelect={selectView} prefs={prefsRouting} onSendFeedback={() => feedback.openFeedback()} />
+        <NavDrawer view={view} onSelect={selectView} prefs={prefsRouting} />
 
-        <MainColumn view={view} onSelect={selectView} onReport={feedback.openFeedback}>
+        <MainColumn view={view} onSelect={selectView}>
           <UnlockLinkProvider open={openUnlock}>
             <ViewContentMemo
               view={view}
@@ -614,7 +590,6 @@ export default function App(): JSX.Element {
               prefs={prefsRouting}
               onOpenPreferences={onOpenPreferences}
               onOpenLeveling={onOpenLeveling}
-              onSendFeedback={feedback.openFeedback}
             />
           </UnlockLinkProvider>
         </MainColumn>
@@ -632,15 +607,8 @@ export default function App(): JSX.Element {
       <LogSwitchNudge />
       <SettingsRecoveryNotice />
 
-      {/* Feedback is a DIALOG, not a view (appViews.ts is untouched), so it is hosted here and
-          opened from the nav footer, from Preferences, and by the ErrorBoundary's "Report this"
-          (which reloads and lands a prefilled bug — see useFeedbackDialog). */}
-      <FeedbackDialog open={feedback.open} onClose={feedback.close} prefill={feedback.prefill} />
-
-      {/* The bottom edge: the first-run usage-analytics notice (plan T1 — the ONLY thing that
-          sets `noticeShown`, which main's network gate requires) and the what's-new teaser
-          (JOS-73). Both are slim bars rather than modals, and both render nothing most launches.
-          See BottomStrips above. */}
+      {/* The bottom edge: the what's-new teaser (JOS-73), a slim bar rather than a modal, which
+          renders nothing most launches. See BottomStrips above. */}
       <BottomStrips prefs={prefsRouting} />
     </Box>
   )

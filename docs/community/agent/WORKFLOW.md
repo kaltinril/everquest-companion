@@ -134,6 +134,14 @@ disagree, RULES.md wins; fix this file.
     and the trunk's tree is compared with the gated tree (`git rev-parse <ref>^{tree}`). An
     identical tree is not gated again.
   - A passed check is not rerun unless code it covers changed.
+- **A gate scoped to what the change touches, on the owner's word** (owner, 2026-11-20, for the
+  feedback and analytics removal, with the game running: "lets skip a full test suite ...
+  specialized testing for areas that these changes would actually affect ... sky quest
+  calculations has nothing to do with removing analytics and feedback"). How it was done: typecheck,
+  lint, and the unit test files that name a changed or deleted source file plus the ones that scan
+  the source tree (`grep -lE "<changed basenames>" tests/*.test.mts`; `--test-concurrency=4` leaves
+  cores for the game). Said for that change; RULES.md rule 11 still asks for the full suite
+  otherwise, until the owner says the scoped gate is the standing rule.
 - `npm run typecheck`, then restore tsbuildinfo; `rm -rf node_modules/.cache/eslint && npm run
   lint`; `npm test` (Node 24). On `main_community` use `bash scripts/community/known-reds.sh`
   (the unit suite where only names in `scripts/community/known-reds.txt` may fail).

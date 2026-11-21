@@ -361,13 +361,14 @@ where one exists.
   it.
 - Row metrics (fork #10) come from `shared/navMenu.ts` (two px ladders, defaults 14px text / 28px
   rows) through four CSS variables on the drawer paper (`--nav-row`, `--nav-text`, `--nav-icon`,
-  `--nav-icon-col`). `NavRowButton` and the feedback row read them via `NAV_ROW_SX` / `NAV_ICON_SX`
+  `--nav-icon-col`). `NavRowButton` and the "Open GitHub issue" row read them via `NAV_ROW_SX` / `NAV_ICON_SX`
   / `NAV_TEXT_SX`; no prop drilling. Group headings stay fixed (`GROUP_HEADING_SX`, 28px).
 - TRAP: the default row height is a measurement, not arithmetic. It was first 32px, sized on paper
   so the open menu fit the default window; the Skills row landed the same day and the menu ran 21px
   over (MEASURED.md). A new nav row costs one row height, and an overflowing drawer grows further
-  by itself: its scrollbar narrows the text column and the two-line Send feedback row wraps to three
-  (42px becomes 57px). `stepNavMenu` in `tests/e2e/text-size.e2e.mts` checks the open menu against
+  by itself: its scrollbar narrows the text column and a long row wraps (the old two-line Send
+  feedback row went from 42px to 57px; since 2026-11-20 that row is one line, "Open GitHub issue").
+  `stepNavMenu` in `tests/e2e/text-size.e2e.mts` checks the open menu against
   the drawer on a fresh install: when a new tab makes it fail, lower the default or shorten a row,
   do not delete the check.
 - Rows use `minHeight`, never `height`: a label that wraps grows its row. `tests/navMenu.test.mts`
