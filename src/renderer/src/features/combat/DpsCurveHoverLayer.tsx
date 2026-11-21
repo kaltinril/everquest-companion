@@ -195,7 +195,7 @@ export function DpsCurveHoverLayer({
       {hit && tip && (
         <>
           <Cursor hit={hit} chart={chart} series={series} />
-          <ChartTooltip {...tip} x={hit.x} y={hit.y} bounds={{ w: hit.w, h: CHART_H }} />
+          <ChartTooltip {...tip} x={hit.x} y={hit.y} />
         </>
       )}
     </div>

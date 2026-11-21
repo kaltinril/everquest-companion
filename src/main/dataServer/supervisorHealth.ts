@@ -21,6 +21,15 @@
 // in-flight answer stops being its business; on resume it waits `ENGINE_RESUME_GRACE_MS` — the
 // machine is still coming back, and a no from a machine that is still coming back is not a
 // diagnosis — and then asks fresh.
+//
+// AND A PROBE IS NOT THE ONLY WITNESS (fork, 2026-11-20). The probe opens a NEW connection each
+// time. A busy engine can take longer than the limit to accept one while it answers the app's own
+// open connection in milliseconds: measured on a starved engine, four kills in ten minutes, each
+// throwing away a read in progress, and the log never went live. So before the verdict the watch
+// asks when the app last HEARD the engine (`engineHeardAt`). Heard inside
+// `ENGINE_HEARD_FRESH_MS`, and newer than the evidence used last time, the beat is forgiven and
+// the next ordinary probe is scheduled. Only a transient reason is forgiven, only for a launch
+// that has answered once, and once the log is live only `ENGINE_FORGIVE_MAX_LIVE` times running.
 
 import type { ByteChannel } from '../../shared/dataServer/ndjson'
 import {
@@ -30,8 +39,10 @@ import {
   type EngineHealth
 } from './engineHealth'
 import {
+  ENGINE_FORGIVE_MAX_LIVE,
   ENGINE_HEALTH_INTERVAL_MS,
   ENGINE_HEALTH_TIMEOUT_MS,
+  ENGINE_HEARD_FRESH_MS,
   ENGINE_LOCAL_SOCKET_GRACE_MS,
   ENGINE_LOCAL_SOCKET_STREAK,
   ENGINE_RESUME_GRACE_MS,
@@ -49,12 +60,24 @@ export interface HealthWatchDeps {
   timer: EngineTimer
   /** The dev log. */
   debug(line: string): void
+  /**
+   * PROOF OF LIFE. When the app's own connection last heard anything from the engine (a progress
+   * frame, a module-changed frame, a health answer), on `now()`'s clock; null when it never has.
+   * Absent (a test, a wiring without a client): nothing is ever forgiven and the watch is the
+   * two-strike rule alone.
+   */
+  engineHeardAt?(): number | null
+  /** The clock `engineHeardAt` is read against. */
+  now?(): number
+  /** Has the engine caught up on the log? Unknown counts as yes, the stricter side. */
+  engineIsLive?(): boolean
   /** TEST SEAMS — every clock this watchdog has. */
   healthIntervalMs?: number
   healthTimeoutMs?: number
   resumeGraceMs?: number
   localSocketGraceMs?: number
   localSocketStreak?: number
+  heardFreshMs?: number
 }
 
 /** The launch being asked about. Fixed for the watch's whole life: a respawn is a launch (contract
@@ -121,12 +144,17 @@ class HealthWatch implements LaunchHealthWatch {
   private localTries = 0
   /** Has the one local-socket entry been written for this watch? See `onLocalSocket`. */
   private localSaid = false
+  /** The `engineHeardAt` stamp the last forgiveness used. The same evidence is never used twice. */
+  private forgivenStamp: number | null = null
+  /** Failed beats forgiven in a row. Reset by any answer. */
+  private forgivenRun = 0
   private cancel: (() => void) | null = null
   private readonly intervalMs: number
   private readonly timeoutMs: number
   private readonly graceMs: number
   private readonly localGraceMs: number
   private readonly localStreak: number
+  private readonly heardFreshMs: number
 
   constructor(
     private readonly deps: HealthWatchDeps,
@@ -138,6 +166,7 @@ class HealthWatch implements LaunchHealthWatch {
     this.graceMs = deps.resumeGraceMs ?? ENGINE_RESUME_GRACE_MS
     this.localGraceMs = deps.localSocketGraceMs ?? ENGINE_LOCAL_SOCKET_GRACE_MS
     this.localStreak = deps.localSocketStreak ?? ENGINE_LOCAL_SOCKET_STREAK
+    this.heardFreshMs = deps.heardFreshMs ?? ENGINE_HEARD_FRESH_MS
   }
 
   begin(): void {
@@ -192,6 +221,7 @@ class HealthWatch implements LaunchHealthWatch {
     const first = this.first
     this.first = false
     this.localTries = 0
+    this.forgivenRun = 0
     this.on.onHealthy(health, first)
     this.schedule(this.intervalMs)
   }
@@ -212,7 +242,43 @@ class HealthWatch implements LaunchHealthWatch {
       this.ask(reason)
       return
     }
-    this.on.onUnhealthy(strike === null ? [reason] : [strike, reason], err)
+    const reasons = strike === null ? [reason] : [strike, reason]
+    if (this.forgiven(reasons)) {
+      this.schedule(this.intervalMs)
+      return
+    }
+    this.on.onUnhealthy(reasons, err)
+  }
+
+  /**
+   * PROOF OF LIFE: is this verdict set aside because the app's own connection heard the engine a
+   * moment ago? See the file header. Every refusal below is a reason the kill stands.
+   */
+  private forgiven(reasons: readonly HealthFailure[]): boolean {
+    // A launch that never answered has proved nothing, and a reason a serving engine cannot
+    // produce (a refusal, a protocol mismatch) is not a stall.
+    if (this.first || !reasons.every(isTransientHealthFailure)) return false
+    const heard = this.freshEvidence()
+    if (heard === null) return false
+    const live = this.deps.engineIsLive?.() ?? true
+    if (live && this.forgivenRun >= ENGINE_FORGIVE_MAX_LIVE) return false
+    const age = (this.deps.now?.() ?? heard) - heard
+    this.forgivenStamp = heard
+    this.forgivenRun += 1
+    this.deps.debug(
+      `data-server engine: health probe failed (${reasons.join(', ')}) but the app heard the engine ` +
+        `${String(Math.max(0, age))} ms ago on its own connection; not ended (${String(this.forgivenRun)} in a row)`
+    )
+    return true
+  }
+
+  /** When the app last heard the engine, if that is recent and not the evidence already used. */
+  private freshEvidence(): number | null {
+    const heard = this.deps.engineHeardAt?.() ?? null
+    const now = this.deps.now?.()
+    if (heard === null || now === undefined) return null
+    if (now - heard > this.heardFreshMs) return null
+    return this.forgivenStamp !== null && heard <= this.forgivenStamp ? null : heard
   }
 
   /**

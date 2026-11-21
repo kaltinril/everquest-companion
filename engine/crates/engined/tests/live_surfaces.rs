@@ -619,22 +619,35 @@ fn a_timer_subscription_serves_the_rows_the_two_windows_draw() {
         c.changed.iter().any(|m| m.module == "buffTimers")
     });
 
-    conn.client.send(&subscribe(10, "timers.rows"));
-    conn.reply(10);
-
     // The opening reset is empty by construction (the rows live on the ingest thread), so the frame
     // worth reading is the next one the serve cadence cuts.
-    let mut resets = 0;
+    //
+    // That frame is cut off whatever the fold holds at that pass, and a `buffTimers` dirty bit does
+    // not prove both mezzes are in it: a second landing beat can carry the bit, or the tail can
+    // hand the fold one appended line a pass ahead of the other. The engine then sends the missing
+    // rows as a diff, which a window applies. This test reads resets only, so it asks again under a
+    // fresh id until a first cut holds both rows (seen 2026-11-20: an empty second reset, once, with
+    // the whole workspace's tests running at the same moment).
     let mut rows: Vec<protocol::generated::Row> = Vec::new();
     let deadline = Instant::now() + PATIENCE;
-    while resets < 2 {
-        assert!(Instant::now() < deadline, "the timer view never answered");
-        if let EngineMessage::ResetMessage(reset) = conn.pump() {
-            if *reset.id == 10 {
-                resets += 1;
-                rows = reset.rows;
+    let mut id = 100;
+    while rows.len() < 2 {
+        conn.client.send(&subscribe(id, "timers.rows"));
+        conn.reply(id);
+        let mut resets = 0;
+        while resets < 2 {
+            assert!(
+                Instant::now() < deadline,
+                "the timer view never served two rows: {rows:?}"
+            );
+            if let EngineMessage::ResetMessage(reset) = conn.pump() {
+                if *reset.id == id {
+                    resets += 1;
+                    rows = reset.rows;
+                }
             }
         }
+        id += 1;
     }
 
     assert_eq!(rows.len(), 2, "two holds, two rows: {rows:?}");

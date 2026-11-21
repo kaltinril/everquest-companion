@@ -147,7 +147,7 @@ export function BazaarHoursChart({ item, ignoreOutliers }: { item: BazaarItem; i
             No quote with a price yet, so nothing to place by time of day.
           </Typography>
         )}
-        {hov !== null && hp !== undefined && rows.length > 0 && <ChartTooltip x={hov.x} y={hov.y} title={hp.bucket} rows={rows} bounds={{ w, h: H }} />}
+        {hov !== null && hp !== undefined && rows.length > 0 && <ChartTooltip x={hov.x} y={hov.y} title={hp.bucket} rows={rows} />}
       </Box>
       <Typography variant="caption" color="text.disabled">
         Average asking and offered price by time of day, from the quotes kept, one per seller per day.

@@ -87,6 +87,7 @@ import {
   stepScriptedPull
 } from './combatSteps.mjs'
 import { stepPetGroupedLayout, stepPetPreferenceMovesTheYouLine } from './petPrefSteps.mjs'
+import { checkReadoutNotCut } from './tooltipClipSteps.mjs'
 
 // ── the run, one step per numbered section ─────────────────────────────────────────────
 //
@@ -566,6 +567,9 @@ async function main(): Promise<void> {
     // 13. HOVER on the real charts (crosshair + shared tooltip + the drag seam) — see the
     //     harness, which owns the steps: this file is at its factoring ceiling.
     await checkChartHover(page)
+    // 13-bis. …and that readout is never cut off, at the default text size and at 125%, where the
+    //         DPS card is shorter than its own plot (tooltipClipSteps.mts).
+    await checkReadoutNotCut(page)
     // 13a. THE DPS LEGEND IS A CONTROL (JOS-264) — straight after the hover, because it needs the
     //      same thing that step does (a selection whose curve is actually drawn) and it hands the
     //      chart back exactly as it found it. Before the live-pull steps: they change what the
