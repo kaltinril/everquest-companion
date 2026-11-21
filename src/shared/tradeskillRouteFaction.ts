@@ -271,7 +271,9 @@ function choicesOf(facts: FactionFacts, feeds: ReadonlyMap<string, Feed[]>): Fac
       standing: facts.standings?.get(key) ?? null
     }
   })
-  return choices.sort((a, b) => b.own - a.own || a.name.localeCompare(b.name))
+  // Most turn-ins the item's own page backs first; among equals the faction more recipes feed
+  // (so a tradeskill whose factions each have one such row opens on the one with most to do).
+  return choices.sort((a, b) => b.own - a.own || b.recipes - a.recipes || a.name.localeCompare(b.name))
 }
 
 /**

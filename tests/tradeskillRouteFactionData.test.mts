@@ -126,8 +126,13 @@ test('what the goal opens on: Baking and Tailoring start on a faction with a row
     assert.deepEqual([first.turnIn.group, first.turnIn.shared], ['own', ''], `${tradeskill}: ${first.name} on ${first.turnIn.page}`)
     assert.notEqual(first.turnIn.tie, TIE_QUEST_PAGE)
   }
-  // The capture of 2026-11-20: Baking opened on Clurg, whose rows are all on Muffin Quests.
-  assert.notEqual(buildFactionRoute(IN_ERA, { tradeskill: 'Baking', level: null, faction: null, eraOnly: true }).picked?.name, 'Clurg')
+  // The capture of 2026-11-20: Baking opened on Clurg's weakest row, Clump of Dough on Muffin Quests.
+  // Among factions with one row an item's own page backs, the one more recipes feed leads, so
+  // Baking opens on Clurg again, now on the row its own page backs.
+  const baking = buildFactionRoute(IN_ERA, { tradeskill: 'Baking', level: null, faction: null, eraOnly: true })
+  assert.equal(baking.picked?.name, 'Clurg')
+  assert.equal(baking.steps[0]?.name, 'Pickled Froglok')
+  assert.notEqual(baking.steps[0]?.turnIn.page, 'Muffin Quests')
 })
 
 test("Silk Swatch (Tailoring 15): Faydarks Champions through Orc Vest, +5, in Kelethin and West Freeport", () => {

@@ -219,10 +219,10 @@ test('the default faction is the one with the most rows the item\'s own page bac
   assert.equal(choiceFacts(r.choices[1], false), '3 recipes')
   // The row the reader meets first is the one its item's own page backs, though the other raise is as big.
   assert.deepEqual(lines(r), ['Mystery Bun | Bun Run', 'Berry Tart | Tart Tax'])
-  // With no such row anywhere, the first by name.
+  // With no such row anywhere, the faction more recipes feed, then the first by name.
   const none = buildFactionRoute(fixtureFacts({ quests: quests.slice(0, 3) }), ask())
-  assert.deepEqual(none.choices.map((c) => [c.name, c.own]), [['Bakers Guild', 0], ['Dockworkers', 0], ['Town Guards', 0]])
-  assert.equal(none.picked?.name, 'Bakers Guild')
+  assert.deepEqual(none.choices.map((c) => [c.name, c.recipes, c.own]), [['Dockworkers', 3, 0], ['Town Guards', 3, 0], ['Bakers Guild', 1, 0]])
+  assert.equal(none.picked?.name, 'Dockworkers')
   // A remembered pick stands whatever its rows are.
   assert.equal(buildFactionRoute(fixtureFacts({ quests }), ask({ faction: questFactionKey('Dockworkers') })).picked?.name, 'Dockworkers')
 })
