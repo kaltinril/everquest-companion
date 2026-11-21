@@ -1,6 +1,8 @@
 // macros/types.ts — the Macros tab's shapes (fork #11). The library is the app's own document; a
 // GameMacro is one slot as the game's character file holds it.
 
+import type { Unsavable } from './unsavable'
+
 /** One macro in the app's library. `lines` is positional (index 0 is Line1), trailing blanks cut. */
 export interface Macro {
   id: string
@@ -69,3 +71,42 @@ export interface Mint {
   id: () => string
   now: () => number
 }
+
+/** Why a send or a restore did not happen. Each has its own sentence on screen. */
+export type GameWriteRefusal =
+  | 'no-folder'
+  | 'bad-request'
+  | 'not-a-character-file'
+  | 'unsavable'
+  | 'game-running'
+  | 'game-unknown'
+  | 'read-failed'
+  | 'changed-since-read'
+  | 'check-failed'
+  | 'no-backup'
+  | 'already-same'
+  | 'backup-failed'
+  | 'write-failed'
+  | 'verify-failed'
+  | 'unexpected'
+
+/** A send or a restore that went through: the copy made first, and the older copies removed. */
+export interface GameWriteDone {
+  ok: true
+  backup: string
+  removed: string[]
+  /** Something that went wrong after the write was safe (an older copy that would not delete). */
+  note?: string
+}
+
+export interface GameWriteRefused {
+  ok: false
+  reason: GameWriteRefusal
+  /** `unsavable`: what blocks the send. */
+  problems?: Unsavable[]
+  /** `verify-failed`: whether the file was put back as it was, and the copy that holds it. */
+  putBack?: boolean
+  backup?: string
+}
+
+export type GameWriteResult = GameWriteDone | GameWriteRefused
