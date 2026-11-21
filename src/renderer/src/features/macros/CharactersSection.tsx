@@ -14,7 +14,7 @@ import type { CharacterFileMacros, GameFilesReason, MacroSet } from '@shared/mac
 import { ButtonGrid } from './ButtonGrid'
 import { ButtonPanel } from './ButtonPanel'
 import { GameBar } from './GameFileSend'
-import { LayoutsMenu } from './LayoutsMenu'
+import { CopyFromCharacter, LayoutsMenu } from './LayoutsMenu'
 import { Quiet, UndoRedo } from './macroParts'
 import type { GameFilesState } from './useGameFiles'
 import { useGameWriter } from './useGameWriter'
@@ -192,6 +192,7 @@ function CharacterDetail({ store, game, file, files, set, spot, onSpot, placing,
               go(next, null)
             }}
           >
+            <CopyFromCharacter store={store} game={game} file={file} files={files} set={set} macros={changes.macros} />
             <LayoutsMenu store={store} game={game} file={file} files={files} set={set} macros={changes.macros} />
             <UndoRedo store={store} />
           </PageRow>
@@ -216,7 +217,7 @@ function CharacterDetail({ store, game, file, files, set, spot, onSpot, placing,
               cell={cells.find((c) => c.slot === spot.slot) ?? null}
               page={page}
               pages={tabs}
-              hint={none ? 'No macros yet. Click a button to add one.' : 'Click a button to edit it.'}
+              hint={none ? 'No macros yet. Click a button to add one, or use Copy from character.' : 'Click a button to edit it.'}
               fresh={fresh}
               onFresh={setFresh}
               onGo={go}
