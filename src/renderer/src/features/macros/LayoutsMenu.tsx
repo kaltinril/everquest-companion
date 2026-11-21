@@ -19,6 +19,7 @@ import {
 import { filledCount, removeSet, renameSet, restoreSet } from '@shared/macros/sets'
 import { characterFileKey, renderSocials } from '@shared/macros/socials'
 import type { CharacterFileMacros, GameMacro, MacroSet } from '@shared/macros/types'
+import { Tooltip } from '../../lib/Tooltip'
 import { Confirm, Line } from './GameFileSend'
 import { Quiet } from './macroParts'
 import { useMacroUi } from './macroUi'
@@ -280,6 +281,37 @@ function LayoutDialogs({ store, game, file, files, set, asking, onClose }: Dialo
       </Line>
       <Line>{UNDO_NOTE}</Line>
     </Confirm>
+  )
+}
+
+/**
+ * "Copy from character", on the page row itself: the way a new character (another server, another
+ * loadout) is given an existing one's buttons, so it is not left inside the Layouts menu.
+ */
+export function CopyFromCharacter(props: LayoutsProps): JSX.Element {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <Tooltip title="Give this character the buttons another character has.">
+        <Button
+          size="small"
+          variant="outlined"
+          data-testid="macro-copy-from-character"
+          onClick={() => {
+            setOpen(true)
+          }}
+        >
+          Copy from character
+        </Button>
+      </Tooltip>
+      <LayoutDialogs
+        {...props}
+        asking={open ? 'copy' : null}
+        onClose={() => {
+          setOpen(false)
+        }}
+      />
+    </>
   )
 }
 

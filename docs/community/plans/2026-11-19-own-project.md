@@ -686,6 +686,9 @@ requests, which name this repo.
    cannot run here, yet their descriptions tell every agent session to use them ("Use at the start
    of any work session", "use it UNPROMPTED"). Options: delete all four; keep them with a note;
    rewrite `feedback-triage` for this repo's issues and delete the rest. Suggested: the last.
+   DECIDED for one of the four, 2026-11-20: `feedback-triage` is deleted (owner: "we don't need
+   feedback-triage skill"; its scripts went with the feedback and analytics code). `linear-board`,
+   `explain` and `login` are still open; `explain` still names the deleted skill in one line.
 5. **`AGENTS.md`.** It still orders a `Co-Authored-By` line on commits (overruled here), work on
    `main`, his Linear tickets, `v*` release tags, and a standing authorization to deploy to his AWS
    account. Options: leave it, with the one pointer line as the only correction; take it over and
