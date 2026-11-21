@@ -127,8 +127,8 @@ the same as a download by hand.
 
 ## Privacy
 
-The app sends no usage counts and no feedback reports: both addresses are empty in this build, so
-there is nowhere for them to go. What it does ask the network for:
+The app sends no usage counts and no feedback reports: the code that did is removed from this
+project. What it does ask the network for:
 
 - **Updates:** a check against this repo's Releases page, and the installer when there is a newer
   one.
@@ -140,13 +140,12 @@ there is nowhere for them to go. What it does ask the network for:
   choose to install. These come from GitHub (and, for the spoken-alert voice, a Microsoft runtime
   download when your PC does not already have it).
 
-`SECURITY.md` and `TELEMETRY.md` in this repo were written for the original app. They do not
-describe this build.
+`SECURITY.md` in this repo was written for the original app. It does not describe this build.
 
 ## Reporting a problem
 
 Open an issue on [**this repo's Issues page**](https://github.com/kaltinril/everquest-companion/issues).
-The **Send feedback** form inside the app is switched off.
+The **Open GitHub issue** row in the app's menu opens the page for a new one.
 
 ## Development
 

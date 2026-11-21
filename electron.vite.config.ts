@@ -4,27 +4,14 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   main: {
-    // `include` EXTERNALIZES four devDependencies that would otherwise be BUNDLED.
+    // `include` BELOW IS A LEFTOVER (2026-11-20). It externalized `pg` and three `@aws-sdk/*`
+    // devDependencies for the owner-only triage surface (src/main/triage/**), which is removed.
+    // Nothing main imports reaches them now, so the line does nothing; it is left until the next
+    // packaged build can confirm that, because a change to this config is checked with a real
+    // `npm run dist` (docs/community/RULES.md rule 11).
     //
-    // externalizeDepsPlugin externalizes `dependencies` only, which is right: a devDependency
-    // is normally never imported by main. The dev-only triage surface (src/main/triage/**) is
-    // the exception — it reaches `pg` and three `@aws-sdk/*` packages behind a dynamic import
-    // gated on `!app.isPackaged`.
-    //
-    // MEASURED, not assumed: without this line rollup follows that dynamic import and bundles
-    // both SDKs into out/main/chunks (917 kB across 23 chunks, one of them 647 kB), and since
-    // electron-builder packages `out/**` wholesale, every shipped installer would carry the
-    // AWS SDK and a postgres driver as dead weight — and the dev gate would be the ONLY thing
-    // standing between a shipped build and a working backlog client. Externalized, the emitted
-    // chunk is ~10 kB of our own code whose `require("pg")` / `require("@aws-sdk/…")` CANNOT
-    // resolve in a packaged app, because electron-builder never installs devDependencies.
-    // That is what makes "a shipped build is structurally incapable of reading the backlog" a
-    // property of the packaging rather than a promise about a boolean.
-    //
-    // electron-vite 5 moved this from a plugin (`externalizeDepsPlugin`, now deprecated) to
-    // `build.externalizeDeps`, which is ON BY DEFAULT and takes the same {include, exclude}.
-    // Same behaviour, one fewer import — but note the default: every environment below
-    // externalizes `dependencies` now whether or not it says so.
+    // electron-vite 5's `build.externalizeDeps` is ON BY DEFAULT: every environment below
+    // externalizes `dependencies` whether or not it says so.
     //
     // Inlined data JSONs (spells/mobs/items/classes) emit as JSON.parse("...") instead of
     // pretty-printed object literals — measured 4.66 MB smaller main bundle and a faster
@@ -33,7 +20,7 @@ export default defineConfig({
     json: { stringify: true, namedExports: false },
     build: {
       // ---- SOURCEMAPS (JOS-100) --------------------------------------------------------
-      // ON FOR ALL THREE BUNDLES, so an `errorReport`'s `out/…:line:col` frames can be turned
+      // ON FOR ALL THREE BUNDLES, so an error's `out/…:line:col` stack frames can be turned
       // back into source terms by `scripts/symbolicate.mts`. Without them a frame names a
       // minified file and a column, which is a fingerprint and not a diagnosis.
       //
@@ -121,11 +108,11 @@ export default defineConfig({
     // Large JSONs as JSON.parse("..."), as on Vite 7: see `json` on the main bundle.
     json: { namedExports: false },
     // ---- THE DEV-TOOLS STRIP -------------------------------------------------------------
-    // `__EQ_DEV_TOOLS__` is a COMPILE-TIME constant, not a runtime flag. The triage tab's whole
-    // component tree is reached only through `if (__EQ_DEV_TOOLS__) import('./features/triage/…')`,
-    // so substituting `false` here turns that branch into dead code and rollup tree-shakes the
-    // feature — its components, its strings and its imports — out of the bundle entirely. A
-    // runtime check would leave all of it shipped and merely hidden.
+    // `__EQ_DEV_TOOLS__` is a COMPILE-TIME constant, not a runtime flag. A dev-only surface is
+    // reached only through a branch on it, so substituting `false` here turns that branch into
+    // dead code and rollup tree-shakes the surface — its components, its strings and its
+    // imports — out of the bundle entirely. A runtime check would leave all of it shipped and
+    // merely hidden.
     //
     // TRUE ONLY UNDER `electron-vite dev`. That command sets NODE_ENV_ELECTRON_VITE=development
     // before it loads this file; `electron-vite build` sets 'production'. Anything else — a

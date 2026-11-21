@@ -19,8 +19,7 @@ Node on PATH (`export PATH="/c/Program Files/nodejs:$PATH"` on this machine).
 ## Fixture extractors (`tests/extract-*.mjs`) — run them under **tsx**
 
 `tests/fixtures/*.log` is committed to a PUBLIC repo, so every extractor routes its slice
-through the shared scrub. That scrub now lives in **`src/shared/logScrub.ts`** (TypeScript —
-the same drop list also governs the log slice an in-app feedback report attaches);
+through the shared scrub. That scrub now lives in **`src/shared/logScrub.ts`** (TypeScript);
 `tests/fixture-scrub.mjs` is a thin shim that binds the self-`/who` carve-out to `Primitive`.
 
 Because the import chain reaches a `.ts` file, run every extractor through the tsx loader:

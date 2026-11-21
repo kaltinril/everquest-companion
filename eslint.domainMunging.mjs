@@ -39,9 +39,8 @@
 // THE REGISTRY IS EXPLICIT, AND IT IS AUDITED. `DOMAIN_MODULES` is a hand-written list, which is a
 // duplicate of a fact that lives elsewhere and therefore able to rot. `tests/domainMunging.test.mts`
 // re-derives the domain surface and fails when a module that serves rows is missing from it — the
-// same shape as the audits in `tests/alertTargetToken.test.mts` and
-// `tests/breadcrumbVocabulary.test.mts`. A duplicated list is fine when something compares it
-// against the thing it duplicates.
+// same shape as the audit in `tests/alertTargetToken.test.mts`. A duplicated list is fine when
+// something compares it against the thing it duplicates.
 //
 // ---------------------------------------------------------------------------------------------
 // WHICH METHODS, AND — LOUDLY — WHICH NOT
