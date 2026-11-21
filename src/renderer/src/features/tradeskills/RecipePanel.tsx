@@ -59,7 +59,7 @@ function DropsLine({ ingredient }: { ingredient: BookIngredient }): JSX.Element 
     const sources = mergeItemSources(sourcesFor(ingredient.key), index.materials.get(ingredient.key)?.dropsFrom)
     return materialDrops(sources, eraOnly, dropCap(ingredient))
   }, [ingredient, index, eraOnly, met])
-  if (drops.shown.length === 0 && drops.outOfEra === 0) return null
+  if (drops.shown.length === 0) return null
   return (
     <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-material-drops">
       Drops:{' '}
@@ -77,7 +77,6 @@ function DropsLine({ ingredient }: { ingredient: BookIngredient }): JSX.Element 
         </Box>
       ))}
       {drops.more > 0 && ` +${String(drops.more)} more`}
-      {drops.outOfEra > 0 && `${drops.shown.length > 0 ? ' · ' : ''}${String(drops.outOfEra)} out of era, hidden`}
     </Typography>
   )
 }
