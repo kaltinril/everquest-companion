@@ -213,7 +213,7 @@ test('"Missing on the wiki" keeps only recipes with a gap, counts them, and says
   const { index } = fixture()
   const recipes = skillRecipes(index, 'Brewing')
   assert.equal(wikiGapCount(recipes), 3)
-  assert.equal(wikiGapSwitchLabel(3), 'Missing on the wiki (3)')
+  assert.equal(wikiGapSwitchLabel(3), 'Wiki is missing info (3)')
   const ask = (over: Partial<LadderAsk>): LadderAsk => ({ level: 50, query: '', hideTrivial: false, only: benchFilters(null, true), ...over })
   const ladder = recipeLadder(recipes, ask({}))
   // The rated one first, then the two with no trivial under their heading.

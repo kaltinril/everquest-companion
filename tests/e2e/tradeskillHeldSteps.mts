@@ -162,7 +162,7 @@ function rowsWith(page: Page, inner: string): Promise<{ rows: number; withIt: nu
 async function checkWikiGaps(page: Page): Promise<void> {
   const label = await switchLabel(page, GAPS_ONLY)
   const count = Number(/\((\d+)\)/.exec(label)?.[1] ?? 'NaN')
-  check('the recipes tab has a "Missing on the wiki" switch with a count', /^missing on the wiki \(\d+\)$/i.test(label), label)
+  check('the recipes tab has a "Missing on the wiki" switch with a count', /^wiki is missing info \(\d+\)$/i.test(label), label)
   await page.click(GAPS_ONLY)
   if (count === 0) {
     const empty = await settle(() => textOf(page, sel('tradeskill-empty')), (t) => t !== '', { timeoutMs: 10_000 })
