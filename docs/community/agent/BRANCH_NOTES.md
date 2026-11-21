@@ -2464,6 +2464,73 @@ only: no engine, parser, protocol, network or dependency change.
   - What's new line: "Tradeskills: the route has a Faction goal. Pick a faction and see which
     items of the tradeskill a quest takes to raise it, with the quest, its giver and zone, every
     faction change the wiki states, and the shopping list. Faction names open the Factions tab."
+- Slice 8, screen fixes after the first captures (2026-11-20, branch `tradeskills-screen-fixes` off
+  `tradeskills-batch3`; not merged, not tried by the owner). TypeScript only; no engine, protocol,
+  network, data or dependency change. Captures: a 1500 px window, the section about 1220 px wide.
+  Unit tests of the changed folds run; typecheck and lint run; e2e steps changed and NOT run.
+  - Recipe table. Seen: Materials showed one material ("Enchanted Gold Bar (Bought + Enc..."), You
+    was cut, and Container repeated one value down a tradeskill. Now six columns: Trivial 72 px,
+    Item 26%, Materials (what is left), Cost 112 px, Sells 112 px, You 23% with 8 px side padding.
+    At a 1205 px table: Item 313, Materials 319 (287 of text), You 277 (261 of text; "made 3,
+    failed 1, 2 raises (204 to 205)" is about 234). A line's Materials are counts and names only;
+    the hover (`materialsText`) and the panel keep the source words. `TABLE_MIN_WIDTH` stays 920.
+    TRAP: the third cell is now Materials, which holds links. An e2e click that only picks a line
+    goes to the Trivial cell (`td >> nth=0`).
+  - Shopping list. `ItemLabel` takes `wrap`: the name wraps in its column (the planner's
+    `DonorName` style cuts it; the override is a selector on its test id in `tradeskillLinks.tsx`,
+    because `PlannerChips.tsx` is another feature's file). Used for the list's lines and its head.
+  - Faction goal. SUPERSEDES the Order and Default pick bullets of slice 6:
+    - `TurnIn.group` (`RowGroup`) is the order's first key: `own` (the item's own page lists the
+      quest, alone or with the quest page, and the row is not marked shared), `shared` (marked
+      shared, item's page lists it), `questOnly` (the quest page alone names the item, marked
+      shared or not). Inside a group the old order stands. No row is dropped.
+    - `FactionChoice.own` counts a faction's `own` rows. `choices` are sorted by it (most first,
+      then name) and the default is the first. The count on screen is still the recipes.
+    - Measured on the committed data, in era, no level: Baking opens on Arcane Scientists (one
+      row: Uncooked Rat Ear Pie on Rat Ear Pie Quest); no Baking faction has more than one `own`
+      row, so the name decides among them. Tailoring opens on Rogues of the White Rose (14 rows,
+      all `own`). Pottery, Fletching and Fishing have no `own` row at all and open on the first
+      name.
+    - A row's changes on screen are `shownChanges(turnIn, all)`: the picked faction's own first,
+      then `CHANGE_CAP` (8) others, then "and N more" (`tradeskill-faction-more`), which opens the
+      whole list in the row and closes it again. `TurnIn.changes` is untouched.
+    - Above the panes: the basis line (reworded for the new order), `FactionRoute.notice` (the
+      level the log never showed, when that is so), then "How to read this"
+      (`tradeskill-faction-how`), which opens the four caveats in place. Closed until asked for;
+      `eq.tradeskills.factionHelp` in localStorage. `caveats` no longer holds the level line.
+  - Missing wiki materials are said in ONE line, `WikiGapLine` (`wikiGapText(gap, note)`,
+    `GapNote`): `guide` when the recipe guide's materials are drawn under it (decided by
+    `gapNote`, the same `guideMaterialsFor` every fold uses; `data-guide` on the line), `guideNone`
+    in the planner's tree, `noList` in the shopping list. Removed: `GUIDE_MATERIALS_TEXT`,
+    `PLAN_GUIDE_MATERIALS_TEXT`, `GUIDE_LIST_TEXT`, `NO_LIST_TEXT`, `NO_MATERIALS_TEXT` and the
+    `tradeskill-guide-materials`, `tradeskill-plan-guide-materials` and
+    `tradeskill-shopping-guide-list` elements. In the recipe panel `MaterialList` draws the gap
+    line itself; `tradeskill-no-materials` is now a wrapper around it.
+  - Home (owner asked whether the overview should be simpler; the page ran past one 860 px
+    screen):
+    - `homeDoors` (shared/tradeskillHome.ts): a tradeskill the log has shown keeps its full tile;
+      the rest are one row of small buttons under the tiles, "Not in your log yet"
+      (`tradeskills-unseen`), each "<Tradeskill> · N recipes". Every door keeps
+      `tradeskill-tile-<Tradeskill>` on an element holding a `button`, with `data-tile` = `seen`
+      or `unseen`. `tradeskill-tile-unseen` is gone. No tradeskill seen: all twelve in the row and
+      `NO_TRADESKILL_SEEN_LINE` above, said only once the skills module is served.
+    - Foraging is a tile of the same grid (`tradeskills-tiles`), after the tradeskills: level and
+      "Found, Failed, Found rate" on one line (`data-value` on each). A click opens the session
+      line, the items and the AA in `tradeskill-forage-detail`, a grid item spanning every column;
+      closed until asked for, `eq.tradeskills.forageOpen`. `ForagingTile` must sit inside a grid.
+    - "Make an item" is one row: heading (hover `PLAN_HOME_TIP`), search, count, and "Your plan"
+      when there is one. Results open under it.
+    - The era count beside the search is gone (Home and the planner screen): the header's count of
+      hidden recipes is the one stated. `PlanChoices.eraHidden` is still computed.
+  - Tests: `tradeskillRouteFaction.test.mts` (fixture) and the new
+    `tradeskillRouteFactionData.test.mts` (committed data; split at the lint's file length),
+    `tradeskillWiki.test.mts`, `tradeskillGuide.test.mts`, `tradeskillHome.test.mts`,
+    `tradeskillGather.test.mts`.
+  - e2e, changed and not run: `tradeskills.e2e.mts` (`stepHome`), `tradeskillHeldSteps.mts`,
+    `tradeskillPlanSteps.mts`, `tradeskillFactionSteps.mts`, `tradeskillHomeSteps.mts`,
+    `tradeskillGatherSteps.mts`. The faction step now reads the long list and the shopping list on
+    the faction with the most recipes, which its pick step leaves up, because the default faction
+    of Baking has one row.
 
 ## Tradeskill guides as data (fork #6, requirements/skills-tab.md)
 
