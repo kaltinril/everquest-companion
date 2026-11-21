@@ -429,17 +429,14 @@ export function failureWords(fault: EngineFaultSay): FailureWords {
 }
 
 /**
- * What the report button seeds the feedback form with.
+ * What the report button fills the GitHub issue's body with.
  *
- * PRE-TAGGED SO TRIAGE CAN FIND THEM. The feedback contract carries exactly one categorisation —
- * `type: 'feature' | 'bug'` — so the failure class rides in the description as a literal marker
- * rather than as a field that does not exist. `engine-fault: unhealthy` is greppable across the
- * report store, which is the whole requirement.
+ * PRE-TAGGED SO THE CLASS CAN BE FOUND: `engine-fault: unhealthy` is a literal marker a search of
+ * the issues finds.
  *
  * THE CANDIDATE PATHS ARE NOT IN IT, DELIBERATELY. They contain the user's own home directory, and
- * the telemetry bright line is that gameplay and machine detail never leave a client without the
- * user putting it there. They are drawn on the card, where the user can read them and type anything
- * they choose; what is seeded is the one word triage needs.
+ * an issue is public. They are drawn on the card, where the user can read them and type anything
+ * they choose; what is seeded is the one word a reader of the issue needs.
  */
 export function reportPrefill(fault: EngineFaultSay): string {
   return `engine-fault: ${fault.kind}\n\nWhat happened just before this appeared:\n`

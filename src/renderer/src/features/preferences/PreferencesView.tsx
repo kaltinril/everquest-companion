@@ -66,15 +66,13 @@
 //   What's new — the browsable release history, newest first, with everything since this
 //             install last read it marked new. A reading surface with no controls, which is why
 //             it is a section rather than a line under Updates (the same argument Performance
-//             and Usage analytics make). Lives in ../whatsnew/WhatsNewPanel.tsx, descriptor and
+//             makes). Lives in ../whatsnew/WhatsNewPanel.tsx, descriptor and
 //             all; the Version row above links straight to it.
-//   Usage analytics — the anonymous-counts switch, the rotatable id, and the payload
-//             viewer that makes the privacy claim checkable. ./TelemetrySetting.tsx.
 //   Performance — the title-bar CPU/memory HUD switch (off by default) and the read-only
 //             breakdown of how long this launch's startup took, phase by phase.
 //             Lives in ./PerfSetting.tsx.
-//   Feedback — the second entry point into the feedback DIALOG (the first is the nav
-//             drawer's footer). Feedback is not a view, so this section only opens it.
+//   Feedback — where reports go: this project's GitHub issues, as two links. The nav drawer's
+//             footer row opens the same new-issue page. ./FeedbackSetting.tsx.
 //   Thanks   — whose pictures these are (JOS-198). The app SHIPS ~3.75 MB of item icons and boss
 //             portraits copied from two volunteer-run wikis; this is where it says so, links
 //             them, and states the consequence a user cares about (they are on your machine, and
@@ -89,7 +87,6 @@ import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt'
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
 import IosShareIcon from '@mui/icons-material/IosShare'
 import FeedbackIcon from '@mui/icons-material/Feedback'
-import PrivacyTipIcon from '@mui/icons-material/PrivacyTip'
 import LayersIcon from '@mui/icons-material/Layers'
 import { ExportSettingsSetting, ImportSettingsSetting } from '../profiles/ProfileSharing'
 import { ClassComboSetting } from '../profiles/ClassComboPanel'
@@ -99,7 +96,7 @@ import { EqFolderSetting } from './EqFolderSetting'
 // Combat: whose damage the meters show (JOS-115) + where the pet's sits. Its own file with its own
 // descriptor, same ceiling and same answer as PerfSetting and GraphicsSetting.
 import { combatSection } from './CombatSection'
-import { FeedbackSetting, type OpenFeedback } from './FeedbackSetting'
+import { FeedbackSetting } from './FeedbackSetting'
 import { VoiceSetting } from './VoiceSetting'
 import { OverlayAutoHideSetting } from './OverlayAutoHideSetting'
 import { OverlaySnapSetting } from './OverlaySnapSetting'
@@ -112,7 +109,6 @@ import { AlertBannerSetting } from './AlertBannerSetting'
 import { ConCardSetting } from './ConCardSetting'
 // Cursor ring: another descriptor that lives beside its own card, same ceiling, same answer.
 import { cursorRingSection } from './CursorRingSetting'
-import { TelemetrySetting } from './TelemetrySetting'
 // Performance is the one section whose DESCRIPTOR lives with its card rather than here: this
 // file sits at the 400-code-line factoring ceiling, and the section's own file is the honest
 // place for the label, icon and search keywords that name it. See ./PerfSetting.tsx.
@@ -269,31 +265,6 @@ function overlaysSection(): PrefSection {
   }
 }
 
-/**
- * Usage analytics (docs/plans/usage-analytics.md). Its own factory for the same reason the two
- * above are — `buildSections` sits against the 100-code-line ceiling.
- *
- * It is a SECTION rather than a line inside another one because of what it contains: the switch
- * is one control, but the payload viewer beside it is the whole privacy claim made checkable,
- * and that does not belong tucked under "Updates".
- */
-function analyticsSection(): PrefSection {
-  return {
-    id: 'analytics',
-    label: 'Usage analytics',
-    icon: <PrivacyTipIcon fontSize="small" />,
-    items: [
-      {
-        id: 'telemetry',
-        label: 'Anonymous usage counts',
-        keywords:
-          'telemetry analytics usage privacy tracking opt out optout data collect anonymous id rotate payload send stats metrics',
-        content: <TelemetrySetting />
-      }
-    ]
-  }
-}
-
 /** What `buildSections` needs from the view. An OBJECT rather than four positional parameters:
  *  the repo's `max-params` ceiling is 4 and the fourth argument was the one that would have hit
  *  it, but the real reason is that "version" and "the way to the release notes" are two halves of
@@ -301,13 +272,12 @@ function analyticsSection(): PrefSection {
 interface SectionInputs {
   version: string
   status: UpdateStatus
-  onSendFeedback: OpenFeedback
   /** Rail switch to the What's new section — the Version row's link (JOS-73). */
   onWhatsNew: () => void
 }
 
 /** The whole settings table, in render order. Rebuilt only when its inputs change. */
-function buildSections({ version, status, onSendFeedback, onWhatsNew }: SectionInputs): PrefSection[] {
+function buildSections({ version, status, onWhatsNew }: SectionInputs): PrefSection[] {
   return [
     {
       id: 'game',
@@ -402,7 +372,6 @@ function buildSections({ version, status, onSendFeedback, onWhatsNew }: SectionI
     // Directly under Updates, which is where a person who just read the version number is
     // standing when they wonder what it changed (JOS-73).
     whatsNewSection(),
-    analyticsSection(),
     perfSection(),
     {
       id: 'feedback',
@@ -411,9 +380,9 @@ function buildSections({ version, status, onSendFeedback, onWhatsNew }: SectionI
       items: [
         {
           id: 'send-feedback',
-          label: 'Send feedback',
-          keywords: 'feedback bug report problem crash issue feature request idea suggest contact support log',
-          content: <FeedbackSetting onSend={onSendFeedback} />
+          label: 'Report a problem or an idea',
+          keywords: 'feedback bug report problem crash issue feature request idea suggest contact support github',
+          content: <FeedbackSetting />
         }
       ]
     },
@@ -526,13 +495,7 @@ function PrefSearch({
  * decides whether this function runs at all: hooks cannot be conditional, and `usePrefsSeed` has
  * to be able to say "there is a snapshot" without a null check in thirteen places.
  */
-function PreferencesPane({
-  onSendFeedback,
-  section
-}: {
-  onSendFeedback: OpenFeedback
-  section: string | null
-}): JSX.Element {
+function PreferencesPane({ section }: { section: string | null }): JSX.Element {
   const [query, setQuery] = useState('')
   const deferred = useDeferredValue(query)
   const [active, setActive] = useState(section ?? 'game')
@@ -556,8 +519,8 @@ function PreferencesPane({
   }, [pick])
 
   const sections = useMemo(
-    () => buildSections({ version, status, onSendFeedback, onWhatsNew: openWhatsNew }),
-    [version, status, onSendFeedback, openWhatsNew]
+    () => buildSections({ version, status, onWhatsNew: openWhatsNew }),
+    [version, status, openWhatsNew]
   )
   const keys = useMemo(() => sectionKeys(sections), [sections])
   const q = normalizeQuery(deferred)
@@ -629,17 +592,15 @@ function PreferencesPane({
  * jump — and there is nothing to look at in an empty pane anyway.
  */
 export default function PreferencesView({
-  onSendFeedback,
   section = null
 }: {
-  onSendFeedback: OpenFeedback
   /** A deep link's landing section, or null for the usual one. App KEYS this component on it,
    *  so an arriving link paints its section on the first frame and needs no effect here. */
   section?: string | null
 }): JSX.Element {
   return (
     <PrefsGate>
-      <PreferencesPane onSendFeedback={onSendFeedback} section={section} />
+      <PreferencesPane section={section} />
     </PrefsGate>
   )
 }
