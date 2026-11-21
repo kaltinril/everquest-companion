@@ -1,7 +1,7 @@
 // macros/sets.ts — named layouts (slot to library macro), the set chosen per character file, and
 // what a set would change in a character file. Pure and immutable, like library.ts.
 
-import { BUTTONS_PER_PAGE, LINES } from './limits'
+import { BUTTONS_PER_PAGE, FIRST_EDITABLE_PAGE, LINES } from './limits'
 import { findMacro, importGameMacros, sameBody, systemMint } from './library'
 import { bySlot, parseSlotKey, slotKey, trimLines } from './socials'
 import type { GameMacro, Macro, MacroLibrary, MacroSet, Mint } from './types'
@@ -164,9 +164,13 @@ export interface SlotDiff {
   file: GameMacro | null
 }
 
-/** Per slot, what sending the set to the file would do. Sorted by slot. */
+/**
+ * Per slot, what sending the set to the file would do. Sorted by slot. The file's pages below
+ * FIRST_EDITABLE_PAGE are left out: a send keeps them as they are (socialsWrite.ts).
+ */
 export function diffSetAgainstFile(setMacros: readonly GameMacro[], fileMacros: readonly GameMacro[]): SlotDiff[] {
-  const inFile = new Map(fileMacros.map((m) => [slotKey(m.page, m.button), m]))
+  const editable = fileMacros.filter((m) => m.page >= FIRST_EDITABLE_PAGE)
+  const inFile = new Map(editable.map((m) => [slotKey(m.page, m.button), m]))
   const out: SlotDiff[] = []
   for (const set of setMacros) {
     const key = slotKey(set.page, set.button)

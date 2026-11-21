@@ -7,8 +7,8 @@ import type { CharacterFile, GameMacro, MacroBody } from './types'
 /** A `LineN` past this is not a macro line; it guards the array a stray number would make. */
 const MAX_LINE_NUMBER = 20
 
-const SECTION = /^\[(.*)\]\s*$/
-const SOCIAL_KEY = /^Page(\d+)Button(\d+)(Name|Color|Line(\d+))=(.*)$/i
+export const SECTION = /^\[(.*)\]\s*$/
+export const SOCIAL_KEY = /^Page(\d+)Button(\d+)(Name|Color|Line(\d+))=(.*)$/i
 
 export function slotKey(page: number, button: number): string {
   return `${String(page)}:${String(button)}`
