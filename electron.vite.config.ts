@@ -4,12 +4,6 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   main: {
-    // `include` BELOW IS A LEFTOVER (2026-11-20). It externalized `pg` and three `@aws-sdk/*`
-    // devDependencies for the owner-only triage surface (src/main/triage/**), which is removed.
-    // Nothing main imports reaches them now, so the line does nothing; it is left until the next
-    // packaged build can confirm that, because a change to this config is checked with a real
-    // `npm run dist` (docs/community/RULES.md rule 11).
-    //
     // electron-vite 5's `build.externalizeDeps` is ON BY DEFAULT: every environment below
     // externalizes `dependencies` whether or not it says so.
     //
@@ -32,14 +26,13 @@ export default defineConfig({
       // asked for, and for a future closed dependency it would be.
       sourcemap: true,
       externalizeDeps: {
-        include: ['pg', '@aws-sdk/client-s3', '@aws-sdk/credential-providers', '@aws-sdk/dsql-signer'],
         // ESM-only since electron-store 9 and chokidar 5. This bundle is CommonJS, and a bare
         // `require()` of an ES module hands back its namespace, not the class; bundled, the
         // import is converted at build time instead.
         exclude: ['electron-store', 'chokidar']
       },
       rollupOptions: {
-        // FOUR main-process bundles. `index` is the app; the other three are worker_threads,
+        // Main-process bundles. `index` is the app; the others are worker_threads,
         // and each is a separate entry for the same reason: `new Worker(path)` loads a FILE, so
         // rolling one into index.js would give the worker no file to load, and bundling it as a
         // data-url string would put a native `require` inside an eval. Each is emitted beside
@@ -56,11 +49,6 @@ export default defineConfig({
         //     parsed once per game patch. Same rule as speechWorker's: the thread that tails the
         //     log cannot spend a few hundred milliseconds of uninterruptible splitting, and
         //     JOS-371 says so in general terms.
-        //   * perfProbeWorker — the SECOND CLOCK (JOS-367). Not offloaded work: it is a 250 ms
-        //     timer measuring its own lateness, and its whole value is that it runs somewhere
-        //     main does not. Two threads late in the same half second means the MACHINE stalled;
-        //     only main late means we did. A rollup into index.js would leave the verdict
-        //     unmeasurable, which is the strongest form of "this needs its own entry".
         //   * fontReaderWorker — the screenshot reader's exact font match (shot/fontReader.ts):
         //     0.05-2.5 s of pure CPU a window, which main cannot spend. Same rule as the others.
         //   * jsonChunkWorker — a big JSON file (the resist cache, the resist ledger) read and
@@ -72,7 +60,6 @@ export default defineConfig({
           index: resolve(__dirname, 'src/main/index.ts'),
           speechWorker: resolve(__dirname, 'src/main/speech/worker.ts'),
           presenceWorker: resolve(__dirname, 'src/main/presenceWorker.ts'),
-          perfProbeWorker: resolve(__dirname, 'src/main/perfProbeWorker.ts'),
           resistTableWorker: resolve(__dirname, 'src/main/resistTableWorker.ts'),
           fontReaderWorker: resolve(__dirname, 'src/main/fontReaderWorker.ts'),
           jsonChunkWorker: resolve(__dirname, 'src/main/jsonChunkWorker.ts'),

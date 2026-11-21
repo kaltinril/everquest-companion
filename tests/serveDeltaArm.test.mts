@@ -211,7 +211,6 @@ test('the world-rebuilt signal reaches the damage-meter overlay, without widenin
   assert.ok(body, 'sendWorldRebuilt not found')
   assert.match(body[0], /sendToCharacterAwareOverlays\(IPC\.onCharacter, character\)/)
   assert.doesNotMatch(body[0], /sendToModuleOverlays\(/, 'the rebuild still uses the module-only fan-out')
-  assert.match(body[0], /timeSeam\('worldRebuilt'/, 'the perf seam bracket was dropped')
 
   // The character-aware helper iterates the character-aware list; the module helper is untouched.
   const aware = /export function sendToCharacterAwareOverlays\([\s\S]*?\n\}/.exec(mod)

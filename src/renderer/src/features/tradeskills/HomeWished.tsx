@@ -16,6 +16,7 @@ import { Box, Paper, Stack, Typography } from '@mui/material'
 import type { PlanDeps } from '@shared/tradeskillPlan'
 import { GATHER_NOTE, planHave } from '@shared/tradeskillPlanGather'
 import { heldKnown } from '@shared/tradeskillHeld'
+import { lastPaid } from '@shared/tradeskillMoney'
 import {
   WISHED_HEADING,
   WISHED_SUBTITLE,
@@ -75,7 +76,7 @@ export function HomeWished({ facts, onPlan }: { facts: HomeFacts; onPlan: OpenPl
     if (!wishlist.ready || !levels.served) return []
     const deps: PlanDeps = { index, guides }
     const have = heldKnown(held, craft) ? planHave({ index: held.index, dumpedAt: held.dumpedAt }, craft) : null
-    return wishedCrafts({ deps, wishes: wishlist.list.entries, rows: levels.rows, have })
+    return wishedCrafts({ deps, wishes: wishlist.list.entries, rows: levels.rows, have, paid: (key) => lastPaid(craft, key) !== null })
   }, [wishlist.ready, wishlist.list, index, guides, levels, craft, held])
   if (rows.length === 0) return null
   return (
