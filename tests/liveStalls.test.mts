@@ -147,3 +147,23 @@ test('the timeline is a bounded ~10-minute ring of PLAIN DATA, and a report does
   resetLiveProbe()
   assert.equal(peekLiveTimeline(now).main.length, 0)
 })
+
+test('NOBODY DRAINS ON A TIMER ANY MORE, so an undrained probe is capped at one window of ticks', () => {
+  // The ten-minute session report that used to empty these lists is removed. With the HUD open
+  // the probe ticks four times a second for as long as the app runs, so the lists hold the newest
+  // window and no more.
+  resetLiveProbe()
+  const window = LIVE_TIMELINE_MS / LIVE_PROBE_INTERVAL_MS
+  const base = 5_000_000
+  const late = Array.from({ length: window + 600 }, (_, i) => ({
+    at: base + i * LIVE_PROBE_INTERVAL_MS,
+    lateMs: LIVE_STALL_LATE_MS + i
+  }))
+  noteLiveProbeSamples(late, late)
+  const reading = takeLiveProbeReading()
+  assert.equal(reading?.samples, window, 'the fold covers one window, not the whole session')
+  // …and it kept the NEWEST: the largest lateness in the run is still in the fold.
+  assert.equal(reading?.maxMs, LIVE_STALL_LATE_MS + window + 599)
+  assert.ok((reading?.coincident ?? 0) <= window, 'the two late lists were capped the same way')
+  resetLiveProbe()
+})

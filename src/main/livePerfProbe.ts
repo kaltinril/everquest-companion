@@ -14,8 +14,9 @@
 // A LEAF, LIKE `log/tailIoStats.ts`: plain data in memory, started by `perf.ts`.
 //
 // NOTHING DRAINS IT SINCE 2026-11-20. Its two readers were the usage-analytics session report
-// (`takeLiveProbeReading`) and the feedback report's perf block (`peekLiveTimeline`), and both
-// are removed. The clocks still run while the HUD is open and the two readers are still exported.
+// (`takeLiveProbeReading`, every ten minutes) and the feedback report's perf block
+// (`peekLiveTimeline`), and both are removed. The clocks still run while the HUD is open and the
+// two readers are still exported, so the undrained lists are capped (`MAX_UNDRAINED`).
 //
 // ============================ WHAT IT COSTS, MEASURED =============================
 // Rule 1 of perf.ts's performance contract is that an instrument which costs something is a bug,
@@ -85,6 +86,16 @@ const mainRing: LiveLateSample[] = []
 const workerRing: LiveLateSample[] = []
 let dueAt = 0
 
+/** The most an undrained list may hold: one timeline window of ticks. The ten-minute drain that
+ *  used to empty `pending`, `mainLate` and `workerLate` is gone (see the header), and a list
+ *  nobody empties must not grow for as long as the HUD is open. */
+const MAX_UNDRAINED = Math.ceil(LIVE_TIMELINE_MS / LIVE_PROBE_INTERVAL_MS)
+
+/** Keep the newest `MAX_UNDRAINED` entries. */
+function cap(list: unknown[]): void {
+  if (list.length > MAX_UNDRAINED) list.splice(0, list.length - MAX_UNDRAINED)
+}
+
 /** Drop everything older than the ring's span. Called on the probe's own tick, so the bound is
  *  TIME rather than a sample count that would mean different spans on different cadences. */
 function trim(ring: LiveLateSample[], now: number): void {
@@ -96,10 +107,14 @@ function trim(ring: LiveLateSample[], now: number): void {
 
 function noteMain(lateMs: number, at: number): void {
   pending.push(lateMs)
+  cap(pending)
   if (lateMs >= LIVE_PROBE_REPORT_MS) {
     const sample = { at, lateMs }
     mainRing.push(sample)
-    if (lateMs >= LIVE_STALL_LATE_MS) mainLate.push(sample)
+    if (lateMs >= LIVE_STALL_LATE_MS) {
+      mainLate.push(sample)
+      cap(mainLate)
+    }
   }
   trim(mainRing, at)
   trim(workerRing, at)
@@ -111,7 +126,10 @@ function noteWorker(msg: LiveProbeMessage): void {
   if (msg.k !== 'late') return
   const sample = { at: msg.at, lateMs: msg.lateMs }
   workerRing.push(sample)
-  if (msg.lateMs >= LIVE_STALL_LATE_MS) workerLate.push(sample)
+  if (msg.lateMs >= LIVE_STALL_LATE_MS) {
+    workerLate.push(sample)
+    cap(workerLate)
+  }
 }
 
 // ---- the two probes ------------------------------------------------------------------------
