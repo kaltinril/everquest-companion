@@ -14,6 +14,11 @@ export type ButtonMark = 'new' | 'changed' | 'removed'
 
 const MARKS: Record<SlotChange, ButtonMark | null> = { added: 'new', changed: 'changed', removed: 'removed', same: null }
 
+/** The mark for one slot of a diff; null when the slot matches the game. */
+export function markOf(kind: SlotChange): ButtonMark | null {
+  return MARKS[kind]
+}
+
 /** What sending a layout to a character file would do. */
 export interface GameChanges {
   /** The layout as the game would hold it: what a send writes. */
@@ -56,7 +61,7 @@ export function gridPage(library: MacroLibrary, set: MacroSet, page: number, fil
     const slot = slotKey(page, i + 1)
     const d = bySlotKey.get(slot) ?? null
     const macroId = slot in set.slots ? set.slots[slot] : null
-    return { button: i + 1, slot, macro: findMacro(library, macroId), mark: d === null ? null : MARKS[d.kind], game: d?.file ?? null }
+    return { button: i + 1, slot, macro: findMacro(library, macroId), mark: d === null ? null : markOf(d.kind), game: d?.file ?? null }
   })
 }
 

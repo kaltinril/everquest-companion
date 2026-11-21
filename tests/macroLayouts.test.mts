@@ -20,6 +20,7 @@ import {
 } from '../src/shared/macros/layouts'
 import { emptyLibrary, removeMacro, updateMacro } from '../src/shared/macros/library'
 import { addSet, assignSlot, chooseSet, chosenSet, newSet, setToGameMacros } from '../src/shared/macros/sets'
+import { usedTagList } from '../src/shared/macros/tags'
 import type { CharacterFileMacros, GameMacro, MacroLibrary, Mint } from '../src/shared/macros/types'
 import { macroSection } from '../src/renderer/src/features/macros/macroSection'
 
@@ -292,6 +293,13 @@ test('where a macro sits: characters by name, saved layouts as "the layout X"', 
   assert.deepEqual(alsoOn(library, pet, kal.id, '3:12'), [])
   const lonely = placeNewMacro(library, kal.id, '9:9', mint)
   assert.equal(usedOnText(assignSlot(lonely.library, kal.id, '9:9', null), lonely.macro?.id ?? ''), 'Not on any button yet.')
+})
+
+test('the tag chips of a picker: only the tags some macro carries', () => {
+  const { library } = ensured()
+  assert.deepEqual(usedTagList(library), [])
+  const tagged = updateMacro(updateMacro(library, library.macros[0].id, { tags: ['pet', 'mine'] }, 1), library.macros[1].id, { tags: ['pet'] }, 2)
+  assert.deepEqual(usedTagList(tagged).map((t) => [t.tag, t.count]), [['pet', 2], ['mine', 1]])
 })
 
 test('the remembered section: Characters unless Library was the one left open', () => {

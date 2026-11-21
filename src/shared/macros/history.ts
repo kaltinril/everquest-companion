@@ -43,11 +43,11 @@ export function amend<T>(history: History<T>, next: T): History<T> {
   return next === history.present ? history : { ...history, present: next }
 }
 
-export function canUndo<T>(history: History<T>): boolean {
+export function canUndo(history: History<unknown>): boolean {
   return history.past.length > 0
 }
 
-export function canRedo<T>(history: History<T>): boolean {
+export function canRedo(history: History<unknown>): boolean {
   return history.future.length > 0
 }
 

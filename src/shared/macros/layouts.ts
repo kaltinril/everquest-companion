@@ -31,6 +31,11 @@ function editable(macros: readonly GameMacro[]): GameMacro[] {
   return macros.filter((m) => m.page >= FIRST_EDITABLE_PAGE)
 }
 
+/** How many buttons a character file fills on the pages a layout holds. */
+export function gameButtonCount(macros: readonly GameMacro[]): number {
+  return editable(macros).length
+}
+
 /** What `ensureCharacterLayouts` took from the game: library macros added, and from which characters. */
 export interface BroughtIn {
   macros: number
