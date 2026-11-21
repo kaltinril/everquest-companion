@@ -313,7 +313,8 @@ fn bind_pet_claim(st: &mut EngineState, name: &str, ts: i64, via: &str) {
     // Anything that names itself yours stops being anybody else's. All three claim routes are
     // first-person and ownership-definitive; an ally bind rests on a broadcast, which is weaker by
     // construction, so this override needs no tie-break.
-    st.ally.release(&key);
+    let guess = st.ally.release(&key);
+    st.ally.clear_own_summon();
     let promote = st.world.pet_instance(name).is_none() && st.charm.claim_is_charmed(&key, ts);
     let inst = if promote {
         st.world.charm(name, ts)
@@ -328,7 +329,12 @@ fn bind_pet_claim(st: &mut EngineState, name: &str, ts: i64, via: &str) {
     // row, so it moves, as a group mate's pet's does on its leader line (`ally_pet_leader`). A mob a
     // charm broadcast named was retracted then (`ingest_charm`), so a promote finds nothing to move.
     let why = format!("claimed as your pet{}", claim_note(via));
-    st.rekey_other(&key, &routing::pet_source(&id, label.clone()), &why);
+    let mine = routing::pet_source(&id, label.clone());
+    st.rekey_other(&key, &mine, &why);
+    // …and so does a row a summon guess had given to a group mate.
+    if let Some(guess) = guess {
+        st.settle_guessed_pet(&guess, &mine);
+    }
     st.note_pet(&key);
     // The claim is also the corroboration a provisional charm bind was waiting for.
     st.charm.note_pet_evidence(&key);
@@ -361,13 +367,20 @@ fn ally_pet_leader(st: &mut EngineState, ev: &Event) {
     if st.is_player_side(&id_key(pet)) {
         return;
     }
+    // A summon guess about this pet, as it stood before the line: the line replaces it.
+    let guess = st.ally.bind_of(&id_key(pet)).cloned();
     let bound = ingest_ally_pet_leader(st, ev);
     let why = format!(
         "named {} its leader",
         ev.str(Key::Owner).unwrap_or_default()
     );
     match bound {
-        Some(to) => st.rekey_other(&id_key(pet), &to, &why),
+        Some(to) => {
+            st.rekey_other(&id_key(pet), &to, &why);
+            if let Some(guess) = guess {
+                st.settle_guessed_pet(&guess, &to);
+            }
+        }
         None => st.retract_other(&id_key(pet), &why),
     }
 }
@@ -916,6 +929,11 @@ fn ingest_cast(st: &mut EngineState, ev: &Event) -> bool {
                     }
                 }
             }
+            // Replayed or live: while a summon of YOURS has no pet to its name, a new pet name
+            // may be yours, so none is guessed for a group mate (`ally.rs infer_summon_owner`).
+            if ev.str(Key::Spell).is_some_and(is_pet_summon_spell) {
+                st.ally.note_own_summon(ev.ts());
+            }
             true
         }
         Kind::CastFizzle | Kind::CastInterrupted => {
@@ -928,6 +946,11 @@ fn ingest_cast(st: &mut EngineState, ev: &Event) -> bool {
                 // because an arm can only exist if something armed it live.
                 if is_pet_summon_spell(spell) {
                     st.pet_nudge.note_cast_failed();
+                    // A fizzle summoned nothing. An interrupt can still recover, so it is left
+                    // waiting: the side that guesses less.
+                    if ev.kind_of() == Kind::CastFizzle {
+                        st.ally.clear_own_summon();
+                    }
                 }
             }
             true
@@ -941,12 +964,14 @@ fn ingest_cast(st: &mut EngineState, ev: &Event) -> bool {
             };
             let caster_key = id_key(caster);
             let allowed = st.ally_caster_allowed(&caster_key);
+            let member = st.is_member(&caster_key);
             st.ally.note_cast(&AllyCastLine {
                 caster,
                 caster_key: &caster_key,
                 spell,
                 ts: ev.ts(),
                 allowed,
+                member,
             });
             true
         }
