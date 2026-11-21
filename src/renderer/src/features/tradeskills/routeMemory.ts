@@ -5,8 +5,10 @@
 //                           "Only use materials I have" switch, per tradeskill like the goal
 //                           (`eq.tradeskills.heldOnly.<Tradeskill>`), the faction picked for
 //                           the Faction goal, per tradeskill
-//                           (`eq.tradeskills.faction.<Tradeskill>`, its join key), and the number
-//                           of combines the shopping list is for
+//                           (`eq.tradeskills.faction.<Tradeskill>`, its join key), whether the
+//                           Faction goal's "How to read this" notes are open
+//                           (`eq.tradeskills.factionHelp`, closed until asked for), and the
+//                           number of combines the shopping list is for
 //
 // A stored value degrades, never errors: anything unreadable is the default (`asGoal`,
 // `asCombines`). A stored faction the tradeskill's list no longer holds reads as no pick
@@ -22,6 +24,7 @@ const GOAL_KEY = 'eq.tradeskills.goal'
 const COMBINES_KEY = 'eq.tradeskills.combines'
 const HELD_ONLY_KEY = 'eq.tradeskills.heldOnly'
 const FACTION_KEY = 'eq.tradeskills.faction'
+const FACTION_HELP_KEY = 'eq.tradeskills.factionHelp'
 
 /** The goal picked on one tradeskill's workbench; Cheapest until the player picks another. */
 export function useGoal(tradeskill: Tradeskill): [RouteGoal, (next: RouteGoal) => void] {
@@ -37,6 +40,11 @@ export function useHeldOnly(tradeskill: Tradeskill): [boolean, (next: boolean) =
 /** The faction picked for the Faction goal on one tradeskill's route (its join key); null until the player picks. */
 export function useFactionPick(tradeskill: Tradeskill): [string | null, (next: string) => void] {
   return useRawPref(`${FACTION_KEY}.${tradeskill}`)
+}
+
+/** Whether the Faction goal's reading notes are open, on every workbench; closed until the reader opens them. */
+export function useFactionHelp(): [boolean, (next: boolean) => void] {
+  return useBoolPref(FACTION_HELP_KEY, false)
 }
 
 /** How many combines the shopping list is for, on every workbench. */
