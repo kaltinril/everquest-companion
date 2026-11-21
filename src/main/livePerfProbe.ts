@@ -11,11 +11,12 @@
 // was stalled by the same thing; ONLY MAIN late ⇒ we stalled, and that is a bug with an address.
 // `coincidentWindows` (shared/perfLive.ts) is that verdict; this file is its two instruments.
 //
-// A LEAF, LIKE `log/tailIoStats.ts`, AND FOR THE SAME TWO REASONS. It is plain data in memory
-// with no idea the user's telemetry switch exists (the telemetry seam drains it and applies the
-// gate, once, where every other producer does), and it must not join an import cycle: `perf.ts`
-// starts it and `telemetry/liveRiders.ts` drains it, and if this module reached back into either
-// the two would be a loop under the app's own privacy boundary.
+// A LEAF, LIKE `log/tailIoStats.ts`: plain data in memory, started by `perf.ts`.
+//
+// NOTHING DRAINS IT SINCE 2026-11-20. Its two readers were the usage-analytics session report
+// (`takeLiveProbeReading`, every ten minutes) and the feedback report's perf block
+// (`peekLiveTimeline`), and both are removed. The clocks still run while the HUD is open and the
+// two readers are still exported, so the undrained lists are capped (`MAX_UNDRAINED`).
 //
 // ============================ WHAT IT COSTS, MEASURED =============================
 // Rule 1 of perf.ts's performance contract is that an instrument which costs something is a bug,
@@ -85,6 +86,16 @@ const mainRing: LiveLateSample[] = []
 const workerRing: LiveLateSample[] = []
 let dueAt = 0
 
+/** The most an undrained list may hold: one timeline window of ticks. The ten-minute drain that
+ *  used to empty `pending`, `mainLate` and `workerLate` is gone (see the header), and a list
+ *  nobody empties must not grow for as long as the HUD is open. */
+const MAX_UNDRAINED = Math.ceil(LIVE_TIMELINE_MS / LIVE_PROBE_INTERVAL_MS)
+
+/** Keep the newest `MAX_UNDRAINED` entries. */
+function cap(list: unknown[]): void {
+  if (list.length > MAX_UNDRAINED) list.splice(0, list.length - MAX_UNDRAINED)
+}
+
 /** Drop everything older than the ring's span. Called on the probe's own tick, so the bound is
  *  TIME rather than a sample count that would mean different spans on different cadences. */
 function trim(ring: LiveLateSample[], now: number): void {
@@ -96,10 +107,14 @@ function trim(ring: LiveLateSample[], now: number): void {
 
 function noteMain(lateMs: number, at: number): void {
   pending.push(lateMs)
+  cap(pending)
   if (lateMs >= LIVE_PROBE_REPORT_MS) {
     const sample = { at, lateMs }
     mainRing.push(sample)
-    if (lateMs >= LIVE_STALL_LATE_MS) mainLate.push(sample)
+    if (lateMs >= LIVE_STALL_LATE_MS) {
+      mainLate.push(sample)
+      cap(mainLate)
+    }
   }
   trim(mainRing, at)
   trim(workerRing, at)
@@ -111,7 +126,10 @@ function noteWorker(msg: LiveProbeMessage): void {
   if (msg.k !== 'late') return
   const sample = { at: msg.at, lateMs: msg.lateMs }
   workerRing.push(sample)
-  if (msg.lateMs >= LIVE_STALL_LATE_MS) workerLate.push(sample)
+  if (msg.lateMs >= LIVE_STALL_LATE_MS) {
+    workerLate.push(sample)
+    cap(workerLate)
+  }
 }
 
 // ---- the two probes ------------------------------------------------------------------------
@@ -177,17 +195,15 @@ export function stopLiveProbe(): void {
 
 /**
  * WHO WANTS THE CLOCKS (audit item 8). Two 250 ms timers, one of them a thread, ran from
- * `replayDone` to quit on every install, and their readings go two places: the telemetry riders
- * (`takeLiveProbeReading`, sent only when collection is on) and the perf HUD's attribution rings.
- * With neither on they measured for nobody. The probes now run while the launch is past
- * `replayDone` AND the HUD is open or telemetry collection is enabled; `perf.ts` and the telemetry
- * toggle report those facts here, and this module, which imports nothing Electron, decides.
+ * `replayDone` to quit on every install. With nobody reading they measured for nobody. The probes
+ * now run while the launch is past `replayDone` AND the HUD is open; `perf.ts` reports those
+ * facts here, and this module, which imports nothing Electron, decides.
  */
-const demand = { armed: false, hud: false, telemetry: false }
+const demand = { armed: false, hud: false }
 
 export function setLiveProbeDemand(key: keyof typeof demand, on: boolean): void {
   demand[key] = on
-  const wanted = demand.armed && (demand.hud || demand.telemetry)
+  const wanted = demand.armed && demand.hud
   if (wanted) startLiveProbe()
   else stopLiveProbe()
 }

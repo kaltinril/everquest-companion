@@ -62,30 +62,6 @@ import { outputsApi } from './outputs'
 // the bottom of that file.
 import type { CursorRingPrefs, OverlayAutoHidePrefs } from '../shared/presencePrefs'
 import type { ShareApplyResult, SharePreview } from '../shared/profiles'
-import type {
-  FeedbackDraft,
-  FeedbackEnv,
-  // The DUMP preview shape (JOS-296) is taken from the shared contract rather than re-declared
-  // here, unlike its slice sibling below. The slice's preload shape genuinely differs from the
-  // shared one (main adds `windowMinutes`, the window it actually used); the dump's does not, and
-  // a second hand-written copy of an identical shape is a shape that will eventually disagree
-  // with itself.
-  FeedbackInventoryPreview,
-  /** The achievements dump's preview (JOS-441), taken from the contract for the same reason. */
-  FeedbackAchievementsPreview,
-  LogSliceMeta,
-  FeedbackContext,
-  SubmitErrorCode,
-  SubmitResult as SharedSubmitResult
-} from '../shared/feedback'
-// Usage analytics (docs/plans/usage-analytics.md). The event union is a SHARED contract — the
-// renderer builds values of it, main re-validates them at the handler, and wave A2's Lambda
-// validates them again on arrival, all from one definition.
-import type {
-  TelemetryEvent,
-  TelemetryPayloadView,
-  TelemetryPrefs
-} from '../shared/telemetry'
 // Performance profiling (docs/plans/perf-profiling.md). Same arrangement as presencePrefs: the
 // shapes live beside their pure helpers in shared/perf.ts, not in types.ts, because
 // storeMigrations.ts must reach the prefs normalizer from module scope.
@@ -118,19 +94,6 @@ import { engineBridge } from './engine'
 // The NOTES are committed source the renderer imports directly — see ./releaseNotes.ts.
 import { releaseNotesBridge } from './releaseNotes'
 import type { SettingsRecoveryNotice } from '../shared/settingsRecovery'
-// The DEV-ONLY triage surface (see the banner above its methods, below). Types only — the
-// contract lives in src/shared so main, preload and the renderer name one definition.
-import type {
-  TriageAnalytics,
-  TriageDetail,
-  TriageDigest,
-  TriageListQuery,
-  TriageOpsState,
-  TriagePatch,
-  TriageResult,
-  TriageRow,
-  TriageSlice
-} from '../shared/triage'
 
 /** Reply of share:saveFile — the OS save dialog either wrote a file or was cancelled. */
 export interface ShareSaveResult {
@@ -138,57 +101,6 @@ export interface ShareSaveResult {
   path?: string
   canceled?: boolean
   error?: string
-}
-
-// ---- in-app feedback (Task #65) ----
-//
-// The WIRE contract (draft, env, limits, validators) lives in `src/shared/feedback.ts` — one
-// definition for renderer, main and the ingest Lambda. What follows is the BRIDGE's own reply
-// shapes, which are renderer-facing only and therefore declared here, exactly like
-// `ShareSaveResult` above: main's `src/main/feedback/index.ts` names the same shapes on its own
-// side of the boundary, and neither tsconfig lets the renderer import that file.
-
-/** Reply of feedback:context — TAKEN FROM THE SHARED CONTRACT, not re-declared.
- *
- *  The rule this file states for `FeedbackInventoryPreview` above, applied where it had been
- *  ignored: main's `feedbackContext()` returns exactly this shape and the shared definition is
- *  the one both sides already read, so a hand-written third copy here was a shape that would
- *  eventually disagree with itself — and JOS-441 adding two fields to it was the third time all
- *  three copies had to be edited in step. */
-export type { FeedbackContext } from '../shared/feedback'
-
-/**
- * Reply of feedback:buildSlice — the metadata plus a CAPPED preview. The gz BYTES never cross
- * IPC (§5.4): at most `PREVIEW_MAX_LINES` lines of text do, and `truncatedPreview` says when
- * that is less than the whole slice, which is what "Save a copy…" exists for.
- */
-export type FeedbackSlicePreview = LogSliceMeta & {
-  previewLines: string[]
-  truncatedPreview: boolean
-  /** The window ACTUALLY used, after any fit-driven halving — not necessarily the one asked for. */
-  windowMinutes: number
-}
-
-/** Reply of feedback:submit. NEVER a rejection: a network failure resolves with `queued:true`.
- *
- *  THE SHARED RESULT PLUS THE TWO DIALOG HINTS, expressed as that rather than retyped: `field`
- *  lets an `invalid_payload` focus the offending input and `retryAfterSec` lets a
- *  `quota_exceeded` say when, and neither is on the wire. Every other field — including each new
- *  attachment's `…Uploaded` — comes from the contract and cannot drift from it. */
-export type SubmitResult =
-  | Extract<SharedSubmitResult, { ok: true }>
-  | (Extract<SharedSubmitResult, { ok: false }> & { field?: string; retryAfterSec?: number })
-
-/** Args of feedback:submit's second parameter — re-validated at the handler. */
-export interface SubmitOpts {
-  attachLog: boolean
-  windowMinutes: number
-  /** Attach the current `/outputfile inventory` dump (JOS-296). Default ON for bug reports —
-   *  an owner ruling, and a VISIBLE checkbox: this is per-report consent, never a silent send. */
-  attachInventory: boolean
-  /** Attach the current `/outputfile achievements` dump (JOS-441). Same default, same visible
-   *  checkbox, same per-report consent — one box per file, never one box for "my exports". */
-  attachAchievements: boolean
 }
 
 export type { CharacterRef, EqConfig, EqConfigResult, LogLine, LogSwitchNudge, LootEvent, ProgressState }
@@ -211,29 +123,7 @@ export type { AppFocus, UpdateStatus }
 export type { EngineConnection } from './engine'
 export type { CursorRingPrefs, OverlayAutoHidePrefs }
 export type { ShareApplyResult, SharePreview }
-export type {
-  FeedbackAchievementsPreview,
-  FeedbackDraft,
-  FeedbackEnv,
-  FeedbackInventoryPreview,
-  LogSliceMeta,
-  SubmitErrorCode
-}
-export type { TelemetryEvent, TelemetryPayloadView, TelemetryPrefs }
 export type { PerfHudPrefs, PerfSample, StartupProfile }
-// Dev-only triage (above): re-exported for the same reason every other payload shape is — a
-// renderer view names them without reaching across the tsconfig boundary into src/shared.
-export type {
-  TriageAnalytics,
-  TriageDetail,
-  TriageDigest,
-  TriageListQuery,
-  TriageOpsState,
-  TriagePatch,
-  TriageResult,
-  TriageRow,
-  TriageSlice
-}
 // The combo module rides the generic transport, so the renderer never names these on an API
 // method — re-exported here for the same reason every other module payload is: so a view can
 // say `useModule<ComboSnap, ComboDelta>('combo', …)` without reaching across the tsconfig
@@ -285,20 +175,11 @@ export interface RendererErrorReport {
   /**
    * The error's own NAME (`TypeError`, `RangeError`), when the thrown value had one (JOS-100).
    *
-   * It used to be folded into `message` and lost, which cost the error REPORT its most useful
+   * It used to be folded into `message` and lost, which cost the error its most useful
    * grouping input — `errorFingerprint` is `hash(name + top frames)`, and every renderer error
    * arriving as `Error` would have collapsed distinct bugs in one function into one issue.
    */
   name?: string
-  /**
-   * Which tab was open. Main cannot know this — it is the renderer's own state — and a
-   * main-process error therefore reports the last view a window mentioned, or `unknown`.
-   *
-   * IT IS UNTRUSTED, like every renderer-supplied string: `noteCurrentView` checks it against
-   * the closed view enum before storing it, because it is kept BETWEEN calls and an unchecked
-   * value would poison every later report, including main-process ones.
-   */
-  view?: string
 }
 
 const api = {
@@ -463,8 +344,8 @@ const api = {
   // 400-code-line ceiling, and phase 4 (JOS-285) needed one more method than it had room for.
   // (The item/mob lookups live in knowledge.ts beside the spell lookups — JOS-293's split.)
   ...plannerApi,
-  // The two reads of the achievements dump (preload/achievements.ts), split out under the same
-  // rule: the Achievements tab's, and the feedback attachment's preview.
+  // The read of the achievements dump (preload/achievements.ts), split out under the same
+  // rule: the Achievements tab's.
   ...achievementsApi,
 
   // ---- character sheet (JOS-45) ----
@@ -626,136 +507,9 @@ const api = {
    */
   writeClipboard: (text: string): Promise<boolean> => ipcRenderer.invoke(IPC.clipboardWrite, text),
 
-  // ---- in-app feedback (Task #65; docs/plans/feedback-triage.md §4.3) ----
-  // All four are PULLS — the dialog asks when it opens. There is deliberately no push channel:
-  // a "queue changed" broadcast would be new surface for no benefit, since the only reader is a
-  // dialog that has to re-open to show it anyway.
-  /** The dialog's header context: versions, channel, queued count, and whether this build has
-   *  an ingest endpoint compiled in at all (it does not, until wave F2 deploys). */
-  getFeedbackContext: (): Promise<FeedbackContext> => ipcRenderer.invoke(IPC.feedbackContext),
-  /** Build the scrubbed slice for a window (minutes) and return the counts + a CAPPED preview.
-   *  `null` when no character log resolves or the window holds nothing. The gz bytes stay in
-   *  main; only `PREVIEW_MAX_LINES` lines of text cross. `windowMinutes` is re-validated at the
-   *  handler against LOG_WINDOW_CHOICES — never trusted because today's only caller is our UI. */
-  buildFeedbackSlice: (windowMinutes: number): Promise<FeedbackSlicePreview | null> =>
-    ipcRenderer.invoke(IPC.feedbackBuildSlice, windowMinutes),
-  /** Write the COMPLETE slice to a user-chosen path via the OS save dialog — the escape hatch
-   *  that makes "you can see exactly what is sent" literally true, not a claim about a preview. */
-  saveFeedbackSlice: (windowMinutes: number): Promise<ShareSaveResult> =>
-    ipcRenderer.invoke(IPC.feedbackSaveSlice, windowMinutes),
-  /** Package the CURRENT `/outputfile inventory` dump and return its counts + a capped preview,
-   *  or the named reason there is none (JOS-296). NO ARGUMENT, on purpose: which file is read is
-   *  main's answer through the outputs registry, never a path the renderer supplies. */
-  buildFeedbackInventory: (): Promise<FeedbackInventoryPreview> =>
-    ipcRenderer.invoke(IPC.feedbackBuildInventory),
-  // (The same for the achievements dump, JOS-441, is `buildFeedbackAchievements` in
-  // preload/achievements.ts, beside the other read of that file.)
-  /** Submit. NEVER rejects: a network failure resolves `{ok:false, queued:true}` and the report
-   *  is retried later; a 4xx resolves `{ok:false, queued:false}` and is not retried. */
-  submitFeedback: (draft: FeedbackDraft, opts: SubmitOpts): Promise<SubmitResult> =>
-    ipcRenderer.invoke(IPC.feedbackSubmit, draft, opts),
-
-  // ---- usage analytics (docs/plans/usage-analytics.md wave A1) ---------------------------
-  //
-  // NOTHING HERE PUTS A BYTE ON THE WIRE. Every method below is local — the ring on disk, the
-  // prefs in the settings store, and a viewer that shows you both. Transmission happens only
-  // in main's flush loop, behind the gates in `src/main/telemetry/net.ts`, and the renderer
-  // cannot trigger it, hurry it or aim it.
-  /**
-   * Record one usage event. FIRE-AND-FORGET by design — nothing the user does may ever wait on
-   * a counter, and nothing they do may ever fail because of one.
-   *
-   * The value is validated TWICE with the same shared function: here, so a mistake is caught
-   * where it was made, and again in main at the handler, because the renderer is untrusted.
-   * The event union has no free-text field, so this call cannot carry a name, a zone or a line
-   * of log even by accident.
-   */
-  track: (event: TelemetryEvent): void => {
-    try {
-      ipcRenderer.send(IPC.telemetryTrack, event)
-    } catch {
-      // Analytics is the one feature that must never make noise when it fails.
-    }
-  },
-  /** The persisted prefs: master switch, whether the first-run notice has been shown, and the
-   *  rotatable anonymous id (null until the collector mints one). */
-  getTelemetryPrefs: (): Promise<TelemetryPrefs> => ipcRenderer.invoke(IPC.telemetryPrefsGet),
-  /** Flip the master switch. Turning it OFF drops the local buffer immediately. */
-  setTelemetryEnabled: (enabled: boolean): Promise<TelemetryPrefs> =>
-    ipcRenderer.invoke(IPC.telemetrySetEnabled, enabled),
-  /** The first-run notice was answered — or dismissed, which KEEPS it on (that is what opt-out
-   *  means). Either way `noticeShown` flips, so the modal is a once-ever event. */
-  telemetryNoticeShown: (keepEnabled: boolean): Promise<TelemetryPrefs> =>
-    ipcRenderer.invoke(IPC.telemetryNoticeShown, keepEnabled),
-  /** New anonymous id + an emptied buffer. Severs the retention chain on purpose. */
-  rotateAnalyticsId: (): Promise<TelemetryPrefs> => ipcRenderer.invoke(IPC.telemetryRotate),
-  /** Everything the payload viewer shows: prefs, whether this build has an endpoint at all,
-   *  the live buffer, and the last batch sent (permanently null while the build is dark). */
-  getTelemetryPayload: (): Promise<TelemetryPayloadView> =>
-    ipcRenderer.invoke(IPC.telemetryPayload),
-
   // ---- performance HUD + startup profile (docs/plans/perf-profiling.md) -------------------
   // Its five methods live in ./perf.ts and are spread in below — this file is at the 400-line
   // factoring ceiling, and a split is the answer to that rather than a widened threshold.
-
-  // ---- feedback TRIAGE (OWNER OPT-IN ONLY — src/main/triage/**) --------------------------
-  //
-  // =========================== THESE METHODS ARE OWNER-ONLY. =============================
-  //
-  // The handlers behind them are registered from `src/main/index.ts` ONLY when `OWNER_TOOLS`
-  // is true — `EQ_OWNER_TOOLS=1` AND not packaged AND not the e2e harness (JOS-72,
-  // ../shared/ownerTools.ts) — via a dynamic import of a module that reaches `pg` and
-  // `@aws-sdk/*`, devDependencies which electron-builder never packages. Without the opt-in
-  // there are no handlers, so every one of these REJECTS with Electron's own
-  // "No handler registered for 'triage:…'". That is the designed outcome, not a bug: the
-  // bridge is a door, and in a packaged app — or a contributor's checkout — there is nothing
-  // on the other side of it.
-  //
-  // The renderer half of this feature is compiled out entirely in any `electron-vite build`
-  // (`DEV_TOOLS`, anchored on `import.meta.env.DEV`) and hidden without the opt-in on a dev
-  // server (`OWNER_TOOLS`), so in practice nothing ever calls them uninvited. Independent
-  // mechanisms, deliberately.
-  //
-  // Everything here reads the OWNER'S feedback backlog with the launching shell's AWS
-  // credentials. Possession of those credentials is the access control.
-  /** The filtered backlog. Every field of the query is re-validated at the handler. */
-  triageList: (query: TriageListQuery): Promise<TriageResult<TriageRow[]>> =>
-    ipcRenderer.invoke(IPC.triageList, query),
-  /** One full record, incl. the contact and the S3-resolved `present`/`missing` log state. */
-  triageDetail: (reportId: string): Promise<TriageResult<TriageDetail | null>> =>
-    ipcRenderer.invoke(IPC.triageDetail, reportId),
-  /** A report's log slice as CAPPED text. The gz bytes stay in main and on disk; the lines
-   *  are rendered in a local window and go nowhere else (§10.3 — THE LAW). */
-  triageSlice: (reportId: string): Promise<TriageResult<TriageSlice | null>> =>
-    ipcRenderer.invoke(IPC.triageSlice, reportId),
-  /** status / severity / cluster / dupe-of / note. `issueUrl` is not writable from here. */
-  triagePatch: (reportId: string, patch: TriagePatch): Promise<TriageResult<void>> =>
-    ipcRenderer.invoke(IPC.triagePatch, reportId, patch),
-  /** §3.5 forget: delete the slice object and stamp the redaction, keep the report itself. */
-  triageForget: (reportId: string): Promise<TriageResult<void>> =>
-    ipcRenderer.invoke(IPC.triageForget, reportId),
-  /** The kill switch + the block list. */
-  triageOps: (): Promise<TriageResult<TriageOpsState>> => ipcRenderer.invoke(IPC.triageOps),
-  /** Set the kill switch. POSITIVE polarity: `false` is what the CLI spells `closed on`. */
-  triageSetAccepting: (accepting: boolean, message?: string): Promise<TriageResult<void>> =>
-    ipcRenderer.invoke(IPC.triageSetAccepting, accepting, message),
-  /** Block / unblock one install id. A block requires a reason; the profile records why. */
-  triageSetBlocked: (
-    installId: string,
-    blocked: boolean,
-    reason?: string
-  ): Promise<TriageResult<void>> =>
-    ipcRenderer.invoke(IPC.triageSetBlocked, installId, blocked, reason),
-  /** The same markdown digest `triage-feedback digest` prints, plus its clusters. */
-  triageDigest: (query: TriageListQuery): Promise<TriageResult<TriageDigest>> =>
-    ipcRenderer.invoke(IPC.triageDigest, query),
-  /** Usage analytics over the last `days` (one of TRIAGE_ANALYTICS_DAYS; omitted = the
-   *  default window), USER COHORT — the owner's own dev + installed use is filtered out.
-   *  `includeOwner` returns it as a second, complete readout in `owner`; the two are rendered
-   *  side by side and never summed. `available:false` means one thing only: this cluster lacks
-   *  a table or column the readout reads. Tables that exist and are empty are honest zeros. */
-  triageAnalytics: (days?: number, includeOwner?: boolean): Promise<TriageResult<TriageAnalytics>> =>
-    ipcRenderer.invoke(IPC.triageAnalytics, days, includeOwner === true),
 
   // ---- frameless window controls (Task #23) ----
   // Moved to ./windows.ts (spread in above) — this file is at the 400-code-line ceiling, and

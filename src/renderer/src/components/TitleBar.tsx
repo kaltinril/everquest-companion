@@ -14,8 +14,6 @@ import { OVERLAY_KINDS } from '@shared/types'
 // The ONE kind-label map (JOS-405). This menu's wording is what it says, because this menu is
 // where a user meets the window in the first place.
 import { OVERLAY_KIND_LABEL } from '@shared/overlayLabels'
-import { track } from '../lib/telemetry'
-import { isTelemetryOverlayKind } from '@shared/telemetryOverlays'
 import { type OverlayReset, OverlayResetDialog, useOverlayReset } from './OverlayResetDialog'
 import PerfChip from './PerfChip'
 import { isDragSurfaceDoubleClick } from './titleBarDrag'
@@ -241,16 +239,8 @@ function OverlayMenu({ overlayState }: { overlayState: Record<OverlayKind, boole
     setAnchor(null)
   })
 
-  /**
-   * Toggle one overlay and record WHICH and WHETHER (usage-analytics §2 `overlayToggle`) — the
-   * "which meters do people actually keep open" signal. The tracked `open` is main's ANSWER,
-   * never the optimistic guess: the toggle IPC resolves to the resulting state, so a toggle
-   * that failed to open a window cannot be counted as one that did.
-   */
   const toggle = (kind: OverlayKind): void => {
-    void window.eq.toggleOverlay(kind).then((open) => {
-      if (isTelemetryOverlayKind(kind)) track({ t: 'overlayToggle', kind, open })
-    })
+    void window.eq.toggleOverlay(kind)
   }
 
   return (

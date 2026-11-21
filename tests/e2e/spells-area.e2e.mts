@@ -21,8 +21,7 @@ import {
   failures,
   note,
   reportRun,
-  settle,
-  settleGone
+  settle
 } from './appHarness.mjs'
 import { mainWindow } from './appWindow.mjs'
 import { launchOnFixture } from './logFixture.mjs'
@@ -39,20 +38,6 @@ const SPELLBOOK_VIEW = '[data-testid="spellbook-view"]'
 const NAV_GEAR = '[data-testid="nav-gear"]'
 const GEAR_AREA_TABS = '[data-testid="gear-area-tabs"]'
 const TAB_GEAR = '[data-testid="tab-gear"]'
-
-/**
- * Answer the analytics first-run notice. A fresh `userData` always shows it and it sits along the
- * bottom edge, where it can take a click meant for a nav row.
- */
-async function answerNotice(page: Page): Promise<void> {
-  const notice = '[data-testid="telemetry-notice"]'
-  if ((await countOf(page, notice)) === 0) return
-  await page.click('[data-testid="telemetry-notice-off"]')
-  check(
-    'the analytics first-run notice can be answered out of the way',
-    await settleGone(page, notice, { timeoutMs: 8_000 })
-  )
-}
 
 /** STEP 1 — the Spells row opens the area: its tab bar, its three tabs, and the Spellbook. */
 async function stepPresent(page: Page): Promise<void> {
@@ -130,7 +115,6 @@ async function main(): Promise<void> {
     page.on('pageerror', (e) => consoleErrors.push(String(e)))
 
     await page.waitForSelector('[data-testid="nav-overview"]', { timeout: 60_000 })
-    await answerNotice(page)
 
     await stepPresent(page)
     await stepControl(page)

@@ -3,7 +3,7 @@
 // ============================================================================
 //
 // Two independent things live here, and they are wired from the composition root
-// (`src/main/index.ts`) the same way `startQueueFlush` and `startTelemetry` are:
+// (`src/main/index.ts`):
 //
 //   THE HUD SAMPLER — `app.getAppMetrics()` every 2 s plus an event-loop lag probe every
 //   500 ms, aggregated into one `PerfSample` pushed to the renderer. It runs ONLY while the
@@ -47,7 +47,6 @@ import {
   phaseMarked,
   replayDutyOf,
   STARTUP_STUTTER_INTERVAL_MS,
-  STARTUP_STUTTER_MIN_SAMPLES,
   totalsOf,
   type BlockSample,
   type PerfSample,
@@ -60,24 +59,16 @@ import {
   type StartupStutterProbe
 } from '../shared/perf'
 import { formatDataWeight } from '../shared/dataWeight'
-import { startupReplayStats } from '../shared/telemetryStartup'
 // The per-file decomposition of the `dataLoaded` phase (JOS-458). A leaf holding one committed
 // table plus this launch's own heap reading.
 import { dataWeightLedger } from './dataWeight'
 import { logError, logInfo } from './errorLog'
-// THE LIVE HALF of the same subject (JOS-367), in its own leaf module for `tailIoStats.ts`'s two
-// reasons: it is plain data that knows nothing about telemetry, and a leaf cannot join the import
-// cycle that would otherwise form between this file and the seam that drains it.
+// THE LIVE HALF of the same subject (JOS-367), in its own leaf module: plain data in memory.
 import { setLiveProbeDemand, stopLiveProbe } from './livePerfProbe'
 // …and the half that says WHO (JOS-458), started and stopped in lockstep with it and a leaf for
 // the identical two reasons. The two measurements are one window on purpose: a stall's magnitude
 // and its owner have to describe the same seconds or neither can explain the other.
 import { startStallAttribution, stopStallAttribution } from './perfAttribution'
-// The fleet half of the same measurement (JOS-57). Through the telemetry FAÇADE, like every other
-// producer in this app — the wiring may not reach around it into the ring.
-import { noteStartupReplay, scheduleSetupSnapshot } from './telemetry'
-import { telemetryCollectEnabled } from './telemetry/net'
-import { getTelemetryPrefs } from './store'
 import { sendToMain } from './windows'
 
 const PROFILE_FILE = 'perf-startup.json'
@@ -95,7 +86,6 @@ const LAUNCH_STARTED_AT = Math.round(performance.timeOrigin)
 let marks: StartupMark[] = []
 let eventsReplayed: number | undefined
 let replayStats: ReplayDutyStats | undefined
-let replayBytes: number | undefined
 // JOS-57's scope addition, both arriving with `replayDone` and both meaning UNKNOWN while unset.
 let newBytes: number | undefined
 let firstMbMs: number | undefined
@@ -202,21 +192,12 @@ export interface MarkOptions {
    *  only when there was a log to replay. */
   replay?: ReplayDutyStats
   /**
-   * Bytes the historical scan actually folded — its own frozen EOF (JOS-57). Only `replayDone`
-   * carries it, and it is the one mark option that does NOT land in `perf-startup.json`: the
-   * profile is about TIME, and this exists solely so the fleet reading can be bucketed by log size
-   * ("6 s" means something different for a 2 MB log than for a 600 MB one). It never leaves this
-   * process as a byte count — `startupReplayStats` turns it into a bucket index first.
-   */
-  bytesReplayed?: number
-  /**
    * Bytes the log grew by since this app last shut down cleanly (JOS-57's scope addition, from the
    * first-start-stutter investigation). Only `replayDone` carries it, and only when a mark from a
    * previous clean shutdown could be compared — absent is UNKNOWN, never zero.
    *
-   * Unlike `bytesReplayed` this one DOES land in `perf-startup.json`, raw: a support answer read on
-   * the user's own machine wants the number, and the bucketing exists to stop a fingerprint leaving
-   * the machine rather than to stop the user seeing their own log.
+   * It lands in `perf-startup.json`, raw: a support answer read on
+   * the user's own machine wants the number.
    */
   newBytes?: number
   /** How long the first megabyte of the historical read took, ms — the cold-disk hint. Only
@@ -236,7 +217,6 @@ export function markStartupPhase(phase: StartupPhase, opts: MarkOptions = {}): v
   const at = opts.atMs ?? performance.now()
   if (opts.eventsReplayed !== undefined) eventsReplayed = opts.eventsReplayed
   if (opts.replay !== undefined) replayStats = opts.replay
-  if (opts.bytesReplayed !== undefined) replayBytes = opts.bytesReplayed
   if (opts.newBytes !== undefined) newBytes = opts.newBytes
   if (opts.firstMbMs !== undefined) firstMbMs = opts.firstMbMs
   const result = addMark(marks, phase, at)
@@ -253,37 +233,24 @@ export function markStartupPhase(phase: StartupPhase, opts: MarkOptions = {}): v
     startStutterProbe()
   }
   if (phase === 'replayDone') {
-    // ORDER MATTERS: both probes are closed FIRST so `blockStats` and `stutterStats` are frozen
-    // before the reading that reports them is built. All of this belongs to this one mark rather
-    // than to the composition root, for the same reason the probes' lifetime does — they cannot
-    // drift from the phase.
+    // Both probes are closed here so `blockStats` and `stutterStats` are frozen for the profile.
+    // This belongs to this one mark rather than to the composition root, for the same reason the
+    // probes' lifetime does — they cannot drift from the phase.
     stopStartupBlockProbe()
     stopStutterProbe()
-    reportStartupReplay(at)
-    // …and THIS is where the setup snapshot is armed (JOS-364). It belongs to this mark for the
-    // same reason the probes do: `replayDone` is the one moment the app agrees its launch is
-    // over, and a machine-class reading taken during the replay would both steal from the launch
-    // it is measured beside and describe an app that is still booting. It is armed rather than
-    // taken — the producer waits out a short delay of its own and never blocks this call.
-    //
-    // NOT gated on `replayStats` like the reading above: an install with no log to replay still
-    // has a machine, and it is disproportionately the install something is wrong with.
-    scheduleSetupSnapshot()
     // …and the LIVE probes take over from the startup ones at the same instant (JOS-367). The
     // handover is the point: the two startup probes have just been closed, and everything after
     // this mark is a running app rather than a boot. Two clocks from here to quit — main's, and
     // one on a thread of its own — because a single clock can prove it was late and can never say
     // who made it late, and the freezes this hunts are reported on a machine we do not own.
     //
-    // …WHEN SOMEBODY IS LISTENING (audit item 8): the probes run only while the HUD is open or
-    // telemetry collection is on, and `livePerfProbe.ts` holds that rule. Armed here, because a
-    // boot is not a running session; the HUD and the telemetry toggle report their halves.
-    setLiveProbeDemand('telemetry', telemetryCollectEnabled(getTelemetryPrefs()))
+    // …WHEN SOMEBODY IS LISTENING (audit item 8): the probes run only while the HUD is open,
+    // and `livePerfProbe.ts` holds that rule. Armed here, because a
+    // boot is not a running session; the HUD reports its half.
     setLiveProbeDemand('armed', true)
     // …and with them the GC half of the instrument that answers WHO (JOS-458). Same instant, same
-    // window, same argument as the probes beside it: `gc` is a POPULATION the fleet reads as a
-    // rate, and a 1.4M-event fold's garbage is nothing like a running session's, so mixing a boot
-    // into it would move every install's numbers by an amount that depends on the size of its log.
+    // window, same argument as the probes beside it: a 1.4M-event fold's garbage is nothing like
+    // a running session's, so a boot is kept out of it.
     //
     // THE SEAM BRACKETS ARE NOT STARTED HERE AND DO NOT NEED TO BE — they record from process
     // start, deliberately, because a per-seam max is not a distribution and because the launch's
@@ -294,67 +261,6 @@ export function markStartupPhase(phase: StartupPhase, opts: MarkOptions = {}): v
     startStallAttribution()
   }
   if (startupProfile().complete) writeStartupProfile()
-}
-
-/**
- * THE FLEET READING (JOS-57): hand this launch's replay numbers to telemetry, once.
- *
- * WHY HERE. This is the seam where every one of them is known and frozen at the same instant — the
- * duty ledger and the event count arrived with the mark, the block probe has just been closed, and
- * `marks` holds the two timestamps the replay ran between. Anywhere else would have to re-derive
- * one of them, and a launch cannot be re-run to check.
- *
- * ONE LAUNCH IS ONE READING, and it is structural rather than a flag: `replayDone` can be marked
- * exactly once per process (`addMark` refuses a duplicate), so a character SWITCH — which replays
- * a log through the same code — cannot produce a second. That refusal is the whole comparability
- * argument: a switch replay is a different kind of work under different conditions, and a
- * population that mixed the two could not answer "how long does starting this app take".
- *
- * A launch with NO LOG TO REPLAY reports nothing at all (`replayStats` is undefined — session.ts
- * only supplies it when a character was tailed). A replay that did not happen is not a replay that
- * took 0 ms, and a fabricated zero would drag every percentile in the fleet down with it.
- */
-function reportStartupReplay(replayDoneAtMs: number): void {
-  if (replayStats === undefined) return
-  // The replay's own window: `tailAttached` is marked the moment the composition root hands the
-  // session its work, and this phase lands when the fold is done. Subtracting the two is exact
-  // even though `rendererHydrated` may have landed BETWEEN them (they race — CONCURRENT_PHASES),
-  // which is precisely why this is not the profile's own `durationMs` for the phase.
-  const attached = marks.find((m) => m.phase === 'tailAttached')
-  if (attached === undefined) return
-  noteStartupReplay(
-    startupReplayStats({
-      replayMs: replayDoneAtMs - attached.atMs,
-      eventsReplayed: eventsReplayed ?? 0,
-      workMs: replayStats.workMs,
-      restMs: replayStats.restMs,
-      // A probe window that held no ticks has observed NOTHING, not a smooth launch — so the
-      // reading says zero blocks, which is what an unmeasured window can honestly contribute to
-      // a sum. `samples` is why the profile on disk keeps the distinction and this cannot.
-      maxBlockMs: blockStats?.maxBlockMs ?? 0,
-      blocksOver50: blockStats?.blocksOver50Ms ?? 0,
-      logBytes: replayBytes ?? 0,
-      // THE TWO DISCRIMINATORS, each passed through only when it was genuinely measured — a
-      // `?? 0` here would be the one thing this whole addition exists to avoid, because "no mark
-      // to compare against" and "no new bytes" are opposite facts about a launch.
-      ...(newBytes === undefined ? {} : { newBytes }),
-      ...(firstMbMs === undefined ? {} : { firstMbMs }),
-      ...stutterReading()
-    })
-  )
-}
-
-/**
- * The stutter reading, IF the probe saw enough ticks to describe (`STARTUP_STUTTER_MIN_SAMPLES`).
- *
- * A short fold reports nothing rather than a percentile over a handful of samples: the wire has no
- * `samples` field to qualify it with (the local profile keeps that distinction, which is where it
- * is readable), so a reading that arrives has to be one that can stand alone.
- */
-function stutterReading(): { stutter?: { p50Ms: number; p95Ms: number; latePct: number } } {
-  if (stutterStats === undefined || stutterStats.samples < STARTUP_STUTTER_MIN_SAMPLES) return {}
-  const { p50Ms, p95Ms, latePct } = stutterStats
-  return { stutter: { p50Ms, p95Ms, latePct } }
 }
 
 /**
@@ -618,8 +524,7 @@ export function stopPerfSampler(): void {
 export function stopPerf(): void {
   stopPerfSampler()
   stopLiveProbe()
-  // The GC observer goes with them (JOS-458). It disconnects only — the tallies are left standing
-  // so a `sessionEnd` report composed during the same teardown still carries its last interval.
+  // The GC observer goes with them (JOS-458). It disconnects only.
   stopStallAttribution()
   flushStartupProfile()
 }

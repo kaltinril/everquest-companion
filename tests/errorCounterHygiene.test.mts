@@ -1,12 +1,11 @@
 // ============================================================================
-// errorCounterHygiene.test.mts — the error counter counts ERRORS (JOS-99).
+// errorCounterHygiene.test.mts — errors.log holds ERRORS (JOS-99).
 // ============================================================================
 //
-// THE READING THIS SUITE EXISTS FOR: 3,859 `mainErrorLogLines` across 3,728 fleet health reports,
-// with ZERO renderer crashes. The counter was honest — it counts lines in `<userData>/errors.log`,
-// and those lines really were written — but two mechanisms were writing lines nobody could ever
-// act on, so a number meant to say "how much is going wrong out there" was mostly saying "the app
-// reloaded a window" and "some component logged a warning".
+// THE READING THIS SUITE EXISTS FOR: thousands of lines in `<userData>/errors.log` across the
+// original app's installs, with ZERO renderer crashes. The lines really were written, but two
+// mechanisms were writing lines nobody could ever act on, so a file meant to say "what went
+// wrong here" was mostly saying "the app reloaded a window" and "some component logged a warning".
 //
 //   A. EVERY RELOAD SPENT AN ERROR LINE. The renderer's send-once guard for the `rendererHydrated`
 //      startup mark is module scope (renderer/src/lib/perfHud.ts), so a reload — the dev watcher's,
@@ -20,10 +19,9 @@
 //
 // WHAT IS DRIVEN HERE AND WHAT IS PINNED. The two rules are pure and are driven for real:
 // `consoleForward` (a leaf module with no imports) and `phaseMarked`/`addMark` (shared/perf.ts),
-// with the REAL health counter behind them so "no line" and "no count" are one assertion rather
-// than two hopes. The two WIRINGS live in modules that cannot load without Electron — an IPC
-// handler and a `webContents` listener — so they are pinned as source, the technique
-// `tests/healthCounters.test.mts` uses on flush.ts's drain sites and for the same honest reason.
+// with a line counter standing where `logError` stands. The two WIRINGS live in modules that
+// cannot load without Electron — an IPC handler and a `webContents` listener — so they are
+// pinned as source.
 // The end-to-end proof that a real reload writes nothing is `tests/e2e/perf.e2e.mts`, which
 // reloads a real window and then greps the errors.log that real launch wrote.
 
@@ -44,7 +42,18 @@ import {
   phaseMarked,
   type StartupMark
 } from '../src/shared/perf'
-import { noteErrorLogLine, peekHealth, resetHealth, takeHealth } from '../src/main/telemetry/health'
+
+/** The lines that would have reached errors.log, counted where `logError` stands. */
+let errorLines = 0
+const noteErrorLogLine = (): void => {
+  errorLines++
+}
+/** Read the count and start again from zero. */
+function takeErrorLines(): number {
+  const n = errorLines
+  errorLines = 0
+  return n
+}
 
 const TEST_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const read = (p: string): string => readFileSync(join(TEST_ROOT, p), 'utf8')
@@ -75,15 +84,15 @@ function rendererHydratedSend(marks: StartupMark[], atMs: number): StartupMark[]
   if (phaseMarked(marks, 'rendererHydrated')) return marks
   const result = addMark(marks, 'rendererHydrated', atMs)
   if (!result.ok) {
-    // `logError` → errors.log → `noteErrorLogLine` (src/main/errorLog.ts).
+    // `logError` → errors.log (src/main/errorLog.ts).
     noteErrorLogLine()
     return result.marks
   }
   return result.marks
 }
 
-test('a RELOAD re-sends rendererHydrated, and it costs nothing — no error line, no count', () => {
-  resetHealth()
+test('a RELOAD re-sends rendererHydrated, and it costs nothing — no error line', () => {
+  takeErrorLines()
   const booted = bootedMarks()
   const firstAt = booted.find((m) => m.phase === 'rendererHydrated')?.atMs
   assert.equal(typeof firstAt, 'number')
@@ -93,25 +102,25 @@ test('a RELOAD re-sends rendererHydrated, and it costs nothing — no error line
   let marks = booted
   for (const at of [5_000, 9_000, 240_000]) marks = rendererHydratedSend(marks, at)
 
-  assert.equal(peekHealth().mainErrorLogLines, 0, 'a reload must not increment the error counter')
+  assert.equal(errorLines, 0, 'a reload must not write an error line')
   assert.equal(marks.filter((m) => m.phase === 'rendererHydrated').length, 1)
   // …and the profile keeps the LAUNCH's own hydration, not the reload four minutes later.
   assert.equal(marks.find((m) => m.phase === 'rendererHydrated')?.atMs, firstAt)
   assert.equal(marks.length, STARTUP_PHASES.length, 'the accounting is otherwise untouched')
-  resetHealth()
+  takeErrorLines()
 })
 
 test('…and the refusal it is stepping around is still there, still loud — that is the bug', () => {
   // THE COUNTERFACTUAL. Without the guard, the same second send reaches `addMark`, is refused as a
   // duplicate, and earns the error line that was landing in errors.log on every single reload.
-  resetHealth()
+  takeErrorLines()
   const marks = bootedMarks()
   const unguarded = addMark(marks, 'rendererHydrated', 5_000)
   assert.ok(!unguarded.ok && unguarded.error.code === 'duplicate')
   assert.match(describeMarkError(unguarded.error), /startup phase 'rendererHydrated' was marked twice/)
   noteErrorLogLine()
-  assert.equal(takeHealth().mainErrorLogLines, 1, 'the line the fleet was counting')
-  resetHealth()
+  assert.equal(takeErrorLines(), 1, 'the line every reload was writing')
+  takeErrorLines()
 })
 
 test('THE STRICTNESS IS NOT LOOSENED: every other phase still refuses a duplicate', () => {
@@ -155,21 +164,20 @@ test('…while DEV VISIBILITY survives: an unpackaged build still prints warning
   assert.equal(consoleForward(CONSOLE_LEVEL_WARNING, true), 'drop')
 })
 
-test('THE COUNT follows the file: four levels through the real counter, one line', () => {
-  // The production shape, with the REAL health counter behind it: only the `errorLog` branch
-  // reaches `logError`, and only `logError` calls `noteErrorLogLine`.
-  resetHealth()
+test('THE COUNT follows the file: four levels, one line', () => {
+  // The production shape: only the `errorLog` branch reaches `logError`.
+  takeErrorLines()
   for (const level of [0, 1, 2, 3]) {
     if (consoleForward(level, false) === 'errorLog') noteErrorLogLine()
   }
-  assert.equal(takeHealth().mainErrorLogLines, 1, 'one console.error, and nothing else, is counted')
-  // A window that only ever warns contributes NOTHING to the fleet's error rate — which is the
+  assert.equal(takeErrorLines(), 1, 'one console.error, and nothing else, is written')
+  // A window that only ever warns contributes NOTHING to errors.log — which is the
   // whole reading this ticket came from.
   for (let i = 0; i < 50; i++) {
     if (consoleForward(CONSOLE_LEVEL_WARNING, false) === 'errorLog') noteErrorLogLine()
   }
-  assert.equal(takeHealth().mainErrorLogLines, 0)
-  resetHealth()
+  assert.equal(takeErrorLines(), 0)
+  takeErrorLines()
 })
 
 // ----------------------------------------------------------------------------------- wiring
@@ -200,17 +208,7 @@ test('THE WIRING: both fixes are where the argument says, in code that needs Ele
   assert.match(forward, /else logError\(tag, \{ level, message, source \}\)/)
 
   // The rule is a LEAF — no imports at all — which is why this suite can drive the real thing with
-  // no Electron in the process (`src/main/telemetry/health.ts`'s argument, for its reason).
+  // no Electron in the process.
   const rule = read('src/main/consoleForward.ts')
   assert.doesNotMatch(rule, /^\s*import\s/m, 'consoleForward.ts must import nothing')
-})
-
-test('THE DOC says what the counter counts, in the file users are pointed at', () => {
-  // TELEMETRY.md is generated from `src/shared/telemetryDoc.ts` (tests/telemetryDoc.test.mts pins
-  // the parity), so the promise about this field is asserted where a user would read it.
-  const row = read('TELEMETRY.md')
-    .split(/\r?\n/)
-    .find((l) => l.includes('`mainErrorLogLines`'))
-  assert.ok(row, 'TELEMETRY.md documents the counter')
-  assert.match(row, /[Ee]rrors only/, 'the doc must not promise it counts warnings')
 })

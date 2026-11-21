@@ -1,36 +1,25 @@
 // ============================================================================
-// SHARED TEXT SANITIZER — the ONE definition of "characters a client may send us".
+// SHARED TEXT SANITIZER — one line of text with nothing in it that is not content.
 // ============================================================================
 //
-// WHY THIS FILE EXISTS. Sanitization used to live entirely on the CLIENT: the log scrubber
-// (src/shared/logScrub.ts) and the contract's bounds (src/shared/feedback.ts) both run in the
-// app before a byte leaves the machine, and the server trusted that an honest client had run
-// them. A hostile or merely buggy client is not obliged to. Two concrete consequences, and this
-// module closes the first of them at every boundary WE control:
+// WHY THIS FILE EXISTS. Text the app did not write (a line of the game's log, an error message, a
+// captured alert token) ends up in places that render it: a terminal, errors.log, a spoken or
+// drawn alert. Two things must not survive the trip:
 //
-//   1. TERMINAL ESCAPE INJECTION. `description` and the free-form `env.*` strings are rendered
-//      in the OWNER's terminal by `scripts/triage-feedback.mts` and in the owner's triage tab.
-//      A description carrying `ESC ] 0 ; ... BEL` retitles the operator's terminal; `ESC [ 2 J`
-//      clears it; the OSC 52 sequence WRITES THE CLIPBOARD. The report is DATA. It must never
-//      be able to speak to the terminal that prints it.
+//   1. TERMINAL ESCAPE SEQUENCES. `ESC ] 0 ; ... BEL` retitles a terminal; `ESC [ 2 J` clears
+//      it; the OSC 52 sequence WRITES THE CLIPBOARD. Text is DATA. It must never be able to
+//      speak to the terminal that prints it.
 //   2. INVISIBLE TEXT. Zero-width joiners, the BiDi overrides (the "Trojan Source" class) and
-//      the BOM let one string RENDER as another. A triage decision made on rendered text that
-//      is not the stored text is a decision made on a lie.
+//      the BOM let one string RENDER as another.
 //
-// THE LAW, and it is the same law `trim` already obeys:
+// STRIPPING A CONTROL CHARACTER IS NORMALIZATION, NOT TRUNCATION. A NUL, an ESC or a BiDi
+// override is not content, so removing it never shortens what was actually written.
 //
-//   * STRIPPING A CONTROL CHARACTER IS NORMALIZATION, NOT TRUNCATION. A NUL, an ESC or a BiDi
-//     override is not content — no user typed one into a bug report — so removing it is the
-//     same class of act as removing the newline the textarea left on the end. It never shortens
-//     what the user actually WROTE.
-//   * REJECT, NEVER TRUNCATE still governs LENGTH (feedback.ts, plan section 8.3 step 2), and
-//     it governs SINGLE-LINE fields entirely: `env.osRelease` is `os.release()`, a value with
-//     no legitimate control character in it at all, so one arriving there means the payload is
-//     forged and the honest answer is `invalid_payload`, not a quiet repair.
+// (Until 2026-11-20 this module also held the validators for the feedback and usage-analytics
+// wire. Both services are removed; what is left is the one-line normalizer local code uses.)
 //
 // PURE, like every other module in `src/shared/**`: zero imports, no `node:`, no Electron, no
-// DOM. It compiles under both tsconfigs, bundles into BOTH Lambdas, and is safe to call once
-// per line over a 50,000-line slice.
+// DOM. It compiles under both tsconfigs.
 
 /* eslint-disable no-control-regex -- control characters ARE this module's subject matter.
    Every class below is written in explicit hex escapes so the source stays plain ASCII and a
@@ -61,13 +50,6 @@ const ANSI_RE =
 /** Every C0 control, DEL, and every C1 control. Nothing in this class is content. */
 const CONTROL_ANY_RE = /[\x00-\x1F\x7F-\x9F]/g
 
-/** The same class MINUS TAB (0009) and LF (000A) — the two a multi-line report may keep. */
-const CONTROL_BLOCK_RE = /[\x00-\x08\x0B-\x1F\x7F-\x9F]/g
-
-/** The same class MINUS TAB ALONE — for ONE LINE of a tab-separated table (see
- *  `sanitizeTabbedLine`). LF and CR are in it: a line that contains one is not a row. */
-const CONTROL_BLOCK_TAB_RE = /[\x00-\x08\x0A-\x1F\x7F-\x9F]/g
-
 /** CR and CRLF, normalized to LF before anything else looks at the string. */
 const NEWLINE_RE = /\x0D\x0A?/g
 
@@ -84,115 +66,21 @@ const INVISIBLE_RE = /[\u200B-\u200F\u2028-\u202E\u2060-\u2064\u2066-\u2069\uFEF
 /** In a ONE-LINE rendering these three become a single space; every other control is deleted. */
 const AS_SPACE = new Set(['\t', '\n', '\r'])
 
-/**
- * A NUL anywhere in a RAW request body, tested BEFORE `JSON.parse` by both ingest Lambdas.
- *
- * Cheap, crude, and in front of everything else on purpose. Nothing on either wire can
- * legitimately contain a NUL; JSON parsers and postgres `text` columns do not agree about what
- * an embedded one means; and a body we have already measured costs one more scan to check. The
- * shared validators are still what govern the PARSED values — this only refuses the bodies that
- * are obviously not ours before a parser has to have an opinion about them.
- */
-export function hasNulByte(raw: string): boolean {
-  return raw.includes(String.fromCharCode(0))
-}
-
-/** Strip ANSI/VT escape sequences whole. Exported by name because the CLI asks for it by name. */
+/** Strip ANSI/VT escape sequences whole. */
 export function stripAnsi(raw: string): string {
   return raw.replace(ANSI_RE, '')
 }
 
 /**
- * The WIRE predicate for a SINGLE-LINE field (`env.platform`, `env.osRelease`, `env.arch`,
- * `env.electron`, `env.chrome`, `env.node`).
+ * The normalizer for anything that must occupy exactly one line: an error message on its way
+ * to errors.log, a captured alert token.
  *
- * True for ANY control character — INCLUDING TAB and LF, which a runtime string like
- * `process.arch` cannot legitimately contain — and for any invisible formatting character.
- * Callers trim FIRST (surrounding whitespace is normalization, exactly as it always was) and
- * then reject on this: a control character surviving in the INTERIOR of `os.release()` is not a
- * formatting accident, it is a forged payload.
- */
-export function hasWireControls(raw: string): boolean {
-  // `.test` on a /g regex is stateful; resetting the index makes these functions total.
-  CONTROL_ANY_RE.lastIndex = 0
-  INVISIBLE_RE.lastIndex = 0
-  return CONTROL_ANY_RE.test(raw) || INVISIBLE_RE.test(raw)
-}
-
-/**
- * The WIRE normalizer for the one MULTI-LINE field (`draft.description`), and the display
- * normalizer for that same text afterwards. Keeps TAB and LF; removes everything else that is
- * not content, in this order:
- *
- *   CRLF/CR -> LF, then ANSI sequences whole, then C0 (minus TAB/LF) + DEL + C1, then invisibles.
- *
- * NOT trimmed here — the CALLER trims, because the trim and the length bound that follows it
- * are the contract's rules and belong in the contract.
- */
-export function sanitizeMultiline(raw: string): string {
-  return stripAnsi(raw.replace(NEWLINE_RE, '\n'))
-    .replace(CONTROL_BLOCK_RE, '')
-    .replace(INVISIBLE_RE, '')
-}
-
-/**
- * The DISPLAY normalizer for anything that must occupy exactly one line: an `env.*` value in a
- * detail pane, a description collapsed into a CLI list row, a log line in the slice box.
- *
- * Newlines and tabs become a single space — a report must not be able to forge extra rows in a
- * table — and every other control and invisible character is deleted, ANSI sequences whole.
+ * Newlines and tabs become a single space — text must not be able to forge extra lines —
+ * and every other control and invisible character is deleted, ANSI sequences whole.
  */
 export function sanitizeOneLine(raw: string): string {
   return stripAnsi(raw)
     .replace(NEWLINE_RE, '\n')
     .replace(CONTROL_ANY_RE, (c) => (AS_SPACE.has(c) ? ' ' : ''))
     .replace(INVISIBLE_RE, '')
-}
-
-/**
- * ONE LINE OF A TAB-SEPARATED TABLE THE GAME ITSELF WROTE — today exactly one caller, the
- * `/outputfile inventory` dump (`src/main/triage/rows.ts sanitizeInventory`, JOS-404).
- *
- * WHY TAB SURVIVES HERE AND NOWHERE ELSE, because that is the only interesting thing about this
- * function. `sanitizeOneLine` folds TAB to a space so that a REPORTER'S OWN TEXT — a description,
- * an `env.*` value, a log line — cannot forge columns in a table the CLI is drawing. An inventory
- * export is the opposite kind of string: the TABS ARE THE FORMAT (`Location<TAB>Name<TAB>ID<TAB>
- * Count<TAB>Slots`, the shape measured in `src/main/feedback/inventory.ts`'s header), the columns
- * are the game's and not the reporter's, and the file is not drawn into a table at all — it is
- * written to disk for the owner to read and to feed back through the app's own dump parser.
- * Folding the tabs there destroyed the structure AND made "this line carried a control character"
- * true of every honest row, which is a warning that fires always and therefore says nothing.
- *
- * Everything else `sanitizeOneLine` removes is still removed, and for its own reason: the dump is
- * text the app did not write and an operator will eventually `cat`. ANSI sequences go whole, then
- * C0 (minus TAB) + DEL + C1 — LF and CR included, so the output IS one line — then the invisibles.
- *
- * DO NOT widen `sanitizeOneLine` to match this. The narrowness is the guarantee.
- */
-export function sanitizeTabbedLine(raw: string): string {
-  return stripAnsi(raw).replace(CONTROL_BLOCK_TAB_RE, '').replace(INVISIBLE_RE, '')
-}
-
-/**
- * `sanitizeTabbedLine`'s flagging twin — `sanitizeAndFlag` for a table row. The caller counts the
- * lines that changed and reports the count as evidence, so it needs the fact, not a second pass.
- */
-export function sanitizeTabbedAndFlag(raw: string): { text: string; changed: boolean } {
-  const text = sanitizeTabbedLine(raw)
-  return { text, changed: text !== raw }
-}
-
-/**
- * DEFENSE IN DEPTH FOR LEGACY ROWS AND RAW UPLOADS. Rows written before the wire rules above
- * existed can carry anything, and so can a slice a client POSTed straight at the presigned URL
- * without ever running the scrubber. Every owner-side reader that turns a stored value into
- * something a human will look at runs it through here, so the hardening does not depend on
- * which front end happens to be reading.
- *
- * Returns the sanitized text AND whether it changed, so a caller that wants to report the delta
- * (the slice re-scrub does, loudly) gets the fact for free instead of comparing twice.
- */
-export function sanitizeAndFlag(raw: string): { text: string; changed: boolean } {
-  const text = sanitizeOneLine(raw)
-  return { text, changed: text !== raw }
 }

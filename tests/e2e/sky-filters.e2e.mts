@@ -215,20 +215,6 @@ async function clearPick(page: Page, picker: string): Promise<void> {
   await page.keyboard.press('Escape')
 }
 
-/**
- * Answer the analytics first-run notice, which a FRESH userData always shows and which sits at the
- * BOTTOM CENTRE of the window until it is answered — directly over the list footer JOS-191's steps
- * click. Nothing in this file cares about analytics, so "turn it off" is the quiet answer (the perf
- * and text-size specs make the same call for the same reason).
- */
-async function dismissFirstRunNotice(page: Page): Promise<void> {
-  const notice = '[data-testid="telemetry-notice"]'
-  await page.waitForSelector(notice, { timeout: 30_000 }).catch(() => undefined)
-  if ((await countOf(page, notice)) === 0) return
-  await page.click('[data-testid="telemetry-notice-off"]')
-  check('the analytics first-run notice can be answered out of the way', await settleGone(page, notice, { timeoutMs: 8_000 }))
-}
-
 /** Open the Sky tab and wait for its toolbar. Safe when the tab is already the open one. */
 async function openSky(page: Page, timeoutMs = 60_000): Promise<boolean> {
   await page.click(NAV_SKY, { timeout: 30_000 })
@@ -675,7 +661,6 @@ async function main(): Promise<void> {
     try {
       page = await mainWindow(first.app)
       await page.waitForSelector(NAV_OVERVIEW, { timeout: 60_000 })
-      await dismissFirstRunNotice(page)
       if (!check('the Sky tab opens', await openSky(page))) {
         throw new Error('never reached the Plane of Sky tab — nothing below can be asserted')
       }

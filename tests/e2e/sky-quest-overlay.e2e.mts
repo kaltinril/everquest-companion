@@ -11,7 +11,7 @@
  * Run: `npm run test:e2e -- sky-quest-overlay` (or node --import tsx this file).
  */
 import type { ElectronApplication, Page } from 'playwright-core'
-import { buildIfStale, check, countOf, dumpArtifacts, failures, reportRun, settle, settleGone } from './appHarness.mjs'
+import { buildIfStale, check, countOf, dumpArtifacts, failures, reportRun, settle } from './appHarness.mjs'
 import { mainWindow, overlayWindow } from './appWindow.mjs'
 import { launchOnFixture } from './logFixture.mjs'
 
@@ -30,14 +30,6 @@ const REWARD = 'Mask of Song'
 
 interface OverlayBridge {
   toggleOverlay: (k: string) => Promise<boolean>
-}
-
-async function dismissFirstRunNotice(page: Page): Promise<void> {
-  const notice = '[data-testid="telemetry-notice"]'
-  await page.waitForSelector(notice, { timeout: 30_000 }).catch(() => undefined)
-  if ((await countOf(page, notice)) === 0) return
-  await page.click('[data-testid="telemetry-notice-off"]')
-  await settleGone(page, notice, { timeoutMs: 8_000 })
 }
 
 const text = (p: Page, sel: string): Promise<string> =>
@@ -97,7 +89,6 @@ async function main(): Promise<void> {
     if (m.type() === 'error') consoleErrors.push(m.text())
   })
   try {
-    await dismissFirstRunNotice(page)
     const overlay = await stepOpen(page, app)
     if (overlay) {
       overlay.on('console', (m) => {

@@ -39,7 +39,6 @@ import { app } from 'electron'
 import { join } from 'path'
 import { consoleForward } from './consoleForward'
 import { logError, logWarn } from './errorLog'
-import { noteRendererCrash } from './telemetry'
 import { DID_FAIL_LOAD_ERROR_NAME, didFailLoadMessage, numericOr, renderGoneReport } from './windowGone'
 
 /** How the capture reaches the window it may need to reload. Injected rather than imported so
@@ -92,14 +91,8 @@ export function captureMainWindowErrors(wc: Electron.WebContents, window: Window
   // then reload the window ONCE so a transient crash doesn't strand the user.
   let renderProcessReloaded = false
   wc.on('render-process-gone', (_e, details) => {
-    // ONE CRASH IS ONE COUNT (JOS-96) — counted here rather than off `logError`, because this
-    // handler writes TWO log lines per crash (the details, then the recovery reload) and counting
-    // lines would report every crash as two. `mainErrorLogLines` still sees both, correctly.
-    // MAIN WINDOW ONLY: overlays get `forwardConsoleMessages` but no crash handler, so an overlay
-    // crash is invisible to this counter and `telemetry/health.ts` says so.
-    noteRendererCrash()
-    // THE DETAILS RIDE ALONG UNDERNEATH the three fields the wire reads, so `errors.log` on the
-    // machine still holds Electron's payload verbatim while the fleet gets a sentence.
+    // THE DETAILS RIDE ALONG UNDERNEATH the name, message and code, so `errors.log` on the
+    // machine holds Electron's payload verbatim beside a sentence.
     logError('main:render-process-gone', renderGoneReport(details))
     const win = window()
     if (!renderProcessReloaded && win && !win.isDestroyed()) {

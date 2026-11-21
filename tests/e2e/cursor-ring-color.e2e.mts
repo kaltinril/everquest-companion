@@ -29,8 +29,7 @@ import {
   failures,
   note,
   reportRun,
-  settle,
-  settleGone
+  settle
 } from './appHarness.mjs'
 import { mainWindow, makeUserData, removeUserData } from './appWindow.mjs'
 import { launchOnFixture, stageFixture } from './logFixture.mjs'
@@ -95,19 +94,6 @@ function storedColor(page: Page): Promise<string> {
       .getCursorRing()
       .then((r) => r.colorHex)
   )
-}
-
-/**
- * Answer the analytics first-run notice, which a FRESH userData always shows and which sits over
- * the whole window until it is answered (the text-size / perf helper). "Turn it off" keeps this
- * run quiet.
- */
-async function dismissFirstRunNotice(page: Page): Promise<void> {
-  const notice = '[data-testid="telemetry-notice"]'
-  await page.waitForSelector(notice, { timeout: 30_000 }).catch(() => undefined)
-  if ((await countOf(page, notice)) === 0) return
-  await page.click('[data-testid="telemetry-notice-off"]')
-  await settleGone(page, notice, { timeoutMs: 8_000 })
 }
 
 async function openCursorRing(page: Page): Promise<void> {
@@ -213,7 +199,6 @@ async function main(): Promise<void> {
   try {
     const page = await mainWindow(first.app)
     watch(page)
-    await dismissFirstRunNotice(page)
     await openCursorRing(page)
     await stepDefaultIsUnchanged(page)
     await stepPickAColor(page)

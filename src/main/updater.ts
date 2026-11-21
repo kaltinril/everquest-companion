@@ -172,7 +172,6 @@ import {
   setAutoUpdateOff,
   setUpdateStagedVersion
 } from './storeAutoUpdate'
-import { classifyFailure, recordEvent } from './telemetry'
 
 const { autoUpdater } = electronUpdater
 
@@ -344,32 +343,6 @@ const noInstallInDev = (): void => {
   /* nothing staged in dev — deliberately does nothing */
 }
 
-/**
- * THE `updateOutcome` PRODUCER (JOS-39). The schema has carried check/download/apply plus a
- * coarse failure class since it was written and nothing ever emitted one, so the Analytics tab's
- * update section was three rows of zeros — which reads as "no install has ever updated" and meant
- * "we never measured it".
- *
- * WHAT EACH STEP MEANS HERE, because the honest answer is narrower than the word suggests:
- *   * `check`    — a check reached a verdict (available / not available) or failed.
- *   * `download` — a staged build appeared, or the download failed.
- *   * `apply`    — the user CLICKED the chip and we handed the installer over. The silent
- *     apply-on-quit path (`autoInstallOnAppQuit`) is invisible from inside this process by
- *     construction: it happens as the app dies. The fleet-wide answer to "did installs actually
- *     move" is the SERVER-side `upgrades` counter (src/shared/telemetryRollup.ts), which sees the
- *     version change on the next batch however the update was applied.
- *
- * Never a message: `classifyFailure` reduces an error to one of five words before it can reach an
- * event, and the event type has no field a message could go in.
- */
-function noteUpdate(step: 'check' | 'download' | 'apply', err?: unknown): void {
-  if (err === undefined) {
-    recordEvent({ t: 'updateOutcome', step, ok: true })
-    return
-  }
-  recordEvent({ t: 'updateOutcome', step, ok: false, failureClass: classifyFailure(err) })
-}
-
 /** The status sinks the electron-updater event handlers write through. */
 interface StatusSinks {
   /** Record + broadcast a status. */
@@ -395,10 +368,8 @@ interface StatusSinks {
  * error report about a laptop's lid, a `consecutiveFailures` tick that walked the backoff out to
  * four hours, and a `checkedAt` stamp for a check that never completed.
  *
- * FOUR THINGS HAPPEN, AND THE ONES THAT DO NOT ARE THE POINT:
- *   * `logUpdateFailure` routes it — warn once per code per session, NEVER the error store;
- *   * `noteUpdate` still counts ONE bounded telemetry outcome, because the law that one logical
- *     check produces exactly one of those is not this ticket's to bend;
+ * THREE THINGS HAPPEN, AND THE ONES THAT DO NOT ARE THE POINT:
+ *   * `logUpdateFailure` routes it — warn once per code per session, NEVER errors.log;
  *   * the resting status is re-pushed so the chip leaves 'checking' — carrying the OLD `checkedAt`,
  *     which keeps ageing and is the honest thing for it to say;
  *   * `retryOnResume` re-anchors the cadence.
@@ -410,7 +381,6 @@ interface StatusSinks {
  */
 function noteInterrupted(step: UpdateStep, err: unknown, sinks: StatusSinks): void {
   logUpdateFailure(step, 'final', err, LOG_SINKS)
-  noteUpdate(step, err)
   checkInFlight = false
   interruptedInARow++
   // `interrupted` is what stops the chip reading "up to date" about a check that never finished.
@@ -468,17 +438,7 @@ function applyStagedUpdate(flushStore: () => void): void {
   } catch (err) {
     logError('main:updateSettle', err)
   }
-  try {
-    autoUpdater.quitAndInstall(true, true)
-    // RECORDED AFTER THE CALL AND BEFORE THE PROCESS DIES, which works because the ring is written
-    // synchronously (telemetry/ring.ts) and `quitAndInstall` only *initiates* the quit. The event
-    // therefore survives on disk and is sent by the NEW build's first flush — which is the only
-    // process that could ever report it.
-    noteUpdate('apply')
-  } catch (err) {
-    noteUpdate('apply', err)
-    throw err
-  }
+  autoUpdater.quitAndInstall(true, true)
 }
 
 /**
@@ -494,7 +454,6 @@ function registerUpdaterEvents(
   autoUpdater.on('update-available', (info) => {
     const version: string | undefined = info?.version
     consecutiveFailures = 0 // the CHECK succeeded, whatever happens to the download
-    noteUpdate('check')
     // The feed moved on from the remembered build: its file is about to be replaced.
     if (version !== stagedVersion) rememberStaged(undefined)
     // UPDATED-AWAY: the feed names a build we already are. Nothing to offer.
@@ -532,7 +491,6 @@ function registerUpdaterEvents(
   autoUpdater.on('update-not-available', () => {
     consecutiveFailures = 0
     downloading = null
-    noteUpdate('check')
     rememberStaged(undefined)
     checkDone({ state: 'idle' })
   })
@@ -550,12 +508,8 @@ function registerUpdaterEvents(
     const version: string | undefined = info?.version
     // The library adds its quit handler right after this event, and only when this flag is on.
     if (autoUpdater.autoInstallOnAppQuit) quitArmed = true
-    // COUNTED ONLY WHEN THIS PROCESS ACTUALLY DOWNLOADED IT. Research §6b: this event is
-    // RE-EMITTED on every check that re-resolves an already-staged file, so counting the event
-    // itself would report one download per poll for the rest of the session — the same trap that
-    // made other apps' "restart to update" prompts into a nag, arriving as a fake metric.
-    // `downloading` is set only where we call `downloadUpdate()`, which makes it the exact latch.
-    if (downloading !== null) noteUpdate('download')
+    // Research §6b: this event is RE-EMITTED on every check that re-resolves an already-staged
+    // file. `downloading` is set only where we call `downloadUpdate()`.
     downloading = null
     // A build that landed proves the verification step ran, so the blocked sentence is no longer
     // the true one (JOS-421).
@@ -624,7 +578,6 @@ function registerUpdaterEvents(
     // (see `downloadBlocked` above).
     if (kind === 'blocked') downloadBlocked = true
     else consecutiveFailures++
-    noteUpdate(step, err ?? 'unknown error')
     checkDone({ state: 'error', message: describeUpdateFailure(err) })
     // A FAILED DOWNLOAD RE-ARMS THE POLL ITSELF. The download runs after its check has returned,
     // so the loop re-armed at the healthy spacing while `consecutiveFailures` was still 0, and the

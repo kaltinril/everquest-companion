@@ -39,12 +39,11 @@
 //      `messageSkeleton`) so that two different frameless failures stop being one row. It is never
 //      sent — it exists only inside the hash.
 //
-// PLUS ONE FIELD THAT IS NOT A FRAME: React's `componentStack` (`parseComponentPath`), which is
-// the only thing that can say a Tooltip warning came from the inventory row rather than the
-// tooltip. Component names are OUR OWN identifiers, but they are still bounded by charset, by
-// name length and by depth — the bright line is held by SHAPE here as everywhere else.
+// WHAT IT IS FOR NOW (2026-11-20): the same thing `./errorReport.ts`'s header says. The error
+// reports are gone with the usage-analytics service; these functions feed the LOCAL fingerprint
+// and its session budget, and nothing here leaves the machine.
 //
-// PURE, like `./errorReport.ts`, and it imports only that. It bundles into the telemetry Lambda.
+// PURE, like `./errorReport.ts`, and it imports only that.
 
 import { FINGERPRINT_FRAMES, framesFrom, type ErrorFrame } from './errorReport'
 
@@ -61,10 +60,7 @@ export const MAX_EXTERNAL_FRAMES = 5
 const EXT_SEGMENT = String.raw`[A-Za-z0-9_-][A-Za-z0-9_.-]{0,39}`
 
 /**
- * The shape an external frame's file must have — the PRODUCER's copy of
- * `EXTERNAL_FRAME_FILE_RE` (shared/telemetry.ts), which cannot be imported here for the reason
- * `BUNDLE_FILE_RE` states about its own twin. `tests/errorReportContract.test.mts` pins the two
- * SOURCE STRINGS equal.
+ * The shape an external frame's file must have.
  *
  * THREE ARMS, ALL OF THEM NAMING SOMETHING PUBLIC:
  *   `node:fs`, `node:internal/fs/promises`   — Node's own module graph.
@@ -81,10 +77,7 @@ const EXTERNAL_FILE_RE = new RegExp(
     `|node_modules/(?:@${EXT_SEGMENT}/)?${EXT_SEGMENT})$`
 )
 
-/** The producer's copy of the wire's external-file pattern, exported for the parity pin only. */
-export const EXTERNAL_FILE_PATTERN = EXTERNAL_FILE_RE.source
-
-/** A candidate value, or null if the wire's own pattern would not hold it. */
+/** A candidate value, or null if the pattern would not hold it. */
 const accept = (file: string): string | null => (EXTERNAL_FILE_RE.test(file) ? file : null)
 
 /** The first `n` path segments of a location, forward-slashed, with any query/hash cut off. */
@@ -232,66 +225,6 @@ function merge(outer: CaughtFields, from: object, depth: number): CaughtFields {
     stack: inner.stack,
     code: outer.code ?? inner.code
   }
-}
-
-// ---------------------------------------------------------------- React's component stack
-
-/**
- * The literal `ErrorBoundary.tsx` writes ahead of `info.componentStack` when it appends it to the
- * reported `stack` and to its console line. Duplicated there rather than imported FROM there:
- * that file deliberately imports no app code (the app may be the crash source), and this file
- * bundles into a Lambda that has never heard of React. `tests/errorReportContract.test.mts` pins
- * the two spellings equal.
- *
- * A MARKER RATHER THAN A HEURISTIC. React's own component-stack lines are `at <Name> (<url>)`,
- * which is character-for-character a V8 frame — there is no way to tell the two apart by looking,
- * and guessing wrong would either lose real frames or invent components. So only a stack WE
- * marked is read as a component stack; React's dev-mode append (which carries no marker) is left
- * alone, and says so here rather than being silently half-supported.
- */
-export const COMPONENT_STACK_MARKER = 'Component stack:'
-
-/** Characters allowed in one component name, and how long it may be. */
-const COMPONENT_NAME = String.raw`[A-Za-z_$][A-Za-z0-9_$.]{0,39}`
-
-/** How many components deep the path goes. Eight is the anchor, its row, its list and the view
- *  around them — enough to place a warning, few enough that the field stays a label. */
-export const MAX_COMPONENT_DEPTH = 8
-
-/** The producer's copy of `COMPONENT_PATH_RE` (shared/telemetry.ts); pinned by the contract. */
-const COMPONENT_PATH_RE = new RegExp(`^${COMPONENT_NAME}(?:>${COMPONENT_NAME}){0,7}$`)
-
-/** Exported for the parity pin only. */
-export const COMPONENT_PATH_PATTERN = COMPONENT_PATH_RE.source
-
-/** One line of a React component stack, both of React's spellings (`at X`, and 17's `in X`). */
-const COMPONENT_LINE_RE = new RegExp(String.raw`^\s*(?:at|in)\s+(${COMPONENT_NAME})`)
-
-/**
- * The chain of COMPONENTS a React error came through, innermost first, `>`-joined —
- * `Tooltip>InventoryRow>InventoryPanel`. Undefined when the stack carries no marked component
- * stack, which is every non-React error in the app.
- *
- * HOST ELEMENTS ARE DROPPED. React's stack interleaves `div`, `span` and `li` between the
- * components, and they spend the depth budget on the one part of the tree that says nothing about
- * whose code it is. The test is the initial capital (or a dotted name like `Foo.Bar`), which is
- * React's own convention for "this is a component and not a tag".
- */
-export function parseComponentPath(stack: unknown): string | undefined {
-  if (typeof stack !== 'string') return undefined
-  const i = stack.indexOf(COMPONENT_STACK_MARKER)
-  if (i === -1) return undefined
-  const names: string[] = []
-  for (const raw of stack.slice(i + COMPONENT_STACK_MARKER.length).split('\n')) {
-    if (names.length >= MAX_COMPONENT_DEPTH) break
-    const name = COMPONENT_LINE_RE.exec(raw)?.[1]
-    if (name === undefined) continue
-    if (!/^[A-Z]/.test(name) && !name.includes('.')) continue
-    names.push(name)
-  }
-  if (names.length === 0) return undefined
-  const path = names.join('>')
-  return COMPONENT_PATH_RE.test(path) ? path : undefined
 }
 
 // ---------------------------------------------------------------- the last-resort skeleton
