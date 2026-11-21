@@ -86,18 +86,15 @@ export function levelBar(rows: readonly SkillRow[], tradeskill: Tradeskill, mast
   const top = skillTop(tradeskill)
   const fill = level === null || top === null ? 0 : Math.min(1, Math.max(0, level / top))
   const capped = top !== null && level !== null && level <= SPECIALIZATION_CAP && CAPPED.includes(tradeskill)
-  const past = capped ? pastCap(rows, tradeskill) : []
-  const lifted = past.length > 0 && masteryRank > past.length - 1
-  const cappedBy = past.length === 0 || lifted ? null : past[0]
-  return {
-    tradeskill,
-    level,
-    top,
-    fill,
-    capTick: cappedBy === null || top === null ? null : SPECIALIZATION_CAP / top,
-    cappedBy,
-    liftedBy: lifted ? masteryRank : null
-  }
+  const cap = capOf(capped ? pastCap(rows, tradeskill) : [], masteryRank)
+  return { tradeskill, level, top, fill, capTick: cap.cappedBy === null || top === null ? null : SPECIALIZATION_CAP / top, ...cap }
+}
+
+/** Whether the rule caps a tradeskill that has `past` others above 200, or the log's rank lifts it. */
+function capOf(past: readonly Tradeskill[], masteryRank: number): Pick<LevelBar, 'cappedBy' | 'liftedBy'> {
+  if (past.length === 0) return { cappedBy: null, liftedBy: null }
+  const lifted = masteryRank > past.length - 1
+  return { cappedBy: lifted ? null : past[0], liftedBy: lifted ? masteryRank : null }
 }
 
 // ---- the words on screen ----------------------------------------------------------------------

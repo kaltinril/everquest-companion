@@ -107,7 +107,7 @@ async function checkShopping(page: Page, rows: number): Promise<void> {
   await page.click(`${sel('tradeskill-faction-shop')} >> nth=0`)
   const moved = await settle(() => textOf(page, SHOP_FOR), (t) => t === second, { timeoutMs: 10_000 })
   check('"Shop for this" puts the shopping list on that row', moved === second && second !== '', `${second} / ${moved}`)
-  check('...and the mark moves with it', (await countOf(page, `${ROW} >> nth=1 >> ${sel('tradeskill-faction-shopping')}`)) === 1)
+  check('...and the mark moves with it', (await page.locator(ROW).nth(1).locator(sel('tradeskill-faction-shopping')).count()) === 1)
 }
 
 /** The list of factions, and the memory of the pick. */
