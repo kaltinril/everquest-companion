@@ -5,7 +5,8 @@
  * spec is at its line budget. It runs last, after the own-log steps.
  *
  * What it holds:
- *   - the workbench has a "Your route" tab with four goals, Cheapest first, and none named Faction;
+ *   - the workbench has a "Your route" tab with five goals, Cheapest first (the fifth, Faction,
+ *     has its own steps: tradeskillFactionSteps.mts);
  *   - a route lists steps from the level up, each stretch starting where the one before ended,
  *     with exactly one marked as the next step, and states what it is ranked on;
  *   - nothing on the route reads as a chance or a forecast;
@@ -81,9 +82,9 @@ async function setCombines(page: Page, n: number): Promise<void> {
 
 /** The route itself: the goals, the steps from the level up, the next mark and the honest lines. */
 async function checkRoute(page: Page): Promise<string> {
-  check('the route tab has four goals', (await countOf(page, '[data-testid^="tradeskill-goal-"]')) === 4)
+  check('the route tab has five goals', (await countOf(page, '[data-testid^="tradeskill-goal-"]')) === 5)
   const goals = (await textOf(page, sel('tradeskill-goals'))).toLowerCase()
-  check('…Cheapest, Fastest, Explore and the community route, and no Faction', ['cheapest', 'fastest', 'explore', 'community route'].every((g) => goals.includes(g)) && !goals.includes('faction'), goals)
+  check('…Cheapest, Fastest, Explore, the community route and Faction', ['cheapest', 'fastest', 'explore', 'community route', 'faction'].every((g) => goals.includes(g)), goals)
   check('Cheapest is the goal a workbench opens on', (await goalOf(page)) === 'cheapest')
   const steps = await settle(() => countOf(page, STEP), (n) => n > 0, { timeoutMs: 20_000 })
   check('the route lists steps', steps > 0)

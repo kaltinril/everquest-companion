@@ -11,18 +11,12 @@
 import type { JSX } from 'react'
 import { Box, Paper, Typography } from '@mui/material'
 import { guideMaterialTail } from '@shared/tradeskillGuide'
-import {
-  PLAN_GUIDE_MATERIALS_TEXT,
-  PLAN_NO_MATERIALS_TEXT,
-  closedText,
-  madeWithText,
-  type PlanNode,
-  type PlanRecipe
-} from '@shared/tradeskillPlan'
+import { closedText, madeWithText, type PlanNode, type PlanRecipe } from '@shared/tradeskillPlan'
 import { CellLink } from '../../lib/CellLink'
 import { GuideSourceLine, Have } from './MaterialWhere'
 import { WhereCell } from './RecipePanel'
 import { ItemLabel } from './tradeskillLinks'
+import { WikiGapLine } from './WikiGap'
 
 /** Material, Need, Have, Where: the recipe panel's columns. */
 const GRID_SX = {
@@ -118,19 +112,18 @@ function NodeRow({ node, setClosed }: { node: PlanNode; setClosed: SetClosed }):
 /** One recipe's materials, each with its own recipe opened under it. */
 function Materials({ plan, setClosed }: { plan: PlanRecipe; setClosed: SetClosed }): JSX.Element {
   if (plan.from === 'none') {
+    // One line: neither the wiki page nor the guide lists materials, and the page is where to add them.
     return (
-      <Typography variant="body2" color="text.secondary" data-testid="tradeskill-plan-no-materials">
-        {PLAN_NO_MATERIALS_TEXT}
-      </Typography>
+      <Box data-testid="tradeskill-plan-no-materials">
+        <WikiGapLine recipe={plan.recipe} note="guideNone" />
+      </Box>
     )
   }
   return (
     <>
-      {plan.from === 'guide' && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-plan-guide-materials">
-          {PLAN_GUIDE_MATERIALS_TEXT}
-        </Typography>
-      )}
+      {/* What the wiki page lacks (its materials, or only its trivial), with the page to add it on. Where the
+          materials under it are the guide's, the same line says so (`data-guide` on it): never a second line. */}
+      <WikiGapLine recipe={plan.recipe} />
       {plan.materials.map((node) => (
         <NodeRow key={node.id} node={node} setClosed={setClosed} />
       ))}

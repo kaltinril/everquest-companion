@@ -1,17 +1,24 @@
 // The `crafting` module's pure helpers (src/shared/crafting.ts): totals per tradeskill, pace per
-// crafting hour, and what an item's combines cost against what its makes bring back.
+// crafting hour, what an item's combines cost against what its makes bring back, and the fishing
+// and forage rates.
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
   combineCost,
   craftingPace,
+  fishingRate,
+  forageRate,
+  gatheredShares,
   itemTradeskill,
   tradeskillTotals,
   unitCopper,
+  unnamedCatches,
   type BoughtRow,
   type CraftedItemRow,
   type CraftSpan,
+  type FishingSnap,
+  type GatheredRow,
   type SoldRow
 } from '../src/shared/crafting'
 
@@ -163,4 +170,69 @@ test('an ingredient never bought leaves the cost unstated and is named', () => {
   assert.deepEqual(cost, { perCombine: null, unpriced: ['Enchanted Gold Bar'], salePrice: null, spent: null, earned: null, net: null })
   // A recipe with no ingredient listed (390 on the wiki) has no cost either.
   assert.equal(combineCost(snap, { item: 'Fleeting Quiver', made: 1, failed: 0 }, []).perCombine, null)
+})
+
+const gathered = (name: string, count: number, lastTs = 0): GatheredRow => ({ item: name, count, lastTs })
+
+// The shape of the owner's live log on 2026-11-20: 131 casts, 126 of them with an outcome.
+const FISHED: FishingSnap = {
+  casts: 131,
+  caught: 64,
+  nothing: 62,
+  lostBait: 4,
+  spilled: 16,
+  poleBroke: 2,
+  session: { casts: 0, caught: 0, nothing: 0, lostBait: 0, spilled: 0, poleBroke: 0 },
+  items: [gathered('Fresh Fish', 28), gathered('Rusty Dagger', 9), gathered('Fish Scales', 8), gathered('Fetid Lake Muck', 8), gathered('Tattered Cloth Sandal', 6)]
+}
+
+test('the fishing rate is over the casts that had an outcome, never over the casts', () => {
+  const rate = fishingRate(FISHED)
+  assert.deepEqual(rate, { outcomes: 126, successRate: 64 / 126, noOutcome: 5 })
+  // Bait, beer and a broken pole each print beside a miss: they are no outcomes of their own.
+  assert.equal(fishingRate({ ...FISHED, lostBait: 40, spilled: 40, poleBroke: 40 }).outcomes, 126)
+})
+
+test('a cast with no outcome line is not a failure', () => {
+  // Three casts, one catch, two interrupted: one outcome, all of it caught.
+  assert.deepEqual(fishingRate({ casts: 3, caught: 1, nothing: 0 }), { outcomes: 1, successRate: 1, noOutcome: 2 })
+  // Casts alone state no rate at all.
+  assert.deepEqual(fishingRate({ casts: 2, caught: 0, nothing: 0 }), { outcomes: 0, successRate: null, noOutcome: 2 })
+  // An outcome whose cast line the log never printed does not make the count negative.
+  assert.equal(fishingRate({ casts: 1, caught: 1, nothing: 1 }).noOutcome, 0)
+  assert.deepEqual(fishingRate(undefined), { outcomes: 0, successRate: null, noOutcome: 0 })
+})
+
+test('the forage rate is found over found and failed', () => {
+  assert.deepEqual(forageRate({ found: 550, failed: 588 }), { attempts: 1138, successRate: 550 / 1138 })
+  assert.deepEqual(forageRate({ found: 0, failed: 3 }), { attempts: 3, successRate: 0 })
+  assert.deepEqual(forageRate({ found: 0, failed: 0 }), { attempts: 0, successRate: null })
+  assert.deepEqual(forageRate(undefined), { attempts: 0, successRate: null })
+})
+
+test('the catches the game did not name are the ones no item row holds', () => {
+  assert.equal(unnamedCatches(FISHED), 5)
+  assert.equal(unnamedCatches({ caught: 2, items: [gathered('Fresh Fish', 2)] }), 0)
+  assert.equal(unnamedCatches({ caught: 1, items: [gathered('Fresh Fish', 2)] }), 0)
+  assert.equal(unnamedCatches(undefined), 0)
+})
+
+test("each item's share, most gathered first, then by name", () => {
+  const shares = gatheredShares(FISHED.items)
+  assert.deepEqual(shares.map((s) => s.item), ['Fresh Fish', 'Rusty Dagger', 'Fetid Lake Muck', 'Fish Scales', 'Tattered Cloth Sandal'])
+  assert.equal(shares[0].share, 28 / 59)
+  assert.equal(shares.reduce((n, s) => n + s.share, 0).toFixed(9), '1.000000000')
+  // The row's own fields come through.
+  assert.deepEqual(gatheredShares([gathered('Roots', 3, 77)]), [{ item: 'Roots', count: 3, lastTs: 77, share: 1 }])
+  assert.deepEqual(gatheredShares([]), [])
+  // The input is not reordered.
+  assert.equal(FISHED.items[2].item, 'Fish Scales')
+})
+
+test('a share can be taken of every catch, the unnamed ones included', () => {
+  const shares = gatheredShares(FISHED.items, FISHED.caught)
+  assert.equal(shares[0].share, 28 / 64)
+  assert.ok(shares.reduce((n, s) => n + s.share, 0) < 1)
+  // A whole smaller than the rows add up to is not believed.
+  assert.equal(gatheredShares(FISHED.items, 10)[0].share, 28 / 59)
 })

@@ -104,6 +104,27 @@ A page is a mob page only if its OWN text opens the template (indirect transclus
 - **Factions**: `* [[Faction]] <span class='profac'>(-30)</span>` under `|factions` (lowered by a
   kill); `<span class='oppfac'>(10)</span>` under `|opposing_factions` (raised). `* None` when known
   to be none (most pages), `(?)` when unknown.
+- **Quest faction lines** (941 cached quest pages, 2026-11-20; parser `questPage.ts` `parseFactionHits`): editors paste
+  the game's line, 4,068 such lines on 658 pages, 3,947 of them list items (`* Your faction standing with [[X]] got
+  better.`), 78 bare lines, 42 ending `<br>`. Three verbs: `got better` / `got worse` (also `has gotten`, `gets`;
+  3,016 lines on 508 pages), `has been adjusted by N` (1,034 on 172; `by (+7)`, `by -300`), `could not possibly get any
+  better/worse` (18 on 12). This game's log prints only the last two (MEASURED.md), so a direction line is an older
+  server's.
+  - The faction is a link on 3,713 lines, piped on 77 (`[[King Tormax (Faction)|King Tormax]]`: the title is the wiki's,
+    the label the game's; other labels are run-together, `[[Emerald Warriors|EmeraldWarriors]]`). Plain text on 355:
+    235 as the game spells it (`Kerra Isle` on 13 pages; 5 of them a link inside `<nowiki>`), 119 run together on 31
+    pages (`LegionofCabilis`, `GuardsofQeynos`: an older server's log, no wiki title, no game name, not read; the 32
+    crafted turn-ins they would add are all on Kunark and Velious pages), 1 `adjusted by X`.
+  - A figure beside a direction verb on 303 lines (59 pages): `got better. (+5)`, `got worse (-1).`, `got better.<span
+    class='oppfac'>(+1)</span>`, `got better. +1`, `<span class='profac'>(-30)</span> got worse`. Always signed like the
+    verb. Not figures: `(10+)`, `+3?`, `(-20 or more)`, `[likely +5]`, `<<+5 in EQL>>`.
+  - Read: 3,943 lines on 645 pages. Unread: the 119 run-together, `adjusted by ?` or `X` (3), two links broken in two,
+    one typo (`wiht`). Prose about raising or losing faction (291 lines, `Faction improves with [[X]]`) is never read.
+  - One list per page, each faction at its first line; a later figure fills it only when it points the same way. A
+    page hosting several turn-ins (Muffin Quests: one per city; Plaguebringer Proof: a good and an evil hand-in)
+    states one mixed list. The parse has no turn-in blocks.
+  - `! ''' Required Faction: '''` in the top table (69 pages) is a standing the giver wants (`Amiable or better` 30,
+    `Indifferent or better` 12), names no faction and is not read.
 - **Item handed out by an NPC** (a quest container, a note): the giver goes in `|dropsfrom`, as a
   drop does: a `[[Zone]]` line, a blank line, then `* [[NPC]] - Gives it to you when you ...`
   (Klunga's Bracelet, Incomplete Blackbox, Stem of Candlestick). Not in `|notes` prose (155 of

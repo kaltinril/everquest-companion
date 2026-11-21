@@ -49,8 +49,12 @@ pub mod character;
 pub mod class_unlocks;
 pub mod combo;
 pub mod consider;
-/// `crafting`: combines per item, crafting spans, merchant money and depot stock (fork #6).
+/// `crafting`: combines per item, crafting spans, merchant money, depot stock, and fishing and
+/// forage outcomes (fork #6).
 pub mod crafting;
+pub mod crafting_gather;
+#[cfg(test)]
+mod crafting_gather_tests;
 pub mod crafting_money;
 pub mod crafting_spans;
 #[cfg(test)]

@@ -263,9 +263,45 @@ function isSectionHub(top: QuestTopTable | null, wikitext: string): boolean {
  * matches both so a page mixing dialects reads consistently. Also pasted (2026-10-10): `faction
  * with`, `faction standings with`, `has gotten`/`gets`, a `(+7)` or span before the verb, and the
  * capped `could not possibly get any better`.
+ *
+ * Re-measured 2026-11-20 on 941 cached pages: 4,068 such lines on 658 pages, 3,947 of them list
+ * items. Read since then: the faction in plain text, when the line is the game's whole sentence
+ * (`Your faction standing with Kerra Isle has been adjusted by 20.`, 235 lines on 51 pages; see
+ * RUN_TOGETHER_RE for the ones left out); bold around the link or the verb; `the` before the
+ * link. Groups: 1 `Your`, 2 link target, 3 link label, 4 plain name, 5 what stands between the
+ * name and the verb, 6 better/worse, 7 the adjusted-by number, 8 capped better/worse.
  */
-const FACTION_HIT_RE =
-  /faction(?: standings?)? (?:with|for) \[\[\s*([^\]|]+?)\s*(?:\|[^\]]*)?\]\]\s*(?:\([^)\n]*\)\s*|<span[^>]*>[^<]*<\/span>\s*)?(?:(?:has\s+)?(?:got(?:ten)?|gets)\s+'*(better|worse)|(?:has been|was)\s+adjusted\s+by\s*\(?\s*([+-]?\d+)\s*\)?|could not possibly get any (better|worse))/gi
+const FACTION_HIT_RE = new RegExp(
+  String.raw`(\byour?\s+)?faction(?: standings?)? (?:with|for) ` +
+    String.raw`(?:(?:the\s+)?'*\[\[\s*([^\]|]+?)\s*(?:\|([^\]]*))?\]\]|'*([A-Za-z][A-Za-z0-9 '\x60-]{1,39}?))` +
+    String.raw`'*\s*(\([^)\n]*\)\s*|<span[^>]*>[^<]*<\/span>\s*)?'*` +
+    String.raw`(?:(?:has\s+)?(?:got(?:ten)?|gets)\s+'*(better|worse)|(?:has been|was)\s+adjusted\s+by\s*\(?\s*([+-]?\d+)\s*\)?|could not possibly get any (better|worse))`,
+  'gi'
+)
+
+/** A figure before the verb: `(+7)`, `<span class='profac'>(-30)</span>`. `(10+)` is no figure. */
+const AMOUNT_BEFORE_RE = /^(?:<span[^>]*>\s*)?\(\s*([+-]?\d+)\s*\)/
+/**
+ * A figure after `got better` on the same line (303 lines on 59 pages, 2026-11-20): `. (+5)`,
+ * ` (-1).`, `.<span class='oppfac'>(+1)</span>`, `. +1`, ` by 10.`. An unsigned figure needs its
+ * brackets or `by`. Left unread: `+3?`, `(-20 or more)`, `[likely +5]`.
+ */
+const AMOUNT_AFTER_RE =
+  /^'*[^\S\n]*[.!]?'*[^\S\n]*(?:<span[^>]*>[^\S\n]*)?(?:by[^\S\n]*\(?[^\S\n]*([+-]?\d+)[^\S\n]*\)?|\([^\S\n]*([+-]?\d+)[^\S\n]*\)|([+-]\d+))(?![\d?+])/i
+
+/** Words running on after the verb (`got better results`): prose, not the game's sentence. */
+const RUNS_ON_RE = /^[^\S\n]+(?!by\b)[a-z]/i
+
+/**
+ * A plain name in one word with a capital inside it (`LegionofCabilis`, `KerraIsle`; 119 lines on
+ * 31 pages, 2026-11-20) is an older server's log spelling: this game's line spaces its names
+ * (`/outputfile faction` has one such word, `DaBashers`). It is no wiki title and no game name, so
+ * a reader that joins on the name cannot place it. Not read.
+ */
+const RUN_TOGETHER_RE = /^(?!DaBashers$)\S*[a-z][A-Z]\S*$/
+
+/** `<nowiki>[[X]]</nowiki>` is the faction in plain text: the editor unlinked it. */
+const NOWIKI_LINK_RE = /<nowiki>\s*\[\[([^\]|]*)\]\]\s*<\/nowiki>/gi
 
 /**
  * THE COIN TURN-IN (measured 2026-09-05: 48 cached quest pages carry one). The classic guard
@@ -314,25 +350,105 @@ export function parseCoinCost(wikitext: string): string | undefined {
   return `${m[1].replace(/,/g, '')} ${COIN_UNIT[unit] ?? unit}`
 }
 
+/** A faction name's key within one page: letters and digits only, so `[[King Ak'Anon]]` and `[[King AkAnon]]`,
+ *  or a plain `Guardsof Qeynos` and `[[Guards of Qeynos]]`, are one faction. */
+function factionKey(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, '')
+}
+
+/**
+ * The figure a direction line states beside its verb, signed by the verb: `got worse. (-1)` is -1,
+ * `got better (5).` is 5. A figure whose own sign contradicts the verb, or a zero, is no amount.
+ */
+function directionAmount(before: string | undefined, after: string, up: boolean): number | undefined {
+  const m = (before === undefined ? null : AMOUNT_BEFORE_RE.exec(before)) ?? AMOUNT_AFTER_RE.exec(after)
+  const text = m === null ? undefined : (m[1] ?? m[2] ?? m[3])
+  if (text === undefined) return undefined
+  const n = Number(text)
+  const contradicts = /^[+-]/.test(text) && n > 0 !== up
+  if (n === 0 || contradicts) return undefined
+  return up ? Math.abs(n) : -Math.abs(n)
+}
+
+/** The name a line gives its faction: the link's target, else the plain text, quotes dropped. */
+function hitName(m: RegExpExecArray): string {
+  return (m[2] ?? m[4])
+    .replace(/[\s_]+/g, ' ')
+    .replace(/^'+|'+$/g, '')
+    .trim()
+}
+
+/** A plain name counts only in the game's whole sentence (`Your faction ...`, nothing running on)
+ *  and in the game's spelling. */
+function plainUnread(m: RegExpExecArray, name: string, after: string): boolean {
+  return m[2] === undefined && (m[1] === undefined || RUNS_ON_RE.test(after) || RUN_TOGETHER_RE.test(name))
+}
+
+/** The direction one line states, and its figure when it states one. */
+function hitChange(m: RegExpExecArray, after: string): { up: boolean; amount?: number } {
+  const stated = m[7] === undefined ? undefined : Number(m[7])
+  const up = stated === undefined ? (m[6] ?? m[8]).toLowerCase() === 'better' : stated >= 0
+  const amount = stated ?? (m[6] === undefined ? undefined : directionAmount(m[5], after, up))
+  return amount === undefined ? { up } : { up, amount }
+}
+
+/** A piped link's label, when it differs from the title. */
+function hitLabel(m: RegExpExecArray, name: string): { label?: string } {
+  const label = (m[3] ?? '').replace(/[\s_]+/g, ' ').trim()
+  return label && label !== name ? { label } : {}
+}
+
+/** One receipt line as a hit, or null when it names no faction (a namespaced link, a plain name
+ *  outside the game's whole sentence or in a run-together spelling). */
+function hitOf(m: RegExpExecArray, after: string): QuestFactionHit | null {
+  const name = hitName(m)
+  if (plainUnread(m, name, after) || !name || NAMESPACED.test(name)) return null
+  return { name, ...hitLabel(m, name), ...(m[2] === undefined ? { plain: true } : {}), ...hitChange(m, after) }
+}
+
+/** Whose name stands when two lines name one faction: a linked name beats a plain one. */
+function namedBy(base: QuestFactionHit, other: QuestFactionHit): QuestFactionHit {
+  return base.plain === true && other.plain !== true ? other : base
+}
+
+/**
+ * Two lines for one faction: the first stands, except that a line with a figure beats an earlier
+ * one without (it carries more of the same fact), a linked name beats a plain one, and a label
+ * the standing line lacks is taken from the other.
+ */
+function mergeHit(prev: QuestFactionHit, next: QuestFactionHit): QuestFactionHit {
+  const fuller = prev.amount === undefined && next.amount !== undefined && next.up === prev.up
+  const [base, other] = fuller ? [next, prev] : [prev, next]
+  const named = namedBy(base, other)
+  const label = named.label ?? (named === base ? other.label : base.label)
+  return {
+    name: named.name,
+    ...(label === undefined || label === named.name || named.plain === true ? {} : { label }),
+    ...(named.plain === true ? { plain: true } : {}),
+    up: base.up,
+    ...(base.amount === undefined ? {} : { amount: base.amount })
+  }
+}
+
 /**
  * Every faction the page's receipt lines name, deduped per faction (first occurrence wins —
  * a page hosting several turn-in variants repeats the same receipts, and summing them would
  * claim one hand-in pays the whole page). A numeric line beats an earlier direction-only line
- * for the same faction, because it carries strictly more of the same fact.
+ * for the same faction, because it carries strictly more of the same fact. One list per page:
+ * the parse has no turn-in blocks to file a hit under.
  */
 export function parseFactionHits(wikitext: string): QuestFactionHit[] {
+  const text = wikitext.replace(NOWIKI_LINK_RE, '$1')
   const byName = new Map<string, QuestFactionHit>()
   let m: RegExpExecArray | null
   FACTION_HIT_RE.lastIndex = 0
-  while ((m = FACTION_HIT_RE.exec(wikitext)) !== null) {
-    const name = m[1].replace(/[\s_]+/g, ' ').trim()
-    if (!name || NAMESPACED.test(name)) continue
-    const amount = m[3] === undefined ? undefined : Number(m[3])
-    const up = amount === undefined ? (m[2] ?? m[4]).toLowerCase() === 'better' : amount >= 0
-    const key = name.toLowerCase()
+  while ((m = FACTION_HIT_RE.exec(text)) !== null) {
+    const end = FACTION_HIT_RE.lastIndex
+    const hit = hitOf(m, text.slice(end, end + 80))
+    if (hit === null) continue
+    const key = factionKey(hit.name)
     const prev = byName.get(key)
-    if (prev === undefined) byName.set(key, { name, up, ...(amount === undefined ? {} : { amount }) })
-    else if (prev.amount === undefined && amount !== undefined) byName.set(key, { name, up, amount })
+    byName.set(key, prev === undefined ? hit : mergeHit(prev, hit))
   }
   return [...byName.values()]
 }

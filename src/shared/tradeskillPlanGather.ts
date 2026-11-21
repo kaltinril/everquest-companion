@@ -173,7 +173,24 @@ export function gatherFor(root: PlanRecipe, ask: GatherAsk): Gather {
   return { count, leaves, made: [...t.made.values()], total: unpriced.length > 0 ? null : total, unpriced }
 }
 
+/**
+ * Everything on the gather list is held: the planned count can be made from what the player
+ * holds now, sub-combines included. False for an empty list, and for any line whose count nothing
+ * states (its whole need is still to get).
+ */
+export function gatherHeld(gather: Pick<Gather, 'leaves'>): boolean {
+  return gather.leaves.length > 0 && gather.leaves.every((line) => line.toGet === 0)
+}
+
 // ---- the words on screen -----------------------------------------------------------------------
+
+/** The planner's mark on an item whose whole gather list is held. */
+export const PLAN_CAN_MAKE_LABEL = 'can make now'
+
+/** The mark's hover: what was counted, and what was not. */
+export function planCanMakeTip(count: number, item: string): string {
+  return `You hold everything on the gather list for ${String(count)} ${item}. A failed combine uses its materials up too.`
+}
 
 /** "What to gather for 3 Fleeting Quiver". */
 export function gatherHeading(count: number, item: string): string {

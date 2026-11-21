@@ -3,15 +3,22 @@
 // maybe it's for an item you need"; "this person should think DANG this is THE PLACE to go").
 //
 // One tradeskill, the player's level, a goal: a route from the level up, as steps the screen
-// only maps over. Four goals are built:
+// only maps over. Four goals are built here, from the recipe book alone (`BOOK_GOALS`):
 //
 //   cheapest   tradeskillRouteLevel.ts   least cost per combine at the player's own prices
 //   fastest    tradeskillRouteLevel.ts   fewest stops, bought materials only
 //   explore    tradeskillRouteExplore.ts never-made recipes, grouped by what the data says
 //   guide      tradeskillRouteExplore.ts the community leveling guide's steps, credited
 //
-// Faction is NOT a goal here: no record holds what a quest rewards, so there is nothing to rank
-// and no placeholder is drawn. The one-item goal is the planner's, not a workbench route.
+// "Only use materials I have" (`RouteAsk.heldOnly`, tradeskillRouteHeld.ts) narrows Cheapest and
+// Fastest to recipes the player holds every material for. It never re-orders a route: holding a
+// material does not change its price (owner, 2026-11-20). Faction reads the same switch
+// (`heldOnlyApplies`): its rows are narrowed to the recipes that can be made now.
+//
+// Faction is the fifth goal of the switch (`ROUTE_GOALS`) and is NOT built here: it is not a
+// climb from the level but a faction's turn-ins, and it needs the quest pages and a picked
+// faction (tradeskillRouteFaction.ts `buildFactionRoute`). The one-item goal is the planner's,
+// not a workbench route.
 //
 // WHAT NO ROUTE STATES: a chance to make a combine, a chance to gain a point, a number of
 // combines to a level, a loss per point, a total cost of a stretch. Nobody has measured this
@@ -21,11 +28,18 @@
 import { skillRecipes, type BookRecipe } from './tradeskillBook'
 import { LEVELING_GUIDE_ID, RECIPE_GUIDE_ID, guideCreditOf, levelingCreditText, noRouteText } from './tradeskillGuide'
 import { communitySteps, explore, type Explored } from './tradeskillRouteExplore'
+import { HELD_BASIS, HELD_NOT_MEASURED, HELD_SHARED, heldEmptyText, heldEndText, heldSteps, isHeldGoal, type HeldGoal } from './tradeskillRouteHeld'
 import { cheapestSteps, fastestSteps } from './tradeskillRouteLevel'
 import type { RouteCtx, RouteFacts, RouteStep } from './tradeskillRouteStep'
 import type { Tradeskill } from './tradeskills'
 
-export const ROUTE_GOALS = ['cheapest', 'fastest', 'explore', 'guide'] as const
+/** The goals `buildRoute` builds: a route from the recipe book and the player's log. */
+export const BOOK_GOALS = ['cheapest', 'fastest', 'explore', 'guide'] as const
+
+export type BookGoal = (typeof BOOK_GOALS)[number]
+
+/** Every goal of the switch, in its order. Faction is tradeskillRouteFaction.ts's. */
+export const ROUTE_GOALS = [...BOOK_GOALS, 'faction'] as const
 
 export type RouteGoal = (typeof ROUTE_GOALS)[number]
 
@@ -33,7 +47,20 @@ export const GOAL_LABELS: Record<RouteGoal, string> = {
   cheapest: 'Cheapest',
   fastest: 'Fastest',
   explore: 'Explore',
-  guide: 'Community route'
+  guide: 'Community route',
+  faction: 'Faction'
+}
+
+export function isBookGoal(goal: RouteGoal): goal is BookGoal {
+  return goal !== 'faction'
+}
+
+/**
+ * The goals "Only use materials I have" changes: the two that climb the ladder (one shared stock,
+ * tradeskillRouteHeld.ts) and Faction, whose rows it narrows to the recipes that can be made now.
+ */
+export function heldOnlyApplies(goal: RouteGoal): boolean {
+  return isHeldGoal(goal) || goal === 'faction'
 }
 
 /** A stored or typed goal, or the default: anything unreadable is Cheapest. */
@@ -54,7 +81,9 @@ export interface RouteGroup {
 }
 
 export interface Route {
-  goal: RouteGoal
+  goal: BookGoal
+  /** Built only from recipes the player holds every material for (Cheapest and Fastest). */
+  heldOnly: boolean
   /** What the route ranks on, in one or two plain sentences. */
   basis: string
   /** What it does not know or does not rank on, each a sentence of its own. */
@@ -74,12 +103,14 @@ export interface RouteAsk {
   tradeskill: Tradeskill
   /** Null: the log never showed the skill. Routes then start from 0, as the recipe book does. */
   level: number | null
-  goal: RouteGoal
+  goal: BookGoal
+  /** "Only use materials I have". Read by Cheapest and Fastest; the other goals ignore it. */
+  heldOnly?: boolean
 }
 
 const NOT_MEASURED = 'Nobody has measured how often a combine fails or raises the skill in this game, so no chance, no number of combines and no total is shown.'
 
-const BASIS: Record<RouteGoal, string> = {
+const BASIS: Record<BookGoal, string> = {
   cheapest:
     'Step by step from your level: the recipe whose one combine costs least at the prices you last paid. A made item can be sold back; a failed combine loses its materials.',
   fastest: 'Fewest stops: from your level, the highest trivial whose materials can all be bought, run to its trivial, then the next. Cost is not ranked.',
@@ -158,6 +189,15 @@ function fastestRoute(ctx: RouteCtx, top: number | null): Built {
   return { groups: capped(steps), basis: BASIS.fastest, caveats: [FAR_BELOW, NOT_MEASURED], credits: [], empty: steps.length === 0 ? ladderEmpty(ctx, top) : '' }
 }
 
+/** Cheapest or Fastest from what is held alone. Past the top of the ladder it says that, as the open route does. */
+function heldRoute(ctx: RouteCtx, goal: HeldGoal, top: number | null): Built {
+  const steps = heldSteps(ctx, goal)
+  const built = { groups: capped(steps), basis: HELD_BASIS[goal], caveats: [HELD_SHARED, FAR_BELOW, HELD_NOT_MEASURED], credits: [] }
+  if (steps.length > 0) return { ...built, empty: '' }
+  const past = top === null || ctx.level >= top
+  return { ...built, empty: past ? ladderEmpty(ctx, top) : heldEmptyText(ctx) }
+}
+
 function exploreRoute(ctx: RouteCtx): Built {
   const found = explore(ctx)
   const drewGuide = found.groups.some((group) => group.id === 'guide')
@@ -182,14 +222,15 @@ export function buildRoute(facts: RouteFacts, ask: RouteAsk): Route {
   const recipes = skillRecipes(facts.index, ask.tradeskill)
   const ctx: RouteCtx = { facts, tradeskill: ask.tradeskill, level: ask.level ?? 0, recipes }
   const top = topTrivial(recipes)
-  const builders: Record<RouteGoal, () => Built> = {
+  const builders: Record<BookGoal, () => Built> = {
     cheapest: () => cheapestRoute(ctx, top),
     fastest: () => fastestRoute(ctx, top),
     explore: () => exploreRoute(ctx),
     guide: () => guideRoute(ctx, ask.level)
   }
-  const built = builders[ask.goal]()
-  return { goal: ask.goal, ...built, next: built.groups.at(0)?.steps.at(0) ?? null, top }
+  const held = ask.heldOnly === true && isHeldGoal(ask.goal) ? ask.goal : null
+  const built = held === null ? builders[ask.goal]() : heldRoute(ctx, held, top)
+  return { goal: ask.goal, heldOnly: held !== null, ...built, next: built.groups.at(0)?.steps.at(0) ?? null, top }
 }
 
 // ---- the words on screen --------------------------------------------------------------------------
@@ -202,9 +243,16 @@ export function moreStepsText(group: RouteGroup, top: number | null): string {
   return top === null ? `${steps}, not listed.` : `${steps}, up to ${String(top)}, not listed.`
 }
 
+/** The top `moreStepsText` names for a route's capped steps: the wiki's, or none on a held-only route, which stops earlier. */
+export function capTop(route: Route): number | null {
+  return route.heldOnly ? null : route.top
+}
+
 /** The foot of a climbing route: where the data ends. '' for a route that does not climb. */
 export function routeEndText(route: Route, tradeskill: Tradeskill): string {
-  if (route.top === null || route.empty !== '' || (route.goal !== 'cheapest' && route.goal !== 'fastest')) return ''
+  if (route.top === null || route.empty !== '' || !isHeldGoal(route.goal)) return ''
+  // A held-only route ends where the held materials do. With steps past the cap the listed ones are not its end.
+  if (route.heldOnly) return route.groups.some((group) => group.more > 0) ? '' : heldEndText(route.groups.flatMap((group) => group.steps))
   return `The route stops at ${String(route.top)}: the highest ${tradeskill} trivial the wiki holds.`
 }
 

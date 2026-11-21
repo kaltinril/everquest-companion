@@ -167,7 +167,12 @@ const SOLO_SPECS: string[] = []
  * default cap is the one that has to hold — re-measure here, do not re-add a cap on a hunch, if a
  * future sweep ever puts it near the edge.
  */
-const SPEC_TIMEOUT_MS: Record<string, number> = {}
+// `tradeskills` is one launch walking the whole section (Home, a workbench's four tabs, five
+// goals, the planner, Maps, Factions and the links in from other tabs). MEASURED 2026-11-20 with
+// the owner's dev app also running: green in 269.1 s at 243 checks, then cut by the 300 s default
+// at check 242 once the Home and Faction steps grew. 480 s is that run plus the steps it had left.
+// The honest fix is two specs with one launch each; until then this is the cap that holds.
+const SPEC_TIMEOUT_MS: Record<string, number> = { 'tradeskills.e2e.mts': 480_000 }
 
 /** Run at most CONCURRENCY specs at once, in discovery order — then the solo ones, alone. */
 async function runAll(specs: string[]): Promise<Result[]> {

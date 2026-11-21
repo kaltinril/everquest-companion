@@ -5,9 +5,10 @@
 // as a CONTROLLER rather than five hooks because these pieces move together: a filter change
 // re-derives the rows, a derive feeds the counts, the counts feed the bar.
 
-import { useCallback, useDeferredValue, useMemo, useState } from 'react'
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
 import type { ClassAbbr } from '@shared/classCombo'
 import type { ZoneShort } from '@shared/maps'
+import type { NavBack } from '../../appRouting'
 import type { View } from '../../appViews'
 import { kept, type Kept } from '../../lib/kept'
 // The Maps tab's own pin is the zone deep link: write the selection it persists, then switch
@@ -174,6 +175,28 @@ export interface FactionsViewProps {
   onOpenMob?: (t: { mob: string }) => void
   /** the app's MANUAL navigator — how a zone link becomes the Maps tab */
   onSelectView?: (v: View) => void
+  /** a link in from another tab (appRouting `openFactions`): the faction to find, by a name the
+   *  search matches */
+  focus?: string | null
+  /** moves on every ask, so the same faction asked twice arrives twice */
+  focusNonce?: number
+  /** retires the ask once it is applied */
+  onFocusConsumed?: () => void
+  /** the app's one Back contract: FactionBack.tsx draws "Back to <tab>" while a link in is parked */
+  nav?: NavBack
+}
+
+/**
+ * A link in names a faction: find it the way a race chip does (`reveal`: the search filled, both
+ * hide switches off), then retire the ask so a later plain visit opens the tab as it was left.
+ */
+function useFocusArrival(props: FactionsViewProps, reveal: (name: string) => void): void {
+  const { focus, focusNonce, onFocusConsumed } = props
+  useEffect(() => {
+    if (focus == null) return
+    reveal(focus)
+    onFocusConsumed?.()
+  }, [focus, focusNonce, reveal, onFocusConsumed])
 }
 
 /** Everything the render shell draws, in the shapes its children take. */
@@ -195,6 +218,7 @@ export interface FactionsController {
 export function useFactionsController(props: FactionsViewProps): FactionsController {
   const { onOpenLoot, onOpenMob, onSelectView } = props
   const { query, rowFilters, onQuery, toggles, reveal, recentMinutes } = useRowFilterState()
+  useFocusArrival(props, reveal)
   const { rows: all, readAt, held, raceUnlocks } = useFactionData(recentMinutes)
   const [classSel, setClassSel] = useState<ClassAbbr[]>([])
   const [slot, setSlot] = useState<SlotFilter>('ANY')

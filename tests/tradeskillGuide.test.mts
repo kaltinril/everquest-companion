@@ -15,7 +15,6 @@ import type { MobEntry } from '../src/shared/mobTypes'
 import { TRADESKILL_BOOK_VERSION, indexBook, type BookIndex, type BookRecipe } from '../src/shared/tradeskillBook'
 import {
   EMPTY_GUIDES,
-  GUIDE_MATERIALS_TEXT,
   LEVELING_GUIDE_ID,
   NO_GUIDES,
   RECIPE_GUIDE_ID,
@@ -206,7 +205,6 @@ test("a recipe the wiki lists no materials for shows the guide's, each with what
   assert.deepEqual(lines[0]?.source, { zone: 'North Karana', sourceText: 'Highland Lions', notes: ['Bring Track....'] })
   assert.deepEqual(lines[1]?.source, { merchant: 'Klok Walrot', zone: 'New Sebi', loc: '286, -54', notes: [] })
   assert.deepEqual([lines[2]?.qty, lines[2]?.returned], [2, true])
-  assert.ok(GUIDE_MATERIALS_TEXT.includes('from the guide'))
 })
 
 test("the guide's materials are not drawn over the wiki's own, nor for another tradeskill's recipe", () => {

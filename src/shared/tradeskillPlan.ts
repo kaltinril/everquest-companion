@@ -307,11 +307,13 @@ export function closedText(node: PlanNode): string {
   return node.closed === null ? '' : CLOSED_TEXT[node.closed]
 }
 
+/** Home's "Working towards" line for a wished item whose recipe lists nothing. The planner's own tree says it through the wiki gap line. */
 export const PLAN_NO_MATERIALS_TEXT = 'Neither the wiki nor the guide lists materials for this recipe.'
 
-export const PLAN_GUIDE_MATERIALS_TEXT = 'The wiki lists no materials for this recipe. These are from the guide.'
-
 export const PLAN_SEARCH_HINT = 'Type part of an item name to plan it.'
+
+/** Home's one-row door to the planner: the heading's hover says what a plan is. */
+export const PLAN_HOME_TIP = 'Plan any craftable item: its materials, the skills it takes, what to gather.'
 
 export function searchEmptyText(eraOnly: boolean): string {
   return eraOnly ? 'No craftable item in the current era matches.' : 'No craftable item matches.'

@@ -30,11 +30,27 @@ export function guideCreditOf(id: string): string {
 /** The leveling guide's route for one tradeskill: its side tables are left out. */
 export type GuideRoute = Pick<GuideLadder, 'notes' | 'steps' | 'alternates'>
 
+/**
+ * Which copy of a guide the app holds, for the Home screen's sources line: the version the guide
+ * states for itself, and when the copy was taken. The guide's address is never served (owner,
+ * 2026-11-20: the app credits both guides in words and links neither).
+ */
+export interface GuideStamp {
+  /** The guide's id in `tradeskillGuides.json` and `GUIDE_CREDITS`. */
+  id: string
+  /** As the guide writes it ("1.8 (wip)"); absent when it states none. */
+  version?: string
+  /** When the pull that produced the committed copy ran (ISO 8601). */
+  pulledAt: string
+}
+
 export interface GuidePayload {
   leveling: Partial<Record<Tradeskill, GuideRoute>>
   recipes: Partial<Record<Tradeskill, RecipeList>>
   /** A guide's spelling of an item (as `sourceItemKey` folds it) to the wiki item's own name. Exact matches only. */
   names: Record<string, string>
+  /** The copy of each guide in hand; absent reads as none stated. */
+  stamps?: GuideStamp[]
 }
 
 export const EMPTY_GUIDES: GuidePayload = { leveling: {}, recipes: {}, names: {} }
@@ -56,6 +72,11 @@ function noteMaterials(names: Record<string, string>, materials: readonly GuideM
   }
 }
 
+/** Which copy of a guide the committed file holds; its address is left behind. */
+function stampOf(guide: { id: string; version?: string; pulledAt: string }): GuideStamp {
+  return { id: guide.id, ...(guide.version === undefined ? {} : { version: guide.version }), pulledAt: guide.pulledAt }
+}
+
 /** The committed guide file as the workbench's payload, every item name looked up once. */
 export function guidePayload(file: TradeskillGuidesFile, wikiName: WikiItemName): GuidePayload {
   const names: Record<string, string> = {}
@@ -73,7 +94,7 @@ export function guidePayload(file: TradeskillGuidesFile, wikiName: WikiItemName)
       for (const material of recipe.materials) noteName(names, material.name, wikiName)
     }
   }
-  return { leveling, recipes: file.recipes.tradeskills, names }
+  return { leveling, recipes: file.recipes.tradeskills, names, stamps: [stampOf(file.leveling), stampOf(file.recipes)] }
 }
 
 // ---- the payload as the screens read it -------------------------------------------------------
@@ -105,7 +126,7 @@ export function wikiNameOf(guide: Pick<GuideIndex, 'payload'>, raw: string): str
 }
 
 /** One key for a guide's name and the wiki's name of the same item. */
-function guideKey(payload: GuidePayload, raw: string): string {
+export function guideKey(payload: GuidePayload, raw: string): string {
   const key = sourceItemKey(raw)
   const wiki = payload.names[key]
   return wiki === undefined ? key : sourceItemKey(wiki)
@@ -168,15 +189,23 @@ export interface GuideMaterialLine {
 
 export const NO_GUIDE_LINES: readonly GuideMaterialLine[] = []
 
+/** The recipe guide's recipe of the same tradeskill that makes the same item, whatever the wiki lists; or null. */
+export function guideRecipeFor(guide: GuideIndex, recipe: BookRecipe): GuideRecipe | null {
+  if (recipe.tradeskill === undefined) return null
+  return guide.recipes.get(recipeSlot(recipe.tradeskill, recipe.key)) ?? null
+}
+
 /**
  * The recipe guide's materials for a recipe the wiki lists none for (Fleeting Quiver): the guide's
  * recipe of the same tradeskill that makes the same item. Empty when the wiki has its own list,
- * or the guide has no such recipe.
+ * or the guide has no such recipe. WIKI FIRST (owner, 2026-11-20: "WIKI is our PRIMARY source,
+ * and others are secondary"): a guide's list never stands in for one the wiki states, and where
+ * the two differ `tradeskillWiki.guideDifferences` says so beside the wiki's.
  */
 export function guideMaterialsFor(guide: GuideIndex, recipe: BookRecipe): readonly GuideMaterialLine[] {
-  if (recipe.ingredients.length > 0 || recipe.tradeskill === undefined) return NO_GUIDE_LINES
-  const found = guide.recipes.get(recipeSlot(recipe.tradeskill, recipe.key))
-  if (found === undefined) return NO_GUIDE_LINES
+  if (recipe.ingredients.length > 0) return NO_GUIDE_LINES
+  const found = guideRecipeFor(guide, recipe)
+  if (found === null) return NO_GUIDE_LINES
   return found.materials.map((material) => ({
     name: material.name,
     wikiName: wikiNameOf(guide, material.name),
@@ -276,8 +305,6 @@ export function recipeGuideCreditText(): string {
 export function levelingCreditText(): string {
   return `Route and notes from ${guideCreditOf(LEVELING_GUIDE_ID)}.`
 }
-
-export const GUIDE_MATERIALS_TEXT = 'The wiki lists no materials for this recipe. These are from the guide:'
 
 export const GUIDE_TIP = 'From a community guide, not from the wiki or your log.'
 

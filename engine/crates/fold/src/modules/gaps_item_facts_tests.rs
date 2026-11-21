@@ -78,11 +78,45 @@ fn a_combine_carries_the_tradeskill_its_second_raised_in_either_order() {
     }
 }
 
+/// The game's own spelling (`an alternate product`), in the order measured: the failed combine,
+/// its raise, the by-product, all in one second. The by-product is an item the log proved, and
+/// nothing more: not crafted, placed in no zone, and given no tradeskill.
 #[test]
-fn an_alternate_product_is_a_crafted_item() {
+fn a_by_product_is_an_item_seen_and_never_a_crafted_one() {
+    let mut m = module();
+    let tick = |skill: &str| json!({ "kind": "skillUp", "skill": skill, "value": 2 });
+    feed(&mut m, 1, json!({ "kind": "zone", "zone": "The Feerrott" }));
+    at(&mut m, 2, 10, line("You lacked the skills to fashion Bog Juice."));
+    at(&mut m, 3, 10, tick("Brewing"));
+    at(&mut m, 4, 10, line("You have fashioned the items together to create an alternate product: Empty Bottle."));
+    let bottle = item_row(&m, "Empty Bottle");
+    assert_eq!(bottle["kinds"], json!(["by-product"]));
+    assert_eq!(bottle["count"], json!(1));
+    assert!(bottle["details"].get("tradeskills").is_none());
+    assert!(bottle["details"].get("zones").is_none(), "where it was made is not where it comes from");
+    let juice = item_row(&m, "Bog Juice");
+    assert_eq!(juice["kinds"], json!(["failed-combine"]));
+    assert_eq!(juice["details"]["tradeskills"]["entries"], json!([{ "name": "Brewing", "n": 1 }]));
+}
+
+/// A raise printed after the by-product (not seen on the owner's logs) is still the combine's:
+/// the by-product takes no part in the pairing.
+#[test]
+fn a_by_product_does_not_take_the_combines_raise() {
+    let mut m = module();
+    at(&mut m, 1, 10, line("You lacked the skills to fashion Bog Juice."));
+    at(&mut m, 2, 10, line("You have fashioned the items together to create an alternate product: Empty Bottle."));
+    at(&mut m, 3, 10, json!({ "kind": "skillUp", "skill": "Brewing", "value": 2 }));
+    assert_eq!(item_row(&m, "Bog Juice")["details"]["tradeskills"]["entries"], json!([{ "name": "Brewing", "n": 1 }]));
+    assert!(item_row(&m, "Empty Bottle")["details"].get("tradeskills").is_none());
+}
+
+/// The spelling without `an` is not the game's: it is no item line at all.
+#[test]
+fn the_spelling_the_game_never_prints_files_nothing() {
     let mut m = module();
     feed(&mut m, 1, line("You have fashioned the items together to create alternate product: Empty Bottle."));
-    assert_eq!(item_row(&m, "Empty Bottle")["kinds"], json!(["crafted"]));
+    assert!(item_row(&m, "Empty Bottle").is_null());
 }
 
 /// A known item's forage (owner, 2026-10-21): no Items row, but a `forage` row with the zones, so

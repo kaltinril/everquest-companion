@@ -439,6 +439,29 @@ test("a recipe carries what the made item's own page states: the quests that tak
   assert.ok(book.recipes.every((r) => r.quests === undefined || r.quests.every((q) => q.trim() !== '')), 'an empty quest name')
 })
 
+test('a recipe keeps its wiki page title only where the item goes by another name, so the page link lands on the right page', () => {
+  const pages = [
+    // Two pages of one in-game name, and a page whose title is the name.
+    entry('Carved Bow (Linen)', { name: 'Carved Bow', ...ring(90, 'Ruby') }),
+    entry('Carved Bow (Silk)', { name: 'Carved Bow', ...ring(95, 'Ruby') }),
+    entry('Plain Ring', ring(101, 'Ruby'))
+  ]
+  const file: ItemDbFile = { scrapedAt: '', source: 'fixture', count: pages.length, items: Object.fromEntries(pages.map((p) => [p.page.toLowerCase(), p])) }
+  const made = buildTradeskillBook(buildItemDbIndex(file), NO_ERA).recipes
+  assert.deepEqual(
+    made.map((r) => [r.item, r.page]),
+    [
+      ['Carved Bow', 'Carved Bow (Linen)'],
+      ['Carved Bow', 'Carved Bow (Silk)'],
+      ['Plain Ring', undefined]
+    ]
+  )
+  // Measured 2026-11-20 on the committed data: 121 recipe pages go by another item name.
+  const book = buildTradeskillBook(buildItemDbIndex(itemsJson as unknown as ItemDbFile), NO_ERA)
+  assertCorpusFloor(new Set(book.recipes.filter((r) => r.page !== undefined).map((r) => r.page)).size, 121, 'recipe pages titled otherwise than their item')
+  assert.ok(book.recipes.every((r) => r.page !== r.item), 'a page kept although it is the item name')
+})
+
 // ---- the committed item database --------------------------------------------------------------
 
 test('the committed data builds a book: every tradeskill has recipes, in ladder order, with keyed materials', () => {

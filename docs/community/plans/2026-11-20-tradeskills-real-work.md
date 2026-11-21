@@ -33,6 +33,28 @@ gated once on a candidate branch (WORKFLOW.md, "Gate") and merged with the tree 
   a "can make now" mark; links from the Character sheet's depot rows, Mobs drop rows and the
   Recommended tab (reasons in BRANCH_NOTES.md).
 
+Third batch, same day (slices 5 to 8 in BRANCH_NOTES.md, "Tradeskills section"): the owner's six
+answers and his first look at the section in the dev app.
+
+- Built: "Only use materials I have" on the route, "Can make now", the wiki-first lines and the
+  "Missing on the wiki" filter; level bars with the wiki's 200 rule and the log's Crafting Mastery
+  rank; "Pick up where you left off"; the wish control on a recipe and a plan, with "Working
+  towards" on Home; the AA panel (wiki AA table, ranks from the log); the Faction goal (quest
+  faction changes were already in `quests.json`; the reader now takes more line shapes, which also
+  moves the Factions tab's lists) with a door into the Factions tab; fishing and forage outcomes in
+  the `crafting` module and on screen; the Wiki Gaps by-product fix (a by-product is its own kind,
+  never a crafted item); a simpler Home; the recipe table without its Container column.
+- Checked: typecheck, lint, unit suite (known reds only), `cargo test --workspace` (1,293 passed),
+  the `tradeskills` e2e spec (256 checks, 279 s; it has a 480 s cap in `run-all.mts` and should be
+  split in two), and a capture of every screen looked at by the coordinating session, twice. The
+  capture needs the hidden e2e window shown off the desktop (`setPosition(-6000, -6000)` then
+  `showInactive()`): a hidden window is not composited and `page.screenshot` times out.
+- Still not checked by anything: the ring on a merchant's map pin; hover cards.
+- Open: whether rows tied only by a quest page naming the item belong in the Faction goal; the
+  Wish list tab files a wished crafted item that cannot be worn under "Nothing says where these
+  come from"; the recipe line's You text is still cut when it also wears "trivial for you"; a
+  sealed archive shows fishing and forage only after a Refresh or a version bump.
+
 Owner's answers, 2026-11-20 (rows in `requirements/skills-tab.md`): Cheapest stays ranked on cost
 and gains an "Only use materials I have" option; guide links stay in the README only; the Skills
 tab stays; the wiki is the primary source and guides fill only where it is silent; the Wiki Gaps

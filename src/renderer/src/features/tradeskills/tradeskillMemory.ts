@@ -2,7 +2,9 @@
 // rule (gear/areaMemory.ts): what you CHOSE outlives a restart, what you TYPED or poked out of a
 // list lasts the session.
 //
-//   restart (localStorage)    the open workbench (absent: Home), the Hide trivial switch
+//   restart (localStorage)    the open workbench (absent: Home), the recipe table's switches
+//                             (Hide trivial, Can make now, Missing on the wiki), whether Home's
+//                             Foraging tile is opened to what was found
 //   session (sessionStorage)  the search text, the picked recipe and the open tab (recipes, your
 //                             route, your history, the guides), for the open workbench only (and
 //                             whether a link from another tab chose that recipe)
@@ -18,6 +20,9 @@ import { useBoolPref, useRawPref } from '../combat/useCombatPrefs'
 
 const OPEN_KEY = 'eq.tradeskills.skill'
 const HIDE_TRIVIAL_KEY = 'eq.tradeskills.hideTrivial'
+const CAN_MAKE_KEY = 'eq.tradeskills.canMake'
+const WIKI_GAPS_KEY = 'eq.tradeskills.wikiGaps'
+const FORAGE_OPEN_KEY = 'eq.tradeskills.forageOpen'
 const BENCH_KEY = 'eq.tradeskills.bench'
 const MAX_SEARCH = 80
 
@@ -29,6 +34,21 @@ export function useOpenTradeskill(): [Tradeskill | null, (next: Tradeskill | nul
 
 export function useHideTrivial(): [boolean, (next: boolean) => void] {
   return useBoolPref(HIDE_TRIVIAL_KEY, false)
+}
+
+/** The recipe table's "Can make now" switch. */
+export function useCanMakeOnly(): [boolean, (next: boolean) => void] {
+  return useBoolPref(CAN_MAKE_KEY, false)
+}
+
+/** The recipe table's "Missing on the wiki" switch. */
+export function useWikiGapsOnly(): [boolean, (next: boolean) => void] {
+  return useBoolPref(WIKI_GAPS_KEY, false)
+}
+
+/** Home's Foraging tile, opened to its items, session line and AA; closed until the reader opens it. */
+export function useForageOpen(): [boolean, (next: boolean) => void] {
+  return useBoolPref(FORAGE_OPEN_KEY, false)
 }
 
 /** The workbench's tabs: the recipe book, the goal route, the player's own combines, the leveling guide. */

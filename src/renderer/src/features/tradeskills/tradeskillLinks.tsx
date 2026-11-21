@@ -57,10 +57,23 @@ export function ItemLink({ name, bold }: { name: string; bold?: boolean }): JSX.
   return <DonorName name={name} bold={bold} card onOpen={doors?.onOpenLoot} />
 }
 
-/** An item's icon and name on one line. */
-export function ItemLabel({ name, bold }: { name: string; bold?: boolean }): JSX.Element {
+const LABEL_SX = { display: 'flex', alignItems: 'center', gap: 0.75, minWidth: 0 } as const
+
+/**
+ * `wrap`: the name runs onto a second line instead of ending in dots. The name's own style
+ * (planner/PlannerChips `DonorName`) keeps it on one line and cuts it; a list whose reader has
+ * to act on the name (the shopping list) undoes that here, for that list alone.
+ */
+const WRAP_SX = {
+  ...LABEL_SX,
+  alignItems: 'flex-start',
+  '& [data-testid="planner-donor-name"]': { whiteSpace: 'normal', overflow: 'visible', textOverflow: 'clip', overflowWrap: 'anywhere' }
+} as const
+
+/** An item's icon and name on one line; with `wrap`, on as many lines as the name takes. */
+export function ItemLabel({ name, bold, wrap }: { name: string; bold?: boolean; wrap?: boolean }): JSX.Element {
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, minWidth: 0 }}>
+    <Box sx={wrap === true ? WRAP_SX : LABEL_SX}>
       <ItemIcon name={name} />
       <ItemLink name={name} bold={bold} />
     </Box>

@@ -7,7 +7,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { GUIDE_CREDITS, guideCreditLine } from '../src/shared/guideCredits'
 import { TRADESKILL_BOOK_VERSION, indexBook, type BookRecipe } from '../src/shared/tradeskillBook'
-import { GOAL_LABELS, ROUTE_GOALS, ROUTE_STEP_CAP, asGoal, buildRoute, moreStepsText, routeEndText, type Route, type RouteGoal } from '../src/shared/tradeskillRoute'
+import { BOOK_GOALS, GOAL_LABELS, ROUTE_GOALS, ROUTE_STEP_CAP, asGoal, buildRoute, isBookGoal, moreStepsText, routeEndText, type BookGoal, type Route } from '../src/shared/tradeskillRoute'
 import { EXPLORE_GROUP_CAP } from '../src/shared/tradeskillRouteExplore'
 import { recipeBuyable } from '../src/shared/tradeskillRouteLevel'
 import { recordText, type RouteCtx, type RouteFacts, type RouteStep } from '../src/shared/tradeskillRouteStep'
@@ -15,7 +15,7 @@ import { skillRecipes } from '../src/shared/tradeskillBook'
 import { bought, ing, item, recipe } from './tradeskillFixtures.mts'
 import { OWNER_LEVEL, ownerFacts, ownerHeld, ownerIndex, ownerRecipes, ownerSnap } from './tradeskillRouteFixtures.mts'
 
-const route = (goal: RouteGoal, facts: RouteFacts = ownerFacts(), level: number | null = OWNER_LEVEL): Route =>
+const route = (goal: BookGoal, facts: RouteFacts = ownerFacts(), level: number | null = OWNER_LEVEL): Route =>
   buildRoute(facts, { tradeskill: 'Jewelcrafting', level, goal })
 
 const allSteps = (r: Route): RouteStep[] => r.groups.flatMap((group) => group.steps)
@@ -32,11 +32,15 @@ const stepOf = (r: Route, name: string): RouteStep => {
 /** Everything a step puts on screen. */
 const words = (s: RouteStep): string => [s.range, s.name, s.why, s.aside, s.money, s.handText, s.record].join(' ')
 
-test('four goals are built, Cheapest is the default, and Faction is not one of them', () => {
-  assert.deepEqual([...ROUTE_GOALS], ['cheapest', 'fastest', 'explore', 'guide'])
-  assert.deepEqual(ROUTE_GOALS.map((g) => GOAL_LABELS[g]), ['Cheapest', 'Fastest', 'Explore', 'Community route'])
+test('the switch has five goals, Cheapest is the default, and Faction is the one this file does not build', () => {
+  assert.deepEqual([...ROUTE_GOALS], ['cheapest', 'fastest', 'explore', 'guide', 'faction'])
+  assert.deepEqual(ROUTE_GOALS.map((g) => GOAL_LABELS[g]), ['Cheapest', 'Fastest', 'Explore', 'Community route', 'Faction'])
+  // Faction is tradeskillRouteFaction.ts's (tests/tradeskillRouteFaction.test.mts).
+  assert.deepEqual(ROUTE_GOALS.filter(isBookGoal), [...BOOK_GOALS])
+  assert.deepEqual([...BOOK_GOALS], ['cheapest', 'fastest', 'explore', 'guide'])
   assert.equal(asGoal('fastest'), 'fastest')
-  assert.equal(asGoal('faction'), 'cheapest')
+  assert.equal(asGoal('faction'), 'faction')
+  assert.equal(asGoal('fun'), 'cheapest')
   assert.equal(asGoal(null), 'cheapest')
 })
 
@@ -105,31 +109,39 @@ test('Cheapest with the ring the cheapest: a made one pays for itself, a failed 
   assert.equal(recordText(item('Once', { failed: 1 })), 'Your own record: failed 1 of 1 combine.')
 })
 
-test('Cheapest: equal costs go to the recipe whose materials are held, and a wiki "returned on failure" is said', () => {
+test('Cheapest ranks on cost alone: equal costs go to the lower trivial whatever is held, and a wiki "returned on failure" is said', () => {
   const twins = [
     recipe('Ruby Band', { trivial: 210, ingredients: [ing('Enchanted Gold Bar', 1, ['Bought + Enchanted']), ing('Ruby', 1, ['Bought'])] }),
     recipe('Ruby Loop', { trivial: 209, ingredients: [ing('Gold Bar', 1, ['Bought']), ing('Ruby', 1, ['Bought', 'Returned on Failure'])] })
   ]
   const index = indexBook({ version: TRADESKILL_BOOK_VERSION, recipes: twins, materials: {} })
-  // Both cost 141.75 pp. The band's bar and gem are held; the loop's plain Gold Bar is not.
+  // Both cost 141.75 pp. The band's bar and gem are held; the loop's plain Gold Bar is not. Holding
+  // a material does not change its price (owner, 2026-11-20), so the held band does NOT move up:
+  // the lower trivial leads, and the band is named in the aside.
   const first = route('cheapest', ownerFacts({ index })).next
-  assert.equal(first?.name, 'Ruby Band')
-  assert.equal(first.range, '205 to 210')
-  // With nothing held, the lower trivial of the two.
+  assert.equal(first?.name, 'Ruby Loop')
+  assert.equal(first.range, '205 to 209')
+  assert.equal(first.aside, 'Not picked, but on hand: materials for 23 Ruby Band (trivial 210), at 141.75 pp a combine.')
+  // With nothing held the pick is the same one.
   const bare = route('cheapest', ownerFacts({ index, held: ownerHeld({ Ruby: 0, 'Enchanted Gold Bar': 0 }) })).next
   assert.equal(bare?.name, 'Ruby Loop')
+  assert.equal(bare.aside, '')
   assert.equal(
     bare.money,
     '141.75 pp a combine at the prices you last paid. Your log shows no sale of it. A failed combine loses its materials, but the wiki marks as returned on failure: Ruby.'
   )
 })
 
-test('Cheapest with no price at all: the next trivial up, what is held first, and the route says nothing is ranked on cost', () => {
+test('Cheapest with no price at all: the next trivial up, held or not, and the route says nothing is ranked on cost', () => {
   const facts = ownerFacts({ snap: ownerSnap({ bought: [] }) })
   const r = route('cheapest', facts)
-  // The ring's materials are held, so it leads; after it the ladder in trivial order.
+  // The ladder in trivial order. The ring leads because 207 is the next trivial above 205, not because it is held.
   assert.deepEqual(lines(r).slice(0, 3), ['205 to 207: Golden Ruby Ring', '207 to 210: Golden Jacinth Wedding Ring', '210 to 212: Golden Black Sapphire Earring'])
-  assert.equal(r.next?.why, 'No recipe above 205 has a cost in your log. You hold materials for this one.')
+  assert.equal(r.next?.why, 'No recipe above 205 has a cost in your log. This is the next trivial up.')
+  // From 200 the held ring is two rungs up: it does not jump the bracelet and the earring, and the aside names it.
+  const lower = route('cheapest', facts, 200)
+  assert.deepEqual(lines(lower).slice(0, 3), ['200 to 202: Fire Emerald Golden Bracelet', '202 to 204: Golden Sapphire Earring', '204 to 207: Golden Ruby Ring'])
+  assert.equal(lower.next?.aside, 'Not picked, but on hand: materials for 23 Golden Ruby Ring (trivial 207).')
   assert.equal(r.next.money, 'No cost stated: your log shows no purchase of Gold Bar (the bar a spell enchants into Enchanted Gold Bar), Ruby. A made one last sold for 141.75 pp.')
   assert.ok(r.caveats.some((c) => c.startsWith('Your log shows no price for any recipe above your level')))
   assert.ok(allSteps(r).every((s) => s.cost === null))
@@ -274,7 +286,7 @@ test('NOTHING GUESSED: no step of any goal states a chance, an expected count or
   // The only prices the fixture can state: bar + gem at the four prices paid, and the ring's sale.
   const known = new Set(['105.06 pp', '141.75 pp', '236.25 pp'])
   const forecast = /%|percent|chance|odds|expect|estimat|\best\b|about \d|roughly|approx|probabl|likely|on average|per skill|per raise|per point|in total|altogether/i
-  for (const goal of ROUTE_GOALS) {
+  for (const goal of BOOK_GOALS) {
     const r = route(goal)
     for (const step of allSteps(r)) {
       const text = words(step)
@@ -318,7 +330,7 @@ test('the era setting is respected: a recipe the book index hides is on no route
   const shown = route('fastest', ownerFacts({ index: indexBook(payload) }))
   assert.equal(shown.next?.name, 'Velium Ruby Veil')
   const hidden = indexBook(payload, (r) => r.eraTag === 'Velious')
-  for (const goal of ROUTE_GOALS) {
+  for (const goal of BOOK_GOALS) {
     const r = route(goal, ownerFacts({ index: hidden }))
     assert.ok(!allSteps(r).some((s) => s.name === 'Velium Ruby Veil'), goal)
     assert.equal(r.top, 295)

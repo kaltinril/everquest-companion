@@ -73,6 +73,11 @@ export function useBookIndex(eraOnly: boolean): BookIndex | null {
   }, [book, eraOnly, met])
 }
 
+/** When the wiki data behind the book was scraped (ISO 8601); undefined until the book has loaded, or when it states none. */
+export function useBookScrapedAt(): string | undefined {
+  return useTradeskillBook()?.scrapedAt
+}
+
 /** The two community guides as the screens read them; empty until the book has loaded. */
 export function useGuides(): GuideIndex {
   const book = useTradeskillBook()
