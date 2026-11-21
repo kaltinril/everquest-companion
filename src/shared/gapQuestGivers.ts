@@ -34,7 +34,11 @@ export function questGiverAction(row: GapRow): GapAction {
   }
 }
 
-/** Copy's text: the related_quests bullets to add, one a line, as the NPC layout writes them. */
+/**
+ * Copy's text: where the lines go, then the related_quests bullets, as the NPC layout writes them
+ * (owner, 2026-11-21: "how do I know what to edit on the page").
+ */
 export function questGiverAddText(gaps: QuestGaps): string {
-  return gaps.quests.map((q) => `* [[${q}]]`).join('\n') + '\n'
+  const bullets = gaps.quests.map((q) => `* [[${q}]]`).join('\n')
+  return `On ${gaps.page}, add under | related_quests = (replace * None if it is there):\n\n${bullets}\n`
 }

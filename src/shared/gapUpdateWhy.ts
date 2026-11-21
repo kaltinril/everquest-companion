@@ -19,7 +19,8 @@ const NOT_A_PAGE_CHANGE: ReadonlySet<GapActionKind> = new Set<GapActionKind>(['r
  */
 export function updateWhy(row: GapRow, verdict: GapVerdict = 'unchecked', ctx: GapActionContext = {}): string[] {
   if (gapJob(row, ctx) !== 'update') return []
-  if (row.domain === 'merchant' && row.viaRedirect === undefined) {
+  // A merchant row with quest gaps has a merchant page already: its reason is the quest chip's.
+  if (row.domain === 'merchant' && row.viaRedirect === undefined && row.questGaps === undefined) {
     return [`The wiki has a page for ${shownName(row)} as a mob, not as a merchant: it lacks the merchant layout.`]
   }
   return gapActions(row, verdict, ctx)

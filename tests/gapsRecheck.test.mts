@@ -92,7 +92,14 @@ test('a saved quest-giver row offers only the quests the page still lacks today'
   const pages = pagesOf([now], [TRAGIC, { page: 'Family Heirloom', giver: 'lord ollix everling' }])
   const out = withoutNowKnown(snapOf([giverRow(['Family Heirloom', 'The Tragic Tale of House Everling'])]), everyName, pages) as { rows: { questGaps: { page: string; quests: string[] } }[] }
   assert.deepEqual(out.rows[0].questGaps.quests, ['The Tragic Tale of House Everling'])
-  assert.equal(questGiverAddText(out.rows[0].questGaps), '* [[The Tragic Tale of House Everling]]\n')
+  assert.match(questGiverAddText(out.rows[0].questGaps), /\n\* \[\[The Tragic Tale of House Everling\]\]\n$/)
+})
+
+test('a saved quest-giver row closes when the page links the quest with a ? or through its family page', () => {
+  const quests = [{ page: "What's going on here", giver: 'lord ollix everling' }, { page: 'The Bread Shipment (Feerrott)', giver: 'lord ollix everling' }]
+  const listed = pagesOf([{ ...EVERLING, relatedQuests: ['What`s going on here?', 'Bread Shipment Quests'] }], quests)
+  const out = withoutNowKnown(snapOf([giverRow(quests.map((q) => q.page))]), () => false, listed) as { rows: unknown[] }
+  assert.deepEqual(out.rows, [])
 })
 
 test('a saved quest-giver row closes when today\'s catalog no longer says its page lacks a quest', () => {
