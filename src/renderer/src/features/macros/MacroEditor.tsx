@@ -6,7 +6,7 @@
 import { type JSX, type ReactNode, useState } from 'react'
 import { Box, Button, Chip, InputAdornment, MenuItem, Stack, TextField, Typography } from '@mui/material'
 import { duplicateMacro, removeMacro, restoreMacro, systemMint, updateMacro } from '@shared/macros/library'
-import { COLOR_MAX, COLOR_MIN, LINES, LINE_MAX } from '@shared/macros/limits'
+import { COLOR_MAX, COLOR_MIN, LINES, LINE_MAX, NAME_MAX } from '@shared/macros/limits'
 import { addOwnTag, normalizeTag, tagList, toggleTag } from '@shared/macros/tags'
 import { macrosToText } from '@shared/macros/text'
 import type { Macro } from '@shared/macros/types'
@@ -117,7 +117,20 @@ function NameAndColor({ macro, patch, warnings, focusName }: { macro: Macro; pat
           patch({ name: e.target.value }, 'name')
         }}
         helperText={nameWarning}
-        slotProps={WARNING_HELPER}
+        slotProps={{
+          ...WARNING_HELPER,
+          // A longer stored name still shows whole: maxLength only stops more being typed.
+          htmlInput: { maxLength: NAME_MAX },
+          input: {
+            endAdornment: (
+              <InputAdornment position="end">
+                <Typography variant="caption" color="text.secondary" data-testid="macro-name-count">
+                  {macro.name.length}/{NAME_MAX}
+                </Typography>
+              </InputAdornment>
+            )
+          }
+        }}
         data-testid="macro-name"
       />
       <TextField

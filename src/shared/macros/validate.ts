@@ -1,11 +1,11 @@
 // macros/validate.ts — what the editor says about a macro while it is typed. Warnings only: the
 // limits are partly assumed (limits.ts), so nothing here stops a save.
 
-import { COLOR_MAX, COLOR_MIN, LINES, LINE_MAX, PAUSE_MAX } from './limits'
+import { COLOR_MAX, COLOR_MIN, LINES, LINE_MAX, NAME_MAX, PAUSE_MAX } from './limits'
 import { trimLines } from './socials'
 import type { MacroBody } from './types'
 
-export type WarningCode = 'name-empty' | 'too-many-lines' | 'line-too-long' | 'color-range' | 'pause-form' | 'pause-long'
+export type WarningCode = 'name-empty' | 'name-long' | 'too-many-lines' | 'line-too-long' | 'color-range' | 'pause-form' | 'pause-long'
 
 export interface Warning {
   code: WarningCode
@@ -68,6 +68,8 @@ export function validateMacro(macro: MacroBody): Warning[] {
   const out: Warning[] = []
   if (macro.name.trim() === '') {
     out.push({ code: 'name-empty', field: 'name', line: null, text: 'Give the macro a name.' })
+  } else if (macro.name.length > NAME_MAX) {
+    out.push({ code: 'name-long', field: 'name', line: null, text: `The game keeps ${String(NAME_MAX)} characters of a name.` })
   }
   if (!Number.isInteger(macro.color) || macro.color < COLOR_MIN || macro.color > COLOR_MAX) {
     const range = `${String(COLOR_MIN)} to ${String(COLOR_MAX)}`

@@ -9,7 +9,9 @@ export const BUTTONS_PER_PAGE = 12
 export const PAGES = 10
 /** ASSUMED: page 1 is the game's built-in set. It is never in the file (that part is measured). */
 export const FIRST_EDITABLE_PAGE = 2
-/** ASSUMED: from the game's /hotbutton help text ("Up to 255 character macro"). */
+/** MEASURED (2026-11-20): the game's name box stopped at "abcdefghijklmno". */
+export const NAME_MAX = 15
+/** MEASURED (2026-11-20): typed to the limit, the game stored exactly 255 characters. */
 export const LINE_MAX = 255
 /** MEASURED: the edit window has twenty colour buttons, numbered 0 to 19. */
 export const COLOR_MIN = 0
