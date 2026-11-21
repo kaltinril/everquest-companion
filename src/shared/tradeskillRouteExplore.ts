@@ -13,6 +13,7 @@
 
 import { sourceItemKey } from './itemSources'
 import { yieldText, type BookRecipe } from './tradeskillBook'
+import type { GuideStep } from './guideData'
 import { placedLadder, stepRange, wikiNameOf, type PlacedStep } from './tradeskillGuide'
 import { recipeHistory } from './tradeskillHistory'
 import { lastPaid } from './tradeskillMoney'
@@ -205,8 +206,19 @@ type Joined = 'recipe' | 'item' | 'nothing'
 
 const UNJOINED: Record<Joined, string> = {
   recipe: '',
-  item: ' The wiki has no recipe for it, so no cost or materials are joined.',
-  nothing: " The guide's name for it is no wiki item's exactly, so no cost or materials are joined."
+  item: ' The wiki has a page for it but no recipe, so no cost is shown.',
+  nothing: ' No wiki item has this exact name, so it has no link and no cost.'
+}
+
+/**
+ * "The guide's materials: 2 Mandrake Root." for a step no wiki recipe is joined to, each name the
+ * wiki's own where the guide's is one (owner, 2026-11-20, of Woven mandrake: "what is that and
+ * why can't i click on it"). '' when the guide lists none.
+ */
+export function guideMaterialsLine(guides: RouteCtx['facts']['guides'], step: Pick<GuideStep, 'materials'>): string {
+  if (step.materials.length === 0) return ''
+  const parts = step.materials.map((m) => `${m.qty !== undefined && m.qty > 1 ? `${String(m.qty)} ` : ''}${wikiNameOf(guides, m.name) ?? m.name}`)
+  return `The guide's materials: ${parts.join(', ')}.`
 }
 
 function joinedOf(recipe: BookRecipe | null, wikiName: string | null): Joined {
@@ -229,7 +241,8 @@ export function communitySteps(ctx: RouteCtx, level: number | null): RouteStep[]
     if (placed.state === 'done') continue
     const wikiName = wikiNameOf(ctx.facts.guides, placed.step.item)
     const recipe = wikiName === null ? null : recipeNamed(ctx, wikiName)
-    const place = { id: `guide:${String(i)}`, range: placed.range, to: placed.step.to ?? null, why: guideWhy(placed, joinedOf(recipe, wikiName)) }
+    const aside = recipe === null ? guideMaterialsLine(ctx.facts.guides, placed.step) : ''
+    const place = { id: `guide:${String(i)}`, range: placed.range, to: placed.step.to ?? null, why: guideWhy(placed, joinedOf(recipe, wikiName)), aside }
     steps.push(recipe === null ? plainStep(wikiName ?? placed.step.item, wikiName !== null, place) : recipeStep(ctx.facts, recipe, place))
   }
   return steps

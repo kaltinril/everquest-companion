@@ -315,6 +315,49 @@ test('parseCraftRecipes: an ingredient row without a source list keeps just name
   ])
 })
 
+test('parseCraftRecipes: a `**:` row under the container is an ingredient too (Fleeting Quiver)', () => {
+  const r = parseCraftRecipes(
+    [
+      '* [[Tailoring]] (Trivial: 222)',
+      "** '''Yield: Fleeting Quiver''' x1",
+      '** In [[Large Sewing Kit]]:',
+      '**: {{SmIcon|1006}} 1 x [[Aviak Egg Oil]] - Crafted',
+      '**: {{SmIcon|1134}} 1 x [[Vial of Distilled Mana]] - Crafted, Summoned'
+    ].join('\n')
+  )
+  assert.deepEqual(r.recipes, [
+    {
+      tradeskill: 'Tailoring',
+      ingredients: [
+        { name: 'Aviak Egg Oil', qty: 1, sources: ['Crafted'] },
+        { name: 'Vial of Distilled Mana', qty: 1, sources: ['Crafted', 'Summoned'] }
+      ],
+      trivial: 222,
+      yieldItem: 'Fleeting Quiver',
+      yieldQty: 1,
+      container: 'Large Sewing Kit'
+    }
+  ])
+})
+
+test('parseCraftRecipes: `***` rows and bare `**1 x [[Item]]` rows are ingredients too', () => {
+  const antidote = parseCraftRecipes(
+    ['* [[Alchemy]] (Trivial: 57)', '** In [[Medicine Bag]]:', "*** {{SmIcon|1133}} 1 x [[Lady's Mantle]] - Bought", '*** {{SmIcon|795}} 1 x [[Hyssop]] - Bought'].join('\n')
+  )
+  assert.deepEqual(antidote.recipes[0].ingredients.map((i) => i.name), ["Lady's Mantle", 'Hyssop'])
+  assert.equal(antidote.recipes[0].container, 'Medicine Bag')
+  const silk = parseCraftRecipes(['* [[Skill Tailoring|Tailoring]] (Trivial: 36)', '**1 x [[Shadow Wolf Pelt]] - Dropped', '**2 x [[Silk Swatch]] - Crafted'].join('\n'))
+  assert.deepEqual(silk.recipes[0].ingredients, [
+    { name: 'Shadow Wolf Pelt', qty: 1, sources: ['Dropped'] },
+    { name: 'Silk Swatch', qty: 2, sources: ['Crafted'] }
+  ])
+})
+
+test('parseCraftRecipes: a pointer to another page under a tradeskill is not an ingredient', () => {
+  const boots = parseCraftRecipes('* [[Skill Tailoring|Tailoring]] (Trivial: 26)\n:*See [[Patchwork Armor]]')
+  assert.deepEqual(boots.recipes, [{ tradeskill: 'Tailoring', ingredients: [], trivial: 26 }])
+})
+
 test('recipes do NOT make an item notable — that predicate drives the push surfaces', () => {
   const k = { ...BASE, ...parseItemWikitext('Skewers', SKEWERS) }
   assert.equal((k.recipes ?? []).length > 0, true)

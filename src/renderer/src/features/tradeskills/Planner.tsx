@@ -144,17 +144,15 @@ export function PlannerHomePanel({ index, eraOnly, plan, onPlan }: PlannerHomePa
             <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
               Your plan:
             </Typography>
-            <ItemLabel name={last.item} />
-            <Button
-              size="small"
-              onClick={() => {
-                onPlan()
-              }}
-              data-testid="tradeskill-plan-open"
-              sx={{ flexShrink: 0 }}
-            >
-              Open the plan
-            </Button>
+            {/* The name opens the plan: its item page is one click further, on the plan's own head. */}
+            <Box sx={{ minWidth: 0, display: 'flex' }} data-testid="tradeskill-plan-open">
+              <ItemLabel
+                name={last.item}
+                act={() => {
+                  onPlan()
+                }}
+              />
+            </Box>
           </Stack>
         )}
       </Stack>

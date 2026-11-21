@@ -633,7 +633,11 @@ paths inside settings).
   share text, the Thanks page). Options: they follow the new name | they stay. Recommended: follow,
   in the same change.
 
-## Part 3: what the app itself still says (not built)
+## Part 3: what the app itself still says (partly built)
+
+Built 2026-11-20 (`requirements/feedback-and-analytics.md`): the first-run usage-data bar is gone,
+"Report this" opens a GitHub issue, the Issues address is a link, and the menu row reads "Open
+GitHub issue". `TELEMETRY.md` goes with the code removal (Part 4, item 8).
 
 Found by the audit's third sweep. Small, but it is code: it goes through the gate, and some of it
 is pinned by tests or clicked by e2e specs.
@@ -682,6 +686,9 @@ requests, which name this repo.
    cannot run here, yet their descriptions tell every agent session to use them ("Use at the start
    of any work session", "use it UNPROMPTED"). Options: delete all four; keep them with a note;
    rewrite `feedback-triage` for this repo's issues and delete the rest. Suggested: the last.
+   DECIDED for one of the four, 2026-11-20: `feedback-triage` is deleted (owner: "we don't need
+   feedback-triage skill"; its scripts went with the feedback and analytics code). `linear-board`,
+   `explain` and `login` are still open; `explain` still names the deleted skill in one line.
 5. **`AGENTS.md`.** It still orders a `Co-Authored-By` line on commits (overruled here), work on
    `main`, his Linear tickets, `v*` release tags, and a standing authorization to deploy to his AWS
    account. Options: leave it, with the one pointer line as the only correction; take it over and
@@ -693,7 +700,8 @@ requests, which name this repo.
 7. **What the fork left on the original repo**: 13 pull requests (BRANCHES.md lists them) and issue
    #74, which still says the changes are kept on separate branches for him to take. Options: leave
    them; close or update them (a write on his repo, so only on the owner's word).
-8. **Telemetry and feedback code.** Switched off, still in the tree, and every new tab must still be
+8. **Telemetry and feedback code.** DECIDED 2026-11-20: remove the code (owner: "Remove all code
+   associated with feedback and usage analytics"). Was: switched off, still in the tree, and every new tab must still be
    added to a waiting list (`NOT_YET_REPORTED`) for a deploy this project cannot make. Options:
    leave it; stop keeping the lists; remove the code (large).
 9. **The two signing tests kept red on purpose** (`scripts/community/known-reds.txt`). Options: keep

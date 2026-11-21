@@ -137,6 +137,13 @@ async function stepFromWorkbench(page: Page): Promise<void> {
   await settle(() => countOf(page, HOME), (n) => n === 1, { timeoutMs: 15_000 })
   check('the planner leaves for Home', (await countOf(page, PLANNER)) === 0)
   check('…where the plan is offered again', (await countOf(page, sel('tradeskill-plan-continue'))) === 1)
+  // The name beside "Your plan" is the door to the plan, not to the item's Loot page.
+  const offered = await textOf(page, `${sel('tradeskill-plan-open')} ${NAME}`)
+  await page.click(`${sel('tradeskill-plan-open')} ${NAME}`)
+  const reopened = await settle(() => countOf(page, PLANNER), (n) => n === 1, { timeoutMs: 20_000 })
+  check("a click on the plan's name opens the plan", reopened === 1 && (await textOf(page, `${HEAD} ${NAME}`)) === offered, offered)
+  await page.click(sel('tradeskill-plan-back'))
+  await settle(() => countOf(page, HOME), (n) => n === 1, { timeoutMs: 15_000 })
   await page.click(`${sel('tradeskill-tile-Jewelcrafting')} button`)
   await settle(() => countOf(page, BENCH), (n) => n === 1, { timeoutMs: 20_000 })
   await page.click(sel('tradeskill-tab-recipes'))

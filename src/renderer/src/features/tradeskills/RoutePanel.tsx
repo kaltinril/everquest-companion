@@ -34,7 +34,7 @@ import {
   type RouteGoal,
   type RouteGroup
 } from '@shared/tradeskillRoute'
-import type { RouteFacts, RouteStep } from '@shared/tradeskillRouteStep'
+import { containerText, type RouteFacts, type RouteStep } from '@shared/tradeskillRouteStep'
 import { SKILLS_MODULE } from '@shared/skills'
 import type { Tradeskill } from '@shared/tradeskills'
 import { LogReadInline } from '../../components/LogReadInline'
@@ -205,6 +205,11 @@ function StepRow({ step, next, onOpenRecipe }: StepRowProps): JSX.Element {
       <Box sx={{ minWidth: 0 }}>
         <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0 }}>
           <StepName step={step} />
+          {containerText(recipe) !== '' && (
+            <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }} data-testid="tradeskill-route-container">
+              {containerText(recipe)}
+            </Typography>
+          )}
           {recipe !== null && <EraChip subject={recipe} outOnly />}
         </Stack>
         <StepLine id="why" text={step.why} color="text.primary" />

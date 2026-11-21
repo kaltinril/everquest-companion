@@ -54,6 +54,8 @@ let large: LogReadReplySize | null = null
 let tooLargeModules: string[] = []
 let nothingRecognised: number | null = null
 let changed: (() => void) | null = null
+/** When this app's own connection last heard anything from the engine. Null: not in this launch. */
+let heardAt: number | null = null
 
 /** The one listener for "something the status is composed from moved" (main/logReadStatus.ts). */
 export function onLogReadChange(cb: (() => void) | null): void {
@@ -89,6 +91,7 @@ function startWait(at: number, newLog: boolean): void {
 /** A new engine launch: nothing recorded about the last one holds. Every error is cleared, so no
  *  standing error needs the old launch's lines and the ring starts empty. */
 export function noteLogReadConnection(at: number): void {
+  heardAt = null
   error = null
   said = []
   health = null
@@ -132,6 +135,7 @@ function clearUnanswered(): void {
 
 /** One `session.health` answer. `live` clears the error: the read it was about has landed. */
 export function noteLogReadHealth(status: string, offset: number | undefined, at: number): void {
+  heardAt = at
   const was = health
   const same = was !== null && (was.status === status || (opening(was.status) && opening(status)))
   health = { status, at, since: same ? was.since : at }
@@ -199,6 +203,24 @@ export function noteLogReadLanded(events: number | undefined, offset: number | u
   const none = events === 0 && offset !== undefined && offset > NOTHING_RECOGNISED_BYTES
   nothingRecognised = none ? offset : null
   changed?.()
+}
+
+/**
+ * PROOF OF LIFE for the supervisor's watchdog (`supervisorHealth.ts`): a frame or an answer arrived
+ * on the app's own connection. No `changed` call: nothing a window draws depends on it, and it is
+ * stamped on every progress frame.
+ */
+export function noteEngineHeard(at: number): void {
+  heardAt = at
+}
+
+export function engineHeardAt(): number | null {
+  return heardAt
+}
+
+/** The engine's last health answer on the app's own connection said it had caught up. */
+export function engineSaidLive(): boolean {
+  return health?.status === 'live'
 }
 
 export function logReadFacts(): LogReadNotes {

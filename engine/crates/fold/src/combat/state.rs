@@ -497,9 +497,8 @@ impl EngineState {
         if name_key.is_empty() || self.roster.admitted.contains(name_key) {
             return;
         }
-        if !self.others.note_pet(name_key) {
-            return;
-        }
+        // Not "the first time": see `rekey_other`.
+        self.others.note_pet(name_key);
         if !self.others.is_recorded(name_key) {
             return;
         }

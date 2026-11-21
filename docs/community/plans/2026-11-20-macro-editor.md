@@ -71,6 +71,31 @@ Opened 2026-11-20. Requirements: `../requirements/macro-editor.md`. Status at th
 - **Limits** are constants in one file, each marked measured or assumed: 5 lines, 12 buttons a
   page, 10 pages, 255 characters a line, colours 0 to 19.
 
+## Character-first flow (owner, 2026-11-20, after first use of the three-tab screen)
+
+The owner found Library / Sets / Characters clunky ("feels random"). The page is reworked around
+one sentence a player can follow with no explanation: **pick a character, click a button to edit
+it, press Send.**
+
+- **Two sections only: "Characters" (first, the default) and "Library".** The Sets tab is gone.
+- **A character's buttons are just there.** Every character file gets its own layout the first
+  time the tab sees it, made from what the game holds; its macros go into the library (identical
+  ones once). No "make a set" step. A one-time line says what was brought in.
+- **The grid is the editor.** Pages 2 to 10, twelve buttons a page. Click a filled button: the
+  macro's editor opens beside the grid. Click an empty one: "New macro" or pick from the library,
+  right there. Drag a button onto another to move or swap.
+- **One macro, many places, said out loud.** An edit changes that macro everywhere it sits; the
+  editor names where else it is and offers "Change only here" (a copy for this button).
+- **Changes are visible before they are sent.** A button that differs from the game is marked
+  (new, changed); a slot the game has and the layout does not is marked removed. A bar at the
+  bottom counts the changes and holds "Review and send". Nothing reaches the game until Send.
+- **Layouts replace sets,** behind one menu on the character's page: save these buttons as a named
+  layout, load a layout, copy another character's buttons, reset to what the game has. That is how
+  macros move between characters and loadouts, and how a set is swapped in at the game's limit.
+- **Undo and Redo** for every change to the library and the layouts (not for a send or a restore:
+  those have the dated copies).
+- The Library section stays the place to see every macro, tag, paste in and delete.
+
 ## Phases
 
 - **P0, proof of concept (no game write):** library, tags, editor, sets, per-character choice,
@@ -100,7 +125,13 @@ Opened 2026-11-20. Requirements: `../requirements/macro-editor.md`. Status at th
    edit still in the file?
 3. Hotbar link: drag the macro at page 2 button 3 to a hotbar. Which `E<n>` is written? Then move
    the macro to another slot in game: does the hotbar button follow?
-4. Loadouts: switch loadout once. Does a `_LO2` file appear, and does it start with the same macros?
+4. ~~Loadouts: switch loadout once.~~ **Answered 2026-11-20** by the owner's files: switching to a
+   new fourth loadout on Drywrought made `Drywrought_oggok_LO4.ini` and `UI_Drywrought_oggok_LO4.ini`
+   at 18:39, and the new file opens with the same macros and hotbar buttons as `_LO1` (a copy). So
+   each loadout has its own macro file, numbered from 1 (`AutoSkillsLO0` to `LO3` in the file are
+   the same four, numbered from 0). Loadouts 2 and 3 exist in the game and have no file: a file
+   seems to appear only once a loadout is played (inferred). No text file read, and nothing the log
+   printed in those minutes, names a loadout or its classes.
 5. Limits: how many characters the name box and a line box take; how many pages, and buttons a
    page; what happens at the reporter's 100.
 6. Page 1: are its macros editable, and does an edit to one get written to the file?
@@ -156,4 +187,24 @@ Opened 2026-11-20. Requirements: `../requirements/macro-editor.md`. Status at th
     copy and rename can leave `<file>.companion-write.tmp`, removed by the next send.
   - Not built: hotbar links (P3). A set that moves a macro may leave a hotbar button pointing at
     the wrong slot; in-game test 3 decides what to do.
+- 2026-11-20: the owner used P0 in the dev app, found the three tabs clunky and asked for the
+  character-first flow (above). Being built on `macro-flow`. No mockup first this time: the owner's
+  word was "build A, B, and C".
+- 2026-11-20: the character-first flow is built (`src/shared/macros/layouts.ts`, `buttons.ts`,
+  `history.ts`; `ButtonGrid`, `ButtonPanel`, `MacroPicker`, `LayoutsMenu`; `GameFileSend` is now
+  the bottom bar; `SetsSection` deleted). 81 macro unit tests. **Not yet seen on screen.** Nothing
+  under `src/main`, the preload or the send and backup logic changed.
+  - A character's own layout is the set `chosen[fileKey]` points at (`isCharacterLayout` is the one
+    rule); every other set is a saved layout. Data saved by the three-tab screen still loads: a
+    set chosen for a character becomes that character's own and takes its name; a second character
+    pointing at the same set gets a copy.
+  - Page 1 macros in a file are not put in a layout (a send leaves page 1 alone). A page above 10
+    or a button above 12 that a file holds is shown as an extra page or button.
+  - "Change only here" keeps the macro's name, so nothing shows as changed until it is edited.
+  - Most likely to misbehave, none tried: Ctrl+Z / Ctrl+Y outside a text box (the app's Edit menu
+    may take the keys; the buttons do not depend on it), native drag and drop on the buttons
+    ("Move to..." is the fallback), the bottom bar staying pinned, the name box taking focus on
+    "New macro".
+  - Not built: scrolling to the editor on a narrow window; a per-page marker of where the changes
+    are; a one-click put-back on a "removed" button.
 

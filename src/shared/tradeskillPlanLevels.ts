@@ -203,10 +203,23 @@ export function unskilledText(recipe: UnskilledRecipe): string {
   return recipe.word === null ? `${recipe.item} is a combine that names no tradeskill.` : `${recipe.item}: ${recipe.word}. No tradeskill level is needed.`
 }
 
-export const CHANCE_NOTE =
-  'A recipe can be tried below its trivial. How often a combine fails there has not been measured for this game, so no chance and no number of combines is shown.'
+export const CHANCE_NOTE = 'You can try a recipe below its trivial. Failure rates have not been measured for this game, so no chance is shown.'
 
 export const ALL_MET_TEXT = 'Your log shows every skill this plan needs at or past its trivial.'
+
+/**
+ * True when the plan asks nothing more of the player's skills: every tradeskill in it is at or
+ * past its trivial and no combine in it needs a line of its own. The plan then says so on one
+ * line in its head instead of a "Where you stand" panel (owner, 2026-11-20).
+ */
+export function skillsAllMet(skills: PlanSkills): boolean {
+  return skills.needs.length > 0 && skills.other.length === 0 && skills.needs.every((need) => need.stand === 'met')
+}
+
+/** Beside a met skill's level on that one line: "past the 106 this plan needs". */
+export function skillMetText(need: SkillNeed): string {
+  return need.trivial === null ? '' : `past the ${String(need.trivial)} this plan needs`
+}
 
 /** "Tailoring, 150 to 222". */
 export function routeHeading(route: SkillRoute): string {

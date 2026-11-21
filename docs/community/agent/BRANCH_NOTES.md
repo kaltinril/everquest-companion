@@ -329,9 +329,32 @@ where one exists.
 - `ever_pet` (every name that was ever YOUR pet, kept for the whole log) no longer refuses a
   leader line that names somebody else: only a pet you have now (`pet_names`) does. Summoned pet
   names come round, and a group mate's pet with a name your own once had was credited to nobody
-  (owner, 2026-11-19: Malkil's Xabantik; `fold/tests/ally_pet_reused_name.rs`). Still in force: a
-  name in `ever_pet` is never RECORDED as another player (`recordable_attacker`), so such a pet's
-  damage before its leader line is not kept, where another name's would move to the pet's row.
+  (owner, 2026-11-19: Malkil's Xabantik; `fold/tests/ally_pet_reused_name.rs`).
+- Pet rules, batch 1 (2026-11-20, requirements/pet-rules.md). `eqlog::names::is_summoned_pet_name`
+  is the game's own table of summoned-pet names (7 first letters x 9 x 5 x 4 endings, 1,204
+  names; all 57 names that said `My leader is` in the owner's logs are in it). Three uses:
+  - The roster's `buffed` rung refuses a table name (`roster.rs fold_heal`), so a pet that caught
+    a buff burst is no longer listed as a group member. `joined`, `stated`, `confirmed` and `user`
+    are not asked: a player may really be called Karn or Garn, which the table also holds.
+  - `routing.rs recordable_attacker`: a name that was a pet once (`ever_pet`, `others.pets`) is
+    refused UNLESS it is a table name. A table name with no live bind is a new pet and is recorded;
+    `rekey_other` / `retract_other` no longer stop at "already called a pet", so its row moves on
+    the next claim or leader line. This ended the test.52 known issue (damage before the leader
+    line dropped for a reused name).
+  - `routing.rs other_source`: an unclaimed table name's row reads `Pet (Xabantik) - owner
+    unknown` (kind still `other`, id still `member:<key>`), unless the roster lists the name.
+  - Kind `other` is hidden by the Group scope, so an unclaimed pet shows under Everyone only until
+    it is tied to a group member. NOT reviewed yet: ending your own claim on a name (rule 4).
+- Pet rules, batch 2 (2026-11-20): the owner guessed from a group mate's summon.
+  `ally_summon.rs` (`SummonWatch`, `AllyCharms::infer_summon_owner`) makes an `AllyVia::Summon` bind (kind `Summon`, no clock, no break rule);
+  `routing.rs infer_summoned_pet` asks it on every `Attribution::Ignore` damage and miss line,
+  BEFORE `route_other_*`, so the line that makes the bind is credited by it. State: `waiting`
+  (group mates' unanswered summons, 10 minutes), `own_waiting` (yours; blocks every guess),
+  `first_unbound` (when a table name first acted with no bind, stamped whatever it swung at).
+  The label is `Pet (X) - Owner (guessed)` (`ally_pet_label`). A leader line or a claim settles
+  it: `rekey.rs settle_guessed_pet` moves the guessed row (`move_recorded`, which also renames a
+  row in place). The target must be an engaged hostile, so a fight that has gone stale guesses
+  nothing until someone in the group swings again.
 - To see what the engine does with a real log: copy it as `eqlog_<Name>_<server>.<anything>.txt`
   (the replay tool reads the character from that shape), then
   `engine/target/release/parity <copy> --snapshots > out.json` (`cargo build --release -p parity`
@@ -361,13 +384,14 @@ where one exists.
   it.
 - Row metrics (fork #10) come from `shared/navMenu.ts` (two px ladders, defaults 14px text / 28px
   rows) through four CSS variables on the drawer paper (`--nav-row`, `--nav-text`, `--nav-icon`,
-  `--nav-icon-col`). `NavRowButton` and the feedback row read them via `NAV_ROW_SX` / `NAV_ICON_SX`
+  `--nav-icon-col`). `NavRowButton` and the "Open GitHub issue" row read them via `NAV_ROW_SX` / `NAV_ICON_SX`
   / `NAV_TEXT_SX`; no prop drilling. Group headings stay fixed (`GROUP_HEADING_SX`, 28px).
 - TRAP: the default row height is a measurement, not arithmetic. It was first 32px, sized on paper
   so the open menu fit the default window; the Skills row landed the same day and the menu ran 21px
   over (MEASURED.md). A new nav row costs one row height, and an overflowing drawer grows further
-  by itself: its scrollbar narrows the text column and the two-line Send feedback row wraps to three
-  (42px becomes 57px). `stepNavMenu` in `tests/e2e/text-size.e2e.mts` checks the open menu against
+  by itself: its scrollbar narrows the text column and a long row wraps (the old two-line Send
+  feedback row went from 42px to 57px; since 2026-11-20 that row is one line, "Open GitHub issue").
+  `stepNavMenu` in `tests/e2e/text-size.e2e.mts` checks the open menu against
   the drawer on a fresh install: when a new tab makes it fail, lower the default or shorten a row,
   do not delete the check.
 - Rows use `minHeight`, never `height`: a label that wraps grows its row. `tests/navMenu.test.mts`
@@ -1574,6 +1598,24 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
   a tab and no healthy-launch text changed. An overlay title during the first 15 s of a read is now
   'Reading log' with no number; no e2e spec was found asserting the number.
 
+## Reading log: a failed probe does not end an engine the app just heard (phase R5 step 1, 2026-11-20)
+
+- `supervisorHealth.ts` `forgiven()`: before `onUnhealthy`, a verdict made only of transient
+  reasons is set aside when the app's own connection heard the engine inside
+  `ENGINE_HEARD_FRESH_MS` (20 s), the stamp is newer than the one used last time, and the launch
+  has answered once. Once the log is live, at most `ENGINE_FORGIVE_MAX_LIVE` (6) beats in a row;
+  while it is being read, no cap. An answered probe resets the run.
+- The stamp is `logReadState.ts` `noteEngineHeard` / `engineHeardAt`, written by the progress and
+  module-changed listeners (`engineClientWiring.ts`) and by `noteLogReadHealth`; a new launch
+  clears it (`noteLogReadConnection`). `engineHost.ts` passes `engineHeardAt` and `engineIsLive`
+  as optional supervisor deps; without them the watch is the two-strike rule alone.
+- Why: a probe opens a new connection each time; a starved engine took 4.8 to 4.9 s of the 5.0 s
+  limit to answer one while answering the app's connection in milliseconds, and was ended four
+  times in ten minutes mid-read (plan, "Measured").
+- NOT built (owner, 2026-11-20: "lets no go wild, lets let the user respond"): the death cap, the
+  restart count under the bar, the longer announce wait, the local-connection words. An engine
+  that really dies on one log is still relaunched forever with no card.
+
 ## Reading log: the read starts again by itself, with caps (phase R4, plans/2026-11-19-reading-log-robustness.md)
 
 - The 2026-11-19 default (nothing retries a read by itself) is replaced, on the default taken for
@@ -2532,6 +2574,50 @@ only: no engine, parser, protocol, network or dependency change.
     the faction with the most recipes, which its pick step leaves up, because the default faction
     of Baking has one row.
 
+### After the owner's first read of the built screens (2026-11-20, branch `tradeskill-tighten`)
+
+- **Ingredient rows come in four leads.** `parseCraftRecipes` read only `::`. The 2026-11-20 cache
+  also writes `**:` (37 pages, Fleeting Quiver), `***` (Ethira's Poison Antidote) and a bare
+  `**1 x [[Item]]` (Shadow Silk, Robe of the Lost Circle). All four are read now. Before a recipe
+  is called "none on the wiki", open its cached page: 17 of the 19 recipes the guide was "filling"
+  were on the wiki all along (two are left: Distillate of Clarity VI, Tumpy Tonic).
+- **Re-reading `craftedBy` without a scrape.** `items.json` was patched for 42 records only: each
+  record with an empty-ingredient recipe was re-parsed from its cached page and replaced only
+  where the page's recipe skeleton (tradeskill, trivial, container, yield) still equalled the
+  stored one (DATA_REFRESH.md's offline rule). `npm run gen:data-weight` after any such patch, or
+  the data-weight ledger test goes red.
+- **A name does the line's own action.** `ItemLink`/`ItemLabel` take `act`: Home's "Your plan" and
+  "Working towards" names open the plan, a "Next" name opens that workbench on that recipe
+  (`rememberLinkedPick` then `show`), a recipe table row's name picks the row (a no-op `act`, so
+  the click reaches the row). The hover card is unchanged. Names with no action of their own keep
+  the Loot page. Do not add a second control beside a name that does the same thing.
+- **The Loot page's "Plan this item"** is `TradeskillFocus.plan`: `useArrival` opens the workbench
+  as for any link in, then the planner over it.
+- **The plan says each thing once.** "What to gather" has no Where column ("What it takes" has
+  it). `skillsAllMet` true and no route to show: "Where you stand" is `PlanStandLine` in the head
+  and `ItemPlanSkills` is not drawn. A material whose wiki words include Bought lists two mobs
+  (`dropCap`), others four.
+
+### The held-materials route chains (2026-11-20, branch `route-held-chain`)
+
+- `tradeskillRouteHeld.ts` no longer asks `onHand` per recipe. `tryCover` takes each material from
+  one running count and, when the stock is short, makes it first with this tradeskill's own
+  lowest-trivial recipe for it if that recipe's materials are held (one level deep). `coverOf`
+  finds the most combines by doubling then halving. `take` commits what the step used and adds
+  what it makes (`combines x yield`), so a later step can use it; that step's count says it rests
+  on the steps above succeeding.
+- Equals (same trivial, same cost) are named in the step's `aside`; between them the order is how
+  many later recipes use the item (`feedCounter`), then the name.
+- Not counted: what was made since the last inventory dump. Have is the dump or a newer depot
+  line; a combine's output in the bags is in neither until the next `/outputfile inventory`.
+- **A starred line is an ingredient only when a quantity follows it.** The first cut of the `**:`
+  fix also took `:*See [[Patchwork Armor]]` as a material on five pages. The re-patch tool now
+  compares every crafted record against a fresh parse of its cached page: after the fix, exactly
+  those five differed and nothing else, which is the check to repeat after any parser change.
+- A guide step no wiki recipe is joined to carries `guideMaterialsLine` in its `aside`. Its `why`
+  says "No wiki item has this exact name": true for a missing page (Woven Mandrake) and for a
+  guide's shorthand (Platinum ruby), so it never claims the wiki lacks a page.
+
 ## Tradeskill guides as data (fork #6, requirements/skills-tab.md)
 
 - Two community guides are pulled at release time by `scripts/community/guides-pull.mts` and
@@ -3177,3 +3263,16 @@ what a later change must know. Each fix has a unit test that failed before it.
   `useProgress` exposes `lootReady` beside `turnInsReady`.
 - Not changed: at launch the overlay first draws the last session's stored payload until the feed
   writes.
+
+## Chart readout: drawn on body (2026-11-20)
+
+- `lib/ChartTooltip.tsx` draws its card with `createPortal` on `document.body`, `position: fixed`,
+  z-index 1500. A zero-size anchor span stays in the hover layer; a caller's `x`/`y` are still px
+  from the layer's positioned ancestor. The card flips at the WINDOW's edge
+  (`lib/chartTooltipPlace.ts place`), so the `bounds` prop is gone.
+- Why: drawn inside the chart it was cut off by a scrolling ancestor (the dashboard's DPS card at
+  125% text). Do not move it back inside a chart; `tests/e2e/tooltipClipSteps.mts` checks its
+  parent is body and that nothing clips it.
+- TRAP for e2e steps: a NAMED helper (an arrow assigned to a const) inside `page.evaluate` fails in
+  the page with `__name is not defined` (the test loader wraps it). Return plain data from the
+  page and judge it in the test.

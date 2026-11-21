@@ -98,6 +98,10 @@ async function checkRoute(page: Page): Promise<string> {
   const text = await textOf(page, sel('tradeskill-route-list'))
   check('no step reads as a chance or a forecast', !/%|chance|expected|estimate/i.test(text), text.slice(0, 200))
   check('every step says why it was chosen', (await countOf(page, sel('tradeskill-route-why'))) === steps)
+  // Where the combine is done sits beside the name, for every step whose recipe names a container.
+  const where = await textOf(page, sel('tradeskill-route-container'))
+  if (where === '') note('no step of this route names a container: the line was not checked')
+  else check('a step says where its combine is done', /^in an? \S/.test(where), where)
   return textOf(page, FIRST_NAME)
 }
 

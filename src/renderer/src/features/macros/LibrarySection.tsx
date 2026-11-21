@@ -2,14 +2,15 @@
 // tag chips, New and Paste on the left and the picked macro's editor on the right.
 
 import { type JSX, useState } from 'react'
-import { Button, Chip, List, Paper, Stack, TextField, Typography } from '@mui/material'
+import { Box, Button, List, Paper, Stack, TextField, Typography } from '@mui/material'
+import { usedOnText } from '@shared/macros/buttons'
 import { addMacro, findMacro, importGameMacros, newMacro, systemMint } from '@shared/macros/library'
-import { filterMacros, tagList, toggleTag } from '@shared/macros/tags'
+import { filterMacros } from '@shared/macros/tags'
 import { parseMacroText } from '@shared/macros/text'
 import { validateMacro } from '@shared/macros/validate'
 import { SearchField } from '../../lib/SearchField'
-import { MacroEditor } from './MacroEditor'
-import { MONO_SX, MacroRow, Quiet, TwoPane } from './macroParts'
+import { LibraryActions, MacroEditor } from './MacroEditor'
+import { MONO_SX, MacroRow, Quiet, TagFilter, TwoPane, UndoRedo } from './macroParts'
 import { useMacroUi } from './macroUi'
 import type { MacroStore } from './useMacroLibrary'
 
@@ -19,6 +20,8 @@ interface LibraryProps {
   store: MacroStore
   selected: string | null
   onSelect: (id: string | null) => void
+  /** Go to the Characters section with a macro ready to put on a button. */
+  onPlace: (id: string) => void
 }
 
 /** The box that takes pasted ini lines or another player's shared text. */
@@ -41,7 +44,7 @@ function PasteBox({ store, onSelect, onClose }: { store: MacroStore; onSelect: (
     <Paper variant="outlined" sx={{ p: 1, bgcolor: 'action.hover' }} data-testid="macros-paste-box">
       <Stack spacing={1}>
         <Typography variant="body2" color="text.secondary">
-          Paste macros copied from an ini file or shared by another player
+          Paste macros copied from a game file or shared by another player
         </Typography>
         <TextField
           multiline
@@ -70,32 +73,7 @@ function PasteBox({ store, onSelect, onClose }: { store: MacroStore; onSelect: (
   )
 }
 
-/** The tag chips over the list: each with how many macros carry it; the picked ones narrow the list. */
-function TagFilter({ store, tags, onTags }: { store: MacroStore; tags: string[]; onTags: (tags: string[]) => void }): JSX.Element {
-  return (
-    <Stack direction="row" spacing={0.5} useFlexGap flexWrap="wrap" data-testid="macros-tag-filters">
-      {tagList(store.library).map(({ tag, count }) => {
-        const on = tags.includes(tag)
-        return (
-          <Chip
-            key={tag}
-            size="small"
-            label={`${tag} ${String(count)}`}
-            color={on ? 'primary' : 'default'}
-            variant={on ? 'filled' : 'outlined'}
-            aria-pressed={on}
-            data-testid="macros-tag-filter"
-            onClick={() => {
-              onTags(toggleTag(tags, tag))
-            }}
-          />
-        )
-      })}
-    </Stack>
-  )
-}
-
-interface ListProps extends LibraryProps {
+interface ListProps extends Omit<LibraryProps, 'onPlace'> {
   query: string
   tags: string[]
 }
@@ -123,7 +101,7 @@ function MacroList({ store, selected, onSelect, query, tags }: ListProps): JSX.E
   )
 }
 
-export function LibrarySection({ store, selected, onSelect }: LibraryProps): JSX.Element {
+export function LibrarySection({ store, selected, onSelect, onPlace }: LibraryProps): JSX.Element {
   const [query, setQuery] = useState('')
   const [tags, setTags] = useState<string[]>([])
   const [pasting, setPasting] = useState(false)
@@ -148,14 +126,14 @@ export function LibrarySection({ store, selected, onSelect }: LibraryProps): JSX
       <SearchField
         query={query}
         onChange={setQuery}
-        placeholder="Search name, command, note"
+        placeholder="Search by name, command, tag or note"
         testid="macros-search"
         clearTestid="macros-search-clear"
         ariaLabel="Search macros"
         clearLabel="Clear the search"
         sx={{ width: '100%' }}
       />
-      <Stack direction="row" spacing={1} alignItems="center">
+      <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
         <Button size="small" variant="contained" onClick={create} data-testid="macros-new">
           New macro
         </Button>
@@ -172,6 +150,8 @@ export function LibrarySection({ store, selected, onSelect }: LibraryProps): JSX
         <Typography variant="caption" color="text.secondary" data-testid="macros-count">
           {shown} of {store.library.macros.length}
         </Typography>
+        <Box sx={{ flexGrow: 1 }} />
+        <UndoRedo store={store} />
       </Stack>
       {pasting && (
         <PasteBox
@@ -190,7 +170,18 @@ export function LibrarySection({ store, selected, onSelect }: LibraryProps): JSX
     macro === null ? (
       <Quiet testid="macro-editor-none">Pick a macro on the left, or make a new one.</Quiet>
     ) : (
-      <MacroEditor key={macro.id} store={store} macro={macro} onSelect={onSelect} focusName={macro.id === fresh} />
+      <MacroEditor
+        key={macro.id}
+        store={store}
+        macro={macro}
+        focusName={macro.id === fresh}
+        top={<LibraryActions store={store} macro={macro} onSelect={onSelect} onPlace={onPlace} />}
+        bottom={<Quiet testid="macro-used-in">{usedOnText(store.library, macro.id)}</Quiet>}
+      />
     )
-  return <TwoPane left={left} right={right} />
+  return (
+    <Box sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto', overscrollBehavior: 'contain' }}>
+      <TwoPane left={left} right={right} />
+    </Box>
+  )
 }

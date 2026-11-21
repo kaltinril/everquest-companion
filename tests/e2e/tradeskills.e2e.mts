@@ -365,6 +365,15 @@ async function stepFromLoot(page: Page): Promise<void> {
   check("…on the item's own recipe", shown === item, `${shown} / ${item}`)
   const label = await textOf(page, BACK)
   check('…with a Back to the Loot tab', /^back to loot$/i.test(label), label)
+  // The same note's "Plan this item": Make an item on that item, and back to the workbench it left.
+  await page.click(BACK)
+  await settle(() => countOf(page, sel('loot-detail')), (n) => n === 1, { timeoutMs: 20_000 })
+  await page.click(`${sel('loot-crafted-plan')} [role="button"]`)
+  const planHead = `${sel('tradeskill-plan-head')} ${sel('planner-donor-name')}`
+  const planned = await settle(() => textOf(page, planHead), (t) => t === item, { timeoutMs: 20_000 })
+  check("the Loot page's Plan this item opens Make an item on it", planned === item, `${planned} / ${item}`)
+  await page.click(sel('tradeskill-plan-back'))
+  await settle(() => countOf(page, BENCH), (n) => n === 1, { timeoutMs: 20_000 })
   if (first?.state === 'trivial') {
     await page.click(sel('tradeskill-hide-trivial'))
     const kept = await settle(() => countOf(page, sel('tradeskill-picked-unlisted')), (n) => n === 1, { timeoutMs: 10_000 })

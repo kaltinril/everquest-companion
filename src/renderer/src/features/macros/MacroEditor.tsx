@@ -1,21 +1,22 @@
-// macros/MacroEditor.tsx — the Library section's right side: one macro's name, colour number, five
-// command lines, tags and note. Every key goes straight into the library (useMacroLibrary saves
-// it); the warnings are shared/macros/validate.ts and never stop an edit.
+// macros/MacroEditor.tsx — one macro's editor, beside the Library's list and beside a character's
+// buttons: name, colour number, five command lines, tags and note. Every key goes straight into
+// the library (useMacroLibrary saves it); the warnings are shared/macros/validate.ts and never
+// stop an edit.
 
-import { type JSX, useState } from 'react'
+import { type JSX, type ReactNode, useState } from 'react'
 import { Box, Button, Chip, InputAdornment, MenuItem, Stack, TextField, Typography } from '@mui/material'
 import { duplicateMacro, removeMacro, restoreMacro, systemMint, updateMacro } from '@shared/macros/library'
 import { COLOR_MAX, COLOR_MIN, LINES, LINE_MAX } from '@shared/macros/limits'
-import { setsUsing } from '@shared/macros/sets'
 import { addOwnTag, normalizeTag, tagList, toggleTag } from '@shared/macros/tags'
 import { macrosToText } from '@shared/macros/text'
 import type { Macro } from '@shared/macros/types'
 import { lineHint, validateMacro, type Warning } from '@shared/macros/validate'
-import { MONO_SX, Quiet } from './macroParts'
+import { MONO_SX } from './macroParts'
 import { useMacroUi } from './macroUi'
 import type { MacroStore } from './useMacroLibrary'
 
-type Patch = (patch: Partial<Omit<Macro, 'id'>>) => void
+/** `field` names the box being typed in, so a run of keys in it is one Undo step. */
+type Patch = (patch: Partial<Omit<Macro, 'id'>>, field?: string) => void
 
 /** A field's helper text is a warning, never an error: it is drawn in the warning colour. */
 const WARNING_HELPER = { formHelperText: { sx: { color: 'warning.main' } } } as const
@@ -25,12 +26,24 @@ const COLORS = Array.from({ length: COLOR_MAX - COLOR_MIN + 1 }, (_, i) => COLOR
 interface EditorProps {
   store: MacroStore
   macro: Macro
-  onSelect: (id: string | null) => void
   /** The name box takes the focus: the macro was just made. */
   focusName: boolean
+  /** What stands over the fields: where the macro is, and what can be done with it there. */
+  top: ReactNode
+  /** What stands under them. */
+  bottom?: ReactNode
 }
 
-function EditorActions({ store, macro, onSelect }: Omit<EditorProps, 'focusName'>): JSX.Element {
+interface LibraryActionsProps {
+  store: MacroStore
+  macro: Macro
+  onSelect: (id: string | null) => void
+  /** Go to the Characters section with this macro ready to put on a button. */
+  onPlace: (id: string) => void
+}
+
+/** The Library's actions on its picked macro. */
+export function LibraryActions({ store, macro, onSelect, onPlace }: LibraryActionsProps): JSX.Element {
   const ui = useMacroUi()
   const duplicate = (): void => {
     const made = duplicateMacro(store.library, macro.id, systemMint)
@@ -53,7 +66,17 @@ function EditorActions({ store, macro, onSelect }: Omit<EditorProps, 'focusName'
   return (
     <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between" useFlexGap flexWrap="wrap">
       <Typography variant="subtitle1">Edit macro</Typography>
-      <Stack direction="row" spacing={1}>
+      <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+        <Button
+          size="small"
+          variant="outlined"
+          data-testid="macro-put-on-button"
+          onClick={() => {
+            onPlace(macro.id)
+          }}
+        >
+          Put on a button...
+        </Button>
         <Button size="small" variant="outlined" onClick={duplicate} data-testid="macro-duplicate">
           Duplicate
         </Button>
@@ -91,7 +114,7 @@ function NameAndColor({ macro, patch, warnings, focusName }: { macro: Macro; pat
           if (focusName) e.target.select()
         }}
         onChange={(e) => {
-          patch({ name: e.target.value })
+          patch({ name: e.target.value }, 'name')
         }}
         helperText={nameWarning}
         slotProps={WARNING_HELPER}
@@ -167,7 +190,7 @@ function CommandLines({ macro, patch, warnings }: { macro: Macro; patch: Patch; 
   const setLine = (index: number, value: string): void => {
     const lines = [...rows]
     lines[index] = value
-    patch({ lines })
+    patch({ lines }, `line${String(index)}`)
   }
   return (
     <Stack spacing={0.75}>
@@ -251,15 +274,14 @@ function TagPicker({ store, macro }: { store: MacroStore; macro: Macro }): JSX.E
 }
 
 /** The picked macro's editor. Keyed by the macro's id by its caller, so the tag box starts empty. */
-export function MacroEditor({ store, macro, onSelect, focusName }: EditorProps): JSX.Element {
+export function MacroEditor({ store, macro, focusName, top, bottom }: EditorProps): JSX.Element {
   const warnings = validateMacro(macro)
-  const usedIn = setsUsing(store.library, macro.id)
-  const patch: Patch = (fields) => {
-    store.change((current) => updateMacro(current, macro.id, fields, Date.now()))
+  const patch: Patch = (fields, field) => {
+    store.change((current) => updateMacro(current, macro.id, fields, Date.now()), field === undefined ? undefined : `${macro.id}:${field}`)
   }
   return (
     <Stack spacing={1.5} data-testid="macro-editor">
-      <EditorActions store={store} macro={macro} onSelect={onSelect} />
+      {top}
       <NameAndColor macro={macro} patch={patch} warnings={warnings} focusName={focusName} />
       <CommandLines macro={macro} patch={patch} warnings={warnings} />
       <TagPicker store={store} macro={macro} />
@@ -270,11 +292,11 @@ export function MacroEditor({ store, macro, onSelect, focusName }: EditorProps):
         label="Note (only this app sees it)"
         value={macro.note}
         onChange={(e) => {
-          patch({ note: e.target.value })
+          patch({ note: e.target.value }, 'note')
         }}
         data-testid="macro-note"
       />
-      <Quiet testid="macro-used-in">{usedIn.length > 0 ? `Used in: ${usedIn.join(', ')}.` : 'Not in any set yet.'}</Quiet>
+      {bottom}
     </Stack>
   )
 }

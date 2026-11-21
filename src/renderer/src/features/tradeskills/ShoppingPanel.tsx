@@ -11,7 +11,7 @@ import { type JSX, useCallback, useEffect, useMemo, useState } from 'react'
 import { Box, Button, Paper, Stack, TextField, Typography } from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import { NO_NEXT_STEP_TEXT, NO_STEP_RECIPE_TEXT } from '@shared/tradeskillRoute'
-import type { RouteFacts, RouteStep } from '@shared/tradeskillRouteStep'
+import { containerText, type RouteFacts, type RouteStep } from '@shared/tradeskillRouteStep'
 import {
   COMBINES_MAX,
   HAVE_UNKNOWN_TEXT,
@@ -292,8 +292,8 @@ export function ShoppingPanel({ step, facts, eraOnly }: ShoppingPanelProps): JSX
       {step !== null && (
         <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0, mb: 0.5 }} data-testid="tradeskill-shopping-for">
           {step.linked ? <ItemLabel name={step.name} bold wrap /> : <Typography variant="body2">{step.name}</Typography>}
-          <Typography variant="caption" color="text.secondary">
-            {step.range}
+          <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+            {[step.range, containerText(step.recipe)].filter((part) => part !== '').join(' · ')}
           </Typography>
         </Stack>
       )}

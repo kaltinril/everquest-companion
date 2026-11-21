@@ -165,7 +165,7 @@ export function timelineMetrics(tl: TimelineView, wrap: WrapSize): TimelineMetri
 
 /** The content half of a ChartTooltip — everything except where the cursor is. Derived from the
  *  tooltip's own model, so the two can't drift. */
-export type TipContent = Omit<ChartTooltipModel, 'x' | 'y' | 'bounds'>
+export type TipContent = Omit<ChartTooltipModel, 'x' | 'y'>
 
 /** The two data hues a tick tooltip tints with. Passed IN rather than imported: `CAT_COLOR` /
  *  `RESIST_COLOR` live in the MUI-importing combatShared, and this module stays MUI-free. */

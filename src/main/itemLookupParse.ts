@@ -376,10 +376,14 @@ function parseIngredientRow(body: string): { name: string; qty?: number; sources
   return ing
 }
 
-/** Attach a `::` ingredient row to the open recipe. With no recipe open the row's text is
+/** Attach an ingredient row to the open recipe. Its lead is `::` (Gnome Kabobs) or, on some
+ *  forty pages of the 2026-11-20 cache, `**:` (Fleeting Quiver: `**: {{SmIcon|1006}} 1 x [[Aviak
+ *  Egg Oil]] - Crafted`), `***` (Ethira's Poison Antidote) or a bare `**1 x [[Item]]` (Shadow
+ *  Silk). A starred lead is an ingredient only when a quantity follows it: `:*See [[Patchwork
+ *  Armor]]` is a pointer to another page, not a material. With no recipe open the row's text is
  *  kept as prose instead (it is not an ingredient of anything we read). */
 function readIngredientRow(line: string, cur: ItemCraftRecipe | null, leftovers: string[]): void {
-  const body = line.replace(/^:+\s*/, '').replace(/\{\{[^}]*\}\}/g, '').trim()
+  const body = line.replace(/^[*:]+\s*/, '').replace(/\{\{[^}]*\}\}/g, '').trim()
   if (!cur) {
     if (body) leftovers.push(body)
     return
@@ -418,7 +422,7 @@ export function parseCraftRecipes(block: string): { recipes: ItemCraftRecipe[]; 
 
   for (const line of bulletLines(block)) {
     // Ingredient row.
-    if (line.startsWith('::')) {
+    if (line.startsWith('::') || /^\*{2,}:?\s*(?:\{\{[^}]*\}\}\s*)?\d+\s*x\s*\[\[/.test(line)) {
       readIngredientRow(line, cur, leftovers)
       continue
     }

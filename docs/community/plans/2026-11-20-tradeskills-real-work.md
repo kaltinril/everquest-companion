@@ -12,6 +12,13 @@ skills work"; "re-review my log for jewelcrafting work i did".
 
 ## Where it stands (end of 2026-11-20)
 
+Later the same day, after the owner read the screens (branch `tradeskill-tighten`): the item parser
+now reads all four ingredient-row leads, so 42 recipes show the wiki's materials (Fleeting Quiver
+among them, which had shown the guide's list); item names on Home open the plan or the workbench;
+the Loot page's crafted line ends in "Plan this item"; the plan's gather list is numbers only and
+"Where you stand" is one head line when nothing is short. Detail: BRANCH_NOTES.md, "After the
+owner's first read of the built screens".
+
 On `main_community`, not pushed, not yet tried by the owner in a running app. Two batches, each
 gated once on a candidate branch (WORKFLOW.md, "Gate") and merged with the tree compared.
 

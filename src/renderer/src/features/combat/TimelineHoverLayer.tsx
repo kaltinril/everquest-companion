@@ -241,7 +241,7 @@ export function TimelineHoverLayer(p: HoverLayerProps): React.JSX.Element {
       {hit && tip && (
         <>
           <Crosshair hit={hit} p={p} />
-          <ChartTooltip {...tip} x={hit.x} y={hit.y} bounds={{ w: m.labelW + m.plotW, h: m.totalH }} />
+          <ChartTooltip {...tip} x={hit.x} y={hit.y} />
         </>
       )}
     </div>

@@ -1,14 +1,18 @@
-// macros/GameFileSend.tsx — the Characters section's two writes into the game folder, each behind
-// a confirm: Send (a set into the file's macros section) and Restore (a kept copy put back whole).
+// macros/GameFileSend.tsx — the bar under a character's buttons: whether they match the game, and
+// the two writes into the game folder, each behind a confirm: Review and send (the buttons into
+// the file's macros section) and Restore (a kept copy put back whole).
 
 import { type JSX, type ReactNode, useState } from 'react'
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material'
+import { Alert, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Stack, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material'
 import type { BackupCopy } from '@shared/macros/backups'
-import type { SlotChange } from '@shared/macros/sets'
-import type { CharacterFileMacros, GameMacro } from '@shared/macros/types'
+import { type GameChanges, changesText, markOf } from '@shared/macros/buttons'
+import type { SlotDiff } from '@shared/macros/sets'
+import type { CharacterFileMacros } from '@shared/macros/types'
 import { unsavable } from '@shared/macros/unsavable'
 import { Tooltip } from '../../lib/Tooltip'
-import { MONO_SX, Quiet } from './macroParts'
+import { GameNow } from './GameNow'
+import { MARK_COLOR, MONO_SX, Quiet } from './macroParts'
+import type { GameFilesState } from './useGameFiles'
 import type { GameWriter } from './useGameWriter'
 
 /** The in-game tests are still owed (plan, "In-game tests owed"): the dialog says so until they are done. */
@@ -21,12 +25,15 @@ interface ConfirmProps {
   testid: string
   onClose: () => void
   onConfirm: () => void
+  /** The action cannot be taken yet (a read is under way). */
+  disabled?: boolean
+  wide?: boolean
   children: ReactNode
 }
 
-function Confirm({ open, title, action, testid, onClose, onConfirm, children }: ConfirmProps): JSX.Element {
+export function Confirm({ open, title, action, testid, onClose, onConfirm, disabled = false, wide = false, children }: ConfirmProps): JSX.Element {
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs" data-testid={`${testid}-dialog`}>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth={wide ? 'sm' : 'xs'} data-testid={`${testid}-dialog`}>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <Stack spacing={1}>{children}</Stack>
@@ -37,6 +44,7 @@ function Confirm({ open, title, action, testid, onClose, onConfirm, children }: 
         </Button>
         <Button
           variant="contained"
+          disabled={disabled}
           data-testid={`${testid}-confirm`}
           onClick={() => {
             onClose()
@@ -50,70 +58,87 @@ function Confirm({ open, title, action, testid, onClose, onConfirm, children }: 
   )
 }
 
-function Line({ children }: { children: ReactNode }): JSX.Element {
+export function Line({ children }: { children: ReactNode }): JSX.Element {
   return <Typography variant="body2">{children}</Typography>
 }
 
-/** What the last send or restore said, where its button is. */
-function Outcome({ writer, action }: { writer: GameWriter; action: 'send' | 'restore' }): JSX.Element | null {
+/** What the last send or restore said, over the bar. */
+function Outcome({ writer }: { writer: GameWriter }): JSX.Element | null {
   const { outcome } = writer
-  if (outcome?.action !== action) return null
+  if (outcome === null) return null
   return (
-    <Alert severity={outcome.ok ? 'success' : 'warning'} onClose={writer.dismiss} data-testid={`macro-${action}-result`}>
+    <Alert severity={outcome.ok ? 'success' : 'warning'} onClose={writer.dismiss} data-testid={`macro-${outcome.action}-result`}>
       {outcome.text}
     </Alert>
   )
 }
 
+/** Every button a send would change: where, what the game has, what it gets. */
+function ReviewTable({ changed }: { changed: SlotDiff[] }): JSX.Element {
+  return (
+    <Box sx={{ maxHeight: 260, overflow: 'auto' }}>
+      <Table size="small" data-testid="macro-diff">
+        <TableBody>
+          {changed.map((d) => {
+            const mark = markOf(d.kind)
+            return (
+              <TableRow key={`${String(d.page)}:${String(d.button)}`} data-testid="macro-diff-row">
+                <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                  Page {d.page}, button {d.button}
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>{d.set?.name ?? d.file?.name ?? ''}</TableCell>
+                <TableCell align="right">{mark !== null && <Chip size="small" variant="outlined" color={MARK_COLOR[mark]} label={mark} />}</TableCell>
+              </TableRow>
+            )
+          })}
+        </TableBody>
+      </Table>
+    </Box>
+  )
+}
+
 interface SendProps {
   file: CharacterFileMacros
-  /** The chosen set as the game would hold it. */
-  macros: GameMacro[]
-  counts: Record<SlotChange, number>
+  /** What the character's buttons would change in the file. */
+  changes: GameChanges
   writer: GameWriter
 }
 
-/** Why Send is off, as its tooltip: null when it may be pressed. */
-function sendOffReason(blocked: boolean, changes: number): string | null {
-  if (blocked) return 'A macro in this set cannot be written to the game file.'
-  if (changes === 0) return 'The game file already matches this set, nothing to send.'
-  return null
-}
-
-/** The Send button, what blocks it, its confirm and its answer. */
-export function SendToGame({ file, macros, counts, writer }: SendProps): JSX.Element {
+/** The Review and send button, what blocks it, and its confirm. */
+function SendToGame({ file, changes, writer }: SendProps): JSX.Element {
   const [asking, setAsking] = useState(false)
-  const blocked = unsavable(macros).at(0) ?? null
-  const off = sendOffReason(blocked !== null, counts.added + counts.changed + counts.removed)
+  const blocked = unsavable(changes.macros).at(0) ?? null
+  const { counts } = changes
   const button = (
     <Button
       size="small"
-      variant="outlined"
-      disabled={off !== null || writer.busy}
+      variant="contained"
+      disabled={blocked !== null || writer.busy}
       data-testid="macro-file-send"
       onClick={() => {
         setAsking(true)
       }}
     >
-      {writer.busy ? 'Working' : 'Send to the game file'}
+      {writer.busy ? 'Working' : 'Review and send'}
     </Button>
   )
   return (
     <>
-      {off === null ? (
+      {blocked === null ? (
         button
       ) : (
-        <Tooltip title={off}>
+        <Tooltip title="A macro on these buttons cannot be written to the game file.">
           <span>{button}</span>
         </Tooltip>
       )}
       {blocked !== null && (
-        <Typography variant="body2" color="warning.main" sx={{ alignSelf: 'center' }} data-testid="macro-send-blocked">
+        <Typography variant="body2" color="warning.main" data-testid="macro-send-blocked">
           {blocked.text}
         </Typography>
       )}
       <Confirm
         open={asking}
+        wide
         title="Send to the game file?"
         action="Send"
         testid="macro-send"
@@ -121,26 +146,23 @@ export function SendToGame({ file, macros, counts, writer }: SendProps): JSX.Ele
           setAsking(false)
         }}
         onConfirm={() => {
-          writer.send(macros, file.stamp)
+          writer.send(changes.macros, file.stamp)
         }}
       >
         <Typography variant="body2" sx={MONO_SX}>
           {file.file}
         </Typography>
+        <ReviewTable changed={changes.changed} />
         <Line>
-          {counts.added} added, {counts.changed} changed, {counts.removed} removed.
+          {counts.added} new, {counts.changed} changed, {counts.removed} removed.
         </Line>
+        <Line>Only the macros in this file change.</Line>
         <Line>The game must be closed.</Line>
         <Line>A copy of the current file is kept beside it.</Line>
         <Line>{NOT_PROVEN}</Line>
       </Confirm>
     </>
   )
-}
-
-/** The answer to a send, on its own row under the buttons. */
-export function SendOutcome({ writer }: { writer: GameWriter }): JSX.Element | null {
-  return <Outcome writer={writer} action="send" />
 }
 
 function copyDate(copy: BackupCopy): string {
@@ -156,12 +178,13 @@ interface CopyProps {
 
 function CopyEntry({ copy, label, writer, onRestore }: CopyProps): JSX.Element {
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center" data-testid={`macro-backup-${copy.kind}`}>
-      <Typography variant="body2" color="text.secondary">
-        {label} {copyDate(copy)}
+    <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between" data-testid={`macro-backup-${copy.kind}`}>
+      <Typography variant="body2">
+        {label}, {copyDate(copy)}
       </Typography>
       <Button
         size="small"
+        variant="outlined"
         disabled={writer.busy}
         data-testid={`macro-restore-${copy.kind}`}
         onClick={() => {
@@ -174,27 +197,48 @@ function CopyEntry({ copy, label, writer, onRestore }: CopyProps): JSX.Element {
   )
 }
 
-/** The copies kept beside the file, each with a Restore behind a confirm. */
-export function BackupsLine({ file, writer }: { file: CharacterFileMacros; writer: GameWriter }): JSX.Element {
+/** The Backups button: the copies kept beside the file, each with a Restore behind a confirm. */
+function Backups({ file, writer }: { file: CharacterFileMacros; writer: GameWriter }): JSX.Element {
+  const [listing, setListing] = useState(false)
   // The copy asked about stays set while the dialog closes, so its words do not change on the way out.
   const [asking, setAsking] = useState<BackupCopy | null>(null)
   const [open, setOpen] = useState(false)
   const ask = (copy: BackupCopy): void => {
+    setListing(false)
     setAsking(copy)
     setOpen(true)
+  }
+  const close = (): void => {
+    setListing(false)
   }
   const { original, last } = file.backups
   return (
     <>
-      <Stack direction="row" spacing={1.5} alignItems="center" useFlexGap flexWrap="wrap" data-testid="macro-backups">
-        <Typography variant="body2" color="text.secondary">
-          Backups:
-        </Typography>
-        {original === null && last === null && <Quiet testid="macro-backups-none">none yet. The first send keeps one.</Quiet>}
-        {original !== null && <CopyEntry copy={original} label="original" writer={writer} onRestore={ask} />}
-        {last !== null && <CopyEntry copy={last} label="last copy" writer={writer} onRestore={ask} />}
-      </Stack>
-      <Outcome writer={writer} action="restore" />
+      <Button
+        size="small"
+        data-testid="macro-backups-open"
+        onClick={() => {
+          setListing(true)
+        }}
+      >
+        Backups
+      </Button>
+      <Dialog open={listing} onClose={close} fullWidth maxWidth="xs" data-testid="macro-backups">
+        <DialogTitle>Backups of the game file</DialogTitle>
+        <DialogContent>
+          <Stack spacing={1}>
+            <Typography variant="body2" sx={MONO_SX}>
+              {file.file}
+            </Typography>
+            {original === null && last === null && <Quiet testid="macro-backups-none">None yet. The first send keeps one.</Quiet>}
+            {original !== null && <CopyEntry copy={original} label="Original" writer={writer} onRestore={ask} />}
+            {last !== null && <CopyEntry copy={last} label="Last copy" writer={writer} onRestore={ask} />}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={close}>Close</Button>
+        </DialogActions>
+      </Dialog>
       <Confirm
         open={open}
         title={asking?.kind === 'original' ? 'Restore the original copy?' : 'Restore the last copy?'}
@@ -215,5 +259,37 @@ export function BackupsLine({ file, writer }: { file: CharacterFileMacros; write
         <Line>The game must be closed.</Line>
       </Confirm>
     </>
+  )
+}
+
+interface BarProps extends SendProps {
+  game: GameFilesState
+}
+
+/** Always under the buttons: do they match the game, the send when they do not, and the backups. */
+export function GameBar({ file, changes, writer, game }: BarProps): JSX.Element {
+  const matches = changes.total === 0
+  return (
+    <Stack spacing={1} sx={{ flexShrink: 0, pt: 1 }} data-testid="macro-game-bar">
+      <Outcome writer={writer} />
+      <Paper variant="outlined" sx={{ px: 1.5, py: 0.75 }}>
+        <Stack direction="row" spacing={1.5} alignItems="center" useFlexGap flexWrap="wrap">
+          <Typography variant="body2" color={matches ? 'text.secondary' : 'warning.main'} sx={{ fontWeight: 600 }} data-testid="macro-game-status">
+            {matches ? 'Matches the game.' : changesText(changes.total)}
+          </Typography>
+          {!matches && <SendToGame file={file} changes={changes} writer={writer} />}
+          <Box sx={{ flexGrow: 1 }} />
+          <Tooltip title="Read this character's macros from the game folder again.">
+            <span>
+              <Button size="small" onClick={game.reload} disabled={game.reading} data-testid="macro-files-reload">
+                Read again
+              </Button>
+            </span>
+          </Tooltip>
+          <GameNow file={file} />
+          <Backups file={file} writer={writer} />
+        </Stack>
+      </Paper>
+    </Stack>
   )
 }

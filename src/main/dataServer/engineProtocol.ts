@@ -124,6 +124,25 @@ export const ENGINE_HEALTH_INTERVAL_MS = 30_000
 export const ENGINE_HEALTH_TIMEOUT_MS = 5_000
 
 /**
+ * PROOF OF LIFE: how recently the app's OWN connection must have heard the engine for a failed
+ * probe to be forgiven (`supervisorHealth.ts`).
+ *
+ * Measured 2026-11-19 on a starved engine: a probe on a NEW connection took 4.8 to 4.9 s against
+ * the 5.0 s limit, while the app's own connection was never silent for more than 8.4 s and was
+ * heard 18 to 384 ms before every kill verdict. 10 s would be too tight; 20 s forgave all seven
+ * verdicts recorded.
+ */
+export const ENGINE_HEARD_FRESH_MS = 20_000
+
+/**
+ * Once the log is live, how many failed beats in a row proof of life may forgive. An engine that
+ * cannot accept a new connection also cannot serve a window's own connection, so past this the
+ * launch is ended as before. While the log is still being read there is no cap: every forgiveness
+ * needs fresh evidence, and a kill there costs the whole read again.
+ */
+export const ENGINE_FORGIVE_MAX_LIVE = 6
+
+/**
  * How long the watchdog waits when a connect failed on OUR side of the wire.
  *
  * Short, because a local endpoint usually comes back within a second or two — and a wait AT ALL,

@@ -31,7 +31,7 @@ export interface HomeFacts {
 }
 
 /** The recipe to make next, with what the held materials cover of it; or that nothing is above the level. */
-function NextLine({ pick }: { pick: PickUp }): JSX.Element | null {
+function NextLine({ pick, onOpenRecipe }: { pick: PickUp; onOpenRecipe: OpenRecipe }): JSX.Element | null {
   if (pick.next === null) {
     if (!pick.topped) return null
     return (
@@ -41,16 +41,22 @@ function NextLine({ pick }: { pick: PickUp }): JSX.Element | null {
     )
   }
   const heldText = pickUpHeldText(pick)
+  const next = pick.next
   return (
     <Stack direction="row" spacing={0.75} alignItems="baseline" sx={{ minWidth: 0, flexWrap: 'wrap' }} data-testid="tradeskills-pickup-next">
       <Typography variant="body2" color="text.secondary" sx={{ flexShrink: 0 }}>
         Next:
       </Typography>
       <Typography variant="body2" component="span" sx={{ minWidth: 0, display: 'flex' }}>
-        <ItemLink name={pick.next.item} />
+        <ItemLink
+          name={next.item}
+          act={() => {
+            onOpenRecipe(pick.tradeskill, next.id)
+          }}
+        />
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ flexShrink: 0 }}>
-        trivial {pick.next.trivial}
+        trivial {next.trivial}
       </Typography>
       {heldText !== '' && (
         <Typography variant="body2" color={pick.canMake === 0 ? 'text.secondary' : 'success.main'} data-testid="tradeskills-pickup-held">
@@ -61,7 +67,16 @@ function NextLine({ pick }: { pick: PickUp }): JSX.Element | null {
   )
 }
 
-export function HomePickUp({ facts, onOpen }: { facts: HomeFacts; onOpen: (tradeskill: Tradeskill) => void }): JSX.Element | null {
+/** Opens a tradeskill's workbench on one of its recipes (the "Next" name's click). */
+export type OpenRecipe = (tradeskill: Tradeskill, recipeId: string) => void
+
+export interface HomePickUpProps {
+  facts: HomeFacts
+  onOpen: (tradeskill: Tradeskill) => void
+  onOpenRecipe: OpenRecipe
+}
+
+export function HomePickUp({ facts, onOpen, onOpenRecipe }: HomePickUpProps): JSX.Element | null {
   const { index, guides, levels, craft, held } = facts
   const pick = useMemo(() => {
     if (!levels.served || !craft.served) return null
@@ -99,7 +114,7 @@ export function HomePickUp({ facts, onOpen }: { facts: HomeFacts; onOpen: (trade
           {pickUpWhyText(pick, pick.lastCombine === null ? '' : formatDate(pick.lastCombine))}
         </Typography>
       </Stack>
-      <NextLine pick={pick} />
+      <NextLine pick={pick} onOpenRecipe={onOpenRecipe} />
       {pick.lastRun !== null && (
         <Typography variant="body2" color="text.secondary" data-testid="tradeskills-pickup-run">
           {lastRunText(pick.lastRun, formatDate(pick.lastRun.end))}

@@ -18,7 +18,6 @@ import { GATHER_NOTE, planHave } from '@shared/tradeskillPlanGather'
 import { heldKnown } from '@shared/tradeskillHeld'
 import {
   WISHED_HEADING,
-  WISHED_PLAN_LABEL,
   WISHED_SUBTITLE,
   wishedCrafts,
   wishedHeldText,
@@ -26,7 +25,6 @@ import {
   wishedSkillText,
   type WishedCraft
 } from '@shared/tradeskillWished'
-import { CellLink } from '../../lib/CellLink'
 import { Tooltip } from '../../lib/Tooltip'
 import { EraChip } from '../planner/PlannerChips'
 import { useWishlist } from '../wishlist/useWishlist'
@@ -41,7 +39,16 @@ function WishedRow({ wished, onPlan }: { wished: WishedCraft; onPlan: OpenPlan }
   return (
     <Box sx={{ py: 0.5, borderTop: 1, borderColor: 'divider', minWidth: 0 }} data-testid="tradeskills-wished-row">
       <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.25, minWidth: 0 }}>
-        <ItemLabel name={wished.recipe.item} bold />
+        {/* The name opens the plan for it. */}
+        <Box sx={{ minWidth: 0, display: 'flex' }} data-testid="tradeskills-wished-plan">
+          <ItemLabel
+            name={wished.recipe.item}
+            bold
+            act={() => {
+              onPlan(wished.key, wished.recipe.id)
+            }}
+          />
+        </Box>
         <EraChip subject={wished.recipe} />
         <Typography variant="body2" color="text.secondary" data-testid="tradeskills-wished-skill">
           {wishedSkillText(wished)}
@@ -51,15 +58,6 @@ function WishedRow({ wished, onPlan }: { wished: WishedCraft; onPlan: OpenPlan }
             {heldText}
           </Typography>
         )}
-        <Box sx={{ flexGrow: 1 }} />
-        <Typography variant="body2" component="span" data-testid="tradeskills-wished-plan">
-          <CellLink
-            text={WISHED_PLAN_LABEL}
-            onOpen={() => {
-              onPlan(wished.key, wished.recipe.id)
-            }}
-          />
-        </Typography>
       </Stack>
       <Tooltip title={GATHER_NOTE}>
         <Typography variant="body2" color="text.secondary" data-testid="tradeskills-wished-materials">
