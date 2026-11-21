@@ -76,8 +76,15 @@ Opened 2026-11-20. Requirements: `../requirements/macro-editor.md`. Status at th
 - **P0, proof of concept (no game write):** library, tags, editor, sets, per-character choice,
   import from the game's files and from pasted text, copy out as ini text, the diff.
 - **P1, in-game tests** (below). Results go in `agent/MEASURED.md`.
-- **P2, apply:** write `[Socials]` of one character file: backup beside it first, refuse while the
-  game runs, show the diff, one-click restore. Needs the owner's ruling (the standing ruling of
+- **P2, apply:** write `[Socials]` of one character file: refuse while the game runs, show the
+  diff, one-click restore.
+  - **Owner rule (2026-11-20: "We should always backup the ini before the first time we touch
+    it"):** before the FIRST write the app ever makes to a given game ini, it copies the file as it
+    was. That first copy is never overwritten by a later one. A write does not go ahead when the
+    copy could not be made. The same holds for an agent editing a game ini by hand for a test.
+  - Default taken, the owner has not ruled: the copy sits beside the file in the game folder under
+    a name that does not end in `.ini` (so neither the game nor `pickCharacterFiles` reads it), and
+    a further copy is kept before each later write. Needs the owner's ruling (the standing ruling of
   2026-10-13 lets the app READ the game's ini, nothing more).
 - **P3:** keep hotbar buttons pointing at a macro that moved slot; copy a set between loadouts in
   one step; a share code between players.
