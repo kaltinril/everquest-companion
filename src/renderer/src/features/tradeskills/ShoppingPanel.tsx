@@ -14,9 +14,7 @@ import { NO_NEXT_STEP_TEXT, NO_STEP_RECIPE_TEXT } from '@shared/tradeskillRoute'
 import type { RouteFacts, RouteStep } from '@shared/tradeskillRouteStep'
 import {
   COMBINES_MAX,
-  GUIDE_LIST_TEXT,
   HAVE_UNKNOWN_TEXT,
-  NO_LIST_TEXT,
   asCombines,
   haveFromText,
   intoText,
@@ -113,7 +111,8 @@ function LineRow({ line }: { line: ShoppingLine }): JSX.Element {
   return (
     <Box sx={GRID_SX} data-testid="tradeskill-shopping-line" data-action={line.action}>
       <Box sx={{ minWidth: 0, pl: line.into.length > 0 ? 2 : 0 }}>
-        {line.linked ? <ItemLabel name={line.name} /> : <Typography variant="body2">{line.name}</Typography>}
+        {/* A name the reader goes to buy is never cut: it wraps inside its column. */}
+        {line.linked ? <ItemLabel name={line.name} wrap /> : <Typography variant="body2">{line.name}</Typography>}
         {into !== '' && (
           <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
             {into}
@@ -224,22 +223,16 @@ function HaveFrom(): JSX.Element | null {
 /** The lines, the total, and the notes that say what the list could not know. */
 function ListBody({ list }: { list: ShoppingList }): JSX.Element {
   if (list.lines.length === 0) {
+    // One line: the wiki page lists no materials, so there is nothing to shop for, and the page is where to add them.
     return (
-      <>
-        <Typography variant="body2" color="text.secondary" sx={{ pt: 2, pb: 0.5 }} data-testid="tradeskill-shopping-empty">
-          {NO_LIST_TEXT}
-        </Typography>
-        <WikiGapLine recipe={list.recipe} />
-      </>
+      <Box sx={{ pt: 2, pb: 0.5 }} data-testid="tradeskill-shopping-empty">
+        <WikiGapLine recipe={list.recipe} note="noList" />
+      </Box>
     )
   }
   return (
     <>
-      {list.fromGuide && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-shopping-guide-list">
-          {GUIDE_LIST_TEXT}
-        </Typography>
-      )}
+      {/* A list made of the recipe guide's materials: the gap line says whose they are and links the wiki page. */}
       {list.fromGuide && <WikiGapLine recipe={list.recipe} />}
       <ColumnHeads />
       {list.lines.map((line) => (
@@ -298,7 +291,7 @@ export function ShoppingPanel({ step, facts, eraOnly }: ShoppingPanelProps): JSX
       </Stack>
       {step !== null && (
         <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0, mb: 0.5 }} data-testid="tradeskill-shopping-for">
-          {step.linked ? <ItemLabel name={step.name} bold /> : <Typography variant="body2">{step.name}</Typography>}
+          {step.linked ? <ItemLabel name={step.name} bold wrap /> : <Typography variant="body2">{step.name}</Typography>}
           <Typography variant="caption" color="text.secondary">
             {step.range}
           </Typography>

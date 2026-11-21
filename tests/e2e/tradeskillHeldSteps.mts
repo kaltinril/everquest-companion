@@ -75,7 +75,8 @@ async function checkPlanner(page: Page): Promise<void> {
     const total = await textOf(page, sel('tradeskill-plan-gather-total'))
     if (total === '') note('the gather total was not found by its test id: the planner mark was not checked against it')
     else check('the planner marks "can make now" exactly when the gather list says everything is held', marked === /you hold everything/i.test(total), `${String(marked)} / ${total}`)
-    if ((await countOf(page, sel('tradeskill-plan-guide-materials'))) > 0) {
+    // The gap line itself says when the materials under it are the guide's (`data-guide`): one line, not two.
+    if ((await countOf(page, `${sel('tradeskill-plan-tree')} ${sel('tradeskill-wiki-gap')}[data-guide="true"]`)) > 0) {
       const href = await page.evaluate((s) => document.querySelector<HTMLAnchorElement>(s)?.href ?? '', `${sel('tradeskill-plan-tree')} ${WIKI_LINK}`)
       check("a tree whose materials are the guide's says the wiki page lacks them", (await countOf(page, `${sel('tradeskill-plan-tree')} ${sel('tradeskill-wiki-gap')}`)) > 0)
       check('…with a link to that page on eqlwiki.com', href.startsWith('https://eqlwiki.com/'), href)
@@ -171,7 +172,8 @@ async function checkWikiGaps(page: Page): Promise<void> {
     check('every line it keeps carries a link to its wiki page', kept.rows > 0 && kept.withIt === kept.rows, JSON.stringify(kept))
     const shown = await textOf(page, sel('tradeskill-count'))
     check('…and the count line agrees with the switch', shown.startsWith(`${String(count)} of `) || shown.startsWith(`${String(count)} wiki`), `${label} / ${shown}`)
-    await page.click(`${ROW} >> nth=0 >> td >> nth=2`)
+    // The trivial cell: a click there picks the line and opens no link (the table has no Container cell any more).
+    await page.click(`${ROW} >> nth=0 >> td >> nth=0`)
     const gap = await settle(() => textOf(page, `${sel('tradeskill-picked')} ${sel('tradeskill-wiki-gap')}`), (t) => t !== '', { timeoutMs: 10_000 })
     check('a picked one says what its wiki page lacks', /wiki page (lists|states) no/i.test(gap), gap)
     const href = await page.evaluate((s) => document.querySelector<HTMLAnchorElement>(s)?.href ?? '', `${sel('tradeskill-picked')} ${sel('tradeskill-wiki-gap')} a`)

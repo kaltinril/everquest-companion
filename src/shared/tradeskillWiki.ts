@@ -7,6 +7,9 @@
 //   the page    which wiki page a recipe is on, so the screen can send the reader there.
 //   the gap     a recipe the wiki lists no materials or no trivial for. The screen says so beside
 //               the recipe and the Recipes tab can list only those, each with its page link.
+//               ONE line says it: where the recipe guide's materials stand in, or there is
+//               nothing to draw, that is a clause of the same line (`GapNote`), never a second
+//               line that repeats "the wiki lists no materials" (seen on Fleeting Quiver).
 //   the guides  where a guide lists a recipe the wiki also lists, the wiki's is what every screen
 //               shows and counts with (`tradeskillMaterials.recipeMaterials`,
 //               `tradeskillPlan.planTree`, the cost). A guide that lists it differently is said
@@ -26,7 +29,7 @@
 
 import type { GuideMaterial } from './guideData'
 import type { BookIngredient, BookRecipe, LadderFilter } from './tradeskillBook'
-import { LEVELING_GUIDE_ID, RECIPE_GUIDE_ID, guideCreditOf, guideKey, guideRecipeFor, wikiNameOf, type GuideIndex } from './tradeskillGuide'
+import { LEVELING_GUIDE_ID, RECIPE_GUIDE_ID, guideCreditOf, guideKey, guideMaterialsFor, guideRecipeFor, wikiNameOf, type GuideIndex } from './tradeskillGuide'
 import { wikiPageUrl } from './wiki'
 
 // ---- the page ---------------------------------------------------------------------------------
@@ -83,11 +86,34 @@ export function wikiGapSwitchLabel(count: number): string {
 
 export const WIKI_GAP_TIP = 'Only recipes the wiki lists no materials or no trivial for. Each one links to its wiki page, where a player who knows can add them.'
 
-/** What the page lacks and where to mend it, as one plain line. */
-export function wikiGapText(gap: WikiGap): string {
-  if (gap.materials && gap.trivial) return 'The wiki page lists no materials and no trivial for this recipe. If you know them, that page is where to add them.'
-  if (gap.materials) return 'The wiki page lists no materials for this recipe. If you know them, that page is where to add them.'
-  return 'The wiki page states no trivial for this recipe. If you know it, that page is where to add it.'
+/**
+ * What a screen does about materials the wiki page does not list, said IN the gap line: the
+ * screen draws no second sentence that opens with the same words.
+ *   guide      the materials drawn under the line are the recipe guide's
+ *   guideNone  the planner looked in the recipe guide too, and it lists none
+ *   noList     the shopping list has nothing to list
+ */
+export type GapNote = 'guide' | 'guideNone' | 'noList'
+
+const GAP_NOTE: Record<GapNote, string> = {
+  guide: ", so the materials shown are the recipe guide's",
+  guideNone: ', and the recipe guide lists none',
+  noList: ', so there is nothing to shop for'
+}
+
+/** The note a recipe's gap line carries wherever its materials are drawn: `guide` when the recipe guide's list stands in. */
+export function gapNote(guides: GuideIndex, recipe: BookRecipe): GapNote | undefined {
+  return guideMaterialsFor(guides, recipe).length > 0 ? 'guide' : undefined
+}
+
+/**
+ * What the page lacks and where to mend it, as one plain line; the page's link follows it. A
+ * note is about the materials, so a page that lacks only its trivial takes none.
+ */
+export function wikiGapText(gap: WikiGap, note?: GapNote): string {
+  if (!gap.materials) return 'The wiki page states no trivial for this recipe. If you know it, that page is where to add it.'
+  const lacks = gap.trivial ? 'no materials and no trivial' : 'no materials'
+  return `The wiki page lists ${lacks} for this recipe${note === undefined ? '' : GAP_NOTE[note]}. If you know them, that page is where to add them.`
 }
 
 /** A table line's empty Materials cell. */

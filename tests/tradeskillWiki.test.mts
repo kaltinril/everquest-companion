@@ -23,6 +23,7 @@ import { TRADESKILLS } from '../src/shared/tradeskills'
 import {
   WIKI_CELL_LINK,
   WIKI_GAP_FILTER,
+  gapNote,
   guideDifferenceText,
   guideDifferences,
   guideTrivialText,
@@ -174,6 +175,38 @@ test('what the wiki page lacks is said in one plain line: materials, the trivial
     tip: 'The wiki states no trivial for this recipe. Opens its page on eqlwiki.com, where it can be added.'
   })
   assert.equal(WIKI_CELL_LINK, 'wiki')
+})
+
+test("the gap line says the rest itself: the guide's materials, or nothing to draw, is a clause of the one line", () => {
+  const { index, guides } = fixture()
+  // The recipe guide's list stands in: the line says whose the materials are and where to add the wiki's.
+  assert.equal(gapNote(guides, byItem(index, 'Guide Only')), 'guide')
+  assert.equal(
+    wikiGapText({ materials: true, trivial: false }, 'guide'),
+    "The wiki page lists no materials for this recipe, so the materials shown are the recipe guide's. If you know them, that page is where to add them."
+  )
+  assert.equal(
+    wikiGapText({ materials: true, trivial: true }, 'guide'),
+    "The wiki page lists no materials and no trivial for this recipe, so the materials shown are the recipe guide's. If you know them, that page is where to add them."
+  )
+  // The wiki lists its own, or neither lists any: no such clause.
+  assert.equal(gapNote(guides, byItem(index, 'Heady Kiola')), undefined)
+  assert.equal(gapNote(guides, byItem(index, 'Bare Brew')), undefined)
+  // The planner looked in the guide too; the shopping list has nothing to list.
+  assert.equal(
+    wikiGapText({ materials: true, trivial: false }, 'guideNone'),
+    'The wiki page lists no materials for this recipe, and the recipe guide lists none. If you know them, that page is where to add them.'
+  )
+  assert.equal(
+    wikiGapText({ materials: true, trivial: false }, 'noList'),
+    'The wiki page lists no materials for this recipe, so there is nothing to shop for. If you know them, that page is where to add them.'
+  )
+  // A page that lacks only its trivial has its materials: a note about them is not said.
+  assert.equal(wikiGapText({ materials: false, trivial: true }, 'guide'), wikiGapText({ materials: false, trivial: true }))
+  // "The wiki ... lists no materials" is said once in every variant.
+  for (const note of [undefined, 'guide', 'guideNone', 'noList'] as const) {
+    assert.equal(wikiGapText({ materials: true, trivial: false }, note).split('no materials').length, 2, String(note))
+  }
 })
 
 test('"Missing on the wiki" keeps only recipes with a gap, counts them, and says when there are none', () => {
