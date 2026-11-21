@@ -30,12 +30,13 @@ interface State {
 export const CRASH_ISSUE_URL = 'https://github.com/kaltinril/everquest-companion/issues/new'
 
 /**
- * The new-issue link with the crash's one-line message as its title. The stack is NOT sent: its
- * file paths carry the player's Windows user name, and an issue is public. It stays on screen and
- * in errors.log for the player to paste if they choose.
+ * The new-issue link, titled with the error's KIND only. Neither the message nor the stack is
+ * sent: either can hold a file path with the player's Windows user name, and an issue is public.
+ * Both stay on screen and in errors.log for the player to paste if they choose.
  */
 export function crashIssueUrl(error: Error): string {
-  const title = `Crash: ${error.name}: ${error.message}`.slice(0, 160)
+  const kind = /^[A-Za-z]{1,40}$/.test(error.name) ? error.name : 'Error'
+  const title = `App crash: ${kind}`
   const body = 'What I was doing when the app broke:\n'
   return `${CRASH_ISSUE_URL}?${new URLSearchParams({ title, body }).toString()}`
 }
@@ -136,7 +137,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
           <p style={{ margin: '0 0 16px', color: '#b9b9b9' }}>
             The app hit an unrecoverable render error. It has been written to{' '}
             <code style={{ color: '#e6e6e6' }}>errors.log</code>. Reporting it opens a GitHub issue in
-            your browser with this error as its title.
+            your browser; paste the error below if you want it included.
           </p>
           <div
             style={{
