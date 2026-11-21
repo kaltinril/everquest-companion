@@ -16,7 +16,7 @@
 
 import { craftingPace, itemTradeskill, type CraftSpan } from './crafting'
 import type { SkillRow } from './skills'
-import { nextRecipe, skillRecipes, tradeskillLevel, type BookIndex, type BookRecipe } from './tradeskillBook'
+import { nextRecipe, skillRecipes, tradeskillLevel, type BookIndex, type BookRecipe, type TradeskillTile } from './tradeskillBook'
 import { guideCreditOf, type GuideIndex, type GuideStamp } from './tradeskillGuide'
 import { rateText, type CraftBook } from './tradeskillHistory'
 import { onHand, type HaveLookup } from './tradeskillMaterials'
@@ -174,3 +174,47 @@ export function sourceParts(scrapedAt: string | undefined, stamps: readonly Guid
 }
 
 export const SOURCES_LABEL = 'Sources:'
+
+// ---- the doors to the workbenches --------------------------------------------------------------
+
+/**
+ * Home's doors, split by whether the log has shown the tradeskill go up (owner's question,
+ * 2026-11-20: should the overview be simpler; the capture ran past one screen, most of it tiles
+ * for tradeskills the player had never touched). A tradeskill the log has shown keeps its full
+ * tile. The rest are one compact row of small buttons under the tiles: the same door to the
+ * same workbench, with no level bar and no next recipe to draw for a level nobody knows.
+ */
+export interface HomeDoors {
+  /** Full tiles, in `tradeskillTiles`' order: the highest level first. */
+  seen: TradeskillTile[]
+  /** The compact row, by name. */
+  unseen: TradeskillTile[]
+}
+
+export function homeDoors(tiles: readonly TradeskillTile[]): HomeDoors {
+  return { seen: tiles.filter((tile) => tile.level !== null), unseen: tiles.filter((tile) => tile.level === null) }
+}
+
+/** The heading of the compact row. */
+export const UNSEEN_HEADING = 'Not in your log yet'
+
+/** A compact door's hover. */
+export const UNSEEN_DOOR_TIP = 'Your log has not shown this skill go up yet. Opens its workbench.'
+
+/** A compact door's words: "Pottery · 143 recipes" (the wiki's, under the era setting). */
+export function unseenDoorText(tile: Pick<TradeskillTile, 'tradeskill' | 'recipes'>): string {
+  return `${tile.tradeskill} · ${tile.recipes === 1 ? '1 recipe' : `${String(tile.recipes)} recipes`}`
+}
+
+export const DOORS_LINE = 'Pick a tradeskill to open its workbench.'
+
+/** Said in place of `DOORS_LINE` when the log has shown no tradeskill at all, so every door is in the compact row. */
+export const NO_TRADESKILL_SEEN_LINE = 'Your log has not shown any tradeskill go up yet. Pick one below to open its workbench.'
+
+/**
+ * The line above the doors. `served` is whether the engine has read the skills yet: until it
+ * has, no level is known for a reason that is not the log's, and the line does not blame the log.
+ */
+export function doorsLine(doors: HomeDoors, served: boolean): string {
+  return served && doors.seen.length === 0 ? NO_TRADESKILL_SEEN_LINE : DOORS_LINE
+}

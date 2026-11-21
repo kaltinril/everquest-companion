@@ -8,10 +8,16 @@
  *   - Faction is the fifth goal of the switch, and picking it draws either the turn-ins of a
  *     picked faction or one line saying no turn-in of the tradeskill raises one;
  *   - every row names a quest through a wiki link and states at least one raise, and the panel
- *     says what the order ranks on and what the rows do not know;
+ *     says what the order ranks on; what the rows do not know is behind "How to read this",
+ *     closed until asked for;
+ *   - rows the item's own page backs come before shared pages, and those before rows named on the
+ *     quest page only;
  *   - nothing on the panel reads as a chance or a forecast;
- *   - the shopping list is for the first row, and "Shop for this" moves it to another row;
- *   - the picked faction is one of a list, and the pick is remembered across a trip to another tab;
+ *   - the picked faction is one of a list, the goal opens on the list's first entry, and the pick
+ *     is remembered across a trip to another tab;
+ *   - a long list of changes is cut until "and N more" opens it in place;
+ *   - the shopping list is for the first row, and "Shop for this" moves it to another row (both on
+ *     the faction with the most recipes, which the pick step leaves up);
  *   - the faction's link opens the Factions tab, whose Back returns to the route.
  *
  * Every claim is a property of what is on screen, never a name or a count from the wiki data.
@@ -68,6 +74,37 @@ async function openRoute(page: Page): Promise<boolean> {
   return (await settle(() => countOf(page, ROUTE), (n) => n === 1, { timeoutMs: 20_000 })) === 1
 }
 
+/** The order's first key, `data-group` on each row: own, then shared, then questOnly. */
+async function checkGroups(page: Page, rows: number): Promise<void> {
+  const groups = await page.evaluate((s) => [...document.querySelectorAll<HTMLElement>(s)].map((r) => ['own', 'shared', 'questOnly'].indexOf(r.dataset.group ?? '')), ROW)
+  check(
+    "rows the item's own page backs come first, then shared pages, then rows named on the quest page only",
+    groups.length === rows && groups.every((g, i) => g >= 0 && (i === 0 || (groups[i - 1] ?? 0) <= g)),
+    JSON.stringify(groups)
+  )
+}
+
+/** A long list of changes is cut to the picked faction's own and eight more until "and N more" opens it in place. */
+async function checkLongList(page: Page): Promise<void> {
+  const MORE = sel('tradeskill-faction-more')
+  const long = page.locator(ROW).filter({ has: page.locator(MORE) }).first()
+  if ((await long.count()) === 0) {
+    note('no row of the picked faction lists more than nine changes: the cut list was not checked')
+    return
+  }
+  const changes = long.locator(sel('tradeskill-faction-change'))
+  const cut = await changes.count()
+  check('a long list of changes shows the picked faction and at most eight more', cut > 0 && cut <= 9, String(cut))
+  check('...the picked faction first', (await changes.first().getAttribute('data-picked')) === 'true')
+  const more = Number(/(\d+)/.exec(await long.locator(MORE).innerText())?.[1] ?? 'NaN')
+  await long.locator(`${MORE} [role="button"]`).click()
+  const all = await settle(() => changes.count(), (n) => n > cut, { timeoutMs: 10_000 })
+  check('"and N more" opens the whole list in place', all === cut + more, `${String(cut)} + ${String(more)} / ${String(all)}`)
+  // Closed again, so the rows are as the steps after this one expect.
+  await long.locator(`${MORE} [role="button"]`).click()
+  await settle(() => changes.count(), (n) => n === cut, { timeoutMs: 10_000 })
+}
+
 /** The rows of the picked faction and the lines above them. */
 async function checkRows(page: Page): Promise<number> {
   const rows = await settle(() => countOf(page, ROW), (n) => n > 0, { timeoutMs: 20_000 })
@@ -81,9 +118,19 @@ async function checkRows(page: Page): Promise<number> {
   check('every row states at least one raise', raises.length === rows && raises.every((n) => n > 0), JSON.stringify(raises))
   check('every row states its trivial', (await countOf(page, sel('tradeskill-faction-trivial'))) === rows)
   check('the panel says what the order ranks on', (await textOf(page, sel('tradeskill-faction-basis'))).length > 20)
+  // The reading notes sit behind one control. A fresh profile has never opened it.
+  const HOW = sel('tradeskill-faction-how')
+  if ((await page.evaluate((s) => document.querySelector<HTMLElement>(s)?.dataset.open ?? '', HOW)) === 'true') {
+    note('"How to read this" was already open when the step began: closed-by-default was not checked')
+  } else {
+    check('the reading notes are closed until asked for', (await countOf(page, sel('tradeskill-faction-caveat'))) === 0)
+    await page.click(`${HOW} [role="button"]`)
+  }
+  await settle(() => countOf(page, sel('tradeskill-faction-caveat')), (n) => n > 0, { timeoutMs: 10_000 })
   const caveats = await page.evaluate((s) => [...document.querySelectorAll<HTMLElement>(s)].map((e) => e.innerText).join(' '), sel('tradeskill-faction-caveat'))
-  check('...that a quest page states one list for the whole page', /one list of faction changes/i.test(caveats), caveats.slice(0, 200))
+  check('"How to read this" opens them in place: that a quest page states one list for the whole page', /one list of faction changes/i.test(caveats), caveats.slice(0, 200))
   check('...and that nothing is forecast', /nothing is forecast/i.test(caveats), caveats.slice(0, 200))
+  await checkGroups(page, rows)
   const text = await textOf(page, sel('tradeskill-faction-list'))
   check('no row reads as a chance or a forecast', !/%|chance|expected|estimate|to reach/i.test(text), text.slice(0, 200))
   // A marked row carries its reason in words, not only the chip.
@@ -110,23 +157,41 @@ async function checkShopping(page: Page, rows: number): Promise<void> {
   check('...and the mark moves with it', (await page.locator(ROW).nth(1).locator(sel('tradeskill-faction-shopping')).count()) === 1)
 }
 
-/** The list of factions, and the memory of the pick. */
-async function checkPick(page: Page): Promise<void> {
+/**
+ * The list of factions, and the memory of the pick. The entry picked is the one with the most
+ * recipes that is not already up (the list's last when none has more than one), so the steps
+ * after this one have several rows to read. Returns how many rows that faction draws.
+ */
+async function checkPick(page: Page): Promise<number> {
+  const opened = await factionOf(page)
   await page.click(`${sel('tradeskill-faction-pick')} [role="combobox"]`)
   const options = await settle(() => countOf(page, OPTION), (n) => n > 0, { timeoutMs: 10_000 })
   check('the faction is picked from a list', options > 0)
-  const facts = await page.evaluate((s) => [...document.querySelectorAll<HTMLElement>(s)].map((e) => e.innerText), OPTION)
-  check('...each entry saying how many recipes feed it', facts.every((t) => /\d+ recipes?/.test(t)), JSON.stringify(facts.slice(0, 3)))
-  const last = await page.evaluate((s) => [...document.querySelectorAll<HTMLElement>(s)].at(-1)?.dataset.faction ?? '', OPTION)
-  await page.click(`${OPTION} >> nth=-1`)
-  const picked = await settle(() => factionOf(page), (f) => f === last, { timeoutMs: 10_000 })
-  check('picking an entry draws that faction', picked === last && last !== '', `${last} / ${picked}`)
+  const entries = await page.evaluate(
+    (s) => [...document.querySelectorAll<HTMLElement>(s)].map((e) => ({ faction: e.dataset.faction ?? '', text: e.innerText, recipes: Number(/(\d+) recipes?/.exec(e.innerText)?.[1] ?? '0') })),
+    OPTION
+  )
+  check('...each entry saying how many recipes feed it', entries.every((e) => e.recipes > 0), JSON.stringify(entries.slice(0, 3).map((e) => e.text)))
+  // Nothing is remembered for this tradeskill on a fresh profile: the goal opened on the list's first entry.
+  check('the goal opened on the first faction of the list', opened !== '' && entries[0]?.faction === opened, `${entries[0]?.faction ?? ''} / ${opened}`)
+  let at = entries.length - 1
+  let most = 0
+  entries.forEach((entry, i) => {
+    if (entry.faction === opened || entry.recipes <= most) return
+    most = entry.recipes
+    at = i
+  })
+  const target = entries[at]?.faction ?? ''
+  await page.click(`${OPTION} >> nth=${String(at)}`)
+  const picked = await settle(() => factionOf(page), (f) => f === target, { timeoutMs: 10_000 })
+  check('picking an entry draws that faction', picked === target && target !== '', `${target} / ${picked}`)
 
   await page.click(sel('nav-skills'))
   await page.click(NAV)
   await settle(() => countOf(page, PANES), (n) => n === 1, { timeoutMs: 20_000 })
   check('leaving and coming back keeps the Faction goal', (await goalOf(page)) === 'faction')
-  check('...and the faction last picked', (await factionOf(page)) === last, last)
+  check('...and the faction last picked', (await factionOf(page)) === target, target)
+  return settle(() => countOf(page, ROW), (n) => n > 0, { timeoutMs: 20_000 })
 }
 
 /** The faction's door to the Factions tab, and the way back. */
@@ -161,9 +226,11 @@ export async function stepFaction(page: Page): Promise<void> {
     note(`no ${TRADESKILL} turn-in raises a faction in this data: the rows, the list and the Factions tab were not checked`)
     return
   }
-  const rows = await checkRows(page)
-  if (rows === 0) return
+  if ((await checkRows(page)) === 0) return
+  // The pick step leaves the faction with the most recipes up: the long list and the shopping list are read there.
+  const rows = await checkPick(page)
+  await checkGroups(page, rows)
+  await checkLongList(page)
   await checkShopping(page, rows)
-  await checkPick(page)
   await checkFactionsTab(page)
 }

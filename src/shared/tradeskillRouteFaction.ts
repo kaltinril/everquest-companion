@@ -8,10 +8,17 @@
 //
 //   the list    every faction a turn-in of the tradeskill raises, with how many recipes feed it
 //               and, when a faction dump is loaded, the player's standing in the Factions tab's
-//               own words.
-//   the order   recipes whose trivial is at or under the level first, then the biggest raise the
-//               wiki states (a raise with no stated number after every stated one), then the
-//               lowest known cost per combine, then the ladder's order.
+//               own words. The faction with the most rows of the first group below comes first,
+//               and is the one shown until the reader picks another.
+//   the order   three groups, by how well the data ties the row to its changes (`RowGroup`):
+//               rows the item's own page lists and that are not marked as a shared page; then
+//               rows marked as a shared page; then rows tied by the quest page alone. Inside a
+//               group: recipes whose trivial is at or under the level first, then the biggest
+//               raise the wiki states (a raise with no stated number after every stated one),
+//               then the lowest known cost per combine, then the ladder's order. Every row is
+//               kept: the groups only decide what a reader meets first (seen 2026-11-20: Baking
+//               opened on Clurg, whose first row was Clump of Dough on Muffin Quests, a shared
+//               page that names the dough only as a material and lists 29 changes).
 //   a row       one recipe and one quest page: the trivial against the level, the quest, its giver
 //               and zones, EVERY faction change the page states (a loss as plainly as a raise),
 //               and the step facts every route states (cost, materials on hand, own record).
@@ -78,12 +85,26 @@ export interface FactionAsk {
   eraOnly?: boolean
 }
 
+/**
+ * How well the data ties a row to the changes it shows: the first key of the order.
+ *   own        the item's own page lists the quest (alone, or with the quest page), and the page
+ *              gives no sign of hosting several turn-ins
+ *   shared     the item's own page lists it, on a page marked as shared (`TurnIn.shared`)
+ *   questOnly  only the quest page names the item, which it also does for a material nobody
+ *              hands in (`TIE_QUEST_PAGE`); marked as shared or not
+ */
+export type RowGroup = 'own' | 'shared' | 'questOnly'
+
+const GROUP_RANK: Record<RowGroup, number> = { own: 0, shared: 1, questOnly: 2 }
+
 /** One faction the tradeskill's turn-ins raise. */
 export interface FactionChoice {
   key: string
   name: string
   /** Recipes of the tradeskill whose made item is a turn-in that raises it. */
   recipes: number
+  /** Rows of the `own` group: what the list of factions is ordered by, and what picks the default. */
+  own: number
   /** Quest pages among those turn-ins. */
   quests: number
   /** Null: no dump is loaded, or the dump does not list the faction. */
@@ -127,6 +148,8 @@ export interface TurnIn {
   shared: string
   /** Which of the two pages ties the item to the quest, when only one does; '' when both do. */
   tie: string
+  /** Where the order files the row. */
+  group: RowGroup
 }
 
 /** A row of the Faction goal: a route step (the shopping list reads it) and its turn-in. */
@@ -141,15 +164,17 @@ export interface FactionStep extends RouteStep {
 export interface FactionRoute {
   tradeskill: Tradeskill
   heldOnly: boolean
-  /** Every faction a turn-in of the tradeskill raises, by name. */
+  /** Every faction a turn-in of the tradeskill raises: the most `own` rows first, then by name. */
   choices: FactionChoice[]
   picked: FactionChoice | null
   steps: FactionStep[]
   /** The row the shopping list is for: the first. */
   next: FactionStep | null
-  /** What the order ranks on. */
+  /** What the list is and what the order ranks on: the one line always above the rows. */
   basis: string
-  /** What the rows do not know, each a sentence of its own. */
+  /** What bears on this reader's own rows, shown under `basis`: the level the log never showed. '' when nothing does. */
+  notice: string
+  /** How to read the rows: what they do not know, each a sentence of its own. Behind one control on screen. */
   caveats: string[]
   /** Why there is no row; '' when there is one. */
   empty: string
@@ -241,22 +266,21 @@ function choicesOf(facts: FactionFacts, feeds: ReadonlyMap<string, Feed[]>): Fac
       key,
       name: names.get(key) ?? (first === undefined ? key : factionHitName(first.hit)),
       recipes: new Set(list.map((feed) => feed.recipe.id)).size,
+      own: list.filter((feed) => groupOf(feed) === 'own').length,
       quests: new Set(list.map((feed) => feed.quest.page)).size,
       standing: facts.standings?.get(key) ?? null
     }
   })
-  return choices.sort((a, b) => a.name.localeCompare(b.name))
+  return choices.sort((a, b) => b.own - a.own || a.name.localeCompare(b.name))
 }
 
-/** The asked faction while the list holds it; else the one most recipes feed, the first by name among equals. */
+/**
+ * The asked faction while the list holds it; else the list's first: the one with the most rows
+ * of the `own` group, the first by name among equals. So a faction with only shared or
+ * quest-page-only rows is never the default while another has a row the item's own page backs.
+ */
 function pickChoice(choices: readonly FactionChoice[], asked: string | null): FactionChoice | null {
-  const found = choices.find((choice) => choice.key === asked)
-  if (found !== undefined) return found
-  let best: FactionChoice | null = null
-  for (const choice of choices) {
-    if (best === null || choice.recipes > best.recipes) best = choice
-  }
-  return best
+  return choices.find((choice) => choice.key === asked) ?? choices.at(0) ?? null
 }
 
 // ---- a row --------------------------------------------------------------------------------------
@@ -296,6 +320,13 @@ function tieText(quest: ItemFactionQuest): string {
   return quest.ties[0] === 'questPage' ? TIE_QUEST_PAGE : TIE_ITEM_PAGE
 }
 
+/** Where the order files a turn-in (`RowGroup`): a quest-page-only tie last, whatever else marks the row. */
+function groupOf(feed: Feed): RowGroup {
+  const { quest, recipe } = feed
+  if (quest.ties.length === 1 && quest.ties[0] === 'questPage') return 'questOnly'
+  return sharedText(quest, filedAs(recipe, quest)) === '' ? 'own' : 'shared'
+}
+
 function eraNote(quest: ItemFactionQuest): string {
   if (quest.eraTag === undefined || !questOutOfEra(quest)) return ''
   return `${quest.eraTag} quest: not open in the current era.`
@@ -319,7 +350,8 @@ function turnInOf(facts: FactionFacts, feed: Feed, pickedKey: string): TurnIn {
     raises,
     losses,
     shared: sharedText(quest, filedAs(recipe, quest)),
-    tie: tieText(quest)
+    tie: tieText(quest),
+    group: groupOf(feed)
   }
 }
 
@@ -351,12 +383,13 @@ function byRaise(a: Feed, b: Feed): number {
   return b.hit.amount - a.hit.amount
 }
 
-/** Trivial at or under the level, the stated raise, the known cost, then the ladder's order. */
+/** The row's group; inside it trivial at or under the level, the stated raise, the known cost, then the ladder's order. */
 function rowOrder(a: FactionStep, b: FactionStep, feeds: ReadonlyMap<FactionStep, Feed>): number {
   const fa = feeds.get(a)
   const fb = feeds.get(b)
   if (fa === undefined || fb === undefined) return 0
   return (
+    GROUP_RANK[a.turnIn.group] - GROUP_RANK[b.turnIn.group] ||
     Number(b.easy) - Number(a.easy) ||
     byRaise(fa, fb) ||
     (a.cost ?? Infinity) - (b.cost ?? Infinity) ||
@@ -431,6 +464,46 @@ export function changeLabel(change: FactionChange): string {
   return `${change.name} ${change.text}`
 }
 
+/** How many changes a row draws beside the picked faction's own before "and N more". */
+export const CHANGE_CAP = 8
+
+/** The changes a row draws: the whole list, or its first few until the reader opens it. */
+export interface ShownChanges {
+  /** The picked faction's own change first, then the page's other raises in page order. */
+  raises: FactionChange[]
+  losses: FactionChange[]
+  /** How many the closed row leaves out; 0 when the whole list fits, and the row then has no control. */
+  more: number
+}
+
+/**
+ * A row's changes as drawn. A shared page can list dozens (Muffin Quests: 29), which buried the
+ * one the row is for: the picked faction's change comes first, then up to `CHANGE_CAP` others
+ * (raises before losses, each in page order), and the rest wait behind "and N more". `all` is
+ * the opened row: every change, in the same order. Nothing is dropped from `TurnIn.changes`.
+ */
+export function shownChanges(turnIn: Pick<TurnIn, 'raises' | 'losses'>, all: boolean): ShownChanges {
+  const own = turnIn.raises.filter((change) => change.picked)
+  const others = turnIn.raises.filter((change) => !change.picked)
+  const more = Math.max(0, others.length + turnIn.losses.length - CHANGE_CAP)
+  if (all || more === 0) return { raises: [...own, ...others], losses: [...turnIn.losses], more }
+  const raises = others.slice(0, CHANGE_CAP)
+  return { raises: [...own, ...raises], losses: turnIn.losses.slice(0, CHANGE_CAP - raises.length), more }
+}
+
+/** The control that opens a capped list in place: "and 20 more". */
+export function moreChangesLabel(more: number): string {
+  return `and ${String(more)} more`
+}
+
+/** The same control on an opened list. */
+export const FEWER_CHANGES_LABEL = 'show fewer'
+
+/** The one control the reading notes (`FactionRoute.caveats`) sit behind, closed until asked for. */
+export const HOW_TO_READ_LABEL = 'How to read this'
+
+export const HOW_TO_READ_HIDE_LABEL = 'Hide how to read this'
+
 /** "Baking has 42, Tailoring 30."; '' when no tradeskill has any. */
 function othersText(facts: FactionFacts): string {
   const counts = factionCounts(facts)
@@ -446,7 +519,7 @@ function noFactionText(facts: FactionFacts, ask: FactionAsk): string {
 
 function basisText(ask: FactionAsk, picked: FactionChoice): string {
   const held = ask.heldOnly === true ? 'Only recipes you hold every material for. ' : ''
-  return `${held}${ask.tradeskill} items a quest takes where the quest's wiki page states a raise of ${picked.name}. Order: recipes whose trivial is at or under your level first, then the biggest raise the wiki states, then the lowest cost per combine at the prices you last paid.`
+  return `${held}${ask.tradeskill} items a quest takes where the quest's wiki page states a raise of ${picked.name}. Order: turn-ins the item's own page lists first, then rows marked shared page, then rows named on the quest page only. Inside each: trivial at or under your level, then the biggest raise the wiki states, then the lowest cost per combine at the prices you last paid.`
 }
 
 function emptyText(facts: FactionFacts, ask: FactionAsk, picked: FactionChoice | null, rows: number): string {
@@ -469,7 +542,8 @@ export function buildFactionRoute(facts: FactionFacts, ask: FactionAsk): Faction
     steps,
     next: steps.at(0) ?? null,
     basis: picked === null ? '' : basisText(ask, picked),
-    caveats: picked === null ? [] : [...(ask.level === null ? [LEVEL_UNSEEN_NOTE] : []), SHARED_PAGE_NOTE, TIE_NOTE, AMOUNT_NOTE, NO_FORECAST_NOTE],
+    notice: picked !== null && ask.level === null ? LEVEL_UNSEEN_NOTE : '',
+    caveats: picked === null ? [] : [SHARED_PAGE_NOTE, TIE_NOTE, AMOUNT_NOTE, NO_FORECAST_NOTE],
     empty: emptyText(facts, ask, picked, steps.length)
   }
 }

@@ -46,8 +46,12 @@ export function usePlanSearchState(deps: PlanDeps, eraOnly: boolean, query: stri
   return { choices, found, typed: query.trim() !== '', settled: text === query }
 }
 
+/**
+ * The box and how many craftable items it searches. What the era setting hides is not counted
+ * here: the section's header states it once, for Home and the planner alike (two different
+ * counts stood side by side on Home, one of recipes and one of items).
+ */
 export function PlanSearchBox({ query, onQuery, state }: { query: string; onQuery: (q: string) => void; state: PlanSearchState }): JSX.Element {
-  const hidden = state.choices.eraHidden
   return (
     <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5, flexShrink: 0 }}>
       <SearchField
@@ -62,7 +66,6 @@ export function PlanSearchBox({ query, onQuery, state }: { query: string; onQuer
       />
       <Typography variant="caption" color="text.secondary" data-testid="tradeskill-plan-count">
         {choiceCountText(state.choices.list.length)}
-        {hidden > 0 && `, ${String(hidden)} out of era hidden`}
       </Typography>
     </Stack>
   )

@@ -444,8 +444,6 @@ export function materialsText(recipe: BookRecipe): string {
     .join(', ')
 }
 
-export const NO_MATERIALS_TEXT = 'The wiki lists no materials for this recipe.'
-
 /** Why the recipe table is empty, or null when it has lines. */
 export function ladderEmptyText(ladder: Ladder, ask: LadderAsk, eraOnly: boolean): string | null {
   if (ladder.shown > 0) return null

@@ -162,7 +162,8 @@ async function stepQuiverAndMap(page: Page): Promise<void> {
   const nodes = await settle(() => countOf(page, `${PLAN} ${sel('tradeskill-plan-node')}`), (n) => n > 0, { timeoutMs: 20_000 })
   check('Fleeting Quiver lists materials', nodes > 0, String(nodes))
   check('…a made one opened to its own recipe', (await countOf(page, `${PLAN} ${sel('tradeskill-plan-sub')}`)) > 0)
-  if ((await countOf(page, sel('tradeskill-plan-guide-materials'))) === 1) {
+  // The gap line says when the materials under it are the guide's (`data-guide`).
+  if ((await countOf(page, `${sel('tradeskill-plan-tree')} ${sel('tradeskill-wiki-gap')}[data-guide="true"]`)) > 0) {
     check('materials taken from the guide carry its credit', (await countOf(page, sel('tradeskill-plan-guide-credit'))) === 1)
   }
   const made = await countOf(page, sel('tradeskill-plan-get'))

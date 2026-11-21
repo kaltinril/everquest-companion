@@ -306,8 +306,6 @@ export function levelingCreditText(): string {
   return `Route and notes from ${guideCreditOf(LEVELING_GUIDE_ID)}.`
 }
 
-export const GUIDE_MATERIALS_TEXT = 'The wiki lists no materials for this recipe. These are from the guide:'
-
 export const GUIDE_TIP = 'From a community guide, not from the wiki or your log.'
 
 export function noRouteText(tradeskill: Tradeskill): string {

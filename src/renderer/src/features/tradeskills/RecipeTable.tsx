@@ -10,6 +10,9 @@
 // (shared/tradeskillWiki.ts `wikiRowLink`, WikiGap.tsx), so a player who knows can add it there:
 // in the Materials cell the wiki left empty, else beside the item's name.
 //
+// A line does not name the container or a material's source words: the container is one value
+// down a whole tradeskill's list, and the picked recipe's panel states both.
+//
 // The lines, their order and their marks are shared/tradeskillBook.ts `recipeLadder`.
 
 import { type JSX, memo, useEffect, useLayoutEffect, useRef } from 'react'
@@ -17,7 +20,6 @@ import { Box, Chip, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typ
 import {
   materialsText,
   qtyPrefix,
-  sourceWords,
   type BookIngredient,
   type BookRecipe,
   type LadderLine,
@@ -36,7 +38,7 @@ import { ItemLabel, ItemLink } from './tradeskillLinks'
 import { WikiPageLink } from './WikiGap'
 
 export const ROW_HEIGHT = 36
-const COLUMNS = 7
+const COLUMNS = 6
 /** Lines of what is already trivial left in view above the line the table opens on. */
 const CONTEXT_LINES = 2
 
@@ -58,6 +60,18 @@ const PRICE_SX = { whiteSpace: 'nowrap', px: 1, fontVariantNumeric: 'tabular-num
  * their width, so a narrower table would take all of it out of Materials.
  */
 const TABLE_MIN_WIDTH = 920
+
+/**
+ * Item and You are shares of the table and Materials takes what is left. Measured on the
+ * owner's captures (2026-11-20, a 1500 px window, the table about 1205 px): with a Container
+ * column Materials had 266 px and showed one material, and You had 207 px and cut
+ * "made 3, failed 1, 2 raises (204 to 205)", which is about 234 px of text in the table's font.
+ * Without Container, at that width: Item 313 px, Materials about 319 px (287 px of text, two
+ * material names with their counts), You 277 px (261 px of text with 8 px either side).
+ */
+const ITEM_WIDTH = '26%'
+const YOU_WIDTH = '23%'
+const YOU_SX = { ...CUT_SX, px: 1 } as const
 
 const NEXT_TIP = 'The first recipe above your level: the one to make next.'
 const TRIVIAL_TIP = 'At or under your level, so it no longer raises the skill.'
@@ -100,24 +114,18 @@ function RowWikiLink({ recipe, place }: { recipe: BookRecipe; place: 'materials'
   )
 }
 
+/** A material's count and name. Its source words are on hover and in the picked recipe's panel. */
 function Material({ ingredient, first }: { ingredient: BookIngredient; first: boolean }): JSX.Element {
-  const words = sourceWords(ingredient)
   return (
     <>
       {!first && ', '}
       {qtyPrefix(ingredient)}
       <ItemLink name={ingredient.name} />
-      {words !== '' && (
-        <Box component="span" sx={{ color: 'text.secondary' }}>
-          {' '}
-          ({words})
-        </Box>
-      )}
     </>
   )
 }
 
-/** Every material on one line, cut off with the whole list on hover; the panel has them in full. */
+/** The materials' counts and names on one line, cut off when long; the hover lists every one with its source words. */
 function MaterialsCell({ recipe }: { recipe: BookRecipe }): JSX.Element {
   if (recipe.ingredients.length === 0) {
     return (
@@ -147,7 +155,7 @@ function YouCell({ recipe, craft }: { recipe: BookRecipe; craft: CraftBook }): J
   if (row === null) return <TableCell data-testid="tradeskill-row-you" />
   const words = historyWords(row)
   return (
-    <TableCell sx={CUT_SX} title={words} data-testid="tradeskill-row-you">
+    <TableCell sx={YOU_SX} title={words} data-testid="tradeskill-row-you">
       <Stack direction="row" spacing={0.75} alignItems="center" sx={{ flexWrap: 'nowrap', minWidth: 0 }}>
         <NoticeChip row={row} />
         <Box component="span" sx={CUT_SX}>
@@ -191,7 +199,6 @@ const RecipeRow = memo(function RecipeRow({ recipe, state, picked, onPick, log, 
           <RowWikiLink recipe={recipe} place="item" />
         </Stack>
       </TableCell>
-      <TableCell sx={CUT_SX}>{recipe.container ?? ''}</TableCell>
       <MaterialsCell recipe={recipe} />
       <TableCell align="right" sx={PRICE_SX} data-testid="tradeskill-row-cost">
         {costCell(money)}
@@ -233,8 +240,7 @@ function Head(): JSX.Element {
         <TableCell align="right" sx={{ width: 72 }}>
           Trivial
         </TableCell>
-        <TableCell sx={{ width: '26%' }}>Item</TableCell>
-        <TableCell sx={{ width: '11%' }}>Container</TableCell>
+        <TableCell sx={{ width: ITEM_WIDTH }}>Item</TableCell>
         <TableCell>Materials</TableCell>
         <TableCell align="right" sx={{ ...PRICE_SX, width: PRICE_WIDTH }}>
           <Tooltip title={COST_TIP}>
@@ -246,7 +252,7 @@ function Head(): JSX.Element {
             <span>Sells</span>
           </Tooltip>
         </TableCell>
-        <TableCell sx={{ width: '17%' }}>
+        <TableCell sx={{ width: YOU_WIDTH, px: 1 }}>
           <Tooltip title={YOU_TIP}>
             <span>You</span>
           </Tooltip>

@@ -4,14 +4,17 @@
 // Above the two panes: the factions a turn-in of the open tradeskill raises, as a list to pick
 // from (remembered per tradeskill, routeMemory.ts), each entry with how many recipes feed it and,
 // when a faction dump is loaded, the player's standing in the Factions tab's own words. Without a
-// dump the list still works and the quiet dump line names the command.
+// dump the list still works and the quiet dump line names the command. Under the picker: one line
+// saying what the list is and how it is ordered, then "How to read this", which opens the reading
+// notes in place (closed until asked for, remembered).
 //
 // The left pane: the picked faction's turn-ins as rows. A row is the made item (the section's
 // standard item link), its trivial against the level, the quest (the app's standard wiki link:
 // no tab holds a quest page), its giver and zones (the standard mob and Maps links), every
 // faction change the quest page states (a loss as plainly as a raise; each name opens the
-// Factions tab), and the step facts every route states. The right pane is the shopping list
-// (ShoppingPanel.tsx) for the first row, or for the row the reader asks it for.
+// Factions tab), and the step facts every route states. A long list of changes shows the picked
+// faction's own and a few more, with "and N more" opening the rest in place. The right pane is
+// the shopping list (ShoppingPanel.tsx) for the first row, or for the row the reader asks it for.
 //
 // Which factions, which rows, their order, the marks and every word are
 // shared/tradeskillRouteFaction.ts; this file maps over what it returns. The standings are the
@@ -27,6 +30,9 @@ import { canMakeLabel, canMakeTip } from '@shared/tradeskillHeld'
 import { ROUTE_STEP_TIP } from '@shared/tradeskillRoute'
 import {
   FACTION_LINK_TEXT,
+  FEWER_CHANGES_LABEL,
+  HOW_TO_READ_HIDE_LABEL,
+  HOW_TO_READ_LABEL,
   QUEST_LINK_TIP,
   SHARED_CHIP_LABEL,
   SHOP_FOR_ROW_LABEL,
@@ -35,6 +41,8 @@ import {
   bookFactionItems,
   buildFactionRoute,
   choiceFacts,
+  moreChangesLabel,
+  shownChanges,
   type FactionChange,
   type FactionChoice,
   type FactionRoute as FactionRouteModel,
@@ -48,11 +56,12 @@ import type { QuestData } from '@shared/types'
 import { wikiPageUrl } from '@shared/wiki'
 import OutputKindLine from '../../components/OutputKindLine'
 import questsJson from '../../data/eqlegends/quests.json'
+import { CellLink } from '../../lib/CellLink'
 import { FactionLink } from '../../lib/factionLink'
 import { Tooltip } from '../../lib/Tooltip'
 import { useFactionData } from '../factions/useFactionRows'
 import { EraChip } from '../planner/PlannerChips'
-import { useFactionPick } from './routeMemory'
+import { useFactionHelp, useFactionPick } from './routeMemory'
 import { ShoppingPanel } from './ShoppingPanel'
 import { ItemLabel, MerchantLink, ZoneList } from './tradeskillLinks'
 
@@ -166,7 +175,33 @@ interface HeadProps {
   onPick: (key: string) => void
 }
 
-/** The picker with the picked faction's own facts and its door to the Factions tab, then what the order ranks on and what the rows do not know. */
+/**
+ * How to read the rows: what they do not know. One control, closed until the reader asks, so the
+ * rows are not under a wall of text; open, every note is there, each on its own line.
+ */
+function ReadingNotes({ notes }: { notes: readonly string[] }): JSX.Element {
+  const [open, setOpen] = useFactionHelp()
+  return (
+    <>
+      <Box component="span" sx={{ typography: 'caption' }} data-testid="tradeskill-faction-how" data-open={open}>
+        <CellLink
+          text={open ? HOW_TO_READ_HIDE_LABEL : HOW_TO_READ_LABEL}
+          onOpen={() => {
+            setOpen(!open)
+          }}
+        />
+      </Box>
+      {open &&
+        notes.map((note) => (
+          <Typography key={note} variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-faction-caveat">
+            {note}
+          </Typography>
+        ))}
+    </>
+  )
+}
+
+/** The picker with the picked faction's own facts and its door to the Factions tab, then what the list is and how it is ordered, and the reading notes behind their control. */
 function Head({ route, dumpLoaded, readAt, onPick }: HeadProps): JSX.Element | null {
   const { picked } = route
   if (picked === null) return null
@@ -186,12 +221,19 @@ function Head({ route, dumpLoaded, readAt, onPick }: HeadProps): JSX.Element | n
       <Typography variant="body2" data-testid="tradeskill-faction-basis">
         {route.basis}
       </Typography>
-      {route.caveats.map((caveat) => (
-        <Typography key={caveat} variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-faction-caveat">
-          {caveat}
-        </Typography>
-      ))}
+      <Line id="notice" text={route.notice} />
+      <ReadingNotes notes={route.caveats} />
     </Box>
+  )
+}
+
+/** Opens a row's capped list of changes in place, and closes it again. Nothing on a row whose whole list is drawn. */
+function MoreChanges({ more, all, onToggle }: { more: number; all: boolean; onToggle: () => void }): JSX.Element | null {
+  if (more === 0) return null
+  return (
+    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-faction-more" data-open={all}>
+      <CellLink text={all ? FEWER_CHANGES_LABEL : moreChangesLabel(more)} onOpen={onToggle} />
+    </Typography>
   )
 }
 
@@ -202,7 +244,7 @@ function Changes({ label, changes, id }: { label: string; changes: readonly Fact
     <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid={`tradeskill-faction-${id}`}>
       {label}{' '}
       {changes.map((change, i) => (
-        <Box key={change.name} component="span" sx={{ fontWeight: change.picked ? 700 : 400 }} data-testid="tradeskill-faction-change" data-up={change.up}>
+        <Box key={change.name} component="span" sx={{ fontWeight: change.picked ? 700 : 400 }} data-testid="tradeskill-faction-change" data-up={change.up} data-picked={change.picked}>
           {i > 0 && ', '}
           <FactionLink name={change.name} openAs={change.openAs} />{' '}
           <Box component="span" sx={{ color: change.up ? 'success.main' : 'error.main' }}>
@@ -293,9 +335,21 @@ function RowHead({ step, shopping, onShop }: Omit<RowProps, 'onOpenRecipe'>): JS
 
 function TurnInRow({ step, shopping, onShop, onOpenRecipe }: RowProps): JSX.Element {
   const { turnIn, recipe } = step
+  // A long list of changes is cut to the picked faction's own and a few more until the reader opens it.
+  const [all, setAll] = useState(false)
+  const shown = shownChanges(turnIn, all)
   const open = recipe === null ? undefined : () => onOpenRecipe(recipe.id)
   return (
-    <Box sx={ROW_SX} onClick={open} title={ROUTE_STEP_TIP} data-testid="tradeskill-faction-row" data-recipe={recipe?.id ?? ''} data-easy={step.easy} data-shared={turnIn.shared !== ''}>
+    <Box
+      sx={ROW_SX}
+      onClick={open}
+      title={ROUTE_STEP_TIP}
+      data-testid="tradeskill-faction-row"
+      data-recipe={recipe?.id ?? ''}
+      data-easy={step.easy}
+      data-shared={turnIn.shared !== ''}
+      data-group={turnIn.group}
+    >
       <Typography variant="body2" sx={{ fontWeight: 700, color: 'success.main' }} data-testid="tradeskill-faction-raise">
         {turnIn.raise.text}
       </Typography>
@@ -304,8 +358,15 @@ function TurnInRow({ step, shopping, onShop, onOpenRecipe }: RowProps): JSX.Elem
         <Line id="trivial" text={step.range} color="text.primary" />
         <QuestLine turnIn={turnIn} />
         <Line id="era" text={turnIn.eraNote} color="warning.main" />
-        <Changes id="raises" label="Raises:" changes={turnIn.raises} />
-        <Changes id="losses" label="Lowers:" changes={turnIn.losses} />
+        <Changes id="raises" label="Raises:" changes={shown.raises} />
+        <Changes id="losses" label="Lowers:" changes={shown.losses} />
+        <MoreChanges
+          more={shown.more}
+          all={all}
+          onToggle={() => {
+            setAll(!all)
+          }}
+        />
         <Line id="shared" text={turnIn.shared} color="warning.main" />
         <Line id="tie" text={turnIn.tie} />
         <Line id="money" text={step.money} />

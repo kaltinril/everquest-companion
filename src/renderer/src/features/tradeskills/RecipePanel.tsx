@@ -7,8 +7,9 @@
 // loop-guarded); a recipe that lists none is one line with its wiki page, never an empty list. A
 // recipe the wiki lists no materials for shows the guide's, marked as the guide's, on the same
 // grid; a line whose source states no count reads 1 (`needQty`). The wiki comes first
-// (WikiGap.tsx): what its page lacks is said with the page's link, and a guide that lists the
-// recipe otherwise than the wiki gets one quiet line under the wiki's own materials.
+// (WikiGap.tsx): what its page lacks is said once, in one line above the materials with the
+// page's link (the same line says when the materials under it are the guide's), and a guide that
+// lists the recipe otherwise than the wiki gets one quiet line under the wiki's own materials.
 //
 // "Plan this item" in the head opens the recipe in the section's Make an item screen (Planner.tsx)
 // through the section's doors, so the workbench threads nothing for it; beside it is the app's
@@ -19,17 +20,8 @@ import { type JSX, useMemo, useState } from 'react'
 import { Box, Button, IconButton, Paper, Stack, Typography } from '@mui/material'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import { materialDrops, recipeFacts, sourceWords, type BookIngredient, type BookRecipe, type LadderState } from '@shared/tradeskillBook'
 import {
-  NO_MATERIALS_TEXT,
-  materialDrops,
-  recipeFacts,
-  sourceWords,
-  type BookIngredient,
-  type BookRecipe,
-  type LadderState
-} from '@shared/tradeskillBook'
-import {
-  GUIDE_MATERIALS_TEXT,
   guideMaterialTail,
   guideMaterialsFor,
   locatedSource,
@@ -258,13 +250,10 @@ interface MaterialListProps {
   heads?: JSX.Element
 }
 
-/** The recipe guide's materials for a recipe the wiki lists none for. */
+/** The recipe guide's materials for a recipe the wiki lists none for; the gap line above them says whose they are. */
 function GuideMaterials({ lines, trail, heads }: { lines: readonly GuideMaterialLine[]; trail: readonly string[]; heads?: JSX.Element }): JSX.Element {
   return (
     <>
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-guide-materials">
-        {GUIDE_MATERIALS_TEXT}
-      </Typography>
       {heads}
       {lines.map((line, i) =>
         line.wikiName === null ? (
@@ -282,20 +271,32 @@ function GuideMaterials({ lines, trail, heads }: { lines: readonly GuideMaterial
   )
 }
 
-/** A recipe's materials: the wiki's, else the guide's, else the line that says neither lists any. */
+/**
+ * A recipe's materials: the wiki's, else the guide's, else nothing. What the wiki page lacks is
+ * said once, by the one line above them (WikiGap.tsx `WikiGapLine`): it is the whole of a list
+ * that has no material to draw, and it names the guide when the materials under it are the guide's.
+ */
 function MaterialList({ recipe, trail, heads }: MaterialListProps): JSX.Element {
   const { guides } = useFacts()
   if (recipe.ingredients.length === 0) {
     const lines = guideMaterialsFor(guides, recipe)
-    if (lines.length > 0) return <GuideMaterials lines={lines} trail={trail} heads={heads} />
+    if (lines.length === 0) {
+      return (
+        <Box data-testid="tradeskill-no-materials">
+          <WikiGapLine recipe={recipe} />
+        </Box>
+      )
+    }
     return (
-      <Typography variant="body2" color="text.secondary" data-testid="tradeskill-no-materials">
-        {NO_MATERIALS_TEXT}
-      </Typography>
+      <>
+        <WikiGapLine recipe={recipe} />
+        <GuideMaterials lines={lines} trail={trail} heads={heads} />
+      </>
     )
   }
   return (
     <>
+      <WikiGapLine recipe={recipe} />
       {heads}
       {recipe.ingredients.map((ingredient, i) => (
         <MaterialRow key={`${ingredient.key}:${String(i)}`} ingredient={ingredient} trail={trail} />
@@ -311,7 +312,6 @@ function SubRecipe({ recipe, trail }: { recipe: BookRecipe; trail: readonly stri
       <Typography variant="caption" color="text.secondary">
         Made with: {recipeFacts(recipe, true)}
       </Typography>
-      <WikiGapLine recipe={recipe} />
       <MaterialList recipe={recipe} trail={trail} />
     </Box>
   )
@@ -427,7 +427,6 @@ export function RecipePanel({ recipe, state, facts, unlisted }: RecipePanelProps
           </Stack>
         </Stack>
         <RecipeYou recipe={recipe} />
-        <WikiGapLine recipe={recipe} />
         {/* Keyed by recipe so a material opened under one recipe is not open under the next. */}
         <MaterialList key={recipe.id} recipe={recipe} trail={[recipe.key]} heads={<ColumnHeads dumpedAt={facts.held.dumpedAt} />} />
         <PanelFoot recipe={recipe} />

@@ -6,8 +6,9 @@
 //                    that main's open handler turns into the system browser (eqlwiki.com is on its
 //                    list; no host is added here).
 //   WikiGapLine      what the page lacks (materials, the trivial), with that link, so a player who
-//                    knows can add it. Where the recipe guide states a trivial the wiki does not,
-//                    it follows as the guide's, credited.
+//                    knows can add it; in the same line, that the materials shown are the recipe
+//                    guide's when they are. Where the recipe guide states a trivial the wiki does
+//                    not, it follows as the guide's, credited.
 //   GuideDifferences where a guide lists the recipe otherwise than the wiki: one quiet line each,
 //                    credited as text. The wiki's is what the panel shows. No guide is linked.
 //
@@ -16,7 +17,18 @@
 import type { JSX, MouseEvent } from 'react'
 import { Typography } from '@mui/material'
 import type { BookRecipe } from '@shared/tradeskillBook'
-import { WIKI_LINK_TIP, guideDifferenceText, guideDifferences, guideTrivialText, recipeWikiUrl, wikiGap, wikiGapText, wikiLinkLabel } from '@shared/tradeskillWiki'
+import {
+  WIKI_LINK_TIP,
+  gapNote,
+  guideDifferenceText,
+  guideDifferences,
+  guideTrivialText,
+  recipeWikiUrl,
+  wikiGap,
+  wikiGapText,
+  wikiLinkLabel,
+  type GapNote
+} from '@shared/tradeskillWiki'
 import { useFacts } from './benchFacts'
 
 /** A link inside a table line opens the page and leaves the line as it was. */
@@ -35,15 +47,21 @@ export function WikiPageLink({ recipe, label, tip }: { recipe: BookRecipe; label
   )
 }
 
-/** What the wiki page lacks for a recipe, and the page to add it on. Nothing when the page states both. */
-export function WikiGapLine({ recipe }: { recipe: BookRecipe }): JSX.Element | null {
+/**
+ * What the wiki page lacks for a recipe, and the page to add it on. Nothing when the page states
+ * both. It is the ONE line about missing materials: where the recipe guide's list is drawn in
+ * their place the line says so itself (`data-guide`), and a screen with nothing to draw hands in
+ * its own `note`, so no screen puts a second "the wiki lists no materials" line beside it.
+ */
+export function WikiGapLine({ recipe, note }: { recipe: BookRecipe; note?: GapNote }): JSX.Element | null {
   const { guides } = useFacts()
   const gap = wikiGap(recipe)
   if (gap === null) return null
   const fill = guideTrivialText(guides, recipe)
+  const said = note ?? gapNote(guides, recipe)
   return (
-    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-wiki-gap">
-      {wikiGapText(gap)} <WikiPageLink recipe={recipe} />
+    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-wiki-gap" data-guide={said === 'guide'}>
+      {wikiGapText(gap, said)} <WikiPageLink recipe={recipe} />
       {fill !== '' && ` ${fill}`}
     </Typography>
   )
