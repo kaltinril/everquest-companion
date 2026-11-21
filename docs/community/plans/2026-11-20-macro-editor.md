@@ -82,10 +82,14 @@ Opened 2026-11-20. Requirements: `../requirements/macro-editor.md`. Status at th
     it"):** before the FIRST write the app ever makes to a given game ini, it copies the file as it
     was. That first copy is never overwritten by a later one. A write does not go ahead when the
     copy could not be made. The same holds for an agent editing a game ini by hand for a test.
-  - Default taken, the owner has not ruled: the copy sits beside the file in the game folder under
-    a name that does not end in `.ini` (so neither the game nor `pickCharacterFiles` reads it), and
-    a further copy is kept before each later write. Needs the owner's ruling (the standing ruling of
-  2026-10-13 lets the app READ the game's ini, nothing more).
+  - **Owner ruling (2026-11-20: "Original copy and last version. Dated or something yeah in
+    folder. Build it"):** two copies, in the game folder beside the ini, each with its date in the
+    name: the ORIGINAL (made once, never replaced) and the LAST (the file just before the latest
+    write; the one before it is removed). "Build it" is taken as the word to build this step, and
+    so as leave for the app to write `[Socials]` in a character ini. Nothing else in the game
+    folder is written: not the `UI_` file, not the hotbar sections.
+  - Built before the in-game tests, so what the game does with the file is still unproven: the
+    screen says so, and the write is refused while the game runs.
 - **P3:** keep hotbar buttons pointing at a macro that moved slot; copy a set between loadouts in
   one step; a share code between players.
 
