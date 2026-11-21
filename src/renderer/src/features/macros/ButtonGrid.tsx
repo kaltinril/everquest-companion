@@ -3,6 +3,8 @@
 
 import { type DragEvent, type JSX, useRef, useState } from 'react'
 import { Box, Button, Chip, Stack, Typography } from '@mui/material'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
 import type { GridButton } from '@shared/macros/buttons'
 import { firstLine } from '@shared/macros/library'
 import { MARK_COLOR, MONO_SX } from './macroParts'
@@ -16,6 +18,8 @@ interface CellProps {
   target: boolean
   /** The game's copy of this button changed too, and the player's is the one kept. */
   clash: boolean
+  /** While selecting: whether this button is selected. Null when not selecting. */
+  check: boolean | null
   onPick: () => void
   drag: DragHandlers
 }
@@ -64,21 +68,27 @@ function cellLabel(cell: GridButton, clash: boolean): string {
   return clash ? `${base}, changed in game too` : base
 }
 
-function Cell({ cell, picked, lifted, target, clash, onPick, drag }: CellProps): JSX.Element {
+/** The check mark a filled button carries while buttons are being selected. */
+function CellCheck({ check }: { check: boolean }): JSX.Element {
+  return check ? <CheckCircleIcon fontSize="small" color="primary" data-testid="macro-slot-check" /> : <RadioButtonUncheckedIcon fontSize="small" color="disabled" />
+}
+
+function Cell({ cell, picked, lifted, target, clash, check, onPick, drag }: CellProps): JSX.Element {
   const { slot, mark } = cell
   const filled = cell.macro !== null
   /** Picked, or about to take a dragged button: drawn with the heavier border. */
-  const strong = picked || target
+  const strong = picked || target || check === true
   return (
     <Button
       variant="outlined"
-      color={picked ? 'primary' : 'inherit'}
+      color={picked || check === true ? 'primary' : 'inherit'}
+      disabled={check !== null && !filled}
       onClick={onPick}
       aria-label={cellLabel(cell, clash)}
-      aria-pressed={picked}
+      aria-pressed={check ?? picked}
       data-testid="macro-slot"
       data-mark={mark ?? 'same'}
-      draggable={filled}
+      draggable={filled && check === null}
       onDragStart={(e) => {
         drag.start(e, slot)
       }}
@@ -111,7 +121,10 @@ function Cell({ cell, picked, lifted, target, clash, onPick, drag }: CellProps):
         <Typography variant="caption" color="text.secondary">
           {cell.button}
         </Typography>
-        {mark !== null && <Chip size="small" variant="outlined" color={MARK_COLOR[mark]} label={mark} data-testid="macro-slot-mark" sx={{ height: 20 }} />}
+        <Stack direction="row" spacing={0.5} alignItems="center">
+          {mark !== null && <Chip size="small" variant="outlined" color={MARK_COLOR[mark]} label={mark} data-testid="macro-slot-mark" sx={{ height: 20 }} />}
+          {check !== null && filled && <CellCheck check={check} />}
+        </Stack>
       </Stack>
       <CellBody cell={cell} />
       {clash && (
@@ -128,12 +141,14 @@ interface GridProps {
   selected: string | null
   /** The slots changed both in the game and in the app. */
   clashes: readonly string[]
+  /** The selected slots while selecting; null when not selecting. */
+  checked: readonly string[] | null
   onPick: (slot: string) => void
   /** A filled button was dropped on another button of the page. */
   onMove: (from: string, to: string) => void
 }
 
-export function ButtonGrid({ buttons, selected, clashes, onPick, onMove }: GridProps): JSX.Element {
+export function ButtonGrid({ buttons, selected, clashes, checked, onPick, onMove }: GridProps): JSX.Element {
   // The slot being dragged is read by the drop handlers at once, so it is a ref; the two states
   // only draw it.
   const from = useRef<string | null>(null)
@@ -181,6 +196,7 @@ export function ButtonGrid({ buttons, selected, clashes, onPick, onMove }: GridP
           lifted={cell.slot === lifted}
           target={cell.slot === over}
           clash={clashes.includes(cell.slot)}
+          check={checked === null ? null : checked.includes(cell.slot)}
           drag={drag}
           onPick={() => {
             onPick(cell.slot)

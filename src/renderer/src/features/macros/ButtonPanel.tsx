@@ -10,7 +10,7 @@ import { BUTTONS_PER_PAGE } from '@shared/macros/limits'
 import { assignSlot } from '@shared/macros/sets'
 import { slotKey } from '@shared/macros/socials'
 import { macrosToText } from '@shared/macros/text'
-import type { Macro, MacroSet } from '@shared/macros/types'
+import type { CharacterFileMacros, Macro, MacroSet } from '@shared/macros/types'
 import { MacroEditor } from './MacroEditor'
 import { MacroPicker } from './MacroPicker'
 import { Quiet } from './macroParts'
@@ -114,6 +114,7 @@ function AlsoOn({ store, set, cell, macro }: Picked & { macro: Macro }): JSX.Ele
 }
 
 interface FilledProps extends Picked {
+  files: readonly CharacterFileMacros[]
   macro: Macro
   pages: PageTab[]
   focusName: boolean
@@ -121,7 +122,7 @@ interface FilledProps extends Picked {
 }
 
 /** A filled button: its macro's editor, under what can be done with the macro on this button. */
-function FilledPane({ store, set, cell, page, macro, pages, focusName, onGo }: FilledProps): JSX.Element {
+function FilledPane({ store, files, set, cell, page, macro, pages, focusName, onGo }: FilledProps): JSX.Element {
   const ui = useMacroUi()
   const [mode, setMode] = useState<'edit' | 'replace' | 'move'>('edit')
   const where = `page ${String(page)}, button ${String(cell.button)}`
@@ -139,6 +140,7 @@ function FilledPane({ store, set, cell, page, macro, pages, focusName, onGo }: F
         </Stack>
         <MacroPicker
           store={store}
+          files={files}
           onPick={(id) => {
             store.change((current) => assignSlot(current, set.id, cell.slot, id))
             edit()
@@ -202,7 +204,7 @@ function FilledPane({ store, set, cell, page, macro, pages, focusName, onGo }: F
 }
 
 /** An empty button: a new macro made right on it, or one of the library's put there. */
-function EmptyPane({ store, set, cell, page, onFresh }: Picked & { onFresh: (macroId: string) => void }): JSX.Element {
+function EmptyPane({ store, files, set, cell, page, onFresh }: Picked & { files: readonly CharacterFileMacros[]; onFresh: (macroId: string) => void }): JSX.Element {
   const create = (): void => {
     const made = placeNewMacro(store.library, set.id, cell.slot)
     if (made.macro === null) return
@@ -225,6 +227,7 @@ function EmptyPane({ store, set, cell, page, onFresh }: Picked & { onFresh: (mac
       </Stack>
       <MacroPicker
         store={store}
+        files={files}
         onPick={(id) => {
           store.change((current) => assignSlot(current, set.id, cell.slot, id))
         }}
@@ -235,6 +238,8 @@ function EmptyPane({ store, set, cell, page, onFresh }: Picked & { onFresh: (mac
 
 interface PanelProps {
   store: MacroStore
+  /** Every character file of the game folder: where the pick list says a macro sits. */
+  files: readonly CharacterFileMacros[]
   set: MacroSet
   /** The picked button; null when none is. */
   cell: GridButton | null
@@ -249,13 +254,13 @@ interface PanelProps {
   onGo: (page: number, slot: string) => void
 }
 
-export function ButtonPanel({ store, set, cell, page, pages, hint, fresh, onFresh, onGo }: PanelProps): JSX.Element {
+export function ButtonPanel({ store, files, set, cell, page, pages, hint, fresh, onFresh, onGo }: PanelProps): JSX.Element {
   let body: JSX.Element
   if (cell === null) body = <Quiet testid="macro-panel-hint">{hint}</Quiet>
-  else if (cell.macro === null) body = <EmptyPane key={cell.slot} store={store} set={set} cell={cell} page={page} onFresh={onFresh} />
+  else if (cell.macro === null) body = <EmptyPane key={cell.slot} store={store} files={files} set={set} cell={cell} page={page} onFresh={onFresh} />
   else {
     body = (
-      <FilledPane key={cell.slot} store={store} set={set} cell={cell} page={page} macro={cell.macro} pages={pages} focusName={cell.macro.id === fresh} onGo={onGo} />
+      <FilledPane key={cell.slot} store={store} files={files} set={set} cell={cell} page={page} macro={cell.macro} pages={pages} focusName={cell.macro.id === fresh} onGo={onGo} />
     )
   }
   return (

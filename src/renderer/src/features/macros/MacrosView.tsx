@@ -11,6 +11,7 @@ import { Alert, Box, Stack, Tab, Tabs, Typography } from '@mui/material'
 import { historyKey } from '@shared/macros/history'
 import { mergeGameFiles, mergeText } from '@shared/macros/gameMerge'
 import { BUTTONS_PER_PAGE, LINES, LINE_MAX } from '@shared/macros/limits'
+import type { CharacterFileMacros } from '@shared/macros/types'
 import type { View } from '../../appViews'
 import { formatTime } from '../../lib/formatDate'
 import { useRawPref } from '../combat/useCombatPrefs'
@@ -25,6 +26,8 @@ import { useMacroLibrary, type MacroStore } from './useMacroLibrary'
 const SECTION_KEY = 'eq.macros.section'
 /** The character last picked (shared `characterFileKey`). */
 const CHARACTER_KEY = 'eq.macros.character'
+
+const NO_FILES: readonly CharacterFileMacros[] = []
 
 const LIMITS_NOTE = `Limits shown (${String(LINES)} lines, ${String(LINE_MAX)} characters, ${String(BUTTONS_PER_PAGE)} buttons a page) are not all confirmed in game yet`
 
@@ -117,6 +120,7 @@ function Sections({ store, game, section, onSection }: SectionsProps): JSX.Eleme
     return (
       <LibrarySection
         store={store}
+        files={game.reply?.files ?? NO_FILES}
         selected={macroId}
         onSelect={setMacroId}
         onPlace={(id) => {

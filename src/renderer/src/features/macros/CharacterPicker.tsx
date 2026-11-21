@@ -5,9 +5,12 @@
 import type { JSX } from 'react'
 import { Box, Button, Chip, Stack, TextField, Typography } from '@mui/material'
 import { type CharacterGroup, LOADOUT_LABEL_MAX, groupCharacters, loadoutLabel, loadoutText, loadoutsCaption, newestLoadout, setLoadoutLabel } from '@shared/macros/characters'
+import { usedButtons, usedText } from '@shared/macros/groups'
+import { chosenSet } from '@shared/macros/sets'
 import { characterFileKey } from '@shared/macros/socials'
 import type { CharacterFileMacros } from '@shared/macros/types'
 import { formatDateTime } from '../../lib/formatDate'
+import { Tooltip } from '../../lib/Tooltip'
 import type { MacroStore } from './useMacroLibrary'
 
 interface PickerProps {
@@ -92,11 +95,19 @@ function macrosText(count: number): string {
 
 /** What is known of the picked loadout, and the name the player gives it (the game writes none). */
 function LoadoutLine({ store, file }: { store: MacroStore; file: CharacterFileMacros }): JSX.Element {
+  const set = chosenSet(store.library, characterFileKey(file))
   return (
     <Stack direction="row" spacing={2} alignItems="center" useFlexGap flexWrap="wrap" data-testid="macro-loadout-detail">
       <Typography variant="body2" color="text.secondary">
         Loadout {file.loadout}: {macrosText(file.macros.length)} in the game, file changed {formatDateTime(file.mtimeMs)}
       </Typography>
+      {set !== null && (
+        <Tooltip title="The game's real button limit is not confirmed; one player reports 100.">
+          <Typography variant="body2" color="text.secondary" tabIndex={0} data-testid="macro-buttons-used">
+            {usedText(usedButtons(store.library, set))}
+          </Typography>
+        </Tooltip>
+      )}
       <TextField
         size="small"
         variant="standard"

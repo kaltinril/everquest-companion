@@ -1,13 +1,14 @@
 // macros/LibrarySection.tsx — the Library section: every macro the app keeps, with a search box,
 // tag chips, New and Paste on the left and the picked macro's editor on the right.
 
-import { type JSX, useState } from 'react'
+import { type JSX, useMemo, useState } from 'react'
 import { Box, Button, List, Paper, Stack, TextField, Typography } from '@mui/material'
 import { usedOnText } from '@shared/macros/buttons'
 import { addMacro, findMacro, importGameMacros, newMacro, systemMint } from '@shared/macros/library'
-import { filterMacros } from '@shared/macros/tags'
 import { parseMacroText } from '@shared/macros/text'
+import type { CharacterFileMacros } from '@shared/macros/types'
 import { validateMacro } from '@shared/macros/validate'
+import { type HolderIndex, holdersText, macroHolders, pickList } from '@shared/macros/where'
 import { SearchField } from '../../lib/SearchField'
 import { LibraryActions, MacroEditor } from './MacroEditor'
 import { MONO_SX, MacroRow, Quiet, TagFilter, TwoPane, UndoRedo } from './macroParts'
@@ -18,6 +19,8 @@ const PASTE_PLACEHOLDER = 'Page3Button1Name=Assist\nPage3Button1Color=0\nPage3Bu
 
 interface LibraryProps {
   store: MacroStore
+  /** Every character file of the game folder: where each row says its macro sits. */
+  files: readonly CharacterFileMacros[]
   selected: string | null
   onSelect: (id: string | null) => void
   /** Go to the Characters section with a macro ready to put on a button. */
@@ -73,13 +76,14 @@ function PasteBox({ store, onSelect, onClose }: { store: MacroStore; onSelect: (
   )
 }
 
-interface ListProps extends Omit<LibraryProps, 'onPlace'> {
+interface ListProps extends Omit<LibraryProps, 'onPlace' | 'files'> {
   query: string
   tags: string[]
+  holders: HolderIndex
 }
 
-function MacroList({ store, selected, onSelect, query, tags }: ListProps): JSX.Element {
-  const rows = filterMacros(store.library.macros, query, tags)
+function MacroList({ store, selected, onSelect, query, tags, holders }: ListProps): JSX.Element {
+  const rows = pickList(store.library.macros, { query, tags, from: '', holders })
   if (store.library.macros.length === 0) return <Quiet testid="macros-empty">No macros yet. Make one, or paste some in.</Quiet>
   if (rows.length === 0) return <Quiet testid="macros-no-match">No macro matches. Clear the search or the tags.</Quiet>
   return (
@@ -92,6 +96,7 @@ function MacroList({ store, selected, onSelect, query, tags }: ListProps): JSX.E
           testid="macro-row"
           toCheck={validateMacro(m).length}
           showTags
+          where={holdersText(holders, m.id)}
           onPick={() => {
             onSelect(m.id)
           }}
@@ -101,14 +106,15 @@ function MacroList({ store, selected, onSelect, query, tags }: ListProps): JSX.E
   )
 }
 
-export function LibrarySection({ store, selected, onSelect, onPlace }: LibraryProps): JSX.Element {
+export function LibrarySection({ store, files, selected, onSelect, onPlace }: LibraryProps): JSX.Element {
   const [query, setQuery] = useState('')
   const [tags, setTags] = useState<string[]>([])
   const [pasting, setPasting] = useState(false)
   /** The macro New just made: its name box takes the focus once. */
   const [fresh, setFresh] = useState<string | null>(null)
   const macro = findMacro(store.library, selected)
-  const shown = filterMacros(store.library.macros, query, tags).length
+  const holders = useMemo(() => macroHolders(store.library, files), [store.library, files])
+  const shown = pickList(store.library.macros, { query, tags, from: '', holders }).length
   const create = (): void => {
     const made = newMacro(systemMint, { name: 'New macro' })
     store.change((current) => addMacro(current, made))
@@ -126,7 +132,7 @@ export function LibrarySection({ store, selected, onSelect, onPlace }: LibraryPr
       <SearchField
         query={query}
         onChange={setQuery}
-        placeholder="Search by name, command, tag or note"
+        placeholder="Search by name, command, tag, note or character"
         testid="macros-search"
         clearTestid="macros-search-clear"
         ariaLabel="Search macros"
@@ -163,7 +169,7 @@ export function LibrarySection({ store, selected, onSelect, onPlace }: LibraryPr
         />
       )}
       <TagFilter store={store} tags={tags} onTags={setTags} />
-      <MacroList store={store} selected={selected} onSelect={pick} query={query} tags={tags} />
+      <MacroList store={store} selected={selected} onSelect={pick} query={query} tags={tags} holders={holders} />
     </>
   )
   const right =
