@@ -12,6 +12,7 @@ import { rowRankLabel } from '@shared/buffTimers'
 import type { EstimateState } from './format'
 import {
   fmtDuration,
+  fmtElapsed,
   remainingFraction,
   classAccent,
   estimateChipLabel,
@@ -214,7 +215,7 @@ export const ActiveRow = memo(function ActiveRow({ buff, elapsedSec }: { buff: A
         {/* One line, never squeezed: a long spell name wraps by itself and this stays whole (it
             used to break "8s elapsed" in two and make the card taller than its neighbours). */}
         <Typography variant="caption" color="text.secondary" data-testid="buff-elapsed" sx={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
-          {fmtDuration(elapsed)} elapsed
+          {fmtElapsed(elapsed)} elapsed
         </Typography>
       </Stack>
 

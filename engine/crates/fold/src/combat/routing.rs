@@ -1138,7 +1138,7 @@ fn infer_summoned_pet(st: &mut EngineState, attacker: &str, target: &str, ts: i6
         return;
     }
     // Stamped whatever it swung at: a pet seen before the cast is nobody's new pet.
-    st.ally.watch.note_unbound(&key, ts);
+    let since = st.ally.watch.note_unbound(&key, ts);
     if !st.is_engaged_hostile(&id_key_ref(target)) {
         return;
     }
@@ -1149,7 +1149,7 @@ fn infer_summoned_pet(st: &mut EngineState, attacker: &str, target: &str, ts: i6
     };
     let to = ally_pet_source(&bind);
     let why = format!("first acted after {}'s pet summon", bind.charmer);
-    st.rekey_other(&key, &to, &why);
+    st.rekey_other(&key, &to, &why, Some(since));
     st.log_lazy(ts, "charm", "info", || {
         format!(
             "⚡ {attacker} first acted after {}'s pet summon - crediting its damage to them \
@@ -1167,7 +1167,21 @@ fn note_ally_pet_damage_evidence(st: &mut EngineState, ev: &DamageEvent<'_>) {
     if ev.dtype == "dot" && id_key_ref(ev.target) == "you" {
         return;
     }
+    // A pet's own spell landing on itself is one pet, not two: EQ prints a lifetap as `Zarartik hit
+    // Zarartik for 6 points of magic damage by Lifebite.` Read as a twin it made the bind ambiguous
+    // for good, so the pet was credited nothing from then on, and no `/pet leader` could bring it
+    // back (owner, 2026-11-20: Malkil's Zarartik). It still proves the pet is here.
+    if lands_on_its_caster(ev) {
+        st.ally.note_activity(&id_key_ref(ev.attacker), ev.ts);
+        return;
+    }
     note_ally_pet_evidence(st, ev.attacker, ev.target, ev.ts);
+}
+
+/// A spell, tick or shield whose attacker and target are one name. A melee swing is not: that is
+/// the line that does prove a second creature of the same name.
+fn lands_on_its_caster(ev: &DamageEvent<'_>) -> bool {
+    matches!(ev.dtype, "spell" | "dot" | "ds") && id_key_ref(ev.attacker) == id_key_ref(ev.target)
 }
 
 /// What one swing by a third party's charm pet proves — read off every attributed and every ignored
@@ -1223,6 +1237,10 @@ fn note_ally_pet_evidence(st: &mut EngineState, attacker: &str, target: &str, ts
 /// every side effect it deliberately does not have.
 fn route_ally_pet_damage(st: &mut EngineState, ev: &DamageEvent<'_>) {
     if st.ally.idle() {
+        return;
+    }
+    // Damage a pet's lifetap does to the pet itself is not damage it dealt.
+    if lands_on_its_caster(ev) {
         return;
     }
     let Some(bind) = st.ally.creditable(&id_key_ref(ev.attacker)) else {

@@ -39,8 +39,18 @@ impl Agg {
 impl EngineState {
     /// `retract_other`'s twin for a bind that names the row it belongs to: the same guards (a name the
     /// roster admitted is a person; a name never recorded has nothing to move), then the recorded row
-    /// moves to `to` in the zone session, the open fight and every finished one.
-    pub fn rekey_other(&mut self, name_key: &str, to: &SourceRef, why: &str) {
+    /// moves to `to` in the zone session, the open fight and every finished one, and in the CLOSED
+    /// zone stays from `since` on: when this pet first acted with no owner (`SummonWatch`).
+    ///
+    /// A stay before `since` is left alone, because summoned-pet names come round and that row
+    /// was another pet's. `None` is a pet never seen acting unowned, which has no closed stay.
+    pub fn rekey_other(
+        &mut self,
+        name_key: &str,
+        to: &SourceRef,
+        why: &str,
+        since: Option<i64>,
+    ) {
         if name_key.is_empty() || self.roster.admitted.contains(name_key) {
             return;
         }
@@ -51,6 +61,9 @@ impl EngineState {
         // recorded again each time it comes round (`routing.rs recordable_attacker`), so there can
         // be a row to move on a second bind too.
         self.others.note_pet(name_key);
+        // Before the check below: a pet that has not swung yet in THIS stay has no row here, and
+        // its closed stays are still its own.
+        self.move_in_closed_stays(&id, to, since);
         if !recorded {
             return;
         }
@@ -84,6 +97,20 @@ impl EngineState {
         moved
     }
 
+    /// The same move in the zone stays already closed. Without it a pet that named its leader after
+    /// a zone line kept its damage under "owner unknown" in every earlier stay, which the Group
+    /// view hides (owner, 2026-11-20: 162k of Malkil's Zarartik's 204k).
+    fn move_in_closed_stays(&mut self, from_id: &str, to: &SourceRef, since: Option<i64>) {
+        let Some(since) = since else { return };
+        for stay in &mut self.zone_history {
+            // The last line booked in the stay by anyone. `last_ts` is the last of OURS, and a
+            // pet can swing after your last hit.
+            if stay.agg.cur.0 >= since {
+                stay.agg.move_out(from_id, to);
+            }
+        }
+    }
+
     /// A guessed owner (`AllyVia::Summon`) has been replaced by a statement: the guessed row goes
     /// to the row the statement names. `guess` is the bind as it was before the statement.
     pub fn settle_guessed_pet(&mut self, guess: &super::ally::AllyBind, to: &SourceRef) {
@@ -91,6 +118,8 @@ impl EngineState {
             return;
         }
         let from = super::routing::ally_pet_source(guess);
+        // A guessed row is this owner's and this pet's by its id, so every stay holding it moves.
+        self.move_in_closed_stays(&from.id, to, Some(i64::MIN));
         if self.move_recorded(&from.id, to) {
             let ts = self.last_activity_ts;
             self.log_lazy(ts, "charm", "info", || {

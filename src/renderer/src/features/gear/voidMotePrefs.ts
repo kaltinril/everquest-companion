@@ -176,8 +176,10 @@ export function moteEmptyText(s: MoteEmptyState): string {
   if (!s.hasRows) return 'The item data could not be read, so nothing can be ranked.'
   if (!s.inventoryReady) return 'Reading your inventory…'
   if (!s.hasDump) return `No inventory dump for this character yet. Type ${s.command} in game.`
-  if (s.unranked > 0) return 'Every worn piece the item data knows is already +10.'
-  return 'Nothing you wear can go higher: every piece the item data knows is already +10.'
+  // An empty list with a dump proves only this much: nothing it could rank is below +10. It may be
+  // that everything is +10, or that nothing is worn at all, so neither is claimed.
+  if (s.unranked > 0) return 'Nothing to rank: every worn piece below +10 is missing from the item data.'
+  return 'Nothing to rank: no worn piece is below +10.'
 }
 
 /** `Not ranked: Bracer of Hate +8 (not in the item data)`: the worn items the list leaves out; `''` for none. */
