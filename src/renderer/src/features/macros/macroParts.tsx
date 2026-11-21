@@ -11,6 +11,7 @@ import { firstLine } from '@shared/macros/library'
 import { tagList, toggleTag, usedTagList } from '@shared/macros/tags'
 import type { Macro } from '@shared/macros/types'
 import { Tooltip } from '../../lib/Tooltip'
+import { ColorMark } from './MacroColor'
 import type { MacroStore } from './useMacroLibrary'
 
 export const MONO_SX = { fontFamily: 'monospace', fontSize: 13 } as const
@@ -55,22 +56,32 @@ interface MacroRowProps {
   /** How many warnings the macro has; a chip says so when it is not 0. */
   toCheck?: number
   showTags?: boolean
+  /** Which characters and loadouts hold it, in a few words. */
+  where?: string
 }
 
 /** One library macro in a list: its name, its first command, and optionally its tags. */
-export function MacroRow({ macro, selected, onPick, testid, toCheck = 0, showTags = false }: MacroRowProps): JSX.Element {
+export function MacroRow({ macro, selected, onPick, testid, toCheck = 0, showTags = false, where }: MacroRowProps): JSX.Element {
   const line = firstLine(macro)
   return (
     <ListItemButton selected={selected} onClick={onPick} data-testid={testid} sx={{ display: 'block', borderRadius: 1, py: 0.75 }}>
       <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
-        <Typography variant="body2" noWrap sx={{ fontWeight: 600 }}>
-          {macro.name === '' ? 'Unnamed' : macro.name}
-        </Typography>
+        <Stack direction="row" spacing={0.5} alignItems="center" sx={{ minWidth: 0 }}>
+          <ColorMark color={macro.color} />
+          <Typography variant="body2" noWrap sx={{ fontWeight: 600 }}>
+            {macro.name === '' ? 'Unnamed' : macro.name}
+          </Typography>
+        </Stack>
         {toCheck > 0 && <Chip size="small" color="warning" variant="outlined" label={`${String(toCheck)} to check`} data-testid="macro-row-to-check" />}
       </Stack>
       <Typography variant="body2" color="text.secondary" noWrap sx={MONO_SX}>
         {line === '' ? 'no commands yet' : line}
       </Typography>
+      {where !== undefined && (
+        <Typography variant="caption" color="text.secondary" noWrap component="div" data-testid="macro-row-where">
+          {where}
+        </Typography>
+      )}
       {showTags && macro.tags.length > 0 && (
         <Stack direction="row" spacing={0.5} useFlexGap flexWrap="wrap" sx={{ mt: 0.5 }}>
           {macro.tags.map((tag) => (

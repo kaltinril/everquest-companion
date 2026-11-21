@@ -3,15 +3,18 @@
 // the library (useMacroLibrary saves it); the warnings are shared/macros/validate.ts and never
 // stop an edit.
 
-import { type JSX, type ReactNode, useState } from 'react'
-import { Box, Button, Chip, InputAdornment, MenuItem, Stack, TextField, Typography } from '@mui/material'
+import { type JSX, type ReactNode, useRef, useState } from 'react'
+import { Box, Button, Chip, InputAdornment, Stack, TextField, Typography } from '@mui/material'
 import { duplicateMacro, removeMacro, restoreMacro, systemMint, updateMacro } from '@shared/macros/library'
-import { COLOR_MAX, COLOR_MIN, LINES, LINE_MAX } from '@shared/macros/limits'
+import { LINES, LINE_MAX, NAME_MAX } from '@shared/macros/limits'
+import { type SpellNames, insertSpellId, memSpellHint } from '@shared/macros/memSpell'
 import { addOwnTag, normalizeTag, tagList, toggleTag } from '@shared/macros/tags'
 import { macrosToText } from '@shared/macros/text'
 import type { Macro } from '@shared/macros/types'
 import { lineHint, validateMacro, type Warning } from '@shared/macros/validate'
+import { ColorPicker } from './MacroColor'
 import { MONO_SX } from './macroParts'
+import { SpellFinder, useSpellNames } from './SpellFinder'
 import { useMacroUi } from './macroUi'
 import type { MacroStore } from './useMacroLibrary'
 
@@ -20,8 +23,6 @@ type Patch = (patch: Partial<Omit<Macro, 'id'>>, field?: string) => void
 
 /** A field's helper text is a warning, never an error: it is drawn in the warning colour. */
 const WARNING_HELPER = { formHelperText: { sx: { color: 'warning.main' } } } as const
-
-const COLORS = Array.from({ length: COLOR_MAX - COLOR_MIN + 1 }, (_, i) => COLOR_MIN + i)
 
 interface EditorProps {
   store: MacroStore
@@ -101,10 +102,8 @@ export function LibraryActions({ store, macro, onSelect, onPlace }: LibraryActio
 function NameAndColor({ macro, patch, warnings, focusName }: { macro: Macro; patch: Patch; warnings: Warning[]; focusName: boolean }): JSX.Element {
   const nameWarning = warnings.find((w) => w.field === 'name')?.text
   const colorWarning = warnings.find((w) => w.field === 'color')?.text
-  // A colour number the game's twenty buttons do not have still shows, with its warning.
-  const colors = COLORS.includes(macro.color) ? COLORS : [...COLORS, macro.color]
   return (
-    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'minmax(0, 1fr)', sm: 'minmax(0, 1fr) 200px' }, gap: 1.5 }}>
+    <Stack spacing={1.5}>
       <TextField
         size="small"
         label="Name"
@@ -117,33 +116,51 @@ function NameAndColor({ macro, patch, warnings, focusName }: { macro: Macro; pat
           patch({ name: e.target.value }, 'name')
         }}
         helperText={nameWarning}
-        slotProps={WARNING_HELPER}
+        slotProps={{
+          ...WARNING_HELPER,
+          // A longer stored name still shows whole: maxLength only stops more being typed.
+          htmlInput: { maxLength: NAME_MAX },
+          input: {
+            endAdornment: (
+              <InputAdornment position="end">
+                <Typography variant="caption" color="text.secondary" data-testid="macro-name-count">
+                  {macro.name.length}/{NAME_MAX}
+                </Typography>
+              </InputAdornment>
+            )
+          }
+        }}
         data-testid="macro-name"
       />
-      <TextField
-        select
-        size="small"
-        label={`Text colour (${String(COLOR_MIN)} to ${String(COLOR_MAX)})`}
+      <ColorPicker
         value={macro.color}
-        onChange={(e) => {
-          patch({ color: Number(e.target.value) })
+        warning={colorWarning}
+        onPick={(color) => {
+          patch({ color })
         }}
-        helperText={colorWarning}
-        slotProps={WARNING_HELPER}
-        data-testid="macro-color"
-      >
-        {colors.map((n) => (
-          <MenuItem key={n} value={n}>
-            {n}
-          </MenuItem>
-        ))}
-      </TextField>
-    </Box>
+      />
+    </Stack>
   )
 }
 
-function LineField({ index, value, onChange }: { index: number; value: string; onChange: (value: string) => void }): JSX.Element {
+interface LineFieldProps {
+  index: number
+  value: string
+  onChange: (value: string) => void
+  /** What the game's spell file says about the ids on screen. */
+  known: SpellNames
+  /** The caret or selection moved in this line. */
+  onCursor: (start: number, end: number) => void
+}
+
+/** A warning first, then what a `/memspellslot` line memorizes, then what a pause does. */
+function shownHint(value: string, known: SpellNames): ReturnType<typeof lineHint> {
   const hint = lineHint(value)
+  return hint.text === '' ? (memSpellHint(value, known) ?? hint) : hint
+}
+
+function LineField({ index, value, onChange, known, onCursor }: LineFieldProps): JSX.Element {
+  const hint = shownHint(value, known)
   const n = String(index + 1)
   const htmlInput = { 'aria-label': `Line ${n}`, spellCheck: false, style: MONO_SX, 'data-testid': `macro-line-${n}` }
   return (
@@ -159,6 +176,10 @@ function LineField({ index, value, onChange }: { index: number; value: string; o
           placeholder="/command"
           onChange={(e) => {
             onChange(e.target.value)
+          }}
+          onSelect={(e) => {
+            const input = e.target as HTMLInputElement
+            onCursor(input.selectionStart ?? input.value.length, input.selectionEnd ?? input.value.length)
           }}
           slotProps={{
             htmlInput,
@@ -192,6 +213,17 @@ function CommandLines({ macro, patch, warnings }: { macro: Macro; patch: Patch; 
     lines[index] = value
     patch({ lines }, `line${String(index)}`)
   }
+  const known = useSpellNames(rows)
+  /** The command line last used and its caret: where a found spell id goes. */
+  const cursor = useRef<{ index: number; start: number; end: number } | null>(null)
+  const [canInsert, setCanInsert] = useState(false)
+  const putSpellId = (id: number): void => {
+    const at = cursor.current
+    if (at === null) return
+    const made = insertSpellId(rows.at(at.index) ?? '', at, id)
+    setLine(at.index, made.line)
+    cursor.current = { index: at.index, start: made.cursor, end: made.cursor }
+  }
   return (
     <Stack spacing={0.75}>
       <Typography variant="body2" color="text.secondary">
@@ -207,11 +239,17 @@ function CommandLines({ macro, patch, warnings }: { macro: Macro; patch: Patch; 
           key={i}
           index={i}
           value={value}
+          known={known}
           onChange={(next) => {
             setLine(i, next)
           }}
+          onCursor={(start, end) => {
+            cursor.current = { index: i, start, end }
+            setCanInsert(true)
+          }}
         />
       ))}
+      <SpellFinder canInsert={canInsert} onPick={putSpellId} />
     </Stack>
   )
 }

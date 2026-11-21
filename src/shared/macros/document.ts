@@ -4,7 +4,7 @@
 
 import { trimLines } from './socials'
 import { cleanTags } from './tags'
-import type { Macro, MacroLibrary, MacroSet } from './types'
+import type { GameMacro, Macro, MacroLibrary, MacroSet } from './types'
 
 export const MACRO_LIBRARY_VERSION = 1
 
@@ -54,11 +54,44 @@ function readList<T>(v: unknown, read: (item: unknown) => T | null): T[] {
   return out
 }
 
+function readGameMacro(v: unknown): GameMacro | null {
+  if (!isObject(v) || !Number.isInteger(v.page) || !Number.isInteger(v.button)) return null
+  return {
+    page: v.page as number,
+    button: v.button as number,
+    name: typeof v.name === 'string' ? v.name : '',
+    color: typeof v.color === 'number' && Number.isFinite(v.color) ? v.color : 0,
+    lines: trimLines(strings(v.lines))
+  }
+}
+
+/** What the game held, per file. An empty list is kept: it says the game held nothing. */
+function readSeen(v: unknown): Record<string, GameMacro[]> {
+  const out: Record<string, GameMacro[]> = {}
+  if (!isObject(v)) return out
+  for (const [key, list] of Object.entries(v)) {
+    if (Array.isArray(list)) out[key] = readList(list, readGameMacro)
+  }
+  return out
+}
+
+function readConflicts(v: unknown): Record<string, string[]> {
+  const out: Record<string, string[]> = {}
+  if (!isObject(v)) return out
+  for (const [key, list] of Object.entries(v)) {
+    const slots = strings(list)
+    if (slots.length > 0) out[key] = slots
+  }
+  return out
+}
+
 /** The library a parsed document holds, or null when it is not one this build can read. */
 export function readLibrary(raw: unknown): MacroLibrary | null {
   if (!isObject(raw) || raw.version !== MACRO_LIBRARY_VERSION) return null
   if (!Array.isArray(raw.macros) || !Array.isArray(raw.sets)) return null
   const labels = stringRecord(raw.labels)
+  const seen = readSeen(raw.seen)
+  const conflicts = readConflicts(raw.conflicts)
   return {
     version: 1,
     macros: readList(raw.macros, readMacro),
@@ -66,6 +99,8 @@ export function readLibrary(raw: unknown): MacroLibrary | null {
     chosen: stringRecord(raw.chosen),
     tags: cleanTags(strings(raw.tags)),
     // Left out when empty, so a library saved before loadouts had names reads back as it was.
-    ...(Object.keys(labels).length > 0 ? { labels } : {})
+    ...(Object.keys(labels).length > 0 ? { labels } : {}),
+    ...(Object.keys(seen).length > 0 ? { seen } : {}),
+    ...(Object.keys(conflicts).length > 0 ? { conflicts } : {})
   }
 }

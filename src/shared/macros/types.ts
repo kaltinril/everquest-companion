@@ -37,6 +37,10 @@ export interface MacroLibrary {
   tags: string[]
   /** Character file key to the name the player gave that loadout (characters.ts). */
   labels?: Record<string, string>
+  /** Character file key to what the game held when the app last read it (gameMerge.ts). */
+  seen?: Record<string, GameMacro[]>
+  /** Character file key to the slots changed both in the game and in the app (gameMerge.ts). */
+  conflicts?: Record<string, string[]>
 }
 
 /** One slot of a character file's `[Socials]` section. */
@@ -53,9 +57,13 @@ export interface CharacterFile {
   loadout: number
 }
 
+/** `page:button` to how many of the game's hotbar buttons point at it (hotbars.ts). */
+export type HotbarSlots = Record<string, number>
+
 /** A character file as main read it. */
 export interface CharacterFileMacros extends CharacterFile {
   macros: GameMacro[]
+  hotbars: HotbarSlots
   mtimeMs: number
   /** What the file's bytes were when read; a send passes it back so a changed file is refused. */
   stamp: string

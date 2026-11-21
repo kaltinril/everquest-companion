@@ -3,8 +3,9 @@
 // the player is an Undo step (shared/macros/history.ts); an Undo or a Redo is saved like any other.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { type History, amend as amendHistory, canRedo, canUndo, record, redo as redoHistory, startHistory, undo as undoHistory } from '@shared/macros/history'
-import type { MacroLibrary } from '@shared/macros/types'
+import { absorbGameRead } from '@shared/macros/gameMerge'
+import { type History, canRedo, canUndo, record, redo as redoHistory, startHistory, undo as undoHistory } from '@shared/macros/history'
+import type { CharacterFileMacros, MacroLibrary } from '@shared/macros/types'
 
 /** A change is saved this long after the last one, so typing is one write, not one a key. */
 const SAVE_DELAY_MS = 400
@@ -18,8 +19,8 @@ export interface MacroStore {
    * the `field` it happens in, so a run of keys in one field is one step.
    */
   change: (update: Update, field?: string) => void
-  /** A change that is not the player's (the game's macros brought in): saved, but no Undo step. */
-  amend: (update: Update) => void
+  /** A read of the game's files merged in (gameMerge.ts): saved, but no Undo step. */
+  absorb: (files: readonly CharacterFileMacros[]) => void
   undo: () => void
   redo: () => void
   canUndo: boolean
@@ -103,9 +104,9 @@ export function useMacroLibrary(): MacroLibraryState {
     },
     [move]
   )
-  const amend = useCallback(
-    (update: Update) => {
-      move((current) => amendHistory(current, update(current.present)))
+  const absorb = useCallback(
+    (files: readonly CharacterFileMacros[]) => {
+      move((current) => absorbGameRead(current, files))
     },
     [move]
   )
@@ -117,8 +118,8 @@ export function useMacroLibrary(): MacroLibraryState {
   }, [move])
 
   const store = useMemo<MacroStore | null>(
-    () => (history === null ? null : { library: history.present, change, amend, undo, redo, canUndo: canUndo(history), canRedo: canRedo(history) }),
-    [history, change, amend, undo, redo]
+    () => (history === null ? null : { library: history.present, change, absorb, undo, redo, canUndo: canUndo(history), canRedo: canRedo(history) }),
+    [history, change, absorb, undo, redo]
   )
   return { store, loadFailed, saveFailed }
 }

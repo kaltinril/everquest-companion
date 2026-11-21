@@ -6,13 +6,16 @@
 import { type JSX, type ReactNode, useState } from 'react'
 import { Alert, Box, Button, Stack, Tab, Tabs } from '@mui/material'
 import { type PageTab, gameChanges, gridPage, moveSlot, pageTabs } from '@shared/macros/buttons'
+import { gameConflicts } from '@shared/macros/gameMerge'
 import { findMacro } from '@shared/macros/library'
+import { heldSelection } from '@shared/macros/groups'
 import { FIRST_EDITABLE_PAGE } from '@shared/macros/limits'
 import { assignSlot, chosenSet } from '@shared/macros/sets'
 import { characterFileKey } from '@shared/macros/socials'
 import type { CharacterFileMacros, GameFilesReason, MacroSet } from '@shared/macros/types'
 import { ButtonGrid } from './ButtonGrid'
 import { ButtonPanel } from './ButtonPanel'
+import { SelectToggle, SelectionBar, useSelection } from './ButtonSelection'
 import { CharacterPicker } from './CharacterPicker'
 import { GameBar } from './GameFileSend'
 import { CopyFromCharacter, LayoutsMenu } from './LayoutsMenu'
@@ -105,22 +108,35 @@ interface DetailProps extends Omit<CharactersProps, 'selected' | 'onSelect'> {
   set: MacroSet
 }
 
+/** What the panel beside the buttons says while none is open. */
+function panelHint(selecting: boolean, none: boolean): string {
+  if (selecting) return 'Click buttons to select them, on any page.'
+  return none ? 'No macros yet. Click a button to add one, or use Copy from character.' : 'Click a button to edit it.'
+}
+
 /** One character: its pages, the page's buttons, the picked button beside them, and the game bar. */
 function CharacterDetail({ store, game, file, files, set, spot, onSpot, placing, onPlaced }: DetailProps): JSX.Element {
   const writer = useGameWriter(file.file, game.reload)
   /** The macro New just made on a button: its name box takes the focus once. */
   const [fresh, setFresh] = useState<string | null>(null)
+  const selection = useSelection()
   const { library } = store
   const tabs = pageTabs(library, set, file.macros)
   const page = tabs.some((t) => t.page === spot.page) ? spot.page : FIRST_EDITABLE_PAGE
   const cells = gridPage(library, set, page, file.macros)
   const changes = gameChanges(library, set, file.macros)
+  const clashes = gameConflicts(library, characterFileKey(file))
   const toPlace = findMacro(library, placing)
+  const selected = heldSelection(library, set, selection.slots)
   const go = (nextPage: number, slot: string | null): void => {
     setFresh(null)
     onSpot({ page: nextPage, slot })
   }
   const pick = (slot: string): void => {
+    if (selection.on) {
+      selection.toggle(slot)
+      return
+    }
     go(page, slot)
     if (toPlace === null) return
     store.change((current) => assignSlot(current, set.id, slot, toPlace.id))
@@ -142,10 +158,18 @@ function CharacterDetail({ store, game, file, files, set, spot, onSpot, placing,
               go(next, null)
             }}
           >
+            <SelectToggle
+              selection={selection}
+              disabled={toPlace !== null}
+              onStart={() => {
+                go(page, null)
+              }}
+            />
             <CopyFromCharacter store={store} game={game} file={file} files={files} set={set} macros={changes.macros} />
             <LayoutsMenu store={store} game={game} file={file} files={files} set={set} macros={changes.macros} />
             <UndoRedo store={store} />
           </PageRow>
+          {selection.on && <SelectionBar store={store} file={file} files={files} set={set} page={page} selection={selection} selected={selected} />}
           {toPlace !== null && (
             <Alert
               severity="info"
@@ -160,14 +184,16 @@ function CharacterDetail({ store, game, file, files, set, spot, onSpot, placing,
             </Alert>
           )}
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 1fr) minmax(340px, 440px)' }, gap: 2, alignItems: 'start' }}>
-            <ButtonGrid buttons={cells} selected={spot.slot} onPick={pick} onMove={move} />
+            <ButtonGrid buttons={cells} selected={spot.slot} clashes={clashes} checked={selection.on ? selected : null} hotbars={file.hotbars} onPick={pick} onMove={move} />
             <ButtonPanel
               store={store}
               set={set}
               cell={cells.find((c) => c.slot === spot.slot) ?? null}
               page={page}
               pages={tabs}
-              hint={none ? 'No macros yet. Click a button to add one, or use Copy from character.' : 'Click a button to edit it.'}
+              hint={panelHint(selection.on, none)}
+              file={file}
+              files={files}
               fresh={fresh}
               onFresh={setFresh}
               onGo={go}
@@ -175,7 +201,7 @@ function CharacterDetail({ store, game, file, files, set, spot, onSpot, placing,
           </Box>
         </Stack>
       </Box>
-      <GameBar file={file} changes={changes} writer={writer} game={game} />
+      <GameBar file={file} changes={changes} clashes={clashes} writer={writer} game={game} />
     </Box>
   )
 }

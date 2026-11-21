@@ -294,6 +294,13 @@ test('text: both forms mixed, a second Name starts the next macro, plain text ha
   assert.deepEqual(parseMacroText(''), [])
 })
 
+test('a name over the 15 the game keeps is warned about, and the stored name is left whole', () => {
+  assert.deepEqual(codes({ name: 'abcdefghijklmno', color: 0, lines: [] }), [])
+  const long = { name: 'abcdefghijklmnop', color: 0, lines: [] }
+  assert.deepEqual(validateMacro(long).map((w) => [w.code, w.field, w.text]), [['name-long', 'name', 'The game keeps 15 characters of a name.']])
+  assert.equal(long.name, 'abcdefghijklmnop')
+})
+
 test('the stored document: read back whole, refused when it is not a version 1 library', () => {
   const { library, mint } = seeded()
   const made = setFromGameMacros(library, 'Main', GAME, mint)
