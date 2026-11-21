@@ -1,61 +1,40 @@
 // ============================================================================
-// THE ERROR REPORT, ADVERSARIALLY — the one telemetry event that carries text.
+// THE ERROR FINGERPRINT'S INPUTS, ADVERSARIALLY — the redactor, the frames, the hash.
 // ============================================================================
 //
-// `tests/telemetryContract.test.mts` pins the property every OTHER event has: no string in it
-// is anything but a closed-enum member. `errorReport` (JOS-100) is the exception the owner
-// ruled for — diagnosability over pure anonymity, holding one bright line: GAMEPLAY DATA NEVER
-// RIDES AUTOMATICALLY — so it needs its own suite, and this is it.
+// `src/shared/errorReport.ts` holds the three pure functions the LOCAL error log's fingerprint is
+// built from (JOS-100): the message redactor, the stack-frame parser and the fingerprint. They
+// were written for the error reports the usage-analytics service received; that service is
+// removed, and what this suite still pins is what the local budget (`errorBudget.ts`) rests on:
 //
-// The suite is organised as the three things that could go wrong:
-//   1. THE REDACTOR lets something through (real nasty messages, including the two the ticket
-//      named: an ENOENT carrying a Windows user path, and a parse error quoting a mob name).
-//   2. THE VALIDATOR accepts free text in a field (a bare path as a message, a function name
-//      with a space in it, an 11th frame, an unredacted message, a made-up breadcrumb kind).
-//   3. THE TWO COPIES DRIFT — the wire bounds restated in `telemetry.ts` and the producer
-//      bounds in `errorReport.ts`. (The breadcrumb VOCABULARY moved to its own suite in JOS-501 —
-//      `tests/breadcrumbVocabulary.test.mts`, the same ceiling and the same kind of cut that
-//      produced the sibling below.)
+//   1. THE REDACTOR lets nothing through (real nasty messages, including the two the ticket
+//      named: an ENOENT carrying a Windows user path, and a parse error quoting a mob name),
+//      and its output is printable ASCII within the length bound.
+//   2. THE FRAMES keep the bundle path and nothing above it.
+//   3. THE FINGERPRINT groups by name and top frames.
 //
-// ITS SIBLING IS `tests/errorReportLocation.test.mts`, which holds the same three questions asked
-// of everything JOS-111 added — the external frames, the component path, the message skeleton and
-// their own duplicated patterns. That is a SPLIT rather than a second opinion: this file had
-// reached the repo's 400-code-line ceiling and the repo's answer to that is a cut on the file's
-// own seam, not a widened threshold.
+// ITS SIBLING IS `tests/errorReportLocation.test.mts`, which asks the same of everything JOS-111
+// added: the external frames and the message skeleton.
 //
-// No Electron, no AWS, no network, no fixtures: this suite NEVER SKIPS.
+// No Electron, no network, no fixtures: this suite NEVER SKIPS.
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
-  errorCodeOf,
   errorFingerprint,
   errorNameOf,
-  BUNDLE_FILE_PATTERN,
   normalizeFrameFile,
   parseStackFrames,
   redactMessage,
   FINGERPRINT_FRAMES,
   MAX_ERROR_FRAMES,
-  MAX_FRAME_FUNC,
-  MAX_FRAME_POSITION,
   MAX_REDACTED_MESSAGE,
   type ErrorFrame
 } from '../src/shared/errorReport'
-import {
-  FRAME_FILE_RE,
-  MAX_ERROR_FRAMES_WIRE,
-  MAX_FRAME_FUNC_WIRE,
-  MAX_FRAME_POSITION_WIRE,
-  MAX_REDACTED_MESSAGE_WIRE,
-  REDACTED_MESSAGE_RE,
-  SESSION_AGE_MS_EDGES,
-  TELEMETRY_ERROR_VIEWS,
-  TELEMETRY_VIEWS,
-  type EvErrorReport
-} from '../src/shared/telemetry'
-import { validateTelemetryEvent } from '../src/shared/telemetryValidate'
-import { rollupBatch } from '../src/shared/telemetryRollup'
+
+/** What a redacted message must be: PRINTABLE ASCII ONLY, and at most `MAX_REDACTED_MESSAGE` of
+ *  it. An ESC, a NUL, a newline and a BiDi override are all outside the class. */
+const REDACTED_MESSAGE_RE = /^[\x20-\x7E]{0,200}$/
 
 const ch = (code: number): string => String.fromCharCode(code)
 const ESC = ch(0x1b)
@@ -279,229 +258,14 @@ test('the fingerprint groups by name and top frames, and ignores the varying par
   assert.equal(FINGERPRINT_FRAMES, 3)
 })
 
-test('errorNameOf / errorCodeOf refuse prose and fall back honestly', () => {
+test('errorNameOf refuses prose and falls back honestly', () => {
   assert.equal(errorNameOf('TypeError'), 'TypeError')
   assert.equal(errorNameOf('a Nisch Mas Mender'), 'Error', 'a name with spaces is prose')
   assert.equal(errorNameOf(undefined), 'Error')
-  assert.equal(errorCodeOf('ENOENT'), 'ENOENT')
-  assert.equal(errorCodeOf(-4058), '-4058')
-  assert.equal(errorCodeOf('no such file or directory'), undefined)
-  assert.equal(errorCodeOf(undefined), undefined)
 })
 
-// =========================================================================================
-// 4. THE VALIDATOR, ADVERSARIALLY
-// =========================================================================================
-
-/** A valid report, as the client would build one. Every negative below is one edit away from it. */
-function sample(over: Partial<EvErrorReport> = {}): Record<string, unknown> {
-  const frames = [
-    { file: 'out/main/pipeline.js', line: 120, col: 15, func: 'Object.foldEvent' },
-    { file: 'out/main/index.js', line: 44, col: 3, func: '<anonymous>' }
-  ]
-  return {
-    t: 'errorReport',
-    errorName: 'TypeError',
-    code: 'ENOENT',
-    redactedMessage: 'ENOENT: no such file or directory, open <path>',
-    frames,
-    fingerprint: errorFingerprint('TypeError', frames),
-    breadcrumbs: [
-      { kind: 'damage', offsetMs: 0 },
-      { kind: 'zone', offsetMs: 1_200 }
-    ],
-    view: 'combat',
-    sessionAgeBucket: 2,
-    mode: 'live',
-    count: 1,
-    ...over
-  }
-}
-
-const ok = (o: Record<string, unknown>): boolean => validateTelemetryEvent(o).ok
-function refused(o: Record<string, unknown>, field: string, why: string): void {
-  const res = validateTelemetryEvent(o)
-  assert.equal(res.ok, false, why)
-  if (!res.ok) assert.equal(res.field, field, `${why} — wrong field named: ${res.field}`)
-}
-
-test('the sample is valid and round-trips field for field', () => {
-  const res = validateTelemetryEvent(sample())
-  assert.equal(res.ok, true, res.ok ? '' : res.message)
-  if (res.ok) assert.deepEqual(res.value, sample() as unknown as EvErrorReport)
-})
-
-test('ADVERSARIAL: free text is refused in every field', () => {
-  // A MESSAGE THAT IS A BARE PATH — the headline case. It is not a fixed point of the redactor,
-  // so the server refuses it rather than repairing it: a repaired message is a message accepted
-  // from a client that is not running the code we think it is.
-  refused(
-    sample({ redactedMessage: 'C:\\Users\\jmoye\\AppData\\Roaming\\eqc\\alerts.json' }),
-    'redactedMessage',
-    'a bare Windows path as the message'
-  )
-  refused(
-    sample({ redactedMessage: "a mob said 'hello there'" }),
-    'redactedMessage',
-    'an unredacted quoted string'
-  )
-  refused(
-    sample({ redactedMessage: 'offset 1073741824' }),
-    'redactedMessage',
-    'an unredacted long number'
-  )
-  // …and a WHOLE LOG LINE, which is the bright line this feature is not allowed to cross. This
-  // assertion is the reason `EQ_LOG_LINE_RE` exists at all: a log line carries no path, no
-  // quotes and no long number, so before that arm was added it was a FIXED POINT of the
-  // redactor and sailed through this validator untouched. The suite found it, not a reviewer.
-  refused(
-    sample({ redactedMessage: '[Sat Aug 01 13:00:28 2026] You slash a rat for 12 points of damage.' }),
-    'redactedMessage',
-    'a log line as the message'
-  )
-  // control characters and invisibles, which is the wireSanitize pin applied to this field
-  for (const poison of [`${ESC}[2J`, `${ESC}]0;pwned${BEL}`, ch(0x00), ch(0x202e), '\n', '\t']) {
-    refused(sample({ redactedMessage: `broke${poison}` }), 'redactedMessage', JSON.stringify(poison))
-  }
-
-  // A FUNCTION NAME WITH SPACES IN IT is prose wearing a function's clothes.
-  refused(
-    sample({ frames: [{ file: 'out/main/a.js', line: 1, col: 1, func: 'a Nisch Mas Mender' }] }),
-    'frames[0].func',
-    'a function name with spaces'
-  )
-  // A FILE THAT IS NOT BUNDLE-RELATIVE. The anchor is the privacy property.
-  for (const file of [
-    'C:\\Users\\jmoye\\out\\main\\a.js',
-    '/home/josh/out/main/a.js',
-    '../out/main/a.js',
-    'out/../../secret.txt',
-    'src/main/index.ts',
-    'file:///out/main/a.js'
-  ]) {
-    refused(sample({ frames: [{ file, line: 1, col: 1, func: 'f' }] }), 'frames[0].file', file)
-  }
-
-  // errorName / code / fingerprint / view / mode
-  refused(sample({ errorName: 'Type Error' }), 'errorName', 'a name with a space')
-  refused(sample({ errorName: 'the app broke while zoning into Plane of Sky' }), 'errorName', 'prose')
-  refused(sample({ code: 'no such file or directory' }), 'code', 'prose in code')
-  refused(sample({ fingerprint: 'not-hex-at-all!!' }), 'fingerprint', 'a non-hex fingerprint')
-  refused(sample({ fingerprint: 'abc' }), 'fingerprint', 'a short fingerprint')
-  refused(sample({ view: 'Plane of Sky' }), 'view', 'a zone name as a view')
-  refused(sample({ mode: 'hydrating' }), 'mode', 'a mode outside the enum')
-  refused(sample({ breadcrumbs: [{ kind: 'a rat hit you', offsetMs: 0 }] }), 'breadcrumbs[0].kind', 'a log LINE as a crumb kind')
-})
-
-test('ADVERSARIAL: the eleventh frame and the eleventh breadcrumb fail the event', () => {
-  const eleven = Array.from({ length: MAX_ERROR_FRAMES_WIRE + 1 }, (_, i) => ({
-    file: 'out/main/a.js',
-    line: i + 1,
-    col: 1,
-    func: 'f'
-  }))
-  refused(sample({ frames: eleven }), 'frames', 'an 11th frame')
-  assert.equal(ok(sample({ frames: eleven.slice(0, MAX_ERROR_FRAMES_WIRE) })), true, '10 is fine')
-
-  const crumbs = Array.from({ length: 11 }, () => ({ kind: 'damage', offsetMs: 1 }))
-  refused(sample({ breadcrumbs: crumbs }), 'breadcrumbs', 'an 11th breadcrumb')
-  assert.equal(ok(sample({ breadcrumbs: crumbs.slice(0, 10) })), true, '10 is fine')
-})
-
-test('ADVERSARIAL: the numeric fields are bounded, and a smuggled field never survives', () => {
-  refused(sample({ frames: [{ file: 'out/main/a.js', line: MAX_FRAME_POSITION_WIRE + 1, col: 1, func: 'f' }] }), 'frames[0].line', 'an absurd line')
-  refused(sample({ frames: [{ file: 'out/main/a.js', line: -1, col: 1, func: 'f' }] }), 'frames[0].line', 'a negative line')
-  refused(sample({ sessionAgeBucket: SESSION_AGE_MS_EDGES.length + 1 }), 'sessionAgeBucket', 'a bucket past the edges')
-  refused(sample({ count: -1 }), 'count', 'a negative count')
-  refused(sample({ breadcrumbs: [{ kind: 'damage', offsetMs: 60 * 60_000 }] }), 'breadcrumbs[0].offsetMs', 'an offset past the cap')
-
-  // THE CONSTRUCTION PROPERTY: the validator builds a new object field by field, so a smuggled
-  // key is not stripped by a rule someone has to remember — it never appears at all.
-  const smuggled = { ...sample(), characterName: 'Primitive', logLine: 'You slash a rat.' }
-  const res = validateTelemetryEvent(smuggled)
-  assert.equal(res.ok, true)
-  if (res.ok) {
-    assert.equal('characterName' in res.value, false)
-    assert.equal('logLine' in res.value, false)
-  }
-  // …and the same for a frame's own extra keys.
-  const fatFrame = validateTelemetryEvent(
-    sample({ frames: [{ file: 'out/main/a.js', line: 1, col: 1, func: 'f', source: 'You slash a rat.' } as never] })
-  )
-  assert.equal(fatFrame.ok, true)
-  if (fatFrame.ok && fatFrame.value.t === 'errorReport') {
-    assert.deepEqual(Object.keys(fatFrame.value.frames[0]).sort(), ['col', 'file', 'func', 'line'])
-  }
-})
-
-test('code is genuinely optional — absent and null both mean "the throw carried none"', () => {
-  for (const code of [undefined, null]) {
-    const res = validateTelemetryEvent({ ...sample(), code })
-    assert.equal(res.ok, true)
-    if (res.ok) assert.equal('code' in res.value, false)
-  }
-})
-
-// =========================================================================================
-// 5. THE COPIES THAT MUST NOT DRIFT
-// =========================================================================================
-
-test('the wire bounds and the producer bounds are one number each', () => {
-  assert.equal(MAX_REDACTED_MESSAGE_WIRE, MAX_REDACTED_MESSAGE)
-  assert.equal(MAX_ERROR_FRAMES_WIRE, MAX_ERROR_FRAMES)
-  assert.equal(MAX_FRAME_POSITION_WIRE, MAX_FRAME_POSITION)
-  assert.equal(MAX_FRAME_FUNC_WIRE, MAX_FRAME_FUNC)
-  // …and the length in REDACTED_MESSAGE_RE is that same number, spelled in a regex where it
-  // cannot be a constant. A message of exactly the cap passes; one character more does not.
-  assert.ok(REDACTED_MESSAGE_RE.test('a'.repeat(MAX_REDACTED_MESSAGE_WIRE)))
-  assert.equal(REDACTED_MESSAGE_RE.test('a'.repeat(MAX_REDACTED_MESSAGE_WIRE + 1)), false)
-  // …and the producer's copy of the frame-file pattern is the wire's copy, character for
-  // character. The producer applies it too, so a frame the wire would refuse never reaches it.
-  assert.equal(BUNDLE_FILE_PATTERN, FRAME_FILE_RE.source)
-})
-
-
-test('the error-view enum is the dwell views plus exactly one honest escape hatch', () => {
-  assert.deepEqual([...TELEMETRY_ERROR_VIEWS], [...TELEMETRY_VIEWS, 'unknown'])
-})
-
-// =========================================================================================
-// 6. THE ROLLUP — one issue is one row, first exemplar wins
-// =========================================================================================
-
-const batchOf = (events: Record<string, unknown>[]) => ({
-  v: 1 as const,
-  env: {
-    analyticsId: '3f2504e0-4f89-41d3-9a0c-0305e82c3301',
-    appVersion: '0.11.0',
-    channel: 'prod' as const,
-    platform: 'win32' as const,
-    tzOffsetBucket: -5
-  },
-  events: events.map((ev) => ({ ts: 1, ev: ev as unknown as EvErrorReport }))
-})
-
-const CTX = { firstOfDay: false, newInstall: false, upgraded: false }
-
-test('the rollup folds one fingerprint into one row and keeps the FIRST exemplar', () => {
-  const first = sample({ count: 2, redactedMessage: 'first <path>' })
-  const second = sample({ count: 3, redactedMessage: 'second <path>' })
-  const roll = rollupBatch(batchOf([first, second]) as never, CTX)
-  assert.equal(roll.errors.length, 1, 'one fingerprint is one row')
-  assert.equal(roll.errors[0].n, 5, 'counts add')
-  assert.equal(roll.errors[0].exemplar.redactedMessage, 'first <path>', 'FIRST wins')
-  assert.equal(roll.errors[0].appVersion, '0.11.0')
-  // …and the counters half carries the per-build denominator
-  const counters = new Map(roll.counters.map((c) => [`${c.metric} ${c.dim}`, c.n]))
-  assert.equal(counters.get('errors 0.11.0'), 5)
-  assert.equal(counters.get('errorEvents 0.11.0'), 2)
-})
-
-test('two fingerprints are two rows, and a batch with no errors has none', () => {
-  const other = sample({ fingerprint: '0123456789abcdef', count: 1 })
-  const roll = rollupBatch(batchOf([sample(), other]) as never, CTX)
-  assert.equal(roll.errors.length, 2)
-  assert.deepEqual(rollupBatch(batchOf([]) as never, CTX).errors, [])
-  const usual = rollupBatch(batchOf([{ t: 'sessionHeartbeat', uptimeMs: 1 }]) as never, CTX)
-  assert.deepEqual(usual.errors, [], 'the common batch pays nothing for this feature')
+test('the redactor bound and the regex above are one number', () => {
+  assert.equal(MAX_REDACTED_MESSAGE, 200)
+  assert.ok(REDACTED_MESSAGE_RE.test('a'.repeat(MAX_REDACTED_MESSAGE)))
+  assert.equal(REDACTED_MESSAGE_RE.test('a'.repeat(MAX_REDACTED_MESSAGE + 1)), false)
 })

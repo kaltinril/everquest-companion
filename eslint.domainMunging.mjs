@@ -101,9 +101,8 @@ const DOMAIN_MODULES = ['src/shared/', 'src/renderer/src/data/eqlegends/']
  *     serves alert FIRES, not alert definitions — definitions travel the other way, pushed in as a
  *     `*.define` command (boundary verdict 3), so there is no view for the renderer to have asked
  *     for instead.
- *   * **diagnostics about the app itself.** Perf rows, telemetry, feedback and the triage tab's
- *     release health are measurements OF the app, not data the fold produces. They are also
- *     owner-tools-gated and never on a user's screen.
+ *   * **diagnostics about the app itself.** Perf rows and error fingerprints are measurements
+ *     OF the app, not data the fold produces.
  *   * **presentation and window state** — scale, toasts, overlays, update channels.
  *
  * Sweeping these in would have put a third of the register's entries on lines that have nothing to
@@ -132,15 +131,9 @@ const NOT_DOMAIN_MODULES = [
   'src/shared/shareSchema.ts',
   'src/shared/shareMerge.ts',
   // diagnostics ABOUT the app, not data the fold produced
-  'src/shared/triage.ts',
-  'src/shared/feedback.ts',
-  'src/shared/feedbackAttachments.ts',
-  'src/shared/feedbackPerf.ts',
-  'src/shared/feedbackPerfSeams.ts',
   'src/shared/enginePerf.ts',
   'src/shared/errorReport.ts',
   'src/shared/errorReportLocation.ts',
-  'src/shared/analyticsSchema.ts',
   'src/shared/dataWeight.ts',
   'src/shared/audioFailureLog.ts',
   'src/shared/devRestart.ts',

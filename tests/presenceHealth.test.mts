@@ -307,12 +307,6 @@ test('THE WENT-SILENT RESTART IS INFO AND THE THREE REAL FAILURES ARE STILL ERRO
   const start = section('function startWatcher', 'function stopWatcher')
   assert.ok(start.includes('could not start the presence watcher'))
   assert.ok(start.includes("...restartCause('start-failed'"))
-
-  // AND THE COUNT STILL LANDS SOMEWHERE HONEST, which is what makes a demotion different from a
-  // silencing: `notePresenceRestart` is the one funnel all three causes reach, so a fleet where
-  // this starts happening shows it as `presenceRestarts` rather than as a defect in the build.
-  assert.equal(presence.match(/notePresenceRestart\(\)/g)?.length, 1)
-  assert.ok(section('function scheduleRestart', 'function handleWatcherGone').includes('notePresenceRestart()'))
 })
 
 test('A COLLAPSED RUN STARTS REPORTING AGAIN THE MOMENT THE PATTERN BREAKS', () => {

@@ -27,8 +27,6 @@
     "gen:spell-lines": "tsx scripts/gen-spell-lines.ts",
     "gen:data-weight": "node --expose-gc --import tsx scripts/gen-data-weight.mts",
     "gen:protocol": "tsx scripts/gen-protocol.mts",
-    "gen:telemetry-doc": "tsx scripts/gen-telemetry-doc.mts",
-    "dev:stack": "tsx scripts/dev-feedback-server.mts",
     "fixtures:e2e": "node --import tsx tests/extract-e2e-fixtures.mjs",
     "fixtures:consider-pairs": "node --import tsx tests/extract-consider-pairs.mjs",
     "lint": "eslint . --cache --cache-location node_modules/.cache/eslint/",

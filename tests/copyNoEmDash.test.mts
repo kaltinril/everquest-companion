@@ -31,10 +31,7 @@
 //     forwards, log-format patterns. A directory-wide guard there would be a rule about process
 //     logging rather than about copy, so main is covered by the explicit list above and a new
 //     main module that starts carrying copy must be ADDED to it. That is a known limit.
-//   * `docs/`, `AGENTS.md`, `TELEMETRY.md` and the other repo prose. Not user-facing app copy.
-//   * `src/shared/telemetryDoc.ts` and `telemetryDocEvents.ts`, which exist to GENERATE
-//     TELEMETRY.md and are pinned against it by `tests/telemetryDoc.test.mts`. They render into
-//     a repo doc, never into the app.
+//   * `docs/`, `AGENTS.md` and the other repo prose. Not user-facing app copy.
 //   * `src/main/speech/phonemes.ts`, where U+2014 is a token id in the Kokoro TTS model's
 //     phoneme VOCABULARY. Rewriting it would corrupt the mapping; it is data, not prose.
 //   * `src/main/presence.ts` was carved out here until JOS-182, for em dashes that sat inside an
@@ -65,8 +62,6 @@ const COPY_FILES = [
   // meter row labels, segment names, the unparsed-line notice — is the ENGINE's to produce now,
   // and the em-dash law follows it there rather than being dropped: `engine/crates/fold` renders
   // those cells, so the check belongs in the Rust suite the day that copy grows a dash.
-  'src/main/feedback/slice.ts',
-  'src/main/feedback/submit.ts',
   'src/main/updater.ts',
   'src/main/userSounds.ts',
   // The tray icon's tooltip and its context menu (JOS-139) — three labels a player reads, in a
@@ -76,7 +71,7 @@ const COPY_FILES = [
 ] as const
 
 /** Excluded with a reason, every one of them spelled out in the header. */
-const EXCLUDED = new Set(['src/shared/telemetryDoc.ts', 'src/shared/telemetryDocEvents.ts'])
+const EXCLUDED = new Set<string>()
 
 const BANNED = /[—–]/
 

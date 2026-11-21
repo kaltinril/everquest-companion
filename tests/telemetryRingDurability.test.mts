@@ -1,6 +1,12 @@
 // ============================================================================
-// telemetryRingDurability.test.mts — JOS-265: the local telemetry file survives its writers.
+// telemetryRingDurability.test.mts — JOS-265: a durable file survives its writers.
 // ============================================================================
+//
+// WHAT THIS COVERS NOW (2026-11-20). `src/main/telemetry/durableWrite.ts` was written for the
+// usage-analytics ring (`telemetry.json`), which is the file the history below is about. That
+// ring is removed with the service. The atomic write and its storm gate stay because the settings
+// store, the log archive, the startup profile and the resist ledger all write through them, and
+// this suite is what pins them. The two source pins on the ring's own code went with the ring.
 //
 // THE DEFECT, read off the error store rather than guessed. `telemetry.json write failed` grew to
 // ~350 occurrences across 0.18-0.23, and EVERY exemplar carries the same code: `ENOSPC`. The four
@@ -29,11 +35,6 @@
 //      same full disk.
 //   5. It comes back on its own. One success clears the pause completely.
 //
-// And two SOURCE pins on `ring.ts`, because the two rules that make (4) safe cannot be observed
-// from outside a process with Electron in it: the in-memory ring is updated BEFORE the gate is
-// consulted (so a pause costs persistence and never an event), and the failure payload keeps the
-// exact message string the fleet's existing fingerprints were built from.
-//
 // No Electron and no network: this suite never skips. It writes into a real temp directory so the
 // "what was left on disk" assertions are answered by the filesystem, and injects the failures
 // through `DurableIo` because a genuinely full volume is not something a test may arrange.
@@ -42,8 +43,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 import {
   createWriteGate,
   nodeIo,
@@ -58,8 +58,6 @@ import {
   type AsyncDurableIo,
   type DurableIo
 } from '../src/main/telemetry/durableWrite'
-
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 
 /** A real, empty directory to write into. Removed by the test that made it. */
 function scratchDir(): string {
@@ -368,63 +366,4 @@ test('OFF THE THREAD: the real async io writes a whole file through a real FileH
   } finally {
     rmSync(dir, { recursive: true, force: true })
   }
-})
-
-// ---- 7. THE TWO RULES THAT LIVE IN ring.ts ---------------------------------------------------
-
-const RING_SRC = readFileSync(join(ROOT, 'src', 'main', 'telemetry', 'ring.ts'), 'utf8')
-
-test('MEMORY FIRST: writeRing updates the cache BEFORE it consults the gate', () => {
-  const body = RING_SRC.slice(RING_SRC.indexOf('export function writeRing'))
-  const cacheAt = body.indexOf('cached = next')
-  const gateAt = body.indexOf('writeGate.ready')
-  assert.ok(cacheAt > 0 && gateAt > 0, 'writeRing must set the cache and ask the gate')
-  assert.ok(
-    cacheAt < gateAt,
-    'a skipped write may cost persistence and NEVER an event: the ring in memory is updated first'
-  )
-})
-
-test('ONE WRITE IN FLIGHT: the async ring writer serialises itself and coalesces what is owed', () => {
-  // The sync writer got serialisation for free — a sync call cannot interleave. Two async ones can,
-  // and two interleaved writers share ONE `.tmp` path, so the second would rename a scratch file
-  // the first is still filling. `writing` is the latch; `owed` is the coalescing, and REPLACING
-  // rather than queueing is correct because a ring write is the whole file and the newest ring
-  // already contains every event an older one had.
-  assert.match(RING_SRC, /let writing = false/)
-  assert.match(RING_SRC, /let owed: \{ data: string; now: number \} \| null = null/)
-  const body = RING_SRC.slice(RING_SRC.indexOf('export function writeRing'), RING_SRC.indexOf('export function flushRingSync'))
-  assert.ok(body.indexOf('writeGate.ready(now)') < body.indexOf('owed = {'), 'the gate is still asked before a byte is touched')
-  assert.match(body, /if \(writing\) return\r?\n {2}writing = true\r?\n {2}void drainWrites\(\)/)
-  // …and there is exactly ONE caller of the async durable write in the file: the drain.
-  assert.equal(RING_SRC.match(/writeFileDurableAsync\(/g)?.length, 1)
-})
-
-test('THE QUIT FINAL: the one sync write left in the ring, and a drop outlives an in-flight write', () => {
-  // `sessionEnd` is recorded as the last window closes; an async write scheduled at that moment is
-  // one the process may never turn the event loop for again. `flushRingSync` is the documented
-  // final — the ONLY synchronous durable write left here — and it respects the same gate.
-  assert.equal(RING_SRC.match(/writeFileDurableFinal\(/g)?.length, 1)
-  const flush = RING_SRC.slice(RING_SRC.indexOf('export function flushRingSync'))
-  assert.ok(flush.indexOf('if (owed === null) return') < flush.indexOf('writeFileDurableFinal('))
-  assert.match(flush, /if \(!writeGate\.ready\(now\)\) return/)
-  // NEVER A TORN FILE TO BUY A LAST RECORD: it writes through its OWN scratch file, so it can run
-  // on top of a threadpool write without two writers ever filling one temp.
-  // A drop cannot cancel a write already in the threadpool, so it discards what is owed and asks
-  // the drain to delete again on its way out — the file must not come back after "turn it off".
-  const drop = RING_SRC.slice(RING_SRC.indexOf('export function dropRing'), RING_SRC.indexOf('export function resetRingCache'))
-  assert.match(drop, /owed = null/)
-  assert.match(drop, /if \(writing\) dropDuringWrite = true/)
-  assert.match(RING_SRC, /if \(dropDuringWrite\) \{\r?\n {4}dropDuringWrite = false\r?\n {4}removeRingFiles\(\)/)
-})
-
-test('THE FINGERPRINT SURVIVES THE FIX: the failure message is unchanged, character for character', () => {
-  // The error store aggregates on the message plus the frames. Rewording this line would split
-  // ~350 filed occurrences from everything the fix files next, and the triage loop would be
-  // reading two half-histories. Anything that varies per occurrence goes to the console instead.
-  assert.ok(RING_SRC.includes("{ message: 'telemetry.json write failed', err }"))
-  assert.ok(
-    !/message: `telemetry\.json write failed/.test(RING_SRC),
-    'the failure message must stay a literal — no interpolated counts, delays or codes'
-  )
 })

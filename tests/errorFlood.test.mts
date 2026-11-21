@@ -45,12 +45,7 @@ import {
   errorBudgetTracked,
   resetErrorBudget
 } from '../src/main/errorBudget'
-import {
-  noteError,
-  peekErrorReports,
-  resetErrorReports,
-  takeErrorReports
-} from '../src/main/telemetry/errorReports'
+import { fingerprintOf, noteError } from '../src/main/telemetry/errorReports'
 
 const TEST_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 /** Source, with the carriage returns taken out. The tree is checked out CRLF on Windows and LF in
@@ -220,49 +215,47 @@ function thrown(message: string, fn = 'logError', line = 573): Error {
   return err
 }
 
-test('the reporter obeys the budget: the EPIPE loop leaves the client capped, not counted', () => {
+test('the reporter obeys the budget: the EPIPE loop is written a hundred times, then never again', () => {
   // The exemplar's own two frames, reconstructed. 5,000 occurrences of it — the loop ran at roughly
-  // eighty a second, so this is about a minute of it — and the client reports a hundred.
-  resetErrorReports(1_000_000)
+  // eighty a second, so this is about a minute of it — and a hundred are let through.
+  resetErrorBudget()
   const epipe = (): Error => Object.assign(thrown('EPIPE: broken pipe, write'), { code: 'EPIPE' })
-  for (let i = 0; i < 5_000; i++) noteError('main:uncaughtException', epipe())
+  const verdicts = Array.from({ length: 5_000 }, () => noteError('main:uncaughtException', epipe()))
+  assert.equal(verdicts.filter((v) => v.report).length, MAX_REPORTS_PER_FINGERPRINT)
+  assert.equal(verdicts.filter((v) => v.notice !== null).length, 1, 'and it says so exactly once')
+  assert.equal(verdicts[MAX_REPORTS_PER_FINGERPRINT - 1].report, true, 'the notice rides the last one written')
+  assert.ok(verdicts[MAX_REPORTS_PER_FINGERPRINT - 1].notice)
+  assert.equal(errorBudgetTracked(), 1, 'five thousand throws are one fingerprint')
 
-  const [ev] = takeErrorReports()
-  assert.ok(ev, 'the issue is still reported — a cap that hid it would be worse than the noise')
-  assert.equal(ev.count, MAX_REPORTS_PER_FINGERPRINT, 'and this is THE summary report, carrying it')
-  assert.equal(ev.errorName, 'Error')
-  assert.equal(ev.code, 'EPIPE')
-  assert.equal(takeErrorReports().length, 0, 'then silence: later occurrences add nothing to drain')
-
-  // …and it stays silent. Five thousand more do not restart the count after a drain.
-  for (let i = 0; i < 5_000; i++) noteError('main:uncaughtException', epipe())
-  assert.deepEqual(takeErrorReports(), [], 'the budget is per SESSION, not per drain window')
-  resetErrorReports()
+  // …and it stays silent. Five thousand more do not restart the count.
+  const more = Array.from({ length: 5_000 }, () => noteError('main:uncaughtException', epipe()))
+  assert.equal(more.filter((v) => v.report || v.notice !== null).length, 0, 'the budget is per SESSION')
+  resetErrorBudget()
 })
 
-test('a NEW session reports it again — the budget resets where the exemplars do', () => {
-  resetErrorReports(1_000_000)
+test('a NEW session writes it again — `resetErrorBudget` is the whole reset', () => {
+  resetErrorBudget()
+  const fp = fingerprintOf('main:uncaughtException', thrown('boom'))
   for (let i = 0; i < MAX_REPORTS_PER_FINGERPRINT + 50; i++) {
     noteError('main:uncaughtException', thrown('boom'))
   }
-  assert.equal(peekErrorReports()[0].n, MAX_REPORTS_PER_FINGERPRINT)
-  // `resetErrorReports` IS the session boundary in this process (the collector calls it), so the
-  // two must reset together or a fresh session inherits the last one's silence.
-  resetErrorReports(2_000_000)
-  noteError('main:uncaughtException', thrown('boom'))
-  assert.equal(peekErrorReports()[0].n, 1)
-  resetErrorReports()
+  assert.equal(errorBudgetSpent(fp), MAX_REPORTS_PER_FINGERPRINT + 1, 'spent, and pinned past the cap')
+  assert.equal(noteError('main:uncaughtException', thrown('boom')).report, false)
+  resetErrorBudget()
+  assert.equal(noteError('main:uncaughtException', thrown('boom')).report, true)
+  assert.equal(errorBudgetSpent(fp), 1)
+  resetErrorBudget()
 })
 
 test('the two fail-open cases are named, and neither is the shape this ticket is about', () => {
-  // A failure inside the error-log writer mints no report at all (JOS-100), so there is no
-  // fingerprint to budget and `logError` writes it as it always did — bounded downstream by
+  // A failure inside the error-log writer is not fingerprinted at all (JOS-100), so there is
+  // nothing to budget and `logError` writes it as it always did — bounded downstream by
   // `errorRepeat`'s five identical lines.
-  resetErrorReports(1_000_000)
+  resetErrorBudget()
   const v = noteError('errorLog', thrown('failed to write errors.log'))
   assert.deepEqual(v, { report: true, notice: null })
-  assert.deepEqual(peekErrorReports(), [], 'and nothing was recorded')
-  resetErrorReports()
+  assert.equal(errorBudgetTracked(), 0, 'and nothing was spent')
+  resetErrorBudget()
 })
 
 // =========================================================================================
@@ -335,7 +328,7 @@ test('THE WIRING: logError asks the budget FIRST, and the notice is never silenc
   const src = read('src/main/errorLog.ts')
   // Outermost gate: the verdict comes back from `noteError` (the only place the fingerprint is
   // known) and is obeyed before the identical-line cap is even consulted.
-  assert.match(src, /const budget = noteError\(source, payload, Date\.now\(\), captureSite\)/)
+  assert.match(src, /const budget = noteError\(source, payload, captureSite\)/)
   assert.ok(src.indexOf('if (!budget.report)') < src.indexOf('const repeat = errorRepeat('))
   // The line that EXPLAINS a silence is written before the silence is obeyed, or a reader of
   // errors.log would watch an error simply stop.
@@ -349,19 +342,7 @@ test('THE WIRING: both new rules are LEAVES, so nothing on the error path can cy
   // this suite drive the real production code with no Electron in the process.
   assert.doesNotMatch(read('src/main/errorBudget.ts'), /^\s*import\s/m)
   assert.doesNotMatch(read('src/main/deadPipe.ts'), /^\s*import\s/m)
-  // …and the budget is reset from the collector's session boundary, beside the exemplars.
-  assert.match(read('src/main/telemetry/errorReports.ts'), /\n {2}resetErrorBudget\(\)/)
-})
-
-test('THE HONEST LEDGER: the health counters are NOT behind the cap, and that is the point', () => {
-  // JOS-133 built `suppressedErrorLines` so a cap could exist without deflating the fleet's error
-  // rate — "a build that started looping" must not "look like a build that got better". A budget
-  // that silenced the counters too would undo exactly that. The distinction is COST, not principle:
-  // `healthCounters` emits eight integers per heartbeat whatever their magnitude, so there is
-  // nothing there to flood and nothing to bypass.
-  const health = read('src/main/telemetry/health.ts')
-  assert.doesNotMatch(health, /errorBudget|MAX_REPORTS_PER_FINGERPRINT/)
-  assert.doesNotMatch(read('src/main/errorBudget.ts'), /noteSuppressedErrorLine|noteErrorLogLine/)
-  // And `logError` counts the budget's silences into that ledger, so the total still adds up.
-  assert.match(read('src/main/errorLog.ts'), /if \(!budget\.report\) \{\s+noteSuppressedErrorLine\(\)/)
+  // …and the module that asks the budget imports only it and pure `shared/` code.
+  const asks = read('src/main/telemetry/errorReports.ts').match(/^import .*from '([^']+)'|^\} from '([^']+)'/gm) ?? []
+  for (const line of asks) assert.match(line, /'\.\.\/errorBudget'|'\.\.\/\.\.\/shared\//, line)
 })
