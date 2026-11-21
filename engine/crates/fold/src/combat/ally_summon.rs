@@ -60,6 +60,11 @@ impl SummonWatch {
         *self.first_unbound.entry(pet_key.to_string()).or_insert(ts)
     }
 
+    /// When this name first acted with no owner, if it has since its last bind or death.
+    pub fn first_seen(&self, pet_key: &str) -> Option<i64> {
+        self.first_unbound.get(pet_key).copied()
+    }
+
     /// `You begin casting <a pet summon>.`
     pub fn note_own(&mut self, ts: i64) {
         self.own_waiting = Some(ts);

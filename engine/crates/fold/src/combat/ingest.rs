@@ -313,6 +313,8 @@ fn bind_pet_claim(st: &mut EngineState, name: &str, ts: i64, via: &str) {
     // Anything that names itself yours stops being anybody else's. All three claim routes are
     // first-person and ownership-definitive; an ally bind rests on a broadcast, which is weaker by
     // construction, so this override needs no tie-break.
+    // Read before the release, which forgets it.
+    let since = st.ally.watch.first_seen(&key);
     let guess = st.ally.release(&key);
     st.ally.watch.clear_own();
     let promote = st.world.pet_instance(name).is_none() && st.charm.claim_is_charmed(&key, ts);
@@ -330,7 +332,7 @@ fn bind_pet_claim(st: &mut EngineState, name: &str, ts: i64, via: &str) {
     // charm broadcast named was retracted then (`ingest_charm`), so a promote finds nothing to move.
     let why = format!("claimed as your pet{}", claim_note(via));
     let mine = routing::pet_source(&id, label.clone());
-    st.rekey_other(&key, &mine, &why);
+    st.rekey_other(&key, &mine, &why, since);
     // …and so does a row a summon guess had given to a group mate.
     if let Some(guess) = guess {
         st.settle_guessed_pet(&guess, &mine);
@@ -369,6 +371,8 @@ fn ally_pet_leader(st: &mut EngineState, ev: &Event) {
     }
     // A summon guess about this pet, as it stood before the line: the line replaces it.
     let guess = st.ally.bind_of(&id_key(pet)).cloned();
+    // Read before the bind, which spends it.
+    let since = st.ally.watch.first_seen(&id_key(pet));
     let bound = ingest_ally_pet_leader(st, ev);
     let why = format!(
         "named {} its leader",
@@ -376,7 +380,7 @@ fn ally_pet_leader(st: &mut EngineState, ev: &Event) {
     );
     match bound {
         Some(to) => {
-            st.rekey_other(&id_key(pet), &to, &why);
+            st.rekey_other(&id_key(pet), &to, &why, since);
             if let Some(guess) = guess {
                 st.settle_guessed_pet(&guess, &to);
             }

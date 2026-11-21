@@ -8,6 +8,10 @@ code; nothing listed here is removed or narrowed without the owner's word (RULES
 | 2026-11-19 | owner | Malkil's pet Xabantik was not on the meter, and four pets (Jasekab, Gebarn, Genober, Xekn) were listed as members of his group. "we need a set of rules that are smarter". | Five rules were proposed to him that night (below). |
 | 2026-11-20 | owner | On the two open questions (show strangers' pets? may the engine infer an owner from summon timing?): "i'll go by your opinion for now on pets". | The opinion given him: a pet with no known owner gets its own row and is never dropped; an owner is inferred from timing only for a group mate, only when exactly one summoned just before the pet appeared; a leader line always wins. Batch 1 built 2026-11-20 (rules 1 and 2), batch 2 the same evening (rule 3). Rule 4 not reviewed. |
 
+| 2026-11-20 | owner | "i've done pet who leader over and overr and over and it's not showingf malkils pet damge". | Fixed the same night: a leader line moved a pet's earlier damage in every fight and the current stay, never in a CLOSED zone stay, so those kept it as "owner unknown", which Group hides (162k of Zarartik's 204k). Closed stays from the pet's first unowned action now move too. |
+
+| 2026-11-20 | owner | Screenshot: Malkil's pet on no meter at all, "i've done pet who leader over and overr and over". | Fixed the same night: the pet's own Lifebite (`Zarartik hit Zarartik ... by Lifebite`) was read as a second pet of that name, which stops all credit for good, and a repeated leader line kept that mark. A spell landing on its own caster is no longer twin evidence. Reproduced on the real log: 454 dps with the pet missing, the screenshot's numbers. |
+
 ## The five rules proposed on 2026-11-19
 
 1. Recognise pet names. A name from the game's summoned-pet table is a summoned pet: never guessed

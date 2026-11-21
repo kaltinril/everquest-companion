@@ -345,6 +345,13 @@ where one exists.
   it: `rekey.rs settle_guessed_pet` moves the guessed row (`move_recorded`, which also renames a
   row in place). The target must be an engaged hostile, so a fight that has gone stale guesses
   nothing until someone in the group swings again.
+- A leader line, a claim or a summon guess moves a pet's row in the CLOSED zone stays too
+  (`rekey.rs move_in_closed_stays`, 2026-11-20), but only stays that end at or after the pet's
+  first unowned action (`SummonWatch::first_seen`): names come round, and an older stay's row was
+  another pet's. Finished FIGHTS still move whatever their date, as they have since 2026-10-22.
+- Twin evidence on an ally pet is a MELEE line only (`routing.rs lands_on_its_caster`, 2026-11-20).
+  A pet's lifetap prints `X hit X ... by Lifebite`; read as a twin it set the sticky `ambiguous`,
+  which credits nothing, and a same-owner leader line keeps `ambiguous`.
 - To see what the engine does with a real log: copy it as `eqlog_<Name>_<server>.<anything>.txt`
   (the replay tool reads the character from that shape), then
   `engine/target/release/parity <copy> --snapshots > out.json` (`cargo build --release -p parity`
