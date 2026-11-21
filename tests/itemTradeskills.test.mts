@@ -353,6 +353,11 @@ test('parseCraftRecipes: `***` rows and bare `**1 x [[Item]]` rows are ingredien
   ])
 })
 
+test('parseCraftRecipes: a pointer to another page under a tradeskill is not an ingredient', () => {
+  const boots = parseCraftRecipes('* [[Skill Tailoring|Tailoring]] (Trivial: 26)\n:*See [[Patchwork Armor]]')
+  assert.deepEqual(boots.recipes, [{ tradeskill: 'Tailoring', ingredients: [], trivial: 26 }])
+})
+
 test('recipes do NOT make an item notable — that predicate drives the push surfaces', () => {
   const k = { ...BASE, ...parseItemWikitext('Skewers', SKEWERS) }
   assert.equal((k.recipes ?? []).length > 0, true)

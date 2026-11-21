@@ -8,12 +8,12 @@ import assert from 'node:assert/strict'
 import { GUIDE_CREDITS, guideCreditLine } from '../src/shared/guideCredits'
 import { TRADESKILL_BOOK_VERSION, indexBook, type BookRecipe } from '../src/shared/tradeskillBook'
 import { BOOK_GOALS, GOAL_LABELS, ROUTE_GOALS, ROUTE_STEP_CAP, asGoal, buildRoute, isBookGoal, moreStepsText, routeEndText, type BookGoal, type Route } from '../src/shared/tradeskillRoute'
-import { EXPLORE_GROUP_CAP } from '../src/shared/tradeskillRouteExplore'
+import { EXPLORE_GROUP_CAP, guideMaterialsLine } from '../src/shared/tradeskillRouteExplore'
 import { recipeBuyable } from '../src/shared/tradeskillRouteLevel'
-import { recordText, type RouteCtx, type RouteFacts, type RouteStep } from '../src/shared/tradeskillRouteStep'
+import { containerText, recordText, type RouteCtx, type RouteFacts, type RouteStep } from '../src/shared/tradeskillRouteStep'
 import { skillRecipes } from '../src/shared/tradeskillBook'
 import { bought, ing, item, recipe } from './tradeskillFixtures.mts'
-import { OWNER_LEVEL, ownerFacts, ownerHeld, ownerIndex, ownerRecipes, ownerSnap } from './tradeskillRouteFixtures.mts'
+import { OWNER_LEVEL, ownerFacts, ownerGuides, ownerHeld, ownerIndex, ownerRecipes, ownerSnap } from './tradeskillRouteFixtures.mts'
 
 const route = (goal: BookGoal, facts: RouteFacts = ownerFacts(), level: number | null = OWNER_LEVEL): Route =>
   buildRoute(facts, { tradeskill: 'Jewelcrafting', level, goal })
@@ -263,13 +263,22 @@ test('the community route: the guide\'s steps from the level in its own order, j
   const here = stepOf(r, "Platinum cat's eye agate")
   assert.equal(here.linked, false)
   assert.equal(here.recipe, null)
-  assert.equal(here.why, "Your level is inside this step of the guide. The guide's name for it is no wiki item's exactly, so no cost or materials are joined.")
+  assert.equal(here.why, "Your level is inside this step of the guide. No wiki item has this exact name, so it has no link and no cost.")
   assert.equal(here.money, '')
+  // A step with no wiki recipe says what the guide makes it from, in the wiki's spelling where the guide's is an item.
+  assert.equal(guideMaterialsLine(ownerGuides(), { materials: [{ name: 'Mandrake root', qty: 2 }, { name: 'Steel boning' }] }), "The guide's materials: 2 Mandrake root, Steel boning.")
+  assert.equal(guideMaterialsLine(ownerGuides(), { materials: [] }), '')
+  // Where the combine is done sits beside a step's name; nothing when the wiki names no container.
+  assert.equal(containerText({ container: 'Loom' }), 'in a Loom')
+  assert.equal(containerText({ container: 'Erudite Sewing Kit' }), 'in an Erudite Sewing Kit')
+  assert.equal(containerText({ container: 'Coldain Tanners  Kit' }), 'in a Coldain Tanners Kit')
+  assert.equal(containerText({}), '')
+  assert.equal(containerText(null), '')
   const joined = stepOf(r, 'Platinum Topaz Necklace')
   assert.equal(joined.recipe?.id, 'platinum topaz necklace#0')
   assert.equal(joined.why, 'A later step of the guide.')
   assert.equal(joined.money, 'No cost stated: your log shows no purchase of Topaz.')
-  assert.equal(stepOf(r, 'Platinum ruby').why, "A later step of the guide. The guide notes: Last store bought gem. The guide's name for it is no wiki item's exactly, so no cost or materials are joined.")
+  assert.equal(stepOf(r, 'Platinum ruby').why, "A later step of the guide. The guide notes: Last store bought gem. No wiki item has this exact name, so it has no link and no cost.")
   const leveling = GUIDE_CREDITS.find((c) => c.id === 'eql-tradeskill-guide')
   assert.ok(leveling)
   assert.deepEqual(r.credits, [`Route and notes from ${guideCreditLine(leveling)}.`])

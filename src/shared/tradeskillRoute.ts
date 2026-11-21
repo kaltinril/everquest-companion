@@ -260,4 +260,4 @@ export const ROUTE_STEP_TIP = 'Open this recipe on the Recipes tab.'
 
 export const NO_NEXT_STEP_TEXT = 'No step to shop for.'
 
-export const NO_STEP_RECIPE_TEXT = 'This step has no wiki recipe to list materials from. The guide\'s own materials for it are on the From the guides tab.'
+export const NO_STEP_RECIPE_TEXT = "No wiki recipe is joined to this step, so there is no shopping list. The guide's materials are on the step."
