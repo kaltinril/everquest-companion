@@ -58,11 +58,14 @@ function readList<T>(v: unknown, read: (item: unknown) => T | null): T[] {
 export function readLibrary(raw: unknown): MacroLibrary | null {
   if (!isObject(raw) || raw.version !== MACRO_LIBRARY_VERSION) return null
   if (!Array.isArray(raw.macros) || !Array.isArray(raw.sets)) return null
+  const labels = stringRecord(raw.labels)
   return {
     version: 1,
     macros: readList(raw.macros, readMacro),
     sets: readList(raw.sets, readSet),
     chosen: stringRecord(raw.chosen),
-    tags: cleanTags(strings(raw.tags))
+    tags: cleanTags(strings(raw.tags)),
+    // Left out when empty, so a library saved before loadouts had names reads back as it was.
+    ...(Object.keys(labels).length > 0 ? { labels } : {})
   }
 }

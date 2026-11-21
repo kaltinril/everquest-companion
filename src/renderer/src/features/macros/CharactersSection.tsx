@@ -4,7 +4,7 @@
 // the buttons match the game and sends them (GameFileSend.tsx).
 
 import { type JSX, type ReactNode, useState } from 'react'
-import { Alert, Box, Button, Stack, Tab, Tabs, Typography } from '@mui/material'
+import { Alert, Box, Button, Stack, Tab, Tabs } from '@mui/material'
 import { type PageTab, gameChanges, gridPage, moveSlot, pageTabs } from '@shared/macros/buttons'
 import { findMacro } from '@shared/macros/library'
 import { FIRST_EDITABLE_PAGE } from '@shared/macros/limits'
@@ -13,6 +13,7 @@ import { characterFileKey } from '@shared/macros/socials'
 import type { CharacterFileMacros, GameFilesReason, MacroSet } from '@shared/macros/types'
 import { ButtonGrid } from './ButtonGrid'
 import { ButtonPanel } from './ButtonPanel'
+import { CharacterPicker } from './CharacterPicker'
 import { GameBar } from './GameFileSend'
 import { CopyFromCharacter, LayoutsMenu } from './LayoutsMenu'
 import { Quiet, UndoRedo } from './macroParts'
@@ -63,57 +64,6 @@ function NoCharacters({ game }: { game: GameFilesState }): JSX.Element {
           Read again
         </Button>
       )}
-    </Stack>
-  )
-}
-
-function whereOf(file: CharacterFileMacros): string {
-  return `${file.server}, loadout ${String(file.loadout)}`
-}
-
-interface PickerProps {
-  files: CharacterFileMacros[]
-  picked: CharacterFileMacros
-  onSelect: (key: string) => void
-}
-
-/** Every character file found, one button each. A single character needs no picking: just its name. */
-function CharacterPicker({ files, picked, onSelect }: PickerProps): JSX.Element {
-  if (files.length === 1) {
-    return (
-      <Stack direction="row" spacing={1} alignItems="baseline" sx={{ flexShrink: 0 }} data-testid="macro-file-only">
-        <Typography variant="h6">{picked.character}</Typography>
-        <Typography variant="body2" color="text.secondary">
-          {whereOf(picked)}
-        </Typography>
-      </Stack>
-    )
-  }
-  return (
-    <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ flexShrink: 0 }} data-testid="macro-files">
-      {files.map((f) => {
-        const on = f === picked
-        return (
-          <Button
-            key={f.file}
-            variant={on ? 'contained' : 'outlined'}
-            color={on ? 'primary' : 'inherit'}
-            aria-pressed={on}
-            data-testid="macro-file-row"
-            sx={{ display: 'block', textAlign: 'left', textTransform: 'none', py: 0.5, borderColor: on ? undefined : 'divider' }}
-            onClick={() => {
-              onSelect(characterFileKey(f))
-            }}
-          >
-            <Typography variant="subtitle1" component="div" sx={{ fontWeight: 600, lineHeight: 1.3 }}>
-              {f.character}
-            </Typography>
-            <Typography variant="caption" component="div" sx={{ opacity: 0.75 }}>
-              {whereOf(f)}
-            </Typography>
-          </Button>
-        )
-      })}
     </Stack>
   )
 }
@@ -237,7 +187,7 @@ export function CharactersSection({ store, game, selected, onSelect, ...rest }: 
   const set = chosenSet(store.library, characterFileKey(picked))
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, minHeight: 0, gap: 1.5 }}>
-      <CharacterPicker files={files} picked={picked} onSelect={onSelect} />
+      <CharacterPicker store={store} files={files} picked={picked} onSelect={onSelect} />
       {set === null ? (
         <Quiet testid="macro-file-loading">Reading this character&apos;s macros.</Quiet>
       ) : (
