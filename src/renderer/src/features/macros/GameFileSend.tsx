@@ -74,19 +74,27 @@ function Outcome({ writer }: { writer: GameWriter }): JSX.Element | null {
 }
 
 /** Every button a send would change: where, what the game has, what it gets. */
-function ReviewTable({ changed }: { changed: SlotDiff[] }): JSX.Element {
+function ReviewTable({ changed, clashes }: { changed: SlotDiff[]; clashes: readonly string[] }): JSX.Element {
   return (
     <Box sx={{ maxHeight: 260, overflow: 'auto' }}>
       <Table size="small" data-testid="macro-diff">
         <TableBody>
           {changed.map((d) => {
             const mark = markOf(d.kind)
+            const clash = clashes.includes(`${String(d.page)}:${String(d.button)}`)
             return (
               <TableRow key={`${String(d.page)}:${String(d.button)}`} data-testid="macro-diff-row">
                 <TableCell sx={{ whiteSpace: 'nowrap' }}>
                   Page {d.page}, button {d.button}
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>{d.set?.name ?? d.file?.name ?? ''}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>
+                  {d.set?.name ?? d.file?.name ?? ''}
+                  {clash && (
+                    <Typography variant="caption" color="warning.main" component="div" data-testid="macro-diff-clash">
+                      Changed in game too{d.file === null ? '' : `: the game has ${d.file.name}`}
+                    </Typography>
+                  )}
+                </TableCell>
                 <TableCell align="right">{mark !== null && <Chip size="small" variant="outlined" color={MARK_COLOR[mark]} label={mark} />}</TableCell>
               </TableRow>
             )
@@ -101,11 +109,13 @@ interface SendProps {
   file: CharacterFileMacros
   /** What the character's buttons would change in the file. */
   changes: GameChanges
+  /** The slots changed both in the game and in the app. */
+  clashes: readonly string[]
   writer: GameWriter
 }
 
 /** The Review and send button, what blocks it, and its confirm. */
-function SendToGame({ file, changes, writer }: SendProps): JSX.Element {
+function SendToGame({ file, changes, clashes, writer }: SendProps): JSX.Element {
   const [asking, setAsking] = useState(false)
   const blocked = unsavable(changes.macros).at(0) ?? null
   const { counts } = changes
@@ -152,10 +162,11 @@ function SendToGame({ file, changes, writer }: SendProps): JSX.Element {
         <Typography variant="body2" sx={MONO_SX}>
           {file.file}
         </Typography>
-        <ReviewTable changed={changes.changed} />
+        <ReviewTable changed={changes.changed} clashes={clashes} />
         <Line>
           {counts.added} new, {counts.changed} changed, {counts.removed} removed.
         </Line>
+        {clashes.length > 0 && <Line>Send replaces the game&apos;s version of buttons changed in game too.</Line>}
         <Line>Only the macros in this file change.</Line>
         <Line>The game must be closed.</Line>
         <Line>A copy of the current file is kept beside it.</Line>
@@ -267,7 +278,7 @@ interface BarProps extends SendProps {
 }
 
 /** Always under the buttons: do they match the game, the send when they do not, and the backups. */
-export function GameBar({ file, changes, writer, game }: BarProps): JSX.Element {
+export function GameBar({ file, changes, clashes, writer, game }: BarProps): JSX.Element {
   const matches = changes.total === 0
   return (
     <Stack spacing={1} sx={{ flexShrink: 0, pt: 1 }} data-testid="macro-game-bar">
@@ -277,7 +288,7 @@ export function GameBar({ file, changes, writer, game }: BarProps): JSX.Element 
           <Typography variant="body2" color={matches ? 'text.secondary' : 'warning.main'} sx={{ fontWeight: 600 }} data-testid="macro-game-status">
             {matches ? 'Matches the game.' : changesText(changes.total)}
           </Typography>
-          {!matches && <SendToGame file={file} changes={changes} writer={writer} />}
+          {!matches && <SendToGame file={file} changes={changes} clashes={clashes} writer={writer} />}
           <Box sx={{ flexGrow: 1 }} />
           <Tooltip title="Read this character's macros from the game folder again.">
             <span>

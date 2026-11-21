@@ -6,6 +6,7 @@
 import { type JSX, type ReactNode, useState } from 'react'
 import { Alert, Box, Button, Stack, Tab, Tabs } from '@mui/material'
 import { type PageTab, gameChanges, gridPage, moveSlot, pageTabs } from '@shared/macros/buttons'
+import { gameConflicts } from '@shared/macros/gameMerge'
 import { findMacro } from '@shared/macros/library'
 import { FIRST_EDITABLE_PAGE } from '@shared/macros/limits'
 import { assignSlot, chosenSet } from '@shared/macros/sets'
@@ -115,6 +116,7 @@ function CharacterDetail({ store, game, file, files, set, spot, onSpot, placing,
   const page = tabs.some((t) => t.page === spot.page) ? spot.page : FIRST_EDITABLE_PAGE
   const cells = gridPage(library, set, page, file.macros)
   const changes = gameChanges(library, set, file.macros)
+  const clashes = gameConflicts(library, characterFileKey(file))
   const toPlace = findMacro(library, placing)
   const go = (nextPage: number, slot: string | null): void => {
     setFresh(null)
@@ -160,7 +162,7 @@ function CharacterDetail({ store, game, file, files, set, spot, onSpot, placing,
             </Alert>
           )}
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 1fr) minmax(340px, 440px)' }, gap: 2, alignItems: 'start' }}>
-            <ButtonGrid buttons={cells} selected={spot.slot} onPick={pick} onMove={move} />
+            <ButtonGrid buttons={cells} selected={spot.slot} clashes={clashes} onPick={pick} onMove={move} />
             <ButtonPanel
               store={store}
               set={set}
@@ -175,7 +177,7 @@ function CharacterDetail({ store, game, file, files, set, spot, onSpot, placing,
           </Box>
         </Stack>
       </Box>
-      <GameBar file={file} changes={changes} writer={writer} game={game} />
+      <GameBar file={file} changes={changes} clashes={clashes} writer={writer} game={game} />
     </Box>
   )
 }

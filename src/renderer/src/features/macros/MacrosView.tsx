@@ -9,7 +9,7 @@
 import { type JSX, useEffect, useState } from 'react'
 import { Alert, Box, Stack, Tab, Tabs, Typography } from '@mui/material'
 import { historyKey } from '@shared/macros/history'
-import { broughtInText, ensureCharacterLayouts } from '@shared/macros/layouts'
+import { mergeGameFiles, mergeText } from '@shared/macros/gameMerge'
 import { BUTTONS_PER_PAGE, LINES, LINE_MAX } from '@shared/macros/limits'
 import type { View } from '../../appViews'
 import { formatTime } from '../../lib/formatDate'
@@ -47,24 +47,24 @@ function Footer({ game, saveFailed }: { game: GameFilesState; saveFailed: boolea
 }
 
 /**
- * The game's macros are simply there: whenever the game files or the library arrive, every
- * character file without buttons of its own gets them, made from the file. Returns the one line
- * said when something was brought in (null when nothing was, or once dismissed) and its dismiss.
+ * The game's macros are simply there: whenever the game files or the library arrive, each read is
+ * merged into the characters' buttons (gameMerge.ts). Returns the one line said when something
+ * was brought in (null when nothing was, or once dismissed) and its dismiss.
  */
 function useGameLayouts(store: MacroStore | null, game: GameFilesState): [string | null, () => void] {
   const [line, setLine] = useState<string | null>(null)
   const library = store?.library ?? null
-  const amend = store?.amend
+  const absorb = store?.absorb
   const files = game.reply?.files
   useEffect(() => {
-    if (library === null || amend === undefined || files === undefined) return
-    const made = ensureCharacterLayouts(library, files)
+    if (library === null || absorb === undefined || files === undefined) return
+    const made = mergeGameFiles(library, files)
     if (made.library === library) return
     // Not an Undo step: it is the game's doing, not the player's.
-    amend((current) => ensureCharacterLayouts(current, files).library)
-    const text = broughtInText(made.report)
+    absorb(files)
+    const text = mergeText(made.report)
     if (text !== null) setLine(text)
-  }, [library, amend, files])
+  }, [library, absorb, files])
   return [
     line,
     () => {
