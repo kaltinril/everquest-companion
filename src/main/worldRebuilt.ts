@@ -19,9 +19,6 @@
 // re-open that: every `IPC.onCharacter` send in this process still goes through here.
 
 import { IPC } from '../shared/ipc'
-// A leaf (see its header) — it starts at `replayDone` and is imported here only to bracket the
-// rebuild fan-out below.
-import { timeSeam } from './perfAttribution'
 import { getOverlayWindow, sendToMain } from './windows'
 import type { CharacterRef, OverlayKind } from '../shared/types'
 
@@ -107,18 +104,10 @@ export function sendToCharacterAwareOverlays(channel: string, ...args: unknown[]
  * Every `log:character` send in this process goes through here, so "who is told the world was
  * rebuilt" is answered in one place rather than at each call site — which is precisely how the
  * overlays came to be missing from it (JOS-172).
- *
- * A TIMED SEAM (JOS-458). It fires in the minute after a fold and its cost is a FAN-OUT: one
- * `webContents.send` per open character-aware window, each of which serializes the payload and
- * wakes a renderer that immediately asks for a full snapshot back. The bracket covers OUR half
- * (the sends), never the renderers' work, so a large number here is main's own bill and nobody
- * else's.
  */
 export function sendWorldRebuilt(character: CharacterRef | null): void {
-  timeSeam('worldRebuilt', () => {
-    sendToMain(IPC.onCharacter, character)
-    sendToCharacterAwareOverlays(IPC.onCharacter, character)
-  })
+  sendToMain(IPC.onCharacter, character)
+  sendToCharacterAwareOverlays(IPC.onCharacter, character)
   // …AND ANYTHING IN-PROCESS THAT NEEDS THE SAME NEWS (JOS-479). See `setWorldRebuiltObserver`.
   worldRebuiltObserver?.(character)
 }
@@ -140,10 +129,6 @@ export function sendWorldRebuilt(character: CharacterRef | null): void {
  * avoided. `engineHost.ts` composes this feature and fills the slot; a launch that never composes
  * one finds a null and pays one comparison per rebuild. An import here would make this leaf drag
  * the whole supervisor and its child-process plumbing into anything that announces a rebuild.
- *
- * IT RUNS OUTSIDE THE `timeSeam` BRACKET on purpose. That bracket measures OUR half of the
- * rebuild fan-out — the `webContents.send`s — and folding a dev-only probe into the same
- * measurement would put an instrument's cost inside the number the instrument reports.
  */
 let worldRebuiltObserver: ((character: CharacterRef | null) => void) | null = null
 
