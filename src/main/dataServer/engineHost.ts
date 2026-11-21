@@ -77,7 +77,6 @@ import { app, powerMonitor } from 'electron'
 import { logError, logInfo, logWarn } from '../errorLog'
 import { E2E } from '../e2e'
 import { setEnginePid } from '../processPriority'
-import { noteEngineEdge } from '../telemetry/breadcrumbs'
 import { mintToken } from './token'
 import {
   ENGINE_PROFILE_ENV,
@@ -473,12 +472,6 @@ export function startEngineSupervisor(): void {
     // argument is on `setEnginePid` in processPriority.ts.
     onPid: (pid) => {
       setEnginePid(pid)
-      // A BREADCRUMB FOR THE BOOT WINDOW (JOS-501). This is the earliest thing this process can
-      // say about an engine, and until now nothing said anything until the first module cursor
-      // moved — which on the owner's real log is the better part of a minute in. Every crash
-      // before that produced a report with an empty ring. The pid itself is NOT recorded: the
-      // edge is the fact, and `noteEngineEdge` has no parameter one could travel in.
-      noteEngineEdge(pid === null ? 'engine:gone' : 'engine:spawned')
       // The supervisor's status moved with this edge, and the log-read status quotes it.
       noteLogReadTouched()
     },
@@ -518,10 +511,6 @@ export function startEngineSupervisor(): void {
       // as an owner call rather than decided here.
       if (info === null) disarmEngineAlerts()
       else armEngineAlerts()
-      // READY means a round trip ANSWERED, which is the one edge in this flow worth a crumb of its
-      // own: a report whose ring shows `engine:spawned` and no `engine:ready` says the child
-      // started and never proved itself, and that is a different bug from one that never spawned.
-      if (info !== null) noteEngineEdge('engine:ready')
       // …AND THE SHELL IS TOLD A LAUNCH IS UNDER WAY (JOS-503). Both edges say the same thing to a
       // window: nothing to draw yet. `noteEngineStarting` deliberately cannot take a standing card
       // down — see its own comment for why a crash loop would otherwise flicker one.
@@ -540,14 +529,6 @@ export function startEngineSupervisor(): void {
       noteEngineFault(scrubFault(fault, getActiveCharacter()?.logPath ?? null, homedir()))
       // Said even when the fault did not change: `absent` is a status, not only a fault.
       noteLogReadTouched()
-    },
-    // THE CYCLING EDGE (JOS-519). `onPid(null)` above already wrote `engine:gone` for this same
-    // ending — this is the one bit that ending did not carry: the engine had REACHED READY, so what
-    // the ring shows is not a launch that failed but a working engine being replaced, which the user
-    // meets as another "Catching up on your log". The error-store entry that names the count is the
-    // supervisor's own (`report`); this is the sequence a crash report carries.
-    onServedExit: () => {
-      noteEngineEdge('engine:cycled')
     },
     // The engine's own words, kept for the log-read report (fork #9).
     onEngineSaid: noteEngineSaid

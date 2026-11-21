@@ -58,7 +58,6 @@ import {
   provisionVcRuntime
 } from '../speech/vcRuntime'
 import { getVoicePrefs, setVoicePrefs } from '../store'
-import { classifyFailure, markFunnelStep, noteSpeechFailure, recordFunnelFailure } from '../telemetry'
 import { sendToMain } from '../windows'
 import type { SpeechInstallProgress } from '../../shared/alertTypes'
 import type { SpeechEngine } from '../speech/engine'
@@ -146,28 +145,6 @@ function speechEngine(): SpeechEngine {
 let installing: Promise<SpeechInstallResult> | null = null
 
 /**
- * THE VOICE-INSTALL FUNNEL (JOS-39), wired at the three moments this file already knows about:
- * the download starting, the download ending, and the first utterance the installed tier speaks.
- * Every step is ONCE-EVER per install (src/main/telemetry/funnels.ts) — the funnel asks how far
- * an install ever got, not how many times somebody re-ran a download.
- *
- * `engineSelected` IS MARKED HERE TOO, not only where the preference is saved. A user can press
- * "download" from the Voice panel without ever having saved the engine choice, and a funnel whose
- * step 2 can exceed its step 1 is a broken instrument — the panel is built to make exactly that
- * visible, so the producer must not manufacture it. Pressing download IS selecting the tier.
- */
-function noteDownloadOutcome(result: SpeechInstallResult): void {
-  if (result.ok) {
-    markFunnelStep('voice-install', 'downloadCompleted')
-    return
-  }
-  // A FAILURE IS NOT A MARK: `recordFunnelFailure` records the attempt and its coarse class but
-  // leaves the once-ever step unspent, so a download that fails tonight and succeeds tomorrow is
-  // counted as both — the honest reading of what happened.
-  recordFunnelFailure('voice-install', 'downloadCompleted', classifyFailure(result.message))
-}
-
-/**
  * THE RUNTIME RIDES THE DOWNLOAD (JOS-274, owner ruling 2026-08-13: a voice that downloads is a
  * voice that plays).
  *
@@ -202,8 +179,6 @@ async function installVcRuntime(): Promise<void> {
 }
 
 function startInstall(): Promise<SpeechInstallResult> {
-  markFunnelStep('voice-install', 'engineSelected')
-  markFunnelStep('voice-install', 'downloadStarted')
   const run = installVcRuntime()
     .catch((err: unknown) => {
       // Belt: provisionVcRuntime is written not to reject, and the model download must not be
@@ -227,10 +202,7 @@ function startInstall(): Promise<SpeechInstallResult> {
       installing = null
     })
   installing = run
-  return run.then((result) => {
-    noteDownloadOutcome(result)
-    return result
-  })
+  return run
 }
 
 export function registerSpeechIpc(): void {
@@ -241,19 +213,7 @@ export function registerSpeechIpc(): void {
     // here (rather than in the engine) keeps the store as main's single source for prefs and
     // leaves the engine electron-free.
     const voiceId = request.voiceId ?? getVoicePrefs().voiceId
-    const result = await speechEngine().say(request.text, voiceId, request.tight)
-    // THE FUNNEL'S LAST STEP: the downloaded tier actually spoke. Only a success counts, and only
-    // THIS tier — the system voice is the renderer's own `speechSynthesis` and never reaches
-    // main, which is right: this funnel measures the install flow, and an install that ends in a
-    // system-tier utterance has not completed it.
-    if (result.ok) markFunnelStep('voice-install', 'firstUtterance')
-    // …and the health counter for the other arm (JOS-96). Every way an utterance can fail — a
-    // worker that would not spawn, a dead thread, a synthesis reply that came back not-ok, a
-    // missing cache file, an engine that is not installed — collapses into this one
-    // `SpeechSayResult`, so this is the single funnel. Counts only: the `reason` is not sent.
-    // Same tier caveat as the funnel above: the system voice never reaches main.
-    else noteSpeechFailure()
-    return result
+    return speechEngine().say(request.text, voiceId, request.tight)
   })
 
   ipcMain.handle(IPC.speechVoices, (): Promise<SpeechVoice[]> => {
@@ -288,12 +248,6 @@ export function registerSpeechIpc(): void {
     // main-side callers, and again inside it — the function is idempotent, and an unparseable
     // payload writes the documented defaults rather than rejecting. The setter's contract is
     // "the store now holds something legal", which is always satisfiable.
-    const next = setVoicePrefs(normalizeVoicePrefs(prefs))
-    // `engineSelected` — the voice-install funnel's step 1, and only for the tier that HAS an
-    // install. 'system' is the default every install already has and needs no download; counting
-    // it here would put every install into step 1 and make the drop-off to `downloadStarted` read
-    // as a failure of the download rather than as "they were happy with the free voice".
-    if (next.engine === 'kokoro') markFunnelStep('voice-install', 'engineSelected')
-    return next
+    return setVoicePrefs(normalizeVoicePrefs(prefs))
   })
 }

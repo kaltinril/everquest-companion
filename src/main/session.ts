@@ -56,7 +56,6 @@ import { setAchievements } from './storeAchievements'
 import { setFactions } from './storeFactions'
 // The clean-shutdown tail mark (JOS-57 scope addition) — a split-out store accessor, for the
 // reason its own header gives: store.ts is at the factoring ceiling.
-import { markFunnelStep } from './telemetry'
 // "Another character's log is active — switch?" (JOS-432). Three touch points in this file and
 // nothing else: stamp every tailed line, follow the character we just attached, let go on the way
 // out. The decision (and the reason it cannot nag) is src/main/log/quietSwitch.ts.
@@ -458,10 +457,6 @@ export async function tailCharacter(ref: CharacterRef): Promise<boolean> {
 function attachCharacter(ref: CharacterRef): void {
   setActiveLogPath(ref.logPath)
   logInfo(`[everquest-companion] Tailing ${ref.name}@${ref.server}: ${ref.logPath}`)
-  // THE FIRST-RUN FUNNEL'S `logDetected`, at the one moment that is unambiguously "we found a log
-  // and are about to read it" — after resolution succeeded. The once-ever mark
-  // (telemetry/funnels.ts) is what keeps a character switch from re-firing it.
-  markFunnelStep('first-run', 'logDetected')
 
   // …and start the quiet clock. It watches whether OUR file is being written to at all, which is a
   // question about the log rather than about a fold. Its feeder is the engine's cursors

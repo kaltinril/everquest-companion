@@ -11,11 +11,11 @@
 // was stalled by the same thing; ONLY MAIN late ⇒ we stalled, and that is a bug with an address.
 // `coincidentWindows` (shared/perfLive.ts) is that verdict; this file is its two instruments.
 //
-// A LEAF, LIKE `log/tailIoStats.ts`, AND FOR THE SAME TWO REASONS. It is plain data in memory
-// with no idea the user's telemetry switch exists (the telemetry seam drains it and applies the
-// gate, once, where every other producer does), and it must not join an import cycle: `perf.ts`
-// starts it and `telemetry/liveRiders.ts` drains it, and if this module reached back into either
-// the two would be a loop under the app's own privacy boundary.
+// A LEAF, LIKE `log/tailIoStats.ts`: plain data in memory, started by `perf.ts`.
+//
+// NOTHING DRAINS IT SINCE 2026-11-20. Its two readers were the usage-analytics session report
+// (`takeLiveProbeReading`) and the feedback report's perf block (`peekLiveTimeline`), and both
+// are removed. The clocks still run while the HUD is open and the two readers are still exported.
 //
 // ============================ WHAT IT COSTS, MEASURED =============================
 // Rule 1 of perf.ts's performance contract is that an instrument which costs something is a bug,
@@ -177,17 +177,15 @@ export function stopLiveProbe(): void {
 
 /**
  * WHO WANTS THE CLOCKS (audit item 8). Two 250 ms timers, one of them a thread, ran from
- * `replayDone` to quit on every install, and their readings go two places: the telemetry riders
- * (`takeLiveProbeReading`, sent only when collection is on) and the perf HUD's attribution rings.
- * With neither on they measured for nobody. The probes now run while the launch is past
- * `replayDone` AND the HUD is open or telemetry collection is enabled; `perf.ts` and the telemetry
- * toggle report those facts here, and this module, which imports nothing Electron, decides.
+ * `replayDone` to quit on every install. With nobody reading they measured for nobody. The probes
+ * now run while the launch is past `replayDone` AND the HUD is open; `perf.ts` reports those
+ * facts here, and this module, which imports nothing Electron, decides.
  */
-const demand = { armed: false, hud: false, telemetry: false }
+const demand = { armed: false, hud: false }
 
 export function setLiveProbeDemand(key: keyof typeof demand, on: boolean): void {
   demand[key] = on
-  const wanted = demand.armed && (demand.hud || demand.telemetry)
+  const wanted = demand.armed && demand.hud
   if (wanted) startLiveProbe()
   else stopLiveProbe()
 }

@@ -27,7 +27,6 @@ import { registerClipboardIpc } from './clipboard'
 import { registerComboIpc } from './combo'
 import { registerDevIpc } from './dev'
 import { registerFactionsIpc } from './factions'
-import { registerFeedbackIpc } from './feedback'
 import { registerGraphicsIpc } from './graphics'
 import { registerKnowledgeIpc } from './knowledge'
 import { registerMapsIpc } from './maps'
@@ -44,7 +43,6 @@ import { registerSettingsRecoveryIpc } from './settingsRecovery'
 import { registerShareIpc } from './share'
 import { registerSoundsIpc } from './sounds'
 import { registerSpeechIpc } from './speech'
-import { registerTelemetryIpc } from './telemetry'
 import { registerUiScaleIpc } from './uiScale'
 import { registerGapVerdictsIpc } from './gapVerdicts'
 import { registerGapsCharactersIpc } from '../gapsCharacters'
@@ -115,8 +113,6 @@ export function registerIpc(): void {
   registerConCardIpc()
   registerTrayIpc()
   registerClipboardIpc()
-  registerFeedbackIpc()
-  registerTelemetryIpc()
   registerPerfIpc()
   registerGraphicsIpc()
   registerBuffTrustIpc()
