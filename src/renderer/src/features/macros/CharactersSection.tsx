@@ -1,42 +1,23 @@
-// macros/CharactersSection.tsx — the Characters section: the character files found in the game
-// folder, what the game holds in the picked one, and the set chosen for it with what that set
-// would change. Send (GameFileSend.tsx) writes the set into the file's macros section; Copy is
-// the same text to carry there by hand.
+// macros/CharactersSection.tsx — the Characters section: pick a character, click a button to edit
+// it, press Send. Top to bottom: the characters found in the game folder, the pages, the page's
+// twelve buttons with the picked one beside them (ButtonPanel.tsx), and the bar that says whether
+// the buttons match the game and sends them (GameFileSend.tsx).
 
-import type { JSX } from 'react'
-import {
-  Button,
-  Chip,
-  List,
-  ListItemButton,
-  MenuItem,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography
-} from '@mui/material'
-import { importGameMacros } from '@shared/macros/library'
-import {
-  chooseSet,
-  chosenSet,
-  diffCounts,
-  diffSetAgainstFile,
-  setFromGameMacros,
-  setToGameMacros,
-  type SlotChange,
-  type SlotDiff
-} from '@shared/macros/sets'
-import { characterFileKey, renderSocials } from '@shared/macros/socials'
+import { type JSX, type ReactNode, useState } from 'react'
+import { Alert, Box, Button, Stack, Tab, Tabs, Typography } from '@mui/material'
+import { type PageTab, gameChanges, gridPage, moveSlot, pageTabs } from '@shared/macros/buttons'
+import { findMacro } from '@shared/macros/library'
+import { FIRST_EDITABLE_PAGE } from '@shared/macros/limits'
+import { assignSlot, chosenSet } from '@shared/macros/sets'
+import { characterFileKey } from '@shared/macros/socials'
 import type { CharacterFileMacros, GameFilesReason, MacroSet } from '@shared/macros/types'
-import { BackupsLine, SendOutcome, SendToGame } from './GameFileSend'
-import { MONO_SX, Quiet, TwoPane } from './macroParts'
-import { useMacroUi } from './macroUi'
+import { ButtonGrid } from './ButtonGrid'
+import { ButtonPanel } from './ButtonPanel'
+import { GameBar } from './GameFileSend'
+import { LayoutsMenu } from './LayoutsMenu'
+import { Quiet, UndoRedo } from './macroParts'
 import type { GameFilesState } from './useGameFiles'
-import { type GameWriter, useGameWriter } from './useGameWriter'
+import { useGameWriter } from './useGameWriter'
 import type { MacroStore } from './useMacroLibrary'
 
 const NO_FOLDER: Record<GameFilesReason, string> = {
@@ -44,20 +25,13 @@ const NO_FOLDER: Record<GameFilesReason, string> = {
   unreadable: 'The game folder could not be read. Check the EverQuest install folder in Preferences, then read again.'
 }
 
-const CHANGE_COLOR: Record<SlotChange, 'success' | 'warning' | 'error' | 'default'> = {
-  added: 'success',
-  changed: 'warning',
-  removed: 'error',
-  same: 'default'
+/** The page shown and the button picked on it. */
+export interface Spot {
+  page: number
+  slot: string | null
 }
 
-function slotName(page: number, button: number): string {
-  return `Page ${String(page)}, button ${String(button)}`
-}
-
-function macroCount(n: number): string {
-  return n === 1 ? '1 macro in the game' : `${String(n)} macros in the game`
-}
+export const FIRST_SPOT: Spot = { page: FIRST_EDITABLE_PAGE, slot: null }
 
 interface CharactersProps {
   store: MacroStore
@@ -65,231 +39,209 @@ interface CharactersProps {
   /** The picked file's key (shared `characterFileKey`); the first file when it names none. */
   selected: string | null
   onSelect: (key: string) => void
+  spot: Spot
+  onSpot: (spot: Spot) => void
+  /** A library macro waiting to be put on a button ("Put on a button..." in the Library). */
+  placing: string | null
+  onPlaced: () => void
 }
 
-/** Why there is no list: still reading, no folder, or a folder with no character file. */
-function listStatus(game: GameFilesState): string | null {
+/** Why there is no character to show: still reading, no folder, or a folder with no character file. */
+function listStatus(game: GameFilesState): string {
   const { reply } = game
   if (reply === null) return 'Reading the game folder.'
   if (reply.gameFolder === null) return NO_FOLDER[reply.reason ?? 'unreadable']
-  if (reply.files.length === 0) return 'No character file in the game folder yet. Log in to a character once, then read again.'
-  return null
+  return 'No character file in the game folder yet. Log in to a character once, then read again.'
 }
 
-function FileList({ game, picked, onSelect }: { game: GameFilesState; picked: CharacterFileMacros | null; onSelect: (key: string) => void }): JSX.Element {
-  const status = listStatus(game)
+function NoCharacters({ game }: { game: GameFilesState }): JSX.Element {
   return (
-    <>
-      <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
-        <Typography variant="subtitle2">Characters found</Typography>
+    <Stack spacing={1} alignItems="flex-start">
+      <Quiet testid="macro-files-status">{listStatus(game)}</Quiet>
+      {game.reply !== null && (
         <Button size="small" variant="outlined" onClick={game.reload} disabled={game.reading} data-testid="macro-files-reload">
           Read again
         </Button>
-      </Stack>
-      {status !== null && <Quiet testid="macro-files-status">{status}</Quiet>}
-      <List dense disablePadding sx={{ maxHeight: '50vh', overflow: 'auto' }}>
-        {(game.reply?.files ?? []).map((f) => (
-          <ListItemButton
-            key={f.file}
-            selected={f === picked}
-            data-testid="macro-file-row"
-            sx={{ display: 'block', borderRadius: 1 }}
-            onClick={() => {
-              onSelect(characterFileKey(f))
-            }}
-          >
-            <Typography variant="body2" noWrap sx={{ fontWeight: 600 }}>
-              {f.character}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {f.server}, loadout {f.loadout} · {macroCount(f.macros.length)}
-            </Typography>
-          </ListItemButton>
-        ))}
-      </List>
-      <Quiet>One row per character and loadout: the game keeps a macro file for each.</Quiet>
-    </>
-  )
-}
-
-/** What the game holds in the file now, and the two ways to take it into the app. */
-function InGameNow({ store, file }: { store: MacroStore; file: CharacterFileMacros }): JSX.Element {
-  const ui = useMacroUi()
-  const importAll = (): void => {
-    const result = importGameMacros(store.library, file.macros)
-    store.change(() => result.library)
-    ui.notify(`${String(result.added)} added, ${String(result.skipped)} already in the library`)
-  }
-  const makeSet = (): void => {
-    const made = setFromGameMacros(store.library, `${file.character} today`, file.macros)
-    store.change(() => chooseSet(made.library, characterFileKey(file), made.set.id))
-    ui.notify(`Made the set "${made.set.name}"`)
-  }
-  if (file.macros.length === 0) return <Quiet testid="macro-file-empty">This character has no macros of its own yet.</Quiet>
-  return (
-    <>
-      <Table size="small" data-testid="macro-file-macros">
-        <TableHead>
-          <TableRow>
-            <TableCell>Slot</TableCell>
-            <TableCell>Name</TableCell>
-            <TableCell>Commands</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {file.macros.map((m) => (
-            <TableRow key={`${String(m.page)}:${String(m.button)}`} data-testid="macro-file-macro">
-              <TableCell sx={{ whiteSpace: 'nowrap', verticalAlign: 'top' }}>{slotName(m.page, m.button)}</TableCell>
-              <TableCell sx={{ fontWeight: 600, verticalAlign: 'top' }}>{m.name}</TableCell>
-              <TableCell sx={{ ...MONO_SX, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{m.lines.join('\n')}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <Stack direction="row" spacing={1}>
-        <Button size="small" variant="outlined" onClick={importAll} data-testid="macro-file-import">
-          Import to library
-        </Button>
-        <Button size="small" variant="outlined" onClick={makeSet} data-testid="macro-file-make-set">
-          Make a set from this file
-        </Button>
-      </Stack>
-    </>
-  )
-}
-
-function DiffTable({ diff }: { diff: SlotDiff[] }): JSX.Element {
-  const empty = (
-    <Typography variant="body2" color="text.secondary" component="span">
-      empty
-    </Typography>
-  )
-  return (
-    <Table size="small" data-testid="macro-diff">
-      <TableHead>
-        <TableRow>
-          <TableCell>Slot</TableCell>
-          <TableCell>Now in the game</TableCell>
-          <TableCell>With this set</TableCell>
-          <TableCell />
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {diff.map((d) => (
-          <TableRow key={`${String(d.page)}:${String(d.button)}`} data-testid="macro-diff-row">
-            <TableCell sx={{ whiteSpace: 'nowrap' }}>{slotName(d.page, d.button)}</TableCell>
-            <TableCell>{d.file === null ? empty : d.file.name}</TableCell>
-            <TableCell>{d.set === null ? empty : d.set.name}</TableCell>
-            <TableCell align="right">
-              <Chip size="small" variant="outlined" color={CHANGE_COLOR[d.kind]} label={d.kind} />
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  )
-}
-
-interface SetChangesProps {
-  store: MacroStore
-  file: CharacterFileMacros
-  set: MacroSet
-  writer: GameWriter
-}
-
-/** What the chosen set would change in the file, and the two ways to get it there. */
-function SetChanges({ store, file, set, writer }: SetChangesProps): JSX.Element {
-  const ui = useMacroUi()
-  const setMacros = setToGameMacros(store.library, set)
-  const diff = diffSetAgainstFile(setMacros, file.macros)
-  const counts = diffCounts(diff)
-  return (
-    <>
-      <Typography variant="body2" data-testid="macro-diff-counts">
-        <Typography component="span" variant="body2" color="success.main">
-          {counts.added} added
-        </Typography>
-        {', '}
-        <Typography component="span" variant="body2" color="warning.main">
-          {counts.changed} changed
-        </Typography>
-        {', '}
-        <Typography component="span" variant="body2" color="error.main">
-          {counts.removed} removed
-        </Typography>
-        {`, ${String(counts.same)} the same.`}
-      </Typography>
-      <DiffTable diff={diff} />
-      <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-        <Button
-          size="small"
-          variant="contained"
-          data-testid="macro-file-copy"
-          onClick={() => {
-            ui.copy(renderSocials(setMacros))
-          }}
-        >
-          Copy [Socials] text
-        </Button>
-        <SendToGame file={file} macros={setMacros} counts={counts} writer={writer} />
-      </Stack>
-      <SendOutcome writer={writer} />
-      <Quiet testid="macro-file-send-note">Send changes only the macros section of {file.file} and keeps copies beside it.</Quiet>
-    </>
-  )
-}
-
-function FileDetail({ store, file, reload }: { store: MacroStore; file: CharacterFileMacros; reload: () => void }): JSX.Element {
-  const key = characterFileKey(file)
-  const set = chosenSet(store.library, key)
-  const writer = useGameWriter(file.file, reload)
-  return (
-    <Stack spacing={1.5} data-testid="macro-file-detail">
-      <Stack direction="row" spacing={1} alignItems="baseline" justifyContent="space-between" useFlexGap flexWrap="wrap">
-        <Typography variant="subtitle1">
-          {file.character}{' '}
-          <Typography component="span" variant="body2" color="text.secondary">
-            {file.server}, loadout {file.loadout}
-          </Typography>
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={MONO_SX}>
-          {file.file}
-        </Typography>
-      </Stack>
-      <BackupsLine file={file} writer={writer} />
-      <Typography variant="subtitle2">In the game now</Typography>
-      <InGameNow store={store} file={file} />
-      <Typography variant="subtitle2">Set for this character</Typography>
-      <TextField
-        select
-        size="small"
-        value={set?.id ?? ''}
-        onChange={(e) => {
-          const id = e.target.value
-          store.change((current) => chooseSet(current, key, id === '' ? null : id))
-        }}
-        slotProps={{ select: { displayEmpty: true } }}
-        data-testid="macro-file-set"
-      >
-        <MenuItem value="">No set chosen</MenuItem>
-        {store.library.sets.map((s) => (
-          <MenuItem key={s.id} value={s.id}>
-            {s.name === '' ? 'Unnamed set' : s.name}
-          </MenuItem>
-        ))}
-      </TextField>
-      {set === null ? (
-        <Quiet testid="macro-file-no-set">Choose a set to see what would change for this character.</Quiet>
-      ) : (
-        <SetChanges store={store} file={file} set={set} writer={writer} />
       )}
     </Stack>
   )
 }
 
-export function CharactersSection({ store, game, selected, onSelect }: CharactersProps): JSX.Element {
+function whereOf(file: CharacterFileMacros): string {
+  return `${file.server}, loadout ${String(file.loadout)}`
+}
+
+interface PickerProps {
+  files: CharacterFileMacros[]
+  picked: CharacterFileMacros
+  onSelect: (key: string) => void
+}
+
+/** Every character file found, one button each. A single character needs no picking: just its name. */
+function CharacterPicker({ files, picked, onSelect }: PickerProps): JSX.Element {
+  if (files.length === 1) {
+    return (
+      <Stack direction="row" spacing={1} alignItems="baseline" sx={{ flexShrink: 0 }} data-testid="macro-file-only">
+        <Typography variant="h6">{picked.character}</Typography>
+        <Typography variant="body2" color="text.secondary">
+          {whereOf(picked)}
+        </Typography>
+      </Stack>
+    )
+  }
+  return (
+    <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ flexShrink: 0 }} data-testid="macro-files">
+      {files.map((f) => {
+        const on = f === picked
+        return (
+          <Button
+            key={f.file}
+            variant={on ? 'contained' : 'outlined'}
+            color={on ? 'primary' : 'inherit'}
+            aria-pressed={on}
+            data-testid="macro-file-row"
+            sx={{ display: 'block', textAlign: 'left', textTransform: 'none', py: 0.5, borderColor: on ? undefined : 'divider' }}
+            onClick={() => {
+              onSelect(characterFileKey(f))
+            }}
+          >
+            <Typography variant="subtitle1" component="div" sx={{ fontWeight: 600, lineHeight: 1.3 }}>
+              {f.character}
+            </Typography>
+            <Typography variant="caption" component="div" sx={{ opacity: 0.75 }}>
+              {whereOf(f)}
+            </Typography>
+          </Button>
+        )
+      })}
+    </Stack>
+  )
+}
+
+interface PageRowProps {
+  tabs: PageTab[]
+  page: number
+  onPage: (page: number) => void
+  /** What stands at the row's right end. */
+  children: ReactNode
+}
+
+/** "Page 2" to "Page 10", each with how many of its buttons are filled. */
+function PageRow({ tabs, page, onPage, children }: PageRowProps): JSX.Element {
+  return (
+    <Stack direction="row" spacing={1} alignItems="center">
+      <Tabs
+        value={page}
+        variant="scrollable"
+        scrollButtons="auto"
+        onChange={(_e, next: number) => {
+          onPage(next)
+        }}
+        sx={{ minHeight: 32, flexGrow: 1, minWidth: 0, '& .MuiTab-root': { minHeight: 32, py: 0.5, minWidth: 0 } }}
+      >
+        {tabs.map((t) => (
+          <Tab key={t.page} value={t.page} label={t.filled > 0 ? `Page ${String(t.page)} (${String(t.filled)})` : `Page ${String(t.page)}`} data-testid="macro-set-page" />
+        ))}
+      </Tabs>
+      {children}
+    </Stack>
+  )
+}
+
+interface DetailProps extends Omit<CharactersProps, 'selected' | 'onSelect'> {
+  file: CharacterFileMacros
+  files: CharacterFileMacros[]
+  /** The character's own layout. */
+  set: MacroSet
+}
+
+/** One character: its pages, the page's buttons, the picked button beside them, and the game bar. */
+function CharacterDetail({ store, game, file, files, set, spot, onSpot, placing, onPlaced }: DetailProps): JSX.Element {
+  const writer = useGameWriter(file.file, game.reload)
+  /** The macro New just made on a button: its name box takes the focus once. */
+  const [fresh, setFresh] = useState<string | null>(null)
+  const { library } = store
+  const tabs = pageTabs(library, set, file.macros)
+  const page = tabs.some((t) => t.page === spot.page) ? spot.page : FIRST_EDITABLE_PAGE
+  const cells = gridPage(library, set, page, file.macros)
+  const changes = gameChanges(library, set, file.macros)
+  const toPlace = findMacro(library, placing)
+  const go = (nextPage: number, slot: string | null): void => {
+    setFresh(null)
+    onSpot({ page: nextPage, slot })
+  }
+  const pick = (slot: string): void => {
+    go(page, slot)
+    if (toPlace === null) return
+    store.change((current) => assignSlot(current, set.id, slot, toPlace.id))
+    onPlaced()
+  }
+  const move = (from: string, to: string): void => {
+    store.change((current) => moveSlot(current, set.id, from, to))
+    go(page, to)
+  }
+  const none = changes.macros.length === 0 && file.macros.length === 0
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, minHeight: 0 }} data-testid="macro-file-detail">
+      <Box sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto', overscrollBehavior: 'contain' }}>
+        <Stack spacing={1.5}>
+          <PageRow
+            tabs={tabs}
+            page={page}
+            onPage={(next) => {
+              go(next, null)
+            }}
+          >
+            <LayoutsMenu store={store} game={game} file={file} files={files} set={set} macros={changes.macros} />
+            <UndoRedo store={store} />
+          </PageRow>
+          {toPlace !== null && (
+            <Alert
+              severity="info"
+              data-testid="macro-placing"
+              action={
+                <Button color="inherit" size="small" onClick={onPlaced} data-testid="macro-placing-cancel">
+                  Cancel
+                </Button>
+              }
+            >
+              Click a button to put {toPlace.name === '' ? 'the macro' : toPlace.name} on it.
+            </Alert>
+          )}
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 1fr) minmax(340px, 440px)' }, gap: 2, alignItems: 'start' }}>
+            <ButtonGrid buttons={cells} selected={spot.slot} onPick={pick} onMove={move} />
+            <ButtonPanel
+              store={store}
+              set={set}
+              cell={cells.find((c) => c.slot === spot.slot) ?? null}
+              page={page}
+              pages={tabs}
+              hint={none ? 'No macros yet. Click a button to add one.' : 'Click a button to edit it.'}
+              fresh={fresh}
+              onFresh={setFresh}
+              onGo={go}
+            />
+          </Box>
+        </Stack>
+      </Box>
+      <GameBar file={file} changes={changes} writer={writer} game={game} />
+    </Box>
+  )
+}
+
+export function CharactersSection({ store, game, selected, onSelect, ...rest }: CharactersProps): JSX.Element {
   const files = game.reply?.files ?? []
   const picked = files.find((f) => characterFileKey(f) === selected) ?? files.at(0) ?? null
-  const right = picked === null ? <Quiet testid="macro-file-none">No character file to show.</Quiet> : <FileDetail key={picked.file} store={store} file={picked} reload={game.reload} />
-  return <TwoPane left={<FileList game={game} picked={picked} onSelect={onSelect} />} right={right} />
+  if (picked === null) return <NoCharacters game={game} />
+  const set = chosenSet(store.library, characterFileKey(picked))
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, minHeight: 0, gap: 1.5 }}>
+      <CharacterPicker files={files} picked={picked} onSelect={onSelect} />
+      {set === null ? (
+        <Quiet testid="macro-file-loading">Reading this character&apos;s macros.</Quiet>
+      ) : (
+        <CharacterDetail key={picked.file} store={store} game={game} file={picked} files={files} set={set} {...rest} />
+      )}
+    </Box>
+  )
 }
