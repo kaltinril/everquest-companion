@@ -301,7 +301,6 @@ test('every Preferences card seeds from the gate, and none of them re-reads main
     'OverlaysAppearanceSetting.tsx',
     'ToastSetting.tsx',
     'VoiceSetting.tsx',
-    'TelemetrySetting.tsx',
     'EqFolderSetting.tsx',
     'UpdateSetting.tsx'
   ]
