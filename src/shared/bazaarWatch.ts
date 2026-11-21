@@ -140,6 +140,12 @@ export function watchOnItem(list: BazaarWatchlist, item: string): BazaarWatch | 
   return on.find((w) => w.tier === null) ?? on[0] ?? null
 }
 
+/** A stored share of the median as the percent a person typed: 0.125 is 12.5, 0.8 is 80 (never
+ *  80.00000000000001). Two decimals, because the alert compares the stored value exactly. */
+export function sharePercent(share: number): number {
+  return Math.round(share * 10_000) / 100
+}
+
 /**
  * The row's watch chip: what alerts on it, or only that it is watched. Thresholds in full, as typed.
  * A price and a share of the median are BOTH named, joined by "or": either one alerts (`wtsReason`),
@@ -148,7 +154,7 @@ export function watchOnItem(list: BazaarWatchlist, item: string): BazaarWatch | 
 export function watchChipLabel(w: BazaarWatch): string {
   const caps: string[] = []
   if (w.wtsMax !== null) caps.push(formatPlatExact(w.wtsMax))
-  if (w.wtsShare !== null) caps.push(`${String(Math.round(w.wtsShare * 100))}% median`)
+  if (w.wtsShare !== null) caps.push(`${String(sharePercent(w.wtsShare))}% median`)
   const wts = caps.length === 0 ? 'WTS' : `WTS ≤ ${caps.join(' or ')}`
   const wtb = w.wtbMin !== null ? `WTB ≥ ${formatPlatExact(w.wtbMin)}` : 'WTB'
   const on = [w.wts ? wts : '', w.wtb ? wtb : ''].filter((s) => s !== '')

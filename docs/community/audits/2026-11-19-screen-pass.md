@@ -25,7 +25,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
 
 ## Preferences: left menu row height and text size
 
-- NOT RE-CHECKED [low, cosmetic] The feedback row's second line wraps to two lines whenever the menu
+- GONE 2026-11-20 (the row's second line was removed with the feedback and analytics work) [low, cosmetic] The feedback row's second line wraps to two lines whenever the menu
   has a scrollbar Seen: nav-feedback .MuiListItemText-secondary 'Off in the community build': ink
   142.9px wide on 1 line in a 150px box when there is no scrollbar (147px box at 16px text). With
   the 12px scrollbar the box is 138px (135px at 16px text) and the ink becomes 112.9 x 31.6, two
@@ -55,12 +55,12 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   Add a source-reading unit test in tests/uiScale.test.mts, which already reads these source files
   and pins navMenuItem(SIZE_WORDS). Read NavMenuSetting.tsx, take the pref-nav-note caption text,
   and assert three things: ...
-- NOT RE-CHECKED [low, missing] Searching Preferences for 'row height', the label printed on the
+- FIXED 2026-11-20 (the card's keywords) [low, missing] Searching Preferences for 'row height', the label printed on the
   card, finds nothing Seen: Query 'row height' (and 'Row height'): 'Left menu card NOT SHOWN; cards
   in order: none'. 'row' alone and 'height' alone each show the card; 'text size' shows it. Also not
   found: 'taller', 'menu size'. The search is a substring test of the whole query against label plus
   keywords, and the keywords hold 'rows row spacing ...
-- NOT RE-CHECKED [low, cut-off] At 150% text size in the minimum window the card's two labels
+- LEFT 2026-11-20 (a small-window cut-off: the owner on the same kind of report, "if no one complained ignore for now") [low, cut-off] At 150% text size in the minimum window the card's two labels
   disappear, leaving two unlabelled steppers Seen: 'Text size' label box 0px wide holding 51px of
   text; 'Row height' label box 0px wide holding 70px (white-space nowrap, overflow hidden,
   text-overflow ellipsis, so nothing of either is drawn). Steppers at x 448.7..560.7, 0.7px past the
@@ -103,7 +103,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   test in tests/skills.test.mts: replace assert.equal(skillsEmptyText(null, 0), null) with
   assert.equal(skillsEmptyText(null, 0), SKILLS_READING_TEXT). Also assert that the text matches
   /^Reading log/ and contains no ...
-- NOT RE-CHECKED [low, cut-off] At the minimum window with larger text, the list scrolls sideways
+- LEFT 2026-11-20 (a small-window cut-off: the owner on the same kind of report, "if no one complained ignore for now") [low, cut-off] At the minimum window with larger text, the list scrolls sideways
   and the right-hand columns are cut off Seen: 125%, long names (probe 1 step 8): the list box has
   scrollWidth 444 against clientWidth 412; the table is 444.4px wide in a box whose visible right
   edge is x=664; the "Last raised" cell text runs 606.1..680.4, so 16px of every date is outside the
@@ -356,7 +356,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   can show this, so it needs an e2e check in the nearest Sky spec, or in text-size.e2e.mts beside
   its 125% case. Steps: open Sky > Quests, search one quest, expand it. Narrow the window to 900x600
   ...
-- NOT RE-CHECKED [low, confusing] The hidden-chip line can read 'Off this list by a count you set:
+- NOT RE-CHECKED, waits on the owner's pick on the Sky '+' wording (item 5 of the list given him) [low, confusing] The hidden-chip line can read 'Off this list by a count you set:
   Azarack Skin: 1', a count that would not take the item off the list Seen: Row 'Azarack Skin x1 By
   hand: 1'; after '+' on the quest (quest reads 0/1, 'Turned in x2') the Cleanup tab shows no row,
   summary chip '1 count set by hand', and the line 'Off this list by a count you set:' + chip
@@ -379,7 +379,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   tests/skyItemOverrides.test.mts or tests/skyRecordedTurnInCounts.test.mts. It asserts that
   handCountChipTitle(5, 'a date') names neither 'the log and the export' nor any single witness,
   ends by ...
-- NOT RE-CHECKED [low, confusing] After Enter, Escape, the check or the X the keyboard focus is
+- FIXED 2026-11-20 (`ItemOverrides.tsx`: the pencil takes the focus back; e2e `sky-item-override`) [low, confusing] After Enter, Escape, the check or the X the keyboard focus is
   dropped to the page body Seen: On open document.activeElement is the input (focused: true). After
   Enter (7, 99999, 100000, blank, -5, 2.7) and after Escape, document.activeElement is BODY; the
   pencil button that opened the editor is not focused again, so a keyboard user starts from the top
@@ -506,13 +506,13 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
 
 ## Gear: Void motes tab
 
-- NOT RE-CHECKED [high, cut-off] At the minimum width, and at 125% text, the table does not fit: the
+- LEFT 2026-11-20 (a small-window cut-off: the owner on the same kind of report, "if no one complained ignore for now") [high, cut-off] At the minimum width, and at 125% text, the table does not fit: the
   last columns are off to the side and rows grow up to 228 px tall Seen: 900 px, 100%:
   [data-testid="gear-motes-list"] scrollWidth 726 against clientWidth 622. "Copies come from" spans
   x733.4 to x962.9 and the visible area ends at x859, so 104 of its 229.5 px are hidden ("Camp: 1 in
   12, hard fight" is cut). The Next tier column is 91 px (367 px at the default window), so rows are
   74 to 228 ...
-- NOT RE-CHECKED [medium, cut-off] The week's plan line is cut off and its hover does not give the
+- FIXED 2026-11-20 (the hover now gives the whole line; the line itself still truncates) [medium, cut-off] The week's plan line is cut off and its hover does not give the
   text Seen: [data-testid="gear-motes-plan"] is one nowrap line with text-overflow ellipsis and
   title "Void-Touched Potential: three a week from raids, each skips a whole tier." Default 1280
   window, three +9 pieces: "This week: Lustrous Russet Vambraces +9→+10 · Gauntlets of Fiery Might
@@ -550,7 +550,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   line keeps its noWrap ellipsis. Optionally add rowGap 0.75 so ... Test: Only the running app can
   show this, so it needs an e2e check, not a unit test. In tests/e2e/gearVoidMoteSteps.mts (run from
   gear.e2e.mts), after the Void motes rows appear: narrow the window to its 900 px minimum and ...
-- NOT RE-CHECKED [low, untrue-words] The empty text claims everything is +10 when nothing known is
+- FIXED 2026-11-20 (`moteEmptyText` claims only what an empty list proves) [low, untrue-words] The empty text claims everything is +10 when nothing known is
   worn Seen: Nothing worn: "Nothing you wear can go higher: every piece the item data knows is
   already +10." with 0 rows and no other line. Only unmatched pieces (22 of them, tiers +0 to +8):
   "Every worn piece the item data knows is already +10." above a not-ranked line naming all 22. In
@@ -641,7 +641,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   unchanged. 2. In ... Test: Unit tests in tests/bazaarWatch.test.mts. Expect parsePlat('12,500')
   === 12500, parsePlat('1,500pp') === 1500, parsePlat('1,500,000') === 1500000 and
   parsePlat('2,500k') === 2500000. Expect null from parsePlat('1,50'), ...
-- NOT RE-CHECKED [medium, untrue-words] Bazaar: a tier's row chip and panel say nothing alerts on it
+- NOT RE-CHECKED, waits on the owner's pick on the every-tier watch (item 14 of the list given him) [medium, untrue-words] Bazaar: a tier's row chip and panel say nothing alerts on it
   while the every-tier watch does alert on it Seen: Row chip on bazaar-row-Fleeting Quiver|4 reads
   "Watch"; its panel reads Watch=on, Every tier=off, "Alert on WTS (someone selling)"=off, "Alert on
   WTB (someone buying)"=off. The box above lists "Tovi WTS Fleeting Quiver +4 25k (at or under your
@@ -695,10 +695,10 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   tests/bazaarWatch.test.mts on the exported watchChipLabel: (a) wts on, wtsMax 12500, wtsShare 0.8:
   expect 'Watch: WTS ≤ 12.5k or 80% median'. (b) wtsMax only: 'Watch: WTS ≤ 12.5k'. (c) wtsShare
   only: ...
-- NOT RE-CHECKED [low, untrue-words] Bazaar: the percent field shows a typed 12.5 as 13 while 12.5%
+- FIXED 2026-11-20 (`sharePercent`, field and chip) [low, untrue-words] Bazaar: the percent field shows a typed 12.5 as 13 while 12.5%
   is what is stored Seen: After the last key the field reads "13", the chip reads "Watch: WTS ≤ 13%
   median", stored wtsShare is 0.125.
-- NOT RE-CHECKED [low, untrue-words] Buffs: a card reads "- elapsed" for its first second Seen: Card
+- FIXED 2026-11-20 (`fmtElapsed`) [low, untrue-words] Buffs: a card reads "- elapsed" for its first second Seen: Card
   text right after landing: "Jonthan's Whistling Warsong | message | - elapsed | ~4s left | log |
   n=1"; "Bounce | message | - elapsed | ~8s left | set | n=1"; "Flash of Light | message | - elapsed
   | ≥ 15s left | log | n=0". The next second it reads "1s elapsed". The left-hand caption was given
@@ -752,7 +752,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   only the running app's layout can show this. In a Bazaar e2e spec, stage a fixture with a long
   item name (35 or more characters) and an item with a two-sided watch (WTS at or under plus WTB at
   or ...
-- NOT RE-CHECKED [low, cut-off] Bazaar detail at 900 px with 125% text: the price grid's "Predicted
+- LEFT 2026-11-20 (a small-window cut-off: the owner on the same kind of report, "if no one complained ignore for now") [low, cut-off] Bazaar detail at 900 px with 125% text: the price grid's "Predicted
   today" column leaves the panel and the page scrolls sideways Seen: bazaar-detail scrollWidth 507
   against clientWidth 410; the "Predicted today" head and its values ("19k", "9k") sit at x
   649.7-759.7, 112.7 px past the panel's inner edge; app-content scrolls sideways by 64 px

@@ -148,6 +148,20 @@ async function stepStateZero(page: Page): Promise<boolean> {
     { timeoutMs: 15_000 }
   )
   check('the editor opens pre-filled with what the app thinks you hold', filled === '1', String(filled))
+  // Closing the box hands the keyboard back to the pencil that opened it (screen pass, 2026-11-20).
+  await page.press(INPUT, 'Escape')
+  const focused = await settle(
+    () => page.evaluate(() => (document.activeElement as HTMLElement | null)?.dataset.testid ?? ''),
+    (v) => v === 'posky-item-count-edit',
+    { timeoutMs: 5_000 }
+  )
+  check('…Escape closes it and the keyboard is back on the pencil', focused === 'posky-item-count-edit', String(focused))
+  await page.click(EDIT, { timeout: 15_000 })
+  await settle(
+    () => page.inputValue(INPUT).catch(() => null),
+    (v) => v === '1',
+    { timeoutMs: 15_000 }
+  )
   await page.fill(INPUT, '0')
   await page.click(SAVE, { timeout: 15_000 })
   const have = await settle(() => haveText(page, ITEM), (v) => v === '0/1', { timeoutMs: 20_000 })

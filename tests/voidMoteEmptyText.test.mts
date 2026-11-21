@@ -7,7 +7,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { moteEmptyText, type MoteEmptyState } from '../src/renderer/src/features/gear/voidMotePrefs'
 
-const MAXED = 'Nothing you wear can go higher: every piece the item data knows is already +10.'
+const MAXED = 'Nothing to rank: no worn piece is below +10.'
 
 /** Everything read and a dump on disk: the one state the "+10" sentence is true in. */
 const SETTLED: MoteEmptyState = {
@@ -47,5 +47,5 @@ test('moteEmptyText: "already +10" is said only when both reads settled and a du
 
 test('moteEmptyText: with a worn item the item data does not know, "nothing can go higher" is not claimed', () => {
   // The unknown piece may be +8: the line under this one names it (`moteUnrankedText`).
-  assert.equal(moteEmptyText({ ...SETTLED, unranked: 1 }), 'Every worn piece the item data knows is already +10.')
+  assert.equal(moteEmptyText({ ...SETTLED, unranked: 1 }), 'Nothing to rank: every worn piece below +10 is missing from the item data.')
 })

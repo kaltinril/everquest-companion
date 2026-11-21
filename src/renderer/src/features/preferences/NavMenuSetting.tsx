@@ -68,7 +68,7 @@ export function navMenuItem(sizeWords: string): PrefItem {
   return {
     id: 'nav-menu',
     label: 'Left menu',
-    keywords: `${sizeWords} menu sidebar side bar left nav navigation drawer tabs rows row spacing spacious gap gaps compact dense density tight height padding`,
+    keywords: `${sizeWords} menu sidebar side bar left nav navigation drawer tabs rows row height taller shorter menu size row spacing spacious gap gaps compact dense density tight height padding`,
     content: <NavMenuSetting />
   }
 }
