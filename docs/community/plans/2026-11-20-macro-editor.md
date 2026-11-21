@@ -140,6 +140,11 @@ to a character, log in, and see it there.
 ## Open decisions (owner)
 
 - Push and release: on the owner's word, after the send above works.
+- Send guard: stays as built, refused while any game client or anything run from the game folder
+  is up. Offered on 2026-11-20: refuse only for a character in use, and stop counting LaunchPad. The
+  owner saw the refusal on Drywrought and said "so this is fine" (read as: keep it; not a ruling
+  against loosening it later). The refusal was the check's first run inside the real app.
+- Loadout labels from the player's own `/who`: looked at and dropped (owner: "do we even care?").
 - Hotbar repair (rewrite `E<n>` when a macro moves) is not built; Review warns instead.
 
 ## Status
