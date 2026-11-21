@@ -214,6 +214,7 @@ import {
   CURRENT_ERA,
   eraBadge,
   eraRank,
+  eraVerdict,
   layeredVerdict,
   zoneEra,
   type Era,
@@ -380,6 +381,24 @@ function droppedOnly(sources: readonly string[] | undefined): boolean {
 
 // ---- the walk ---------------------------------------------------------------------------------
 
+/** The same witnesses the app uses for the item itself: the catalog's zones UNION its own page's. */
+function materialZones(target: ItemDbEntry, catalogs: EraDeriveCatalogs): string[] {
+  return [...new Set([...pageZones(target), ...(catalogs.catalogZones.get(itemKey(target.page)) ?? [])])]
+}
+
+/** Edge 4: an ingredient the recipe says only drops, and whose drops are all out of era. */
+function dropWall(
+  ingredient: ItemCraftIngredient,
+  corpus: ReadonlyMap<string, ItemDbEntry>,
+  catalogs: EraDeriveCatalogs
+): EraDerivation | null {
+  const target = corpus.get(itemKey(ingredient.name))
+  if (target === undefined || !droppedOnly(ingredient.sources)) return null
+  const zones = materialZones(target, catalogs)
+  if (layeredVerdict(zones, target.eraTag) !== 'out-of-era') return null
+  return { basis: 'component-zone', verdict: 'out-of-era', target: ingredient.name, detail: zones.join(', ') }
+}
+
 /** ONE ingredient line → its edge, or null. Edges 1 and 4, which share a target lookup. */
 function componentEdge(
   ingredient: ItemCraftIngredient,
@@ -390,12 +409,38 @@ function componentEdge(
   if (badgedOut(target)) {
     return { basis: 'component', verdict: 'out-of-era', target: ingredient.name, detail: target.eraTag }
   }
-  if (target === undefined || !droppedOnly(ingredient.sources)) return null
-  // The same three witnesses the app uses for the item itself: the catalog's zones for this
-  // ingredient UNION the ones its own page names.
-  const zones = [...new Set([...pageZones(target), ...(catalogs.catalogZones.get(itemKey(target.page)) ?? [])])]
-  if (layeredVerdict(zones, target.eraTag) !== 'out-of-era') return null
-  return { basis: 'component-zone', verdict: 'out-of-era', target: ingredient.name, detail: zones.join(', ') }
+  return dropWall(ingredient, corpus, catalogs)
+}
+
+/**
+ * A crafted item EVERY recipe of which needs a material that only drops out of era cannot be made
+ * here, whatever its own page's banner says (owner, 2026-11-21, of Arctic Wyvern Boots: a `Classic`
+ * banner over a recipe that needs a Cobalt Scar hide: "It should not be showing this as an option
+ * at all"). DEFINITIVE, so it overrules that banner. Only the drop-only read: a foraged or bought
+ * material can be one of a recipe's alternatives (Clump of Dough lists every egg) or sold here.
+ * The material's ZONES must say so, not only its banner: Wasp Wing is bannered Luclin and drops in
+ * Greater Faydark. An item that also drops in era, or that a quest hands out, is left alone.
+ */
+function recipeDropWall(
+  entry: ItemDbEntry,
+  corpus: ReadonlyMap<string, ItemDbEntry>,
+  catalogs: EraDeriveCatalogs
+): EraDerivation | null {
+  const recipes = entry.craftedBy ?? []
+  if (recipes.length === 0 || (entry.questUses ?? []).some((use) => use.role === 'reward')) return null
+  if (eraVerdict([...pageZones(entry), ...(catalogs.catalogZones.get(itemKey(entry.page)) ?? [])]) === 'in-era') return null
+  const walled = (ingredient: ItemCraftIngredient): EraDerivation | null => {
+    const target = corpus.get(itemKey(ingredient.name))
+    if (target === undefined || eraVerdict(materialZones(target, catalogs)) !== 'out-of-era') return null
+    return dropWall(ingredient, corpus, catalogs)
+  }
+  let wall: EraDerivation | null = null
+  for (const recipe of recipes) {
+    const found = recipe.ingredients.map(walled).find((edge) => edge !== null)
+    if (found === undefined || found === null) return null
+    wall ??= found
+  }
+  return wall === null ? null : { ...wall, definitive: true }
 }
 
 /** Every edge the `|playercrafted` block states — its ingredients, and a yield that is elsewhere. */
@@ -624,12 +669,12 @@ export function* eraDerivationSteps(
     seen.add(entry.page)
     if (seen.size % PAGES_PER_STEP === 0) yield
     // A page that already states an era, or that any zone places, is not layer 3's business —
-    // EXCEPT for the one definitive edge, which is the only thing here entitled to overrule a
-    // witness. Asked with the page's OWN zones only: the renderer folds the catalog in as well and
-    // can therefore only be MORE decided than this, so a non-definitive edge computed here can
-    // never overrule a witness it did not see.
+    // EXCEPT for the two definitive edges, the only things here entitled to overrule a witness.
+    // Asked with the page's OWN zones only: the renderer folds the catalog in as well and can
+    // therefore only be MORE decided than this, so a non-definitive edge computed here can never
+    // overrule a witness it did not see.
     const decided = layeredVerdict(pageZones(entry), entry.eraTag) !== 'unknown'
-    const derived = decided ? dropMobEdge(entry, catalogs) : deriveEra(entry, corpus, catalogs)
+    const derived = decided ? (dropMobEdge(entry, catalogs) ?? recipeDropWall(entry, corpus, catalogs)) : deriveEra(entry, corpus, catalogs)
     if (derived !== null) out.set(itemKey(entry.page), derived)
   }
   return out

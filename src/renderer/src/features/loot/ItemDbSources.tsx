@@ -38,6 +38,7 @@ import { CellLink } from '../../lib/CellLink'
 import { dropMobTarget, dropZoneTarget } from '../gear/dropLinks'
 import type { MobTarget } from '../mobs/mobTarget'
 import { mobOutOfEra } from '@shared/mobEra'
+import { eraVerdict } from '@shared/planner/era'
 import { useMetVersion } from '../../lib/useMetInLog'
 import { EraChip, MobEraChip } from '../planner/PlannerChips'
 import type { EraSubject } from '../planner/plannerData'
@@ -106,7 +107,8 @@ function SourceRow({
   // The mob era predicate reads a row's NAME (and page) to ask the player's own log first, and the
   // row redraws when that log meets more (lib/useMetInLog).
   useMetVersion()
-  const mob = { name: source.mob, page: source.mobPage, outOfEra: source.outOfEra }
+  // A row the mob table has no flag for is still out of era when every zone it lives in is.
+  const mob = { name: source.mob, page: source.mobPage, ...(source.outOfEra === true || eraVerdict(source.zones) === 'out-of-era' ? { outOfEra: true as const } : {}) }
   return (
     <Box data-testid="loot-db-source" sx={{ py: 0.25 }}>
       <Typography variant="caption" sx={{ display: 'block' }}>

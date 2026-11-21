@@ -110,6 +110,30 @@ test('a recipe component the wiki badges out of era marks the product out, bough
   })
 })
 
+test('a banner cannot keep a recipe in era when every recipe needs a material that only drops out of era', () => {
+  const walled = { eraTag: 'Velious', dropsFrom: [{ mob: 'a wyvern', zone: 'Cobalt Scar' }] }
+  const entries = [
+    item('Cold Hide', walled),
+    item('Cold Boots', { eraTag: 'Classic', craftedBy: recipe([dropped('Cold Hide'), bought('Thread')]) }),
+    // The recipe says it can be bought: a shopkeeper is not gated by where a mob also drops one.
+    item('Sold Hide', walled),
+    item('Sold Boots', { eraTag: 'Classic', craftedBy: recipe([bought('Sold Hide')]) }),
+    // Bannered out, but it drops in a zone the server has open.
+    item('Odd Wing', { eraTag: 'Luclin', dropsFrom: [{ mob: 'a wasp', zone: 'Greater Faydark' }] }),
+    item('Odd Rune', { eraTag: 'Classic', craftedBy: recipe([dropped('Odd Wing')]) }),
+    // A second recipe needs nothing walled.
+    item('Two Way Boots', { eraTag: 'Classic', craftedBy: [...(recipe([dropped('Cold Hide')]) ?? []), ...(recipe([bought('Thread')]) ?? [])] }),
+    // The item itself also drops in era.
+    item('Found Boots', { eraTag: 'Classic', dropsFrom: [{ mob: 'a bat', zone: 'Greater Faydark' }], craftedBy: recipe([dropped('Cold Hide')]) })
+  ]
+  const file = { items: Object.fromEntries(entries.map((e) => [itemKey(e.page), e])) } as unknown as ItemDbFile
+  const built = buildEraDerivations(file, catalogs(NO_MOBS))
+  assert.deepEqual(built.get('cold boots'), { basis: 'component-zone', verdict: 'out-of-era', target: 'Cold Hide', detail: 'Cobalt Scar', definitive: true })
+  for (const key of ['sold boots', 'odd rune', 'two way boots', 'found boots']) {
+    assert.equal(built.get(key)?.definitive, undefined, `${key} has another way in`)
+  }
+})
+
 test('an IN-era component states nothing, and an unknown component states nothing either', () => {
   const inEra = item('Ordinary Mold', { eraTag: 'Classic' })
   const silent = item('Silent Mold')
