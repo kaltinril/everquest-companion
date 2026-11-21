@@ -14,7 +14,7 @@ import { GUIDE_CREDITS, guideCreditLine } from '../src/shared/guideCredits'
 import type { TradeskillGuidesFile } from '../src/shared/guideData'
 import type { SkillRow } from '../src/shared/skills'
 import { MAX_RECIPE_DEPTH, TRADESKILL_BOOK_VERSION, indexBook, type BookRecipe } from '../src/shared/tradeskillBook'
-import { guidePayload, indexGuides, type GuidePayload } from '../src/shared/tradeskillGuide'
+import { guidePayload, indexGuides, locatedSource, type GuidePayload } from '../src/shared/tradeskillGuide'
 import { indexCrafting } from '../src/shared/tradeskillHistory'
 import {
   PLAN_SEARCH_CAP,
@@ -51,7 +51,9 @@ import {
   routeHeading,
   routeMoreText,
   routeSourceText,
+  skillMetText,
   skillNeedText,
+  skillsAllMet,
   skillNeeds,
   skillRoutes
 } from '../src/shared/tradeskillPlanLevels'
@@ -278,6 +280,11 @@ test('each tradeskill is needed at the highest trivial of its recipes in the tre
   const met = skillNeeds(tree, [skill('Tailoring', 222), skill('Brewing', 250)]).needs
   assert.deepEqual(met.map((n) => n.stand), ['met', 'met'])
   assert.equal(skillNeedText(met[0]), 'Quiver is trivial at 222. You are past it.')
+  // Every skill met: the plan says so on one line in its head, and only then.
+  assert.equal(skillsAllMet({ needs: met, other: [] }), true)
+  assert.equal(skillsAllMet({ needs, other: [] }), false)
+  assert.equal(skillsAllMet({ needs: [], other: [] }), false)
+  assert.equal(skillMetText(met[0]), 'past the 222 this plan needs')
 })
 
 test('a combine that names no tradeskill, or states no trivial, is said and never counted as a level', () => {
@@ -451,23 +458,26 @@ function committedDeps(): PlanDeps {
   return { index: indexBook(book), guides: indexGuides(guides) }
 }
 
-test('COMMITTED DATA: Fleeting Quiver takes the guide\'s four materials, and Aviak Egg Oil opens to its Brewing recipe', () => {
+test("COMMITTED DATA: Fleeting Quiver takes the wiki's five materials, and Aviak Egg Oil opens to its Brewing recipe", () => {
   const deps = committedDeps()
   const choice = searchChoices(planChoices(deps).list, 'fleeting quiver').shown[0]
   assert.equal(choice.item, 'Fleeting Quiver')
   const recipe = pickRecipe(itemRecipes(deps, choice.key), null)
   assert.ok(recipe)
-  assert.deepEqual([recipe.tradeskill, recipe.trivial, recipe.ingredients.length], ['Tailoring', 222, 0])
+  // The wiki page lists them (its rows lead with `**:`, which the parser read as nothing until 2026-11-20).
+  assert.deepEqual([recipe.tradeskill, recipe.trivial, recipe.ingredients.length], ['Tailoring', 222, 5])
 
   const tree = planTree(deps, recipe)
-  assert.equal(tree.from, 'guide')
-  assert.deepEqual(names(tree.materials), ['High Quality Lion Skin', 'Fleeting Quiver Pattern', 'Griffon Feathers', 'Aviak Egg Oil'])
-  assert.ok(tree.materials.every((n) => n.linked), 'all four are wiki items: each is the standard item link')
-  assert.equal(node(tree.materials, 'Fleeting Quiver Pattern').guide?.source.merchant, 'Klok Walrot')
+  // Wiki first: its list is the one shown, and it asks one material the guide's list does not.
+  assert.equal(tree.from, 'wiki')
+  assert.deepEqual(names(tree.materials), ['Aviak Egg Oil', 'Fleeting Quiver Pattern', 'Griffon Feathers', 'High Quality Lion Skin', 'Vial of Distilled Mana'])
+  assert.ok(tree.materials.every((n) => n.linked), 'all five are wiki items: each is the standard item link')
+  // The guide still says where the pattern is sold: its merchant is the item's located source.
+  assert.equal(locatedSource(deps.guides, 'fleeting quiver pattern')?.merchant, 'Klok Walrot')
   const oil = node(tree.materials, 'Aviak Egg Oil')
   assert.deepEqual([oil.made?.recipe.tradeskill, oil.made?.recipe.trivial, oil.made?.from], ['Brewing', 102, 'wiki'])
   assert.deepEqual(names(oil.made?.materials ?? []), ['Aviak Eggs', 'Water Flask'])
-  // The other three are leaves.
+  // The other four are leaves.
   assert.deepEqual(tree.materials.filter((n) => n.made !== null).map((n) => n.name), ['Aviak Egg Oil'])
   assert.equal(treeDrawsGuide(deps, tree), true)
 
@@ -491,13 +501,14 @@ test('COMMITTED DATA: Fleeting Quiver takes the guide\'s four materials, and Avi
   assert.ok(routes[0].lines.length >= 2, 'several Tailoring steps cover 0 to 222')
   assert.ok(routes.every((r) => r.lines.every((l) => l.range !== '' && l.item !== '')))
 
-  // What to gather for two: every leaf doubled, the oil's two materials through its recipe.
+  // What to gather for two: every leaf doubled, the oil's materials through its recipe (and its Water Flask's through its own).
   const gather = gatherFor(tree, { count: 2, have: () => null, price: () => null })
-  assert.deepEqual(gather.made.map((m) => [m.node.name, m.need, m.toMake]), [['Aviak Egg Oil', 2, 2]])
+  assert.deepEqual(gather.made.map((m) => [m.node.name, m.need, m.toMake]).filter((m) => m[0] === 'Aviak Egg Oil'), [['Aviak Egg Oil', 2, 2]])
   const need = Object.fromEntries(gather.leaves.map((l) => [l.node.name, l.toGet]))
   assert.equal(need['High Quality Lion Skin'], 2)
   assert.equal(need['Fleeting Quiver Pattern'], 2)
   assert.equal(need['Griffon Feathers'], 2)
   assert.equal(need['Aviak Eggs'], 2)
+  assert.equal(need['Vial of Distilled Mana'], 2)
   assert.equal(gather.total, null, 'no price is known, so no total is stated')
 })

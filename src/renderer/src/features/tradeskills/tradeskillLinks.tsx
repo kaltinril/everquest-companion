@@ -2,7 +2,10 @@
 // tabs draw it (owner, 2026-11-20: "the standard item viewing on hover, hyper link etc").
 //
 //   item   `DonorName` with its card: the item window on hover, its Loot page on click, as on the
-//          Wish list and the Bazaar.
+//          Wish list and the Bazaar. Where the line the name sits on has an action of its own
+//          about that item (Home's "Your plan", a tile's "Next", a recipe table row), the click
+//          does that instead (`act`), and the hover card stays (owner, 2026-11-20: "clicking the
+//          item next to Your plan should take me to the plan").
 //   mob    `CellLink` to the mob's page, resolved by `gear/dropLinks.dropMobTarget`.
 //   zone   `CellLink` to the Maps tab when `dropZoneTarget` resolves the spelling; plain text when
 //          it refuses (`Various`), never a nearest guess.
@@ -51,10 +54,13 @@ export function useDoors(): TradeskillDoors | null {
   return useContext(DoorsContext)
 }
 
-/** An item name. Outside a provider it is the same name with its card and no click. */
-export function ItemLink({ name, bold }: { name: string; bold?: boolean }): JSX.Element {
+/**
+ * An item name. Outside a provider it is the same name with its card and no click. With `act`
+ * the click does that instead of opening the item's Loot page.
+ */
+export function ItemLink({ name, bold, act }: { name: string; bold?: boolean; act?: () => void }): JSX.Element {
   const doors = useContext(DoorsContext)
-  return <DonorName name={name} bold={bold} card onOpen={doors?.onOpenLoot} />
+  return <DonorName name={name} bold={bold} card onOpen={act ?? doors?.onOpenLoot} />
 }
 
 const LABEL_SX = { display: 'flex', alignItems: 'center', gap: 0.75, minWidth: 0 } as const
@@ -71,11 +77,11 @@ const WRAP_SX = {
 } as const
 
 /** An item's icon and name on one line; with `wrap`, on as many lines as the name takes. */
-export function ItemLabel({ name, bold, wrap }: { name: string; bold?: boolean; wrap?: boolean }): JSX.Element {
+export function ItemLabel({ name, bold, wrap, act }: { name: string; bold?: boolean; wrap?: boolean; act?: () => void }): JSX.Element {
   return (
     <Box sx={wrap === true ? WRAP_SX : LABEL_SX}>
       <ItemIcon name={name} />
-      <ItemLink name={name} bold={bold} />
+      <ItemLink name={name} bold={bold} act={act} />
     </Box>
   )
 }

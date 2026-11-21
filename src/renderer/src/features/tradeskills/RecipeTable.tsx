@@ -176,6 +176,9 @@ interface RowProps {
   canMake: number
 }
 
+/** A name's click in the table: nothing of its own, so the click reaches the row and picks the recipe. */
+const PICKS_WITH_ROW = (): void => undefined
+
 const RecipeRow = memo(function RecipeRow({ recipe, state, picked, onPick, log, canMake }: RowProps): JSX.Element {
   const money = log.money.of(recipe)
   return (
@@ -192,7 +195,8 @@ const RecipeRow = memo(function RecipeRow({ recipe, state, picked, onPick, log, 
       <TableCell align="right">{recipe.trivial ?? ''}</TableCell>
       <TableCell sx={{ fontWeight: picked ? 700 : 400 }}>
         <Stack direction="row" spacing={0.75} alignItems="center" sx={{ flexWrap: 'nowrap', minWidth: 0 }}>
-          <ItemLabel name={recipe.item} bold={state === 'next'} />
+          {/* The row's own click picks the recipe; the name joins it (the panel's head links the item's page). */}
+          <ItemLabel name={recipe.item} bold={state === 'next'} act={PICKS_WITH_ROW} />
           <StateChip state={state} />
           <CanMakeChip combines={canMake} />
           <EraChip subject={recipe} />

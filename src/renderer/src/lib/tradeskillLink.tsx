@@ -20,6 +20,11 @@ export interface TradeskillFocus {
   tradeskill: Tradeskill
   /** The workbench picks the recipe that makes this item, or failing that the first that uses it. */
   item?: string
+  /**
+   * Open "Make an item" on that recipe instead of the workbench (the Loot page's "Plan this
+   * item"). With no recipe for the item on that tradeskill, the workbench opens as for any link.
+   */
+  plan?: boolean
 }
 
 /** With no focus the section opens on the screen the player left it on (the Skills tab's "Open Tradeskills"). */

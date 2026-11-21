@@ -3,6 +3,9 @@
 // player's log last showed for each, and a total only when every line still to get has a price.
 // Under it, the materials made on the way.
 //
+// Numbers only: where each material comes from is said once, in "What it takes" above (owner,
+// 2026-11-20: "do we really need to list where things come from again").
+//
 // The roll-up and every sentence are shared/tradeskillPlanGather.ts. The counts are for combines
 // that succeed; nothing is added for failures, and the panel says why.
 
@@ -24,16 +27,15 @@ import {
   type MakeLine
 } from '@shared/tradeskillPlanGather'
 import { Tooltip } from '../../lib/Tooltip'
-import { GuideSourceLine } from './MaterialWhere'
-import { WhereCell } from './RecipePanel'
 import { ItemLabel } from './tradeskillLinks'
 
-/** Material, Need, Have, To get, Each, Cost, Where. */
+/** Material, Need, Have, To get, Each, Cost. Held to a readable width: six short columns. */
 const GRID_SX = {
   display: 'grid',
-  gridTemplateColumns: 'minmax(170px, 2fr) 48px 48px 52px 92px 84px minmax(0, 3fr)',
+  gridTemplateColumns: 'minmax(170px, 1fr) 56px 56px 60px 100px 92px',
   columnGap: 1.5,
   alignItems: 'start',
+  maxWidth: 720,
   py: 0.25
 } as const
 
@@ -88,7 +90,6 @@ function Heads(): JSX.Element {
       <Typography variant="caption" align="right">
         Cost
       </Typography>
-      <Typography variant="caption">Where it comes from</Typography>
     </Box>
   )
 }
@@ -113,10 +114,6 @@ function LeafRow({ line }: { line: GatherLine }): JSX.Element {
       <Typography {...NUM} data-testid="tradeskill-plan-gather-cost">
         {lineCostText(line)}
       </Typography>
-      <Box sx={{ minWidth: 0 }}>
-        {node.linked && <WhereCell ingredient={node.ingredient} own={node.guide ?? undefined} />}
-        {!node.linked && node.guide !== null && <GuideSourceLine source={node.guide.source} />}
-      </Box>
     </Box>
   )
 }
@@ -142,7 +139,6 @@ export interface ItemPlanGatherProps {
   onCount: (raw: string) => void
 }
 
-/** Must sit inside a `FactsProvider`: the Where cells read the section's facts. */
 export function ItemPlanGather({ gather, item, onCount }: ItemPlanGatherProps): JSX.Element {
   const total = gatherTotalText(gather)
   return (

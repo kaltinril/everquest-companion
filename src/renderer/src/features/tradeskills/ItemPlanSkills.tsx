@@ -8,6 +8,7 @@
 
 import type { JSX } from 'react'
 import { Box, Chip, Paper, Stack, Typography } from '@mui/material'
+import { Tooltip } from '../../lib/Tooltip'
 import { SKILLS_MODULE } from '@shared/skills'
 import {
   ALL_MET_TEXT,
@@ -20,6 +21,7 @@ import {
   routeHeading,
   routeMoreText,
   routeSourceText,
+  skillMetText,
   skillNeedText,
   unskilledText,
   type PlanSkills,
@@ -119,6 +121,35 @@ function RouteBlock({ route, onOpenBench }: { route: SkillRoute; onOpenBench: Op
         </Typography>
       )}
     </Box>
+  )
+}
+
+/**
+ * The whole of "Where you stand" when every skill the plan needs is met (`skillsAllMet`): one
+ * line in the plan's head, each tradeskill's level a chip that opens its workbench.
+ */
+export function PlanStandLine({ skills, onOpenBench }: { skills: PlanSkills; onOpenBench: OpenBench }): JSX.Element {
+  return (
+    <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5, mt: 0.75 }} data-testid="tradeskill-plan-stand">
+      {skills.needs.map((need) => (
+        <Stack key={need.tradeskill} direction="row" spacing={0.75} alignItems="center" data-testid="tradeskill-plan-stand-skill">
+          <Tooltip title={`Open the ${need.tradeskill} workbench`}>
+            <Chip
+              size="small"
+              variant="outlined"
+              color="success"
+              label={`Your ${need.tradeskill}: ${levelText(need)}`}
+              onClick={() => {
+                onOpenBench(need.tradeskill)
+              }}
+            />
+          </Tooltip>
+          <Typography variant="body2" color="text.secondary">
+            {skillMetText(need)}
+          </Typography>
+        </Stack>
+      ))}
+    </Stack>
   )
 }
 

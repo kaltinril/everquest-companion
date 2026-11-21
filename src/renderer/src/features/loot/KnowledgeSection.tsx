@@ -225,11 +225,14 @@ function RecipesNote({ note, recipeCount }: { note?: string; recipeCount: number
  * How the item is made. Each way that names a tradeskill is a link to that tradeskill's workbench
  * with this item's recipe picked (`CellLink`, the reward names' gesture above); a way that names
  * none, the prose fallback, and a window with no Tradeskills door stay the plain text they were.
+ * After them, "Plan this item": the Tradeskills section's Make an item screen on this item
+ * (owner, 2026-11-20: "item page should link back to how to plan page").
  */
 function CraftedNote({ data, crafted }: { data: ItemKnowledge; crafted?: string }): JSX.Element | null {
   const open = useTradeskillLink()
   if (!crafted) return null
   const parts = open === null ? [] : craftedByParts(data)
+  const planOn = parts.find((part) => part.tradeskill !== undefined)?.tradeskill
   return (
     <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }} data-testid="loot-crafted">
       Crafted:{' '}
@@ -247,6 +250,12 @@ function CraftedNote({ data, crafted }: { data: ItemKnowledge; crafted?: string 
           </Fragment>
         )
       })}
+      {open !== null && planOn !== undefined && (
+        <span data-testid="loot-crafted-plan">
+          {' · '}
+          <CellLink text="Plan this item" onOpen={() => open({ tradeskill: planOn, item: data.name, plan: true })} />
+        </span>
+      )}
     </Typography>
   )
 }

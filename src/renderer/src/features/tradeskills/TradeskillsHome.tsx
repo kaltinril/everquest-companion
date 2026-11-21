@@ -34,7 +34,7 @@ import type { Tradeskill } from '@shared/tradeskills'
 import { LogReadInline } from '../../components/LogReadInline'
 import { ForagingTile } from './ForagingTile'
 import { useMasteryRank } from './useMasteryRank'
-import { HomePickUp, type HomeFacts } from './HomePickUp'
+import { HomePickUp, type HomeFacts, type OpenRecipe } from './HomePickUp'
 import { HomeWished, type OpenPlan } from './HomeWished'
 import { BarOf, CapNote, SkillBar } from './SkillBar'
 import { useBookScrapedAt, useCrafting, useGuides, useHeld, useSkillLevels } from './tradeskillData'
@@ -53,8 +53,8 @@ function TileLevel({ bar }: { bar: LevelBar }): JSX.Element | null {
   )
 }
 
-/** The recipe to make next: a link to the item, outside the tile's own button. */
-function TileNext({ tile }: { tile: TradeskillTile }): JSX.Element | null {
+/** The recipe to make next, outside the tile's own button: its name opens the workbench on that recipe. */
+function TileNext({ tile, onOpenRecipe }: { tile: TradeskillTile; onOpenRecipe: OpenRecipe }): JSX.Element | null {
   if (tile.recipes === 0) return null
   if (tile.next === null) {
     return (
@@ -63,16 +63,22 @@ function TileNext({ tile }: { tile: TradeskillTile }): JSX.Element | null {
       </Typography>
     )
   }
+  const next = tile.next
   return (
     <Stack direction="row" spacing={0.75} alignItems="baseline" sx={{ minWidth: 0 }} data-testid="tradeskill-tile-next">
       <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
         Next:
       </Typography>
       <Typography variant="body2" component="span" sx={{ minWidth: 0, display: 'flex' }}>
-        <ItemLink name={tile.next.item} />
+        <ItemLink
+          name={next.item}
+          act={() => {
+            onOpenRecipe(tile.tradeskill, next.id)
+          }}
+        />
       </Typography>
       <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
-        trivial {tile.next.trivial}
+        trivial {next.trivial}
       </Typography>
     </Stack>
   )
@@ -84,9 +90,10 @@ interface TileProps {
   /** The Crafting Mastery rank the log shows bought (useMasteryRank). */
   rank: number
   onOpen: (t: Tradeskill) => void
+  onOpenRecipe: OpenRecipe
 }
 
-function Tile({ tile, rows, rank, onOpen }: TileProps): JSX.Element {
+function Tile({ tile, rows, rank, onOpen, onOpenRecipe }: TileProps): JSX.Element {
   const bar = levelBar(rows, tile.tradeskill, rank)
   return (
     <Card variant="outlined" data-testid={`tradeskill-tile-${tile.tradeskill}`} data-tile="seen">
@@ -111,7 +118,7 @@ function Tile({ tile, rows, rank, onOpen }: TileProps): JSX.Element {
         <CapNote bar={bar} />
       </CardActionArea>
       <Box sx={{ px: 1.5, pb: 1.25, minHeight: 28 }}>
-        <TileNext tile={tile} />
+        <TileNext tile={tile} onOpenRecipe={onOpenRecipe} />
       </Box>
     </Card>
   )
@@ -167,13 +174,15 @@ function SourcesLine({ guides }: { guides: GuideIndex }): JSX.Element {
 export interface TradeskillsHomeProps {
   index: BookIndex
   onOpen: (t: Tradeskill) => void
+  /** Opens a workbench on one recipe: what a "Next" name does. */
+  onOpenRecipe: OpenRecipe
   /** Opens Make an item on a wished item's recipe. */
   onPlan: OpenPlan
   /** The "Make an item" panel, drawn above the tiles. */
   planner?: ReactNode
 }
 
-export function TradeskillsHome({ index, onOpen, onPlan, planner }: TradeskillsHomeProps): JSX.Element {
+export function TradeskillsHome({ index, onOpen, onOpenRecipe, onPlan, planner }: TradeskillsHomeProps): JSX.Element {
   const levels = useSkillLevels()
   const held = useHeld()
   const guides = useGuides()
@@ -183,7 +192,7 @@ export function TradeskillsHome({ index, onOpen, onPlan, planner }: TradeskillsH
   const rank = useMasteryRank()
   return (
     <Box sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto' }} data-testid="tradeskills-home">
-      <HomePickUp facts={facts} onOpen={onOpen} />
+      <HomePickUp facts={facts} onOpen={onOpen} onOpenRecipe={onOpenRecipe} />
       {planner}
       <HomeWished facts={facts} onPlan={onPlan} />
       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }} data-testid="tradeskills-doors-line">
@@ -193,7 +202,7 @@ export function TradeskillsHome({ index, onOpen, onPlan, planner }: TradeskillsH
       {!levels.served && <LogReadInline module={SKILLS_MODULE} served={false} sx={{ mb: 1 }} />}
       <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 1.5 }} data-testid="tradeskills-tiles">
         {doors.seen.map((tile) => (
-          <Tile key={tile.tradeskill} tile={tile} rows={levels.rows} rank={rank} onOpen={onOpen} />
+          <Tile key={tile.tradeskill} tile={tile} rows={levels.rows} rank={rank} onOpen={onOpen} onOpenRecipe={onOpenRecipe} />
         ))}
         {/* Forage has no recipes and so no workbench: its tile is the whole of it, and what it found opens under the tiles (ForagingTile.tsx). */}
         <ForagingTile />

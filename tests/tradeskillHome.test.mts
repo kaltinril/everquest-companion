@@ -331,21 +331,21 @@ function committed(): { deps: PlanDeps; stamps: NonNullable<ReturnType<typeof gu
   return { deps: { index: indexBook(buildTradeskillBook(items, new Map())), guides: indexGuides(payload) }, stamps: payload.stamps ?? [] }
 }
 
-test('COMMITTED DATA: Aviak Egg Oil opens to its Brewing recipe; Water Flask, whose recipe lists nothing, does not open', () => {
+test('COMMITTED DATA: Aviak Egg Oil opens to its Brewing recipe; Medium Quality Sheet Metal, whose recipe lists nothing, does not open', () => {
   const { deps, stamps } = committed()
   const oil = madeBy(deps, 'aviak egg oil', ['fleeting quiver'])
   assert.deepEqual([oil.open.map((r) => r.tradeskill), oil.bare.length], [['Brewing'], 0])
-  const flask = madeBy(deps, 'water flask', ['fleeting quiver', 'aviak egg oil'])
-  assert.equal(flask.open.length, 0, 'the wiki lists no materials for Water Flask and the guide none: nothing to open')
-  assert.equal(flask.bare.length, 1)
-  assert.match(bareRecipeText(flask.bare[0]), /^Also made with Brewing · trivial \d+ · Brew Barrel: the wiki lists no materials for it\.$/)
+  const metal = madeBy(deps, 'medium quality sheet metal', ['antonian javelin'])
+  assert.equal(metal.open.length, 0, 'the wiki lists no materials for Medium Quality Sheet Metal and the guide none: nothing to open')
+  assert.equal(metal.bare.length, 1)
+  assert.match(bareRecipeText(metal.bare[0]), /^Also made with Blacksmithing · trivial \d+: the wiki lists no materials for it\.$/)
   // An item already open above, and one nothing makes, read as leaves.
   assert.deepEqual(madeBy(deps, 'aviak egg oil', ['aviak egg oil']), { open: [], bare: [] })
   assert.deepEqual(madeBy(deps, 'griffon feathers', ['fleeting quiver']), { open: [], bare: [] })
 
-  // Wished: Fleeting Quiver is made by Tailoring from five leaves once Aviak Egg Oil is opened.
+  // Wished: Fleeting Quiver is made by Tailoring from seven leaves once Aviak Egg Oil and its Water Flask are opened.
   const [quiver] = wishedCrafts({ deps, wishes: [{ itemKey: 'fleeting quiver' }], rows: OWNER_ROWS, have: null })
-  assert.deepEqual([quiver.recipe.tradeskill, quiver.recipe.trivial, quiver.materials], ['Tailoring', 222, 5])
+  assert.deepEqual([quiver.recipe.tradeskill, quiver.recipe.trivial, quiver.materials], ['Tailoring', 222, 7])
   assert.equal(wishedSkillText(quiver), 'Tailoring, trivial 222. Not in your log.')
 
   // The guides' stamps: one per credited guide, with no address in them.

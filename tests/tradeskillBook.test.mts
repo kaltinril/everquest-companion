@@ -22,6 +22,7 @@ import {
   indexBook,
   ladderEmptyText,
   lineOfRecipe,
+  dropCap,
   materialDrops,
   materialsText,
   nextRecipe,
@@ -366,6 +367,10 @@ test('the mobs a material lists: capped, and under the era setting the out-of-er
   assert.equal(era.outOfEra, 2)
   assert.equal(era.more, 0)
   assert.equal(materialDrops([], true).shown.length, 0)
+  // A material a merchant sells lists fewer mobs: the purchase is the short way.
+  assert.equal(dropCap({ sources: ['Bought', 'Dropped'] }), 2)
+  assert.equal(dropCap({ sources: ['Dropped'] }), 4)
+  assert.equal(dropCap({}), 4)
   // One name on several pages is one row with every page's zones; an out-of-era page of it is dropped first.
   const bandits = [mob('a bandit', 'Lake Rathe'), mob('A Bandit', 'Western Karana'), mob('a bandit', 'Chardok'), mob('a bandit', 'Lake Rathe')]
   const folded = materialDrops(bandits, false)

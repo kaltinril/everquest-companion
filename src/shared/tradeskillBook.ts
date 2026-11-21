@@ -362,6 +362,14 @@ export function capped<T>(list: readonly T[], cap: number): { shown: readonly T[
 /** How many mobs a material lists before the rest become a count. */
 export const MATERIAL_MOB_CAP = 4
 
+/** A material the wiki says a merchant sells: its mobs are the long way round, so fewer are listed. */
+export const BOUGHT_MOB_CAP = 2
+
+/** How many mobs to list for a material before the rest become a count. */
+export function dropCap(ingredient: Pick<ItemCraftIngredient, 'sources'>): number {
+  return (ingredient.sources ?? []).some((word) => word.toLowerCase() === 'bought') ? BOUGHT_MOB_CAP : MATERIAL_MOB_CAP
+}
+
 export interface MaterialDrops {
   shown: readonly ItemSource[]
   /** Listed mobs past the cap. */
