@@ -17,10 +17,10 @@ Opened 2026-11-20. Requirements: `../requirements/macro-editor.md`. Status at th
   is inferred, not seen.
 - `<Account>_characters.ini` lists every character as `CharacterN=<name>,<server>`.
 - Hotbar buttons are in the same file, `[HotButtons]`, `[HotButtons2]` ...:
-  `Page1Button9=E13,@-1,0000000000000000,0,,`. `E13` and `E14` appear on the owner's bars and the
-  owner has macros on page 2 buttons 1 to 4, so `E<n>` is read as slot number
-  `(page - 1) * 12 + button`. Inferred from two values; `E229`, `E2136`, `E6120` on the same bars
-  are something else.
+  `Page10Button4=E13,@-1,0000000000000000,0,,`. **Measured 2026-11-20** (the owner's bar against the
+  file, five buttons): `E<n>` is a ZERO-BASED macro slot, `n = (page - 1) * 12 + (button - 1)`, 0 to
+  119. No name is stored, so a hotbar button fires whatever sits in that slot. Values from 120 up
+  (`E229`, `E2136`, `E6120`) are something else.
 - The macro window is a list with a search box, a "show blank" box and "New Macro: add a new macro
   in the first blank slot" (`uifiles/default/EQUI_ActionsWindow.xml`). Its edit window has a name,
   five lines and twenty colour buttons, numbered 0 to 19 (`EQUI_SocialEditWnd.xml`). Neither file
@@ -68,8 +68,8 @@ Opened 2026-11-20. Requirements: `../requirements/macro-editor.md`. Status at th
   file. No write to the game folder.
 - **Isolation:** `src/shared/macros/` (pure), `src/main/ipc/macros.ts` and its store,
   `src/renderer/src/features/macros/`. Shared files touched: the tab's registration only.
-- **Limits** are constants in one file, each marked measured or assumed: 5 lines, 12 buttons a
-  page, 10 pages, 255 characters a line, colours 0 to 19.
+- **Limits** are constants in one file, all measured 2026-11-20: name 15, 5 lines, 255 characters a
+  line, 12 buttons a page, 10 pages, colours 0 to 19.
 
 ## Character-first flow (owner, 2026-11-20, after first use of the three-tab screen)
 
@@ -118,29 +118,34 @@ it, press Send.**
 - **P3:** keep hotbar buttons pointing at a macro that moved slot; copy a set between loadouts in
   one step; a share code between players.
 
-## In-game tests owed (the owner; an agent reads the files after each)
+## In-game tests
 
-1. Pickup: game closed, one macro added to a character file by hand. Is it there at login?
-2. While logged in: a macro's text changed in the file. Does the game show it? After camp, is the
-   edit still in the file?
-3. Hotbar link: drag the macro at page 2 button 3 to a hotbar. Which `E<n>` is written? Then move
-   the macro to another slot in game: does the hotbar button follow?
-4. ~~Loadouts: switch loadout once.~~ **Answered 2026-11-20** by the owner's files: switching to a
-   new fourth loadout on Drywrought made `Drywrought_oggok_LO4.ini` and `UI_Drywrought_oggok_LO4.ini`
-   at 18:39, and the new file opens with the same macros and hotbar buttons as `_LO1` (a copy). So
-   each loadout has its own macro file, numbered from 1 (`AutoSkillsLO0` to `LO3` in the file are
-   the same four, numbered from 0). Loadouts 2 and 3 exist in the game and have no file: a file
-   seems to appear only once a loadout is played (inferred). No text file read, and nothing the log
-   printed in those minutes, names a loadout or its classes.
-5. Limits: how many characters the name box and a line box take; how many pages, and buttons a
-   page; what happens at the reporter's 100.
-6. Page 1: are its macros editable, and does an edit to one get written to the file?
-7. Colours: what colours 0 to 19 are on screen (a screenshot of the twenty buttons).
+Answered 2026-11-20 (the owner's screenshots and files; numbers in `agent/MEASURED.md`):
+
+- Limits: name 15 characters, line 255, five lines, 10 pages of 12 buttons = 120 macros, of which
+  page 1 is the 12 built-ins and 108 are the player's. The reporter's "100" was approximate.
+- Colours: 0 to 19, top row then bottom row, RGB in the game's `EQUI_SocialEditWnd.xml`.
+- Loadouts: one file per loadout, numbered from 1. Switching to a new fourth loadout made
+  `Drywrought_oggok_LO4.ini` at 18:39, a copy of `_LO1` (macros and hotbars). A loadout never played
+  has no file (inferred). No ini names a loadout's classes. The player's own `/who` row in the log
+  names classes and race, but not the loadout; pairing the two is not built or proven.
+- Hotbars: a button stores a slot number (above). Not watched in game: a macro moved to another slot.
+- The game rewrites the character file within seconds of a macro being saved, while logged in.
+- Page 1's macros open in the edit window. Whether an edit is written was not tried; the app leaves
+  page 1 alone. "Edit the file while logged in" was dropped: a send is refused while the game runs.
+
+**Still owed, the one that decides the feature:** with the game and LaunchPad closed, Send a macro
+to a character, log in, and see it there.
 
 ## Open decisions (owner)
 
-- May the app write the game's character file (P2)?
-- Top-level tab, or under an existing one. P0 ships it as its own tab, "Macros".
+- Push and release: on the owner's word, after the send above works.
+- Send guard: stays as built, refused while any game client or anything run from the game folder
+  is up. Offered on 2026-11-20: refuse only for a character in use, and stop counting LaunchPad. The
+  owner saw the refusal on Drywrought and said "so this is fine" (read as: keep it; not a ruling
+  against loosening it later). The refusal was the check's first run inside the real app.
+- Loadout labels from the player's own `/who`: looked at and dropped (owner: "do we even care?").
+- Hotbar repair (rewrite `E<n>` when a macro moves) is not built; Review warns instead.
 
 ## Status
 
@@ -207,4 +212,19 @@ it, press Send.**
     "New macro".
   - Not built: scrolling to the editor on a narrow window; a per-page marker of where the changes
     are; a one-click put-back on a "removed" button.
+- 2026-11-20: the reporter's asks built on `macro-finish`: copy or move a chosen group of buttons
+  onto another loadout's empty buttons (never replacing), tag groups put on and taken off, "N of
+  108 buttons used", a spell finder for `/memspellslot` (ids from field 0 of `spells_us.txt`), and
+  where each macro sits in the pick list. Also the game's colours and a hotbar warning in Review.
+  - **Bug found by the owner's test and fixed:** a macro made in game after the first read showed
+    as removed, and a send would have deleted it. A game read is now a three-way merge
+    (`gameMerge.ts`, `seen`): a change on one side is taken, a change on both keeps the player's
+    and is marked "Changed in game too".
+  - Dry run on the owner's real files, in memory, nothing written: the merge brought in the two new
+    Drywrought macros and removed none, is idempotent, and a send of all six files left every byte
+    outside `[Socials]` unchanged and read back as sent. The spell index: 23,834 scribable rows,
+    135 ms, 4.4 MB held; "Flash of Light" is 201.
+  - Known edge: a read landing while the game writes the file could look like macros removed in
+    game; the next read puts them back, and a send is refused while the game runs.
+  - **Not yet seen on screen.**
 

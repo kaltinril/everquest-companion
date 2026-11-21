@@ -343,9 +343,9 @@ test('COMMITTED DATA: Aviak Egg Oil opens to its Brewing recipe; Medium Quality 
   assert.deepEqual(madeBy(deps, 'aviak egg oil', ['aviak egg oil']), { open: [], bare: [] })
   assert.deepEqual(madeBy(deps, 'griffon feathers', ['fleeting quiver']), { open: [], bare: [] })
 
-  // Wished: Fleeting Quiver is made by Tailoring from seven leaves once Aviak Egg Oil and its Water Flask are opened.
+  // Wished: Fleeting Quiver is made by Tailoring from six leaves: Aviak Egg Oil is opened, and its Water Flask is bought.
   const [quiver] = wishedCrafts({ deps, wishes: [{ itemKey: 'fleeting quiver' }], rows: OWNER_ROWS, have: null })
-  assert.deepEqual([quiver.recipe.tradeskill, quiver.recipe.trivial, quiver.materials], ['Tailoring', 222, 7])
+  assert.deepEqual([quiver.recipe.tradeskill, quiver.recipe.trivial, quiver.materials], ['Tailoring', 222, 6])
   assert.equal(wishedSkillText(quiver), 'Tailoring, trivial 222. Not in your log.')
 
   // The guides' stamps: one per credited guide, with no address in them.

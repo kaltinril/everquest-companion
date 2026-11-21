@@ -12,9 +12,8 @@
 // TWO CHANGES, ONE DECISION, and this suite drives both because neither is worth much alone:
 //   * IT HEALS. The entry is evicted (userData only) and the request falls through to the same
 //     fetch a never-cached image takes, so the outcome is the picture, a beat late.
-//   * IT IS A WARNING. One console line per failure CODE per session plus the
-//     `imageCacheReadFailures` counter, instead of an errors.log line and a `mainErrorLogLines`
-//     tick — so the error store stops counting a self-healed read as an error.
+//   * IT IS A WARNING. One console line per failure CODE per session, instead of an errors.log
+//     line — so a self-healed read is not recorded as an error.
 //
 // WHAT IS DRIVEN AND HOW. The whole `eqimg://` handler, for real: Electron is INJECTED
 // (`installImageCacheProtocol` takes a `protocol` and the userData dir), the fetch is injected, and
@@ -48,7 +47,6 @@ import {
   resetImageReadWarnings,
   takeImageReadWarning
 } from '../src/main/imageCache'
-import { resetHealth, takeHealth } from '../src/main/telemetry/health'
 
 const TEST_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -122,7 +120,6 @@ function stemOf(url: string): string {
 
 /** Every suite-visible piece of session state these tests share, back to a fresh session. */
 function freshSession(): void {
-  resetHealth()
   resetImageReadWarnings()
   resetImageFetchWarnings()
   resetImageFailures()
@@ -146,14 +143,13 @@ test('an entry that will not read back is served by RE-FETCHING it, not by a gap
     // …and it is kept, so the next launch pays nothing.
     assert.deepEqual(readFileSync(join(h.cacheDir, 'item-1234.png')), PNG)
 
-    // THE SEVERITY. A warning, once, with a counter — and NOTHING on the sink that writes
+    // THE SEVERITY. A warning, once — and NOTHING on the sink that writes
     // errors.log. Before JOS-266 this request filed `image cache: could not read <path>`.
     assert.deepEqual(h.errors, [])
     assert.equal(h.warns.length, 1)
     assert.match(h.warns[0], /^\[everquest-companion\] image cache: could not read item-1234\.png \(EISDIR\)/)
     assert.match(h.warns[0], /re-fetching it/)
     assert.match(h.warns[0], /counted, not logged/)
-    assert.equal(takeHealth().imageCacheReadFailures, 1)
 
     // THE BUNDLE IS NOT OURS TO EVICT: deleting an installer's file would not restore it, and on a
     // per-machine install the directory may not even be writable.
@@ -231,7 +227,6 @@ test('an eviction that FAILS still heals the request — the unlink is tidying, 
     // The bytes decide the name, so the replacement lands under `.png` beside it.
     assert.deepEqual(readFileSync(join(h.cacheDir, `${stem}.png`)), PNG)
     assert.deepEqual(h.errors, [])
-    assert.equal(takeHealth().imageCacheReadFailures, 1)
   } finally {
     h.dispose()
     freshSession()
@@ -239,8 +234,8 @@ test('an eviction that FAILS still heals the request — the unlink is tidying, 
 })
 
 test('IT CANNOT SPIN: every candidate is read once, and one request fetches at most once', async () => {
-  // The heal-loop failure mode, pinned. Two unreadable candidates in one request must produce two
-  // counts, ONE warn (same code) and exactly ONE fetch — never a retry of the read that just failed.
+  // The heal-loop failure mode, pinned. Two unreadable candidates in one request must produce
+  // ONE warn (same code) and exactly ONE fetch — never a retry of the read that just failed.
   freshSession()
   const h = harness()
   try {
@@ -254,7 +249,6 @@ test('IT CANNOT SPIN: every candidate is read once, and one request fetches at m
     assert.equal(first.status, 200)
     assert.equal(h.fetches.length, 1)
     assert.equal(h.warns.length, 1)
-    assert.equal(takeHealth().imageCacheReadFailures, 2)
 
     // …and asking again does NOT re-fetch: the replacement landed under `.png`, which is probed
     // FIRST, so the healed entry answers before either directory is reached.
@@ -262,7 +256,6 @@ test('IT CANNOT SPIN: every candidate is read once, and one request fetches at m
     assert.equal(second.status, 200)
     assert.equal(h.fetches.length, 1, 'the second request is served from the healed cache')
     assert.equal(h.warns.length, 1, 'one line per code per session, however many requests')
-    assert.equal(takeHealth().imageCacheReadFailures, 0, 'and the healed request reads nothing bad')
     assert.deepEqual(h.errors, [])
   } finally {
     h.dispose()
@@ -273,7 +266,7 @@ test('IT CANNOT SPIN: every candidate is read once, and one request fetches at m
 test('a re-fetch that also fails falls through to the fetch failure path, unchanged', async () => {
   // The other half of "cannot spin": when the heal cannot complete, nothing new happens. The
   // status branch is still an error (a host that ANSWERED said no — that is ours to fix) and the
-  // read failure beside it is still one warn and one count.
+  // read failure beside it is still one warn.
   freshSession()
   const root = mkdtempSync(join(tmpdir(), 'eqc-imgheal-'))
   const warns: string[] = []
@@ -303,7 +296,6 @@ test('a re-fetch that also fails falls through to the fetch failure path, unchan
     assert.equal(warns.length, 1, 'the read failure warned, once')
     assert.equal(errors.length, 1, 'and the 404 from a host that answered is still an error')
     assert.match(errors[0], /image cache: 404 for/)
-    assert.equal(takeHealth().imageCacheReadFailures, 1)
   } finally {
     rmSync(root, { recursive: true, force: true })
     freshSession()
@@ -319,8 +311,7 @@ test('the warn gate is ONE LINE PER CODE PER SESSION, and the code is bounded', 
   for (let i = 0; i < 500; i++) assert.equal(takeImageReadWarning('ENOENT'), false)
   assert.equal(takeImageReadWarning('EPERM'), true)
   assert.equal(takeImageReadWarning('EPERM'), false)
-  // A pathological disk cannot grow the set without bound: past the ceiling nothing new warns, and
-  // the counter carries the whole story anyway.
+  // A pathological disk cannot grow the set without bound: past the ceiling nothing new warns.
   for (let i = 0; i < 100; i++) takeImageReadWarning(`E${String(i)}`)
   assert.equal(takeImageReadWarning('EBUSY'), false, 'the ceiling holds')
   resetImageReadWarnings()
@@ -343,32 +334,29 @@ test('the failure description is TOTAL, and nothing can put free text into the l
   }
 })
 
-test('THE WIRING: the read failure evicts, counts, and never reaches the error sink', () => {
+test('THE WIRING: the read failure evicts, and never reaches the error sink', () => {
   // A SOURCE PIN for the one thing a staged failure cannot show — a successful unlink of an entry
   // whose READ failed (no plain file can be made to fail a read on demand from inside Node). The
-  // order is the pin: evict, then count, then decide whether to say anything.
+  // order is the pin: evict, then decide whether to say anything.
   const src = readFileSync(join(TEST_ROOT, 'src/main/imageCache.ts'), 'utf8')
   // The catch does one thing and files nothing.
   const readCatch = src.slice(src.indexOf('const bytes = await readFile(path)'), src.indexOf('return null\n  }'))
   assert.match(readCatch, /await healUnreadableEntry\(path, err, repair, warn\)/)
   assert.doesNotMatch(readCatch, /onError\(/, 'a self-healed read never files an error')
-  // …and that one thing is: evict (userData only), count, then decide whether to say anything.
+  // …and that one thing is: evict (userData only), then decide whether to say anything.
   const heal = src.slice(
     src.indexOf('async function healUnreadableEntry'),
     src.indexOf('export function installImageCacheProtocol')
   )
-  assert.match(heal, /if \(repair\) await unlink\(path\)\.catch\(ignoreCleanupFailure\)\s*\n\s*noteImageCacheReadFailure\(\)/)
-  assert.match(heal, /const code = describeReadFailure\(err\)/)
+  assert.match(heal, /if \(repair\) await unlink\(path\)\.catch\(ignoreCleanupFailure\)\s*\n\s*const code = describeReadFailure\(err\)/)
   assert.match(heal, /if \(takeImageReadWarning\(code\)\) \{/)
-  // The counter has ONE call site, and it is that one.
-  assert.equal(src.match(/noteImageCacheReadFailure\(\)/g)?.length, 1)
   // And the sink it uses is the console-only one, as JOS-133 left it: `logWarn` writes to stdout
   // and never to errors.log, so a demoted condition cannot re-enter the error count.
   assert.match(src, /const warn = opts\.warn \?\? \(\(m: string\) => logWarn\(m\)\)/)
   assert.equal(src.match(/logError\(/g), null, 'imageCache never writes errors.log directly')
 })
 
-test('a body cut off mid-read is the network leg: counted, warned once, and a 404', async () => {
+test('a body cut off mid-read is the network leg: warned once, and a 404', async () => {
   // The response arrived and then died (the 10 s timeout, a reset). That is the same failure as
   // no response at all, so it must not reject the request every waiter on this image shares.
   freshSession()
@@ -398,7 +386,6 @@ test('a body cut off mid-read is the network leg: counted, warned once, and a 40
   try {
     const res = await ask(new Request('eqimg://item/77'))
     assert.equal(res.status, 404)
-    assert.equal(takeHealth().imageFetchFailures, 1, 'counted with the other network failures')
     assert.equal(warns.length, 1, 'one warn line for the host')
     assert.equal(errors.length, 0, 'and nothing filed as an error')
   } finally {

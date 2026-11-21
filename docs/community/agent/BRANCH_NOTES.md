@@ -43,8 +43,7 @@ where one exists.
   - Where it lives: its own gear-area tab, right of Exaltations (owner, 2026-11-19: as a chip-opened
     panel over the Gear tab's table it was a second list on the catalog page; it asks about what is
     WORN, not about the catalog). Never put it back on the Gear tab. `VoidMotePanel` fills whatever
-    box hosts it, so another host (the Character tab) is a mount, not a rewrite. In
-    `NOT_YET_REPORTED` (`tests/telemetryContract.test.mts`); the build sends no telemetry.
+    box hosts it, so another host (the Character tab) is a mount, not a rewrite.
   - Gain = the role model's score at tier+1 minus tier (`roleValuer`, the Gear tab's class picks,
     default dial), or one stat's own points. Read at no banked progress: the dump states `+N` only.
   - Ranking (owner, 2026-11-19; `plans/2026-11-19-void-mote-ranking.md` has the rules, the
@@ -140,9 +139,7 @@ where one exists.
   `conCard` stays last and no meter's dock slot moves), `OVERLAY_KIND_LABEL`/`OVERLAY_LABEL_ORDER`,
   `DEFAULT_OVERLAY_CONFIG`, `OVERLAY_MENU_ROWS` (description only, never the label),
   `OVERLAY_TITLE`, `overlay/main.tsx`, `MODULE_READING_OVERLAYS` when it reads a module, tests
-  `overlayHotZone` + `overlaysAppearanceSteps` ALL_KINDS. Telemetry: list it in
-  `UNREPORTED_OVERLAY_KINDS` (`shared/telemetryOverlays.ts`) rather than widen the closed enum.
-  The service that validates it is the creator's, and this build sends it nothing.
+  `overlayHotZone` + `overlaysAppearanceSteps` ALL_KINDS.
 - Overlays may not carry native `title` tooltips (`overlayTooltipPolicy.test.mts`).
 - Owner rule (2026-10-13): zoom and pan NEVER redraw the Maps sidebar. `MapMobPane` is `memo`;
   every prop it takes must keep its identity across view changes. A callback that needs the view
@@ -233,13 +230,7 @@ where one exists.
 
 ## Spells, upgrades and Loadout (was spell-upgrades)
 
-- The Spells views are drawn in every build but not yet in `TELEMETRY_VIEWS` (listed in
-  `NOT_YET_REPORTED`, `tests/telemetryContract.test.mts`, so the contract test passes). The build
-  sends no telemetry (`TELEMETRY_API_URL` is empty) and the ingest service is the creator's, which
-  the fork never deploys to (WORKFLOW.md), so no widening is pending. Whether the lists are kept is
-  the owner's decision, still open. If reporting is ever turned on, the order is `TELEMETRY_VIEWS`
-  and the ingest deploy FIRST (a client reporting an unknown view 400s the whole batch), then drop
-  the view from that list. `tests/e2e/spells-area.e2e.mts` checks the area opens.
+- The Spells views are drawn in every build. `tests/e2e/spells-area.e2e.mts` checks the area opens.
 - Two copies of the spell load pipeline: `buildLevelUnlocks` (levelUnlocks.ts) runs its own pass
   over spells.json, separate from `loadSpellDb`. A new load pass goes in both.
 - `spells_us.txt` is parsed into a versioned disk cache (`SPELL_RESIST_CACHE_VERSION`,
@@ -288,8 +279,7 @@ where one exists.
   requests). Wiki quest pages quote receipts inconsistently, so home-zone quests with no stated
   receipt are shown separately with a neutral marker.
 - Class filter is inclusive on ambiguity (wiki class tokens are prose).
-- Factions: `factions` stays in `NOT_YET_REPORTED` (the build sends no telemetry; see Spells,
-  above). Open: give `loadFactionsNow` its perf seam.
+- Factions: open: give `loadFactionsNow` its perf seam.
 - Achievements: the view id stays `slayer`. `achievements:book` is read on demand and never stored. Mob race
   from the wiki `|race` field (`scripts/gen-mob-races.mts`), mob factions likewise
   (`gen-mob-factions.mts`). Open: `Obtain <Item>` lines link nowhere; picks are per machine, not
@@ -1193,7 +1183,7 @@ where one exists.
 - The `swing` overlay kind is NOT in `METER_KINDS`: it opens 220x96 bottom-left (`swingBounds`).
   A thirteenth meter slot shrank every meter's first-open size at 1080p and overlapped two slots on
   a 1366x728 laptop (`tests/overlayLayout.test.mts`). It is in `METER_OVERLAYS` (4 Hz ping) and
-  `CHARACTER_AWARE_OVERLAYS`, and unreported to telemetry.
+  `CHARACTER_AWARE_OVERLAYS`.
 - Fixtures: `tests/fixtures/death-recap.log` and `swing-timer.log` (a real SK's log, chat removed)
   are folded by `fold/tests/death_recap.rs` and `swing_rounds.rs`, which pin the engine's output to
   `death-recap.json` and `swing-rounds.json`; the TS tests read those JSON files, so both ends
@@ -1775,8 +1765,7 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
 - `App.tsx` `PlainView` is at the complexity ceiling (13): the tab is mounted as `<SkillsTab view
   viewKey />`, whose view check is in `features/skills/SkillsView.tsx`. A new plain tab must do the
   same.
-- View id `skills` is in `NOT_YET_REPORTED` (tests/telemetryContract.test.mts) until the telemetry
-  schema widens. Nav row: Stats/Data, after Leveling.
+- View id `skills`. Nav row: Stats/Data, after Leveling.
 - Per hour and This session cells are blank when there is nothing to state (no dash glyph:
   copyNoEmDash).
 
@@ -1868,8 +1857,8 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
 Slice 1 (2026-11-20): the menu entry, Home and a workbench with the wiki recipe book. TypeScript
 only: no engine, parser, protocol, network or dependency change.
 
-- View id `tradeskills`, one view with two screens. Nav row: Research, after Maps. In
-  `NOT_YET_REPORTED` (tests/telemetryContract.test.mts). Mounted as `<TradeskillsTab view viewKey
+- View id `tradeskills`, one view with two screens. Nav row: Research, after Maps.
+  Mounted as `<TradeskillsTab view viewKey
   routing />` (`features/tradeskills/TradeskillsView.tsx`), the Skills tab's way, because
   `App.tsx` `PlainView` is at the complexity ceiling. The Skills tab is unchanged.
 - Data path: main builds the book once per process (`src/main/tradeskillBook.ts`
@@ -2618,6 +2607,17 @@ only: no engine, parser, protocol, network or dependency change.
   says "No wiki item has this exact name": true for a missing page (Woven Mandrake) and for a
   guide's shorthand (Platinum ruby), so it never claims the wiki lacks a page.
 
+### The plan buys first, folds, and keeps its columns (2026-11-20, branch `plan-buy-first`)
+
+- `planTree` shuts a material with a recipe as `closed: 'bought'` when the wiki's words, a guide's
+  merchant (`soldByMerchant`) or the log (`PlanAsk.paid`) say it can be bought. `PlanAsk.opened` /
+  `PlanMemory.opened` is the reader's "Make it instead". Pass `paid` wherever a tree is built for
+  the player, or Home's "Working towards" count and the plan disagree.
+- Unfolded made materials are `PlanMemory.expanded`, by item key, so they survive a Back from a
+  link out. A new item starts folded. "What to gather" reads the tree, not what is unfolded.
+- `materialGrid.ts` is the one material table. Nesting goes in `nameCell(depth)` only; do not wrap
+  nested rows in a margin, which is what pushed Need and Have out of line.
+
 ## Tradeskill guides as data (fork #6, requirements/skills-tab.md)
 
 - Two community guides are pulled at release time by `scripts/community/guides-pull.mts` and
@@ -2822,8 +2822,8 @@ what a later change must know. Each fix has a unit test that failed before it.
 - The notice is in memory for one launch (`main/ipc/settingsRecovery.ts`), cleared by
   `settingsRecovery:seen`. It is not stored; a launch that never opens the main window never shows
   it.
-- The card sits top centre under the title bar on purpose: a reset brings back the first-run
-  telemetry strip along the bottom, and bottom right belongs to the switch nudge and toasts.
+- The card sits top centre under the title bar on purpose: the bottom edge belongs to the
+  what's-new strip, and bottom right belongs to the switch nudge and toasts.
 - `salvagedBackup.savedAtMs` is the backup file's mtime and is optional: a stat failure must never
   cost the restore (`storeFile.ts backupFacts`).
 - Quarantine: `tornJson.ts quarantineSlots()` gives five names; `quarantineStore` takes the first
@@ -2859,8 +2859,8 @@ what a later change must know. Each fix has a unit test that failed before it.
   downloads when the cached file fails validation, and clears the pending folder on failure).
 - Trap: electron-updater adds its quit handler only when a download resolves while
   autoInstallOnAppQuit is true. Setting the flag later is not enough; rearmApplyOnQuit() re-resolves
-  the cached file through downloadUpdate(). Keep 'downloading' unset there or telemetry counts a
-  download that did not happen.
+  the cached file through downloadUpdate(). Keep 'downloading' unset there: the latch picks the
+  failing step from it.
 - Trap: the download runs after its check has returned, so runCheck's caller has already re-armed
   the poll. Anything that should change the next delay after a download ends must re-arm from the
   event handler (retrySoon), not rely on consecutiveFailures being read later: update-available

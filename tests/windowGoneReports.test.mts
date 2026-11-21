@@ -11,8 +11,7 @@
 //
 // It drives three real leaf modules — `src/main/windowGone.ts`, `src/shared/errorReportLocation.ts`
 // and `src/main/telemetry/errorReports.ts` — none of which imports Electron, so this suite NEVER
-// SKIPS. The child-process-gone half of the same ticket is pinned in `setupSnapshot.test.mts`,
-// beside the counters it shares an event with.
+// SKIPS. The child-process-gone half of the same ticket is pinned in `childProcessGone.test.mts`.
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
@@ -24,16 +23,18 @@ import {
   renderGoneReport
 } from '../src/main/windowGone'
 import { GPU_LOSS_ERROR_NAME } from '../src/main/childProcessGone'
-import { NO_MESSAGE, stampedMessage } from '../src/shared/errorReportLocation'
+import { NO_MESSAGE, caughtFields, stampedMessage } from '../src/shared/errorReportLocation'
 import {
   MAX_REDACTED_MESSAGE,
   errorFingerprint,
   errorNameOf,
   redactMessage
 } from '../src/shared/errorReport'
-import { REDACTED_MESSAGE_RE } from '../src/shared/telemetry'
-import { noteError, resetErrorReports, takeErrorReports } from '../src/main/telemetry/errorReports'
-import { validateTelemetryEvent } from '../src/shared/telemetryValidate'
+import { caughtFields } from '../src/shared/errorReportLocation'
+import { fingerprintOf } from '../src/main/telemetry/errorReports'
+
+/** What a redacted message must be: printable ASCII, at most `MAX_REDACTED_MESSAGE` of it. */
+const REDACTED_MESSAGE_RE = /^[\x20-\x7E]{0,200}$/
 
 // =========================================================================================
 // 1. THE TWO webContents SITES
@@ -153,10 +154,9 @@ test('THE TAG IS HELD TO A SHAPE, because one logError source is renderer-suppli
   }
 })
 
-test('EVERY STAMP IS A FIXED POINT OF redactMessage — the server re-runs it and refuses drift', () => {
-  // `telemetryValidateError.ts` re-redacts the message a client sent and rejects the whole report
-  // if the output differs. A stamp applied AFTER the redaction has to survive that, or the belt
-  // would silently delete the reports it was built to rescue.
+test('EVERY STAMP IS A FIXED POINT OF redactMessage, so the stamp cannot move a fingerprint twice', () => {
+  // A stamp is applied AFTER the redaction and is then folded into the fallback fingerprint. If
+  // redacting it again changed it, the same blank error would hash two ways.
   for (const source of [
     'main:render-process-gone',
     'renderer:ErrorBoundary',
@@ -165,7 +165,7 @@ test('EVERY STAMP IS A FIXED POINT OF redactMessage — the server re-runs it an
   ]) {
     const stamp = stampedMessage('', source)
     assert.equal(redactMessage(stamp), stamp, `not a fixed point: ${stamp}`)
-    assert.equal(REDACTED_MESSAGE_RE.test(stamp), true, `wire refuses: ${stamp}`)
+    assert.equal(REDACTED_MESSAGE_RE.test(stamp), true, `not printable ASCII: ${stamp}`)
     assert.ok(stamp.length <= MAX_REDACTED_MESSAGE)
   }
 })
@@ -186,56 +186,43 @@ function withFrames(message: string): Record<string, unknown> {
 }
 
 test('THE OLD BLANK FAMILY BECOMES A NAMED ONE, and the belt catches whatever is left', () => {
-  resetErrorReports(1_000_000)
-  // What 1.5.0 actually sent from `main:render-process-gone`: an object with no message on it.
-  noteError('main:render-process-gone', withFrames(''), 1_000_100)
-  const [blank] = takeErrorReports()
-  assert.equal(blank.redactedMessage, `${NO_MESSAGE} [main:render-process-gone]`)
-  assert.equal(validateTelemetryEvent(blank).ok, true, 'the stamp must survive the wire')
+  // What 1.5.0 actually handed over from `main:render-process-gone`: an object with no message.
+  const blank = caughtFields(withFrames(''))
+  assert.equal(
+    stampedMessage(redactMessage(blank.message), 'main:render-process-gone'),
+    `${NO_MESSAGE} [main:render-process-gone]`
+  )
 
-  // What it sends now.
-  resetErrorReports(1_000_000)
+  // What it hands over now.
   const report = renderGoneReport({ reason: 'oom', exitCode: 5 })
-  noteError('main:render-process-gone', { ...withFrames(report.message), ...report }, 1_000_100)
-  const [named] = takeErrorReports()
-  assert.equal(named.errorName, RENDER_GONE_ERROR_NAME)
-  assert.equal(named.redactedMessage, 'render process gone: reason=oom, exitCode=5')
-  assert.equal(named.code, '5', 'the exit code rides in the machine-readable field too')
-  assert.equal(validateTelemetryEvent(named).ok, true)
-  // And nothing from the game came along for the ride.
-  const json = JSON.stringify(named)
-  for (const leak of ['Users', 'jmoye', 'Primitive', 'freeport']) {
-    assert.equal(json.includes(leak), false, `leaked ${leak}`)
-  }
+  const named = caughtFields({ ...withFrames(report.message), ...report })
+  assert.equal(errorNameOf(named.name), RENDER_GONE_ERROR_NAME)
+  assert.equal(redactMessage(named.message), 'render process gone: reason=oom, exitCode=5')
+  assert.equal(named.code, 5, 'the exit code rides in the machine-readable field too')
 })
 
 test('THE BELT CANNOT MOVE A FINGERPRINT THAT ALREADY HAS FRAMES', () => {
   // The provable half of the design: `errorFingerprint` reads its `fallback` ONLY when `frames` is
-  // empty, and every report in this app has frames (`errorLog` hands over a capture site precisely
-  // so the frameless ones are not all one row). So a family the error store already tracks keeps
-  // its identity across this change, and only its MESSAGE improves.
-  resetErrorReports(1_000_000)
-  noteError('main:render-process-gone', withFrames(''), 1_000_100)
-  const [stamped] = takeErrorReports()
+  // empty, and every error in this app has frames (`errorLog` hands over a capture site precisely
+  // so the frameless ones are not all one fingerprint). So an error keeps its identity whatever
+  // its message says.
   const frames = [{ file: 'out/main/index.js', line: 10_455, col: 5, func: 'WebContents.<anonymous>' }]
   assert.equal(
-    stamped.fingerprint,
+    fingerprintOf('main:render-process-gone', withFrames('')),
     errorFingerprint('Error', frames),
     'the fingerprint is the name and the frames — the stamped message is not in it'
   )
 })
 
-test('two BLANK frameless reports from different sites stop being one row', () => {
+test('two BLANK frameless errors from different sites stop being one fingerprint', () => {
   // The other half, and the one case where the belt DOES move a fingerprint — on purpose. With no
   // frames of any kind, `fingerprintFallback` folds the message skeleton, and before this ticket
-  // both of these hashed `Error` plus the empty string: one row for every silent failure in the
-  // app. That is the JOS-111 collapse, in the corner JOS-111 could not reach because there was no
-  // message to make a skeleton out of.
-  resetErrorReports(1_000_000)
-  noteError('main:did-fail-load', { message: '' }, 1_000_100)
-  noteError('main:gpu-process-gone', { message: '' }, 1_000_200)
-  const out = takeErrorReports()
-  assert.equal(out.length, 2, 'two silent sites are two issues')
-  assert.notEqual(out[0].fingerprint, out[1].fingerprint)
-  for (const ev of out) assert.equal(validateTelemetryEvent(ev).ok, true)
+  // both of these hashed `Error` plus the empty string: one fingerprint for every silent failure
+  // in the app. That is the JOS-111 collapse, in the corner JOS-111 could not reach because there
+  // was no message to make a skeleton out of.
+  assert.notEqual(
+    fingerprintOf('main:did-fail-load', { message: '' }),
+    fingerprintOf('main:gpu-process-gone', { message: '' }),
+    'two silent sites are two issues'
+  )
 })

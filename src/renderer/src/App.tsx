@@ -53,14 +53,8 @@ import PreferencesView from './features/preferences/PreferencesView'
 // menu opens them, and the Appearance rows tag a closed one). Both are recorded HERE, at the root.
 // See the effect.
 import { peekPrefsSnapshot, recordPref } from './features/preferences/prefsSnapshot'
-// OWNER-ONLY. `devTriage` holds the single `DEV_TOOLS ? lazy(() => import(…)) : null` — the
-// STRIP, which is a compile-time question and stays on `DEV_TOOLS`; in a build without the flag
-// its only use below is dead code, so rollup drops the import and the entire triage feature with
-// it. WHETHER TO SHOW IT is a second question and a runtime one (`OWNER_TOOLS`, JOS-72). See
-// devTriage.tsx / devFlags.ts.
-import DevTriageView from './devTriage'
 // The CHARACTER SHEET (JOS-45, released JOS-327). It used to come through `unreleasedCharacter.tsx`
-// — a `UNRELEASED ? lazy(() => import(…)) : null` twin of `devTriage` above, whose whole job was to
+// — a `UNRELEASED ? lazy(() => import(…)) : null` wrapper whose whole job was to
 // keep the tree out of packaged bytes. The owner released the tab, so that file is gone and this is
 // an ordinary static import like the eleven views above it.
 import CharacterView from './features/character/CharacterView'
@@ -82,13 +76,10 @@ import { UnlockLinkProvider, useOpenUnlock } from './lib/unlockLink'
 // The ACHIEVEMENTS and UNLOCKS tabs; each view check lives in its own file.
 import UnreleasedSlayerView from './unreleasedSlayer'
 import UnreleasedUnlocksView from './unreleasedUnlocks'
-import { OWNER_TOOLS } from './devFlags'
 // What's new (JOS-73). The teaser strip is one quiet line along the bottom edge, never a modal,
 // and renders nothing unless this launch is the first one after an update. See
 // features/whatsnew/WhatsNewTeaser.tsx.
 import { WhatsNewTeaser } from './features/whatsnew/WhatsNewTeaser'
-import { setCurrentView } from './lib/currentView'
-import { dwellView, useViewDwell } from './lib/telemetry'
 import { useLiveDot } from './lib/useLiveDot'
 import { relistOnFocus, showsNoLogs } from './lib/noLogs'
 import { MetInLogFeed } from './lib/useMetInLog'
@@ -191,8 +182,8 @@ function PlainView({
           by the fold the character switch kicks off. */}
       {view === 'timers' && <TimersView key={viewKey} onOpenMob={routing.openMob} onOpenMapZone={routing.openMapZone} />}
       {view === 'alerts' && <AlertsView key={viewKey} {...{ onOpenVoicePrefs, onOpenOverlayPrefs }} />}
-      {/* CHARACTER (JOS-45, released JOS-327). It sits HERE, below the no-characters gate, and not
-          beside the triage branch: unlike triage this tab reads the game log (name, level, loadout)
+      {/* CHARACTER (JOS-45, released JOS-327). It sits HERE, below the no-characters gate:
+          this tab reads the game log (name, level, loadout)
           and the character's own inventory dump, so a machine with no EverQuest install has nothing
           to show it. Keyed like the rest — the sheet and its carry-all ledger are one character's,
           and the remount is how this app says that. */}
@@ -247,17 +238,13 @@ function ViewContent({
   if (view === 'preferences') {
     return <PreferencesView key={prefs.section ?? 'prefs'} section={prefs.section} />
   }
-  // OWNER-ONLY (`OWNER_TOOLS` = DEV **and** `EQ_OWNER_TOOLS=1`, JOS-72), and ABOVE the
-  // no-characters gate on purpose: the triage tab reads the cloud backlog, not the game log, so
-  // a machine with no EverQuest install must still reach it.
-  if (OWNER_TOOLS && view === 'triage') return <DevTriageView />
   if (!hasCharacters) return <NoLogsEmptyState onOpenPreferences={onOpenPreferences} />
   // EVERY SPELL NAME BELOW THIS LINE IS A LINK (JOS-508) — one provider rather than a prop threaded
   // through AlertsView, BuffsView and LevelingView to the five places a name is drawn.
   // `lib/spellLink.tsx`'s header carries the argument; the short form is that whether a spell name
   // links is a property of the APP, not a per-caller decision. It sits HERE rather than at App's
-  // root because this is the exact subtree that draws spell names: Preferences and the owner-only
-  // triage tab return above it and draw none, and the overlay bundle — a different window, mounting
+  // root because this is the exact subtree that draws spell names: Preferences
+  // returns above it and draws none, and the overlay bundle — a different window, mounting
   // no provider at all — keeps the plain text it has always had. `AppLinkProvider` (lib/appLinks.tsx)
   // is that spell provider plus the Tradeskills door (lib/tradeskillLink.tsx), mounted as one element.
   return (
@@ -488,22 +475,6 @@ export default function App(): JSX.Element {
     // does this nav row open", and both have to survive visits to every other tab in the app.
     rememberSpellTab(view)
   }, [view])
-
-  // How long each tab was on screen, reported ON SWITCH (plan §2). `View` and the schema's
-  // `viewDwell` enum are the SAME SET as of JOS-327, which released the last view that was held out
-  // of it — `dwellView` still folds an unknown id to `null` rather than reporting it, because
-  // widening the enum before the ingest Lambda is deployed would 400 the whole batch and drop every
-  // counter with it. `tests/telemetryContract.test.mts` pins the equality in both directions.
-  useViewDwell(dwellView(view))
-
-  // …and the same fact, kept for the ERROR reporter (JOS-100). It is a separate mechanism on
-  // purpose: `useViewDwell` reports the view you LEFT, on a switch, which is exactly the wrong
-  // answer for "which tab was open when it broke". This is a plain module variable because its
-  // readers — the global error handlers in main.tsx and ErrorBoundary — run at moments when the
-  // React tree is not something to rely on. A view the schema has not learned would set it too and
-  // be folded to `unknown` by main's closed-enum check, which is the right outcome: an error there
-  // is worth reporting even though the view id is not.
-  setCurrentView(view)
 
   useEffect(() => {
     void window.eq.getCharacter().then(setCharacter)

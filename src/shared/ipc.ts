@@ -165,6 +165,8 @@ export const IPC = {
   // that as "no exact verdict for this one" rather than as an error: a machine with no EverQuest
   // install answers an empty map, and the tab degrades to its flagged tier and says so.
   spellsStackViews: 'spells:stackViews',
+  // The macro editor's spell lookup: real ids from the player's spells_us.txt (src/main/spellIds.ts).
+  spellIdLookup: 'spells:idLookup',
 
   // ---- voice alerts / TTS (docs/plans/voice-alerts.md §3) ----
   // The 'system' engine tier needs NO channel at all: Chromium's own `speechSynthesis` lives in
@@ -765,58 +767,6 @@ export const IPC = {
   // length cap), never trusted because today's only caller is the app's own UI.
   clipboardWrite: 'clipboard:write',
 
-  // ---- in-app feedback (Task #65 — docs/plans/feedback-triage.md §4.3) ----
-  // renderer -> main: the dialog's header context (versions, channel, queued count,
-  // whether this build has an endpoint compiled in). Returns FeedbackContext.
-  feedbackContext: 'feedback:context',
-  // renderer -> main: build the scrubbed log slice for a window (minutes) and return a
-  // CAPPED preview + the real counts. The bytes never cross IPC — only PREVIEW_MAX_LINES
-  // of text plus the metadata. Returns FeedbackSlicePreview | null.
-  feedbackBuildSlice: 'feedback:buildSlice',
-  // renderer -> main: save the FULL slice to disk via the OS save dialog, so a user who
-  // wants to read every byte before sending can. Returns {ok, path?, canceled?}.
-  feedbackSaveSlice: 'feedback:saveSlice',
-  // renderer -> main: package the CURRENT `/outputfile inventory` dump and return its
-  // metadata + a capped preview, or the NAMED reason there is none (JOS-296). No arguments:
-  // which dump belongs to this character is main's answer, never the renderer's. The gz bytes
-  // never cross. Returns FeedbackInventoryPreview.
-  feedbackBuildInventory: 'feedback:buildInventory',
-  // renderer -> main: the same for the CURRENT `/outputfile achievements` dump (JOS-441), on the
-  // identical no-arguments terms. Returns FeedbackAchievementsPreview.
-  feedbackBuildAchievements: 'feedback:buildAchievements',
-  // renderer -> main: submit. Args (draft, {attachLog, windowMinutes, attachInventory,
-  // attachAchievements}). Never rejects; a network failure resolves with {ok:false,
-  // queued:true}. Returns SubmitResult.
-  feedbackSubmit: 'feedback:submit',
-
-  // ---- usage analytics (docs/plans/usage-analytics.md wave A1) ------------------------
-  //
-  // NONE OF THESE CAN PUT A BYTE ON THE WIRE. They move events into the local ring, read and
-  // write the switch, and render the payload viewer. The only thing that transmits is main's
-  // flush loop, gated in src/main/telemetry/net.ts — there is no "send now" channel, on purpose.
-  //
-  // renderer -> main, FIRE-AND-FORGET: record one event. The payload is VALIDATED AT THE
-  // HANDLER with the shared `validateTelemetryEvent` — the renderer is untrusted here like
-  // everywhere else, and the schema is a closed allowlist, so an unknown tag or an unlisted
-  // enum member is dropped rather than buffered. Arg: TelemetryEvent.
-  telemetryTrack: 'telemetry:track',
-  // renderer -> main: the persisted prefs {enabled, noticeShown, analyticsId}. Returns
-  // TelemetryPrefs.
-  telemetryPrefsGet: 'telemetryPrefs:get',
-  // renderer -> main: flip the master switch. OFF drops the local buffer immediately.
-  // Arg: boolean. Returns TelemetryPrefs.
-  telemetrySetEnabled: 'telemetry:setEnabled',
-  // renderer -> main: the first-run notice has been ANSWERED (or dismissed — dismissal keeps
-  // it on, that is what opt-out means). Sets noticeShown either way. Arg: boolean (keep on).
-  telemetryNoticeShown: 'telemetry:noticeShown',
-  // renderer -> main: mint a new anonymous analyticsId and DROP the local buffer (T3).
-  // Returns TelemetryPrefs.
-  telemetryRotate: 'telemetry:rotate',
-  // renderer -> main: everything the Preferences payload viewer renders — prefs, whether this
-  // build has an endpoint at all, the live buffer, and the last batch sent (permanently null
-  // while dark). Returns TelemetryPayloadView.
-  telemetryPayload: 'telemetry:payload',
-
   // ---- what's new (JOS-73; shared/releaseNotes.ts) --------------------------------------
   //
   // TWO CHANNELS, AND THE NOTES THEMSELVES CROSS NEITHER. `src/shared/releaseNotes.ts` is
@@ -1066,62 +1016,13 @@ export const IPC = {
   // couple of seconds, and the only route that does not blank the window under `npm run dev`),
   // or nothing happened at all.
   //
-  // UNLIKE THE TRIAGE CHANNELS BELOW, THIS HANDLER IS REGISTERED IN EVERY BUILD — and REFUSES
+  // THIS HANDLER IS REGISTERED IN EVERY BUILD — and REFUSES
   // in a packaged one, having done nothing (src/main/ipc/dev.ts). A packaged
   // build is therefore provably inert even if the channel is reached, rather than relying on
   // the renderer surface having been stripped (it has been: `DEV_TOOLS`, anchored on
   // `import.meta.env.DEV`, deletes the button from those bytes). Takes no arguments, so there
   // is nothing at this handler to validate.
   devRestart: 'dev:restart',
-
-  // ---- feedback TRIAGE (the OWNER-only operator tab — src/main/triage/**) --------------
-  //
-  // ========= OWNER OPT-IN ONLY. NO SHIPPED APP EVER REGISTERS THESE HANDLERS. =============
-  //
-  // The names live here because every channel name in this app lives here — but nothing in a
-  // packaged build listens on them, and since JOS-72 nothing in an ordinary dev build does
-  // either. Registration happens from `src/main/index.ts` behind `if (!OWNER_TOOLS) return`
-  // via a dynamic import — DEV **and** an explicit `EQ_OWNER_TOOLS=1` that no fresh checkout
-  // has (src/shared/ownerTools.ts; a self-compiled build from this public repo is not
-  // `app.isPackaged`, which is what the old predicate had missed) — and the module it imports
-  // reaches `pg` + `@aws-sdk/*`, which are devDependencies and therefore never packaged.
-  // Calling one of these from a shipped build rejects with "No handler registered", which is
-  // the correct and intended outcome.
-  //
-  // These channels read the OWNER'S FEEDBACK BACKLOG (Aurora DSQL + S3) using the launching
-  // shell's AWS profile (AWS_PROFILE, default 'eqc'). Possession of those IAM credentials is
-  // the access control; there is no password and no server-side read API to secure.
-  //
-  // Every argument is VALIDATED AT THE HANDLER (src/main/triage/validate.ts) — `reportId`
-  // reaches a file path as well as a SQL parameter and must be a 26-character ULID. Every
-  // reply is a `TriageResult<T>` (never a rejection), so an IAM denial renders as prose.
-  //
-  // renderer -> main: the filtered backlog. Arg: TriageListQuery. Returns TriageRow[].
-  triageList: 'triage:list',
-  // renderer -> main: one full record + the S3-resolved log state. Arg: reportId.
-  triageDetail: 'triage:detail',
-  // renderer -> main: download (cached) + gunzip a report's log slice and return CAPPED text.
-  // The gz bytes never cross; at most PREVIEW_MAX_LINES lines do. Arg: reportId.
-  triageSlice: 'triage:slice',
-  // renderer -> main: the triage-only writes (status/severity/cluster/dupe/note). Args:
-  // (reportId, TriagePatch). `issueUrl` is deliberately NOT writable from the UI.
-  triagePatch: 'triage:patch',
-  // renderer -> main: §3.5 forget — strip the contact, delete the slice object, keep the
-  // report. Arg: reportId.
-  triageForget: 'triage:forget',
-  // renderer -> main: the kill switch + block list. Returns TriageOpsState.
-  triageOps: 'triage:ops',
-  // renderer -> main: set the kill switch. POSITIVE polarity — `accepting:false` is what the
-  // CLI spells `closed on`. Args: (accepting, message?).
-  triageSetAccepting: 'triage:setAccepting',
-  // renderer -> main: block/unblock one install. Args: (installId, blocked, reason).
-  triageSetBlocked: 'triage:setBlocked',
-  // renderer -> main: the CLI's markdown digest + its deterministic clusters. Arg: query.
-  triageDigest: 'triage:digest',
-  // renderer -> main: usage analytics over a window (arg: days, one of TRIAGE_ANALYTICS_DAYS).
-  // Reads usage_daily + usage_funnel_daily + analytics_install; `available:false` means the
-  // tables are missing (a cluster that predates the A2 migration), NOT that they are empty.
-  triageAnalytics: 'triage:analytics',
 
   // ---- the data server's renderer brokerage (JOS-484, docs/plans/data-server.md ruling 7) ----
   //

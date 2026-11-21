@@ -84,6 +84,11 @@ function wikiSaysBought(ingredient: BookIngredient): boolean {
   return (ingredient.sources ?? []).some((word) => BOUGHT_WORD.test(word) && !ENCHANTED_WORD.test(word))
 }
 
+/** The wiki's words or a guide's merchant say it can be bought. `guide`: the guide's source on this very line. */
+export function soldByMerchant(guides: GuideIndex, ingredient: BookIngredient, guide?: GuideSource): boolean {
+  return wikiSaysBought(ingredient) || (guide ?? locatedSource(guides, ingredient.key))?.merchant !== undefined
+}
+
 /** The evidence that a merchant sells a material, strongest first; null when nothing says so. */
 export function buyEvidence(facts: Pick<MaterialFacts, 'craft' | 'guides'>, material: RecipeMaterial): BuyEvidence | null {
   const { ingredient } = material

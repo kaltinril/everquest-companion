@@ -12,10 +12,11 @@ import { Box, Chip, MenuItem, Paper, Stack, TextField, Typography } from '@mui/m
 import { recipeFacts, type BookRecipe } from '@shared/tradeskillBook'
 import { recipeGuideCreditText } from '@shared/tradeskillGuide'
 import { haveSourceText, logCountsInUse } from '@shared/tradeskillHistory'
+import { lastPaid } from '@shared/tradeskillMoney'
 import { planTree, recipeCountText, recipeOptionText, treeDrawsGuide, type PlanDeps } from '@shared/tradeskillPlan'
 import { PLAN_CAN_MAKE_LABEL, gatherFor, gatherHeld, planCanMakeTip, planHave, planPrice } from '@shared/tradeskillPlanGather'
 import { skillNeeds, skillRoutes, skillsAllMet } from '@shared/tradeskillPlanLevels'
-import { withClosed, withCount, withRecipe, type PlanMemory } from '@shared/tradeskillPlanMemory'
+import { withClosed, withCount, withExpanded, withRecipe, type PlanMemory } from '@shared/tradeskillPlanMemory'
 import OutputKindLine from '../../components/OutputKindLine'
 import { formatDate } from '../../lib/formatDate'
 import { Tooltip } from '../../lib/Tooltip'
@@ -93,7 +94,10 @@ export interface ItemPlanProps {
 
 export function ItemPlan({ recipe, recipes, deps, facts, levels, plan, setPlan, onOpenBench }: ItemPlanProps): JSX.Element {
   const { held, craft } = facts
-  const tree = useMemo(() => planTree(deps, recipe, { closed: new Set(plan.closed) }), [deps, recipe, plan.closed])
+  const tree = useMemo(
+    () => planTree(deps, recipe, { closed: new Set(plan.closed), opened: new Set(plan.opened), paid: (key) => lastPaid(craft, key) !== null }),
+    [deps, recipe, plan.closed, plan.opened, craft]
+  )
   const skills = useMemo(() => skillNeeds(tree, levels.rows), [tree, levels.rows])
   const routes = useMemo(() => skillRoutes(deps, skills.needs), [deps, skills])
   const gather = useMemo(() => {
@@ -137,8 +141,14 @@ export function ItemPlan({ recipe, recipes, deps, facts, levels, plan, setPlan, 
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'minmax(0, 1fr)', lg: clear ? 'minmax(0, 1fr)' : 'minmax(0, 3fr) minmax(0, 2fr)' }, gap: 1.5, alignItems: 'start' }}>
           <ItemPlanTree
             tree={tree}
-            setClosed={(key, closed) => {
-              setPlan(withClosed(plan, key, closed))
+            controls={{
+              setClosed: (key, closed) => {
+                setPlan(withClosed(plan, key, closed))
+              },
+              expanded: new Set(plan.expanded),
+              setExpanded: (key, open) => {
+                setPlan(withExpanded(plan, key, open))
+              }
             }}
           />
           {!clear && <ItemPlanSkills skills={skills} routes={routes} served={levels.served} onOpenBench={onOpenBench} />}

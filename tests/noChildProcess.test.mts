@@ -150,18 +150,13 @@ test('NO SHIPPED CODE CAN NAME POWERSHELL — the watcher launches nothing at al
 })
 
 /**
- * The modules allowed to launch a process. TWO, each with its argument stated here, which is the
+ * The modules allowed to launch a process. ONE, with its argument stated here, which is the
  * bargain this file's header offers: a ticket that genuinely needs to launch something adds itself
- * with its reason in the same breath.
- *
- * `main/triage/store.ts` runs `terraform output -json` for the operator's backlog client. It is
- * reached only through a dynamic import gated on `!app.isPackaged`, and its dependencies are
- * devDependencies that electron-builder never installs — so in a packaged app the require cannot
- * resolve at all. That is a property of the PACKAGING, not a promise about a boolean, and it is
- * spelled out at the `externalizeDeps` line in electron.vite.config.ts.
+ * with its reason in the same breath. (The second, the operator's backlog client, was removed
+ * with the triage code on 2026-11-20.)
  *
  * `main/dataServer/engineHost.ts` spawns the DATA-SERVER ENGINE (JOS-459 phase 0), and it is the
- * first thing added here that is meant to ship. THE OWNER'S CORRECTION IS WHY (docs/plans/
+ * one thing here that is meant to ship. THE OWNER'S CORRECTION IS WHY (docs/plans/
  * data-server.md, ruling 16, 2026-08-24, verbatim in the plan): **PowerShell was the AV trigger,
  * not child processes.** JOS-182/184 removed `powershell.exe`, `reg.exe` and `wmic` because THOSE
  * BINARIES trip behavioural heuristics — an app compiling C# at runtime to enumerate every process
@@ -177,7 +172,7 @@ test('NO SHIPPED CODE CAN NAME POWERSHELL — the watcher launches nothing at al
  *     never a path from a config file or the wire.
  *   * IT JOINS THE CODE-SIGNING SET like any other shipped executable (phase 3).
  */
-const SPAWNERS = new Set(['main/triage/store.ts', 'main/dataServer/engineHost.ts'])
+const SPAWNERS = new Set(['main/dataServer/engineHost.ts'])
 
 /** Every module specifier a file imports or re-exports. */
 function importSpecifiers(file: string): string[] {
@@ -197,7 +192,7 @@ function importSpecifiers(file: string): string[] {
   return out
 }
 
-test('NOTHING UNDER src/ CAN START A PROCESS — two exemptions, each argued above', () => {
+test('NOTHING UNDER src/ CAN START A PROCESS — one exemption, argued above', () => {
   const files = sourceFiles(SRC_ROOT)
   const offenders: string[] = []
   let exempted = 0
@@ -213,7 +208,7 @@ test('NOTHING UNDER src/ CAN START A PROCESS — two exemptions, each argued abo
     offenders.push(`${name}: ${spawns.join(', ')}`)
   }
   assert.deepEqual(offenders, [], 'a module imports a child-process API')
-  // The exemption must still be REACHED. Without this, deleting the triage client would leave a
+  // The exemption must still be REACHED. Without this, deleting the exempt module would leave a
   // guard standing over nothing, looking exactly as green as it does today.
   assert.equal(exempted, SPAWNERS.size, 'every exempt module is still there to be exempted')
 })

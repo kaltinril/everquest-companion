@@ -2,9 +2,15 @@
 // dragged onto another moves there, or the two swap. Each carries its mark against the game's file.
 
 import { type DragEvent, type JSX, useRef, useState } from 'react'
-import { Box, Button, Chip, Stack, Typography } from '@mui/material'
+import { Box, Button, Chip, Stack, type SxProps, type Theme, Typography } from '@mui/material'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import BoltIcon from '@mui/icons-material/Bolt'
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
 import type { GridButton } from '@shared/macros/buttons'
 import { firstLine } from '@shared/macros/library'
+import type { HotbarSlots } from '@shared/macros/types'
+import { Tooltip } from '../../lib/Tooltip'
+import { ColorMark } from './MacroColor'
 import { MARK_COLOR, MONO_SX } from './macroParts'
 
 interface CellProps {
@@ -14,6 +20,12 @@ interface CellProps {
   lifted: boolean
   /** A dragged button is over this one. */
   target: boolean
+  /** The game's copy of this button changed too, and the player's is the one kept. */
+  clash: boolean
+  /** While selecting: whether this button is selected. Null when not selecting. */
+  check: boolean | null
+  /** A hotbar button of the game points at this one. */
+  onBar: boolean
   onPick: () => void
   drag: DragHandlers
 }
@@ -33,9 +45,12 @@ function CellBody({ cell }: { cell: GridButton }): JSX.Element {
     const line = firstLine(macro)
     return (
       <>
-        <Typography variant="body2" noWrap sx={{ fontWeight: 600 }}>
-          {macro.name === '' ? 'Unnamed' : macro.name}
-        </Typography>
+        <Stack direction="row" spacing={0.5} alignItems="center" sx={{ minWidth: 0 }}>
+          <ColorMark color={macro.color} />
+          <Typography variant="body2" noWrap sx={{ fontWeight: 600 }}>
+            {macro.name === '' ? 'Unnamed' : macro.name}
+          </Typography>
+        </Stack>
         <Typography variant="caption" color="text.secondary" noWrap component="div" sx={MONO_SX}>
           {line === '' ? 'no commands yet' : line}
         </Typography>
@@ -56,26 +71,79 @@ function CellBody({ cell }: { cell: GridButton }): JSX.Element {
   )
 }
 
-function cellLabel(cell: GridButton): string {
+function cellLabel(cell: GridButton, clash: boolean, onBar: boolean): string {
   const what = cell.macro === null ? 'empty' : cell.macro.name
-  return cell.mark === null ? `Button ${String(cell.button)}: ${what}` : `Button ${String(cell.button)}: ${what}, ${cell.mark}`
+  const base = cell.mark === null ? `Button ${String(cell.button)}: ${what}` : `Button ${String(cell.button)}: ${what}, ${cell.mark}`
+  const marked = clash ? `${base}, changed in game too` : base
+  return onBar ? `${marked}, on a hotbar` : marked
 }
 
-function Cell({ cell, picked, lifted, target, onPick, drag }: CellProps): JSX.Element {
+/** The check mark a filled button carries while buttons are being selected. */
+function CellCheck({ check }: { check: boolean }): JSX.Element {
+  return check ? <CheckCircleIcon fontSize="small" color="primary" data-testid="macro-slot-check" /> : <RadioButtonUncheckedIcon fontSize="small" color="disabled" />
+}
+
+/** The mark on a button a hotbar uses. The button's children ignore the mouse; this one takes it for its tooltip. */
+function HotbarMark(): JSX.Element {
+  return (
+    <Tooltip title="A hotbar button fires whatever macro sits on this button.">
+      <Box component="span" data-testid="macro-slot-hotbar" sx={{ display: 'inline-flex', pointerEvents: 'auto' }}>
+        <BoltIcon sx={{ fontSize: 16 }} color="action" />
+      </Box>
+    </Tooltip>
+  )
+}
+
+/** A button's top row: its number, its marks against the game and the hotbars, and its check mark while selecting. */
+function CellTop({ cell, check, onBar }: { cell: GridButton; check: boolean | null; onBar: boolean }): JSX.Element {
+  const { mark } = cell
+  return (
+    <Stack direction="row" spacing={0.5} alignItems="center" justifyContent="space-between" sx={{ minHeight: 24 }}>
+      <Typography variant="caption" color="text.secondary">
+        {cell.button}
+      </Typography>
+      <Stack direction="row" spacing={0.5} alignItems="center">
+        {onBar && <HotbarMark />}
+        {mark !== null && <Chip size="small" variant="outlined" color={MARK_COLOR[mark]} label={mark} data-testid="macro-slot-mark" sx={{ height: 20 }} />}
+        {check !== null && cell.macro !== null && <CellCheck check={check} />}
+      </Stack>
+    </Stack>
+  )
+}
+
+/** How a button is drawn. `strong` is the heavier border: picked, selected, or about to take a drag. */
+function cellSx(filled: boolean, strong: boolean, lifted: boolean, target: boolean): SxProps<Theme> {
+  return {
+    display: 'block',
+    textAlign: 'left',
+    textTransform: 'none',
+    minWidth: 0,
+    minHeight: 72,
+    opacity: lifted ? 0.5 : 1,
+    borderStyle: filled ? 'solid' : 'dashed',
+    borderWidth: strong ? 2 : 1,
+    borderColor: strong ? 'primary.main' : 'divider',
+    bgcolor: target ? 'action.hover' : undefined,
+    // Drag events land on the button itself, never on its text, so the target does not flicker.
+    '& > *': { pointerEvents: 'none' }
+  }
+}
+
+function Cell({ cell, picked, lifted, target, clash, check, onBar, onPick, drag }: CellProps): JSX.Element {
   const { slot, mark } = cell
   const filled = cell.macro !== null
-  /** Picked, or about to take a dragged button: drawn with the heavier border. */
-  const strong = picked || target
+  const strong = picked || target || check === true
   return (
     <Button
       variant="outlined"
-      color={picked ? 'primary' : 'inherit'}
+      color={picked || check === true ? 'primary' : 'inherit'}
+      disabled={check !== null && !filled}
       onClick={onPick}
-      aria-label={cellLabel(cell)}
-      aria-pressed={picked}
+      aria-label={cellLabel(cell, clash, onBar)}
+      aria-pressed={check ?? picked}
       data-testid="macro-slot"
       data-mark={mark ?? 'same'}
-      draggable={filled}
+      draggable={filled && check === null}
       onDragStart={(e) => {
         drag.start(e, slot)
       }}
@@ -89,28 +157,15 @@ function Cell({ cell, picked, lifted, target, onPick, drag }: CellProps): JSX.El
         drag.drop(e, slot)
       }}
       onDragEnd={drag.end}
-      sx={{
-        display: 'block',
-        textAlign: 'left',
-        textTransform: 'none',
-        minWidth: 0,
-        minHeight: 72,
-        opacity: lifted ? 0.5 : 1,
-        borderStyle: filled ? 'solid' : 'dashed',
-        borderWidth: strong ? 2 : 1,
-        borderColor: strong ? 'primary.main' : 'divider',
-        bgcolor: target ? 'action.hover' : undefined,
-        // Drag events land on the button itself, never on its text, so the target does not flicker.
-        '& > *': { pointerEvents: 'none' }
-      }}
+      sx={cellSx(filled, strong, lifted, target)}
     >
-      <Stack direction="row" spacing={0.5} alignItems="center" justifyContent="space-between" sx={{ minHeight: 24 }}>
-        <Typography variant="caption" color="text.secondary">
-          {cell.button}
-        </Typography>
-        {mark !== null && <Chip size="small" variant="outlined" color={MARK_COLOR[mark]} label={mark} data-testid="macro-slot-mark" sx={{ height: 20 }} />}
-      </Stack>
+      <CellTop cell={cell} check={check} onBar={onBar} />
       <CellBody cell={cell} />
+      {clash && (
+        <Typography variant="caption" color="warning.main" noWrap component="div" data-testid="macro-slot-clash">
+          Changed in game too
+        </Typography>
+      )}
     </Button>
   )
 }
@@ -118,12 +173,18 @@ function Cell({ cell, picked, lifted, target, onPick, drag }: CellProps): JSX.El
 interface GridProps {
   buttons: GridButton[]
   selected: string | null
+  /** The slots changed both in the game and in the app. */
+  clashes: readonly string[]
+  /** The selected slots while selecting; null when not selecting. */
+  checked: readonly string[] | null
+  /** The buttons the game's hotbars point at. */
+  hotbars: HotbarSlots
   onPick: (slot: string) => void
   /** A filled button was dropped on another button of the page. */
   onMove: (from: string, to: string) => void
 }
 
-export function ButtonGrid({ buttons, selected, onPick, onMove }: GridProps): JSX.Element {
+export function ButtonGrid({ buttons, selected, clashes, checked, hotbars, onPick, onMove }: GridProps): JSX.Element {
   // The slot being dragged is read by the drop handlers at once, so it is a ref; the two states
   // only draw it.
   const from = useRef<string | null>(null)
@@ -170,6 +231,9 @@ export function ButtonGrid({ buttons, selected, onPick, onMove }: GridProps): JS
           picked={cell.slot === selected}
           lifted={cell.slot === lifted}
           target={cell.slot === over}
+          clash={clashes.includes(cell.slot)}
+          check={checked === null ? null : checked.includes(cell.slot)}
+          onBar={cell.slot in hotbars}
           drag={drag}
           onPick={() => {
             onPick(cell.slot)

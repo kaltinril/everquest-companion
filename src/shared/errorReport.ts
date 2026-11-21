@@ -2,10 +2,17 @@
 // ERROR REPORT — the message redactor, the stack parser, and the fingerprint.
 // ============================================================================
 //
-// The three pure functions behind `errorReport` (JOS-100). They sit BESIDE `sanitizeText.ts`
-// because they are the same kind of thing: the one definition of how a hostile-by-accident
-// string is made safe to carry, run on the client before a byte leaves the machine AND on the
-// server before a byte is stored.
+// The three pure functions behind an error's FINGERPRINT (JOS-100). They sit BESIDE
+// `sanitizeText.ts` because they are the same kind of thing: the one definition of how a
+// hostile-by-accident string is made safe to carry.
+//
+// WHAT THEY ARE FOR NOW (2026-11-20). They were written for the error reports the original
+// author's usage-analytics service received. That service and the sending code are removed.
+// The functions stay because the LOCAL error log uses them: `src/main/telemetry/errorReports.ts`
+// fingerprints every error with them, and the per-fingerprint session budget
+// (`src/main/errorBudget.ts`) is what stops one failing loop from filling errors.log. Where a
+// comment below says "the wire", "the server" or "the fleet", it is describing the removed
+// report format whose shape rules these functions still apply; nothing leaves the machine.
 //
 // -----------------------------------------------------------------------------------------
 // WHY THIS FILE EXISTS AT ALL — and what changed about the privacy promise.
@@ -35,7 +42,7 @@
 // are the FIRST placeholder-substituting redactor in this repo.
 //
 // PURE: the only import is `./sanitizeText` (itself import-free). No `node:`, no Electron, no
-// DOM. It compiles under both tsconfigs and bundles into the telemetry Lambda.
+// DOM. It compiles under both tsconfigs.
 
 import { sanitizeOneLine } from './sanitizeText'
 
@@ -43,8 +50,6 @@ import { sanitizeOneLine } from './sanitizeText'
 //
 // Declared FIRST because two of them are default arguments below, and a reader looking for
 // "how long may a message be" should not have to scroll past the regex that produces it.
-// Each is restated as a wire bound in `./telemetry.ts`; `tests/errorReportContract.test.mts`
-// pins the two copies equal, the same way the overlay-kind list is pinned.
 
 /** Length ceiling for `redactedMessage`. */
 export const MAX_REDACTED_MESSAGE = 200
@@ -239,16 +244,7 @@ const BUNDLE_ROOT_RE = /^(?:.*[\\/])?(?:out|out-e2e)[\\/](.*)$/
 /** Not an identifier, not `<anonymous>`, not a dotted method path — refused rather than sent. */
 const FUNC_ALLOWED_RE = /^[A-Za-z0-9_$.<>[\]]+$/
 
-/**
- * The shape a normalized frame file must have — the PRODUCER's copy of `FRAME_FILE_RE`
- * (shared/telemetry.ts), which cannot be imported here without giving that file an import it
- * is not allowed to have. `tests/errorReportContract.test.mts` pins the two SOURCE STRINGS
- * equal, so the copy cannot rot.
- *
- * It is applied at the producer as well as the validator because a frame that the wire would
- * refuse must never reach the wire: an event dropped at the boundary is an error report nobody
- * ever sees, which is indistinguishable from a fleet with no errors in it.
- */
+/** The shape a normalized frame file must have. */
 const BUNDLE_FILE_RE = /^out\/[A-Za-z0-9_-][A-Za-z0-9_.-]*(?:\/[A-Za-z0-9_-][A-Za-z0-9_.-]*)*$/
 
 /**
@@ -272,9 +268,6 @@ export function normalizeFrameFile(raw: string): string | null {
   const file = `out/${m[1].replace(/\\/g, '/').replace(/[?#].*$/, '')}`
   return BUNDLE_FILE_RE.test(file) ? file : null
 }
-
-/** The producer's copy of the wire's file pattern, exported for the parity pin only. */
-export const BUNDLE_FILE_PATTERN = BUNDLE_FILE_RE.source
 
 /**
  * Parse a stack into at most `max` frames, newest first, keeping whatever `normalize` recognises.
@@ -376,7 +369,7 @@ export function errorFingerprint(
   return `${hex8(fnv1a(text, 0x811c9dc5))}${hex8(fnv1a(text, 0x01000193))}`
 }
 
-// ---------------------------------------------------------------- the error's own name/code
+// ---------------------------------------------------------------- the error's own name
 
 /** `TypeError`, `Error`, `EqError` — an identifier, capped. Anything else reads as `Error`. */
 const NAME_RE = /^[A-Za-z_$][A-Za-z0-9_$]{0,63}$/
@@ -390,12 +383,4 @@ const NAME_RE = /^[A-Za-z_$][A-Za-z0-9_$]{0,63}$/
  */
 export function errorNameOf(name: unknown): string {
   return typeof name === 'string' && NAME_RE.test(name) ? name : 'Error'
-}
-
-/** `ENOENT`, `EPERM`, `ERR_MODULE_NOT_FOUND`, `-4058` — Node's own machine-readable code, when
- *  the thrown value carries one. Undefined when it does not, or when it is not code-shaped. */
-export function errorCodeOf(code: unknown): string | undefined {
-  const text = typeof code === 'number' ? String(code) : code
-  if (typeof text !== 'string') return undefined
-  return /^[A-Za-z0-9_.-]{1,32}$/.test(text) ? text : undefined
 }

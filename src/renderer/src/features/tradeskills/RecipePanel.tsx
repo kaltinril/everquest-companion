@@ -39,37 +39,13 @@ import { Tooltip } from '../../lib/Tooltip'
 import { useMetVersion } from '../../lib/useMetInLog'
 import { EraChip } from '../planner/PlannerChips'
 import { FactsProvider, useFacts, type BenchFacts } from './benchFacts'
+import { DEPTH_INDENT, GRID_SX, NAME_INDENT, NUMBER_SX, OPEN_COL, ROW_SX, WHERE_SX, nameCell } from './materialGrid'
 import { GuideSourceLine, Have, MATERIAL_LINE, PaidLine } from './MaterialWhere'
 import { CanMakeChip, StateChip } from './RecipeTable'
 import { NoticeChip, RecipeYou } from './RecipeYou'
 import { ItemLabel, MobLink, ZoneList, useDoors } from './tradeskillLinks'
 import { RecipeWish } from './RecipeWish'
 import { GuideDifferences, WikiGapLine, WikiPageLink } from './WikiGap'
-
-/**
- * Material, Need, Have, Where. Every material line is this one grid, whoever listed the material
- * (the wiki, or the guide where the wiki lists none) and whether or not it opens: a rule above
- * each line, and a first line of one height in every cell (`MATERIAL_LINE`), so a line with one
- * source and a line with four read as rows of one table. Every nested recipe repeats the columns.
- */
-const GRID_SX = {
-  display: 'grid',
-  gridTemplateColumns: 'minmax(200px, 2fr) 52px 52px minmax(0, 3fr)',
-  columnGap: 1.5,
-  alignItems: 'start'
-} as const
-
-const ROW_SX = { ...GRID_SX, py: 0.5, borderTop: 1, borderColor: 'divider' } as const
-
-/** The first line of a cell: the item icon's height and a line of text both sit in it. */
-const LINE_SX = { minHeight: MATERIAL_LINE, display: 'flex', alignItems: 'center', minWidth: 0, typography: 'body2' } as const
-
-const NUMBER_SX = { lineHeight: `${String(MATERIAL_LINE)}px` } as const
-
-/** The Where cell's lines are 20 px tall: this centres the first on the line beside it. */
-const WHERE_SX = { minWidth: 0, pt: `${String((MATERIAL_LINE - 20) / 2)}px` } as const
-
-const OPEN_COL = 28
 
 const HAVE_TIP = 'How many your inventory dump lists: bags, bank and tradeskill depot. A count marked log is the depot count your log stated after the dump.'
 
@@ -119,7 +95,7 @@ function ForageLine({ ingredient }: { ingredient: BookIngredient }): JSX.Element
   )
 }
 
-function OpenToggle({ open, name, onToggle }: { open: boolean; name: string; onToggle: () => void }): JSX.Element {
+export function OpenToggle({ open, name, onToggle }: { open: boolean; name: string; onToggle: () => void }): JSX.Element {
   return (
     <IconButton
       size="small"
@@ -186,7 +162,7 @@ function MaterialRow({ ingredient, trail, own }: { ingredient: BookIngredient; t
   return (
     <>
       <Box sx={ROW_SX} data-testid="tradeskill-material">
-        <Box sx={LINE_SX}>
+        <Box sx={nameCell(trail.length - 1)}>
           {made.open.length > 0 ? (
             <OpenToggle
               open={open}
@@ -217,14 +193,11 @@ function MaterialRow({ ingredient, trail, own }: { ingredient: BookIngredient; t
   )
 }
 
-/** Where a linked material's name starts: past the opener's column, the icon and the gap after it. */
-const NAME_INDENT = OPEN_COL + 28
-
 /** A guide's material whose name is no wiki item: the name as the guide wrote it, with the guide's source, on the same grid. */
-function GuideOnlyRow({ line }: { line: GuideMaterialLine }): JSX.Element {
+function GuideOnlyRow({ line, depth }: { line: GuideMaterialLine; depth: number }): JSX.Element {
   return (
     <Box sx={ROW_SX} data-testid="tradeskill-guide-material">
-      <Box sx={LINE_SX}>
+      <Box sx={nameCell(depth)}>
         <Box sx={{ width: NAME_INDENT, flexShrink: 0 }} />
         <Typography variant="body2" noWrap>
           {line.name}
@@ -257,7 +230,7 @@ function GuideMaterials({ lines, trail, heads }: { lines: readonly GuideMaterial
       {heads}
       {lines.map((line, i) =>
         line.wikiName === null ? (
-          <GuideOnlyRow key={`${line.key}:${String(i)}`} line={line} />
+          <GuideOnlyRow key={`${line.key}:${String(i)}`} line={line} depth={trail.length - 1} />
         ) : (
           <MaterialRow
             key={`${line.key}:${String(i)}`}
@@ -308,8 +281,8 @@ function MaterialList({ recipe, trail, heads }: MaterialListProps): JSX.Element 
 /** A material's own recipe, opened in place under it. */
 function SubRecipe({ recipe, trail }: { recipe: BookRecipe; trail: readonly string[] }): JSX.Element {
   return (
-    <Box sx={{ ml: 1.5, pl: 1.5, my: 0.5, borderLeft: 2, borderColor: 'divider' }} data-testid="tradeskill-subrecipe">
-      <Typography variant="caption" color="text.secondary">
+    <Box data-testid="tradeskill-subrecipe">
+      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', pl: `${String((trail.length - 1) * DEPTH_INDENT + OPEN_COL)}px` }}>
         Made with: {recipeFacts(recipe, true)}
       </Typography>
       <MaterialList recipe={recipe} trail={trail} />

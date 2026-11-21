@@ -22,6 +22,7 @@ import type { CharacterFileMacros, GameMacro, MacroSet } from '@shared/macros/ty
 import { Tooltip } from '../../lib/Tooltip'
 import { Confirm, Line } from './GameFileSend'
 import { Quiet } from './macroParts'
+import { TagGroupsDialog } from './TagGroups'
 import { useMacroUi } from './macroUi'
 import type { GameFilesState } from './useGameFiles'
 import type { MacroStore } from './useMacroLibrary'
@@ -219,7 +220,7 @@ interface LayoutsProps {
   macros: GameMacro[]
 }
 
-type Asking = 'save' | 'load' | 'copy' | 'reset' | 'manage'
+type Asking = 'save' | 'load' | 'copy' | 'reset' | 'manage' | 'tags'
 
 interface DialogsProps extends LayoutsProps {
   asking: Asking | null
@@ -236,6 +237,7 @@ function LayoutDialogs({ store, game, file, files, set, asking, onClose }: Dialo
   }
   if (asking === 'save') return <SaveDialog store={store} fileKey={fileKey} owner={owner} onClose={onClose} />
   if (asking === 'manage') return <ManageDialog store={store} onClose={onClose} />
+  if (asking === 'tags') return <TagGroupsDialog store={store} set={set} onClose={onClose} />
   if (asking === 'load') {
     return (
       <PickDialog
@@ -360,6 +362,7 @@ export function LayoutsMenu(props: LayoutsProps): JSX.Element {
         {item('copy', 'Copy from another character...')}
         {item('reset', 'Reset to what the game has')}
         {item('manage', 'Manage layouts...')}
+        {item('tags', 'Tag groups...')}
         <Divider />
         <MenuItem
           data-testid="macro-layout-copy-text"

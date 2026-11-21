@@ -168,17 +168,27 @@ async function stepQuiverAndMap(page: Page): Promise<void> {
   }
   const nodes = await settle(() => countOf(page, `${PLAN} ${sel('tradeskill-plan-node')}`), (n) => n > 0, { timeoutMs: 20_000 })
   check('Fleeting Quiver lists materials', nodes > 0, String(nodes))
-  check('…a made one opened to its own recipe', (await countOf(page, `${PLAN} ${sel('tradeskill-plan-sub')}`)) > 0)
+  const sub = `${PLAN} ${sel('tradeskill-plan-sub')}`
+  check('…a made one starts folded', (await countOf(page, sub)) === 0)
+  await page.click(`${PLAN} ${sel('tradeskill-material-open')} >> nth=0`)
+  check('…and its arrow shows its own recipe', (await settle(() => countOf(page, sub), (n) => n > 0, { timeoutMs: 10_000 })) > 0)
+  // Nesting moves the name only: Need sits in one column at every depth.
+  const needs = await page.evaluate((row) => [...document.querySelectorAll(row)].map((r) => Math.round((r.children[1] as HTMLElement).getBoundingClientRect().left)), `${PLAN} ${sel('tradeskill-plan-node')}`)
+  check('…and Need stays in one column at every depth', new Set(needs).size === 1, JSON.stringify(needs))
   // The gap line says when the materials under it are the guide's (`data-guide`).
   if ((await countOf(page, `${sel('tradeskill-plan-tree')} ${sel('tradeskill-wiki-gap')}[data-guide="true"]`)) > 0) {
     check('materials taken from the guide carry its credit', (await countOf(page, sel('tradeskill-plan-guide-credit'))) === 1)
   }
+  // Water Flask, under the oil: the wiki says it is bought, so the plan buys it until told otherwise.
+  const buying = await countOf(page, sel('tradeskill-plan-make'))
+  check('a material that can be bought is bought, with a way to make it', buying === 1, String(buying))
   const made = await countOf(page, sel('tradeskill-plan-get'))
-  await page.click(`${sel('tradeskill-plan-get')} [role="button"] >> nth=0`)
-  const closed = await settle(() => countOf(page, sel('tradeskill-plan-make')), (n) => n === 1, { timeoutMs: 15_000 })
-  check('a made material can be closed, and opened again', closed === 1 && (await countOf(page, sel('tradeskill-plan-get'))) < made)
   await page.click(`${sel('tradeskill-plan-make')} [role="button"]`)
-  await settle(() => countOf(page, sel('tradeskill-plan-get')), (n) => n === made, { timeoutMs: 15_000 })
+  const making = await settle(() => countOf(page, sel('tradeskill-plan-get')), (n) => n === made + 1, { timeoutMs: 15_000 })
+  check('…Make it instead opens its recipe', making === made + 1 && (await countOf(page, sel('tradeskill-plan-make'))) === 0)
+  await page.click(`${sel('tradeskill-plan-get')} [role="button"] >> nth=1`)
+  const reclosed = await settle(() => countOf(page, sel('tradeskill-plan-make')), (n) => n === 1, { timeoutMs: 15_000 })
+  check('…and Get it instead closes it again', reclosed === 1 && (await countOf(page, sel('tradeskill-plan-get'))) === made)
 
   const link = `${sel('tradeskill-plan-tree')} ${sel('tradeskill-map-link')} [role="button"]`
   if ((await countOf(page, link)) === 0) {

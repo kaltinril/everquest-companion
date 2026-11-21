@@ -15,6 +15,7 @@
 
 import { recipeFacts, recipeOrder, subRecipes, type BookIndex, type BookIngredient, type BookRecipe } from './tradeskillBook'
 import { guideMaterialsFor, type GuideIndex, type GuideMaterialLine } from './tradeskillGuide'
+import { soldByMerchant } from './tradeskillMaterials'
 import { returnedOnSuccess } from './tradeskillMoney'
 
 /** What a plan is built against: the recipe book and the two guides. */
@@ -140,10 +141,12 @@ export interface PlanRecipe {
 
 /**
  * Why a material some recipe makes is not opened:
+ * `bought` it can be bought, so the plan does not craft it unless the reader says to (owner,
+ * 2026-11-20, of Water Flask: "isn't water flask purchaseable???"; the shopping list's rule);
  * `reader` the reader gets it instead of making it; `loop` it is already open above (Water Flask
  * from Water Flask); `depth` past the depth limit; `unlisted` no recipe for it lists materials.
  */
-export type ClosedWhy = 'reader' | 'loop' | 'depth' | 'unlisted'
+export type ClosedWhy = 'bought' | 'reader' | 'loop' | 'depth' | 'unlisted'
 
 /** One material of a recipe in the tree. */
 export interface PlanNode {
@@ -168,13 +171,17 @@ export interface PlanNode {
   made: PlanRecipe | null
   /** Why it is a leaf although a recipe makes it; null when opened, or when nothing makes it. */
   closed: ClosedWhy | null
-  /** The recipe that opens when the reader chooses to make it; set with `closed: 'reader'`. */
+  /** The recipe that opens when the reader chooses to make it; set with `closed: 'reader'` or `'bought'`. */
   makeable: BookRecipe | null
 }
 
 export interface PlanAsk {
   /** Item keys of made materials the reader gets instead of making. */
   closed?: ReadonlySet<string>
+  /** Item keys of materials that can be bought and that the reader chose to make anyway. */
+  opened?: ReadonlySet<string>
+  /** The player's log shows a purchase of this item. */
+  paid?: (key: string) => boolean
 }
 
 /** A material before the tree decides whether it opens. */
@@ -215,6 +222,12 @@ type Opened = Pick<PlanNode, 'recipes' | 'made' | 'closed' | 'makeable'>
 
 const LEAF: Opened = { recipes: 0, made: null, closed: null, makeable: null }
 
+/** The plan buys this material: something says it is sold, and the reader has not chosen to make it. */
+function buysIt(deps: PlanDeps, ask: PlanAsk, line: Line): boolean {
+  if (ask.opened?.has(line.key) === true) return false
+  return ask.paid?.(line.key) === true || soldByMerchant(deps.guides, line.ingredient, line.guide?.source)
+}
+
 /** Whether a material opens, and to which recipe. `trail` is the keys open above it, the root's first. */
 function openOf(deps: PlanDeps, ask: PlanAsk, line: Line, trail: readonly string[]): Opened {
   const all = line.linked ? (deps.index.byItem.get(line.key) ?? NO_RECIPES) : NO_RECIPES
@@ -225,6 +238,7 @@ function openOf(deps: PlanDeps, ask: PlanAsk, line: Line, trail: readonly string
   const first = itemRecipes(deps, line.key).find((r) => hasMaterials(deps, r))
   if (first === undefined) return shut('unlisted')
   if (ask.closed?.has(line.key) === true) return shut('reader', first)
+  if (buysIt(deps, ask, line)) return shut('bought', first)
   return { recipes: all.length, made: build(deps, ask, first, [...trail, line.key]), closed: null, makeable: null }
 }
 
@@ -296,6 +310,7 @@ export function madeWithText(node: PlanNode): string {
 }
 
 const CLOSED_TEXT: Record<ClosedWhy, string> = {
+  bought: 'Can be bought, so the plan does not make it.',
   reader: 'You chose to get this one instead of making it.',
   loop: 'Also made by a recipe, which is already open above.',
   depth: 'Also made by a recipe. It is not opened this deep: plan that item on its own.',

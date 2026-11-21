@@ -24,8 +24,8 @@
 //
 // ── THE GATE ──────────────────────────────────────────────────────────────────────────────────
 //
-// `engineEnabled` is a STATIC boolean read from `process.env`, exactly like `isE2E` in index.ts and
-// `ownerTools` in dev.ts, and for their reasons: the variable is fixed before the process starts,
+// `engineEnabled` is a STATIC boolean read from `process.env`, exactly like `isE2E` in index.ts,
+// and for its reasons: the variable is fixed before the process starts,
 // the renderer has no `process` of its own, and an IPC round trip would make every consumer async
 // for an answer that cannot change. It is a READOUT, never a grant — main registers the handler
 // unconditionally and refuses when no engine is running, so a renderer that ignored this flag would

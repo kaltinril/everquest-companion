@@ -17,6 +17,18 @@ test('the crash screen, which imports no app code, spells the same new-issue pag
   assert.ok(crash.includes(`CRASH_ISSUE_URL = '${NEW_ISSUE_URL}'`))
 })
 
+test('the crash link never carries the message or stack: an issue is public', async () => {
+  const { crashIssueUrl } = await import('../src/renderer/src/lib/ErrorBoundary.tsx')
+  const err = new TypeError("ENOENT: open 'C:\\Users\\someplayer\\eqlog_Somechar_server.txt'")
+  const url = crashIssueUrl(err)
+  assert.ok(allowedExternalUrl(url) !== null)
+  assert.equal(new URL(url).searchParams.get('title'), 'App crash: TypeError')
+  assert.doesNotMatch(decodeURIComponent(url), /someplayer|Somechar/)
+  const odd = new Error('x')
+  odd.name = 'C:\\Users\\someplayer'
+  assert.equal(new URL(crashIssueUrl(odd)).searchParams.get('title'), 'App crash: Error')
+})
+
 test('a prefilled link keeps its text and is still allowed', () => {
   const url = newIssueUrl('Engine fault: absent', 'engine-fault: absent\n\nWhat happened & when?\n')
   const opened = allowedExternalUrl(url)

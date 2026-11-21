@@ -2,8 +2,6 @@
 // persisted "which tab was I on" key all agree on. Lives outside App.tsx so the nav drawer
 // can import it without importing the app itself.
 
-import { OWNER_TOOLS } from './devFlags'
-
 export type View =
   | 'overview'
   | 'combat'
@@ -13,32 +11,26 @@ export type View =
   // ACHIEVEMENTS: everything the newest `/outputfile achievements` dump lists, grouped as the
   // game groups it, and for the kill counters where to go. The id is the one the tab was given
   // as the Slayer tab (2026-09-28), a day before it took in the other families; an id is not a
-  // label (`bosses` is Raid Targets). Not yet in `TELEMETRY_VIEWS` (a server deploy first).
+  // label (`bosses` is Raid Targets).
   | 'slayer'
   // UNLOCKS (2026-09-29): the three unlock families of the same dump (races, classes, deities)
-  // as what each still needs, joined to the factions dump and the Sky quests. Not yet in
-  // `TELEMETRY_VIEWS`, as the tab above.
+  // as what each still needs, joined to the factions dump and the Sky quests.
   | 'unlocks'
   | 'posky'
   | 'alerts'
   | 'leveling'
-  // SKILLS (fork #6, 2026-11-19): every skill the log has seen go up, at its newest level. Not yet
-  // in `TELEMETRY_VIEWS`.
+  // SKILLS (fork #6, 2026-11-19): every skill the log has seen go up, at its newest level.
   | 'skills'
   // TRADESKILLS (fork #6, 2026-11-20): one tile per tradeskill and a workbench with its wiki recipe
-  // book. One view: Home or a workbench is the tab's own remembered state. Not yet in
-  // `TELEMETRY_VIEWS`.
+  // book. One view: Home or a workbench is the tab's own remembered state.
   | 'tradeskills'
   // MACROS (fork #11, 2026-11-20): the app's own macro library, sets, and what each character's
-  // game file holds. Proof of concept: the game's files are read, never written. Not yet in
-  // `TELEMETRY_VIEWS`.
+  // game file holds. Proof of concept: the game's files are read, never written.
   | 'macros'
   | 'loot'
-  // BAZAAR (2026-10-06): what trade chat asked and offered per item, per day. Not yet in
-  // `TELEMETRY_VIEWS`.
+  // BAZAAR (2026-10-06): what trade chat asked and offered per item, per day.
   | 'bazaar'
-  // GAPS (2026-10-11): names the log mentions that the wiki data has no record of. Not yet in
-  // `TELEMETRY_VIEWS`.
+  // GAPS (2026-10-11): names the log mentions that the wiki data has no record of.
   | 'gaps'
   | 'planner'
   // The GEAR PLANNER's search surface (JOS-284) — the candidate index over every equippable item.
@@ -58,24 +50,14 @@ export type View =
   // ticket as an honest placeholder panel and gains its content in JOS-326.
   | 'wishlist'
   // VOID MOTES (owner, 2026-11-19): where a Void-Touched Potential is best spent on what you wear.
-  // A gear-area tab of its own, not a panel over the Gear tab's catalog. Not yet in `TELEMETRY_VIEWS`.
+  // A gear-area tab of its own, not a panel over the Gear tab's catalog.
   | 'voidMotes'
   | 'buffs'
   | 'timers'
   // FACTION STANDINGS (the third graduated `/outputfile` kind, 2026-09-05) — the tab that draws
-  // `ProgressState.factionStandings`. Not yet in `TELEMETRY_VIEWS` — that enum is validated by the
-  // ingest Lambda, so widening it is a server deploy before it is a client change
-  // (shared/telemetry.ts), and until then the view reports no dwell (`dwellView` fails closed).
-  // Widening it is owner-sequenced.
+  // `ProgressState.factionStandings`.
   | 'factions'
   | 'preferences'
-  // OWNER-ONLY view (src/renderer/src/features/triage/**). It stays in the union
-  // unconditionally because a union member is a TYPE and types are erased — nothing of it
-  // survives compilation. What actually strips is the CODE: the nav row, the content branch
-  // and the whole component tree sit behind `OWNER_TOOLS` (DEV **and** `EQ_OWNER_TOOLS=1`,
-  // JOS-72), and `KNOWN_VIEWS` below drops the string itself in a build or a checkout without
-  // it, so a persisted 'triage' can never leave anyone staring at an empty content area.
-  | 'triage'
   // The CHARACTER SHEET (src/renderer/src/features/character/**) — the gear area's LAST TAB: what
   // you are wearing right now, read out of the newest `/outputfile inventory` dump, plus the
   // searchable ledger of everything else that dump lists. It was behind the old review gate from
@@ -88,15 +70,6 @@ export type View =
   // work: a view id the build cannot restore bounces to the default on launch, and a spell page
   // with no spell is exactly the thing nobody should be able to come back to. It is reached ONLY
   // by clicking a spell name — every one of them, through `lib/spellLink.tsx` — and left by Back.
-  //
-  // AND IT IS ABSENT FROM `TELEMETRY_VIEWS` (shared/telemetry.ts) ON PURPOSE. That enum is
-  // validated by the ingest Lambda, so a new member is a SERVER DEPLOY before it is a client
-  // change; `lib/telemetry.ts dwellView` already fails closed for a view the schema does not
-  // carry — its header calls that "the ONE deliberate exception" — so this page reports no dwell
-  // and distorts no other tab's, with no deploy ordering to arrange. The same applies to
-  // `noteCurrentView` in main, which drops an unknown id and keeps the last one it trusted: an
-  // error thrown here is attributed to the tab you came from, which for a drill is the honest
-  // answer anyway. Widening either enum is a separate, owner-sequenced change.
   | 'spell'
   // ============================================================================================
   // THE SPELLS AREA (docs/plans/spell-upgrades-and-loadout.md §2) — three tabs behind one nav row
@@ -112,11 +85,6 @@ export type View =
   // THE FOURTH FACE IS `spell` ABOVE, AND IT IS DELIBERATELY NOT A TAB. A drilldown is reached by
   // clicking a spell name and left by Back; a tab that opened it would have to invent a spell to
   // open it on.
-  //
-  // ALL THREE ARE ABSENT FROM `TELEMETRY_VIEWS` (shared/telemetry.ts): that enum is validated by
-  // the ingest Lambda, so widening it is a server deploy before it is a client change, and
-  // `lib/telemetry.ts dwellView` fails closed for a view the schema does not carry. Widening it is
-  // owner-sequenced.
   | 'spells'
   | 'spellUpgrades'
   | 'spellLoadout'
@@ -159,7 +127,7 @@ export const VIEW_LABELS: Record<View, string> = {
   gear: 'Gear',
   // THE TAB IS CALLED RECOMMENDED (owner, 2026-08-22). "Plan" named the doc's feature; "Recommended"
   // says what the surface hands you — the items and zones it recommends for your level. The `plan`
-  // view id, its `eq.plan.*` keys, its telemetry value and every `plan-*` testid are unchanged: a
+  // view id, its `eq.plan.*` keys and every `plan-*` testid are unchanged: a
   // label, not a refactor, exactly as the Exaltations rename above.
   plan: 'Recommended',
   // JOS-324. Two words, as a player writes it — the tab bar says it and, the day a wish-list row
@@ -170,7 +138,6 @@ export const VIEW_LABELS: Record<View, string> = {
   timers: 'Timers',
   factions: 'Factions',
   preferences: 'Preferences',
-  triage: 'Triage',
   character: 'Character',
   // Named even though no nav row draws it: this table is also what a drill's Back button reads
   // (navOrigin.ts), so the day a spell page links onward to something else, that something's Back
@@ -221,12 +188,7 @@ const KNOWN_VIEWS: View[] = [
   // THE SPELLS AREA. `SPELL_AREA_VIEWS` below derives its roster from THIS list.
   'spells',
   'spellUpgrades',
-  'spellLoadout',
-  // Compile-time in a BUILD (`false ? [...] : []` folds away, taking the literal with it) and a
-  // runtime read of the opt-in on a dev server — so a contributor's checkout, which has no
-  // `EQ_OWNER_TOOLS`, bounces a persisted 'triage' to the default view instead of routing to a
-  // tab it will not draw.
-  ...(OWNER_TOOLS ? (['triage'] as const) : [])
+  'spellLoadout'
 ]
 
 export function loadView(): View {

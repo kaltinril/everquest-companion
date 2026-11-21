@@ -80,7 +80,6 @@ import { sendToCharacterAwareOverlays, sendToModuleOverlays } from '../worldRebu
 import { sendToMain } from '../windows'
 import { getOverlayWindow } from '../windows'
 import { noteTailLine } from '../switchNudge'
-import { noteEventKind } from '../telemetry/breadcrumbs'
 import { noteModuleMoved } from '../gapSourceMoves'
 
 /**
@@ -123,23 +122,6 @@ export function pushModuleChanged(moduleId: string, seq: number): void {
   // which makes the log look quiet sooner. So the clock also reads the file's own size
   // (`switchNudge.ts hearFromFile`), and this is the cheap feeder, not the only one.
   noteTailLine()
-  // …and the ERROR-REPORT BREADCRUMB RING (JOS-499), which lost its only producer with the parser.
-  //
-  // `noteEventKind` was called from `LogBus.emit` — the choke point every parsed event passed
-  // through — and it answers one question for a crash report: what was happening just before this.
-  // There are no parsed events here. A cursor is the nearest true thing this process still sees, so
-  // the ring records MODULE MOVEMENT instead of event kinds: "loot moved, kills moved, buffs moved"
-  // in the seconds before the throw.
-  //
-  // IT IS A COARSER INSTRUMENT AND THE SHAPE SAYS SO — a module id is not a log-event kind, and the
-  // ring is prefixed so no reader mistakes one for the other. It is still a closed vocabulary (the
-  // engine's own module list) and still carries no content from the log, which is what the
-  // telemetry bright line requires of it.
-  //
-  // THE TIMESTAMP IS THE HOST'S, and that is the one honest difference: an event carried its own
-  // `LogEvent.ts` and a cursor carries none. A breadcrumb answers "just before, or a while before"
-  // (breadcrumbs.ts), which the wall clock answers as well here as a log clock did.
-  noteEventKind(`module:${moduleId}`, Date.now())
 }
 
 /**

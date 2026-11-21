@@ -637,7 +637,7 @@ paths inside settings).
 
 Built 2026-11-20 (`requirements/feedback-and-analytics.md`): the first-run usage-data bar is gone,
 "Report this" opens a GitHub issue, the Issues address is a link, and the menu row reads "Open
-GitHub issue". `TELEMETRY.md` goes with the code removal (Part 4, item 8).
+GitHub issue". `TELEMETRY.md` went with the code removal (Part 4, item 8).
 
 Found by the audit's third sweep. Small, but it is code: it goes through the gate, and some of it
 is pinned by tests or clicked by e2e specs.

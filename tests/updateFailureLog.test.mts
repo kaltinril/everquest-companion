@@ -55,7 +55,7 @@ import {
   updateHttpStatus
 } from '../src/shared/update'
 import { caughtFields } from '../src/shared/errorReportLocation'
-import { errorCodeOf, errorNameOf, redactMessage } from '../src/shared/errorReport'
+import { errorNameOf, redactMessage } from '../src/shared/errorReport'
 
 const TEST_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const read = (p: string): string => readFileSync(join(TEST_ROOT, p), 'utf8')
@@ -357,7 +357,7 @@ test('THE STORE ROW READS: which step, which attempt, which status, which error'
   // The NESTED error supplies the identity: the row says HttpError / HTTP_ERROR_403, with the
   // real stack behind it, exactly as if the raw error had been filed bare.
   assert.equal(errorNameOf(fields.name), 'HttpError')
-  assert.equal(errorCodeOf(fields.code), 'HTTP_ERROR_403')
+  assert.equal(fields.code, 'HTTP_ERROR_403')
   assert.ok(typeof fields.stack === 'string' && fields.stack.includes('HttpError'))
   // The WRAPPER supplies what the raw error never knew: step, attempt, class and status.
   const message = redactMessage(fields.message)
@@ -454,13 +454,6 @@ test('THE WIRING: the raw error is routed BEFORE the sanitizer, on every path', 
   assert.match(route, /shouldRetryCheck\(err, checkAttempts\)\) \{\s+logUpdateFailure\('check', 'retrying'/)
   // NEVER the sanitized text as a payload: the whole ticket is that the sentence is not the error.
   assert.doesNotMatch(src, /logUpdateFailure\([^)]*describeUpdateFailure/)
-  // The bounded telemetry signal is NOT gated on any of this: `noteUpdate` still records one
-  // `updateOutcome` per failure whatever the routing decided, which is what makes an offline
-  // fleet countable without an error storm.
-  assert.ok(
-    handler.indexOf("logUpdateFailure(step, 'final', err, LOG_SINKS)") <
-      handler.indexOf("noteUpdate(step, err ?? 'unknown error')")
-  )
 })
 
 test('THE WIRING: an interruption counts no failure, stamps no check, and re-anchors (JOS-307)', () => {
@@ -469,9 +462,8 @@ test('THE WIRING: an interruption counts no failure, stamps no check, and re-anc
   const note = src.slice(src.indexOf('function noteInterrupted('))
   const body = note.slice(0, note.indexOf('\n}'))
   assert.ok(body.length > 0, 'found noteInterrupted')
-  // The four things that DO happen…
+  // The three things that DO happen…
   assert.match(body, /logUpdateFailure\(step, 'final', err, LOG_SINKS\)/)
-  assert.match(body, /noteUpdate\(step, err\)/)
   assert.match(body, /sinks\.push\(\{ state: 'idle', interrupted: step \}\)/)
   assert.match(body, /sinks\.retryOnResume\(\)/)
   // …and the ones that must not. A `checkDone` here would stamp `lastCheckedAt` for a check that

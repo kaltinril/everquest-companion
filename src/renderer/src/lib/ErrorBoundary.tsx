@@ -1,8 +1,4 @@
 import React from 'react'
-// The ONE app import this file allows itself, and it is import-free itself (see its header).
-// The rule is "no app code, because the app — or the theme — may be the crash source"; a module
-// holding one string and two functions cannot be that.
-import { currentViewId } from './currentView'
 
 /**
  * Last line of defense against a BLANK WINDOW. Wraps <App/> in main.tsx. When any
@@ -34,12 +30,13 @@ interface State {
 export const CRASH_ISSUE_URL = 'https://github.com/kaltinril/everquest-companion/issues/new'
 
 /**
- * The new-issue link with the crash's one-line message as its title. The stack is NOT sent: its
- * file paths carry the player's Windows user name, and an issue is public. It stays on screen and
- * in errors.log for the player to paste if they choose.
+ * The new-issue link, titled with the error's KIND only. Neither the message nor the stack is
+ * sent: either can hold a file path with the player's Windows user name, and an issue is public.
+ * Both stay on screen and in errors.log for the player to paste if they choose.
  */
 export function crashIssueUrl(error: Error): string {
-  const title = `Crash: ${error.name}: ${error.message}`.slice(0, 160)
+  const kind = /^[A-Za-z]{1,40}$/.test(error.name) ? error.name : 'Error'
+  const title = `App crash: ${kind}`
   const body = 'What I was doing when the app broke:\n'
   return `${CRASH_ISSUE_URL}?${new URLSearchParams({ title, body }).toString()}`
 }
@@ -88,31 +85,24 @@ export class ErrorBoundary extends React.Component<Props, State> {
     // Report over the same fire-and-forget channel used by window.onerror.
     try {
       window.eq?.reportError({
-        // JOS-100: the NAME is half the error report's grouping key, and the VIEW is state only
-        // this process has.
+        // JOS-100: the NAME is half the error's grouping key.
         //
-        // THE COMPONENT STACK IS APPENDED TO `stack` BEHIND A LITERAL MARKER, and since JOS-111
-        // that marker is load-bearing rather than decoration: main reads the text after it as the
-        // chain of COMPONENTS the error came through and sends it as `componentPath`, bounded to
-        // eight identifier-shaped names, so a Tooltip warning can name its anchor. React's own
-        // component-stack lines are character-for-character V8 frames, so a marker is the only
-        // way to tell the two apart without guessing — see shared/errorReportLocation.ts, which
-        // holds the other copy of this string and is pinned equal to it by the contract test.
+        // THE COMPONENT STACK IS APPENDED TO `stack` BEHIND A LITERAL MARKER (JOS-111), so a
+        // reader of errors.log can tell where the thrown stack ends and the chain of COMPONENTS
+        // the error came through begins. React's own component-stack lines are
+        // character-for-character V8 frames, so a marker is the only way to tell the two apart.
         name: error?.name,
         message: error?.message ?? String(error),
         stack: `${error?.stack ?? ''}${
           info?.componentStack ? `\n\nComponent stack:${info.componentStack}` : ''
         }`,
-        source: 'ErrorBoundary',
-        view: currentViewId()
+        source: 'ErrorBoundary'
       })
     } catch {
       // Ignore — the visible fallback below is the primary user-facing signal.
     }
     // Also hit the console so main's console-message forwarder picks it up. The component stack
-    // carries the SAME marker it carries on the IPC report: the forwarder's payload has no `stack`
-    // field at all, so this string is the only place the component path could be read from on
-    // that path, and an unmarked one is not read at all (JOS-111).
+    // carries the SAME marker it carries on the IPC report (JOS-111).
     // eslint-disable-next-line no-console
     console.error(
       '[everquest-companion] ErrorBoundary caught:',
@@ -147,7 +137,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
           <p style={{ margin: '0 0 16px', color: '#b9b9b9' }}>
             The app hit an unrecoverable render error. It has been written to{' '}
             <code style={{ color: '#e6e6e6' }}>errors.log</code>. Reporting it opens a GitHub issue in
-            your browser with this error as its title.
+            your browser; paste the error below if you want it included.
           </p>
           <div
             style={{

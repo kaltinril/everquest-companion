@@ -20,7 +20,6 @@ import { BG_ALPHA_DEFAULT, type OverlayBgAlphaPrefs } from '../../shared/overlay
 import { applyOverlayIndependent } from '../storeOverlayIndependent'
 import { getCloseToTray } from '../storeCloseToTray'
 import { applyCloseToTray } from '../tray'
-import { noteCurrentView } from '../telemetry/errorReports'
 
 /** What the preload's `RendererErrorReport` puts on the wire. Every field is optional here
  *  because the sender is untrusted and nothing downstream requires any of them. */
@@ -29,7 +28,6 @@ interface RendererErrorPayload {
   stack?: string
   source?: string
   name?: string
-  view?: string
 }
 import { fitOverlayHeight, refitStripsForTextScale } from '../overlayBounds'
 import {
@@ -467,20 +465,16 @@ export function registerWindowIpc(): void {
   //
   // Structurally the preload's `RendererErrorReport`; see `RendererErrorPayload` below.
   //
-  // `logError` is still the ONE funnel: it writes the file, bumps `mainErrorLogLines`, and —
-  // since JOS-100 — builds the error REPORT. So the payload handed to it carries `name` and
-  // `code` as their own fields rather than mashed into the message, because `errorFingerprint`
+  // `logError` is still the ONE funnel: it writes the file and — since JOS-100 — fingerprints
+  // the error for the session budget. So the payload handed to it carries `name`
+  // as its own field rather than mashed into the message, because `errorFingerprint`
   // groups on the name and the frames.
   //
-  // The VIEW is noted separately and BEFORE the log call, not passed through it: it is state
-  // that outlives this error (a later main-process throw reports the same view), and it is
-  // untrusted renderer input, so it goes through `noteCurrentView`'s closed-enum check.
   // The parameter is spelled out rather than importing `RendererErrorReport` from the preload:
   // main does not depend on the preload bundle in either direction, and a type-only import
   // would be the first. It is IPC input, so `unknown`-ish fields and defensive reads are the
   // honest shape anyway — nothing here trusts the renderer.
   ipcMain.on(IPC.reportError, (_e, report: RendererErrorPayload | undefined) => {
-    noteCurrentView(report?.view)
     const source = report?.source ? `renderer:${report.source}` : 'renderer:report'
     logError(source, { name: report?.name, message: report?.message, stack: report?.stack })
   })

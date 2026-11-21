@@ -46,6 +46,9 @@ export const knowledgeBridge = {
    */
   getSpellStackViews: (names: readonly string[]): Promise<Record<string, StackSource>> =>
     ipcRenderer.invoke(IPC.spellsStackViews, names),
+  /** The macro editor's spell lookup: game spell ids by name, and names by id. Never rejects. */
+  spellIdLookup: (ask: import('../shared/macros/spellIds').SpellIdAsk): Promise<import('../shared/macros/spellIds').SpellIdReply> =>
+    ipcRenderer.invoke(IPC.spellIdLookup, ask),
   /**
    * "What's new at this level" (docs/plans/levelup-whats-new.md): every (class, level) unlock the
    * committed DBs state — spells from spells.json, skills/discs/innates from classes.json.

@@ -56,13 +56,10 @@ import { setAchievements } from './storeAchievements'
 import { setFactions } from './storeFactions'
 // The clean-shutdown tail mark (JOS-57 scope addition) — a split-out store accessor, for the
 // reason its own header gives: store.ts is at the factoring ceiling.
-import { markFunnelStep } from './telemetry'
 // "Another character's log is active — switch?" (JOS-432). Three touch points in this file and
 // nothing else: stamp every tailed line, follow the character we just attached, let go on the way
 // out. The decision (and the reason it cannot nag) is src/main/log/quietSwitch.ts.
 import { stopWatchingForQuietSwitch, watchForQuietSwitch } from './switchNudge'
-// A leaf (see its header) — the two dump loads below are timed seams.
-import { timeSeam } from './perfAttribution'
 // The achievements dump's Slayer counters: their own read and their own store write.
 import { loadSlayer } from './outputs/slayer'
 import { setSlayer } from './storeSlayer'
@@ -458,10 +455,6 @@ export async function tailCharacter(ref: CharacterRef): Promise<boolean> {
 function attachCharacter(ref: CharacterRef): void {
   setActiveLogPath(ref.logPath)
   logInfo(`[everquest-companion] Tailing ${ref.name}@${ref.server}: ${ref.logPath}`)
-  // THE FIRST-RUN FUNNEL'S `logDetected`, at the one moment that is unambiguously "we found a log
-  // and are about to read it" — after resolution succeeded. The once-ever mark
-  // (telemetry/funnels.ts) is what keeps a character switch from re-firing it.
-  markFunnelStep('first-run', 'logDetected')
 
   // …and start the quiet clock. It watches whether OUR file is being written to at all, which is a
   // question about the log rather than about a fold. Its feeder is the engine's cursors
@@ -561,37 +554,26 @@ function outputFileKey(pathOrName: string): string {
  * A missing dump is silence, not an error: on a machine where `/outputfile inventory` has never
  * been typed there is nothing to load, and the surfaces already render that as the never-run
  * state (the `/outputfile` registry's own line).
- *
- * A TIMED SEAM (JOS-458): a synchronous file read plus a parse plus a clicky re-derivation over
- * the item corpus, on main, one statement before the rebuild fan-out. The STALENESS GUARD is
- * outside the bracket and the missing-file arm is inside it, deliberately — a call that was
- * refused for the wrong character did no work and must not be counted, while a call that went to
- * the filesystem and found nothing DID, and on a cold disk that probe is the measurement.
  */
 function loadInventoryNow(ref: CharacterRef, why: 'startup' | 'watch'): void {
-  // Captured rather than re-read inside the bracket: `character` is module-level and mutable, so
-  // a closure cannot carry the guard's narrowing, and re-reading it would ALSO be a second read of
-  // a value the guard has already ruled on.
   const who = character
   if (who?.logPath !== ref.logPath) return
-  timeSeam('inventoryLoad', () => {
-    const res = loadInventory(who.name, who.server, inventoryWrittenAt)
-    if (!res) return
-    setInventory(activeCharId(), res.counts, res.source)
-    // A dump is the ONLY evidence that a cast-less firing was a click you made (JOS-438). The set
-    // used to be re-derived here and pushed into this process's combat engine; it is an ENGINE
-    // construction input now and reaches it on the next attach. NAMED GAP: a dump read mid-session
-    // does not re-arm the clicky classification until the engine next re-folds, where it used to
-    // take effect on the tail's next line. Closing it needs a `clickies.define` command.
-    // The buff engine's proc gate (upstream issue #69) reads the same dump through `buffTrust.define`
-    // and has no such gap: the push goes out the moment the counts do.
-    pushAppKnowledge('buffTrust.define')
-    logInfo(
-      `[everquest-companion] Inventory ${why === 'startup' ? 'loaded at startup' : 'auto-reloaded'}: ${res.path}`
-    )
-    sendToMain(IPC.onInventoryReload, { path: res.path, loadedAt: res.loadedAt })
-    sendToMain(IPC.onProgress, getProgress(activeCharId()))
-  })
+  const res = loadInventory(who.name, who.server, inventoryWrittenAt)
+  if (!res) return
+  setInventory(activeCharId(), res.counts, res.source)
+  // A dump is the ONLY evidence that a cast-less firing was a click you made (JOS-438). The set
+  // used to be re-derived here and pushed into this process's combat engine; it is an ENGINE
+  // construction input now and reaches it on the next attach. NAMED GAP: a dump read mid-session
+  // does not re-arm the clicky classification until the engine next re-folds, where it used to
+  // take effect on the tail's next line. Closing it needs a `clickies.define` command.
+  // The buff engine's proc gate (upstream issue #69) reads the same dump through `buffTrust.define`
+  // and has no such gap: the push goes out the moment the counts do.
+  pushAppKnowledge('buffTrust.define')
+  logInfo(
+    `[everquest-companion] Inventory ${why === 'startup' ? 'loaded at startup' : 'auto-reloaded'}: ${res.path}`
+  )
+  sendToMain(IPC.onInventoryReload, { path: res.path, loadedAt: res.loadedAt })
+  sendToMain(IPC.onProgress, getProgress(activeCharId()))
 }
 
 /**
@@ -608,21 +590,17 @@ function loadInventoryNow(ref: CharacterRef, why: 'startup' | 'watch'): void {
 function loadAchievementsNow(ref: CharacterRef, why: 'startup' | 'watch'): void {
   const who = character
   if (who?.logPath !== ref.logPath) return
-  // A TIMED SEAM, on `loadInventoryNow`'s terms exactly — same shape of work, same second file,
-  // same place in `tailCharacter`, and the guard is likewise outside the bracket.
-  timeSeam('achievementsLoad', () => {
-    const slayer = loadSlayer(who.name, who.server)
-    if (slayer) setSlayer(activeCharId(), slayer)
-    const res = loadAchievements(who.name, who.server)
-    if (!res) return
-    setAchievements(activeCharId(), res)
-    logInfo(
-      `[everquest-companion] Achievements ${
-        why === 'startup' ? 'loaded at startup' : 'auto-reloaded'
-      }: ${res.path} (${String(res.unlocks.length)} class-unlock rewards earned)`
-    )
-    sendToMain(IPC.onProgress, getProgress(activeCharId()))
-  })
+  const slayer = loadSlayer(who.name, who.server)
+  if (slayer) setSlayer(activeCharId(), slayer)
+  const res = loadAchievements(who.name, who.server)
+  if (!res) return
+  setAchievements(activeCharId(), res)
+  logInfo(
+    `[everquest-companion] Achievements ${
+      why === 'startup' ? 'loaded at startup' : 'auto-reloaded'
+    }: ${res.path} (${String(res.unlocks.length)} class-unlock rewards earned)`
+  )
+  sendToMain(IPC.onProgress, getProgress(activeCharId()))
 }
 
 /** Follow the achievements dump — `startInventoryWatch`'s twin, same registry, same staleness guard. */
@@ -648,11 +626,6 @@ function startAchievementsWatch(ref: CharacterRef): void {
  * function for both halves, a missing file is silence, and `onProgress` is the whole delivery —
  * the store write lands on `ProgressState` and the Factions tab derives everything from it on
  * every read, so no channel of its own (OutputKindLine's header carries that argument).
- *
- * NOT A TIMED SEAM, unlike its two elders, and deliberately: seam names are a closed schema that
- * rides telemetry (shared/perfSeams.ts → telemetryLive), so a seam for the Factions tab would be
- * an enum widening. It gets its seam in the same owner-sequenced change that puts the tab in
- * `TELEMETRY_VIEWS`.
  */
 function loadFactionsNow(ref: CharacterRef, why: 'startup' | 'watch'): void {
   const who = character
@@ -730,9 +703,3 @@ export function stopSession(): void {
   stopWatchingForFirstLog()
   stopWatchingForQuietSwitch()
 }
-
-// `logTailIo` IS GONE (JOS-499). It printed what the live tail's file I/O cost — reopens, reads
-// over 100 ms and over 500 ms — so the owner reproducing the EverQuest render freezes could say
-// what the tail was doing rather than guess. `log/tailIoStats.ts` SURVIVES as the shape of that
-// measurement; its feeder is the engine's tail now, and reporting it is part of ruling 19's
-// engine-side perf surface rather than a line this process can write.

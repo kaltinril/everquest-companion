@@ -43,8 +43,7 @@ import {
   failures,
   note,
   reportRun,
-  settle,
-  settleGone
+  settle
 } from './appHarness.mjs'
 import { mainWindow, makeUserData, removeUserData } from './appWindow.mjs'
 // THE OVERLAYS' appearance (JOS-405, JOS-407, JOS-408) — the same Preferences section, but every
@@ -152,19 +151,6 @@ async function pressToEnd(page: Page, selector: string): Promise<number> {
     pressed++
   }
   return pressed
-}
-
-/**
- * Answer the analytics first-run notice, which a FRESH userData always shows and which sits over
- * the whole window until it is answered (the perf spec's helper, same reason). "Turn it off" keeps
- * this run quiet.
- */
-async function dismissFirstRunNotice(page: Page): Promise<void> {
-  const notice = '[data-testid="telemetry-notice"]'
-  await page.waitForSelector(notice, { timeout: 30_000 }).catch(() => undefined)
-  if ((await countOf(page, notice)) === 0) return
-  await page.click('[data-testid="telemetry-notice-off"]')
-  await settleGone(page, notice, { timeoutMs: 8_000 })
 }
 
 async function openAppearance(page: Page): Promise<void> {
@@ -476,7 +462,6 @@ async function main(): Promise<void> {
   try {
     const page = await mainWindow(first.app)
     watch(page)
-    await dismissFirstRunNotice(page)
     await openAppearance(page)
     await stepCard(page)
     // Before any zoom: the menu's row heights are read at 100%.
