@@ -132,3 +132,24 @@ Opened 2026-11-20. Requirements: `../requirements/macro-editor.md`. Status at th
   slot with only a colour is empty; a colour that is not a number reads as 0; character and server
   names hold no underscore; files are read as latin1. The pause hint (runs the command, then
   waits, tenths of a second) is from guides for the older game.
+- 2026-11-20: P2 built (`src/shared/macros/socialsWrite.ts`, `backups.ts`, `unsavable.ts`;
+  `src/main/macros/gameFileSend.ts`, the one module that writes in the game folder, and
+  `gameRunning.ts`). 31 new unit tests, 15 of them on real files in a temp folder. **Not yet seen
+  on screen and never run against a real game folder.**
+  - A send: the name must be a character file of the folder's own listing; macros that cannot be
+    written faithfully block it (a character above U+00FF, a control character, an empty name, a
+    slot off the grid); refused while `eqgame.exe` is in `tasklist`, and when the list cannot be
+    trusted (it must hold the app's own pid); refused when the file's sha256 is not the one the
+    screen read; the copy is made and read back; temp file + flush + rename; read back and checked
+    (the macros parse as sent, every byte outside `[Socials]` unchanged), put back from the copy
+    when wrong.
+  - Kept inside `[Socials]`: page 1's keys and any line that is not a macro key. The file is read
+    and written as latin1, in its own line ending.
+  - A restore puts the WHOLE file back (hotbars too) and first keeps the current file as the last
+    copy, so it can be undone. The original copy is never removed.
+  - Known edges: a renamed game client is not seen; the game could start between the check and the
+    rename; a refused send can leave an extra last copy until the next good one; a crash between
+    copy and rename can leave `<file>.companion-write.tmp`, removed by the next send.
+  - Not built: hotbar links (P3). A set that moves a macro may leave a hotbar button pointing at
+    the wrong slot; in-game test 3 decides what to do.
+
