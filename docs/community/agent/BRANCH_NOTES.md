@@ -732,6 +732,14 @@ where one exists.
   (`ingredient`); a page lacking `[[Category:Tradeskill Ingredient]]` sets `forageUpdate.ingredient`,
   on the item's forage row when it has one, else a row of its own. 35 rows on the owner's logs.
   SAVED_ROWS 3.
+- By-products (2026-11-20, `gaps_craft.rs by_product`): a combine's by-product line
+  (`... create an alternate product: Bottle.`) files the item under kind `by-product`, through
+  `item_named` like any item mention (unknown: an Items row; known: no row; a redirect-only name:
+  a redirect row). Not `crafted`: `wikiPage.ts madeAndForaged` writes Player Crafted for
+  `crafted` and `failed-combine` only, and a returned Bottle is no recipe's product. No zone
+  (`gaps.rs note`, the list that also holds `crafted` and `fused`). Never passed to `Combines`:
+  a by-product that entered the pairing would overwrite the failed combine waiting for its raise.
+  Before the fix the reader matched a spelling the game never prints, so none of this ran.
 - `itemLookupParse.ts` is 421 code lines, near the 440 bar.
 - Job rule: `shared/gapJob.ts gapJob` is the one classification. Faction, drop and image rows are
   updates; a merchant is an update when `isMob`; a `forageUpdate` row is an update; a faction row
@@ -1736,12 +1744,12 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
   rows, pairing), `crafting_spans.rs`, `crafting_money.rs`, `crafting_tests.rs`. No parser kind and
   no protocol change: the failed combine, the trivial notice and the depot draw are read from
   `unknown` lines, as Wiki Gaps reads the first.
-- State: `items` (per item: `made`, `failed`, `trivial`, `trivialTs?`, `raises`, `firstRaise?`,
+- State: `items` (per item: `made`, `failed`, `byProducts?`, `trivial`, `trivialTs?`, `raises`, `firstRaise?`,
   `lastRaise?`, `tradeskill?`, `firstTs`, `lastTs`, `sessionMade`, `sessionFailed`,
   `sessionRaises`), `levels` (per tradeskill: `value` and its log's first line), `spans`,
   `olderSpans?`, `bought`, `sold`, `depot`. Types and helpers: `src/shared/crafting.ts`.
-- Shared with Wiki Gaps, one copy: `gaps_craft.rs` `failed_combine_of`, `is_tradeskill` and the
-  `Combines` pairing (the module is `gaps::craft`, `pub(crate)`); `gaps_details.rs` `coin_of` and
+- Shared with Wiki Gaps, one copy: `gaps_craft.rs` `failed_combine_of`, `alternate_product_of`,
+  `is_tradeskill` and the `Combines` pairing (the module is `gaps::craft`, `pub(crate)`); `gaps_details.rs` `coin_of` and
   `price_of`. A change to any of them changes both features.
 - Pairing: a tradeskill line and a combine pair when they share a log second, either order. The
   raise is counted on the item, the session and the span. A line restating the stored level is
@@ -1751,6 +1759,10 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
 - Not combines: the refused attempt (`Sorry, but you don't have everything ...`) and the
   by-product line (`... create an alternate product: Bottle.`), which rides on a failed combine
   already counted.
+- By-products (2026-11-20): the line is counted as `byProducts` on the item of the newest combine
+  when that combine is in its second or the one before; with no combine that near it is counted
+  nowhere. The key is absent at 0, in the engine and after a join (`mergeCrafting.ts` adds the
+  two sides). The by-product's own name is not kept. No session column.
 - The trivial notice is held and claimed by the next combine within 1 s, made or failed; a
   later combine does not get it.
 - Spans: a combine within 5 minutes of the last one extends the span, else opens one. The newest
@@ -1767,6 +1779,36 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
 - `depot` is the newest `(leaving N)` of a `Consumed` line. A deposit or a withdrawal states no
   count, so the number is as old as the item's last draw.
 - Session = since the newest `offlineGap`; an epoch clears every table (the zone is kept).
+- Fishing and forage (2026-11-20, `crafting_gather.rs`, tests `crafting_gather_tests.rs`): the
+  snapshot gains `fishing` (`casts`, `caught`, `nothing`, `lostBait`, `spilled`, `poleBroke`,
+  `session` with the same six, `items`) and `forage` (`found`, `failed`, `session`, `items`);
+  an item row is `item`, `count`, `lastTs`. Each key is absent until the log has a line of its
+  kind, and from an engine or an archive older than this, so both are optional in `CraftingSnap`.
+  - No parser kind and no protocol change: all eight shapes are `unknown` lines (a test holds the
+    real parser to that). The two that name an item are read with Wiki Gaps' `caught_of` and
+    `forage_of` (`gaps_players.rs`), one copy: a change there changes both features. A forage's
+    leading `a `/`an ` is dropped, as on the Gaps row.
+  - Line counts, no state machine. A cast and its outcome are counted apart, so a cast with no
+    outcome (zoned, interrupted) is in `casts` and in nothing else. `fishingRate` is `caught`
+    over `caught + nothing`.
+  - `lostBait`, `spilled` and `poleBroke` are not outcomes: each prints beside a `You didn't
+    catch anything.` of its second (32 of 32), so `nothing` holds those casts already. Adding
+    them to a denominator counts a cast twice.
+  - `You caught something...` is a catch the game does not name: in `caught`, in no item row.
+    `unnamedCatches` is `caught` less the rows' sum.
+  - The item rows are not capped: one row per distinct name, 5 fished and 15 to 26 foraged per
+    log on the owner's three (MEASURED.md). The session has totals only, no per-item column.
+  - A catch or a forage is never a combine or a purchase: the module counts a combine only on an
+    `itemReceived` with `via` fashioned or a failed-combine line, a purchase only on `purchase`.
+  - Archives (`mergeCrafting.ts joinGathered`): counts and item counts add, the session is the
+    newer log's, an item's `lastTs` the later. A side without the key reads as zeros, which is
+    also how `mergeModule`'s empty template (`fishing: {}`) passes.
+  - Trap: a sealed archive keeps the state it was folded with. It gains `fishing` and `forage`
+    when it is refolded: by itself once the app's version moves (`refreshLackingHistories`), or by
+    Refresh on its card. Until then a joined total holds the live log's counts only (the owner's
+    October archive has 72 casts and 659 forages the dev build will not show before a refresh).
+  - Not built: a screen; the zone a fish or a forage came from (Wiki Gaps keeps those for its own
+    rows); pace per hour (the Skills tab states raises per hour for Fishing and Forage).
 - Archives: `crafting` is in `CAPTURED_MODULES` and `MERGE_RULES` (`mergeCrafting.ts`). Counts
   add; session columns, last price, merchant, depot count and level are the newer log's; the
   first raise is the older log's. Spans are concatenated, bridged when an archive cut a run
@@ -1775,9 +1817,9 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
 - `combineCost` states a cost only when every ingredient was bought at least once; a crafted
   ingredient (Enchanted Gold Bar) is never bought, so its recipe must be costed first by the
   caller. It assumes a failed combine loses its materials.
-- Open: Wiki Gaps' `alternate_product_of` matches `create alternate product: `, but the game
-  prints `create an alternate product: ` (4 of 4 lines in the owner's archive), so Gaps never
-  reads a by-product. Left alone here; one word fixes it.
+- Fixed 2026-11-20: `alternate_product_of` reads `create an alternate product: `, the game's
+  spelling (4 of 4 lines in the owner's archive). The spelling without `an` is not read: nothing
+  ever printed it.
 
 ## Tradeskills section (fork #6, requirements/skills-tab.md, plans/2026-11-20-tradeskills-real-work.md)
 
@@ -2081,7 +2123,8 @@ only: no engine, parser, protocol, network or dependency change.
     and the name are needed: an imbued recipe's bar is sourced "Summoned" and stays unpriced. The
     spell's own cost is not in the log and is not counted. One for one is the cost rule's reading
     and the shopping list's too.
-  - Cheapest: from the level, the recipe above it with the least cost per combine; equal costs:
+  - Cheapest (the two held tie-breaks in this bullet were removed the same day: slice 5 below):
+    from the level, the recipe above it with the least cost per combine; equal costs:
     more combines on hand, then the lower trivial. With no priced recipe above: what is held, then
     the next trivial up. TRAP for the reader: the cheapest per combine can sit far above the
     level and skip a recipe the player holds materials for. The step's `aside` names that recipe
@@ -2128,6 +2171,366 @@ only: no engine, parser, protocol, network or dependency change.
   - What's new line: "Tradeskills: a workbench now plans a route from your level for the goal you
     pick (cheapest, fastest, explore, or the community guide's), with a shopping list for the next
     step. Jewelcraft recipes now show a cost: an enchanted bar counts at the price of its bar."
+- Slice 5, held materials and wiki first (2026-11-20, branch `tradeskill-held-wiki` off the trunk;
+  not merged, not tried by the owner). TypeScript only; no engine, protocol, network, data or
+  dependency change; `security.ts` untouched. Owner rulings: "the price of the materials doesn't
+  change just because I already have them. but... you can add a 'only use materials i have'
+  option"; "WIKI is our PRIMARY source, and others are secondary. If there are issues with the
+  wiki, the users need to find out and fix the wiki".
+  - SUPERSEDES the Cheapest bullet above: Cheapest ranks on cost alone. `cheaperFirst` is cost,
+    then the lower trivial; with no priced recipe it is the next trivial up. Held counts are read
+    only for the aside ("Not picked, but on hand"). Do not put `ready` back in the order.
+  - Files: `shared/tradeskillRouteHeld.ts` (the held-only route), `tradeskillHeld.ts` (can make
+    now, whether anything says what is held, the switches' words), `tradeskillWiki.ts` (the page,
+    the gap, guide differences). Screens: `RecipeFilters.tsx` (the two table switches),
+    `WikiGap.tsx` (`WikiPageLink`, `WikiGapLine`, `GuideDifferences`).
+  - Held-only route (`RouteAsk.heldOnly`, read by Cheapest and Fastest only): candidates are
+    rated recipes above the level whose `onHand(...).ready` is at least 1 against what is LEFT of
+    the stock. Cheapest: cost, then lower trivial. Fastest: highest trivial. A step takes every
+    combine it covers and `take` removes that from the stock (a returned tool is not removed), so
+    the next step sees the rest. `handText` is "Your held materials cover N combines", with
+    "after what the steps above use" from the second step on.
+  - Strict on purpose: only a recipe's own materials count. Plain bars that a spell could enchant
+    and a made material whose parts are held do NOT qualify a recipe. A material with no stated
+    count (no dump, no depot line for it) is not held.
+  - TRAP: the count of combines is a count of materials. Nothing may say it reaches a level
+    (`HELD_NOT_MEASURED`; the NOTHING GUESSED test in `tests/tradeskillHeld.test.mts`).
+  - A held-only route can end below the wiki's top: `capTop(route)` is null for it (so "N more
+    steps, not listed" names no top) and `routeEndText` names the last listed step's trivial, or
+    nothing when steps were capped.
+  - Whether anything says what is held: `heldKnown` = an inventory dump or any depot line. False:
+    the route switch and "Can make now" are disabled with `HELD_UNKNOWN_SHORT` beside them, and no
+    mark is drawn. On Explore and Community route the route switch is disabled with
+    `HELD_ONLY_GOALS_TEXT`; the stored choice is kept.
+  - Can make now: `makeableNow(facts, recipes)` = recipe id to combines, each recipe judged alone
+    (two marked recipes may want the same material; only the route shares a stock). It does not
+    read the level. A recipe with no consumed material listed is never marked. The planner's mark
+    is `gatherHeld` (every leaf's To get is 0), so it covers sub-combines.
+  - Table switches: `LadderAsk.only` is a list of `LadderFilter` (`keep`, `emptyText`), applied
+    after the marks are set, like Hide trivial. `benchFilters(makeable | null, wikiGaps)` builds
+    it. Both switches are remembered across restarts (`eq.tradeskills.canMake`,
+    `eq.tradeskills.wikiGaps`), the section's rule for a choice; the count line says "N of M".
+  - `BookRecipe.page` (added in `main/tradeskillBook.ts`): the wiki page title, kept only when it
+    is not the item's name (122 recipes on 2026-11-20). The wiki link is
+    `wikiPageUrl(recipe.page ?? recipe.item)`, the app's one URL builder; `<a target="_blank">`
+    as on the Loot and Mobs pages. `TRADESKILL_BOOK_VERSION` unchanged (optional field).
+  - A table line's wiki link: `wikiRowLink(recipe)` = in the empty Materials cell, else beside
+    the item's name. TRAP: never in the Trivial cell. `tests/e2e/tradeskills.e2e.mts` `rows()`
+    reads that cell as a number or nothing, and its unrated-lines check wants nothing.
+  - Wiki first was already true in every fold (`recipeMaterials`, `planTree.linesOf`, the cost,
+    the shopping list read a guide list only when `recipe.ingredients` is empty); a test in
+    `tests/tradeskillWiki.test.mts` now holds it on fixtures and on the committed data.
+  - Guide differences (`guideDifferences`): the recipe guide's recipe for the same tradeskill and
+    item (materials and trivial), and the leveling guide's step for it (top-level materials only;
+    a nested sub-combine is not compared; its range is not a trivial). A list differs when a
+    shared material has another count, the guide names a real wiki item the wiki's list lacks, or
+    the leftovers differ in number or counts. A loose guide spelling alone ("Fresh Fresh") is NOT
+    a difference: it cannot be told from the wiki's own material.
+  - Measured 2026-11-20: 36 recipes have materials on both the wiki and the recipe guide; 23
+    match; 7 differ by the rule (Clump of Dough, Evergreen Extract, Fine Plate Breastplate, Fine
+    Plate Helm, Forged Javelin, Heady Kiola, Metal Bits); 6 differ only by a loose name. 5 state
+    another trivial (Fine Plate Helm, Fine Plate Visor, Metal Bits, Mithril Bundled Arrow Shafts,
+    Sheet Metal). 2 leveling guide steps differ (the two Unfired poison vials). 12 recipes in all.
+  - Seen in the data, not acted on: the wiki's Clump of Dough lists every kind of egg as its own
+    material (13 lines), so its cost and "can make" want all of them. A wiki page to fix.
+  - The guide's trivial where the wiki has none (`guideTrivialText`; Distillate of Clarity VI)
+    is said in the gap line only. The ladder still files the recipe as unrated.
+  - Missing on the wiki, 2026-11-20: 615 of 2,359 recipes (Alchemy 177, Baking 21, Blacksmithing
+    192, Brewing 26, Fishing 5, Fletching 7, Jewelcrafting 72, Poison Making 4, Pottery 8, Spell
+    Research 27, Tailoring 69, Tinkering 7). `tests/tradeskillWiki.test.mts` prints them.
+  - Tests: `tests/tradeskillHeld.test.mts`, `tradeskillWiki.test.mts`; changed
+    `tradeskillRoute.test.mts` (cost alone) and `tradeskillBook.test.mts` (`page`). e2e:
+    `tests/e2e/tradeskillHeldSteps.mts` (`stepHeldAndWiki`), called last from
+    `tradeskills.e2e.mts`; written, NOT run.
+  - What's new line: "Tradeskills: the route has Only use materials I have, recipes you can make
+    right now are marked and can be listed alone, and a recipe the wiki is missing materials or a
+    trivial for says so with a link to its wiki page."
+- Slice 6, crafting AAs, fishing outcomes and the Foraging tile (2026-11-20, branch
+  `tradeskills-aa-gather` off `tradeskills-batch3`; not merged, not tried by the owner). TypeScript
+  only; no engine, protocol, network or dependency change; `security.ts`, `crafting.ts`,
+  `Workbench.tsx` and `TradeskillsHome.tsx` untouched.
+  - Mounts (one line each, by the coordinator): `<AaPanel tradeskill={tradeskill} />` under
+    `SkillGearPanel` in `Workbench.tsx`; `<ForagingTile />` after the tile grid in
+    `TradeskillsHome.tsx`. `GatherPanel` is mounted in `HistoryPanel.tsx` when the workbench is
+    Fishing. All three read their modules themselves (`useModule`): no prop from the workbench.
+  - AA data: `src/shared/tradeskillAaTable.generated.ts` (`GENERAL_AAS`: name, ranks, the Cost
+    cell and the Description cell as the wiki writes them, 32 rows; `TRADESKILL_AA_RULES`: the
+    lines of the wiki's Tradeskills page that link to the AA page, one today). Written by
+    `scripts/gen-tradeskill-aas.mts` (parsers `scripts/sources/generalAas.ts`) from the committed
+    caches, zero requests, no date in the file. `tests/tradeskillAaTable.test.mts` fails while the
+    file is behind the caches (DATA_REFRESH.md).
+  - Why not `classes.json`: its `aas` rows hold group, classes, levels and cast, no ranks, cost or
+    text, and `classWiki.aaRows` reads only rows written on one line with `||`. The wiki writes
+    Full Potential, Widened Perception and Point Blank Fire one cell per line, so those three are
+    not in `classes.json` (175 AAs there; `scrape:classes -- --offline` over the 2026-11-20 cache
+    rewrites nothing, so the file is in step with its parser). Not fixed here: reading them adds
+    three rows to `classes.json`, which the level-up unlock tables are built from.
+    `generalAas.aaCells` reads both layouts.
+  - Which AAs (`shared/tradeskillAa.ts aaReach`), read off the row, no name list: `<X> Mastery`
+    whose X folds to a tradeskill bears on it (`aaTradeskill`: `tradeskillOf` plus the wiki's
+    "Jewel Craft" and "Jewelcraft"); a text naming Forage bears on foraging; any other text saying
+    "tradeskill" bears on all (Crafting Mastery, Full Potential). 2026-11-20 cache: 8 masteries
+    (Alchemy, Baking, Blacksmithing, Brewing, Fletching, Jewelcrafting, Pottery, Tailoring),
+    Crafting Mastery, Full Potential, Foraging. No mastery for Fishing, Poison Making, Spell
+    Research, Tinkering; no fishing AA.
+  - Crafting Mastery's text lists seven "standard" tradeskills (Baking, Blacksmithing, Brewing,
+    Fletching, Jewelcraft, Pottery, Tailoring); the Tradeskills page's rule says "all other
+    tradeskills". Both are shown as written; a workbench outside the seven adds "The wiki's text
+    names ... It does not name <Tradeskill>". Which is right in game is not known.
+  - Figures: read only from `by A/B/C%` and `raise A/B/C additional`, once in the text, one value
+    per rank (`percents`, `extra`); else null. Shown as "At rank N the wiki states ...". THE LAW of
+    slice 4 holds: no chance, no rate, nothing worked out from a figure (the NOTHING GUESSED test
+    in `tests/tradeskillAa.test.mts`).
+  - Purchases: the `leveling` module's `aaSpends` through `aaLedger` (the top rank a line names;
+    a re-bought rank is one rank; every rank at cost 0 reads "granted"). The game's names match
+    the wiki's exactly on the owner's log (Jewel Craft Mastery, Baking Mastery, Crafting Mastery;
+    costs 2/4/6 and 3 each as the wiki lists). No line: "Your log shows no purchase", with a hover
+    saying a log that began later does not show it. Never "you do not have it".
+  - Past 200 (`pastCap`): `tradeskillLevel` over all twelve app tradeskills, level above 200,
+    named with their levels. The app does not work out how many more may pass 200.
+  - Panel: one line, closed by default (`eq.tradeskills.aaOpen`, localStorage), because the
+    workbench must not grow a scroll of panels; open, the details scroll inside 220 px.
+  - Fishing and forage words: `shared/tradeskillGather.ts` over `crafting.ts`'s `fishingRate`,
+    `forageRate`, `gatheredShares`, `unnamedCatches`. Fishing shares are over ALL catches (the
+    unnamed ones in the whole), so the named rows can add up to under 100%. A part that rounds to
+    0 reads "under 1%". The Foraging tile lists 5 items, then "Show all N" (window state only).
+  - The Forage level is the `skills` row spelled `Forage` (the newest line), not a tradeskill row.
+  - TRAP (same as the Crafting module's): a sealed archive gains `fishing` and `forage` only when
+    refolded, so the panel and the tile count the live log alone until then.
+  - TRAP: `tests/copyNoEmDash.test.mts` scans every string under `src/shared`, the generated table
+    included. `generalAas.cellText` writes an em or en dash in a wiki cell as a spaced hyphen (none
+    in the table today).
+  - Not built: a fishing or forage pace per hour; the zone a catch or a forage came from; the AA
+    table's Archetype, Class and Special rows (none bears on a tradeskill on today's page).
+  - Tests: `tests/tradeskillAa.test.mts`, `tradeskillAaTable.test.mts`, `tradeskillGather.test.mts`.
+    e2e: `tests/e2e/tradeskillGatherSteps.mts` (`stepAaAndGather(page, log)`), to be called last
+    from `tradeskills.e2e.mts`; written, NOT run; each part notes and skips when its mount is not in.
+  - What's new line: "Tradeskills: a workbench lists the AAs for its tradeskill with the ranks your
+    log shows bought, Fishing shows your casts, catches and what you caught, and Home has a
+    Foraging tile."
+- Slice 6, Home after the owner's first look (2026-11-20, branch `tradeskills-home` off
+  `tradeskills-batch3`; not merged, not tried by the owner). TypeScript only; no engine, protocol,
+  network, data or dependency change; `security.ts` untouched. Owner: "that bar you had showing the
+  progress for each tradeskill"; "perhaps people can 'wishlist' a crafted item"; of the mockup's
+  other parts, "if they made sense and you feel it has value add them".
+  - Files: `shared/tradeskillLevelBar.ts` (the bar, the 200 rule), `tradeskillHome.ts` (pick up,
+    the sources line), `tradeskillWished.ts` (working towards), `tradeskillPicked.ts` (the picked
+    recipe's material lines). Screens: `SkillBar.tsx`, `HomePickUp.tsx`, `HomeWished.tsx`,
+    `RecipeWish.tsx`; `TradeskillsHome.tsx` lays Home out (pick up, Make an item, working towards,
+    the tiles, sources). Tests: `tests/tradeskillHome.test.mts`.
+  - The bar's scale is MEASURED per tradeskill, and it is not 300 for all: the achievements dump
+    (`tests/fixtures/Primitive_freeport-Achievements.txt`, blocks `Tradeskill: <name>` and
+    `Tradeskill: Special`) lists milestones 50 to 300 for Alchemy, Baking, Blacksmithing (written
+    "Smithing"), Brewing, Fletching, Jewelcrafting, Pottery and Tailoring, 50 to 200 for Fishing,
+    and none for Tinkering, Poison Making or Spell Research. `skillTop` holds that table and a test
+    reads the fixture against it. No milestone: an empty bar, the level as a number, no "of".
+  - The 200 cap is the WIKI'S RULE, worded as such (`CAP_NOTE`, `capTip`): its Tradeskills page
+    says every other tradeskill caps at 200 once one passes it, until Crafting Mastery; its AA
+    table names the seven that AA lifts (Baking, Blacksmithing, Brewing, Fletching, Jewelcraft,
+    Pottery, Tailoring). The note and the tick at 200 are drawn for those seven only, where the
+    two pages agree, on a tradeskill whose level is known and at or under 200 while another of the
+    seven is above 200. Not for Alchemy or Fishing, not for a skill the log never showed.
+    Open: it does not read the Crafting Mastery ranks the log shows bought (the AA panel's branch
+    has that fold); a player with ranks still sees the note on the tradeskills at or under 200.
+  - e2e contract kept: `tradeskill-tile-level` and `tradeskill-level` hold the number alone; "of
+    300" is its own element (`tradeskill-bar-of`); the bar is `tradeskill-bar` with `data-fill`.
+  - Pick up (`pickUp`): the tradeskill of the newest item row with a combine that a raise or the
+    recipe book places; none, then the highest level; no level, then null and no panel. The next
+    recipe is named only when the level is known. `canMake` is `onHand(...).ready`: null (left
+    out) when nothing says what is held or one material's count is unknown; 0 is said ("You do
+    not hold every material for it."). The last run is `spans.at(-1)`, every tradeskill's raises
+    together, and its pace is `craftingPace` over that one span (null under the rate's minimum
+    time). The panel waits for BOTH the skills and the crafting module: before that "no combine
+    yet" would be a default.
+  - Sources: `TradeskillBookPayload.scrapedAt` (items.json's own, through the new
+    `itemLookup.itemDbScrapedAt()`: no new JSON import edge) and `GuidePayload.stamps` (id,
+    version, pulledAt, built in `guidePayload`). A guide's `sourceUrl` is NEVER put on the payload:
+    the test scans the stamps for an address. Title and author are `GUIDE_CREDITS`'s. Both fields
+    are optional; `TRADESKILL_BOOK_VERSION` unchanged.
+  - Wish: ONE control (`wishlist/WishToggle`). `RecipeWish` only names the item: `hasWish` by
+    `recipe.key`, `wishFromGear({ key, name })`, `useWishlist` add and remove, nothing drawn before
+    `ready`. Homes: the picked recipe's head (beside "Plan this item") and the planned item's head.
+    NOT on recipe lines: the table is fixed-layout and a line already holds up to four marks.
+  - Working towards (`wishedCrafts`): every wish list entry whose key is in `BookIndex.byItem`,
+    in the list's order; the recipe is `pickRecipe(itemRecipes(...), null)` and the counts are
+    `gatherFor(planTree(recipe), { count: 1 })`, so they are the planner's. Shown whatever its era,
+    with the chip (a wish is the player's own choice, as a remembered plan is). The link is
+    `openPlan(item, recipeId)`.
+    TRAP: a wished crafted item that is not equippable is not in the Gear index, so the Wish list
+    tab resolves it as `unknownItem` and files it under "Nothing says where these come from" (so
+    does one wished from the Loot page). Giving the Wish list a crafted lane off the recipe book
+    is a feature of that tab, not done here.
+  - Price format: `ppText` is two decimals, half up from the copper (`14_175` reads 14.18 pp); 1
+    to 4 copper reads "under 0.01 pp"; 0 reads 0.00 pp. `differenceText` says "the same as the
+    materials" within `SAME_PRICE_SHARE` (1%) of the cost. No other formatter prints plat here.
+  - The recipe table's Cost and Sells (`PRICE_SX`, `PRICE_WIDTH`): the cause of the cut-off was
+    not Materials. The table is `tableLayout: fixed`, so a column is as wide as its head says; 92
+    px less the small table's 16 px either side left 60 px. Now 112 px with 8 px either side and
+    no ellipsis; `TABLE_MIN_WIDTH` (920) makes the table scroll sideways when the pane is
+    narrower, because every px a fixed table loses comes out of the one column with no width.
+  - The picked recipe's material lines: one grid (`ROW_SX`, `LINE_SX`) for wiki lines, guide lines
+    that name a wiki item and guide lines that do not. Need prints `needQty` (the stated count,
+    else 1: the count `combineCost`, `onHand`, the planner and the Have cell's "enough" already
+    use). `madeBy` splits a material's recipes into `open` (lists materials on the wiki, or the
+    guide's) and `bare` (lists none): the opener is drawn only for `open`; each `bare` recipe is
+    one line in the Where cell with its wiki page link (`tradeskill-material-bare`).
+    Read, not seen: nothing opened a material by default (`useState(false)`, lists keyed by
+    recipe); the screenshot's open Water Flask came from an opener the row offered for a recipe
+    with nothing under it.
+  - Skills tab: `lib/tradeskillLink.OpenTradeskills` takes an optional focus; with none the
+    router's slot switches tab unanchored, so the section opens where it was left and shows no
+    Back. `SkillsView` `OpenTradeskills` is the button (`skills-open-tradeskills`).
+  - e2e: `tests/e2e/tradeskillHomeSteps.mts` (`stepHomeAndWish`), called last from
+    `tradeskills.e2e.mts`; written, NOT run. The price change moved no e2e string: every pinned
+    price there already had two decimals.
+  - What's new line: "Tradeskills: every tradeskill shows a level bar, Home opens with Pick up
+    where you left off, and a crafted item can be put on your wish list from its recipe and
+    followed under Working towards. Prices print to two decimals, and the Skills tab has an Open
+    Tradeskills button."
+- Slice 6, the Faction goal (2026-11-20, branch `tradeskill-faction` off `tradeskills-batch3`; not
+  merged, not tried by the owner). TypeScript only; no engine, protocol, network, data or
+  dependency change; `security.ts` untouched.
+  - Where: the fifth goal of the switch on "Your route". `ROUTE_GOALS` has five; `BOOK_GOALS` is
+    the four `buildRoute` builds (`RouteAsk.goal` and `Route.goal` are `BookGoal`). Faction is not
+    a climb from the level, so it is not a `Route`: `shared/tradeskillRouteFaction.ts`
+    `buildFactionRoute(facts, ask)` returns the list of factions, the picked one and its rows.
+    `RoutePanel.tsx` draws `BookRoute` or `FactionRoute.tsx` by the goal.
+  - The join is `shared/questFactions.ts` (`questsTaking`). The renderer has no items.json, so
+    its item records come from the recipe book: `bookFactionItems(index)`, one record per made
+    item's page, every recipe counted (era-hidden too). `BookRecipe.questPages` (new, filled in
+    `main/tradeskillBook.ts` `madeItemFacts`) is quest name to page title for a use whose page has
+    another title (97 entries on 83 recipes); without it Tarnished Dagger lost its rows.
+    `TRADESKILL_BOOK_VERSION` unchanged (optional field). A test holds the book's rows equal to
+    the item database's (none invented, at most 2% lost; measured: none lost).
+  - Era: the caller builds the join over `inEraQuests(quests)` when the Current era setting is on
+    (`FactionRoute.useTurnIns`), and the rows walk `skillRecipes(index, tradeskill)`, which the
+    setting has already narrowed. With the setting off an out-of-era quest's row carries
+    `TurnIn.eraNote`.
+  - A row is one recipe and one quest page (`FactionStep`, a `RouteStep` plus `turnIn`, so
+    `ShoppingPanel` reads it unchanged). Its id is `<recipe id>|<quest page>`. One recipe is a row
+    under every faction its page raises.
+  - Order (`rowOrder`): trivial at or under the level, then the stated raise (unstated after every
+    stated one), then the known cost per combine, then ladder order, then the page title. A level
+    the log never showed makes no recipe trivial (`LEVEL_UNSEEN_NOTE`), unlike the climbing routes,
+    which start from 0.
+  - Default pick: the faction most recipes feed, first by name among equals; a remembered pick
+    (`eq.tradeskills.faction.<Tradeskill>`, the join key) stands while the list holds it.
+  - THE LAW: one list per quest page (questFactions.ts header). Nothing is filtered for it. A row
+    is marked (`TurnIn.shared`, chip "shared page" and the sentence) on three signs: the item's
+    page files the use under a quest name that is not the page's title (`filedAs`), the title
+    matches `quests|tests`, or the page lists more than `LONG_LIST` (5) changes. Do not turn a
+    sign into a filter without the owner's word.
+  - A second honesty line, `TurnIn.tie`: a row tied by the quest page alone (`requiredItems` is
+    every item the page names outside its Reward section, so a material of the turn-in is there
+    too: Clump of Dough on Muffin Quests) or by the item's page alone says which. Both: nothing.
+  - Never drawn: a number of turn-ins, a standing to reach, how many of the item a turn-in takes
+    (`requiredItems` holds no counts), a combine chance. `tests/tradeskillRouteFaction.test.mts`
+    "NOTHING FORECAST" scans every row.
+  - Standings: `factions/useFactionRows.useFactionData()`, the Factions tab's own rows (the dump
+    corrected by the log), keyed by `questFactionKey(row.name)`. It asks main for the log evidence
+    while the Faction goal is open, as the Factions tab does. Null rows = no dump: no standing is
+    drawn and `OutputKindLine kind="faction" quiet` names the command.
+  - "Only use materials I have" reads here too (`tradeskillRoute.heldOnlyApplies`): rows whose
+    recipe `combinesHeld` covers at least one combine, each judged alone (rows are alternatives,
+    not a sequence, so no stock is shared out). The list of factions is not narrowed.
+    `HELD_ONLY_GOALS_TEXT` now reads "Applies to Cheapest and Fastest, and to Faction." (the e2e
+    held steps match `cheapest and fastest`).
+  - Shopping list: for the first row, or the row whose "Shop for this" was pressed (component
+    state, not remembered; a pick the list no longer holds falls back to the first row).
+  - Links: item = `ItemLabel`; quest = `<a target="_blank">` to `wikiPageUrl(page)` (no tab holds a
+    quest page; the Factions tab and the Loot page link a quest the same way); giver =
+    `MerchantLink` (a link only when the mob catalog holds the name on one page); zones =
+    `ZoneList` (`startZone` split on commas; a spelling the table refuses stays text); faction =
+    `lib/factionLink.FactionLink`.
+  - The door into the Factions tab is new: `appRouting.openFactions(name?)` (`factionFocus`,
+    `factionNonce`, `clearFactionFocus`; a `FocusSlot`, anchored when a name rides along),
+    published by `lib/factionLink.tsx` through `lib/appLinks.tsx`. `useFactionsController`
+    `useFocusArrival` calls `reveal(name)` and retires the ask; `FactionBack.tsx` is the Back
+    (`MapBack.tsx`'s arrangement). The link asks for the dump's spelling when the dump lists the
+    faction (`FactionChange.openAs`): the tab's search is a substring match on the dump's names,
+    and a wiki spelling of a faction can differ from the dump's. Not checked against a real dump.
+  - Back from Factions lands on the route again: the open workbench, the route tab, the goal and
+    the picked faction are all in storage. The "Shop for this" row is not.
+  - Measured 2026-11-20, in era: factions per tradeskill Baking 42, Brewing 42, Blacksmithing 38,
+    Tailoring 30, Pottery 25, Fletching 13, Fishing 3 (the other five none; with the setting off
+    Poison Making 5, Alchemy 3 and Jewelcrafting 2 appear). 90 recipe and page pairs; 26 marked
+    shared (14 pages); 26 tied by the quest page alone, 13 by the item's page alone. TRAP for the
+    reader: Pottery's 25 and Fletching's 13 are one item on one long page each.
+  - Tests: `tests/tradeskillRouteFaction.test.mts` (a fixture, then Muffin, Silk Swatch and
+    Tarnished Dagger from the committed data); changed `tradeskillRoute.test.mts` (five goals,
+    `BOOK_GOALS`) and `tradeskillHeld.test.mts` (`heldOnlyApplies`). e2e:
+    `tests/e2e/tradeskillFactionSteps.mts` (`stepFaction`), written, NOT run, and not yet called
+    from `tradeskills.e2e.mts`; `tradeskillRouteSteps.mts` now expects five goals.
+  - What's new line: "Tradeskills: the route has a Faction goal. Pick a faction and see which
+    items of the tradeskill a quest takes to raise it, with the quest, its giver and zone, every
+    faction change the wiki states, and the shopping list. Faction names open the Factions tab."
+- Slice 8, screen fixes after the first captures (2026-11-20, branch `tradeskills-screen-fixes` off
+  `tradeskills-batch3`; not merged, not tried by the owner). TypeScript only; no engine, protocol,
+  network, data or dependency change. Captures: a 1500 px window, the section about 1220 px wide.
+  Unit tests of the changed folds run; typecheck and lint run; e2e steps changed and NOT run.
+  - Recipe table. Seen: Materials showed one material ("Enchanted Gold Bar (Bought + Enc..."), You
+    was cut, and Container repeated one value down a tradeskill. Now six columns: Trivial 72 px,
+    Item 26%, Materials (what is left), Cost 112 px, Sells 112 px, You 23% with 8 px side padding.
+    At a 1205 px table: Item 313, Materials 319 (287 of text), You 277 (261 of text; "made 3,
+    failed 1, 2 raises (204 to 205)" is about 234). A line's Materials are counts and names only;
+    the hover (`materialsText`) and the panel keep the source words. `TABLE_MIN_WIDTH` stays 920.
+    TRAP: the third cell is now Materials, which holds links. An e2e click that only picks a line
+    goes to the Trivial cell (`td >> nth=0`).
+  - Shopping list. `ItemLabel` takes `wrap`: the name wraps in its column (the planner's
+    `DonorName` style cuts it; the override is a selector on its test id in `tradeskillLinks.tsx`,
+    because `PlannerChips.tsx` is another feature's file). Used for the list's lines and its head.
+  - Faction goal. SUPERSEDES the Order and Default pick bullets of slice 6:
+    - `TurnIn.group` (`RowGroup`) is the order's first key: `own` (the item's own page lists the
+      quest, alone or with the quest page, and the row is not marked shared), `shared` (marked
+      shared, item's page lists it), `questOnly` (the quest page alone names the item, marked
+      shared or not). Inside a group the old order stands. No row is dropped.
+    - `FactionChoice.own` counts a faction's `own` rows. `choices` are sorted by it (most first,
+      then name) and the default is the first. The count on screen is still the recipes.
+    - Measured on the committed data, in era, no level: Baking opens on Arcane Scientists (one
+      row: Uncooked Rat Ear Pie on Rat Ear Pie Quest); no Baking faction has more than one `own`
+      row, so the name decides among them. Tailoring opens on Rogues of the White Rose (14 rows,
+      all `own`). Pottery, Fletching and Fishing have no `own` row at all and open on the first
+      name.
+    - A row's changes on screen are `shownChanges(turnIn, all)`: the picked faction's own first,
+      then `CHANGE_CAP` (8) others, then "and N more" (`tradeskill-faction-more`), which opens the
+      whole list in the row and closes it again. `TurnIn.changes` is untouched.
+    - Above the panes: the basis line (reworded for the new order), `FactionRoute.notice` (the
+      level the log never showed, when that is so), then "How to read this"
+      (`tradeskill-faction-how`), which opens the four caveats in place. Closed until asked for;
+      `eq.tradeskills.factionHelp` in localStorage. `caveats` no longer holds the level line.
+  - Missing wiki materials are said in ONE line, `WikiGapLine` (`wikiGapText(gap, note)`,
+    `GapNote`): `guide` when the recipe guide's materials are drawn under it (decided by
+    `gapNote`, the same `guideMaterialsFor` every fold uses; `data-guide` on the line), `guideNone`
+    in the planner's tree, `noList` in the shopping list. Removed: `GUIDE_MATERIALS_TEXT`,
+    `PLAN_GUIDE_MATERIALS_TEXT`, `GUIDE_LIST_TEXT`, `NO_LIST_TEXT`, `NO_MATERIALS_TEXT` and the
+    `tradeskill-guide-materials`, `tradeskill-plan-guide-materials` and
+    `tradeskill-shopping-guide-list` elements. In the recipe panel `MaterialList` draws the gap
+    line itself; `tradeskill-no-materials` is now a wrapper around it.
+  - Home (owner asked whether the overview should be simpler; the page ran past one 860 px
+    screen):
+    - `homeDoors` (shared/tradeskillHome.ts): a tradeskill the log has shown keeps its full tile;
+      the rest are one row of small buttons under the tiles, "Not in your log yet"
+      (`tradeskills-unseen`), each "<Tradeskill> · N recipes". Every door keeps
+      `tradeskill-tile-<Tradeskill>` on an element holding a `button`, with `data-tile` = `seen`
+      or `unseen`. `tradeskill-tile-unseen` is gone. No tradeskill seen: all twelve in the row and
+      `NO_TRADESKILL_SEEN_LINE` above, said only once the skills module is served.
+    - Foraging is a tile of the same grid (`tradeskills-tiles`), after the tradeskills: level and
+      "Found, Failed, Found rate" on one line (`data-value` on each). A click opens the session
+      line, the items and the AA in `tradeskill-forage-detail`, a grid item spanning every column;
+      closed until asked for, `eq.tradeskills.forageOpen`. `ForagingTile` must sit inside a grid.
+    - "Make an item" is one row: heading (hover `PLAN_HOME_TIP`), search, count, and "Your plan"
+      when there is one. Results open under it.
+    - The era count beside the search is gone (Home and the planner screen): the header's count of
+      hidden recipes is the one stated. `PlanChoices.eraHidden` is still computed.
+  - Tests: `tradeskillRouteFaction.test.mts` (fixture) and the new
+    `tradeskillRouteFactionData.test.mts` (committed data; split at the lint's file length),
+    `tradeskillWiki.test.mts`, `tradeskillGuide.test.mts`, `tradeskillHome.test.mts`,
+    `tradeskillGather.test.mts`.
+  - e2e, changed and not run: `tradeskills.e2e.mts` (`stepHome`), `tradeskillHeldSteps.mts`,
+    `tradeskillPlanSteps.mts`, `tradeskillFactionSteps.mts`, `tradeskillHomeSteps.mts`,
+    `tradeskillGatherSteps.mts`. The faction step now reads the long list and the shopping list on
+    the faction with the most recipes, which its pick step leaves up, because the default faction
+    of Baking has one row.
 
 ## Tradeskill guides as data (fork #6, requirements/skills-tab.md)
 

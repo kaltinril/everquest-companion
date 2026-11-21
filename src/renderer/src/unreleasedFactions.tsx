@@ -14,7 +14,9 @@ const LazyFactionsView = lazy(() => import('./features/factions/FactionsView'))
 
 /** The Factions tab — nothing at all on any other view. It takes
  *  the app's router whole (the SpellDrill contract) and hands the tab the two drill-downs its
- *  names link out to: an item's Loot page and a giver's Mobs page. */
+ *  names link out to: an item's Loot page and a giver's Mobs page. A link IN (`openFactions`, from
+ *  the Tradeskills route's Faction goal) rides beside them: the faction to find, the way to retire
+ *  the ask, and the Back contract. */
 export default function UnreleasedFactionsView({
   view,
   viewKey,
@@ -32,6 +34,10 @@ export default function UnreleasedFactionsView({
         onOpenLoot={routing.openLoot}
         onOpenMob={routing.openMob}
         onSelectView={routing.selectView}
+        focus={routing.factionFocus}
+        focusNonce={routing.factionNonce}
+        onFocusConsumed={routing.clearFactionFocus}
+        nav={routing.nav}
       />
     </Suspense>
   )

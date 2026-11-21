@@ -3,6 +3,7 @@
  *
  *   npm run scrape:quests            # incremental: reuses the on-disk wikitext cache
  *   npm run scrape:quests -- --refresh   # ignore the cached index/pages, re-fetch all
+ *   npm run scrape:quests -- --offline   # zero requests: quests.json again from the cached pages
  *
  * WHY: item pages only name a quest when someone filled in their `|relatedquests` field,
  * so classic turn-in items look quest-less from the item side (in the user's live cache:
@@ -46,6 +47,13 @@ const CACHE_DIR = resolve(HERE, 'sources/cache/quests')
 const OUT_PATH = resolve(HERE, '../src/renderer/src/data/eqlegends/quests.json')
 
 const refresh = process.argv.slice(2).includes('--refresh')
+/** `--offline` re-parses the committed cache and sends the wiki nothing (as scrape-classes.ts does). */
+const offline = process.argv.slice(2).includes('--offline')
+
+/** Offline, a list the cache lacks is a refusal, never a request. */
+function listsFromWiki(what: string): void {
+  if (offline) throw new Error(`--offline: ${what} is not cached under ${CACHE_DIR}; only a real run lists it`)
+}
 
 interface Member {
   pageid: number
@@ -252,6 +260,7 @@ async function collectQuestPages(): Promise<Member[]> {
     console.log(`Quest pages: ${cached.length} (cached)`)
     return cached
   }
+  listsFromWiki('the quest page list (quest-pages.json)')
   console.log('Enumerating quest categories…')
   const cats = questCategoryNames(await allCategories())
   console.log(`  ${cats.length} quest categories: ${cats.map((c) => c.replace('Category:', '')).join(', ')}`)
@@ -305,6 +314,7 @@ async function collectItemTitles(): Promise<Set<string>> {
     console.log(`Item titles: ${cached.length} (cached)`)
     return new Set(cached)
   }
+  listsFromWiki('the item title list (item-titles.json)')
   const titles = new Set<string>()
   for (const cat of ITEM_CATEGORIES) {
     const members = await categoryMembers(cat)
@@ -424,23 +434,46 @@ export function buildCatalog(
   return run
 }
 
-/** The committed file's stamp when its quests did not change, so an unchanged wiki is a no-op diff. */
-function previousScrapedAt(quests: QuestEntry[]): string | undefined {
+/** The committed file, or undefined when there is none to read. */
+function previousFile(): QuestData | undefined {
   try {
-    const prev = JSON.parse(readFileSync(OUT_PATH, 'utf8')) as QuestData
-    return JSON.stringify(prev.quests) === JSON.stringify(quests) ? prev.scrapedAt : undefined
+    return JSON.parse(readFileSync(OUT_PATH, 'utf8')) as QuestData
   } catch {
     return undefined
   }
 }
 
+const LIVE_SOURCE = 'eqlwiki.com — Category:Quests + quest subcategories'
+
+/**
+ * The file's stamp and source line. A real run checked every page against its live revid, so a new
+ * stamp is honest, unless the quests did not change (an unchanged wiki is a no-op diff). Offline
+ * the text is the cache's: the file keeps the stamp and the source of the run that fetched it.
+ */
+function header(quests: QuestEntry[]): { scrapedAt: string; source: string } {
+  const prev = previousFile()
+  if (offline && prev) return { scrapedAt: prev.scrapedAt, source: prev.source }
+  const same = prev !== undefined && JSON.stringify(prev.quests) === JSON.stringify(quests)
+  return { scrapedAt: same ? prev.scrapedAt : new Date().toISOString(), source: LIVE_SOURCE }
+}
+
+/** The titles the wiki gave nothing for; offline nothing is asked, so every cached page stands. */
+async function syncedPages(pages: Member[]): Promise<Set<string>> {
+  if (offline) {
+    console.log('  (offline: the cached copies, no requests)')
+    return new Set()
+  }
+  return new Set(await syncPageCache(pages))
+}
+
 async function main(): Promise<void> {
+  if (offline && refresh) throw new Error('--offline and --refresh contradict: --refresh re-fetches everything')
   const itemTitles = await collectItemTitles()
   const isItem = (title: string): boolean => itemTitles.has(titleKey(title))
 
   const pages = await collectQuestPages()
   console.log(`\nChecking ${pages.length} quest pages for changes…`)
-  const fetchFailed = new Set(await syncPageCache(pages))
+  const fetchFailed = await syncedPages(pages)
   const wikitext = (p: Member): string | null =>
     fetchFailed.has(p.title) || !existsSync(pageFile(p.pageid)) ? null : readFileSync(pageFile(p.pageid), 'utf8')
 
@@ -449,16 +482,15 @@ async function main(): Promise<void> {
     // Writing now would drop these quests from the committed file.
     console.error(`\n${failed.length} pages have no wikitext; ${OUT_PATH} left unchanged:`)
     for (const t of failed) console.error(`  - ${t}`)
-    console.error('Re-run to retry; --refresh re-lists the pages if they were deleted or renamed.')
+    console.error(
+      offline
+        ? 'The cache lacks them: a real run or a delta fetches them.'
+        : 'Re-run to retry; --refresh re-lists the pages if they were deleted or renamed.'
+    )
     process.exitCode = 1
     return
   }
-  const out: QuestData = {
-    // Every page was just checked against its live revid, so a new stamp is honest.
-    scrapedAt: previousScrapedAt(quests) ?? new Date().toISOString(),
-    source: 'eqlwiki.com — Category:Quests + quest subcategories',
-    quests
-  }
+  const out: QuestData = { ...header(quests), quests }
   mkdirSync(dirname(OUT_PATH), { recursive: true })
   writeFileSync(OUT_PATH, JSON.stringify(out, null, 2))
 

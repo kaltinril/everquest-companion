@@ -34,6 +34,8 @@ export interface BookRecipe {
   /** The made item's database key. */
   key: string
   item: string
+  /** The wiki page's title, kept only when it is not the item's name (a bow's Linen, Hemp and Silk pages). */
+  page?: string
   /** Absent when the wiki's word names no tradeskill ("Non-Tradeskill", a quest's name). */
   tradeskill?: Tradeskill
   /** The wiki's own word, kept only when it folds to no tradeskill. */
@@ -48,6 +50,8 @@ export interface BookRecipe {
   wikiSources?: ItemDropSource[]
   /** The quests that take the made item (its page's quest uses; a quest that only hands it out is left out). */
   quests?: string[]
+  /** For a quest of `quests` the wiki hosts on a page of another title (a page of several quests): quest name to page title. */
+  questPages?: Record<string, string>
   /** The made item's own stats, saves and effects, as its window words them; absent when it has none. */
   worn?: BookWorn
 }
@@ -66,6 +70,8 @@ export interface TradeskillBookPayload {
   materials: Record<string, BookMaterial>
   /** The two community guides as data (shared/tradeskillGuide.ts); absent reads as no guide. */
   guides?: GuidePayload
+  /** When the wiki data the recipes come from was scraped (items.json's own `scrapedAt`, ISO 8601); absent when not stated. */
+  scrapedAt?: string
 }
 
 export const EMPTY_BOOK: TradeskillBookPayload = { version: TRADESKILL_BOOK_VERSION, recipes: [], materials: {} }
@@ -186,6 +192,15 @@ export interface LadderAsk {
   /** Part of an item or material name, any case. */
   query: string
   hideTrivial: boolean
+  /** Switches that each keep only the recipes they accept ("Can make now", "Missing on the wiki"); absent keeps all. */
+  only?: readonly LadderFilter[]
+}
+
+/** One switch of the recipe table that narrows the list, and the line it leaves when nothing passes. */
+export interface LadderFilter {
+  keep: (recipe: BookRecipe) => boolean
+  /** Why the table is empty when this switch took the last line away. */
+  emptyText: string
 }
 
 export interface Ladder {
@@ -235,6 +250,7 @@ export function recipeLadder(recipes: readonly BookRecipe[], ask: LadderAsk): La
     const state = stateOf(recipe, level, next)
     if (ask.hideTrivial && state === 'trivial') continue
     if (!matches(recipe, needle)) continue
+    if (ask.only?.some((filter) => !filter.keep(recipe)) === true) continue
     const line: LadderLine = { kind: 'recipe', recipe, state }
     if (state === 'unrated') unrated.push(line)
     else lines.push(line)
@@ -428,13 +444,14 @@ export function materialsText(recipe: BookRecipe): string {
     .join(', ')
 }
 
-export const NO_MATERIALS_TEXT = 'The wiki lists no materials for this recipe.'
-
 /** Why the recipe table is empty, or null when it has lines. */
 export function ladderEmptyText(ladder: Ladder, ask: LadderAsk, eraOnly: boolean): string | null {
   if (ladder.shown > 0) return null
   if (ladder.total === 0) return eraOnly ? 'The wiki lists no recipes here in the current era.' : 'The wiki lists no recipes here.'
   if (ask.query.trim() !== '') return 'No recipe or material matches the search.'
+  // A switch that narrows the list says so in its own words; two of them on share one line.
+  const [first, second] = ask.only ?? []
+  if (first !== undefined) return second === undefined ? first.emptyText : 'No recipe here passes every switch that is on.'
   return 'Every recipe here is already trivial for you.'
 }
 

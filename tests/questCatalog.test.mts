@@ -365,11 +365,11 @@ test('parseFactionHits reads both wiki dialects and dedupes per faction', () => 
   ])
 })
 
-test('parseFactionHits takes the link TARGET when the line labels it, and skips junk', () => {
+test('parseFactionHits takes the link TARGET, keeps a label that differs, and skips junk', () => {
   const wt = "Your faction standing with [[Guards of Qeynos|the Qeynos guards]] got better.\n" +
-    'Your faction standing with nobody got worse.\n' // no link: not a receipt line
+    'Raising faction with nobody got worse over time.\n' // no link and not the game's sentence
     + 'faction standing with [[Category:Quests]] got better.' // namespaced: never a faction
-  assert.deepEqual(parseFactionHits(wt), [{ name: 'Guards of Qeynos', up: true }])
+  assert.deepEqual(parseFactionHits(wt), [{ name: 'Guards of Qeynos', label: 'the Qeynos guards', up: true }])
 })
 
 test('parseFactionHits reads the receipt variants the wiki also pastes, and folds underscores', () => {
@@ -390,9 +390,10 @@ test('parseFactionHits reads the receipt variants the wiki also pastes, and fold
     { name: 'Zlandicar (Faction)', up: true, amount: 5 },
     { name: 'Hall of the Ebon Mask', up: false },
     { name: 'Carson McCabe', up: true },
-    { name: 'Coldain', up: true },
-    { name: "Tunare's Scouts", up: true },
-    { name: 'Pirates of Gunthak', up: false }
+    { name: 'Coldain', up: true, amount: 7 },
+    { name: "Tunare's Scouts", up: true }, // `(10+)` is no figure
+    { name: 'Pirates of Gunthak', up: false },
+    { name: 'Crushbone Orcs', plain: true, up: false }
   ])
 })
 

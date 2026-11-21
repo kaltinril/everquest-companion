@@ -2,30 +2,26 @@
 // combines, the cost at the prices last paid, the last sale), then each material with how many
 // the combine takes, how many are held, the wiki's source words, the mobs and zones it drops in,
 // the zones it is foraged in, where the player last bought it, and the merchant, zone and loc the
-// recipe guide gives. A material that is itself made opens in place to its own recipe
-// (shared/tradeskillBook.ts `subRecipes`: depth-limited, loop-guarded). A recipe the wiki lists
-// no materials for shows the guide's, marked as the guide's.
+// recipe guide gives. A material that is itself made opens in place to its own recipe when that
+// recipe lists materials (shared/tradeskillPicked.ts `madeBy`, over `subRecipes`: depth-limited,
+// loop-guarded); a recipe that lists none is one line with its wiki page, never an empty list. A
+// recipe the wiki lists no materials for shows the guide's, marked as the guide's, on the same
+// grid; a line whose source states no count reads 1 (`needQty`). The wiki comes first
+// (WikiGap.tsx): what its page lacks is said once, in one line above the materials with the
+// page's link (the same line says when the materials under it are the guide's), and a guide that
+// lists the recipe otherwise than the wiki gets one quiet line under the wiki's own materials.
 //
 // "Plan this item" in the head opens the recipe in the section's Make an item screen (Planner.tsx)
-// through the section's doors, so the workbench threads nothing for it. `WhereCell` is exported:
-// the planner's tree and its gather list draw a material's sources with the same lines.
+// through the section's doors, so the workbench threads nothing for it; beside it is the app's
+// one wish control (RecipeWish.tsx). `WhereCell` is exported: the planner's tree and its gather
+// list draw a material's sources with the same lines.
 
 import { type JSX, useMemo, useState } from 'react'
 import { Box, Button, IconButton, Paper, Stack, Typography } from '@mui/material'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import { materialDrops, recipeFacts, sourceWords, type BookIngredient, type BookRecipe, type LadderState } from '@shared/tradeskillBook'
 import {
-  NO_MATERIALS_TEXT,
-  materialDrops,
-  recipeFacts,
-  sourceWords,
-  subRecipes,
-  type BookIngredient,
-  type BookRecipe,
-  type LadderState
-} from '@shared/tradeskillBook'
-import {
-  GUIDE_MATERIALS_TEXT,
   guideMaterialTail,
   guideMaterialsFor,
   locatedSource,
@@ -33,26 +29,45 @@ import {
   recipeGuideCreditText,
   type GuideMaterialLine
 } from '@shared/tradeskillGuide'
+import { combinesHeld, heldKnown } from '@shared/tradeskillHeld'
+import { bareRecipeText, madeBy, needQty } from '@shared/tradeskillPicked'
 import { haveSourceText, logCountsInUse, recipeHistory } from '@shared/tradeskillHistory'
+import { haveLookup } from '@shared/tradeskillMaterials'
 import { formatDate } from '../../lib/formatDate'
 import { mergeItemSources, sourcesFor } from '../../lib/itemSources'
 import { Tooltip } from '../../lib/Tooltip'
 import { useMetVersion } from '../../lib/useMetInLog'
 import { EraChip } from '../planner/PlannerChips'
 import { FactsProvider, useFacts, type BenchFacts } from './benchFacts'
-import { GuideSourceLine, Have, PaidLine } from './MaterialWhere'
-import { StateChip } from './RecipeTable'
+import { GuideSourceLine, Have, MATERIAL_LINE, PaidLine } from './MaterialWhere'
+import { CanMakeChip, StateChip } from './RecipeTable'
 import { NoticeChip, RecipeYou } from './RecipeYou'
 import { ItemLabel, MobLink, ZoneList, useDoors } from './tradeskillLinks'
+import { RecipeWish } from './RecipeWish'
+import { GuideDifferences, WikiGapLine, WikiPageLink } from './WikiGap'
 
-/** Material, Need, Have, Where. Every nested recipe repeats the same columns. */
+/**
+ * Material, Need, Have, Where. Every material line is this one grid, whoever listed the material
+ * (the wiki, or the guide where the wiki lists none) and whether or not it opens: a rule above
+ * each line, and a first line of one height in every cell (`MATERIAL_LINE`), so a line with one
+ * source and a line with four read as rows of one table. Every nested recipe repeats the columns.
+ */
 const GRID_SX = {
   display: 'grid',
   gridTemplateColumns: 'minmax(200px, 2fr) 52px 52px minmax(0, 3fr)',
   columnGap: 1.5,
-  alignItems: 'start',
-  py: 0.25
+  alignItems: 'start'
 } as const
+
+const ROW_SX = { ...GRID_SX, py: 0.5, borderTop: 1, borderColor: 'divider' } as const
+
+/** The first line of a cell: the item icon's height and a line of text both sit in it. */
+const LINE_SX = { minHeight: MATERIAL_LINE, display: 'flex', alignItems: 'center', minWidth: 0, typography: 'body2' } as const
+
+const NUMBER_SX = { lineHeight: `${String(MATERIAL_LINE)}px` } as const
+
+/** The Where cell's lines are 20 px tall: this centres the first on the line beside it. */
+const WHERE_SX = { minWidth: 0, pt: `${String((MATERIAL_LINE - 20) / 2)}px` } as const
 
 const OPEN_COL = 28
 
@@ -139,16 +154,40 @@ export function WhereCell({ ingredient, own }: { ingredient: BookIngredient; own
   )
 }
 
-/** One material, and under it, when opened, the recipes that make it. */
+/** A recipe that makes the material but lists nothing to open: one line, with its wiki page. */
+function BareRecipeLine({ recipe }: { recipe: BookRecipe }): JSX.Element {
+  return (
+    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-material-bare">
+      {bareRecipeText(recipe)} <WikiPageLink recipe={recipe} />
+    </Typography>
+  )
+}
+
+/** What follows a guide material's name: that the combine gives it back, and the guide's remark. */
+function GuideTail({ line }: { line: GuideMaterialLine | undefined }): JSX.Element | null {
+  const tail = line === undefined ? '' : guideMaterialTail(line)
+  if (tail === '') return null
+  return (
+    <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5, flexShrink: 0 }}>
+      {tail}
+    </Typography>
+  )
+}
+
+/**
+ * One material, and under it, when opened, the recipes that make it. It opens only to a recipe
+ * that lists materials (shared/tradeskillPicked.ts `madeBy`); a recipe that lists none is one
+ * line in the Where cell.
+ */
 function MaterialRow({ ingredient, trail, own }: { ingredient: BookIngredient; trail: readonly string[]; own?: GuideMaterialLine }): JSX.Element {
-  const { index } = useFacts()
+  const { index, guides } = useFacts()
   const [open, setOpen] = useState(false)
-  const made = subRecipes(index, ingredient.key, trail)
+  const made = madeBy({ index, guides }, ingredient.key, trail)
   return (
     <>
-      <Box sx={GRID_SX} data-testid="tradeskill-material">
-        <Box sx={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
-          {made.length > 0 ? (
+      <Box sx={ROW_SX} data-testid="tradeskill-material">
+        <Box sx={LINE_SX}>
+          {made.open.length > 0 ? (
             <OpenToggle
               open={open}
               name={ingredient.name}
@@ -160,49 +199,62 @@ function MaterialRow({ ingredient, trail, own }: { ingredient: BookIngredient; t
             <Box sx={{ width: OPEN_COL, flexShrink: 0 }} />
           )}
           <ItemLabel name={ingredient.name} />
-          {own !== undefined && (
-            <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>
-              {guideMaterialTail(own)}
-            </Typography>
-          )}
+          <GuideTail line={own} />
         </Box>
-        <Typography variant="body2" align="right">
-          {ingredient.qty ?? ''}
+        <Typography variant="body2" align="right" sx={NUMBER_SX} data-testid="tradeskill-material-need">
+          {needQty(ingredient)}
         </Typography>
-        <Have ingredient={ingredient} />
-        <WhereCell ingredient={ingredient} own={own} />
+        <Have ingredient={ingredient} line={MATERIAL_LINE} />
+        <Box sx={WHERE_SX}>
+          <WhereCell ingredient={ingredient} own={own} />
+          {made.bare.map((recipe) => (
+            <BareRecipeLine key={recipe.id} recipe={recipe} />
+          ))}
+        </Box>
       </Box>
-      {open && made.map((recipe) => <SubRecipe key={recipe.id} recipe={recipe} trail={[...trail, ingredient.key]} />)}
+      {open && made.open.map((recipe) => <SubRecipe key={recipe.id} recipe={recipe} trail={[...trail, ingredient.key]} />)}
     </>
   )
 }
 
-/** A guide's material whose name is no wiki item: the name as the guide wrote it, with the guide's source. */
+/** Where a linked material's name starts: past the opener's column, the icon and the gap after it. */
+const NAME_INDENT = OPEN_COL + 28
+
+/** A guide's material whose name is no wiki item: the name as the guide wrote it, with the guide's source, on the same grid. */
 function GuideOnlyRow({ line }: { line: GuideMaterialLine }): JSX.Element {
   return (
-    <Box sx={GRID_SX} data-testid="tradeskill-guide-material">
-      <Typography variant="body2" sx={{ pl: `${String(OPEN_COL)}px` }}>
-        {line.name}
-        {guideMaterialTail(line)}
-      </Typography>
-      <Typography variant="body2" align="right">
-        {line.qty ?? ''}
+    <Box sx={ROW_SX} data-testid="tradeskill-guide-material">
+      <Box sx={LINE_SX}>
+        <Box sx={{ width: NAME_INDENT, flexShrink: 0 }} />
+        <Typography variant="body2" noWrap>
+          {line.name}
+        </Typography>
+        <GuideTail line={line} />
+      </Box>
+      <Typography variant="body2" align="right" sx={NUMBER_SX}>
+        {needQty(line)}
       </Typography>
       <span />
-      <Box sx={{ minWidth: 0 }}>
+      <Box sx={WHERE_SX}>
         <GuideSourceLine source={line.source} />
       </Box>
     </Box>
   )
 }
 
-/** The recipe guide's materials for a recipe the wiki lists none for. */
-function GuideMaterials({ lines, trail }: { lines: readonly GuideMaterialLine[]; trail: readonly string[] }): JSX.Element {
+interface MaterialListProps {
+  recipe: BookRecipe
+  /** The keys of the items open above, the recipe's own included. */
+  trail: readonly string[]
+  /** The column heads, drawn above the first line when there is one; a nested recipe passes none. */
+  heads?: JSX.Element
+}
+
+/** The recipe guide's materials for a recipe the wiki lists none for; the gap line above them says whose they are. */
+function GuideMaterials({ lines, trail, heads }: { lines: readonly GuideMaterialLine[]; trail: readonly string[]; heads?: JSX.Element }): JSX.Element {
   return (
     <>
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-guide-materials">
-        {GUIDE_MATERIALS_TEXT}
-      </Typography>
+      {heads}
       {lines.map((line, i) =>
         line.wikiName === null ? (
           <GuideOnlyRow key={`${line.key}:${String(i)}`} line={line} />
@@ -219,20 +271,33 @@ function GuideMaterials({ lines, trail }: { lines: readonly GuideMaterialLine[];
   )
 }
 
-/** A recipe's materials. `trail` is the keys of the items open above, the recipe's own included. */
-function MaterialList({ recipe, trail }: { recipe: BookRecipe; trail: readonly string[] }): JSX.Element {
+/**
+ * A recipe's materials: the wiki's, else the guide's, else nothing. What the wiki page lacks is
+ * said once, by the one line above them (WikiGap.tsx `WikiGapLine`): it is the whole of a list
+ * that has no material to draw, and it names the guide when the materials under it are the guide's.
+ */
+function MaterialList({ recipe, trail, heads }: MaterialListProps): JSX.Element {
   const { guides } = useFacts()
   if (recipe.ingredients.length === 0) {
     const lines = guideMaterialsFor(guides, recipe)
-    if (lines.length > 0) return <GuideMaterials lines={lines} trail={trail} />
+    if (lines.length === 0) {
+      return (
+        <Box data-testid="tradeskill-no-materials">
+          <WikiGapLine recipe={recipe} />
+        </Box>
+      )
+    }
     return (
-      <Typography variant="body2" color="text.secondary" data-testid="tradeskill-no-materials">
-        {NO_MATERIALS_TEXT}
-      </Typography>
+      <>
+        <WikiGapLine recipe={recipe} />
+        <GuideMaterials lines={lines} trail={trail} heads={heads} />
+      </>
     )
   }
   return (
     <>
+      <WikiGapLine recipe={recipe} />
+      {heads}
       {recipe.ingredients.map((ingredient, i) => (
         <MaterialRow key={`${ingredient.key}:${String(i)}`} ingredient={ingredient} trail={trail} />
       ))}
@@ -252,11 +317,12 @@ function SubRecipe({ recipe, trail }: { recipe: BookRecipe; trail: readonly stri
   )
 }
 
+/** The heads of the material grid. The rule under them is the first line's own. */
 function ColumnHeads({ dumpedAt }: { dumpedAt: number | null }): JSX.Element {
   const have = dumpedAt === null ? HAVE_TIP : `${HAVE_TIP} Dump of ${formatDate(dumpedAt)}.`
   return (
-    <Box sx={{ ...GRID_SX, color: 'text.secondary', borderBottom: 1, borderColor: 'divider', mb: 0.5 }}>
-      <Typography variant="caption" sx={{ pl: `${String(OPEN_COL)}px` }}>
+    <Box sx={{ ...GRID_SX, color: 'text.secondary', py: 0.25 }}>
+      <Typography variant="caption" sx={{ pl: `${String(NAME_INDENT)}px` }}>
         Material
       </Typography>
       <Typography variant="caption" align="right">
@@ -290,8 +356,19 @@ function PanelFoot({ recipe }: { recipe: BookRecipe }): JSX.Element {
           {recipeGuideCreditText()}
         </Typography>
       )}
+      <GuideDifferences recipe={recipe} />
     </>
   )
+}
+
+/** "can make N" on the picked recipe, from the counts its own Have cells show. Nothing when nothing says what is held. */
+function PickedCanMake({ recipe }: { recipe: BookRecipe }): JSX.Element {
+  const { index, guides, held, craft } = useFacts()
+  const combines = useMemo(
+    () => (heldKnown(held, craft) ? combinesHeld({ index, guides, have: haveLookup(held, craft) }, recipe) : 0),
+    [index, guides, held, craft, recipe]
+  )
+  return <CanMakeChip combines={combines} />
 }
 
 const PLAN_TIP = 'Opens Make an item on this recipe: every material down to its leaves, the skills it takes and what to gather.'
@@ -308,7 +385,7 @@ function PlanThis({ recipe }: { recipe: BookRecipe }): JSX.Element | null {
           doors.onPlanRecipe({ key: recipe.key, id: recipe.id })
         }}
         data-testid="tradeskill-plan-this"
-        sx={{ ml: 'auto', flexShrink: 0 }}
+        sx={{ flexShrink: 0 }}
       >
         Plan this item
       </Button>
@@ -332,6 +409,7 @@ export function RecipePanel({ recipe, state, facts, unlisted }: RecipePanelProps
         <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5, mb: 0.5 }}>
           <ItemLabel name={recipe.item} bold />
           {state !== null && <StateChip state={state} />}
+          <PickedCanMake recipe={recipe} />
           <NoticeChip row={recipeHistory(facts.craft, recipe)} />
           <EraChip subject={recipe} />
           <Typography variant="body2" color="text.secondary" data-testid="tradeskill-picked-facts">
@@ -342,12 +420,15 @@ export function RecipePanel({ recipe, state, facts, unlisted }: RecipePanelProps
               {unlisted}
             </Typography>
           )}
-          <PlanThis recipe={recipe} />
+          {/* The two doors out of the panel sit together at its right edge: plan it, wish for it. */}
+          <Stack direction="row" spacing={0.5} alignItems="center" sx={{ ml: 'auto', minWidth: 0 }}>
+            <PlanThis recipe={recipe} />
+            <RecipeWish recipe={recipe} testId="tradeskill-wish" />
+          </Stack>
         </Stack>
         <RecipeYou recipe={recipe} />
-        <ColumnHeads dumpedAt={facts.held.dumpedAt} />
         {/* Keyed by recipe so a material opened under one recipe is not open under the next. */}
-        <MaterialList key={recipe.id} recipe={recipe} trail={[recipe.key]} />
+        <MaterialList key={recipe.id} recipe={recipe} trail={[recipe.key]} heads={<ColumnHeads dumpedAt={facts.held.dumpedAt} />} />
         <PanelFoot recipe={recipe} />
       </Paper>
     </FactsProvider>

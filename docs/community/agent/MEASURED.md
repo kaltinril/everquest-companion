@@ -481,6 +481,39 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
   drink, loot sold).
 - Snapshot: 149 KB as JSON (bought 92, sold 44, items 10, spans 1.2, depot 1.1, levels 0.4).
 
+**Fishing and forage outcomes (fork #6, measured 2026-11-20, read-only, on the owner's three logs)**
+
+- Live log (2026-10-25 to 2026-11-20, 1,223,143 lines): `You cast your line.` 131; `You caught
+  <X>!` 59 over 5 names; `You caught something...` 5 (no `!`, no name; after each the player
+  destroyed a junk item within 12 s, so it is a catch); `You didn't catch
+  anything.` 62; `You lost your bait!` 4; `You spill your beer while bringing in your line.` 16;
+  `Your fishing pole broke!` 2. The 64 in the fork #6 block above is the 59 and the 5 together.
+- October archive (2026-10-06 to 2026-10-25): casts 72, caught 26 named over 5 names and 7
+  unnamed, nothing 35, spilled 8, lost bait 2, pole broke 0. The August archive has no fishing line.
+- Lost bait, spilled beer and a broken pole are not outcomes of their own: each was followed in
+  its second by `You didn't catch anything.` (32 of 32 over both logs). So of the live log's 62
+  misses, 22 carry one of the three.
+- A cast is followed by its outcome 11 to 30 s later (185 of 190; five within 3 s). 13 of 203
+  casts had no outcome line at all (the next fishing line was another cast, or there was none):
+  `You stop fishing and go on your way.` (4 lines, printed twice per stop) or nothing. 4 outcome
+  lines had no cast line before them. Casts with an outcome: 125 live, 65 in October.
+- Refused fishing prints no cast: `You can't fish while holding something.` 17, `Trying to catch
+  land sharks perhaps?` 3 (live).
+- Forage: `You have scrounged up <X>.` 550 live over 19 names, 659 over 26 in October, 159 over
+  15 in August; `You fail to locate any food nearby.` 588, 659, 357. Two live lines have an
+  article (`a Tuft of ...`); the rest name the item bare. Refused attempts print neither line:
+  `You must wait longer before you can forage.` 30, `You can't try to forage while attacking.`
+  24, `You must be standing to forage.` 12 (live).
+- The parser types none of the eight shapes: all reach a module as `unknown`.
+- The engine's `crafting` module on a copy of the live log (`parity --snapshots`, debug build,
+  79 s): fishing 131 casts, 64 caught, 62 nothing, 4 lost bait, 16 spilled, 2 pole broke, 5 item
+  rows adding up to 59; forage 550 found, 588 failed, 19 item rows adding up to 550. A line count
+  of the same file agrees on every number and on every item's count. Both sessions were 0: no
+  fishing or forage line follows the log's newest offline gap.
+- Snapshot on the live log: 26.6 KB as JSON, 1.7 KB of it new (fishing 0.5, forage 1.2). The live
+  log has no combine, so its `items`, `levels`, `spans` and `depot` are empty and no
+  by-product line was there to count.
+
 **Left menu (fork #10)**
 
 - Measured in the hidden e2e app, fresh install, default window (inner 1280 x 860, 100%), every

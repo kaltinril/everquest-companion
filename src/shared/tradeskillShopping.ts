@@ -200,10 +200,6 @@ export function haveFromText(dumped: string | null, logInUse: boolean): string {
 
 export const HAVE_UNKNOWN_TEXT = 'A blank Have is not known: there is no inventory dump to count it from, so its To buy is the full need.'
 
-export const GUIDE_LIST_TEXT = 'The wiki lists no materials for this recipe. These are the recipe guide\'s.'
-
-export const NO_LIST_TEXT = 'The wiki lists no materials for this recipe, so there is nothing to shop for.'
-
 function headLine(list: ShoppingList): string {
   const { recipe } = list
   const facts = [recipe.tradeskill ?? recipe.skillWord, recipe.trivial === undefined ? undefined : `trivial ${String(recipe.trivial)}`, recipe.container]

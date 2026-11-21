@@ -14,12 +14,16 @@ import { heldCount, type BookIngredient } from '@shared/tradeskillBook'
 import { GUIDE_TIP, type GuideSource } from '@shared/tradeskillGuide'
 import { depotTip, haveNow } from '@shared/tradeskillHistory'
 import { lastPaid, ppText } from '@shared/tradeskillMoney'
+import { needQty } from '@shared/tradeskillPicked'
 import { formatDate, formatDateTime } from '../../lib/formatDate'
 import { Tooltip } from '../../lib/Tooltip'
 import { useFacts } from './benchFacts'
 import { MerchantLink, MerchantMapLink, ZoneLink } from './tradeskillLinks'
 
 const CHIP_SX = { height: 16, fontSize: 10, mr: 0.5 } as const
+
+/** The height of a material line's first line on the picked recipe: the item icon and one line of text. */
+export const MATERIAL_LINE = 24
 
 const LOG_TIP = 'From your own log.'
 
@@ -92,17 +96,24 @@ export function GuideSourceLine({ source }: { source: GuideSource }): JSX.Elemen
 
 /**
  * The Have cell: the inventory dump's count, or the log's depot count when that line is newer
- * than the dump, marked and dated. Blank when neither has said what is held.
+ * than the dump, marked and dated. Blank when neither has said what is held. `line` is the
+ * height of the row's first line, where the row sets one (the picked recipe's grid).
  */
-export function Have({ ingredient }: { ingredient: BookIngredient }): JSX.Element {
+export function Have({ ingredient, line }: { ingredient: BookIngredient; line?: number }): JSX.Element {
   const { held, craft } = useFacts()
   const dump = held.index === null ? null : { count: heldCount(held.index, ingredient.name), at: held.dumpedAt }
   const have = haveNow(dump, craft.depot.get(ingredient.key))
   if (have === null) return <span />
-  const enough = have.count >= (ingredient.qty ?? 1)
+  const enough = have.count >= needQty(ingredient)
   return (
     <Box sx={{ textAlign: 'right' }}>
-      <Typography variant="body2" align="right" color={enough ? 'success.main' : 'text.secondary'} data-testid="tradeskill-material-have">
+      <Typography
+        variant="body2"
+        align="right"
+        color={enough ? 'success.main' : 'text.secondary'}
+        sx={line === undefined ? undefined : { lineHeight: `${String(line)}px` }}
+        data-testid="tradeskill-material-have"
+      >
         {have.count}
       </Typography>
       {have.source === 'depot' && have.ts !== null && (

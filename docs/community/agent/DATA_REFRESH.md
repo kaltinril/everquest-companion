@@ -316,6 +316,14 @@ file.
 `npm run scrape:quests|bosses|spells|page-era|mobs|classes` run only on the owner's word. A real `scrape:spells` refuses to write when the wiki lists no spell pages or under half the catalog (an error body or an outage); `--allow-shrink` overrides after a look.
 `npm run scrape:classes -- --offline` (since 2026-10-17) re-derives `classes.json` from the committed
 cache with zero requests and keeps `scrapedAt`.
+`npm run scrape:quests -- --offline` (since 2026-11-20) does the same for `quests.json`: every page of the committed
+`cache/quests/quest-pages.json` re-parsed, `scrapedAt` and `source` kept, no ledger line. It refuses when a list or a
+page is missing from the cache, and with `--refresh`. On 2026-11-20, before any parser change, its output was byte
+for byte the committed file.
+- A quest parser change (`sources/questPage.ts`): run it, read the field-by-field diff (only the fields the change
+  means to move), commit `quests.json` with the parser. `tests/scrapeQuests.test.mts` fails while the committed file is
+  not what the committed cache parses to. The delta folds a changed page through the same `buildCatalog`, so a new
+  field needs nothing in `deltaQuests.ts` (`tests/scrapeDeltaFolds.test.mts` folds one with faction lines).
 `scrape:spells`, `scrape:classes` and (since 2026-10-10) `scrape:quests` are
 revid-checked: one request per 50 titles, then content only for pages whose revision moved, so a
 rerun is cheap; the quest scraper's first run builds its index (~38 requests). `scrape:mobs` was
@@ -330,6 +338,23 @@ records in `cache/spells/index.json`; the spell name is the page title, `Healing
 page's copy-pasted `|spellname = Greater Healing`). After a spell re-derive, the name corrections
 in `spellCorrectionsList.ts` and `engine/crates/eqlog/data/spell-overlay.json`
 (`npm run gen:engine-spell-overlay`) follow in the same change.
+
+The General AAs table (since 2026-11-20): `npx tsx scripts/gen-tradeskill-aas.mts` writes
+`src/shared/tradeskillAaTable.generated.ts`, the table the Tradeskills section reads (name, ranks,
+cost and description of every row) and the Tradeskills page's line that links to the AA page. It
+only parses: the cached `Alternate Advancement` page (`cache/classes/`) and the cached `Tradeskills`
+page (`cache/pages/`, found by title in `pages.json`), zero requests on every run, no date in the
+file, so a run over unchanged caches changes nothing.
+- The delta does NOT run it (`sources/deltaFollow.ts` has no entry for it). After a delta or a
+  class scrape that changed either cached page, `tests/tradeskillAaTable.test.mts` fails until the
+  script is run and the file is committed with the data. A row the parser could not read is
+  printed by the script and fails the same test: fix the parser (`sources/generalAas.ts`), never
+  the file.
+- It keeps every row of the General table and picks none: which rows bear on a tradeskill is
+  `src/shared/tradeskillAa.ts`. `tests/tradeskillAa.test.mts` holds today's eleven as present, so a
+  row the wiki removes or renames turns that test red for a look.
+- `classes.json` `aas` is a different read of the same page (group, classes, levels, cast) and
+  lacks the rows the wiki writes one cell per line; the two files are not kept in step.
 
 ## The ETL, as the owner wants it run (2026-10-10)
 

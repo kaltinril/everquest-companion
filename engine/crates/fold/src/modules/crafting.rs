@@ -1,6 +1,7 @@
 //! Crafting: what the log says of the player's tradeskill combines (fork #6). Compact aggregates
 //! only, no per-combine list: one row per item combined, the runs of combines (spans, for pace),
-//! what merchants were paid and paid back, and the depot stock the game last stated.
+//! what merchants were paid and paid back, and the depot stock the game last stated. Fishing and
+//! forage outcomes ride in the same snapshot (`crafting_gather.rs`).
 //!
 //! Measured on the owner's archive (MEASURED.md, "Combines in detail"):
 //! - A combine's line never names its tradeskill. A raise printed in the combine's second does,
@@ -11,11 +12,13 @@
 //! - A skill line can restate the level it already gave (`skills.rs`): that is not a raise.
 //! - `Sorry, but you don't have everything you need for this recipe ...` is a refused attempt and
 //!   the by-product line (`... create an alternate product: Bottle.`) rides on a combine already
-//!   counted. Neither is a combine.
+//!   counted. Neither is a combine. The by-product line prints in its combine's second (4 of 4,
+//!   each after a failed Brewing combine) and is counted on that combine's item.
 
+use super::crafting_gather::Gather;
 use super::crafting_money::{consumed_of, Money};
 use super::crafting_spans::Spans;
-use super::gaps::craft::{failed_combine_of, is_tradeskill, Combines};
+use super::gaps::craft::{alternate_product_of, failed_combine_of, is_tradeskill, Combines};
 use crate::event::{Event, Key, Kind};
 use crate::message_overlay::message_text_of;
 use crate::EqModule;
@@ -26,6 +29,12 @@ use std::collections::HashMap;
 const TRIVIAL_NOTICE: &str = "You can no longer advance your skill from making this item.";
 /// The notice belongs to a combine in its second or the next one.
 const TRIVIAL_WINDOW_MS: i64 = 1_000;
+/// A by-product line belongs to the combine of its second or the one before.
+const BY_PRODUCT_WINDOW_MS: i64 = 1_000;
+
+fn is_zero(n: &i64) -> bool {
+    *n == 0
+}
 
 /// Rows by name, in the order the log first named them.
 pub(super) struct Rows<T> {
@@ -78,6 +87,10 @@ pub struct ItemRow {
     pub item: String,
     pub made: i64,
     pub failed: i64,
+    /// By-product lines its combines printed (`... create an alternate product: Bottle.`);
+    /// absent when none did.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub by_products: i64,
     /// Combines the game's trivial notice preceded; 0 when it was never printed for the item.
     pub trivial: i64,
     /// The newest such combine.
@@ -134,11 +147,14 @@ pub struct CraftingModule {
     levels: Rows<LevelRow>,
     spans: Spans,
     money: Money,
+    gather: Gather,
     /// The last tradeskill line and the last combine, each waiting for the other in its second.
     pairing: Combines,
     tick: Option<Tick>,
     /// When the trivial notice was last printed and not yet claimed by a combine.
     trivial_at: Option<i64>,
+    /// The newest combine, for the by-product line that may follow it.
+    last_combine: Option<(i64, String)>,
     zone: Option<String>,
     seq: i64,
     announce: crate::announce::Announce,
@@ -152,7 +168,8 @@ impl CraftingModule {
     /// A same-name rebirth: everything counted belongs to the character before it. True when
     /// there was anything.
     fn clear(&mut self) -> bool {
-        let had = !(self.items.is_empty() && self.levels.is_empty() && self.money.is_empty());
+        let had = !(self.items.is_empty() && self.levels.is_empty() && self.money.is_empty() && self.gather.is_empty());
+        self.gather.clear();
         self.items.clear();
         self.levels.clear();
         self.spans.clear();
@@ -160,6 +177,7 @@ impl CraftingModule {
         self.pairing.clear();
         self.tick = None;
         self.trivial_at = None;
+        self.last_combine = None;
         had
     }
 
@@ -175,7 +193,7 @@ impl CraftingModule {
         for level in &mut self.levels.list {
             changed |= std::mem::take(&mut level.first_in_session);
         }
-        changed
+        changed | self.gather.end_session()
     }
 
     /// A combine of `item`, made or failed. Always a change.
@@ -195,6 +213,7 @@ impl CraftingModule {
             row.trivial_ts = Some(ts);
         }
         self.spans.combine(ts, made);
+        self.last_combine = Some((ts, item.to_string()));
         if let Some(skill) = self.pairing.combined(ts, item.to_string()) {
             if let Some(tick) = self.tick.take() {
                 self.credit(item, &skill, &tick);
@@ -257,7 +276,22 @@ impl CraftingModule {
         true
     }
 
-    /// The lines the parser leaves unknown: a failed combine, the trivial notice, a depot draw.
+    /// A by-product line: counted on the item of the combine it rode on, and on nothing when no
+    /// combine is that near. Never a combine of its own.
+    fn by_product(&mut self, ts: i64) -> bool {
+        let near = |at: &i64| (0..=BY_PRODUCT_WINDOW_MS).contains(&(ts - at));
+        let Some((_, item)) = self.last_combine.as_ref().filter(|(at, _)| near(at)) else {
+            return false;
+        };
+        let Some(row) = self.items.get_mut(item) else {
+            return false;
+        };
+        row.by_products += 1;
+        true
+    }
+
+    /// The lines the parser leaves unknown: a failed combine, the trivial notice, a depot draw,
+    /// a combine's by-product, a fishing or a forage line.
     fn line(&mut self, text: &str, ts: i64) -> bool {
         if let Some(item) = failed_combine_of(text) {
             return self.combine(item, false, ts);
@@ -266,7 +300,13 @@ impl CraftingModule {
             self.trivial_at = Some(ts);
             return false;
         }
-        consumed_of(text).is_some_and(|c| self.money.consumed(&c, ts))
+        if let Some(c) = consumed_of(text) {
+            return self.money.consumed(&c, ts);
+        }
+        if alternate_product_of(text).is_some() {
+            return self.by_product(ts);
+        }
+        self.gather.line(text, ts)
     }
 }
 
@@ -306,8 +346,9 @@ impl EqModule for CraftingModule {
         }
     }
 
-    /// Moves on a combine, a credited or first-stated raise, a merchant line, a depot draw, a
-    /// session end that zeroed something, or an epoch that emptied the tables.
+    /// Moves on a combine, a by-product counted on one, a credited or first-stated raise, a
+    /// merchant line, a depot draw, a fishing or forage line, a session end that zeroed something,
+    /// or an epoch that emptied the tables.
     fn published_seq(&self) -> Option<i64> {
         Some(self.announce.cursor())
     }
@@ -323,6 +364,13 @@ impl EqModule for CraftingModule {
         });
         if let Some(older) = self.spans.older() {
             state["olderSpans"] = json!(older);
+        }
+        // Absent until the log has a line of the kind: most characters never fish.
+        if let Some(fishing) = self.gather.fishing() {
+            state["fishing"] = fishing;
+        }
+        if let Some(forage) = self.gather.forage() {
+            state["forage"] = forage;
         }
         json!({ "seq": self.seq, "state": state })
     }

@@ -26,16 +26,24 @@ impl GapsModule {
         }
     }
 
-    /// The item lines the parser leaves unknown, a forage and two combine shapes: `Some(filed)`
-    /// when `text` is one.
+    /// The item lines the parser leaves unknown, a forage, a combine's by-product and a failed
+    /// combine: `Some(filed)` when `text` is one.
     pub(super) fn item_line(&mut self, text: &str, ev: &Event) -> Option<bool> {
         if let Some(item) = forage_of(text) {
             return Some(self.foraged(item, ev));
         }
         if let Some(item) = alternate_product_of(text) {
-            return Some(self.combine(item, "crafted", ev));
+            return Some(self.by_product(item, ev));
         }
         failed_combine_of(text).map(|item| self.combine(item, "failed-combine", ev))
+    }
+
+    /// What a combine handed back beside its product (measured: a Bottle, in the second of a
+    /// failed Brewing combine). The item exists, so an unknown one is a row; it is not the recipe's
+    /// product, so it is not `crafted` and never enters the pairing: a tick of that second stays
+    /// the combine's own.
+    fn by_product(&mut self, item: &str, ev: &Event) -> bool {
+        self.item_named(item, "by-product", ev)
     }
 
     /// A forage: the row filed (`record` counted the zone among `zones`), then the zone apart. A
@@ -118,11 +126,12 @@ pub fn is_tradeskill(skill: &str) -> bool {
     TRADESKILLS.contains(&skill)
 }
 
-/// `You have fashioned the items together to create alternate product: Bottle.` → the item: a
-/// combine's by-product, a shape the parser's success line does not read.
+/// `You have fashioned the items together to create an alternate product: Bottle.` → the item: a
+/// combine's by-product, a shape the parser's success line does not read. The game prints `an`
+/// (4 of 4 lines on the owner's archive); the spelling without it was never seen and is not read.
 pub fn alternate_product_of(text: &str) -> Option<&str> {
     let item = text
-        .strip_prefix("You have fashioned the items together to create alternate product: ")?
+        .strip_prefix("You have fashioned the items together to create an alternate product: ")?
         .strip_suffix('.')?;
     (!item.is_empty()).then_some(item)
 }
@@ -203,7 +212,7 @@ mod tests {
             ev.payload().kind()
         };
         assert_eq!(kind("You lacked the skills to fashion Silver Malachite Ring."), Kind::Unknown);
-        assert_eq!(kind("You have fashioned the items together to create alternate product: Bottle."), Kind::Unknown);
+        assert_eq!(kind("You have fashioned the items together to create an alternate product: Bottle."), Kind::Unknown);
         assert_eq!(kind("You have fashioned the items together to create something new: Silver Malachite Ring."), Kind::ItemReceived);
         assert_eq!(kind("You have become better at Jewelry Making! (4)"), Kind::SkillUp);
     }
@@ -211,9 +220,13 @@ mod tests {
     #[test]
     fn the_two_combine_shapes_the_parser_leaves() {
         assert_eq!(
-            alternate_product_of("You have fashioned the items together to create alternate product: Bottle."),
+            alternate_product_of("You have fashioned the items together to create an alternate product: Bottle."),
             Some("Bottle")
         );
+        // The spelling without `an` is not the game's.
+        assert_eq!(alternate_product_of("You have fashioned the items together to create alternate product: Bottle."), None);
+        // The success line is the parser's, never a by-product.
+        assert_eq!(alternate_product_of("You have fashioned the items together to create something new: Bottle."), None);
         assert_eq!(failed_combine_of("You lacked the skills to fashion Silver Malachite Ring."), Some("Silver Malachite Ring"));
         assert!(is_tradeskill("Jewelry Making") && !is_tradeskill("Kick"));
     }

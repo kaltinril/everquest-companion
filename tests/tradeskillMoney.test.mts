@@ -31,13 +31,40 @@ const byId = (index: BookIndex, id: string): BookRecipe => {
   return found
 }
 
-test('copper reads as platinum, to the copper', () => {
+test('copper reads as platinum to two decimals, and a price too small for that still reads as paid', () => {
   assert.equal(ppText(131_250), '131.25 pp')
   assert.equal(ppText(10_500), '10.50 pp')
-  assert.equal(ppText(14_175), '14.175 pp')
   assert.equal(ppText(141_750), '141.75 pp')
+  // The owner's screenshot: "141.748 pp" in a cell, and a three-decimal price everywhere else.
+  assert.equal(ppText(141_748), '141.75 pp')
+  assert.equal(ppText(14_175), '14.18 pp')
+  assert.equal(ppText(14_174), '14.17 pp')
+  assert.equal(ppText(52), '0.05 pp')
+  assert.equal(ppText(60), '0.06 pp')
+  assert.equal(ppText(5), '0.01 pp')
   assert.equal(ppText(0), '0.00 pp')
-  assert.equal(ppText(52), '0.052 pp')
+  // Paid, but under half a hundredth of a platinum: never "0.00 pp".
+  assert.equal(ppText(4), 'under 0.01 pp')
+  assert.equal(ppText(1), 'under 0.01 pp')
+  for (const copper of [0, 1, 4, 5, 52, 999, 1_000, 14_175, 141_748, 12_345_678]) {
+    assert.match(ppText(copper), /^(?:under 0\.01|\d+\.\d{2}) pp$/, String(copper))
+  }
+})
+
+test('a sale within one percent of the cost of the materials reads as the same, not as a few copper over', () => {
+  const index = book([recipe('Golden Ruby Ring', { trivial: 207, ingredients: [ing('Gold Bar'), ing('Ruby')] })])
+  const ring = (ruby: number, sale: number): string => {
+    const snap = fixtureSnap({ bought: [bought('Gold Bar', 20, 210_000, 'Amber'), bought('Ruby', 1, ruby, 'Jade')], sold: [sold('Golden Ruby Ring', sale, 'Amber')] })
+    return differenceText(moneyBook(indexCrafting(snap, index), index).of(byId(index, 'golden ruby ring#0')))
+  }
+  // The owner's screenshot: materials 141.748 pp, sold for 141.75 pp, was "0.002 pp over the materials".
+  assert.equal(ring(131_248, 141_750), 'the same as the materials')
+  assert.equal(ring(131_252, 141_750), 'the same as the materials')
+  // One percent of 141.75 pp is 1.4175 pp: a sale 1.41 pp either side is the same, 1.50 pp is not.
+  assert.equal(ring(131_250, 143_160), 'the same as the materials')
+  assert.equal(ring(131_250, 140_340), 'the same as the materials')
+  assert.equal(ring(131_250, 143_250), '1.50 pp over the materials')
+  assert.equal(ring(131_250, 140_250), '1.50 pp under the materials')
 })
 
 test("a material's price is the newest purchase line's, per unit, with who sold it and where", () => {

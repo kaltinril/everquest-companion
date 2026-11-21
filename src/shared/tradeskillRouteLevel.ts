@@ -5,8 +5,12 @@
 // Neither ranks on a chance to make a combine or to gain a point: nobody has measured either.
 //
 //   Cheapest  step by step, the recipe above the level whose one combine costs least at the
-//             prices the player last paid. Equal costs: the one more of whose materials are held,
-//             then the lower trivial. Recipes with no known cost come after every priced one.
+//             prices the player last paid. Equal costs: the lower trivial. Recipes with no known
+//             cost come after every priced one, the next trivial up first. What the player holds
+//             is NOT in the order (owner, 2026-11-20: "the price of the materials doesn't change
+//             just because I already have them"): a recipe whose materials are held is named in
+//             the step's aside, and "Only use materials I have" (tradeskillRouteHeld.ts) is the
+//             switch for a route built from them.
 //   Fastest   fewest stops: the highest trivial above the level whose materials can all be
 //             bought, run to its trivial, then again. When none is left, the highest trivial
 //             that lists its materials, and last the highest the wiki holds.
@@ -39,14 +43,9 @@ const byName = (a: Rated, b: Rated): number => a.recipe.item.localeCompare(b.rec
 
 // ---- cheapest -------------------------------------------------------------------------------------
 
-/** Least cost per combine; then more held; then the lower trivial. */
+/** Least cost per combine, then the lower trivial. With no cost to rank on it is the next trivial up. */
 function cheaperFirst(a: Rated, b: Rated): number {
-  return (a.cost ?? Infinity) - (b.cost ?? Infinity) || b.ready - a.ready || a.trivial - b.trivial || byName(a, b)
-}
-
-/** With no cost to rank on: what is held first, then the next trivial up. */
-function heldThenNext(a: Rated, b: Rated): number {
-  return Math.max(0, b.ready) - Math.max(0, a.ready) || a.trivial - b.trivial || byName(a, b)
+  return (a.cost ?? Infinity) - (b.cost ?? Infinity) || a.trivial - b.trivial || byName(a, b)
 }
 
 interface CheapPick {
@@ -66,7 +65,7 @@ function mostHeld(a: Rated, b: Rated): number {
 
 function cheapestPick(above: readonly Rated[]): CheapPick | null {
   const priced = above.filter((r) => r.cost !== null)
-  const pick = priced.length > 0 ? firstBy(priced, cheaperFirst) : firstBy(above, heldThenNext)
+  const pick = firstBy(above, cheaperFirst)
   if (pick === null) return null
   const passed = above.filter((r) => r !== pick && r.cost === null && r.trivial <= pick.trivial).length
   const held = firstBy(above.filter((r) => r !== pick && r.ready > 0), mostHeld)
@@ -89,10 +88,7 @@ function passedText(passed: number, trivial: number): string {
 function cheapestWhy(at: number, found: CheapPick): string {
   const { pick, priced, passed } = found
   const tail = passedText(passed, pick.trivial)
-  if (priced === 0) {
-    const held = pick.ready > 0 ? 'You hold materials for this one.' : 'This is the next trivial up.'
-    return `No recipe above ${String(at)} has a cost in your log. ${held}`
-  }
+  if (priced === 0) return `No recipe above ${String(at)} has a cost in your log. This is the next trivial up.`
   if (priced === 1) return `The only recipe above ${String(at)} your log can price.${tail}`
   return `The lowest cost per combine of the ${String(priced)} recipes above ${String(at)} your log can price.${tail}`
 }

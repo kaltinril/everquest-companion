@@ -18,11 +18,11 @@ const TRIVIAL: &str = "You can no longer advance your skill from making this ite
 const REFUSED: &str = "Sorry, but you don't have everything you need for this recipe in your general inventory.";
 
 /// One log line of 2026-08-15 at `clock` (`00:15:14`).
-fn at(clock: &str, text: &str) -> String {
+pub(super) fn at(clock: &str, text: &str) -> String {
     format!("[Sat Aug 15 {clock} 2026] {text}")
 }
 
-fn read(m: &mut CraftingModule, lines: &[String]) {
+pub(super) fn read(m: &mut CraftingModule, lines: &[String]) {
     let parser = eqlog::parser_for("Tester", eqlog::Tz::UTC);
     let mut ev = Ev::new();
     for line in lines {
@@ -32,20 +32,20 @@ fn read(m: &mut CraftingModule, lines: &[String]) {
     }
 }
 
-fn fold(lines: &[String]) -> CraftingModule {
+pub(super) fn fold(lines: &[String]) -> CraftingModule {
     let mut m = CraftingModule::new();
     read(&mut m, lines);
     m
 }
 
 /// A derived event, which the parser never writes.
-fn derived(m: &mut CraftingModule, kind: &str) {
+pub(super) fn derived(m: &mut CraftingModule, kind: &str) {
     let seq = m.snapshot()["seq"].as_i64().unwrap_or(0) + 1;
     let ev = Event::from_json(&json!({ "kind": kind, "seq": seq, "ts": 0 }).to_string()).expect("a JSON event");
     m.on_event(&ev, false);
 }
 
-fn state(m: &CraftingModule) -> Value {
+pub(super) fn state(m: &CraftingModule) -> Value {
     m.snapshot()["state"].clone()
 }
 
@@ -65,6 +65,7 @@ fn the_parser_leaves_the_three_lines_the_module_reads_as_unknown() {
     assert_eq!(kind(TRIVIAL), Kind::Unknown);
     assert_eq!(kind("Consumed 2 x Gold Bar (leaving 21) from your personal depot."), Kind::Unknown);
     assert_eq!(kind(REFUSED), Kind::Unknown);
+    assert_eq!(kind("You have fashioned the items together to create an alternate product: Bottle."), Kind::Unknown);
     assert_eq!(kind(MADE), Kind::ItemReceived);
     assert_eq!(kind("You purchased 20 Gold Bar from Jeweler Anvo for  210 platinum."), Kind::Purchase);
     assert_eq!(kind("You receive 4 gold 3 silver 9 copper from Jeweler Anvo for the Silver Malachite Ring(s)."), Kind::Coin);
@@ -176,6 +177,28 @@ fn a_refused_attempt_and_a_by_product_are_not_combines() {
     let row = item(&m, 0);
     assert_eq!((row["item"].clone(), row["failed"].clone(), row["raises"].clone()), (json!("Bog Juice"), json!(1), json!(1)));
     assert_eq!(state(&m)["spans"][0]["combines"], json!(1));
+    // The by-product is counted on the combine it rode on.
+    assert_eq!(row["byProducts"], json!(1));
+}
+
+#[test]
+fn a_by_product_is_counted_on_the_combine_of_its_second_only() {
+    let by_product = "You have fashioned the items together to create an alternate product: Bottle.";
+    let mut m = fold(&[at("00:15:14", MADE)]);
+    // No by-product yet: the row does not carry the key.
+    assert_eq!(item(&m, 0).get("byProducts"), None);
+    let cursor = m.published_seq();
+    // Three seconds after the combine: nobody's.
+    read(&mut m, &[at("00:15:17", by_product)]);
+    assert_eq!(item(&m, 0).get("byProducts"), None);
+    assert_eq!(m.published_seq(), cursor);
+    read(&mut m, &[at("00:15:20", "You lacked the skills to fashion Bog Juice."), at("00:15:20", by_product), at("00:15:26", MADE)]);
+    assert_eq!(item(&m, 0).get("byProducts"), None);
+    assert_eq!(item(&m, 1)["byProducts"], json!(1));
+    // The spelling the game never prints is not a by-product.
+    read(&mut m, &[at("00:15:26", "You have fashioned the items together to create alternate product: Bottle.")]);
+    assert_eq!(item(&m, 0).get("byProducts"), None);
+    assert_eq!(state(&m)["items"].as_array().map(Vec::len), Some(2));
 }
 
 #[test]

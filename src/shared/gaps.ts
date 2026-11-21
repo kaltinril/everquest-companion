@@ -191,6 +191,11 @@ export type GapKind =
   | 'fused'
   /** a combine that failed (`You lacked the skills to fashion X.`): still a recipe's product */
   | 'failed-combine'
+  /**
+   * what a combine handed back beside its product (`... create an alternate product: Bottle.`): the
+   * item exists, but it is not the recipe's product, so no Player Crafted and no tradeskill
+   */
+  | 'by-product'
   | 'foraged'
   | 'killed'
   | 'considered'

@@ -12,6 +12,10 @@
 // Spans stay bounded by the engine's own rule: the newest CRAFT_SPAN_CAP one by one, the rest
 // summed into `olderSpans`. A run of combines an archive cut in two is one span again when the
 // two halves are within the five-minute gap.
+//
+// Fishing and forage: the line counts and each item's count add, the session is the newer log's,
+// and an item's last time is the later of the two. A side folded before the engine counted them
+// (or the empty template a shape is tested with) has none, and reads as zeros.
 
 import {
   CRAFT_SPAN_CAP,
@@ -21,6 +25,9 @@ import {
   type CraftingSnap,
   type CraftLevelRow,
   type CraftSpan,
+  type FishingCounts,
+  type ForageCounts,
+  type GatheredRow,
   type OlderCraftSpans,
   type SoldRow
 } from '../crafting'
@@ -69,6 +76,7 @@ const ITEMS: Join<CraftedItemRow> = {
       ...n,
       made: o.made + n.made,
       failed: o.failed + n.failed,
+      byProducts: (o.byProducts ?? 0) + (n.byProducts ?? 0) || undefined,
       trivial: o.trivial + n.trivial,
       trivialTs: n.trivialTs ?? o.trivialTs,
       raises: o.raises + n.raises,
@@ -95,6 +103,37 @@ const BOUGHT: Join<BoughtRow> = {
 const SOLD: Join<SoldRow> = {
   key: (r) => r.item,
   both: (o, n) => ({ ...n, lines: o.lines + n.lines, copper: o.copper + n.copper })
+}
+
+const GATHERED: Join<GatheredRow> = {
+  key: (r) => r.item,
+  both: (o, n) => ({ item: n.item, count: o.count + n.count, lastTs: Math.max(o.lastTs, n.lastTs) })
+}
+
+const FISHING_COUNTS: readonly (keyof FishingCounts)[] = ['casts', 'caught', 'nothing', 'lostBait', 'spilled', 'poleBroke']
+const FORAGE_COUNTS: readonly (keyof ForageCounts)[] = ['found', 'failed']
+
+/** The named counts of `of`; one it does not hold is 0. */
+function countsOf<K extends string>(keys: readonly K[], of: unknown): Record<K, number> {
+  const held = (of !== null && typeof of === 'object' ? of : {}) as Partial<Record<K, unknown>>
+  const count = (v: unknown): number => (typeof v === 'number' ? v : 0)
+  return Object.fromEntries(keys.map((k) => [k, count(held[k])])) as Record<K, number>
+}
+
+function gatheredRows(of: unknown): GatheredRow[] {
+  const rows = (of as { items?: unknown } | undefined)?.items
+  return named(rows, 'item') ? (rows as GatheredRow[]) : []
+}
+
+type Gathered<K extends string> = Record<K, number> & { session: Record<K, number>; items: GatheredRow[] }
+
+/** One activity (fishing, forage) across the two logs, or undefined when neither log has it. */
+function joinGathered<K extends string>(keys: readonly K[], older: unknown, newer: unknown): Gathered<K> | undefined {
+  if (older === undefined && newer === undefined) return undefined
+  const [o, n] = [countsOf(keys, older), countsOf(keys, newer)]
+  const total = Object.fromEntries(keys.map((k) => [k, o[k] + n[k]])) as Record<K, number>
+  const session = countsOf(keys, (newer as { session?: unknown } | undefined)?.session)
+  return { ...total, session, items: joinRows(gatheredRows(older), gatheredRows(newer), GATHERED) }
 }
 
 /** The newer log's first lines that restated the older log's level and were credited as a raise. */
@@ -208,5 +247,9 @@ export function mergeCrafting(older: unknown, newer: unknown): CraftingSnap | nu
   }
   if (joined.olderSpans === undefined) delete out.olderSpans
   else out.olderSpans = joined.olderSpans
+  const fishing = joinGathered(FISHING_COUNTS, older.fishing, live.fishing)
+  const forage = joinGathered(FORAGE_COUNTS, older.forage, live.forage)
+  if (fishing !== undefined) out.fishing = fishing
+  if (forage !== undefined) out.forage = forage
   return out
 }
