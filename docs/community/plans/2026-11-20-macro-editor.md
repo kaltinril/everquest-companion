@@ -184,3 +184,21 @@ it, press Send.**
 - 2026-11-20: the owner used P0 in the dev app, found the three tabs clunky and asked for the
   character-first flow (above). Being built on `macro-flow`. No mockup first this time: the owner's
   word was "build A, B, and C".
+- 2026-11-20: the character-first flow is built (`src/shared/macros/layouts.ts`, `buttons.ts`,
+  `history.ts`; `ButtonGrid`, `ButtonPanel`, `MacroPicker`, `LayoutsMenu`; `GameFileSend` is now
+  the bottom bar; `SetsSection` deleted). 81 macro unit tests. **Not yet seen on screen.** Nothing
+  under `src/main`, the preload or the send and backup logic changed.
+  - A character's own layout is the set `chosen[fileKey]` points at (`isCharacterLayout` is the one
+    rule); every other set is a saved layout. Data saved by the three-tab screen still loads: a
+    set chosen for a character becomes that character's own and takes its name; a second character
+    pointing at the same set gets a copy.
+  - Page 1 macros in a file are not put in a layout (a send leaves page 1 alone). A page above 10
+    or a button above 12 that a file holds is shown as an extra page or button.
+  - "Change only here" keeps the macro's name, so nothing shows as changed until it is edited.
+  - Most likely to misbehave, none tried: Ctrl+Z / Ctrl+Y outside a text box (the app's Edit menu
+    may take the keys; the buttons do not depend on it), native drag and drop on the buttons
+    ("Move to..." is the fallback), the bottom bar staying pinned, the name box taking focus on
+    "New macro".
+  - Not built: scrolling to the editor on a narrow window; a per-page marker of where the changes
+    are; a one-click put-back on a "removed" button.
+
