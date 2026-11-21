@@ -180,7 +180,7 @@ function quoteRows(s: BazaarSide, color: string): TooltipRow[] {
   return more > 0 ? [...shown, { value: `+${more} more (listed below the chart)` }] : shown
 }
 
-function HoverCard({ hov, p, w }: { hov: Hover; p: BazaarPoint; w: number }): JSX.Element {
+function HoverCard({ hov, p }: { hov: Hover; p: BazaarPoint }): JSX.Element {
   const sides = [sideRow('Asking', p.sell, ASK_COLOR), ...quoteRows(p.sell, ASK_COLOR), sideRow('Offered', p.buy, OFFER_COLOR), ...quoteRows(p.buy, OFFER_COLOR)]
   const rows = sides.flatMap((r) => (r === null ? [] : [r]))
   return (
@@ -190,7 +190,6 @@ function HoverCard({ hov, p, w }: { hov: Hover; p: BazaarPoint; w: number }): JS
       title={shortDay(p.day)}
       rows={rows.length > 0 ? rows : [{ value: `${p.trades} trade offer(s), no price` }]}
       note={p.trades > 0 && rows.length > 0 ? `${p.trades} trade offer(s)` : undefined}
-      bounds={{ w, h: H }}
     />
   )
 }
@@ -236,7 +235,7 @@ export function BazaarChart({ item, endDay }: { item: BazaarItem; endDay: string
             onPointerLeave={() => setHov(null)}
           />
         </svg>
-        {hov !== null && hp !== undefined && <HoverCard hov={hov} p={hp} w={w} />}
+        {hov !== null && hp !== undefined && <HoverCard hov={hov} p={hp} />}
       </Box>
     </Stack>
   )

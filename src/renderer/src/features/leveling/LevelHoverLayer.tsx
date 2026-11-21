@@ -306,7 +306,7 @@ export function LevelHoverLayer({
       )}
       {hov && content && (
         <div style={TIP_LAYER}>
-          <ChartTooltip {...content} x={hov.x} y={hov.y} bounds={hov.bounds} />
+          <ChartTooltip {...content} x={hov.x} y={hov.y} />
         </div>
       )}
     </div>
