@@ -26,7 +26,7 @@ import { haveLookup } from '../src/shared/tradeskillMaterials'
 import { planTree } from '../src/shared/tradeskillPlan'
 import { gatherFor, gatherHeld, planCanMakeTip, planHave } from '../src/shared/tradeskillPlanGather'
 import { ROUTE_GOALS, ROUTE_STEP_CAP, buildRoute, capTop, heldOnlyApplies, moreStepsText, routeEndText, type BookGoal, type Route } from '../src/shared/tradeskillRoute'
-import { heldCoverText, isHeldGoal } from '../src/shared/tradeskillRouteHeld'
+import { equalsText, feedsText, heldCoverText, isHeldGoal, premakeText } from '../src/shared/tradeskillRouteHeld'
 import type { RouteFacts, RouteStep } from '../src/shared/tradeskillRouteStep'
 import { depot, ing, recipe, SEP_12 } from './tradeskillFixtures.mts'
 import { OWNER_LEVEL, ownerFacts, ownerGuides, ownerHeld, ownerIndex, ownerSnap } from './tradeskillRouteFixtures.mts'
@@ -194,6 +194,56 @@ test('held only: a tool is not used up by a step, and a material with no stated 
   // No dump, and the log's depot line names only the ruby: the bar's count is unknown, so nothing qualifies.
   const rubies = ownerFacts({ snap: ownerSnap({ depot: [depot('Ruby', 50, SEP_12)] }), held: null })
   assert.deepEqual(held('cheapest', rubies).groups, [])
+})
+
+/** The owner's Tailoring at 6 (2026-11-20): spider silk and spiderling silk held, nothing made of them yet. */
+function silkFacts(heldNow: Record<string, number>): RouteFacts {
+  const tailoring = (item: string, trivial: number, ingredients: BookRecipe['ingredients']): BookRecipe => recipe(item, { tradeskill: 'Tailoring', trivial, ingredients })
+  const recipes = [
+    tailoring('Silk Swatch', 15, [ing('Spider Silk', 2)]),
+    tailoring('Silk Thread', 15, [ing('Spiderling Silk', 2)]),
+    tailoring('Silk Bandage', 21, [ing('Silk Thread', 2)]),
+    tailoring('Silk Cord', 26, [ing('Silk Thread', 3)]),
+    tailoring('Raw Silk Cap', 36, [ing('Silk Swatch', 1), ing('Cap Pattern', 1)])
+  ]
+  const index = indexBook({ version: TRADESKILL_BOOK_VERSION, recipes, materials: {} })
+  return ownerFacts({ index, held: ownerHeld(heldNow) })
+}
+
+const tailored = (goal: BookGoal, facts: RouteFacts, level: number): Route => buildRoute(facts, { tradeskill: 'Tailoring', level, goal, heldOnly: true })
+
+test('held only: equals at one trivial are named, the one more later recipes use is picked, and what a step makes feeds the next', () => {
+  const r = tailored('cheapest', silkFacts({ 'Spider Silk': 210, 'Spiderling Silk': 200 }), 6)
+  const steps = allSteps(r)
+  assert.deepEqual(steps.map((s) => `${s.range}: ${s.name}`), ['6 to 15: Silk Thread', '15 to 21: Silk Bandage'])
+  // Thread and swatch tie at 15 with no cost: thread goes into two recipes above it, swatch into one.
+  assert.equal(steps[0].aside, 'Same trivial, and your materials cover it too: Silk Swatch. Silk Thread is a material in 2 Tailoring recipes above it.')
+  assert.equal(steps[0].handText, 'Your held materials cover 100 combines.')
+  // The bandage is made of the thread the step above makes, and says what that count rests on.
+  assert.equal(
+    steps[1].handText,
+    'Your held materials cover 50 combines, after what the steps above use. That counts the Silk Thread the steps above make: one fewer for each combine there that fails.'
+  )
+  // The bandages took every thread, so the cord has none and nothing is left to make it from: the route stops.
+  assert.equal(equalsText(['A', 'B', 'C', 'D', 'E', 'F']), 'Same trivial, and your materials cover them too: A, B, C, D and 2 more.')
+  assert.equal(feedsText('Silk Swatch', 'Tailoring', 1), 'Silk Swatch is a material in 1 Tailoring recipe above it.')
+  assert.equal(feedsText('Silk Cord', 'Tailoring', 0), '')
+})
+
+test('held only: a material the stock is short of is made first from what is held, one level deep, and its inputs are spent once', () => {
+  // Past 15, thread is no step of its own: the bandage still qualifies, through the spiderling silk held.
+  const r = tailored('cheapest', silkFacts({ 'Spiderling Silk': 200, 'Silk Thread': 4 }), 15)
+  const steps = allSteps(r)
+  assert.deepEqual(steps.map((s) => `${s.range}: ${s.name}: ${s.handText}`), [
+    // 4 thread held and 100 more from 200 silk: 104 thread, two a bandage.
+    '15 to 21: Silk Bandage: Your held materials cover 52 combines.'
+  ])
+  assert.equal(steps[0].aside, 'Make first, from what you hold: Silk Thread (100 combines, trivial 15).')
+  assert.equal(premakeText([]), '')
+  // Nothing held that makes thread: the bandage is not on the route, and neither is anything else.
+  assert.deepEqual(tailored('cheapest', silkFacts({ 'Spider Silk': 10 }), 15).groups, [])
+  // Fastest reaches the highest trivial the chain covers.
+  assert.equal(allSteps(tailored('fastest', silkFacts({ 'Spiderling Silk': 200 }), 6))[0].name, 'Silk Cord')
 })
 
 test('held only: when nothing qualifies the route says so in one line, and past the top it says that instead', () => {
