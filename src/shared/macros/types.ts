@@ -1,6 +1,7 @@
 // macros/types.ts — the Macros tab's shapes (fork #11). The library is the app's own document; a
 // GameMacro is one slot as the game's character file holds it.
 
+import type { FileBackups } from './backups'
 import type { Unsavable } from './unsavable'
 
 /** One macro in the app's library. `lines` is positional (index 0 is Line1), trailing blanks cut. */
@@ -54,6 +55,10 @@ export interface CharacterFile {
 export interface CharacterFileMacros extends CharacterFile {
   macros: GameMacro[]
   mtimeMs: number
+  /** What the file's bytes were when read; a send passes it back so a changed file is refused. */
+  stamp: string
+  /** The copies the app keeps beside the file (backups.ts). */
+  backups: FileBackups
 }
 
 /** Why no game folder was read: no character log found yet, or the folder would not list. */
