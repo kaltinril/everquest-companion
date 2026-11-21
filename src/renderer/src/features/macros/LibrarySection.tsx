@@ -126,7 +126,7 @@ export function LibrarySection({ store, selected, onSelect, onPlace }: LibraryPr
       <SearchField
         query={query}
         onChange={setQuery}
-        placeholder="Search name, command, note"
+        placeholder="Search by name, command, tag or note"
         testid="macros-search"
         clearTestid="macros-search-clear"
         ariaLabel="Search macros"

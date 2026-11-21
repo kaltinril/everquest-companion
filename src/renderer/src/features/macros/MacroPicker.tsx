@@ -16,7 +16,7 @@ export function MacroPicker({ store, onPick }: { store: MacroStore; onPick: (mac
       <SearchField
         query={query}
         onChange={setQuery}
-        placeholder="Search your macros"
+        placeholder="Search by name, command or tag"
         testid="macro-slot-search"
         clearTestid="macro-slot-search-clear"
         ariaLabel="Search your macros"
