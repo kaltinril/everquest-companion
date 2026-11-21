@@ -126,6 +126,17 @@ export interface StepPlace {
   aside?: string
 }
 
+/**
+ * Where a step's combine is done, beside its name: "in a Loom". '' when the wiki names no
+ * container. A step has to say it (owner, 2026-11-20: "it looks like some things require a LOOM"):
+ * a sewing kit is carried, a loom is where the game put it.
+ */
+export function containerText(recipe: Pick<BookRecipe, 'container'> | null): string {
+  const container = recipe?.container?.replace(/\s+/g, ' ').trim() ?? ''
+  if (container === '') return ''
+  return `in ${/^[aeiou]/i.test(container) ? 'an' : 'a'} ${container}`
+}
+
 /** A step that makes a wiki recipe, with everything the data states of it. */
 export function recipeStep(facts: RouteFacts, recipe: BookRecipe, place: StepPlace): RouteStep {
   const money = facts.money.of(recipe)

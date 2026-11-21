@@ -10,7 +10,7 @@ import { TRADESKILL_BOOK_VERSION, indexBook, type BookRecipe } from '../src/shar
 import { BOOK_GOALS, GOAL_LABELS, ROUTE_GOALS, ROUTE_STEP_CAP, asGoal, buildRoute, isBookGoal, moreStepsText, routeEndText, type BookGoal, type Route } from '../src/shared/tradeskillRoute'
 import { EXPLORE_GROUP_CAP, guideMaterialsLine } from '../src/shared/tradeskillRouteExplore'
 import { recipeBuyable } from '../src/shared/tradeskillRouteLevel'
-import { recordText, type RouteCtx, type RouteFacts, type RouteStep } from '../src/shared/tradeskillRouteStep'
+import { containerText, recordText, type RouteCtx, type RouteFacts, type RouteStep } from '../src/shared/tradeskillRouteStep'
 import { skillRecipes } from '../src/shared/tradeskillBook'
 import { bought, ing, item, recipe } from './tradeskillFixtures.mts'
 import { OWNER_LEVEL, ownerFacts, ownerGuides, ownerHeld, ownerIndex, ownerRecipes, ownerSnap } from './tradeskillRouteFixtures.mts'
@@ -268,6 +268,12 @@ test('the community route: the guide\'s steps from the level in its own order, j
   // A step with no wiki recipe says what the guide makes it from, in the wiki's spelling where the guide's is an item.
   assert.equal(guideMaterialsLine(ownerGuides(), { materials: [{ name: 'Mandrake root', qty: 2 }, { name: 'Steel boning' }] }), "The guide's materials: 2 Mandrake root, Steel boning.")
   assert.equal(guideMaterialsLine(ownerGuides(), { materials: [] }), '')
+  // Where the combine is done sits beside a step's name; nothing when the wiki names no container.
+  assert.equal(containerText({ container: 'Loom' }), 'in a Loom')
+  assert.equal(containerText({ container: 'Erudite Sewing Kit' }), 'in an Erudite Sewing Kit')
+  assert.equal(containerText({ container: 'Coldain Tanners  Kit' }), 'in a Coldain Tanners Kit')
+  assert.equal(containerText({}), '')
+  assert.equal(containerText(null), '')
   const joined = stepOf(r, 'Platinum Topaz Necklace')
   assert.equal(joined.recipe?.id, 'platinum topaz necklace#0')
   assert.equal(joined.why, 'A later step of the guide.')
