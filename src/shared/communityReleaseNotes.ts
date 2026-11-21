@@ -28,6 +28,112 @@ export interface CommunityRelease {
 
 export const COMMUNITY_RELEASE_NOTES: readonly CommunityRelease[] = [
   {
+    "version": "0.1.0-test.53",
+    "date": "2026-11-20",
+    "title": "a Tradeskills section, a Macros tab, and group mates' pets that stay on the meter",
+    "groups": [
+      {
+        "heading": "Tradeskills",
+        "items": [
+          {
+            "text": "New section under Research: a tile for each tradeskill with your level, and a workbench for each with its recipes in trivial order, their materials and where those come from."
+          },
+          {
+            "text": "Routes for a goal: cheapest, fastest, explore, community route or faction, with a shopping list. \"Only use materials I have\" keeps a route to what you hold."
+          },
+          {
+            "text": "Make an item: pick a crafted item and get the plan to make it, across tradeskills."
+          },
+          {
+            "text": "Your history from your own log: combines made and failed, money spent and earned, and what you fished and foraged."
+          },
+          {
+            "text": "Gear has a Skill mod column, and a tradeskill's page lists the gear that raises it."
+          },
+          {
+            "text": "Recipes come from the wiki first, then two community guides (credited in Preferences, Thanks)."
+          }
+        ]
+      },
+      {
+        "heading": "Macros",
+        "items": [
+          {
+            "text": "New tab under Config: each character's macros by loadout. Edit, copy, move and tag them, move a group of buttons to another loadout, and find a spell's id by name for /memspellslot."
+          },
+          {
+            "text": "Send writes your macros to the character's game file. The game must be closed. A dated copy of the file is kept beside it first, and Restore puts it back."
+          }
+        ]
+      },
+      {
+        "heading": "Combat",
+        "items": [
+          {
+            "text": "A pet that lifetaps itself no longer drops off the meter for good."
+          },
+          {
+            "text": "/pet who leader now moves a pet's earlier damage in zone visits that have already ended too."
+          },
+          {
+            "text": "A summoned pet is no longer listed as a group member."
+          },
+          {
+            "text": "A pet with no known owner keeps its damage on its own \"owner unknown\" row. A group mate's new pet is credited from their summon, marked \"(guessed)\", until /pet who leader settles it."
+          },
+          {
+            "text": "A chart's hover readout is no longer cut off at larger text sizes."
+          }
+        ]
+      },
+      {
+        "heading": "Reading log",
+        "items": [
+          {
+            "text": "A busy engine that is still talking to the app is no longer restarted in the middle of a read."
+          }
+        ]
+      },
+      {
+        "heading": "Reports",
+        "items": [
+          {
+            "text": "The Feedback row and the Report buttons now open a new GitHub issue."
+          }
+        ]
+      },
+      {
+        "heading": "Small fixes",
+        "items": [
+          {
+            "text": "Bazaar: a watch at 12.5% of the median reads 12.5, not 13."
+          },
+          {
+            "text": "Buffs: a buff that just landed reads \"0s elapsed\", not a dash."
+          },
+          {
+            "text": "Void motes: the plan line's hover gives the whole line, and the empty text no longer claims everything is +10."
+          },
+          {
+            "text": "Plane of Sky: closing a hand-count box returns the keyboard to its pencil."
+          },
+          {
+            "text": "Preferences: searching \"row height\" finds the left menu card."
+          }
+        ]
+      },
+      {
+        "heading": "Data",
+        "items": [
+          {
+            "text": "Wiki pages refreshed to today (8 pages changed)."
+          }
+        ]
+      }
+    ],
+    "knownIssues": "The Macros Send is new and has not yet been tried in game: keep the copy it makes until you have logged in and seen your macros. A macro moved to another button can leave a hotbar button firing the wrong macro; the review before a Send warns about it. A \"(guessed)\" pet owner can be wrong until /pet who leader settles it. Fishing and forage counts for an archived log appear after a Refresh. The Wiki Gaps icon rows read the wiki data this build shipped with, so a page fixed on the wiki stays a row until the next build or until it is marked Done. Plane of Sky runes moved to the currencies tab are not in the game's inventory export; set the count by hand or use the log count. The Void motes tab estimates a drop's chance from the size of the mob's loot list, because the wiki lists no drop rates; a row's hover says what it assumed. It does not count spells (a mote raises a spell rank too) or progress already banked toward a tier, and it assumes copies are farmed at Refined. The healing meters still divide by the whole fight's length. A buff's percent stats (haste, run speed) and regen are not raised with rank yet, and the Upgrades tab does not count bigger stats as a reason to upgrade a buff. Shorter pauses cannot change the spacing a Windows voice puts between words. A Copy page read is kept for half an hour, so a page made on the wiki within that time is not seen until it passes. A merchant page the wiki already has gets no \"items sold\" or \"location\" check. An item page the wiki already has gets no check that it lists a merchant you were quoted by. Joining another player's private instance is not told apart from the open world of that zone; only an instance you create yourself is. A pet summoned shortly before its first \"My leader is\" line can carry a \"(2)\" after its name in the meters until the next restart. Another player's spells never count toward a mob's resists: the game prints only your own resists to you. The con card does not list a mob's immunities yet (the mob page does). Saved characters read \"needs refresh\" on Wiki Gaps until logged in once with this build. A +0 worked back from a window often leaves Weight as ?. A groupmate's charmed pet can still lose its credit when a damage-over-time it cast before the charm ticks on a groupmate. A mob or item added to the wiki after this build shows no wiki details until the next build (or a Copy click in Wiki Gaps). Copy on a wiki page that still holds the template's placeholders keeps them. Capture finds the game window only when it is titled \"EverQuest Legends\" or \"EverQuest\". All characters needs each character logged in here once with this build. The screenshot reader reads English only. The installer is not code-signed, so Windows shows \"Windows protected your PC\" the first time (More info, then Run anyway). Builds before test.20 do not update themselves; install one by hand once."
+  },
+  {
     "version": "0.1.0-test.52",
     "date": "2026-11-20",
     "title": "a Skills tab, an alert before a respawn, a tighter left menu, and tabs that say what they are waiting on",
