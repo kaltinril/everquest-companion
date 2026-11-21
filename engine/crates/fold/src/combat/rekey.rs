@@ -47,7 +47,11 @@ impl EngineState {
         let id = format!("member:{name_key}");
         // A pet the roster admitted off your burst, then refused, recorded its row as a member.
         let recorded = self.others.is_recorded(name_key) || self.zone_agg.out.contains_key(&id);
-        if !self.others.note_pet(name_key) || !recorded {
+        // Not "the first time this name was called a pet": a name from the summoned-pet table is
+        // recorded again each time it comes round (`routing.rs recordable_attacker`), so there can
+        // be a row to move on a second bind too.
+        self.others.note_pet(name_key);
+        if !recorded {
             return;
         }
         self.others.forget(name_key);
