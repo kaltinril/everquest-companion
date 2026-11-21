@@ -40,7 +40,6 @@ import {
   note,
   reportRun,
   settle,
-  settleGone,
   settleStable
 } from './appHarness.mjs'
 import { mainWindow, makeUserData, removeUserData } from './appWindow.mjs'
@@ -70,15 +69,6 @@ function liveWindows(app: ElectronApplication): Promise<string[]> {
       .filter((w) => !w.isDestroyed())
       .map((w) => w.getTitle())
   )
-}
-
-/** The first-run analytics bar sits over the content area; every other spec clears it the same way. */
-async function dismissFirstRunNotice(page: Page): Promise<void> {
-  const notice = '[data-testid="telemetry-notice"]'
-  await page.waitForSelector(notice, { timeout: 30_000 }).catch(() => undefined)
-  if ((await countOf(page, notice)) === 0) return
-  await page.click('[data-testid="telemetry-notice-off"]')
-  await settleGone(page, notice, { timeoutMs: 8_000 })
 }
 
 /** CLAIM 1a: the section is in the rail, the card is in it, and it opens OFF. */
@@ -191,7 +181,6 @@ async function main(): Promise<void> {
     })
     page.on('pageerror', (e) => consoleErrors.push(String(e)))
 
-    await dismissFirstRunNotice(page)
     await stepCard(page)
     await stepRoundTrip(page)
     await stepSearch(page)

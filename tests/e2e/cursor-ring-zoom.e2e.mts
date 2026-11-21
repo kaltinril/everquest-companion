@@ -45,18 +45,16 @@
  * Run: `npm run test:e2e -- cursor-ring-zoom`
  */
 import { dirname, join } from 'node:path'
-import type { ElectronApplication, Page } from 'playwright-core'
+import type { ElectronApplication } from 'playwright-core'
 import {
   MAIN_ENTRY,
   buildIfStale,
   check,
-  countOf,
   dumpArtifacts,
   failures,
   note,
   reportRun,
-  settle,
-  settleGone
+  settle
 } from './appHarness.mjs'
 import { mainWindow } from './appWindow.mjs'
 import { launchOnFixture } from './logFixture.mjs'
@@ -290,16 +288,6 @@ function destroyProbes(app: ElectronApplication): Promise<void> {
   })
 }
 
-/** Answer the analytics first-run notice — the text-size / cursor-ring-colour helper. It is the
- *  ONLY click this spec makes, and it happens before anything touches a zoom (see `main`). */
-async function dismissFirstRunNotice(page: Page): Promise<void> {
-  const notice = '[data-testid="telemetry-notice"]'
-  await page.waitForSelector(notice, { timeout: 30_000 }).catch(() => undefined)
-  if ((await countOf(page, notice)) === 0) return
-  await page.click('[data-testid="telemetry-notice-off"]')
-  await settleGone(page, notice, { timeoutMs: 8_000 })
-}
-
 /** DIP is what main measured the pointer in; CSS px is what the page drew in. One multiply. */
 const toDip = (cssValue: number, zoom: number): number => cssValue * zoom
 
@@ -344,11 +332,10 @@ async function main(): Promise<void> {
       if (m.type() === 'error') consoleErrors.push(m.text())
     })
     page.on('pageerror', (e) => consoleErrors.push(String(e)))
-    // EVERY CLICK HAPPENS FIRST, ON PURPOSE. windows.ts's landmine: a `setZoomFactor` after page
+    // NO CLICKS, ON PURPOSE. windows.ts's landmine: a `setZoomFactor` after page
     // load leaves a never-composited window in a state where Playwright's actionability check
     // ("visible, enabled and stable") does not complete. This spec zooms windows deliberately, so
-    // it does its one click before any of that and drives the app by `evaluate` afterwards.
-    await dismissFirstRunNotice(page)
+    // it drives the app by `evaluate` only.
 
     const born = await createProbes(launch.app)
     check(

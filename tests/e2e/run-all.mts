@@ -215,15 +215,8 @@ function report(results: Result[], wallMs: number): number {
   return failed.length
 }
 
-/** TEST build (this branch only): specs whose subject this build turns off, so a red always means something. */
-const TEST_BUILD_SKIPS: Record<string, string> = {
-  'feedback.e2e.mts': 'the feedback controls are disabled',
-  'telemetry.e2e.mts': 'no analytics are compiled in'
-}
-for (const [spec, why] of Object.entries(TEST_BUILD_SKIPS)) console.log(`[e2e] skip ${spec} on the TEST build: ${why}`)
-
 const specs = readdirSync(here)
-  .filter((f) => f.endsWith('.e2e.mts') && !(f in TEST_BUILD_SKIPS))
+  .filter((f) => f.endsWith('.e2e.mts'))
   .filter((f) => filters.length === 0 || filters.some((needle) => f.includes(needle)))
   .sort()
 

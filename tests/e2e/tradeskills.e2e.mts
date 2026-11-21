@@ -48,13 +48,6 @@ function textOf(page: Page, selector: string): Promise<string> {
   return page.evaluate((s) => (document.querySelector(s) as HTMLElement | null)?.innerText.trim() ?? '', selector)
 }
 
-async function answerNotice(page: Page): Promise<void> {
-  const notice = sel('telemetry-notice')
-  if ((await countOf(page, notice)) === 0) return
-  await page.click(sel('telemetry-notice-off'))
-  await settleGone(page, notice, { timeoutMs: 8_000 })
-}
-
 interface RowFacts {
   state: string
   trivial: number | null
@@ -441,7 +434,6 @@ async function main(): Promise<void> {
     })
     page.on('pageerror', (e) => consoleErrors.push(String(e)))
     await page.waitForSelector(sel('nav-overview'), { timeout: 60_000 })
-    await answerNotice(page)
     log.append(`You have become better at Jewelry Making! (${String(LEVEL)})`)
 
     await stepNav(page)

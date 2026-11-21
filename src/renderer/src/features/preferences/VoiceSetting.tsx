@@ -59,7 +59,6 @@ import {
   SPEECH_SETUP_NOTES
 } from '../../lib/speech'
 import { useSpeechEngineFault, useVoiceOptions } from '../../lib/useVoices'
-import { trackFeature } from '../../lib/telemetry'
 import { recordPref, usePrefsSeed } from './prefsHydration'
 
 /** What each tier is, in one line. The size lives on the download button, where it is actionable. */
@@ -400,9 +399,6 @@ function VoicePickerRow({
         startIcon={<PlayArrowIcon />}
         data-testid="pref-voice-preview"
         onClick={() => {
-          // usage-analytics `featureUse: speechPreview` — "did anyone ever hear this work".
-          // A count, with no voice id and no text attached; the utterance is a fixed constant.
-          trackFeature('speechPreview')
           void speak(PREVIEW_TEXT, prefs)
         }}
       >
