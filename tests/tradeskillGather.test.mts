@@ -30,6 +30,8 @@ import {
   FORAGE_NO_LINE_TEXT,
   FORAGE_RATE_TIP,
   FORAGE_TILE_TITLE,
+  FORAGE_HIDE_TEXT,
+  FORAGE_SHOW_TEXT,
   FORAGE_TOP,
   NO_FISHING_TEXT,
   fishingFigures,
@@ -216,6 +218,17 @@ test('the Foraging tile draws on a level alone, and on counts alone', () => {
   const waiting = forageTile({ forage: FORAGED, skills: null, spends: null }, false)
   assert.ok(waiting)
   assert.equal(waiting.aas[0].boughtText, '')
+})
+
+test('what a click on the tile opens: the session line, the items found or an AA; a tile with none of them opens nothing', () => {
+  const full = forageTile({ forage: FORAGED, skills: [skill('Forage', 151)], spends: NO_SPENDS }, false)
+  assert.equal(full?.detail, true)
+  // A level alone still has the wiki's Foraging AA to open.
+  const level = forageTile({ forage: undefined, skills: [skill('Forage', 40)], spends: NO_SPENDS }, false)
+  assert.deepEqual([level?.items.length, level?.session, level?.aas.length, level?.detail], [0, '', 1, true])
+  // The words of the tile's last line.
+  assert.equal(FORAGE_SHOW_TEXT, 'Show what you found')
+  assert.equal(FORAGE_HIDE_TEXT, 'Hide what you found')
 })
 
 test('the switch between the top few and all', () => {

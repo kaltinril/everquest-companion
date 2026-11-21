@@ -3,7 +3,7 @@
 // screen, beside Home and a workbench: a search over every craftable item, and the chosen item's
 // plan (ItemPlan.tsx).
 //
-// It is reached from Home's "Make an item" panel (`PlannerHomePanel` below) and from "Plan this
+// It is reached from Home's "Make an item" row (`PlannerHomePanel` below) and from "Plan this
 // item" on a workbench's picked recipe. The chosen item, its recipe, the count and the materials
 // marked "get it instead" are remembered across restarts, the search text for the session
 // (plannerMemory.ts), so Back from a link out (an item's Loot page, a mob, the Maps tab) returns
@@ -13,9 +13,10 @@ import { type JSX, type RefObject, useEffect, useLayoutEffect, useMemo, useRef }
 import { Box, Button, Paper, Stack, Typography } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import type { BookIndex } from '@shared/tradeskillBook'
-import { itemRecipes, pickRecipe, type PlanChoice, type PlanDeps } from '@shared/tradeskillPlan'
+import { PLAN_HOME_TIP, itemRecipes, pickRecipe, type PlanChoice, type PlanDeps } from '@shared/tradeskillPlan'
 import { withItem, type PlanMemory } from '@shared/tradeskillPlanMemory'
 import { parkReturn } from '../../lib/navReturn'
+import { Tooltip } from '../../lib/Tooltip'
 import type { BenchFacts } from './benchFacts'
 import { ItemPlan } from './ItemPlan'
 import type { OpenBench } from './ItemPlanSkills'
@@ -118,7 +119,11 @@ export interface PlannerHomePanelProps {
   onPlan: (item?: string) => void
 }
 
-/** Home's door to the planner: the search over every craftable item, and the plan left open last time. */
+/**
+ * Home's door to the planner, on ONE row: the heading (its hover says what a plan is), the search
+ * over every craftable item with how many there are, and the plan left open last time. The
+ * results of a typed search open under the row.
+ */
 export function PlannerHomePanel({ index, eraOnly, plan, onPlan }: PlannerHomePanelProps): JSX.Element {
   const guides = useGuides()
   const deps = useMemo((): PlanDeps => ({ index, guides }), [index, guides])
@@ -126,17 +131,34 @@ export function PlannerHomePanel({ index, eraOnly, plan, onPlan }: PlannerHomePa
   const search = usePlanSearchState(deps, eraOnly, query)
   const last = plan.item === null ? null : pickRecipe(itemRecipes(deps, plan.item), plan.recipe)
   return (
-    <Paper variant="outlined" sx={{ p: 1.5, mb: 1.5 }} data-testid="tradeskill-plan-home">
-      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5, mb: 0.5 }}>
-        <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-          Make an item
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Pick any craftable item: every material down to its leaves, the skills it takes, and what to gather.
-        </Typography>
+    <Paper variant="outlined" sx={{ px: 1.5, py: 1, mb: 1.5 }} data-testid="tradeskill-plan-home">
+      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
+        <Tooltip title={PLAN_HOME_TIP}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600, flexShrink: 0 }}>
+            Make an item
+          </Typography>
+        </Tooltip>
+        <PlanSearchBox query={query} onQuery={setQuery} state={search} />
+        {!search.typed && last !== null && (
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0 }} data-testid="tradeskill-plan-continue">
+            <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+              Your plan:
+            </Typography>
+            <ItemLabel name={last.item} />
+            <Button
+              size="small"
+              onClick={() => {
+                onPlan()
+              }}
+              data-testid="tradeskill-plan-open"
+              sx={{ flexShrink: 0 }}
+            >
+              Open the plan
+            </Button>
+          </Stack>
+        )}
       </Stack>
-      <PlanSearchBox query={query} onQuery={setQuery} state={search} />
-      <Box sx={{ mt: 0.5, maxHeight: '40vh', overflow: 'auto' }}>
+      <Box sx={{ mt: search.typed ? 0.5 : 0, maxHeight: '40vh', overflow: 'auto' }}>
         <PlanSearchResults
           state={search}
           eraOnly={eraOnly}
@@ -146,24 +168,6 @@ export function PlannerHomePanel({ index, eraOnly, plan, onPlan }: PlannerHomePa
           }}
         />
       </Box>
-      {!search.typed && last !== null && (
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5, minWidth: 0 }} data-testid="tradeskill-plan-continue">
-          <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
-            Your plan:
-          </Typography>
-          <ItemLabel name={last.item} />
-          <Button
-            size="small"
-            onClick={() => {
-              onPlan()
-            }}
-            data-testid="tradeskill-plan-open"
-            sx={{ flexShrink: 0 }}
-          >
-            Open the plan
-          </Button>
-        </Stack>
-      )}
     </Paper>
   )
 }

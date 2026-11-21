@@ -14,10 +14,24 @@ import { buildTradeskillBook, wikiItemName } from '../src/main/tradeskillBook'
 import { GUIDE_CREDITS } from '../src/shared/guideCredits'
 import type { TradeskillGuidesFile } from '../src/shared/guideData'
 import type { SkillRow } from '../src/shared/skills'
-import { indexBook } from '../src/shared/tradeskillBook'
+import { indexBook, tradeskillTiles } from '../src/shared/tradeskillBook'
 import { LEVELING_GUIDE_ID, RECIPE_GUIDE_ID, guidePayload, indexGuides } from '../src/shared/tradeskillGuide'
 import { indexCrafting } from '../src/shared/tradeskillHistory'
-import { HOME_SUBTITLE, lastRunText, pickUp, pickUpHeldText, pickUpWhyText, sourceParts, type PickUpAsk } from '../src/shared/tradeskillHome'
+import {
+  DOORS_LINE,
+  HOME_SUBTITLE,
+  NO_TRADESKILL_SEEN_LINE,
+  UNSEEN_HEADING,
+  doorsLine,
+  homeDoors,
+  lastRunText,
+  pickUp,
+  pickUpHeldText,
+  pickUpWhyText,
+  sourceParts,
+  unseenDoorText,
+  type PickUpAsk
+} from '../src/shared/tradeskillHome'
 import { CAP_NOTE, SPECIALIZATION_CAP, barLabel, barOfText, barTip, capTip, levelBar, skillTop } from '../src/shared/tradeskillLevelBar'
 import { haveLookup } from '../src/shared/tradeskillMaterials'
 import { bareRecipeText, madeBy, needQty } from '../src/shared/tradeskillPicked'
@@ -194,6 +208,34 @@ test('the last run states its pace only when the run is long enough to state one
 })
 
 // ---- the sources line ---------------------------------------------------------------------------
+
+test("Home's doors: a full tile for each tradeskill the log has shown, one compact row for the rest", () => {
+  const index = ownerIndex()
+  // The owner's five: the highest level first. The other seven by name, each with its wiki recipes.
+  const doors = homeDoors(tradeskillTiles(index, OWNER_ROWS))
+  assert.deepEqual(doors.seen.map((t) => [t.tradeskill, t.level]), [['Jewelcrafting', OWNER_LEVEL], ['Fishing', 127], ['Brewing', 8], ['Baking', 5], ['Alchemy', 2]])
+  assert.deepEqual(doors.unseen.map((t) => t.tradeskill), ['Blacksmithing', 'Fletching', 'Poison Making', 'Pottery', 'Spell Research', 'Tailoring', 'Tinkering'])
+  assert.equal(doors.seen.length + doors.unseen.length, TRADESKILLS.length)
+  assert.ok(doors.unseen.every((t) => t.level === null))
+  assert.equal(doorsLine(doors, true), DOORS_LINE)
+  assert.equal(UNSEEN_HEADING, 'Not in your log yet')
+  assert.equal(unseenDoorText({ tradeskill: 'Pottery', recipes: 143 }), 'Pottery · 143 recipes')
+  assert.equal(unseenDoorText({ tradeskill: 'Tinkering', recipes: 1 }), 'Tinkering · 1 recipe')
+  assert.equal(unseenDoorText({ tradeskill: 'Alchemy', recipes: 0 }), 'Alchemy · 0 recipes')
+  // A skill that is no tradeskill (Forage) makes no tile and moves none.
+  assert.deepEqual(homeDoors(tradeskillTiles(index, [...OWNER_ROWS, skill('Forage', 119)])), doors)
+})
+
+test('the log has shown no tradeskill: all twelve are in the compact row, and the line above says so', () => {
+  const doors = homeDoors(tradeskillTiles(ownerIndex(), []))
+  assert.deepEqual(doors.seen, [])
+  assert.deepEqual(doors.unseen.map((t) => t.tradeskill), [...TRADESKILLS].sort((a, b) => a.localeCompare(b)))
+  assert.equal(doorsLine(doors, true), NO_TRADESKILL_SEEN_LINE)
+  assert.match(NO_TRADESKILL_SEEN_LINE, /^Your log has not shown any tradeskill go up yet\. /)
+  // Until the engine has read the skills the line does not blame the log.
+  assert.equal(doorsLine(doors, false), DOORS_LINE)
+  for (const line of [DOORS_LINE, NO_TRADESKILL_SEEN_LINE, UNSEEN_HEADING, unseenDoorText({ tradeskill: 'Pottery', recipes: 2 })]) assert.doesNotMatch(line, EM_DASH)
+})
 
 test('the sources line names the wiki data by its date and each guide by title, author and version or copy date', () => {
   const parts = sourceParts('2026-11-20T10:12:58.967Z', [

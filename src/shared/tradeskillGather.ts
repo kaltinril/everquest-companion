@@ -196,6 +196,8 @@ export interface ForageTile {
   /** The words of the switch between the top few and all; '' when the top few are all there is. */
   toggle: string
   aas: AaLine[]
+  /** Whether a click on the tile has anything to open: this session's line, an item found, or an AA. */
+  detail: boolean
 }
 
 /**
@@ -208,16 +210,23 @@ export function forageTile(facts: ForageFacts, all: boolean): ForageTile | null 
   if (!hasForage(forage) && level === null) return null
   const rows = hasForage(forage) ? itemLines(gatheredShares(forage.items)) : []
   const more = rows.length > FORAGE_TOP
+  const session = hasForage(forage) ? forageSessionText(forage.session) : ''
+  const aas = forageAaLines({ spends: facts.spends, skills: facts.skills })
   return {
     level,
     figures: hasForage(forage) ? forageFigures(forage) : [],
-    session: hasForage(forage) ? forageSessionText(forage.session) : '',
+    session,
     items: all || !more ? rows : rows.slice(0, FORAGE_TOP),
     itemCount: rows.length,
     toggle: forageToggleText(all, rows.length),
-    aas: forageAaLines({ spends: facts.spends, skills: facts.skills })
+    aas,
+    detail: session !== '' || rows.length > 0 || aas.length > 0
   }
 }
+
+/** The tile's last line: what a click opens under it, and closes again. */
+export const FORAGE_SHOW_TEXT = 'Show what you found'
+export const FORAGE_HIDE_TEXT = 'Hide what you found'
 
 /** "Show all 19" / "Show the top 5"; '' when there are no more than the top few. */
 export function forageToggleText(all: boolean, itemCount: number): string {

@@ -13,8 +13,9 @@
  *     log, with the catch rate over the casts that had an outcome; a spilled beer is its own small
  *     count and adds no miss; the catch is listed under the standard item link; this session's
  *     line is drawn;
- *   - the Foraging tile on Home (when the mount is in) shows the Forage level, found and failed
- *     with the rate, the item found, and the Foraging AA.
+ *   - the Foraging tile on Home (when the mount is in) is a tile of the tradeskills' grid showing
+ *     the Forage level and found and failed with the rate; a click on it opens, in place, the
+ *     items found, this session's line and the Foraging AA.
  *
  * Every claim is a property of what is on screen. The AA whose purchase is appended is whichever
  * the panel lists first; no AA name or count is taken from the wiki data.
@@ -33,6 +34,7 @@ const AA = sel('tradeskill-aa')
 const AA_ITEM = sel('tradeskill-aa-item')
 const FISHING = sel('tradeskill-fishing')
 const FORAGE = sel('tradeskill-forage-tile')
+const FORAGE_DETAIL = sel('tradeskill-forage-detail')
 const DONOR = sel('planner-donor-name')
 
 function textOf(page: Page, selector: string): Promise<string> {
@@ -46,6 +48,11 @@ function textsOf(page: Page, selector: string): Promise<string[]> {
 /** The big number of one figure (`<prefix>-<id>` holds a caption and an h6). */
 function figureOf(page: Page, testid: string): Promise<string> {
   return textOf(page, `${sel(testid)} h6`)
+}
+
+/** One number of the Foraging tile's line (`data-value` on `<prefix>-<id>` holds the number alone). */
+function valueOf(page: Page, testid: string): Promise<string> {
+  return page.evaluate((s) => document.querySelector<HTMLElement>(s)?.dataset.value ?? '', sel(testid))
 }
 
 /** A workbench by its tile, from wherever the section stands. */
@@ -130,7 +137,7 @@ async function checkFishing(page: Page, log: Pick<FixtureLog, 'appendAt'>): Prom
   check("this session's fishing is drawn while the session has any", /^This session: \d+ casts?, \d+ caught, \d+ nothing/.test(session), session)
 }
 
-/** The Foraging tile on Home: level, found and failed, the item found, the Foraging AA. */
+/** The Foraging tile on Home: level, found and failed on the tile; the items found, the session and the Foraging AA behind a click. */
 async function checkForaging(page: Page, log: Pick<FixtureLog, 'appendAt'>): Promise<void> {
   const at = (seconds: number): Date => new Date(Date.now() + seconds * 1000)
   log.appendAt(at(8), 'You have scrounged up Roots.', 'You have become better at Forage! (12)')
@@ -143,17 +150,27 @@ async function checkForaging(page: Page, log: Pick<FixtureLog, 'appendAt'>): Pro
     note('Home drew no Foraging tile (the mount is not in): the Foraging step did not run')
     return
   }
-  await settle(() => figureOf(page, 'tradeskill-forage-found'), (t) => Number(t) >= 2, { timeoutMs: 30_000 })
+  await settle(() => valueOf(page, 'tradeskill-forage-found'), (t) => Number(t) >= 2, { timeoutMs: 30_000 })
+  check("the Foraging tile sits in the tradeskills' grid", (await countOf(page, `${sel('tradeskills-tiles')} > ${FORAGE}`)) === 1)
   const level = await settle(() => textOf(page, sel('tradeskill-forage-level')), (t) => t !== '', { timeoutMs: 30_000 })
   check('the Foraging tile shows the Forage level the log last stated', level === '12', level)
-  const found = Number(await figureOf(page, 'tradeskill-forage-found'))
-  const failed = Number(await figureOf(page, 'tradeskill-forage-failed'))
-  const rate = await figureOf(page, 'tradeskill-forage-rate')
+  const found = Number(await valueOf(page, 'tradeskill-forage-found'))
+  const failed = Number(await valueOf(page, 'tradeskill-forage-failed'))
+  const rate = await valueOf(page, 'tradeskill-forage-rate')
   check('…what was found and what failed', found >= 2 && failed >= 1, `${String(found)}/${String(failed)}`)
   check('…and the rate of the two', rate === `${String(Math.round((found / (found + failed)) * 100))}%`, rate)
-  const names = await textsOf(page, `${FORAGE} ${sel('tradeskill-forage-item')} ${DONOR}`)
+  // What was found is behind a click on the tile. A fresh profile has never opened it.
+  if ((await page.evaluate((s) => document.querySelector<HTMLElement>(s)?.dataset.open ?? '', FORAGE)) === 'true') {
+    note('the Foraging tile was already open when the step began: closed-by-default was not checked')
+  } else {
+    check('what was found is closed until the tile is clicked', (await countOf(page, FORAGE_DETAIL)) === 0 && (await countOf(page, sel('tradeskill-forage-item'))) === 0)
+    await page.click(`${FORAGE} button`)
+  }
+  const opened = await settle(() => countOf(page, FORAGE_DETAIL), (n) => n === 1, { timeoutMs: 10_000 })
+  check('a click on the tile opens what was found, in place', opened === 1)
+  const names = await textsOf(page, `${FORAGE_DETAIL} ${sel('tradeskill-forage-item')} ${DONOR}`)
   check('the items found are listed under the standard item link, the leading article dropped', names.includes('Roots') && names.includes('Pod of Water'), names.join(' | '))
-  check("…with this session's numbers", (await textOf(page, sel('tradeskill-forage-session'))).startsWith('This session:'))
+  check("…with this session's numbers", (await textOf(page, `${FORAGE_DETAIL} ${sel('tradeskill-forage-session')}`)).startsWith('This session:'))
   if ((await countOf(page, sel('tradeskill-forage-aa'))) === 0) {
     note('the wiki table lists no AA for foraging: the tile drew none')
   } else {

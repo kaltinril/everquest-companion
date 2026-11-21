@@ -7,8 +7,8 @@
  *
  * What it holds:
  *   - Home says what the section draws on, and every tile carries a level bar; a bar's fill is
- *     its own tile's level over the scale the tile states, and a tradeskill the log never showed
- *     has an empty bar and keeps its words;
+ *     its own tile's level over the scale the tile states; a tradeskill the log never showed is
+ *     not a tile but a small button under "Not in your log yet", with no bar and no next recipe;
  *   - "Pick up where you left off" names a tradeskill and its button opens that workbench, whose
  *     head carries the same bar;
  *   - the picked recipe has the app's wish control; a wished item is listed on Home under
@@ -59,7 +59,6 @@ interface TileBar {
   name: string
   level: string
   of: string
-  unseen: boolean
   bars: number
   fill: number
 }
@@ -72,11 +71,33 @@ function tileBars(page: Page): Promise<TileBar[]> {
         name: (card.dataset.testid ?? '').replace('tradeskill-tile-', ''),
         level: card.querySelector('[data-testid="tradeskill-tile-level"]')?.textContent ?? '',
         of: card.querySelector('[data-testid="tradeskill-bar-of"]')?.textContent ?? '',
-        unseen: card.querySelector('[data-testid="tradeskill-tile-unseen"]') !== null,
         bars: card.querySelectorAll(barSel).length,
         fill: Number(card.querySelector<HTMLElement>(barSel)?.dataset.fill ?? 'NaN')
       })),
     [TILE, BAR] as const
+  )
+}
+
+interface SmallDoor {
+  name: string
+  inRow: boolean
+  buttons: number
+  bars: number
+  next: number
+}
+
+/** The doors of tradeskills the log never showed (`data-tile="unseen"`): where each sits and what it holds. */
+function smallDoors(page: Page): Promise<SmallDoor[]> {
+  return page.evaluate(
+    ([doorSel, barSel]) =>
+      [...document.querySelectorAll<HTMLElement>(doorSel)].map((door) => ({
+        name: (door.dataset.testid ?? '').replace('tradeskill-tile-', ''),
+        inRow: door.closest('[data-testid="tradeskills-unseen"]') !== null,
+        buttons: door.querySelectorAll('button').length,
+        bars: door.querySelectorAll(barSel).length,
+        next: door.querySelectorAll('[data-testid="tradeskill-tile-next"]').length
+      })),
+    ['[data-testid^="tradeskill-tile-"][data-tile="unseen"]', BAR] as const
   )
 }
 
@@ -98,8 +119,14 @@ async function checkHome(page: Page): Promise<void> {
   check('a tile with a level states its scale', scaled.length > 0, `${String(scaled.length)} of ${String(tiles.length)}`)
   const off = scaled.filter((t) => Math.abs(t.fill - Math.min(1, Number(t.level) / Number(t.of.slice(3)))) > 0.002)
   check("…and its bar is filled to that level's share of it", off.length === 0, off.map((t) => `${t.name} ${t.level} ${t.of} ${String(t.fill)}`).join(' | '))
-  const unseen = tiles.filter((t) => t.unseen)
-  check('a tradeskill the log never showed has an empty bar and keeps its words', unseen.every((t) => t.fill === 0 && t.level === ''), unseen.map((t) => t.name).join(', '))
+  check('a full tile is drawn only for a tradeskill the log has shown', tiles.every((t) => t.level !== ''), tiles.filter((t) => t.level === '').map((t) => t.name).join(', '))
+  const small = await smallDoors(page)
+  if (small.length === 0) note('the log has shown every tradeskill: the "Not in your log yet" row is not drawn and was not checked')
+  else {
+    const odd = small.filter((d) => !d.inRow || d.buttons !== 1 || d.bars !== 0 || d.next !== 0)
+    check('a tradeskill the log never showed is one small button under "Not in your log yet", with no bar and no next recipe', odd.length === 0, odd.map((d) => d.name).join(', '))
+    check('…under that heading', (await textOf(page, sel('tradeskills-unseen-heading'))) === 'Not in your log yet')
+  }
   const sources = await textOf(page, sel('tradeskills-sources'))
   check('the foot of Home names the sources', sources.startsWith('Sources:') && /wiki data/i.test(sources) && /your own log/i.test(sources), sources)
   check('…as words: no link on Home leaves for another host', (await foreignLinks(page, HOME)).length === 0)
