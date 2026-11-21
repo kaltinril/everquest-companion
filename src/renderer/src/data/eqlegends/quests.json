@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-20T10:12:58.967Z",
+  "scrapedAt": "2026-11-21T07:52:34.249Z",
   "source": "eqlwiki.com — Category:Quests + quest subcategories + recentchanges delta (scripts/scrape-delta.mts)",
   "quests": [
     {
@@ -31080,6 +31080,9 @@
         },
         {
           "name": "Bronze Dagger"
+        },
+        {
+          "name": "Fishing Spear"
         }
       ],
       "requiredItems": [
