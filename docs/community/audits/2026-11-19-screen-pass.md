@@ -461,7 +461,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   needed: 1. In tests/combatPetGroups.test.mts (or a new petRows test next to
   tests/meterScope.test.mts), build SourceViews self {kind 'you', total 4400, dps 43, ownSec 102}
   and pet {kind 'pet', total ...
-- CONFIRMED [medium, cut-off] At 125% text in the default window the DPS card shows 86 px of its
+- FIXED 2026-11-20 (the readout half: `lib/ChartTooltip.tsx` draws its card in a portal on body, fixed to the window; e2e `tooltipClipSteps.mts`) [medium, cut-off] At 125% text in the default window the DPS card shows 86 px of its
   192: the legend is below the card's own fold and the hover readout is cut off Seen: Dashboard
   region y 161..440 (279 px) between the header and the fixed log (y 493..661). Four panels
   374x133.3. DPS card body: scrollHeight 192, clientHeight 86 (y 198.1..283.9, overflow auto); plot

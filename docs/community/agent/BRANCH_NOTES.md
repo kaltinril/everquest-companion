@@ -3220,3 +3220,16 @@ what a later change must know. Each fix has a unit test that failed before it.
   `useProgress` exposes `lootReady` beside `turnInsReady`.
 - Not changed: at launch the overlay first draws the last session's stored payload until the feed
   writes.
+
+## Chart readout: drawn on body (2026-11-20)
+
+- `lib/ChartTooltip.tsx` draws its card with `createPortal` on `document.body`, `position: fixed`,
+  z-index 1500. A zero-size anchor span stays in the hover layer; a caller's `x`/`y` are still px
+  from the layer's positioned ancestor. The card flips at the WINDOW's edge
+  (`lib/chartTooltipPlace.ts place`), so the `bounds` prop is gone.
+- Why: drawn inside the chart it was cut off by a scrolling ancestor (the dashboard's DPS card at
+  125% text). Do not move it back inside a chart; `tests/e2e/tooltipClipSteps.mts` checks its
+  parent is body and that nothing clips it.
+- TRAP for e2e steps: a NAMED helper (an arrow assigned to a const) inside `page.evaluate` fails in
+  the page with `__name is not defined` (the test loader wraps it). Return plain data from the
+  page and judge it in the test.
