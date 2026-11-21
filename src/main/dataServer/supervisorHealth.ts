@@ -258,14 +258,11 @@ class HealthWatch implements LaunchHealthWatch {
     // A launch that never answered has proved nothing, and a reason a serving engine cannot
     // produce (a refusal, a protocol mismatch) is not a stall.
     if (this.first || !reasons.every(isTransientHealthFailure)) return false
-    const heard = this.deps.engineHeardAt?.() ?? null
-    const now = this.deps.now?.()
-    if (heard === null || now === undefined) return false
-    const age = now - heard
-    if (age > this.heardFreshMs) return false
-    if (this.forgivenStamp !== null && heard <= this.forgivenStamp) return false
+    const heard = this.freshEvidence()
+    if (heard === null) return false
     const live = this.deps.engineIsLive?.() ?? true
     if (live && this.forgivenRun >= ENGINE_FORGIVE_MAX_LIVE) return false
+    const age = (this.deps.now?.() ?? heard) - heard
     this.forgivenStamp = heard
     this.forgivenRun += 1
     this.deps.debug(
@@ -273,6 +270,15 @@ class HealthWatch implements LaunchHealthWatch {
         `${String(Math.max(0, age))} ms ago on its own connection; not ended (${String(this.forgivenRun)} in a row)`
     )
     return true
+  }
+
+  /** When the app last heard the engine, if that is recent and not the evidence already used. */
+  private freshEvidence(): number | null {
+    const heard = this.deps.engineHeardAt?.() ?? null
+    const now = this.deps.now?.()
+    if (heard === null || now === undefined) return null
+    if (now - heard > this.heardFreshMs) return null
+    return this.forgivenStamp !== null && heard <= this.forgivenStamp ? null : heard
   }
 
   /**
