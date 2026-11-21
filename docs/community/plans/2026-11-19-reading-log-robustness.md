@@ -64,7 +64,7 @@ structured-clone size per window, and merged archive history over IPC (experimen
 | R2 | One status, pushed to every window, with a Try line and a Try again action | typescript | L | R1 | built 2026-11-19 |
 | R3 | Tabs, overlays, the title-bar dot and the no-logs screen follow the status | typescript | L | R2 | built 2026-11-19 |
 | R4 | The read recovers by itself when a fact changes | typescript | L | R1, R2 | built 2026-11-19 |
-| R5 | The engine process: no blind kill, no blind relaunch loop, right words for why it will not start | typescript | M | R2, R4 | planned |
+| R5 | The engine process: no blind kill, no blind relaunch loop, right words for why it will not start | typescript | M | R2, R4 | step 1 built 2026-11-20 (no blind kill); steps 2 to 7 wait for a user report (owner: "lets no go wild, lets let the user respond") |
 | R6 | The log is there but nothing is being written, or the game runs from another folder | typescript | M | R2, R3, R4 | planned |
 | R7 | The engine phase (Rust), built in its own worktree and target directory | both | M | R1, R4 | planned |
 
@@ -1753,6 +1753,24 @@ attached; 10. The PC sleeps or hibernates during the read, or for hours while li
    Try line says the app looks again by itself.
 7. Words: BRANCH_NOTES ('relaunched forever with no card' is done; the forgiveness rule; the cap)
    and requirements/fix-combat-reading-log.md.
+
+### Built 2026-11-20: step 1 only
+
+The owner, asked about R5 to R7: "you can do further log protection and error checking sure, but
+lets no go wild, lets let the user respond". So the one measured harm was fixed and the rest waits.
+
+- Built as written above, with these differences: the stamp comes from the progress frames, the
+  module-changed frames and the health answers on the app's own connection (`noteEngineHeard`,
+  and `noteLogReadHealth` stamps too); the supervisor's own probe answer is not a stamp (it is the
+  instrument being doubted); a new launch clears the stamp; "live" is the app's last health answer
+  (`engineSaidLive`), and unknown counts as live, the stricter side.
+- Not built from step 1: the extra ask on the app's own connection after go-live on a quiet log
+  ("What it means for this plan"). After go-live with no frame in 20 s, two failed probes still
+  end the engine, as before.
+- Not built: the death cap (step 2) and everything after it. An engine that really dies on one log
+  is still started again and reads from the top with no card. Land step 2 only after step 1 has
+  been out, as the measurements said, and when a user reports it.
+- Tests: `tests/dataServerSupervisorHeard.test.mts` (12).
 
 ### What the player reads
 

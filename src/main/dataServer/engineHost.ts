@@ -113,7 +113,7 @@ import {
   noteEngineRetrying,
   noteEngineStarting
 } from './engineLaunchState'
-import { noteEngineSaid, noteLogReadTouched } from './logReadState'
+import { engineHeardAt, engineSaidLive, noteEngineSaid, noteLogReadTouched } from './logReadState'
 import { scrubFault } from '../../shared/logReadReport'
 import { getActiveCharacter } from '../session'
 
@@ -531,6 +531,10 @@ export function startEngineSupervisor(): void {
     // Every answer to the 30 s probe: the only look at the engine's status once the read is live
     // (fork #9, `afterLive.ts`).
     onHealth: noteSupervisorHealth,
+    // PROOF OF LIFE (supervisorHealth.ts): a probe on a new connection can time out on a busy
+    // engine that is answering the app's own connection, so the watchdog is given that witness.
+    engineHeardAt,
+    engineIsLive: engineSaidLive,
     // THE DIAGNOSIS, WHEN IT HAS STOPPED CHANGING (JOS-503). Fires twice at most in a session and
     // is what puts the failure card on screen; `null` is a launch that reached READY and takes it
     // back off. The candidate paths are grafted on inside `noteEngineFault` from the list above.

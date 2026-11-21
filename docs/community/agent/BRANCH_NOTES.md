@@ -1575,6 +1575,24 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
   a tab and no healthy-launch text changed. An overlay title during the first 15 s of a read is now
   'Reading log' with no number; no e2e spec was found asserting the number.
 
+## Reading log: a failed probe does not end an engine the app just heard (phase R5 step 1, 2026-11-20)
+
+- `supervisorHealth.ts` `forgiven()`: before `onUnhealthy`, a verdict made only of transient
+  reasons is set aside when the app's own connection heard the engine inside
+  `ENGINE_HEARD_FRESH_MS` (20 s), the stamp is newer than the one used last time, and the launch
+  has answered once. Once the log is live, at most `ENGINE_FORGIVE_MAX_LIVE` (6) beats in a row;
+  while it is being read, no cap. An answered probe resets the run.
+- The stamp is `logReadState.ts` `noteEngineHeard` / `engineHeardAt`, written by the progress and
+  module-changed listeners (`engineClientWiring.ts`) and by `noteLogReadHealth`; a new launch
+  clears it (`noteLogReadConnection`). `engineHost.ts` passes `engineHeardAt` and `engineIsLive`
+  as optional supervisor deps; without them the watch is the two-strike rule alone.
+- Why: a probe opens a new connection each time; a starved engine took 4.8 to 4.9 s of the 5.0 s
+  limit to answer one while answering the app's connection in milliseconds, and was ended four
+  times in ten minutes mid-read (plan, "Measured").
+- NOT built (owner, 2026-11-20: "lets no go wild, lets let the user respond"): the death cap, the
+  restart count under the bar, the longer announce wait, the local-connection words. An engine
+  that really dies on one log is still relaunched forever with no card.
+
 ## Reading log: the read starts again by itself, with caps (phase R4, plans/2026-11-19-reading-log-robustness.md)
 
 - The 2026-11-19 default (nothing retries a read by itself) is replaced, on the default taken for
