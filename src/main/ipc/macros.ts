@@ -144,7 +144,15 @@ async function gameFiles(): Promise<GameMacroFiles> {
   return { gameFolder: folder, files }
 }
 
-const gameFileDeps: GameFileDeps = { isGameRunning: () => isGameRunningNow(), now: () => new Date() }
+/** The clock and the "is the game running" scan for one game folder. Why it could not tell is logged. */
+function gameFileDeps(folder: string): GameFileDeps {
+  const isGameRunning = (): Promise<boolean> =>
+    isGameRunningNow(folder).catch((err: unknown) => {
+      logWarn('[macros] could not tell whether the game is running', err)
+      throw err
+    })
+  return { isGameRunning, now: () => new Date() }
+}
 
 /** A file name as the log shows it: it came from the renderer, so it is cut short and quoted. */
 function shown(file: unknown): string {
@@ -178,14 +186,14 @@ function sendToGame(file: unknown, macros: unknown, expect: unknown): Promise<Ga
   return gameWrite('send to', file, (folder) => {
     const read = readGameMacros(macros)
     if (typeof file !== 'string' || typeof expect !== 'string' || read === null) return null
-    return sendSet({ folder, file, macros: read, expect }, gameFileDeps)
+    return sendSet({ folder, file, macros: read, expect }, gameFileDeps(folder))
   })
 }
 
 function restoreInGame(file: unknown, which: unknown): Promise<GameWriteResult> {
   return gameWrite(which === 'original' ? 'restore the original of' : 'restore the last copy of', file, (folder) => {
     if (typeof file !== 'string' || (which !== 'original' && which !== 'last')) return null
-    return restoreBackup({ folder, file, which }, gameFileDeps)
+    return restoreBackup({ folder, file, which }, gameFileDeps(folder))
   })
 }
 

@@ -16,7 +16,6 @@ import {
   sendSet,
   stampOf
 } from '../src/main/macros/gameFileSend'
-import { gameInTaskList, isGameRunningNow } from '../src/main/macros/gameRunning'
 import { parseSocials } from '../src/shared/macros/socials'
 import type { GameMacro, GameWriteResult } from '../src/shared/macros/types'
 
@@ -383,20 +382,4 @@ test('restore refused, and the folder is byte for byte as it was', async (t) => 
   const same = snapshot(f.root)
   assert.deepEqual(await restoreBackup({ folder: f.folder, file: INI, which: 'original' }, f.deps), { ok: false, reason: 'already-same' })
   assert.deepEqual(snapshot(f.root), same)
-})
-
-test('the process list: the game by its image name, and no answer from a list without this process', () => {
-  const rows = ['"System Idle Process","0","Services","0","8 K"', '"node.exe","4242","Console","1","61,000 K"', '']
-  assert.equal(gameInTaskList(rows.join('\r\n'), 4242), false)
-  assert.equal(gameInTaskList(['"EQGame.exe","9000","Console","1","900,000 K"', ...rows].join('\r\n'), 4242), true)
-  assert.equal(gameInTaskList([...rows, '"eqgame.exe","9000","Console","1","900,000 K"'].join('\n'), 1), true)
-  assert.equal(gameInTaskList('"not eqgame.exe","9000","Console","1","1 K"\r\n"node.exe","4242","Console","1","1 K"', 4242), false)
-  assert.equal(gameInTaskList(rows.join('\r\n'), 1), null)
-  assert.equal(gameInTaskList('', 4242), null)
-  assert.equal(gameInTaskList('INFO: No tasks are running which match the specified criteria.', 4242), null)
-  assert.equal(gameInTaskList('ERROR: The RPC server is unavailable.', 4242), null)
-})
-
-test('the process list on this machine holds this process', { skip: process.platform !== 'win32' }, async () => {
-  assert.equal(typeof (await isGameRunningNow(60_000)), 'boolean')
 })

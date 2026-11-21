@@ -45,7 +45,7 @@ const REFUSALS: Record<Exclude<GameWriteRefusal, Worded>, string> = {
 function refusalText(action: Action, result: GameWriteRefused): string {
   const { reason } = result
   if (reason === 'unsavable') return `${result.problems?.at(0)?.text ?? 'A macro cannot be written as it is.'} ${UNCHANGED}`
-  if (reason === 'game-running') return `The game is running. Close it, then ${action} again.`
+  if (reason === 'game-running') return `The game or its launcher is running. Close it, then ${action} again.`
   if (reason !== 'verify-failed') return REFUSALS[reason]
   if (result.putBack === true) return 'The new file did not read back right. The file was put back as it was.'
   return `The new file did not read back right and could not be put back. The good copy is ${result.backup ?? 'beside it'}.`
