@@ -5,6 +5,7 @@
 import { type JSX, useState } from 'react'
 import { Button, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material'
 import { type GridButton, type PageTab, alsoOn, moveSlot, ownCopyAt, placeNewMacro } from '@shared/macros/buttons'
+import { hotbarText, hotbarsAfter } from '@shared/macros/hotbars'
 import { findMacro } from '@shared/macros/library'
 import { BUTTONS_PER_PAGE } from '@shared/macros/limits'
 import { assignSlot } from '@shared/macros/sets'
@@ -26,19 +27,22 @@ interface Picked {
 }
 
 interface MoveProps extends Picked {
+  /** The character's game file: which of its buttons a hotbar uses. */
+  file: CharacterFileMacros
   pages: PageTab[]
   onMoved: (page: number, slot: string) => void
   onCancel: () => void
 }
 
 /** "Move to...": the page and button to move the macro to, for a move without the mouse. */
-function MoveForm({ store, set, cell, page, pages, onMoved, onCancel }: MoveProps): JSX.Element {
+function MoveForm({ store, file, set, cell, page, pages, onMoved, onCancel }: MoveProps): JSX.Element {
   const [toPage, setToPage] = useState(page)
   const [toButton, setToButton] = useState(cell.button)
   const target = slotKey(toPage, toButton)
   const here = target === cell.slot
   const holder = findMacro(store.library, target in set.slots ? set.slots[target] : null)
   const buttons = Array.from({ length: Math.max(BUTTONS_PER_PAGE, cell.button) }, (_, i) => i + 1)
+  const onHotbar = here ? null : hotbarText(hotbarsAfter(moveSlot(store.library, set.id, cell.slot, target), set.id, file, [cell.slot, target]))
   const move = (): void => {
     store.change((current) => moveSlot(current, set.id, cell.slot, target))
     onMoved(toPage, target)
@@ -86,6 +90,11 @@ function MoveForm({ store, set, cell, page, pages, onMoved, onCancel }: MoveProp
         Cancel
       </Button>
       {holder !== null && !here && <Quiet testid="macro-move-swap">{holder.name === '' ? 'A macro' : holder.name} is there: the two swap.</Quiet>}
+      {onHotbar !== null && (
+        <Typography variant="body2" color="warning.main" data-testid="macro-move-hotbar">
+          {onHotbar}
+        </Typography>
+      )}
     </Stack>
   )
 }
@@ -114,6 +123,7 @@ function AlsoOn({ store, set, cell, macro }: Picked & { macro: Macro }): JSX.Ele
 }
 
 interface FilledProps extends Picked {
+  file: CharacterFileMacros
   files: readonly CharacterFileMacros[]
   macro: Macro
   pages: PageTab[]
@@ -122,7 +132,7 @@ interface FilledProps extends Picked {
 }
 
 /** A filled button: its macro's editor, under what can be done with the macro on this button. */
-function FilledPane({ store, files, set, cell, page, macro, pages, focusName, onGo }: FilledProps): JSX.Element {
+function FilledPane({ store, file, files, set, cell, page, macro, pages, focusName, onGo }: FilledProps): JSX.Element {
   const ui = useMacroUi()
   const [mode, setMode] = useState<'edit' | 'replace' | 'move'>('edit')
   const where = `page ${String(page)}, button ${String(cell.button)}`
@@ -196,7 +206,7 @@ function FilledPane({ store, files, set, cell, page, macro, pages, focusName, on
           Copy as text
         </Button>
       </Stack>
-      {mode === 'move' && <MoveForm store={store} set={set} cell={cell} page={page} pages={pages} onMoved={onGo} onCancel={edit} />}
+      {mode === 'move' && <MoveForm store={store} file={file} set={set} cell={cell} page={page} pages={pages} onMoved={onGo} onCancel={edit} />}
       <AlsoOn store={store} set={set} cell={cell} page={page} macro={macro} />
     </Stack>
   )
@@ -238,6 +248,8 @@ function EmptyPane({ store, files, set, cell, page, onFresh }: Picked & { files:
 
 interface PanelProps {
   store: MacroStore
+  /** The character's game file. */
+  file: CharacterFileMacros
   /** Every character file of the game folder: where the pick list says a macro sits. */
   files: readonly CharacterFileMacros[]
   set: MacroSet
@@ -254,13 +266,13 @@ interface PanelProps {
   onGo: (page: number, slot: string) => void
 }
 
-export function ButtonPanel({ store, files, set, cell, page, pages, hint, fresh, onFresh, onGo }: PanelProps): JSX.Element {
+export function ButtonPanel({ store, file, files, set, cell, page, pages, hint, fresh, onFresh, onGo }: PanelProps): JSX.Element {
   let body: JSX.Element
   if (cell === null) body = <Quiet testid="macro-panel-hint">{hint}</Quiet>
   else if (cell.macro === null) body = <EmptyPane key={cell.slot} store={store} files={files} set={set} cell={cell} page={page} onFresh={onFresh} />
   else {
     body = (
-      <FilledPane key={cell.slot} store={store} files={files} set={set} cell={cell} page={page} macro={cell.macro} pages={pages} focusName={cell.macro.id === fresh} onGo={onGo} />
+      <FilledPane key={cell.slot} store={store} file={file} files={files} set={set} cell={cell} page={page} macro={cell.macro} pages={pages} focusName={cell.macro.id === fresh} onGo={onGo} />
     )
   }
   return (

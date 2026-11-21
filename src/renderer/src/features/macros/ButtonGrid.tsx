@@ -4,9 +4,12 @@
 import { type DragEvent, type JSX, useRef, useState } from 'react'
 import { Box, Button, Chip, Stack, type SxProps, type Theme, Typography } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import BoltIcon from '@mui/icons-material/Bolt'
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
 import type { GridButton } from '@shared/macros/buttons'
 import { firstLine } from '@shared/macros/library'
+import type { HotbarSlots } from '@shared/macros/types'
+import { Tooltip } from '../../lib/Tooltip'
 import { ColorMark } from './MacroColor'
 import { MARK_COLOR, MONO_SX } from './macroParts'
 
@@ -21,6 +24,8 @@ interface CellProps {
   clash: boolean
   /** While selecting: whether this button is selected. Null when not selecting. */
   check: boolean | null
+  /** A hotbar button of the game points at this one. */
+  onBar: boolean
   onPick: () => void
   drag: DragHandlers
 }
@@ -66,10 +71,11 @@ function CellBody({ cell }: { cell: GridButton }): JSX.Element {
   )
 }
 
-function cellLabel(cell: GridButton, clash: boolean): string {
+function cellLabel(cell: GridButton, clash: boolean, onBar: boolean): string {
   const what = cell.macro === null ? 'empty' : cell.macro.name
   const base = cell.mark === null ? `Button ${String(cell.button)}: ${what}` : `Button ${String(cell.button)}: ${what}, ${cell.mark}`
-  return clash ? `${base}, changed in game too` : base
+  const marked = clash ? `${base}, changed in game too` : base
+  return onBar ? `${marked}, on a hotbar` : marked
 }
 
 /** The check mark a filled button carries while buttons are being selected. */
@@ -77,8 +83,19 @@ function CellCheck({ check }: { check: boolean }): JSX.Element {
   return check ? <CheckCircleIcon fontSize="small" color="primary" data-testid="macro-slot-check" /> : <RadioButtonUncheckedIcon fontSize="small" color="disabled" />
 }
 
-/** A button's top row: its number, its mark against the game, and its check mark while selecting. */
-function CellTop({ cell, check }: { cell: GridButton; check: boolean | null }): JSX.Element {
+/** The mark on a button a hotbar uses. The button's children ignore the mouse; this one takes it for its tooltip. */
+function HotbarMark(): JSX.Element {
+  return (
+    <Tooltip title="A hotbar button fires whatever macro sits on this button.">
+      <Box component="span" data-testid="macro-slot-hotbar" sx={{ display: 'inline-flex', pointerEvents: 'auto' }}>
+        <BoltIcon sx={{ fontSize: 16 }} color="action" />
+      </Box>
+    </Tooltip>
+  )
+}
+
+/** A button's top row: its number, its marks against the game and the hotbars, and its check mark while selecting. */
+function CellTop({ cell, check, onBar }: { cell: GridButton; check: boolean | null; onBar: boolean }): JSX.Element {
   const { mark } = cell
   return (
     <Stack direction="row" spacing={0.5} alignItems="center" justifyContent="space-between" sx={{ minHeight: 24 }}>
@@ -86,6 +103,7 @@ function CellTop({ cell, check }: { cell: GridButton; check: boolean | null }): 
         {cell.button}
       </Typography>
       <Stack direction="row" spacing={0.5} alignItems="center">
+        {onBar && <HotbarMark />}
         {mark !== null && <Chip size="small" variant="outlined" color={MARK_COLOR[mark]} label={mark} data-testid="macro-slot-mark" sx={{ height: 20 }} />}
         {check !== null && cell.macro !== null && <CellCheck check={check} />}
       </Stack>
@@ -111,7 +129,7 @@ function cellSx(filled: boolean, strong: boolean, lifted: boolean, target: boole
   }
 }
 
-function Cell({ cell, picked, lifted, target, clash, check, onPick, drag }: CellProps): JSX.Element {
+function Cell({ cell, picked, lifted, target, clash, check, onBar, onPick, drag }: CellProps): JSX.Element {
   const { slot, mark } = cell
   const filled = cell.macro !== null
   const strong = picked || target || check === true
@@ -121,7 +139,7 @@ function Cell({ cell, picked, lifted, target, clash, check, onPick, drag }: Cell
       color={picked || check === true ? 'primary' : 'inherit'}
       disabled={check !== null && !filled}
       onClick={onPick}
-      aria-label={cellLabel(cell, clash)}
+      aria-label={cellLabel(cell, clash, onBar)}
       aria-pressed={check ?? picked}
       data-testid="macro-slot"
       data-mark={mark ?? 'same'}
@@ -141,7 +159,7 @@ function Cell({ cell, picked, lifted, target, clash, check, onPick, drag }: Cell
       onDragEnd={drag.end}
       sx={cellSx(filled, strong, lifted, target)}
     >
-      <CellTop cell={cell} check={check} />
+      <CellTop cell={cell} check={check} onBar={onBar} />
       <CellBody cell={cell} />
       {clash && (
         <Typography variant="caption" color="warning.main" noWrap component="div" data-testid="macro-slot-clash">
@@ -159,12 +177,14 @@ interface GridProps {
   clashes: readonly string[]
   /** The selected slots while selecting; null when not selecting. */
   checked: readonly string[] | null
+  /** The buttons the game's hotbars point at. */
+  hotbars: HotbarSlots
   onPick: (slot: string) => void
   /** A filled button was dropped on another button of the page. */
   onMove: (from: string, to: string) => void
 }
 
-export function ButtonGrid({ buttons, selected, clashes, checked, onPick, onMove }: GridProps): JSX.Element {
+export function ButtonGrid({ buttons, selected, clashes, checked, hotbars, onPick, onMove }: GridProps): JSX.Element {
   // The slot being dragged is read by the drop handlers at once, so it is a ref; the two states
   // only draw it.
   const from = useRef<string | null>(null)
@@ -213,6 +233,7 @@ export function ButtonGrid({ buttons, selected, clashes, checked, onPick, onMove
           target={cell.slot === over}
           clash={clashes.includes(cell.slot)}
           check={checked === null ? null : checked.includes(cell.slot)}
+          onBar={cell.slot in hotbars}
           drag={drag}
           onPick={() => {
             onPick(cell.slot)

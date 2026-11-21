@@ -4,6 +4,8 @@
 import { type JSX, useCallback, useState } from 'react'
 import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, List, ListItemButton, ListItemText, ListSubheader, Paper, Stack, TextField, Typography } from '@mui/material'
 import { countWithTag, filledOnPageSlots, groupTargets, macroIdsOnSlots, placeGroup, planGroup, planText, tagMacros, usedText } from '@shared/macros/groups'
+import { groupMoveHotbarText } from '@shared/macros/hotbars'
+import { type PlacePlan } from '@shared/macros/groups'
 import { findSet } from '@shared/macros/sets'
 import { characterFileKey } from '@shared/macros/socials'
 import { normalizeTag, tagList } from '@shared/macros/tags'
@@ -97,6 +99,27 @@ interface PickedTarget {
   name: string
 }
 
+/** What the dialog says about the picked loadout, and what a Move does to this character's hotbars. */
+function PlaceResult({ plan, onHotbar, testid }: { plan: PlacePlan | null; onHotbar: string | null; testid: string }): JSX.Element | null {
+  if (plan === null) return null
+  return (
+    <>
+      <Typography variant="body2" color={plan.left > 0 ? 'warning.main' : 'text.primary'} data-testid={`${testid}-plan`}>
+        {planText(plan)}
+      </Typography>
+      {onHotbar !== null && (
+        <Typography variant="body2" color="warning.main" data-testid={`${testid}-hotbar`}>
+          {onHotbar}
+        </Typography>
+      )}
+    </>
+  )
+}
+
+function placeLabel(verb: string, plan: PlacePlan | null): string {
+  return plan !== null && plan.left > 0 ? `${verb} the ${String(plan.landing.length)} that fit` : verb
+}
+
 /** "Copy to..." and "Move to...": pick a loadout, read what would happen, then do it. */
 function PlaceDialog({ store, file, files, set, selected, move, onDone, onClose }: PlaceProps): JSX.Element {
   const ui = useMacroUi()
@@ -107,6 +130,7 @@ function PlaceDialog({ store, file, files, set, selected, move, onDone, onClose 
   const target = findSet(store.library, picked?.setId ?? null)
   const plan = target === null ? null : planGroup(store.library, set, selected, target)
   const fits = plan?.landing.length ?? 0
+  const onHotbar = groupMoveHotbarText(store.library, { fromSetId: set.id, slots: selected, toSetId: target?.id ?? '', move }, file)
   const confirm = (): void => {
     if (target === null || picked === null) return
     store.change((current) => placeGroup(current, { fromSetId: set.id, slots: selected, toSetId: target.id, move }))
@@ -146,11 +170,7 @@ function PlaceDialog({ store, file, files, set, selected, move, onDone, onClose 
               </li>
             ))}
           </List>
-          {plan !== null && (
-            <Typography variant="body2" color={plan.left > 0 ? 'warning.main' : 'text.primary'} data-testid={`${testid}-plan`}>
-              {planText(plan)}
-            </Typography>
-          )}
+          <PlaceResult plan={plan} onHotbar={onHotbar} testid={testid} />
         </Stack>
       </DialogContent>
       <DialogActions>
@@ -158,7 +178,7 @@ function PlaceDialog({ store, file, files, set, selected, move, onDone, onClose 
           Cancel
         </Button>
         <Button variant="contained" disabled={fits === 0} onClick={confirm} data-testid={`${testid}-confirm`}>
-          {plan !== null && plan.left > 0 ? `${verb} the ${String(fits)} that fit` : verb}
+          {placeLabel(verb, plan)}
         </Button>
       </DialogActions>
     </Dialog>

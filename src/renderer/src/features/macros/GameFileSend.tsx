@@ -6,6 +6,7 @@ import { type JSX, type ReactNode, useState } from 'react'
 import { Alert, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Stack, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material'
 import type { BackupCopy } from '@shared/macros/backups'
 import { type GameChanges, changesText, markOf } from '@shared/macros/buttons'
+import { type HotbarEffect, hotbarEffects, hotbarText } from '@shared/macros/hotbars'
 import type { SlotDiff } from '@shared/macros/sets'
 import type { CharacterFileMacros } from '@shared/macros/types'
 import { unsavable } from '@shared/macros/unsavable'
@@ -74,7 +75,7 @@ function Outcome({ writer }: { writer: GameWriter }): JSX.Element | null {
 }
 
 /** Every button a send would change: where, what the game has, what it gets. */
-function ReviewTable({ changed, clashes }: { changed: SlotDiff[]; clashes: readonly string[] }): JSX.Element {
+function ReviewTable({ changed, clashes, onBars }: { changed: SlotDiff[]; clashes: readonly string[]; onBars: readonly HotbarEffect[] }): JSX.Element {
   return (
     <Box sx={{ maxHeight: 260, overflow: 'auto' }}>
       <Table size="small" data-testid="macro-diff">
@@ -82,6 +83,7 @@ function ReviewTable({ changed, clashes }: { changed: SlotDiff[]; clashes: reado
           {changed.map((d) => {
             const mark = markOf(d.kind)
             const clash = clashes.includes(`${String(d.page)}:${String(d.button)}`)
+            const onBar = onBars.some((e) => e.page === d.page && e.button === d.button)
             return (
               <TableRow key={`${String(d.page)}:${String(d.button)}`} data-testid="macro-diff-row">
                 <TableCell sx={{ whiteSpace: 'nowrap' }}>
@@ -92,6 +94,11 @@ function ReviewTable({ changed, clashes }: { changed: SlotDiff[]; clashes: reado
                   {clash && (
                     <Typography variant="caption" color="warning.main" component="div" data-testid="macro-diff-clash">
                       Changed in game too{d.file === null ? '' : `: the game has ${d.file.name}`}
+                    </Typography>
+                  )}
+                  {onBar && (
+                    <Typography variant="caption" color="warning.main" component="div" data-testid="macro-diff-hotbar">
+                      On a hotbar
                     </Typography>
                   )}
                 </TableCell>
@@ -119,6 +126,8 @@ function SendToGame({ file, changes, clashes, writer }: SendProps): JSX.Element 
   const [asking, setAsking] = useState(false)
   const blocked = unsavable(changes.macros).at(0) ?? null
   const { counts } = changes
+  const onBars = hotbarEffects(changes, file.hotbars)
+  const onHotbar = hotbarText(onBars)
   const button = (
     <Button
       size="small"
@@ -162,11 +171,16 @@ function SendToGame({ file, changes, clashes, writer }: SendProps): JSX.Element 
         <Typography variant="body2" sx={MONO_SX}>
           {file.file}
         </Typography>
-        <ReviewTable changed={changes.changed} clashes={clashes} />
+        <ReviewTable changed={changes.changed} clashes={clashes} onBars={onBars} />
         <Line>
           {counts.added} new, {counts.changed} changed, {counts.removed} removed.
         </Line>
         {clashes.length > 0 && <Line>Send replaces the game&apos;s version of buttons changed in game too.</Line>}
+        {onHotbar !== null && (
+          <Alert severity="warning" data-testid="macro-send-hotbars">
+            {onHotbar}
+          </Alert>
+        )}
         <Line>Only the macros in this file change.</Line>
         <Line>The game must be closed.</Line>
         <Line>A copy of the current file is kept beside it.</Line>

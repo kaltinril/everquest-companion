@@ -17,6 +17,7 @@ import { dirname, join } from 'node:path'
 import { IPC } from '../../shared/ipc'
 import { type FileBackups, listedBackups } from '../../shared/macros/backups'
 import { readLibrary } from '../../shared/macros/document'
+import { parseHotbarSlots } from '../../shared/macros/hotbars'
 import { emptyLibrary } from '../../shared/macros/library'
 import { parseSocials, pickCharacterFiles } from '../../shared/macros/socials'
 import type { CharacterFile, CharacterFileMacros, GameMacroFiles, GameWriteResult, MacroLibrary } from '../../shared/macros/types'
@@ -112,8 +113,9 @@ async function readCharacterFile(folder: string, file: CharacterFile, names: rea
   const path = join(folder, file.file)
   try {
     const [bytes, info] = await Promise.all([readFile(path), stat(path)])
-    const macros = parseSocials(bytes.toString('latin1'))
-    return { ...file, macros, mtimeMs: info.mtimeMs, stamp: stampOf(bytes), backups: listedBackups(file.file, names) }
+    const text = bytes.toString('latin1')
+    const macros = parseSocials(text)
+    return { ...file, macros, hotbars: parseHotbarSlots(text), mtimeMs: info.mtimeMs, stamp: stampOf(bytes), backups: listedBackups(file.file, names) }
   } catch {
     return null
   }

@@ -184,7 +184,7 @@ function CharacterDetail({ store, game, file, files, set, spot, onSpot, placing,
             </Alert>
           )}
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 1fr) minmax(340px, 440px)' }, gap: 2, alignItems: 'start' }}>
-            <ButtonGrid buttons={cells} selected={spot.slot} clashes={clashes} checked={selection.on ? selected : null} onPick={pick} onMove={move} />
+            <ButtonGrid buttons={cells} selected={spot.slot} clashes={clashes} checked={selection.on ? selected : null} hotbars={file.hotbars} onPick={pick} onMove={move} />
             <ButtonPanel
               store={store}
               set={set}
@@ -192,6 +192,7 @@ function CharacterDetail({ store, game, file, files, set, spot, onSpot, placing,
               page={page}
               pages={tabs}
               hint={panelHint(selection.on, none)}
+              file={file}
               files={files}
               fresh={fresh}
               onFresh={setFresh}

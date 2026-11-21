@@ -102,7 +102,7 @@ function LoadoutLine({ store, file }: { store: MacroStore; file: CharacterFileMa
         Loadout {file.loadout}: {macrosText(file.macros.length)} in the game, file changed {formatDateTime(file.mtimeMs)}
       </Typography>
       {set !== null && (
-        <Tooltip title="The game's real button limit is not confirmed; one player reports 100.">
+        <Tooltip title="Page 1 is the game's own, so 108 buttons are yours.">
           <Typography variant="body2" color="text.secondary" tabIndex={0} data-testid="macro-buttons-used">
             {usedText(usedButtons(store.library, set))}
           </Typography>

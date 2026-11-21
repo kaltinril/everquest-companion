@@ -57,9 +57,13 @@ export interface CharacterFile {
   loadout: number
 }
 
+/** `page:button` to how many of the game's hotbar buttons point at it (hotbars.ts). */
+export type HotbarSlots = Record<string, number>
+
 /** A character file as main read it. */
 export interface CharacterFileMacros extends CharacterFile {
   macros: GameMacro[]
+  hotbars: HotbarSlots
   mtimeMs: number
   /** What the file's bytes were when read; a send passes it back so a changed file is refused. */
   stamp: string

@@ -10,7 +10,6 @@ import { type JSX, useEffect, useState } from 'react'
 import { Alert, Box, Stack, Tab, Tabs, Typography } from '@mui/material'
 import { historyKey } from '@shared/macros/history'
 import { mergeGameFiles, mergeText } from '@shared/macros/gameMerge'
-import { PAGES } from '@shared/macros/limits'
 import type { CharacterFileMacros } from '@shared/macros/types'
 import type { View } from '../../appViews'
 import { formatTime } from '../../lib/formatDate'
@@ -29,8 +28,6 @@ const CHARACTER_KEY = 'eq.macros.character'
 
 const NO_FILES: readonly CharacterFileMacros[] = []
 
-const LIMITS_NOTE = `The page count (${String(PAGES)}) is not confirmed in game yet`
-
 function Footer({ game, saveFailed }: { game: GameFilesState; saveFailed: boolean }): JSX.Element {
   return (
     <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap" justifyContent="space-between" sx={{ flexShrink: 0, pt: 1 }}>
@@ -42,9 +39,6 @@ function Footer({ game, saveFailed }: { game: GameFilesState; saveFailed: boolea
           The last change was not saved.
         </Typography>
       )}
-      <Typography variant="caption" color="text.secondary">
-        {LIMITS_NOTE}
-      </Typography>
     </Stack>
   )
 }

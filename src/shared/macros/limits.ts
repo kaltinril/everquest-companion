@@ -1,11 +1,11 @@
-// macros/limits.ts — the game's macro limits, each marked MEASURED (read off the owner's install,
-// 2026-11-20) or ASSUMED (not yet checked in game; plan "In-game tests owed", item 5).
+// macros/limits.ts — the game's macro limits, each MEASURED on the owner's install (2026-11-20),
+// except the pause limit, which is from public guides.
 
 /** MEASURED: the game's edit window has five line boxes, and the file has Line1 to Line5. */
 export const LINES = 5
 /** MEASURED (2026-11-20): the game's list shows Index 1 to 12 a page; its Index is our button number. */
 export const BUTTONS_PER_PAGE = 12
-/** ASSUMED: ten pages, from the older game. */
+/** MEASURED (2026-11-20): the game's list ends at Page 10, Index 12: 120 macros, 108 a player can fill. */
 export const PAGES = 10
 /** MEASURED (2026-11-20): page 1 holds the game's built-in macros, not in the file unless changed. Left alone. */
 export const FIRST_EDITABLE_PAGE = 2
