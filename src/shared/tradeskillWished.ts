@@ -92,7 +92,7 @@ export function wishedCrafts(ask: WishedAsk): WishedCraft[] {
 
 export const WISHED_HEADING = 'Working towards'
 
-export const WISHED_SUBTITLE = 'Items on your wish list that a recipe makes.'
+export const WISHED_SUBTITLE = 'Items on your wish list that a recipe makes. Click one to open its plan.'
 
 /** "Tailoring, trivial 222. Your level: 205." The level is left out for a combine that names no tradeskill. */
 export function wishedSkillText(wished: Pick<WishedCraft, 'recipe' | 'level'>): string {
@@ -129,6 +129,3 @@ export function wishedMaterialsText(wished: Pick<WishedCraft, 'materials' | 'cov
 export function wishedHeldText(wished: Pick<WishedCraft, 'held'>): string {
   return wished.held === null || wished.held === 0 ? '' : `You hold ${String(wished.held)}.`
 }
-
-/** The link that opens the planner on the item. */
-export const WISHED_PLAN_LABEL = 'Open the plan'

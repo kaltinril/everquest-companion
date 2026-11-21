@@ -104,15 +104,18 @@ export interface TradeskillArrival {
  * a focus waits, so the workbench mounts after the pick is written and reads it like any other.
  * An item with no recipe on that tradeskill opens the workbench as the player left it.
  */
-function useArrival(arrival: TradeskillArrival, index: BookIndex | null, show: (next: Tradeskill | null) => void): void {
+function useArrival(arrival: TradeskillArrival, index: BookIndex | null, screens: Pick<Screens, 'show' | 'openPlan'>): void {
   const { focus, onConsumed } = arrival
+  const { show, openPlan } = screens
   useEffect(() => {
     if (focus === null || index === null) return
     const recipe = focus.item === undefined ? null : recipeForItem(index, focus.tradeskill, focus.item)
     if (recipe !== null) rememberLinkedPick(focus.tradeskill, recipe.id)
     show(focus.tradeskill)
+    // "Plan this item": the planner over that workbench, so its Back lands on the recipe.
+    if (focus.plan === true && recipe !== null) openPlan(recipe.key, recipe.id)
     onConsumed()
-  }, [focus, index, show, onConsumed])
+  }, [focus, index, show, openPlan, onConsumed])
 }
 
 /** Which screen is up, and the moves between the three. */
@@ -173,7 +176,12 @@ function Screen({ screens, index, eraOnly }: { screens: Screens; index: BookInde
   }
   if (open === null) {
     const planner: ReactNode = <PlannerHomePanel index={index} eraOnly={eraOnly} plan={plan} onPlan={openPlan} />
-    return <TradeskillsHome index={index} onOpen={show} onPlan={openPlan} planner={planner} />
+    // A "Next" name: that workbench, on that recipe (the pick a link in from another tab writes).
+    const openRecipe = (tradeskill: Tradeskill, recipeId: string): void => {
+      rememberLinkedPick(tradeskill, recipeId)
+      show(tradeskill)
+    }
+    return <TradeskillsHome index={index} onOpen={show} onOpenRecipe={openRecipe} onPlan={openPlan} planner={planner} />
   }
   return (
     <Workbench
@@ -193,8 +201,8 @@ function TradeskillsView({ doors, nav, arrival }: { doors: RouterDoors; nav: Nav
   const [eraOnly, setEraOnly] = useEraOnly()
   const index = useBookIndex(eraOnly)
   const screens = useScreens()
-  const { open, planOpen, show, openPlan } = screens
-  useArrival(arrival, index, show)
+  const { open, planOpen, openPlan } = screens
+  useArrival(arrival, index, screens)
   // "Plan this item" on a workbench's recipe is the section's own door, added to the router's.
   const allDoors = useMemo(
     (): TradeskillDoors => ({

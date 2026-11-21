@@ -198,7 +198,7 @@ export function gatherHeading(count: number, item: string): string {
 }
 
 export const GATHER_NOTE =
-  'Counts are for combines that succeed. A failed combine uses up its materials, and how often one fails has not been measured for this game, so nothing is added for failures.'
+  'Counts assume every combine succeeds. Failure rates have not been measured for this game, so nothing is added for failures.'
 
 export const GATHER_EMPTY_TEXT = 'No material is listed for this recipe, so there is nothing to add up.'
 

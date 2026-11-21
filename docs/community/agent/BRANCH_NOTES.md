@@ -2532,6 +2532,30 @@ only: no engine, parser, protocol, network or dependency change.
     the faction with the most recipes, which its pick step leaves up, because the default faction
     of Baking has one row.
 
+### After the owner's first read of the built screens (2026-11-20, branch `tradeskill-tighten`)
+
+- **Ingredient rows come in four leads.** `parseCraftRecipes` read only `::`. The 2026-11-20 cache
+  also writes `**:` (37 pages, Fleeting Quiver), `***` (Ethira's Poison Antidote) and a bare
+  `**1 x [[Item]]` (Shadow Silk, Robe of the Lost Circle). All four are read now. Before a recipe
+  is called "none on the wiki", open its cached page: 17 of the 19 recipes the guide was "filling"
+  were on the wiki all along (two are left: Distillate of Clarity VI, Tumpy Tonic).
+- **Re-reading `craftedBy` without a scrape.** `items.json` was patched for 42 records only: each
+  record with an empty-ingredient recipe was re-parsed from its cached page and replaced only
+  where the page's recipe skeleton (tradeskill, trivial, container, yield) still equalled the
+  stored one (DATA_REFRESH.md's offline rule). `npm run gen:data-weight` after any such patch, or
+  the data-weight ledger test goes red.
+- **A name does the line's own action.** `ItemLink`/`ItemLabel` take `act`: Home's "Your plan" and
+  "Working towards" names open the plan, a "Next" name opens that workbench on that recipe
+  (`rememberLinkedPick` then `show`), a recipe table row's name picks the row (a no-op `act`, so
+  the click reaches the row). The hover card is unchanged. Names with no action of their own keep
+  the Loot page. Do not add a second control beside a name that does the same thing.
+- **The Loot page's "Plan this item"** is `TradeskillFocus.plan`: `useArrival` opens the workbench
+  as for any link in, then the planner over it.
+- **The plan says each thing once.** "What to gather" has no Where column ("What it takes" has
+  it). `skillsAllMet` true and no route to show: "Where you stand" is `PlanStandLine` in the head
+  and `ItemPlanSkills` is not drawn. A material whose wiki words include Bought lists two mobs
+  (`dropCap`), others four.
+
 ## Tradeskill guides as data (fork #6, requirements/skills-tab.md)
 
 - Two community guides are pulled at release time by `scripts/community/guides-pull.mts` and

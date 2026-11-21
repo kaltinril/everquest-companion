@@ -362,11 +362,12 @@ test('the committed guides: names that are wiki items resolve to them, counted a
   t.diagnostic(`leveling steps and alternates: ${String(steps)} of ${String(names.steps.length)} name a wiki item exactly`)
   t.diagnostic(`recipe guide: ${String(recipes)} of ${String(names.recipes.length)} recipes and ${String(materials)} of ${String(names.materials.length)} materials name a wiki item exactly`)
   t.diagnostic(`wiki recipes with no materials that the guide fills: ${String(filled)}; materials the guide places at a merchant: ${String(guides.located.size)}`)
-  // Measured 2026-11-20: 46 of 73 steps, 61 of 68 recipes, 174 of 189 materials, 19 filled, 66 placed.
+  // Measured 2026-11-20: 46 of 73 steps, 61 of 68 recipes, 174 of 189 materials, 2 filled, 66 placed.
+  // (19 filled until the item parser read the wiki's `**:` ingredient rows: 17 of them were on the wiki all along.)
   assertCorpusFloor(steps, 46, 'leveling steps that name a wiki item')
   assertCorpusFloor(recipes, 61, 'guide recipes that name a wiki item')
   assertCorpusFloor(materials, 174, 'guide materials that name a wiki item')
-  assertCorpusFloor(filled, 19, 'wiki recipes the guide fills')
+  assertCorpusFloor(filled, 2, 'wiki recipes the guide fills')
   assertCorpusFloor(guides.located.size, 66, 'materials placed at a merchant')
   assert.ok(Object.values(guides.payload.names).every((name) => name.trim() !== ''), 'a guide name resolved to nothing')
 })
@@ -386,14 +387,13 @@ test('the committed route places any level: the steps before the mark are done a
 
 test('the committed guides: a recipe the wiki has no materials for gets the guide list, plain text all the way', (t) => {
   const { guides, book } = committed()
-  const quiver = [...book.byId.values()].find((r) => r.item === 'Fleeting Quiver' && r.tradeskill === 'Tailoring')
-  if (quiver === undefined || quiver.ingredients.length > 0) {
-    t.diagnostic('the wiki now lists Fleeting Quiver with materials, or not at all: the example did not run')
+  const tonic = [...book.byId.values()].find((r) => r.item === 'Tumpy Tonic' && r.tradeskill === 'Brewing')
+  if (tonic === undefined || tonic.ingredients.length > 0) {
+    t.diagnostic('the wiki now lists Tumpy Tonic with materials, or not at all: the example did not run')
   } else {
-    const lines = guideMaterialsFor(guides, quiver)
-    assert.ok(lines.length > 0, 'the guide lists what a Fleeting Quiver takes')
-    assert.ok(lines.some((l) => l.source.merchant !== undefined && l.source.loc !== undefined), 'one of them is sold by a merchant at a loc')
+    assert.ok(guideMaterialsFor(guides, tonic).length > 0, 'the guide lists what a Tumpy Tonic takes')
   }
+  assert.ok([...guides.located.values()].some((s) => s.merchant !== undefined && s.loc !== undefined), 'the guide places a material at a merchant with a loc')
   // The pull refuses markup; the screens draw these strings as text. Nothing here may look like a tag.
   const text = JSON.stringify(guides.payload)
   assert.doesNotMatch(text, /<\s*[a-z/!]/i)

@@ -20,7 +20,7 @@ import { type JSX, useMemo, useState } from 'react'
 import { Box, Button, IconButton, Paper, Stack, Typography } from '@mui/material'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { materialDrops, recipeFacts, sourceWords, type BookIngredient, type BookRecipe, type LadderState } from '@shared/tradeskillBook'
+import { dropCap, materialDrops, recipeFacts, sourceWords, type BookIngredient, type BookRecipe, type LadderState } from '@shared/tradeskillBook'
 import {
   guideMaterialTail,
   guideMaterialsFor,
@@ -81,8 +81,8 @@ function DropsLine({ ingredient }: { ingredient: BookIngredient }): JSX.Element 
   const drops = useMemo(() => {
     void met
     const sources = mergeItemSources(sourcesFor(ingredient.key), index.materials.get(ingredient.key)?.dropsFrom)
-    return materialDrops(sources, eraOnly)
-  }, [ingredient.key, index, eraOnly, met])
+    return materialDrops(sources, eraOnly, dropCap(ingredient))
+  }, [ingredient, index, eraOnly, met])
   if (drops.shown.length === 0 && drops.outOfEra === 0) return null
   return (
     <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-material-drops">
