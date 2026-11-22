@@ -98,15 +98,18 @@ const CELL = { py: 0.25, px: 1, fontSize: 12, whiteSpace: 'nowrap' } as const
 interface ControlsProps {
   motes: VoidMotePrefs
   setMotes: (next: VoidMotePrefs) => void
+  /** Greyed while there is no list: a pick would change nothing on screen. */
+  disabled: boolean
 }
 
 /** The two picks: what a gain is measured in, and what the list is ranked by. */
-function MoteControls({ motes, setMotes }: ControlsProps): JSX.Element {
+function MoteControls({ motes, setMotes, disabled }: ControlsProps): JSX.Element {
   return (
     <>
       <TextField
         select
         size="small"
+        disabled={disabled}
         label="Gain for"
         value={motes.target}
         data-testid="gear-motes-target"
@@ -132,6 +135,7 @@ function MoteControls({ motes, setMotes }: ControlsProps): JSX.Element {
       <ToggleButtonGroup
         size="small"
         exclusive
+        disabled={disabled}
         data-testid="gear-motes-order"
         value={motes.order}
         onChange={(_e: unknown, v: MoteOrder | null) => {
@@ -242,7 +246,7 @@ export default function VoidMotePanel({ compare, indexReady, indexRefused, class
         >
           {list.length === 0 ? 'One lifts a worn item a full tier' : motePlanLine(plan)}
         </Typography>
-        <MoteControls motes={motes} setMotes={setMotes} />
+        <MoteControls motes={motes} setMotes={setMotes} disabled={list.length === 0} />
       </Stack>
       {list.length === 0 ? (
         <Typography variant="body2" color="text.secondary" data-testid="gear-motes-empty" sx={{ px: 1, pb: 1 }}>
