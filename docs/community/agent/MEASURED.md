@@ -602,3 +602,9 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
   `[36 WAR/MNK/SHM] Drywrought (Half Elf) <Neon Knights> ZONE: ...`. It says nothing of which loadout
   is on. The live log can be short after an archive: search `Logs/companion-archive/*.log.gz` too.
 - Not measured: whether the game picks up an outside edit of `[Socials]` at login.
+
+## Pet owner guesses (2026-11-21, the owner's 3 sealed archives, 2026-08-12 to 2026-11-20)
+
+- Real fold replay: 91 guesses, 25 right, 0 wrong, 57 with no later leader line, 9 with a line only after the stretch (8 name the guessed owner, 1 someone else, 23 h later across a zone change).
+- A stretch ends at the pet's death, the guessed owner's next summon, a new guess of that name, a zone change or a 30-minute log pause.
+- 88 of 91 guesses and all 25 judged are one group mate. The 95% upper bound on the wrong rate is about 11% if independent. A stranger's pet joining inside the window is not tested.

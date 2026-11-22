@@ -84,13 +84,16 @@ export async function captureRead<T>(what: string, read: Promise<T | null>): Pro
   }
 }
 
+/** A capture's refusal of a reply too large to read: the archive remembers this one (tooLargeLog.ts). */
+export const TOO_LARGE_REASON = 'this log is too large to summarize in one piece'
+
 /**
  * The refusal for a failed read, as `captureSegment` returns it. A reply too large to read gets
  * its own words, because trying again cannot help. Anything that is not a failed read is rethrown.
  */
 export function readFailure(err: unknown): { ok: false; reason: string } {
   if (!(err instanceof CaptureReadError)) throw err
-  if (isTooLarge(err.cause)) return { ok: false, reason: 'this log is too large to summarize in one piece' }
+  if (isTooLarge(err.cause)) return { ok: false, reason: TOO_LARGE_REASON }
   return { ok: false, reason: `the data engine did not answer for ${err.what}; try again in a minute` }
 }
 

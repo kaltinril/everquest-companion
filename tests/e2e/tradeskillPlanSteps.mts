@@ -1,7 +1,7 @@
 /**
  * e2e steps: "Make an item" in the Tradeskills section, and the Maps tab opened at a merchant.
  * A STEP MODULE rather than a spec (the tradeskillLogSteps.mts precedent): the launched app, the
- * staged log and the open Tradeskills section are already standing in tradeskills.e2e.mts, which
+ * staged log and the open Tradeskills section are already standing in tradeskills-log.e2e.mts, which
  * calls `stepPlanner` last.
  *
  * What they hold:

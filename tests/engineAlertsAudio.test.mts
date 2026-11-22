@@ -257,6 +257,24 @@ test('…and when even the sound cannot separate them, the FIRST is played rathe
   assert.equal(fireToFiring(fire({ rule: 'Twin', sound: 'gone/missing' }), defs)?.alertId, 'first')
 })
 
+test('TWO ENABLED TWINS: the id on the frame names the one that fired', () => {
+  const defs = [
+    def({ id: 'first', name: 'Twin', volume: 0.2 }),
+    def({ id: 'second', name: 'Twin', volume: 1 })
+  ]
+  assert.equal(fireToFiring(fire({ rule: 'Twin', alertId: 'second' }), defs)?.alertId, 'second')
+  assert.equal(fireToFiring(fire({ rule: 'Twin', alertId: 'first' }), defs)?.alertId, 'first')
+  // The id outranks the label: a rename saved after the engine's last define still finds the alert.
+  assert.equal(fireToFiring(fire({ rule: 'Old name', alertId: 'second' }), defs)?.alertId, 'second')
+})
+
+test('AN ID NOTHING ENABLED ANSWERS TO is dropped, never played as its twin', () => {
+  const survivor = def({ id: 'survivor', name: 'Twin' })
+  assert.equal(fireToFiring(fire({ rule: 'Twin', alertId: 'deleted' }), [survivor]), null)
+  const off = def({ id: 'off', name: 'Twin', enabled: false })
+  assert.equal(fireToFiring(fire({ rule: 'Twin', alertId: 'off' }), [off, survivor]), null)
+})
+
 test('MATCHING IS EXACT: a label that differs by case is a different alert', () => {
   const defs = [def({ id: 'charm-break', name: 'Charm break' })]
   assert.equal(fireToFiring(fire({ rule: 'charm break' }), defs), null)

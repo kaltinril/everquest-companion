@@ -15,6 +15,7 @@ import {
   type LogReadStep
 } from '../../shared/logReadReport'
 import { NOTHING_RECOGNISED_BYTES } from '../../shared/logReadNotes'
+import { replyStopsCapture } from '../../shared/logArchive/tooLarge'
 
 const SAID_KEPT = 8
 const SAID_WITH_ERROR = 4
@@ -52,6 +53,8 @@ let combatReads: LogReadCombatRead[] = []
 let tooLarge: LogReadReplySize | null = null
 let large: LogReadReplySize | null = null
 let tooLargeModules: string[] = []
+/** This read refused a reply a capture needs, so the archive cannot work on this log. */
+let captureRefused = false
 let nothingRecognised: number | null = null
 let changed: (() => void) | null = null
 /** When this app's own connection last heard anything from the engine. Null: not in this launch. */
@@ -79,6 +82,7 @@ function forgetReadNotes(): void {
   tooLarge = null
   large = null
   tooLargeModules = []
+  captureRefused = false
   nothingRecognised = null
 }
 
@@ -191,7 +195,13 @@ export function noteReplySize(reply: Omit<LogReadReplySize, 'at'>, at: number): 
   // Every module that could not be shown, not only the newest: each one's tab says so.
   const unshown = reply.limit === null ? null : reply.module
   if (unshown !== null && !tooLargeModules.includes(unshown)) tooLargeModules = [...tooLargeModules, unshown]
+  if (replyStopsCapture(reply)) captureRefused = true
   changed?.()
+}
+
+/** A reply the archive's capture needs was over what main may read, in this read of the log. */
+export function captureReplyRefused(): boolean {
+  return captureRefused
 }
 
 /**

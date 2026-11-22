@@ -77,5 +77,5 @@ needs deciding (one item is a one-item sheet; the full gather below is for
 
 Route each answer through the standing loops: build rulings become GATE LIFTED
 comments and dispatches per the linear-board skill; declines and
-answer-in-place stamps go back to the feedback system per the feedback-triage
-skill; every captured constraint is quoted verbatim in the ticket as law.
+answer-in-place stamps go back to the feedback system; every captured
+constraint is quoted verbatim in the ticket as law.

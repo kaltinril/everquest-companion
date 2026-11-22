@@ -84,6 +84,25 @@ export function armVerdict(_defs: readonly AlertDef[]): ArmVerdict {
 }
 
 /**
+ * The def a fire belongs to. A frame with an `alertId` names it outright, and an id that is gone or
+ * switched off is a drop, never its same-named twin. A frame from an engine older than the field
+ * has only the label, resolved as `fireToFiring` describes.
+ */
+function firedDef(fire: FireMessage, defs: readonly AlertDef[]): AlertDef | null {
+  if (fire.alertId !== undefined) {
+    const own = defs.find((d) => d.id === fire.alertId)
+    return own?.enabled === true ? own : null
+  }
+  const named = defs.filter((d) => d.enabled && d.name === fire.rule)
+  if (named.length === 0) return null
+  const narrowed =
+    named.length === 1
+      ? named
+      : named.filter((d) => `${d.sound.packId}/${d.sound.soundId}` === fire.sound)
+  return narrowed[0] ?? named[0]
+}
+
+/**
  * THE FRAME, AS A FIRING — so which def a fire belongs to is a question with a test rather than a
  * behaviour discovered in a raid.
  *
@@ -100,7 +119,7 @@ export function armVerdict(_defs: readonly AlertDef[]): ArmVerdict {
  *     narrows next, because it is a fact the ENGINE stated about the def it fired rather than a
  *     guess made here. If that still does not separate them the FIRST is taken, and that can be
  *     the wrong twin: the phrase, the banner and the volume are all read off the resolved def.
- *     Only an alert id on the frame closes that, and the frame carries none yet.
+ *     That tiebreak now serves only a frame with no `alertId`: the id on the frame closes it.
  *
  * MATCHING IS EXACT AND CASE-SENSITIVE. The label round-tripped through the engine verbatim (the
  * define pushes the store's own object and the fold republishes it), so any folding here would be
@@ -131,13 +150,8 @@ export function armVerdict(_defs: readonly AlertDef[]): ArmVerdict {
  * the three.
  */
 export function fireToFiring(fire: FireMessage, defs: readonly AlertDef[]): FiredAlert | null {
-  const named = defs.filter((d) => d.enabled && d.name === fire.rule)
-  if (named.length === 0) return null
-  const narrowed =
-    named.length === 1
-      ? named
-      : named.filter((d) => `${d.sound.packId}/${d.sound.soundId}` === fire.sound)
-  const def = narrowed[0] ?? named[0]
+  const def = firedDef(fire, defs)
+  if (def === null) return null
   // `at` is the LOG's own clock (schema: "never the host's wall clock"), which is exactly what
   // `FiredAlert.ts` has always carried for a main-side fire — so nothing downstream has to know
   // which world timed it. The one exception is an early warning, whose `at` and `dueAt` both come

@@ -2,7 +2,7 @@
  * e2e steps: the player's own log, the history tab and the guides tab on a Tradeskills workbench
  * (fork #6). A STEP MODULE rather than a spec, the customPhraseSteps.mts precedent: the launched
  * app, the staged log and the open Tradeskills section are already standing in
- * tradeskills.e2e.mts, and that spec is at its line budget.
+ * tradeskills-log.e2e.mts, and that spec is at its line budget.
  *
  * What they hold:
  *   - combines, a raise, the game's trivial notice, purchases, a sale and a depot draw appended to
@@ -19,6 +19,9 @@
 import type { Page } from 'playwright-core'
 import { check, countOf, note, settle } from './appHarness.mjs'
 import type { FixtureLog } from './logFixture.mjs'
+
+/** The Jewelry Making level both Tradeskills specs give the fixture log. */
+export const E2E_LEVEL = 205
 
 const sel = (id: string): string => `[data-testid="${id}"]`
 const NAV = sel('nav-tradeskills')

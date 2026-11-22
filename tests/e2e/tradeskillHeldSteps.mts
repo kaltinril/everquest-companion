@@ -2,7 +2,7 @@
  * e2e steps: "Only use materials I have" on the route, "Can make now" and "Missing on the wiki"
  * on the recipes tab, and the wiki page link (owner's rulings of 2026-11-20). A STEP MODULE, the
  * tradeskillRouteSteps.mts precedent: the launched app and the staged log are already standing in
- * tradeskills.e2e.mts, and that spec is at its line budget. It runs last, after the planner steps,
+ * tradeskills-log.e2e.mts, and that spec is at its line budget. It runs last, after the planner steps,
  * which leave the planner up.
  *
  * What it holds:

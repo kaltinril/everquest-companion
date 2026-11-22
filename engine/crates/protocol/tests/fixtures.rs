@@ -147,6 +147,18 @@ fn the_four_plan_doc_moments_are_all_here() {
     }
 }
 
+#[test]
+fn a_fire_frame_from_before_the_alert_id_still_reads() {
+    let older = serde_json::json!({
+        "kind": "fire", "at": 1, "rule": "Twin", "sound": "classic/ding", "message": "x"
+    });
+    let Ok(EngineMessage::FireMessage(fire)) = serde_json::from_value(older.clone()) else {
+        panic!("a fire frame with no alertId must decode");
+    };
+    assert_eq!(fire.alert_id, None);
+    assert_eq!(serde_json::to_value(&fire).expect("serializes"), older);
+}
+
 fn engine_frames(file: &str) -> Vec<EngineMessage> {
     fixtures()
         .into_iter()

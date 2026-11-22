@@ -18,22 +18,21 @@
  *     and the Loot page's crafted note opens the workbench on that item's own recipe;
  *   - "Gear that raises this skill" lists items with their mod, each the standard item link, and
  *     its last link opens the Gear tab with the search box filled;
- *   - the player's own log, the history tab and the guides tab: tradeskillLogSteps.mts (written
- *     on `workbench-data`, not yet run).
+ *   - the player's own log, the routes, the planner and the rest: tradeskills-log.e2e.mts, the
+ *     second half, with a launch of its own.
  *
  * Every claim about a recipe is a property of what is on screen, never a name or a count from the
  * wiki data, so a data refresh cannot turn it red.
  *
- * Run: `npm run test:e2e -- tradeskills`
+ * Run: `npm run test:e2e -- tradeskills` (both halves)
  */
 import type { Page } from 'playwright-core'
 import { buildIfStale, check, countOf, dumpArtifacts, failures, note, reportRun, settle, settleGone } from './appHarness.mjs'
 import { mainWindow } from './appWindow.mjs'
 import { launchOnFixture } from './logFixture.mjs'
-import { stepGuides, stepHistory, stepOwnLog } from './tradeskillLogSteps.mjs'
+import { E2E_LEVEL as LEVEL } from './tradeskillLogSteps.mjs'
 import { TRADESKILLS } from '../../src/shared/tradeskills'
 
-const LEVEL = 205
 const sel = (id: string): string => `[data-testid="${id}"]`
 const NAV = sel('nav-tradeskills')
 const VIEW = sel('tradeskills-view')
@@ -454,18 +453,7 @@ async function main(): Promise<void> {
     await stepFromLoot(page)
     await stepHave(page)
     await stepSkillGear(page)
-    // Last: it raises the level, which every step above reads as LEVEL.
-    const crafted = await stepOwnLog(page, log, LEVEL)
-    if (crafted !== null) {
-      await stepHistory(page, crafted)
-      await stepGuides(page, LEVEL)
-    }
-    await (await import('./tradeskillRouteSteps.mjs')).stepRoute(page)
-    await (await import('./tradeskillPlanSteps.mjs')).stepPlanner(page) // Make an item and Maps at a merchant (written, not yet run)
-    await (await import('./tradeskillHeldSteps.mjs')).stepHeldAndWiki(page) // held-only route, Can make now, Missing on the wiki (written, not yet run)
-    await (await import('./tradeskillGatherSteps.mjs')).stepAaAndGather(page, log) // crafting AAs, fishing outcomes, the Foraging tile (written, not yet run)
-    await (await import('./tradeskillHomeSteps.mjs')).stepHomeAndWish(page) // level bars, Pick up where you left off, wishing a crafted item, sources, the Skills tab's door (written, not yet run)
-    await (await import('./tradeskillFactionSteps.mjs')).stepFaction(page) // the Faction goal: a faction's turn-ins, the shopping list, the Factions tab and back (written, not yet run)
+    // What raises the level, and everything after it, is tradeskills-log.e2e.mts.
 
     check('no renderer console errors', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | '))
     if (failures.length) await dumpArtifacts(page, 'tradeskills-FAIL')

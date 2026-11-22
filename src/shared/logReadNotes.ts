@@ -17,10 +17,11 @@ export const NOTHING_RECOGNISED_BYTES = 64 * 1024
 function sizeNote(f: LogReadFacts): LogReadNote | null {
   if (f.tooLargeModules.length > 0) {
     const note = { id: 'tooLarge', text: LOG_READ_NOTE.tooLarge, modules: f.tooLargeModules }
+    if (f.archiveWontHelp === true) return { ...note, tryLine: LOG_READ_NOTE.tooLargeNoArchive }
     // With the archive on there is nothing to turn on, and the app archives by itself.
     return f.archiveOn ? note : { ...note, tryLine: LOG_READ_NOTE.tooLargeTry }
   }
-  return f.large !== null && !f.archiveOn ? { id: 'large', text: LOG_READ_NOTE.large } : null
+  return f.large !== null && !f.archiveOn && f.archiveWontHelp !== true ? { id: 'large', text: LOG_READ_NOTE.large } : null
 }
 
 /** The notes of this read, in the order the band draws them. `logFile` is the log's base name. */

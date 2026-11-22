@@ -67,6 +67,12 @@ export const LOG_READ_TRY: Readonly<Record<LogReadWait, string | null>> = {
   ok: null
 }
 
+/** The Try lines that offer the archive, for a log the archive cannot work on. */
+export const LOG_READ_TRY_NO_ARCHIVE: Readonly<Partial<Record<LogReadWait, string>>> = {
+  replyTooLarge: 'This log is too large to archive, so the app cannot shrink it.',
+  panelSlow: 'Wait a moment. This log is too large to archive.'
+}
+
 /** What the Try again button does for each wait, or null when the app has no button to offer. */
 export const LOG_READ_ACTION: Readonly<Record<LogReadWait, LogReadAction | null>> = {
   noCharacter: null,
@@ -158,6 +164,7 @@ export function overlayTitle(
 export const LOG_READ_NOTE = {
   tooLarge: "Part of your log's history is too large for the app to show.",
   tooLargeTry: 'Turn on Summarize and archive log in Preferences, then restart the app.',
+  tooLargeNoArchive: 'This log is too large to archive, so the app cannot shrink it.',
   large: 'Your log is getting large. Turn on Summarize and archive log in Preferences.',
   /** A tab whose own reply was the one too large. */
   tabTooLarge: "This tab's history is too large for the app to show."

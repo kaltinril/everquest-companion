@@ -33,7 +33,7 @@ import { Tooltip } from '../../lib/Tooltip'
 import { parkReturn } from '../../lib/navReturn'
 import { useWindowedRows } from '../../lib/useWindowedRows'
 import { EraChip } from '../planner/PlannerChips'
-import { NoticeChip } from './RecipeYou'
+import { NoticeMark } from './RecipeYou'
 import { ItemLabel, ItemLink } from './tradeskillLinks'
 import { WikiPageLink } from './WikiGap'
 
@@ -149,6 +149,19 @@ export interface RowLog {
   money: MoneyBook
 }
 
+/**
+ * The wiki's trivial, with the game's own notice as a small mark before it. The mark sits here
+ * because a chip in the You cell took about 80 px of that cell's text.
+ */
+function TrivialCell({ recipe, craft }: { recipe: BookRecipe; craft: CraftBook }): JSX.Element {
+  return (
+    <TableCell align="right" sx={{ whiteSpace: 'nowrap', pl: 0.5 }}>
+      <NoticeMark row={recipeHistory(craft, recipe)} />
+      {recipe.trivial ?? ''}
+    </TableCell>
+  )
+}
+
 /** The player's combines of the recipe, cut off with the whole of it on hover; blank when the log shows none. */
 function YouCell({ recipe, craft }: { recipe: BookRecipe; craft: CraftBook }): JSX.Element {
   const row = recipeHistory(craft, recipe)
@@ -156,12 +169,7 @@ function YouCell({ recipe, craft }: { recipe: BookRecipe; craft: CraftBook }): J
   const words = historyWords(row)
   return (
     <TableCell sx={YOU_SX} title={words} data-testid="tradeskill-row-you">
-      <Stack direction="row" spacing={0.75} alignItems="center" sx={{ flexWrap: 'nowrap', minWidth: 0 }}>
-        <NoticeChip row={row} />
-        <Box component="span" sx={CUT_SX}>
-          {words}
-        </Box>
-      </Stack>
+      {words}
     </TableCell>
   )
 }
@@ -192,7 +200,7 @@ const RecipeRow = memo(function RecipeRow({ recipe, state, picked, onPick, log, 
       data-testid="tradeskill-recipe-row"
       data-state={state}
     >
-      <TableCell align="right">{recipe.trivial ?? ''}</TableCell>
+      <TrivialCell recipe={recipe} craft={log.craft} />
       <TableCell sx={{ fontWeight: picked ? 700 : 400 }}>
         <Stack direction="row" spacing={0.75} alignItems="center" sx={{ flexWrap: 'nowrap', minWidth: 0 }}>
           {/* The row's own click picks the recipe; the name joins it (the panel's head links the item's page). */}

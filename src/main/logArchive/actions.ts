@@ -23,7 +23,8 @@ import { archiveBuckets, placeArchivedBuckets, wasMovedThisRun } from './engineB
 import { logWasPutBack } from './history'
 import { liveHistory, logArchiveDir } from './liveHistory'
 import { readLogPrefix } from './logPrefix'
-import { engineCaptureReads, servedOrUnread } from './captureReads'
+import { engineCaptureReads, servedOrUnread, TOO_LARGE_REASON } from './captureReads'
+import { liveTooLarge } from './liveTooLarge'
 import { refoldWithApp } from './refoldActions'
 import { historyKeys, readRespawnHistory } from './respawnHistory'
 import { writeFactionLedger, type LedgerSource } from './factionLedgerFile'
@@ -263,7 +264,8 @@ function fillOn(base: LogArchiveStatus, dir: string, a: { character: string; log
     busy: busy !== null,
     // One archive per run, per character (engineBuckets.ts): another character's log is a fresh fold.
     archivedThisRun: a !== null && wasMovedThisRun(a.character),
-    putBackUnfinished: base.newestSealedId !== null && putBackLeftovers(dir).some((f) => f.startsWith(`${base.newestSealedId}.`))
+    putBackUnfinished: base.newestSealedId !== null && putBackLeftovers(dir).some((f) => f.startsWith(`${base.newestSealedId}.`)),
+    tooLarge: liveTooLarge.known(a)
   })
   return base
 }
@@ -340,19 +342,30 @@ export function keepHistory(id: string): Promise<LogArchiveReply> {
   })
 }
 
+/** Why the archive cannot start, or null. A log already refused as too large is asked about first,
+ *  so it does not wait out the capture again. */
+async function archiveBlocked(a: { character: string; logPath: string } | null): Promise<string | null> {
+  if (a !== null) await liveTooLarge.check(a)
+  const blockers = logArchiveStatus().rotateBlockers.filter((b) => !b.startsWith('Another'))
+  return blockers.length > 0 ? blockers.join(' ') : null
+}
+
 /** Step 3.5: archive the live log and start a fresh one. The card has confirmed with the player. */
 export function rotateNow(): Promise<LogArchiveReply> {
   return exclusive('archiving the log', async () => {
-    const blockers = logArchiveStatus().rotateBlockers.filter((b) => !b.startsWith('Another'))
-    if (blockers.length > 0) return reply(false, blockers.join(' '))
     const a = attached()
+    const blocked = await archiveBlocked(a)
+    if (blocked !== null) return reply(false, blocked)
     if (a === null) return reply(false, 'No character log is attached.')
     // Step 5.2: resist and message history is read between the capture and the move (engineBuckets.ts).
     const buckets = archiveBuckets(app.getPath('userData'), a.character)
     await buckets.settle()
     // The wait can outlast a character switch: only `a`'s capture may stand behind a move of `a`'s log.
     const cap = await captureSegment(captureDeps, a)
-    if (!cap.ok) return reply(false, `Not archived: ${cap.reason}. Nothing has changed.`)
+    if (!cap.ok) {
+      if (cap.reason === TOO_LARGE_REASON) await liveTooLarge.remember(a)
+      return reply(false, `Not archived: ${cap.reason}. Nothing has changed.`)
+    }
     const dir = logArchiveDir()
     // No await from the capture's last check to the rename inside rotateLog: keep it that way.
     buckets.take()

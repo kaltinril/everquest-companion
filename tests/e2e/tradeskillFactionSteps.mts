@@ -1,7 +1,7 @@
 /**
  * e2e steps: the Faction goal on a Tradeskills workbench's "Your route" tab.
  * A STEP MODULE rather than a spec, the tradeskillRouteSteps.mts precedent: the launched app, the
- * staged log and the Tradeskills section are already standing in tradeskills.e2e.mts. It runs
+ * staged log and the Tradeskills section are already standing in tradeskills-log.e2e.mts. It runs
  * last: it leaves the Baking workbench open on the Faction goal.
  *
  * What it holds:

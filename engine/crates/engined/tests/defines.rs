@@ -413,6 +413,35 @@ fn an_alert_fires_on_a_live_line_and_never_on_the_historical_scan() {
 }
 
 #[test]
+fn two_enabled_twins_each_fire_under_their_own_id() {
+    // Same name, same sound: `alertId` is the only thing on the frame that tells them apart, and
+    // it is read off the wire here so the test speaks for what the app receives.
+    let staged = Staged::new("twins", A_LOOT);
+    let engine = Engine::start();
+    let mut conn = Conn::new(engine.connected());
+
+    let trigger = json!({"type":"event","kind":"loot"});
+    let defs = vec![
+        a_def("twin-1", "Twin", trigger.clone()),
+        a_def("twin-2", "Twin", trigger),
+    ];
+    conn.send(&alerts_define(1, &defs));
+    assert_eq!(ack_count(&conn.reply(1)), Some(1 + 1));
+    conn.send(&attach(2, &staged.path()));
+    let _accepted = conn.reply(2);
+    conn.wait_for_live(10);
+
+    staged.append(A_LATER_LOOT);
+    let frames = [conn.next_fire(), conn.next_fire()];
+    let mut ids: Vec<Value> = frames
+        .iter()
+        .map(|fire| serde_json::to_value(fire).expect("a frame serializes")["alertId"].clone())
+        .collect();
+    ids.sort_by_key(Value::to_string);
+    assert_eq!(ids, vec![json!("twin-1"), json!("twin-2")]);
+}
+
+#[test]
 fn a_define_made_while_the_tail_is_live_reaches_the_fold_that_is_running() {
     // The mid-session edit: a user saving an alert while the app is up. The ack is not a receipt for
     // a queue — it says the live fold has this set — so the very next matching line sounds.

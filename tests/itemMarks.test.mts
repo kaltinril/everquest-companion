@@ -56,6 +56,12 @@ test('madeBy names what makes the item, once each in first-named order, and is a
   assert.equal('madeBy' in marksOf(record({ craftedBy: [{ tradeskill: 'Non-Tradeskill', ingredients: [] }] })), false)
 })
 
+test('crafted is the page\'s own recipe flag, and absent otherwise', () => {
+  assert.equal(marksOf(record({ playerCrafted: true })).crafted, true)
+  assert.equal('crafted' in marksOf(record({ playerCrafted: false })), false)
+  assert.equal('crafted' in marksOf(record({})), false)
+})
+
 test('notability on marks is the same rule as on records', () => {
   for (const over of [{}, { lore: true }, { quest: true }, { questUses: [{ quest: 'A', page: 'A', source: 'wiki' as const }] }, { recipes: [{ recipe: 'R' }] }]) {
     const k = record(over)

@@ -1,7 +1,7 @@
 /**
  * e2e steps: the goal routes and the shopping list on a Tradeskills workbench ("Your route").
  * A STEP MODULE rather than a spec, the tradeskillLogSteps.mts precedent: the launched app, the
- * staged log and the Tradeskills section are already standing in tradeskills.e2e.mts, and that
+ * staged log and the Tradeskills section are already standing in tradeskills-log.e2e.mts, and that
  * spec is at its line budget. It runs last, after the own-log steps.
  *
  * What it holds:

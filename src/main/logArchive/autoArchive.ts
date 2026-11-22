@@ -14,11 +14,13 @@
 import { statSync } from 'node:fs'
 import { engineServeReadiness } from '../dataServer/engineClientHost'
 import { logInfo } from '../errorLog'
+import { characterId } from '../log/config'
 import { getActiveCharacter } from '../session'
 import { logArchiveOn } from '../storeLogArchive'
 import type { LogArchiveReply } from '../../shared/logArchive/panel'
 import { AUTO_ARCHIVE_BYTES, autoArchiveDue } from '../../shared/logArchive/preflight'
 import { attachedLogPutBack, learnEngineModules, refreshLackingHistories, rotateNow } from './actions'
+import { liveTooLarge } from './liveTooLarge'
 
 const WAIT_FOR_ENGINE_MS = 30_000
 const CHECK_EVERY_MS = 24 * 3600_000
@@ -42,7 +44,11 @@ export async function autoArchiveCheck(): Promise<LogArchiveReply | null> {
   // The folder is read only once the log is over the limit.
   const putBack = on && bytes >= AUTO_ARCHIVE_BYTES && attachedLogPutBack()
   if (putBack) logInfo('[everquest-companion] log archive (automatic): this log was put back, so it is left until Archive now')
-  if (running || !autoArchiveDue({ on, liveBytes: bytes, putBack })) return null
+  const c = getActiveCharacter()
+  // A log already refused as too large is not captured again: that read costs up to a minute.
+  const tooLarge = c !== null && (await liveTooLarge.check({ character: characterId(c), logPath: c.logPath }))
+  if (on && tooLarge) logInfo('[everquest-companion] log archive (automatic): this log was refused as too large, so it is left alone')
+  if (running || !autoArchiveDue({ on, liveBytes: bytes, putBack, tooLarge })) return null
   running = true
   try {
     const r = await rotateNow()

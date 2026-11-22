@@ -8,7 +8,7 @@
 //! and a schema edit that lands without regenerating turns the protocol-codegen staleness
 //! test red on this side and tests/protocolSchema.test.mts red on the other.
 //!
-//! schema-digest: sha256:2114bb0cb3d5e4b96341e7cb7babdb56c9eb282aee8027656b64570566593572
+//! schema-digest: sha256:8bbe496fa8471e0cb2ffb81a8685662e57da3fef2f05503923f6404a2c00c763
 #![allow(missing_docs, clippy::all, clippy::pedantic)]
 
 /// Error types.
@@ -3370,6 +3370,10 @@ THE ABSENCES ARE THE COMMON CASE, DELIBERATELY. An alert that declares no captur
 ///    "sound"
 ///  ],
 ///  "properties": {
+///    "alertId": {
+///      "description": "THE ALERT THAT FIRED — `AlertDefinition.id`, which is what tells two alerts with the same name and sound apart. The engine always sends it. OPTIONAL so a frame from an engine older than this field still reads: with no id the app falls back to resolving the label.",
+///      "type": "string"
+///    },
 ///    "at": {
 ///      "description": "When it fired, on THE LOG'S OWN CLOCK — the `ts` of the event that matched, never the host's wall clock. A fire is a statement about the log (ruling 18 law 1).",
 ///      "type": "integer"
@@ -3412,6 +3416,13 @@ THE ABSENCES ARE THE COMMON CASE, DELIBERATELY. An alert that declares no captur
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct FireMessage {
+    ///THE ALERT THAT FIRED — `AlertDefinition.id`, which is what tells two alerts with the same name and sound apart. The engine always sends it. OPTIONAL so a frame from an engine older than this field still reads: with no id the app falls back to resolving the label.
+    #[serde(
+        rename = "alertId",
+        default,
+        skip_serializing_if = "::std::option::Option::is_none"
+    )]
+    pub alert_id: ::std::option::Option<::std::string::String>,
     ///When it fired, on THE LOG'S OWN CLOCK — the `ts` of the event that matched, never the host's wall clock. A fire is a statement about the log (ruling 18 law 1).
     pub at: i64,
     ///THE WORDS THIS FIRING MAY SPEAK, or absent when it has none — see `FireCaptures` for what may be in it and what has already been done to it. Absent for the overwhelming majority of alerts, which declare no named group and ask for no `{target}`.

@@ -33,10 +33,12 @@
 import { type JSX, useEffect, useMemo, useState } from 'react'
 import { Box, Stack, TextField, Typography } from '@mui/material'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
+import type { ItemMarks } from '@shared/itemKnowledge'
 import type { ExaltPlan } from '@shared/planner/types'
 import type { ZoneShort } from '@shared/maps'
 import { seedWishes, type WishEntry, type WishList } from '@shared/planner/wishlist'
 import type { MobTarget } from '../mobs/mobTarget'
+import { requestItemMarks, useItemMarksReader } from '../../lib/itemMarks'
 import { useMetVersion } from '../../lib/useMetInLog'
 import { useGearIndex } from '../gear/gearData'
 import { useRememberedSearch } from '../gear/useAreaMemory'
@@ -127,6 +129,8 @@ interface FoldInputs {
   eraOnly: boolean
   /** the search box over the WISHES — matched against what the row says, not the corpus's haystack */
   text: string
+  /** the item data's marks by name: a wish that cannot be worn is in neither index */
+  marksOf: (name: string) => ItemMarks | undefined
 }
 
 /**
@@ -140,11 +144,12 @@ interface FoldInputs {
  * the WANTED half meets the era filter — a fulfilled Velious wish is not a route entry the filter
  * has any business hiding, it is a thing you already have.
  */
-function foldWishes({ list, index, progressOf, eraOnly, text }: FoldInputs): WishView {
+function foldWishes({ list, index, progressOf, eraOnly, text, marksOf }: FoldInputs): WishView {
   const needle = text.trim().toLowerCase()
   const cleared = new Set(list.clearedDone)
   const byKey = new Map(list.entries.map((e) => [e.itemKey, e]))
-  const needs = collectWishNeeds(list.entries, index, progressOf).filter((n) => {
+  const isCrafted = (name: string): boolean => marksOf(name)?.crafted === true
+  const needs = collectWishNeeds(list.entries, index, progressOf, isCrafted).filter((n) => {
     if (cleared.has(n.itemKey)) return false
     // The search runs over what the ROW says — the item's name and what it is wanted for — which
     // is the same haystack the eye is scanning. The corpus's own `searchKey` would be wrong here:
@@ -214,10 +219,14 @@ export default function WishlistView({ onOpenLoot, onOpenMob, onOpenMapZone }: W
   )
   // The era filter and the farm zones read the player's own log too (lib/useMetInLog).
   const met = useMetVersion()
+  const marksOf = useItemMarksReader()
+  useEffect(() => {
+    for (const entry of entries) requestItemMarks(entry.name)
+  }, [entries])
   const view = useMemo(() => {
     void met
-    return foldWishes({ list, index, progressOf: progress.of, eraOnly, text })
-  }, [list, index, progress, eraOnly, text, met])
+    return foldWishes({ list, index, progressOf: progress.of, eraOnly, text, marksOf })
+  }, [list, index, progress, eraOnly, text, met, marksOf])
   const wished = useMemo(() => new Set(entries.map((e) => e.itemKey)), [entries])
   const nothing = view.groups.length === 0 && view.done.length === 0
 
