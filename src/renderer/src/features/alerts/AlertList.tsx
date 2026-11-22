@@ -37,7 +37,7 @@ import { alertShowsOnScreen } from '@shared/alertBanner'
 import { formatTime } from '../../lib/formatDate'
 import AudioPicker from './AudioPicker'
 import type { VoiceSetupNotice } from './VoiceSetupLink'
-import { triggerBadge } from './conditionDraft'
+import { hasFireHistory, triggerBadge } from './conditionDraft'
 
 /** The expandable "recent fires" panel for one alert. */
 function RecentFires({ fires }: { fires: AlertFireRecord[] }): JSX.Element {
@@ -209,6 +209,7 @@ function AlertRowVolume({
  */
 function AlertRowActions({
   fireCount,
+  hasHistory,
   isOpen,
   showOnScreen,
   onToggle,
@@ -219,6 +220,8 @@ function AlertRowActions({
   onDelete
 }: {
   fireCount: number
+  /** False: the button keeps its place, unseen, so the row's other icons do not move. */
+  hasHistory: boolean
   isOpen: boolean
   /** Null while the banner overlay is off — the icon does not render at all. */
   showOnScreen: boolean | null
@@ -256,6 +259,7 @@ function AlertRowActions({
         title={`Recent fires (${fireCount})`}
         color={isOpen ? 'primary' : 'default'}
         onClick={onToggle}
+        sx={hasHistory ? undefined : { visibility: 'hidden' }}
       >
         <HistoryIcon fontSize="small" />
       </IconButton>
@@ -314,6 +318,7 @@ function AlertRow({
   handlers: AlertRowHandlers
 }): JSX.Element {
   const badge = triggerBadge(def.trigger)
+  const hasHistory = hasFireHistory(def.trigger, fires.length)
   // TWO HOOKS, NOT ONE: `alert-row` is the collection every spec counts and indexes, and the
   // id-scoped `data-alert-id` lets a spec address ONE known def without betting on list order
   // (the capture-alert step in tests/e2e/voice-alerts.e2e.mts appends a def to a list the earlier
@@ -354,6 +359,7 @@ function AlertRow({
 
         <AlertRowActions
           fireCount={fires.length}
+          hasHistory={hasHistory}
           isOpen={isOpen}
           showOnScreen={bannerOverlayOn ? alertShowsOnScreen(def) : null}
           onToggle={() => onToggle(def.id)}
@@ -370,7 +376,7 @@ function AlertRow({
         />
       </Box>
 
-      <Collapse in={isOpen} unmountOnExit>
+      <Collapse in={isOpen && hasHistory} unmountOnExit>
         <Divider sx={{ my: 0.75 }} />
         <Typography variant="caption" color="text.secondary" sx={{ pl: 1, fontWeight: 600 }}>
           Recent fires
