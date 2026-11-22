@@ -225,6 +225,15 @@ test("the owner's case, Explore: never-made recipes from 185 up, each in the fir
   for (const credit of GUIDE_CREDITS) assert.ok(r.credits[0]?.includes(guideCreditLine(credit)), credit.id)
 })
 
+test('Explore under Hide trivial starts above the level; with it off it still reaches a little under', () => {
+  const hidden = buildRoute(ownerFacts(), { tradeskill: 'Jewelcrafting', level: OWNER_LEVEL, goal: 'explore', hideTrivial: true })
+  assert.ok(allSteps(hidden).length > 0)
+  assert.ok(allSteps(hidden).every((s) => (s.to ?? 0) > OWNER_LEVEL), 'nothing at or under the level')
+  assert.ok(!allSteps(hidden).some((s) => s.range.includes('at or under your level')))
+  assert.ok(hidden.basis.includes(`from trivial ${String(OWNER_LEVEL + 1)} up`), hidden.basis)
+  assert.ok(allSteps(route('explore')).some((s) => s.range.includes('at or under your level')), 'the switch off keeps them')
+})
+
 test('Explore: an odd yield or a rare container is a group, a group is capped and counted, and nothing is said before the log is read', () => {
   const kit = (n: number): BookRecipe => recipe(`Plain Ring ${String(n).padStart(2, '0')}`, { trivial: 210 + n, container: "Jeweler's Kit", ingredients: [ing('Ruby', 1, ['Bought'])] })
   const extra = [
