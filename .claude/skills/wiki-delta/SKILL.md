@@ -29,7 +29,10 @@ bash scripts/community/wiki-delta.sh --extra="Title|Title"  # hand-named pages
 ```
 
 It takes 2 to 10 minutes: a day's delta is a handful of requests at one a second, the unit gate
-is most of the time. The dev app can stay up. Run it in the foreground with a long timeout (or in
+is most of the time. The dev app can stay up, but it keeps the OLD wiki data until a full relaunch:
+the engine builds `items.json`, `mobs.json` and the rest into `engined.exe`, and a watch reload does
+not rebuild it (2026-11-21: a delta's new items still read New page on Wiki Gaps). Stop the dev task
+and launch with `start_companion.ps1`, which rebuilds a stale engine. Run it in the foreground with a long timeout (or in
 the background and wait for the task), never two at once: the item and mob caches are shared.
 
 What it does, in order: `eoz-compare.mts` (GitHub, no wiki); `scrape-delta.mts --dry-run`;
