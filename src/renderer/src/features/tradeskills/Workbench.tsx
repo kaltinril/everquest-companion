@@ -326,7 +326,7 @@ export function Workbench({ tradeskill, index, eraOnly, onHome, restoreTop }: Wo
       )}
       {memory.tab === 'route' && <RoutePanel tradeskill={tradeskill} level={level} ready={levels.served} facts={facts} onOpenRecipe={openRecipe} />}
       {memory.tab === 'history' && <HistoryPanel tradeskill={tradeskill} facts={facts} history={history} onOpenRecipe={openRecipe} />}
-      {memory.tab === 'guides' && <GuidePanel tradeskill={tradeskill} level={level} facts={facts} />}
+      {memory.tab === 'guides' && <GuidePanel tradeskill={tradeskill} level={level} facts={facts} onOpenRecipe={openRecipe} />}
     </Stack>
   )
 }

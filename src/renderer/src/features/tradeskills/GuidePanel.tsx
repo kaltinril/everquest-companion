@@ -14,6 +14,7 @@ import {
   guideItemRecipe,
   guideMaterialTail,
   guideQtyPrefix,
+  guideStepRecipe,
   levelMarkerText,
   levelingCreditText,
   noRouteText,
@@ -22,6 +23,7 @@ import {
   type PlacedStep,
   type StepState
 } from '@shared/tradeskillGuide'
+import { ROUTE_STEP_TIP } from '@shared/tradeskillRoute'
 import type { Tradeskill } from '@shared/tradeskills'
 import { EraChip } from '../planner/PlannerChips'
 import { FactsProvider, useFacts, type BenchFacts } from './benchFacts'
@@ -55,7 +57,15 @@ function GuideName({ name, bold }: { name: string; bold?: boolean }): JSX.Elemen
   const recipe = guideItemRecipe(index, wiki)
   return (
     <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0 }}>
-      <ItemLabel name={wiki} bold={bold} />
+      {/* The name opens its Loot page; the click stops here so it does not also open the step's recipe. */}
+      <Box
+        sx={{ minWidth: 0 }}
+        onClick={(e) => {
+          e.stopPropagation()
+        }}
+      >
+        <ItemLabel name={wiki} bold={bold} />
+      </Box>
       {recipe !== null && <EraChip subject={recipe} outOnly />}
     </Stack>
   )
@@ -82,10 +92,25 @@ function MaterialTree({ materials }: { materials: readonly GuideMaterial[] }): J
   )
 }
 
-function StepRow({ placed }: { placed: PlacedStep }): JSX.Element {
+interface StepOpen {
+  tradeskill: Tradeskill
+  onOpenRecipe: (id: string) => void
+}
+
+function StepRow({ placed, tradeskill, onOpenRecipe }: StepOpen & { placed: PlacedStep }): JSX.Element {
   const { step, state, range } = placed
+  const { guides, index } = useFacts()
+  const recipe = guideStepRecipe(index, tradeskill, wikiNameOf(guides, step.item))
+  const open = recipe === null ? undefined : () => onOpenRecipe(recipe.id)
   return (
-    <Box sx={STEP_SX} data-testid="tradeskill-guide-step" data-state={state}>
+    <Box
+      sx={{ ...STEP_SX, cursor: open === undefined ? 'default' : 'pointer', '&:hover': open === undefined ? {} : { bgcolor: 'action.hover' } }}
+      onClick={open}
+      title={open === undefined ? undefined : ROUTE_STEP_TIP}
+      data-testid="tradeskill-guide-step"
+      data-state={state}
+      data-recipe={recipe?.id ?? ''}
+    >
       <Box>
         <Typography variant="body2" sx={{ fontWeight: 700, color: RANGE_COLOR[state] }}>
           {range}
@@ -116,13 +141,19 @@ function LevelMarker({ level }: { level: number }): JSX.Element {
   )
 }
 
-function Steps({ steps, markerAt, level }: { steps: readonly PlacedStep[]; markerAt: number | null; level: number | null }): JSX.Element {
+interface StepsProps extends StepOpen {
+  steps: readonly PlacedStep[]
+  markerAt: number | null
+  level: number | null
+}
+
+function Steps({ steps, markerAt, level, tradeskill, onOpenRecipe }: StepsProps): JSX.Element {
   return (
     <Box>
       {steps.map((placed, i) => (
         <Box key={`${placed.range}:${placed.step.item}`}>
           {level !== null && markerAt === i && <LevelMarker level={level} />}
-          <StepRow placed={placed} />
+          <StepRow placed={placed} tradeskill={tradeskill} onOpenRecipe={onOpenRecipe} />
         </Box>
       ))}
       {level !== null && markerAt === steps.length && <LevelMarker level={level} />}
@@ -135,9 +166,10 @@ export interface GuidePanelProps {
   /** Null: the log has not shown the skill, so nothing is placed. */
   level: number | null
   facts: BenchFacts
+  onOpenRecipe: (id: string) => void
 }
 
-export function GuidePanel({ tradeskill, level, facts }: GuidePanelProps): JSX.Element {
+export function GuidePanel({ tradeskill, level, facts, onOpenRecipe }: GuidePanelProps): JSX.Element {
   const ladder = useMemo(() => placedLadder(facts.guides, tradeskill, level), [facts.guides, tradeskill, level])
   if (ladder === null) {
     return (
@@ -162,11 +194,11 @@ export function GuidePanel({ tradeskill, level, facts }: GuidePanelProps): JSX.E
               </Typography>
             )}
           </Stack>
-          <Steps steps={ladder.steps} markerAt={ladder.markerAt} level={level} />
+          <Steps steps={ladder.steps} markerAt={ladder.markerAt} level={level} tradeskill={tradeskill} onOpenRecipe={onOpenRecipe} />
           {ladder.alternates.length > 0 && (
             <Box sx={{ mt: 1.5 }} data-testid="tradeskill-guide-alternates">
               <Typography variant="subtitle2">Alternates</Typography>
-              <Steps steps={ladder.alternates} markerAt={null} level={null} />
+              <Steps steps={ladder.alternates} markerAt={null} level={null} tradeskill={tradeskill} onOpenRecipe={onOpenRecipe} />
             </Box>
           )}
           <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }} data-testid="tradeskill-guide-credit">

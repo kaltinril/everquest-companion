@@ -149,4 +149,40 @@ export async function stepGuides(page: Page, level: number): Promise<void> {
   const marked = await countOf(page, `${PICKED} ${sel('tradeskill-material-guide')}`)
   if (marked === 0) note('the recipe guide places none of the picked materials: the guide line and its credit were not checked')
   else check('a guide line in the panel brings the guide credit with it', (await countOf(page, `${PICKED} ${sel('tradeskill-guide-credit')}`)) === 1)
+  await stepGuideRowOpens(page)
+}
+
+/** Opens a tradeskill's workbench from Home. */
+async function openBench(page: Page, tradeskill: string): Promise<void> {
+  await page.click(sel('tradeskill-home'))
+  await settle(() => countOf(page, HOME), (n) => n === 1, { timeoutMs: 15_000 })
+  await page.click(`${sel(`tradeskill-tile-${tradeskill}`)} button`)
+  await settle(() => countOf(page, sel('tradeskill-workbench')), (n) => n === 1, { timeoutMs: 20_000 })
+}
+
+/**
+ * A guide row's name still opens the Loot page; the row around it opens its recipe. On
+ * Blacksmithing: no Jewelcrafting step of the guide is a wiki item's exact name. The steps after
+ * this one expect the Jewelcrafting workbench, so it is reopened at the end.
+ */
+async function stepGuideRowOpens(page: Page): Promise<void> {
+  const row = `${sel('tradeskill-guide-step')}:not([data-recipe=""])`
+  await openBench(page, 'Blacksmithing')
+  await page.click(TAB('guides'))
+  const rows = await settle(() => countOf(page, row), (n) => n > 0, { timeoutMs: 15_000 })
+  check('the guide has a step joined to a wiki recipe', rows > 0)
+  if (rows > 0) {
+    const item = await textOf(page, `${row} ${sel('planner-donor-name')}`)
+    await page.click(`${row} ${sel('planner-donor-name')}`)
+    await settle(() => countOf(page, sel('tradeskill-workbench')), (n) => n === 0, { timeoutMs: 15_000 })
+    await page.click(NAV)
+    const stayed = await settle(() => countOf(page, sel('tradeskill-guide')), (n) => n === 1, { timeoutMs: 20_000 })
+    check("a guide row's item name opens its page and leaves the guides tab as it was", stayed === 1)
+    // The range cell: a click there is on the row and on no link.
+    await page.click(`${row} >> nth=0 >> div >> nth=0`)
+    const opened = await settle(() => textOf(page, `${PICKED} ${sel('planner-donor-name')}`), (t) => t === item, { timeoutMs: 15_000 })
+    check('a guide row opens its recipe on the recipes tab', opened === item, `${item} -> ${opened}`)
+  }
+  await openBench(page, 'Jewelcrafting')
+  await settle(() => countOf(page, SCROLL), (n) => n === 1, { timeoutMs: 15_000 })
 }
