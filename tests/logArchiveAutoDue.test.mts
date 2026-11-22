@@ -11,13 +11,13 @@
 import { after, test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { logWasPutBack } from '../src/main/logArchive/history'
 import { writeSegment } from '../src/main/logArchive/segmentStore'
 import { putBackInLive, type LiveLog } from '../src/shared/logArchive/eligible'
-import { AUTO_ARCHIVE_BYTES, autoArchiveDue } from '../src/shared/logArchive/preflight'
+import { AUTO_ARCHIVE_BYTES, autoArchiveDue, autoArchiveFailure } from '../src/shared/logArchive/preflight'
 import { SEGMENT_VERSION, type Segment, type SegmentState } from '../src/shared/logArchive/segment'
 
 const sha = (b: Buffer | string): string => createHash('sha256').update(b).digest('hex')
@@ -82,4 +82,32 @@ test('put back: read off the files a Put back leaves, and over once the log is a
   writeFileSync(logPath, FRESH)
   assert.equal(logWasPutBack(dir, 'primitive_freeport', logPath), false)
   assert.equal(logWasPutBack(dir, 'primitive_freeport', join(root, 'missing.txt')), false, 'an unreadable log decides nothing')
+})
+
+// An automatic archive that stopped before the move used to reach only the error log: the card
+// read as if nothing had been tried (bug hunt, 2026-11-19).
+const status = (rotateBlockers: string[] = [], enabled = true): { enabled: boolean; rotateBlockers: string[] } => ({
+  enabled,
+  rotateBlockers
+})
+
+test('an automatic archive that stopped says why, in the card', () => {
+  const message = 'Not archived: the engine did not answer. Nothing has changed.'
+  assert.equal(
+    autoArchiveFailure({ ok: false, message, status: status() }),
+    'The automatic archive stopped: the engine did not answer. Nothing has changed.'
+  )
+})
+
+test('nothing is said for an archive that ran, or a reason the card already states', () => {
+  assert.equal(autoArchiveFailure({ ok: true, message: 'Archived.', status: status() }), null)
+  const blocked = 'There is not enough free space for the archive.'
+  assert.equal(autoArchiveFailure({ ok: false, message: blocked, status: status([blocked]) }), null)
+  assert.equal(autoArchiveFailure({ ok: false, message: 'Summarize and archive log is off.', status: status([], false) }), null)
+})
+
+test('the automatic check goes through the door that keeps the reason', () => {
+  const read = (rel: string): string => readFileSync(new URL(rel, import.meta.url), 'utf8')
+  assert.match(read('../src/main/logArchive/autoArchive.ts'), /await rotateAutomatically\(\)/)
+  assert.match(read('../src/renderer/src/features/preferences/LogArchiveSetting.tsx'), /st\.autoFailed/)
 })

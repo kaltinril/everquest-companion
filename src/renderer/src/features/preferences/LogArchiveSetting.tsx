@@ -144,6 +144,11 @@ function OnPanel(props: { st: LogArchiveStatus; run: (p: Promise<LogArchiveReply
           Archiving is not available right now: {st.rotateBlockers.join(' ')}
         </Typography>
       )}
+      {st.autoFailed !== null && (
+        <Typography variant="caption" color="warning.main" data-testid="log-archive-auto-failed">
+          {st.autoFailed}
+        </Typography>
+      )}
       {st.archived.length > 0 && (
         <Typography variant="overline" color="text.secondary" sx={{ lineHeight: 1 }}>
           History
