@@ -223,6 +223,7 @@ export function useFactionsController(props: FactionsViewProps): FactionsControl
   const [classSel, setClassSel] = useState<ClassAbbr[]>([])
   const [slot, setSlot] = useState<SlotFilter>('ANY')
   const [coinOnly, setCoinOnly] = useState(false)
+  const [repeatableOnly, setRepeatableOnly] = useState(false)
   const [cleanOnly, setCleanOnly] = useState(false)
   const dontCare = useDontCareFactions()
   const [sort, setSort] = useState<RowSort>(DEFAULT_SORT)
@@ -271,8 +272,8 @@ export function useFactionsController(props: FactionsViewProps): FactionsControl
   // The work filters WITHOUT the search: the query narrows per keystroke in `useTableRows`, on
   // top of this base, never inside the whole-dump derivation (factionDerive.ts's header).
   const workFilters = useMemo<WorkFilters>(
-    () => ({ classes: classSel, slot, coinOnly, query: '', rewardsOnly: false, cleanOnly, dontCare: dontCare.keys }),
-    [classSel, slot, coinOnly, cleanOnly, dontCare.keys]
+    () => ({ classes: classSel, slot, coinOnly, repeatableOnly, query: '', rewardsOnly: false, cleanOnly, dontCare: dontCare.keys }),
+    [classSel, slot, coinOnly, repeatableOnly, cleanOnly, dontCare.keys]
   )
   const tableFilters = useMemo(() => ({ rows: rowFilters, sort, work: workFilters }), [rowFilters, sort, workFilters])
   const { rows, derivedById } = useTableRows(all, tableFilters, joins)
@@ -302,6 +303,8 @@ export function useFactionsController(props: FactionsViewProps): FactionsControl
       onSlot: setSlot,
       coinOnly,
       onCoinOnly: setCoinOnly,
+      repeatableOnly,
+      onRepeatableOnly: setRepeatableOnly,
       cleanOnly,
       onCleanOnly: setCleanOnly,
       dontCareCount: dontCare.keys.size

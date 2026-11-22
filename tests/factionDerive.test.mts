@@ -165,6 +165,7 @@ const NO_WORK_FILTERS = {
   coinOnly: false,
   query: '',
   rewardsOnly: false,
+  repeatableOnly: false,
   cleanOnly: false,
   dontCare: new Set<string>()
 } as const

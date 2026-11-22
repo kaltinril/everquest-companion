@@ -7,8 +7,8 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { filterWork, questClassAbbrs, type WorkFilters } from '../src/renderer/src/features/factions/factionFilters'
-import type { FactionWork } from '../src/renderer/src/features/factions/factionQuests'
+import { filterWork, filtersActive, questClassAbbrs, type WorkFilters } from '../src/renderer/src/features/factions/factionFilters'
+import type { FactionQuestRef, FactionWork } from '../src/renderer/src/features/factions/factionQuests'
 
 const WORK: FactionWork = {
   raise: [
@@ -65,7 +65,30 @@ const WORK: FactionWork = {
 
 const NO_SLOTS = new Map<string, never[]>()
 const f = (query: string, coinOnly = false, rewardsOnly = false): WorkFilters =>
-  ({ classes: [], slot: 'ANY', coinOnly, rewardsOnly, query, cleanOnly: false, dontCare: new Set() })
+  ({ classes: [], slot: 'ANY', coinOnly, repeatableOnly: false, rewardsOnly, query, cleanOnly: false, dontCare: new Set() })
+
+test('repeatable only keeps the marked raises and costs, and drops the unstated candidates', () => {
+  const row = (name: string, repeatable: boolean): FactionQuestRef => ({
+    name,
+    page: name,
+    items: [],
+    rewards: [],
+    hits: [],
+    ...(repeatable ? { repeatable: true as const } : {})
+  })
+  const work: FactionWork = {
+    raise: [row('Again', true), row('Once', false)],
+    lower: [row('Costs Again', true), row('Costs Once', false)],
+    homeZone: 'Town',
+    nearby: [row('Silent Again', true), row('Silent Once', false)]
+  }
+  const on = filterWork(work, { ...f(''), repeatableOnly: true }, NO_SLOTS)
+  assert.deepEqual(on.raise.map((q) => q.name), ['Again'])
+  assert.deepEqual(on.lower.map((q) => q.name), ['Costs Again'])
+  assert.deepEqual(on.nearby, [])
+  assert.equal(filtersActive({ ...f(''), repeatableOnly: true }), true)
+  assert.equal(filterWork(work, f(''), NO_SLOTS).raise.length, 2)
+})
 
 test('a search that is not the faction name narrows EVERY list to the quests that carried it', () => {
   const scythe = filterWork(WORK, f('pestilence scythe'), NO_SLOTS)
