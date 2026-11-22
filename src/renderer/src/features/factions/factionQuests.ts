@@ -56,6 +56,8 @@ export interface FactionQuestRef {
   itemCount?: number
   /** this turn-in can be repeated, and repeating it moves this faction */
   repeatable?: true
+  /** it repeats, but this row's receipt merges turn-ins that pay differently: not ranked first */
+  repeatMixed?: true
   /** on a row showing a repeat step: the page's own start zone, still the home-zone vote */
   stepOfPage?: { startZone?: string }
   /** the reward items, linkable the same way */
@@ -118,6 +120,12 @@ export interface FactionWork {
   nearby: FactionQuestRef[]
 }
 
+/** A whole-quest row's repeat mark. A quest with a read step marks only that step's rows. */
+function repeatMark(q: QuestEntry): Pick<FactionQuestRef, 'repeatable' | 'repeatMixed'> {
+  if (q.repeatable !== true || q.repeatStep !== undefined) return {}
+  return q.repeatMixed === true ? { repeatable: true, repeatMixed: true } : { repeatable: true }
+}
+
 function toRef(q: QuestEntry, amount: number | undefined): FactionQuestRef {
   const ref: FactionQuestRef = {
     name: q.name,
@@ -125,7 +133,7 @@ function toRef(q: QuestEntry, amount: number | undefined): FactionQuestRef {
     items: q.requiredItems ?? [],
     rewards: [],
     hits: receiptOf(q.factions ?? []),
-    ...(q.repeatable === true && q.repeatStep === undefined ? { repeatable: true as const } : {}),
+    ...repeatMark(q),
     ...(q.giver === undefined ? {} : { giver: q.giver }),
     ...(q.startZone === undefined ? {} : { startZone: q.startZone }),
     ...(q.minLevel === undefined ? {} : { minLevel: q.minLevel }),
@@ -172,9 +180,12 @@ function byPayout(a: FactionQuestRef, b: FactionQuestRef): number {
   return bv - av || a.name.localeCompare(b.name)
 }
 
-/** A faction's raises: what can be repeated first, then by payout. */
+/** A repeat whose receipt is its own. A merged receipt is no sure route, so it keeps its payout rank. */
+const repeatsSurely = (r: FactionQuestRef): boolean => r.repeatable === true && r.repeatMixed !== true
+
+/** A faction's raises: what can surely be repeated first, then by payout. */
 function byRepeatThenPayout(a: FactionQuestRef, b: FactionQuestRef): number {
-  return Number(b.repeatable === true) - Number(a.repeatable === true) || byPayout(a, b)
+  return Number(repeatsSurely(b)) - Number(repeatsSurely(a)) || byPayout(a, b)
 }
 
 /** The most frequent start zone among the raising quests, or nothing when none states one. */

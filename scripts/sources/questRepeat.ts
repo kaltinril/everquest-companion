@@ -35,6 +35,7 @@ const FACTION_WORD_RE = /\bfactions?\b/i
 const FILLER_RE = /^(?:\{\{[^{}]*\}\}\s*)*$/
 const BLOCK_OPEN_RE = /<div[^>]*facblock/i
 const BLOCK_CLOSE_RE = /<\/div>/i
+const BLOCK_RE = /<div[^>]*facblock[^>]*>([\s\S]*?)<\/div>/gi
 const SPEAKER_RE = /^:*\s*([A-Z][^:'.!?]{1,48}?) says\b/
 const HAND_IN_RE = /\b(?:hand|handing|give|giving|turn in|turning in)\b/i
 const SECTION_RE = /^\s*={2,6}/
@@ -181,17 +182,32 @@ export function readRepeatStep(
   return { giver: speaker[1], ...(zone === undefined ? {} : { zone }), ...cost, factions }
 }
 
+/**
+ * The page's receipt blocks move different factions (Deathfist Slashed Belts' good and evil
+ * versions), so the catalog's one merged receipt is not what any single repeat pays.
+ */
+function mixedReceipts(text: string): boolean {
+  const receipts = [...text.matchAll(BLOCK_RE)].map((m) =>
+    parseFactionHits(m[1])
+      .map((h) => `${titleKey(h.name)}:${String(h.up)}`)
+      .sort()
+      .join('|')
+  )
+  return new Set(receipts.filter((r) => r !== '')).size > 1
+}
+
 /** The catalog fields for one parsed page: nothing unless the page says it repeats. */
 export function repeatFields(
   page: ParsedQuestPage,
   wikitext: string,
   isItem: (t: string) => boolean
-): Pick<QuestEntry, 'repeatable' | 'repeatStep'> {
+): Pick<QuestEntry, 'repeatable' | 'repeatMixed' | 'repeatStep'> {
   if (page.disambiguation && !page.hasTopTable) return {}
   const text = wikitext.replace(/\r\n/g, '\n')
   const lines = text.split('\n')
   const at = repeatSentenceLine(lines)
-  if (at < 0) return CATEGORY_RE.test(text) || FIELD_RE.test(text) ? { repeatable: true } : {}
-  const repeatStep = readRepeatStep(lines, at, page, isItem)
-  return repeatStep === null ? { repeatable: true } : { repeatable: true, repeatStep }
+  if (at < 0 && !CATEGORY_RE.test(text) && !FIELD_RE.test(text)) return {}
+  const repeatStep = at < 0 ? null : readRepeatStep(lines, at, page, isItem)
+  if (repeatStep !== null) return { repeatable: true, repeatStep }
+  return mixedReceipts(text) ? { repeatable: true, repeatMixed: true } : { repeatable: true }
 }

@@ -540,6 +540,9 @@ export interface QuestEntry {
   coin?: string
   /** the page says this quest or one of its steps can be repeated (questRepeat.ts) */
   repeatable?: boolean
+  /** it repeats, but its turn-ins pay different factions and no one step was read, so the merged
+   *  receipt is not what one repeat pays: marked, not ranked as the easy route */
+  repeatMixed?: boolean
   /** the one step that repeats, when the page's repeat sentence sits inside a longer quest */
   repeatStep?: QuestRepeatStep
 }

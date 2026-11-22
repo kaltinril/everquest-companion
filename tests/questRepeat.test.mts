@@ -119,9 +119,25 @@ test('a disambiguation hub is not a quest; a real page with a hatnote still is',
 
 test('a step that does not read leaves the plain marker', () => {
   const noHandIn = PAINTING.replace('Upon handing Palatos four drinks:', 'Then this happens:')
-  assert.deepEqual(fields('P', noHandIn), { repeatable: true })
+  assert.deepEqual(fields('P', noHandIn), { repeatable: true, repeatMixed: true })
   const twoItems = PAINTING.replace('Nesin Tapper.', 'Nesin Tapper, or a [[Muffin]].')
-  assert.deepEqual(fields('P', twoItems), { repeatable: true })
+  assert.deepEqual(fields('P', twoItems), { repeatable: true, repeatMixed: true })
+})
+
+test('two receipts with no step read are mixed; the same receipt twice is not', () => {
+  const block = (faction: string): string => `<div class="facblock">\n* Your faction standing with [[${faction}]] got better.\n</div>\n`
+  const page = (body: string): string => `${TOP('N', 'Z')}== Walkthrough ==\n${body}[[Category: Repeatable Turn-in Quests]]`
+  assert.deepEqual(fields('A', page(block('F') + block('G'))), { repeatable: true, repeatMixed: true })
+  assert.deepEqual(fields('B', page(block('F') + block('F'))), { repeatable: true })
+})
+
+test('a mixed repeat keeps its chip but its payout rank', () => {
+  const big: QuestEntry = { name: 'Big Once', page: 'Big Once', factions: [{ name: 'F', up: true, amount: 50 }] }
+  const mixed: QuestEntry = { name: 'Mixed', page: 'Mixed', repeatable: true, repeatMixed: true, factions: [{ name: 'F', up: true, amount: 5 }] }
+  const sure: QuestEntry = { name: 'Sure', page: 'Sure', repeatable: true, factions: [{ name: 'F', up: true, amount: 1 }] }
+  const raise = buildFactionWorkIndex([big, mixed, sure]).get('f')?.raise ?? []
+  assert.deepEqual(raise.map((q) => q.name), ['Sure', 'Big Once', 'Mixed'])
+  assert.equal(raise[2].repeatable, true)
 })
 
 test('another NPC with no zone stated gets none, never the quest\'s start zone', () => {
@@ -196,8 +212,9 @@ test('the real catalog: The Painting is the ale step, first of the marked raises
     const raise = index.get(name)?.raise ?? []
     const at = raise.findIndex((r) => r.page === 'The Painting')
     assert.ok(at >= 0, name)
-    assert.ok(raise.slice(0, at).every((r) => r.repeatable === true), `${name}: only repeatables sit above it`)
+    assert.ok(raise.slice(0, at).every((r) => r.repeatable === true && r.repeatMixed !== true), `${name}: only sure repeats sit above it`)
   }
+  assert.deepEqual(CATALOG.filter((x) => x.repeatMixed).map((x) => x.page), ['Deathfist Slashed Belts', 'Karana Clovers', 'Moonstones Quest'])
 })
 
 test('the real catalog marks exactly the pages read by hand', () => {
