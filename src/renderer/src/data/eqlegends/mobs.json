@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-21T07:52:34.249Z",
+  "scrapedAt": "2026-11-22T06:28:30.018Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -22152,9 +22152,6 @@
         "Fire Beetle Eye",
         "Fire Beetle Leg"
       ],
-      "otherNames": [
-        "A giant fire beetle"
-      ],
       "image": "npc_a_giant_beetle.png",
       "relatedQuests": [
         "Bug Collection"
@@ -22297,6 +22294,27 @@
         "10"
       ],
       "image": "npc_a_giant_diseased_rat.png"
+    },
+    {
+      "page": "A giant fire beetle",
+      "eraTag": "Classic",
+      "name": "a giant fire beetle",
+      "level": "9-11",
+      "zones": [
+        "Western Plains of Karana",
+        "Toxxulia Forest"
+      ],
+      "drops": [
+        "Giant Fire Beetle Eye",
+        "Giant Fire Beetle Leg"
+      ],
+      "loc": [
+        {
+          "ns": -1903,
+          "ew": 385
+        }
+      ],
+      "image": "npc_a_giant_fire_beetle.png"
     },
     {
       "page": "A giant frenzied leech",
@@ -22785,8 +22803,7 @@
       "relatedQuests": [
         "Gindlin's Poison",
         "Zimel's Blades (SoulFire)"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "A giant swamp leech",
@@ -24372,10 +24389,10 @@
       ],
       "factionAmounts": [
         "-30",
-        "10",
-        "10",
-        "10",
-        "10"
+        "5",
+        "5",
+        "5",
+        "5"
       ],
       "image": "npc_a_gnoll_guard.png",
       "relatedQuests": [
@@ -24624,9 +24641,9 @@
       "factionAmounts": [
         "-30",
         "10",
-        "10",
-        "10",
-        "10"
+        "5",
+        "5",
+        "5"
       ],
       "image": "npc_a_gnoll_pup.png",
       "relatedQuests": [
@@ -35485,6 +35502,27 @@
       "noImage": true
     },
     {
+      "page": "A lantern beetle",
+      "eraTag": "Classic",
+      "name": "a lantern beetle",
+      "level": "2",
+      "zones": [
+        "Butcherblock Mountains",
+        "Greater Faydark"
+      ],
+      "drops": [
+        "Fire Beetle Eye",
+        "Fire Beetle Leg"
+      ],
+      "loc": [
+        {
+          "ns": 1769,
+          "ew": -595
+        }
+      ],
+      "image": "npc_a_lantern_beetle.png"
+    },
+    {
       "page": "A large arachneidae",
       "name": "a large arachneidae",
       "level": "?",
@@ -36612,6 +36650,25 @@
         "Explorer Survival Knives"
       ],
       "noImage": true
+    },
+    {
+      "page": "A leaf scarab",
+      "eraTag": "Classic",
+      "name": "a leaf scarab",
+      "level": "4-5",
+      "zones": [
+        "East Commonlands"
+      ],
+      "drops": [
+        "Scarab Legs"
+      ],
+      "loc": [
+        {
+          "ns": 651,
+          "ew": 195
+        }
+      ],
+      "image": "npc_a_leaf_scarab.png"
     },
     {
       "page": "A Leatherfoot Spy",
@@ -49906,10 +49963,10 @@
       ],
       "factionAmounts": [
         "-30",
-        "10",
-        "10",
-        "10",
-        "10"
+        "5",
+        "5",
+        "5",
+        "5"
       ],
       "image": "npc_a_scrawny_gnoll_guard.png",
       "relatedQuests": [
@@ -62799,6 +62856,29 @@
       "noImage": true
     },
     {
+      "page": "A woodland lioness",
+      "eraTag": "Classic",
+      "name": "a woodland lioness",
+      "level": "6",
+      "zones": [
+        "East Commonlands"
+      ],
+      "drops": [
+        "Chunk of Meat",
+        "High Quality Cat Pelt",
+        "Lion Meat",
+        "Medium Quality Cat Pelt",
+        "Ruined Cat Pelt"
+      ],
+      "loc": [
+        {
+          "ns": 351,
+          "ew": 1504
+        }
+      ],
+      "image": "npc_a_woodland_lioness.png"
+    },
+    {
       "page": "A wooly mammoth",
       "eraTag": "Classic",
       "name": "a wooly mammoth",
@@ -63545,8 +63625,7 @@
           "pct": 17
         }
       ],
-      "image": "npc_a_young_plains_cat.0",
-      "noImage": true
+      "image": "npc_a_young_plains_cat.png"
     },
     {
       "page": "A young plains lion",
@@ -81182,17 +81261,17 @@
       ],
       "factions": [
         "Merchants of Halas",
+        "Rogues of the White Rose",
         "Shamen of Justice",
         "Steel Warriors",
-        "Wolves of the North",
-        "Rogues of the White Rose"
+        "Wolves of the North"
       ],
       "factionAmounts": [
-        "-30",
-        "-30",
-        "-30",
-        "-30",
-        "10"
+        "-1",
+        "-1",
+        "-1",
+        "-1",
+        "-5"
       ],
       "image": "npc_arnis_mclish.png",
       "relatedQuests": [
@@ -99716,6 +99795,12 @@
           "ew": 289,
           "pct": 33
         }
+      ],
+      "factions": [
+        "Clockworks of Ak`Anon"
+      ],
+      "factionAmounts": [
+        "-10"
       ],
       "image": "npc_cleaner_vii.png",
       "relatedQuests": [
@@ -165734,8 +165819,7 @@
         "-30",
         "10"
       ],
-      "image": "npc_jak_sindin.png",
-      "noImage": true
+      "image": "npc_jak_sindin.png"
     },
     {
       "page": "Jakom Herolon",
@@ -167480,6 +167564,25 @@
         "Thimble Mold",
         "Toolbox Mold"
       ]
+    },
+    {
+      "page": "Jimble Woodentoe",
+      "eraTag": "Classic",
+      "name": "Jimble Woodentoe",
+      "level": "12",
+      "zones": [
+        "East Commonlands"
+      ],
+      "drops": [
+        "Tarnished Short Sword"
+      ],
+      "loc": [
+        {
+          "ns": 16,
+          "ew": 78
+        }
+      ],
+      "image": "npc_jimble_woodentoe.png"
     },
     {
       "page": "Jinalis Andir",
@@ -182380,8 +182483,7 @@
         "Journal Strongbox",
         "Lenka's Pouch",
         "The Painting"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Lenka Stoutheart (Firiona Vie)",
@@ -187787,8 +187889,7 @@
       "image": "npc_lozani.png",
       "relatedQuests": [
         "Illegible Scrolls"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Lucetta",
@@ -187991,8 +188092,7 @@
         "Short Ale",
         "Short Beer",
         "White Wine"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Luren Renthalis",
@@ -189746,6 +189846,22 @@
         "Rogue Epic Quest"
       ],
       "noImage": true
+    },
+    {
+      "page": "Malloy the Songbird",
+      "eraTag": "Classic",
+      "name": "Malloy the Songbird",
+      "level": "61",
+      "zones": [
+        "West Freeport"
+      ],
+      "loc": [
+        {
+          "ns": -283,
+          "ew": -347
+        }
+      ],
+      "image": "npc_malloy_the_songbird.png"
     },
     {
       "page": "Malteor Flamecaller",
@@ -207338,8 +207454,7 @@
         "-",
         "+"
       ],
-      "image": "npc_palana_willin.png",
-      "noImage": true
+      "image": "npc_palana_willin.png"
     },
     {
       "page": "Palatos Kynarn",
@@ -221711,8 +221826,7 @@
         "-10",
         "-10"
       ],
-      "image": "scar.png",
-      "noImage": true
+      "image": "npc_scar.png"
     },
     {
       "page": "Scarbrow Ga`Hruk",
@@ -222154,6 +222268,23 @@
       "image": "npc_scribe_biddlegorb.png"
     },
     {
+      "page": "Scribe Flogglebig",
+      "eraTag": "Classic",
+      "name": "Scribe Flogglebig",
+      "level": "50",
+      "zones": [
+        "Rathe Mountains"
+      ],
+      "loc": [
+        {
+          "ns": -2056,
+          "ew": 1985
+        }
+      ],
+      "merchant": true,
+      "image": "npc_scribe_flogglebig.png"
+    },
+    {
       "page": "Scribe Noglleg",
       "eraTag": "Classic",
       "name": "Scribe Noglleg",
@@ -222169,6 +222300,70 @@
       ],
       "merchant": true,
       "image": "npc_scribe_noglleg.png"
+    },
+    {
+      "page": "Scribe Ooglebeg",
+      "eraTag": "Classic",
+      "name": "Scribe Ooglebeg",
+      "level": "50",
+      "zones": [
+        "Rathe Mountains"
+      ],
+      "loc": [
+        {
+          "ns": -1993,
+          "ew": 1960
+        }
+      ],
+      "merchant": true,
+      "sells": [
+        "Bloodstone",
+        "Book of Dark Bindings",
+        "Cat's Eye Agate",
+        "Dagger",
+        "Diablerie",
+        "Diablerie II",
+        "Fine Numen Plaque Solution",
+        "Fine Runic Numen Plaque Solution",
+        "Fine Runic Spell Tablet Solution",
+        "Fine Spell Tablet Solution",
+        "Gray Jr Apprentice Robe*",
+        "Gray Sr Apprentice Robe*",
+        "Helatan's Writ of Depravity",
+        "Jasper",
+        "Lore of Malignancy",
+        "Numen Plaque Solution",
+        "Pearl",
+        "Peridot",
+        "Piece of Parchment",
+        "Quill",
+        "Rapier",
+        "Rough Numen Plaque Solution",
+        "Rough Spell Tablet Solution",
+        "Runic Numen Plaque Solution",
+        "Runic Spell Tablet Solution",
+        "Spell Tablet Solution",
+        "Throwing Knife",
+        "Wrist Pouch"
+      ],
+      "image": "npc_scribe_ooglebeg.png"
+    },
+    {
+      "page": "Scribe Vordangl",
+      "eraTag": "Classic",
+      "name": "Scribe Vordangl",
+      "level": "50",
+      "zones": [
+        "Rathe Mountains"
+      ],
+      "loc": [
+        {
+          "ns": -1770,
+          "ew": 2156
+        }
+      ],
+      "merchant": true,
+      "image": "npc_scribe_vordangl.png"
     },
     {
       "page": "Scrounge",
@@ -240921,8 +241116,7 @@
         "-10",
         "-10"
       ],
-      "image": "npc_swiftfingers.jpg",
-      "noImage": true
+      "image": "npc_swiftfingers.png"
     },
     {
       "page": "Swin Blackeye",
@@ -243395,8 +243589,7 @@
           "pct": 50
         }
       ],
-      "image": "npc_tarn_bearcrusher.png",
-      "noImage": true
+      "image": "npc_tarn_bearcrusher.png"
     },
     {
       "page": "Tarn Visilin",
@@ -244607,8 +244800,7 @@
         "Shuriken",
         "Throwing Axe",
         "Throwing Knife"
-      ],
-      "noImage": true
+      ]
     },
     {
       "page": "Tenralus Brackmar",
@@ -252826,8 +253018,7 @@
         "10",
         "10"
       ],
-      "image": "Trolon lightleer.jpg",
-      "noImage": true
+      "image": "npc_trolon_lightleer.png"
     },
     {
       "page": "Trooni Thimblethumb",
@@ -264240,7 +264431,10 @@
       "page": "Voidling",
       "eraTag": "Classic",
       "name": "Voidling",
-      "image": "voidling.jpg"
+      "image": "voidling.jpg",
+      "relatedQuests": [
+        "Potential of the Void"
+      ]
     },
     {
       "page": "Vol T`Vke",

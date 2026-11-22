@@ -2446,3 +2446,4 @@ File:Npc_gallin_woodwind.png
 Shark_Meat_Quest
 Niola_Impholder
 Spirit_of_Keshuval_Summon
+Renouncing_Your_Faith
