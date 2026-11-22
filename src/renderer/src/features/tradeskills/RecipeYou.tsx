@@ -6,7 +6,8 @@
 // Where the log has no price, no price is drawn: at most the reason, in words.
 
 import type { JSX } from 'react'
-import { Chip, Stack, Typography } from '@mui/material'
+import { Box, Chip, Stack, Typography } from '@mui/material'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import type { CraftedItemRow } from '@shared/crafting'
 import type { BookRecipe } from '@shared/tradeskillBook'
 import { NOTICE_LABEL, NO_HISTORY_TEXT, historyWords, noticeTip, recipeHistory, trivialNotice } from '@shared/tradeskillHistory'
@@ -29,6 +30,24 @@ export function NoticeChip({ row }: { row: CraftedItemRow | null }): JSX.Element
   return (
     <Tooltip title={noticeTip(notice.count, notice.ts === null ? '' : formatDate(notice.ts))}>
       <Chip size="small" variant="outlined" color="info" label={NOTICE_LABEL} sx={CHIP_SX} data-testid="tradeskill-notice-chip" />
+    </Tooltip>
+  )
+}
+
+/** The same notice on a recipe line: a small mark, because a chip cut that line's You text. */
+export function NoticeMark({ row }: { row: CraftedItemRow | null }): JSX.Element | null {
+  const notice = trivialNotice(row)
+  if (notice === null) return null
+  return (
+    <Tooltip title={noticeTip(notice.count, notice.ts === null ? '' : formatDate(notice.ts))}>
+      <Box
+        component="span"
+        aria-label={NOTICE_LABEL}
+        sx={{ display: 'inline-flex', verticalAlign: 'text-bottom', mr: 0.5, color: 'info.main' }}
+        data-testid="tradeskill-notice-mark"
+      >
+        <InfoOutlinedIcon sx={{ fontSize: 14 }} />
+      </Box>
     </Tooltip>
   )
 }
