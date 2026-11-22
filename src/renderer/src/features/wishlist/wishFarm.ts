@@ -157,7 +157,9 @@ export function indexGear(rows: readonly GearRow[]): Map<string, GearRow> {
 export function collectWishNeeds(
   entries: readonly WishEntry[],
   index: WishIndices,
-  progressOf: (itemKey: string, tierRequired: ExtractTier) => DonorProgress
+  progressOf: (itemKey: string, tierRequired: ExtractTier) => DonorProgress,
+  /** The item data's own word by wish name: the gear index holds only what can be worn. */
+  isCrafted: (name: string) => boolean = () => false
 ): FarmNeed[] {
   return entries.map((entry) => {
     const facts = factsFor(entry, index)
@@ -171,7 +173,7 @@ export function collectWishNeeds(
       classes: facts.classes,
       slots: facts.slots,
       quest: facts.quest,
-      playerCrafted: facts.playerCrafted,
+      playerCrafted: facts.playerCrafted || isCrafted(entry.name),
       sources,
       // eslint-disable-next-line eqc/no-domain-munging -- JOS-459 cutover ledger item 3: ItemSource now lives in shared so the gear index can build the drop trio (fork PR #31); no served source answers this read yet
       zones: [...new Set(sources.flatMap((s) => s.zones))],

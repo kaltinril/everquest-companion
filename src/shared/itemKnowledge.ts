@@ -36,6 +36,8 @@ export interface ItemMarks {
   tradeskills: Tradeskill[]
   /** The tradeskills that MAKE it, one spelling each; absent when no recipe of its own names one. */
   madeBy?: Tradeskill[]
+  /** The page carries a crafting recipe, whatever it names (the Wish list's "Crafted" heading). */
+  crafted?: true
   /** The stats block says NO DROP / NO TRADE (the Bazaar's keep rule). */
   noTrade: boolean
 }
@@ -59,6 +61,7 @@ export function marksOf(k: Omit<ItemKnowledge, 'cached'>): ItemMarks {
     recipes: k.recipes?.length ?? 0,
     tradeskills: folded(skills),
     ...(madeBy.length === 0 ? {} : { madeBy }),
+    ...(k.playerCrafted === true ? { crafted: true as const } : {}),
     noTrade: (k.stats?.flags ?? []).some((f) => NO_TRADE.has(f.toLowerCase()))
   }
 }

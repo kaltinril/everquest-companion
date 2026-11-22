@@ -188,6 +188,15 @@ test('a crafted wish files under Crafted — the flag comes from whichever index
   assert.equal(groupNeeds(needs, { eraOnly: true })[0].kind, 'crafted')
 })
 
+test('a crafted wish that cannot be worn is in neither index and still files under Crafted', () => {
+  const wish = gearWish('a jeweled gem', 'A Jeweled Gem')
+  const crafted = collectWishNeeds([wish], indices(), () => progress(), (name) => name === 'A Jeweled Gem')
+  assert.equal(groupNeeds(crafted, { eraOnly: true })[0].kind, 'crafted')
+  // The item data says nothing: the honest heading stays.
+  const silent = collectWishNeeds([wish], indices(), () => progress(), () => false)
+  assert.equal(groupNeeds(silent, { eraOnly: true })[0].kind, 'unknown')
+})
+
 // ---- 3. done detection ------------------------------------------------------------------------
 
 test('a DONOR wish is done at `ready`, and NOT one tier earlier', () => {
