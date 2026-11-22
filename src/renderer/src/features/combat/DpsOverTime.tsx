@@ -22,7 +22,7 @@ import { formatRate } from '../../lib/formatRate'
 import { petDrawnApart, type ChartLineKey, type DpsLineKey } from './combatPrefs'
 import { ApproxChip, DashCard, QuietNote, fmtDur } from './combatShared'
 import { approxNote, buildDpsSeries, type DpsSeries } from './dashboardData'
-import { outLabel, peakTitle, withPetApart } from './dpsAt'
+import { bandLabel, outLabel, peakTitle, withPetApart } from './dpsAt'
 import {
   CHART_H,
   CHART_W,
@@ -304,7 +304,7 @@ function ChartLegend({
           never read as "yours". */}
       {entry('out', OUT_COLOR, outLabel(series))}
       {series.hasPet && entry('pet', PET_COLOR, 'pet')}
-      {series.hasGroup && entry('group', GROUP_COLOR, 'group')}
+      {series.hasGroup && entry('group', GROUP_COLOR, bandLabel(series))}
       {series.hasInc && entry('inc', INC_COLOR, 'incoming')}
       {/* One legend entry per marker KIND actually present — an always-on legend for four
           kinds would spend the strip explaining ticks the fight never had. */}

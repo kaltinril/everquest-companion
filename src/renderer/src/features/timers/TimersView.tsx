@@ -97,6 +97,7 @@ import {
   Typography
 } from '@mui/material'
 import {
+  cappedRowCount,
   filterRespawnCandidates,
   orderRespawnRows,
   respawnCandidateNote,
@@ -269,7 +270,7 @@ function ClocksPanel({
     return (
       <Typography variant="body2" color="text.secondary" data-testid="respawn-empty" sx={{ py: 2 }}>
         {elsewhere > 0
-          ? `No clocks in ${zoneName}. ${elsewhere} running in other zones.`
+          ? `No clocks in ${zoneName}. ${cappedRowCount(elsewhere, elsewhere)} running in other zones.`
           : 'No clocks running. Watch a mob from Recently killed.'}
       </Typography>
     )
@@ -308,7 +309,8 @@ function ScopeSwitch({
   onScope: (s: Scope) => void
   zoneName: string
   here: number
-  total: number
+  /** Already worded: `60+` when the other zones' rows are at their cap. */
+  total: string
 }): JSX.Element {
   return (
     <ToggleButtonGroup
@@ -484,7 +486,7 @@ export default function TimersView({
           onScope={setScope}
           zoneName={zoneName}
           here={hereRows.length}
-          total={snap.rows.length}
+          total={cappedRowCount(snap.rows.length, snap.rows.length - hereRows.length)}
         />
         {/* What the switch shows is what this clears — the plan is worked out in shared/, because
             deciding which served rows go is not the renderer's job (owner ruling 4). */}

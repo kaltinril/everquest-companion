@@ -28,10 +28,11 @@ import {
 import {
   DEFAULT_MOTE_PREFS,
   moteChangesText,
-  moteCopiesText,
+  moteGainHint,
   moteGainText,
   moteGateText,
   moteHoursText,
+  moteHoursTitle,
   motePlanLine,
   moteSourceText,
   moteSourceTitle,
@@ -412,8 +413,9 @@ test('the tab words: target names, the gain, the changes, the copies and the hou
     { key: 'WEIGHT', from: 1.5, to: 0.8 }
   ] as const
   assert.equal(moteChangesText({ changes: [...changes] }), 'AC 66→70 · SV VOID -→1 · WEIGHT 1.5→0.8')
-  assert.equal(moteCopiesText({ copies: 1 }), '1 copy')
-  assert.equal(moteCopiesText({ copies: 1024 }), '1,024 copies')
+  // The cost is item experience: a dropped +4 copy is worth 16 of it, so it is never "128 copies".
+  assert.equal(moteHoursTitle({ copies: 128, road: 'copies' }), 'Without a mote: 128 item experience, mostly by farming copies')
+  assert.equal(moteHoursTitle({ copies: 1024, road: 'motes' }), 'Without a mote: 1,024 item experience, mostly by ordinary motes')
   assert.equal(moteHoursText({ hours: 5.1 }), '5.1 h')
   assert.equal(moteHoursText({ hours: 1189.6 }), '1,190 h')
 })
@@ -429,6 +431,13 @@ test('the tab words: the source, what it assumed, and why a row is not yet a pic
   assert.equal(moteGateText({ gate: 'rare', gain: 3 }), 'Below +7, but copies barely exist')
   assert.equal(moteGateText({ gate: 'pick', gain: 3 }), '')
   assert.equal(moteGateText({ gate: 'pick', gain: 0 }), 'No gain for your target')
+})
+
+test('the Gain hover names the class pick a focus is scored for, and only a focus', () => {
+  assert.equal(moteGainHint('tank', ['WIZ']), 'What the next tier adds for your target, scored for Wizard')
+  assert.equal(moteGainHint('tank', ['SHD', 'ENC']), 'What the next tier adds for your target, scored for Shadow Knight, Enchanter')
+  assert.equal(moteGainHint('tank', []), 'What the next tier adds for your target, scored for every class')
+  assert.equal(moteGainHint('AC', ['WIZ']), 'What the next tier adds for your target', 'a stat has no class in it')
 })
 
 test('the tab words: the worn items left off the list are named with the reason', () => {

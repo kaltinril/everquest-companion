@@ -109,6 +109,16 @@ export function estimateText(ms: number, src: string | undefined): string {
   return `${estimatePrefix(src)}${fmtPrecise(ms)}`
 }
 
+/**
+ * The edit dialog's note under "Automatic". `src` is the automatic estimate's own source, known
+ * only while no choice is saved (a saved choice replaces `estimatorSource`), so pass undefined then.
+ */
+export function automaticNote(src: string | undefined): string {
+  if (src === 'deathBound') return 'At least this long (the target died with it on)'
+  if (src === 'cluster') return 'Your clean casts agree it runs shorter than the wiki'
+  return 'The wiki duration, raised to your longest recent cast'
+}
+
 /** The provenance chip's word: the database, a number you set, or the log. */
 export function estimateChipLabel(src: string | undefined): string {
   if (src === 'db') return 'db'

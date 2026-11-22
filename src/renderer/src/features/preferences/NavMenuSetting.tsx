@@ -57,7 +57,7 @@ function NavMenuSetting(): JSX.Element {
         />
       </Row>
       <Typography variant="caption" color="text.secondary" data-testid="pref-nav-note">
-        This sizes the left menu only; the text size above still scales it.
+        This sizes the left menu only; In-app text size scales it too.
       </Typography>
     </Stack>
   )

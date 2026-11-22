@@ -7,7 +7,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import type { ActiveBuff } from '../src/shared/buffTypes'
-import { estimateState, estimateText, fmtElapsed, fmtPrecise, leftCaption, statCells } from '../src/renderer/src/features/buffs/format'
+import { automaticNote, estimateState, estimateText, fmtElapsed, fmtPrecise, leftCaption, statCells } from '../src/renderer/src/features/buffs/format'
 
 function buff(over: Partial<ActiveBuff>): ActiveBuff {
   return { spell: 'Swift Like the Wind', cls: 'buff', self: true, startedTs: 0, estimatedMs: null, p25: null, p75: null, n: 0, ...over }
@@ -107,4 +107,14 @@ test('a card that has just landed reads 0s elapsed, never a dash', () => {
   assert.equal(fmtElapsed(0), '0s')
   assert.equal(fmtElapsed(400), '0s')
   assert.equal(fmtElapsed(8_000), '8s')
+})
+
+test('the Automatic note says what the automatic number is', () => {
+  const raised = 'The wiki duration, raised to your longest recent cast'
+  assert.equal(automaticNote('deathBound'), 'At least this long (the target died with it on)')
+  assert.doesNotMatch(automaticNote('deathBound'), /wiki|cast/, 'no wiki number or cast stands behind a bound')
+  assert.doesNotMatch(automaticNote('cluster'), /raised/, 'the casts ran shorter than the wiki')
+  assert.equal(automaticNote('db'), raised)
+  assert.equal(automaticNote('observed'), raised)
+  assert.equal(automaticNote(undefined), raised, 'a saved choice hides the automatic source')
 })

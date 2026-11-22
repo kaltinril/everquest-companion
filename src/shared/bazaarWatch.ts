@@ -140,6 +140,15 @@ export function watchOnItem(list: BazaarWatchlist, item: string): BazaarWatch | 
   return on.find((w) => w.tier === null) ?? on[0] ?? null
 }
 
+/**
+ * Would turning this tier's watch into the every-tier one replace another watch? One key holds one
+ * watch, so the tick used to wipe the every-tier watch's sides and prices without a word.
+ */
+export function everyTierTaken(list: BazaarWatchlist, w: BazaarWatch): boolean {
+  const lower = w.item.toLowerCase()
+  return w.tier !== null && list.entries.some((x) => x.tier === null && x.item.toLowerCase() === lower)
+}
+
 /** A stored share of the median as the percent a person typed: 0.125 is 12.5, 0.8 is 80 (never
  *  80.00000000000001). Two decimals, because the alert compares the stored value exactly. */
 export function sharePercent(share: number): number {

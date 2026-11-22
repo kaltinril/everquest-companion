@@ -59,7 +59,7 @@ const LAYOUT_HINT: Record<PetLayout, string> = {
   nested:
     'Your pet’s damage rides inside your bar, and appears once more as one row inside your breakdown - click it for the pet’s own skills. Your per-skill numbers stay yours; the pet’s damage is never folded into them.',
   separate:
-    'Your pet gets its own bar beside yours, and each bar drills into its own skills. The DPS chart draws you and your pet as two lines.',
+    'Your pet gets its own bar beside yours, and each bar drills into its own skills. The DPS chart draws your pet as its own line.',
   grouped:
     'Each pet sits on the line under its owner, grouped by a shared bar, with the pair’s total on the right. A group-mate’s pet joins its owner once they have typed /pet who leader near you. The Overview card shows your pet inside your bar.'
 }

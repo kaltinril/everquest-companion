@@ -165,6 +165,9 @@ export const recordedTurnInMovesCounts = (s: CountSource): boolean => s === 'log
 
 /** The '+' hover: what recording a turn-in does to the counts under this source. */
 export function recordTurnInTitle(s: CountSource): string {
+  // `both` takes the higher witness, and a click never discounts the dump: an item the export
+  // holds does not move, so "subtracted" alone was untrue with a dump loaded.
+  if (s === 'both') return 'Record another turn-in; its items are subtracted from your log count, not your export.'
   return recordedTurnInMovesCounts(s)
     ? 'Record another turn-in. The items it required are subtracted, so the quest goes back to what you hold toward running it again.'
     : 'Record another turn-in; item counts stay the same unless you set them by hand.'

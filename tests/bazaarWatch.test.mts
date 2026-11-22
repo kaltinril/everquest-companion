@@ -5,6 +5,8 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { formatPlat, formatPlatExact, parsePlat, platFieldCommit, summarizeBazaar, type BazaarRow, type BazaarSnap, type LiveOffer } from '../src/shared/bazaar'
 import {
+  EMPTY_WATCHLIST,
+  everyTierTaken,
   findWatch,
   freshWatchAlerts,
   normalizeBazaarWatchlist,
@@ -345,4 +347,15 @@ test('a typed share of the median reads as typed, in the field and on the chip',
   assert.equal(sharePercent(0.07), 7)
   const w = { item: 'Fleeting Quiver', tier: 4, wts: true, wtb: false, wtsMax: null, wtsShare: 0.125, wtbMin: null }
   assert.equal(watchChipLabel(w), 'Watch: WTS ≤ 12.5% median')
+})
+
+test('a tier watch cannot take over an every-tier watch that already holds prices', () => {
+  const base: BazaarWatch = { item: 'Fleeting Quiver', tier: 4, wts: false, wtb: false, wtsMax: null, wtsShare: null, wtbMin: null }
+  const every: BazaarWatch = { ...base, tier: null, wts: true, wtsMax: 31_000 }
+  const both = setWatch(setWatch(EMPTY_WATCHLIST, base), every)
+  assert.equal(everyTierTaken(both, base), true, 'the tick would replace the 31k watch')
+  assert.equal(everyTierTaken(both, every), false, 'the every-tier watch can always be un-ticked')
+  assert.equal(everyTierTaken(setWatch(EMPTY_WATCHLIST, base), base), false, 'nothing to replace')
+  const other = setWatch(setWatch(EMPTY_WATCHLIST, base), { ...every, item: 'Bone Chip Ring' })
+  assert.equal(everyTierTaken(other, base), false, 'another item is another watch')
 })

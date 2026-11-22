@@ -55,6 +55,7 @@ import {
   MOTE_TARGET_ROLES,
   moteChangesText,
   moteEmptyText,
+  moteGainHint,
   moteGainText,
   moteGateText,
   moteHoursText,
@@ -74,8 +75,8 @@ const HINT = 'Void-Touched Potential: three a week from raids, each skips a whol
 
 /** One clause per header (the tooltip diet). */
 const HEAD: readonly { label: string; hint: string; align?: 'right' }[] = [
-  { label: '#', hint: "A number marks one of this week's motes; a dash is not yet" },
-  { label: 'Item', hint: 'A worn item, and the tier this week takes it to' },
+  { label: '#', hint: "How many of this week's motes it gets; a dash means not yet" },
+  { label: 'Item', hint: "A worn item and its next tier, or where this week's motes take it" },
   { label: 'Slot', hint: 'Where your inventory dump says you wear it' },
   { label: 'Gain', hint: 'What the next tier adds for your target', align: 'right' },
   { label: 'Next tier', hint: 'Every stat the next tier changes' },
@@ -98,15 +99,18 @@ const CELL = { py: 0.25, px: 1, fontSize: 12, whiteSpace: 'nowrap' } as const
 interface ControlsProps {
   motes: VoidMotePrefs
   setMotes: (next: VoidMotePrefs) => void
+  /** Greyed while there is no list: a pick would change nothing on screen. */
+  disabled: boolean
 }
 
 /** The two picks: what a gain is measured in, and what the list is ranked by. */
-function MoteControls({ motes, setMotes }: ControlsProps): JSX.Element {
+function MoteControls({ motes, setMotes, disabled }: ControlsProps): JSX.Element {
   return (
     <>
       <TextField
         select
         size="small"
+        disabled={disabled}
         label="Gain for"
         value={motes.target}
         data-testid="gear-motes-target"
@@ -132,6 +136,7 @@ function MoteControls({ motes, setMotes }: ControlsProps): JSX.Element {
       <ToggleButtonGroup
         size="small"
         exclusive
+        disabled={disabled}
         data-testid="gear-motes-order"
         value={motes.order}
         onChange={(_e: unknown, v: MoteOrder | null) => {
@@ -242,7 +247,7 @@ export default function VoidMotePanel({ compare, indexReady, indexRefused, class
         >
           {list.length === 0 ? 'One lifts a worn item a full tier' : motePlanLine(plan)}
         </Typography>
-        <MoteControls motes={motes} setMotes={setMotes} />
+        <MoteControls motes={motes} setMotes={setMotes} disabled={list.length === 0} />
       </Stack>
       {list.length === 0 ? (
         <Typography variant="body2" color="text.secondary" data-testid="gear-motes-empty" sx={{ px: 1, pb: 1 }}>
@@ -262,7 +267,7 @@ export default function VoidMotePanel({ compare, indexReady, indexRefused, class
             <TableHead>
               <TableRow>
                 {HEAD.map((h) => (
-                  <TableCell key={h.label} title={h.hint} align={h.align} sx={{ ...CELL, color: 'text.secondary' }}>
+                  <TableCell key={h.label} title={h.label === 'Gain' ? moteGainHint(motes.target, classes) : h.hint} align={h.align} sx={{ ...CELL, color: 'text.secondary' }}>
                     {h.label}
                   </TableCell>
                 ))}
