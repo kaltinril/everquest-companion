@@ -20,6 +20,7 @@ import { ScopeStatus } from './ScopeStatus'
 import type { CombatScope, MeterMode, ScopeOptions } from './dashboardData'
 import type { MeterScope, RosterSnap } from '@shared/roster'
 import { fmtDur } from './combatShared'
+import { headlineClockSec } from './headlineClock'
 import { formatDateTime } from '../../lib/formatDate'
 import { formatNum as fmt, formatRate } from '../../lib/formatRate'
 import type { BladeCoatState, CoatSlot, CombatSnapshot, SegmentView } from '@shared/combat'
@@ -177,7 +178,7 @@ function HeadlineStat({ seg }: { seg: SegmentView | null }): React.JSX.Element |
         {formatRate(seg.outDps)}
       </Typography>
       <Typography variant="caption" noWrap sx={{ color: 'text.disabled', fontVariantNumeric: 'tabular-nums' }}>
-        {fmt(seg.outTotal)} · {fmtDur(seg.durationSec)}
+        {fmt(seg.outTotal)} · {fmtDur(headlineClockSec(seg.outTotal, seg.outDps, seg.durationSec))}
       </Typography>
     </Stack>
   )

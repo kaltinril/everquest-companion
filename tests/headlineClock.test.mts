@@ -52,4 +52,8 @@ test('the Overview card and the Combat tab header both read the clock here', () 
   assert.doesNotMatch(card, /fmtDur\(seg\.durationSec\)/, 'the card prints the fight length under any headline')
   const header = read('../src/renderer/src/features/combat/SegmentHeader.tsx')
   assert.match(header, /\bheadlineClockSec\s*\(/, 'the header works its clock out apart from the card')
+  // A zone overall's rate is over more than your fights, so the top bar reads the same clock.
+  const bar = read('../src/renderer/src/features/combat/CombatHeader.tsx')
+  assert.match(bar, /\bheadlineClockSec\s*\(/, 'the top bar prints the fight length under any headline')
+  assert.doesNotMatch(bar, /fmtDur\(seg\.durationSec\)/, 'the top bar prints the fight length under any headline')
 })

@@ -19,7 +19,9 @@ use crate::combat::aggregate::{
 use crate::combat::collate::compare_names;
 use crate::combat::encounter::{encounter_name, Encounter, ACTIVE_MS};
 use crate::combat::healing::{build_healing_view, HealingView};
-use crate::combat::lifecycle::{zone_active_sec, zone_duration_sec};
+use crate::combat::lifecycle::{
+    live_stay_rate, stay_rate, zone_active_sec, zone_duration_sec, StayRate,
+};
 use crate::combat::procviews::{build_procs_view, effect_landings, ProcsView, ProcsViewSpec};
 use crate::combat::rounds::round_confidence;
 use crate::combat::state::EngineState;
@@ -818,6 +820,8 @@ struct ViewSpec<'a> {
     end_ts: i64,
     /// Present only for a fight.
     enc: Option<&'a Encounter>,
+    /// A stay's own divisors for the outgoing headline; a fight's are its length and active time.
+    stay: Option<StayRate>,
 }
 
 fn build_view(spec: ViewSpec) -> SegmentView {
@@ -842,9 +846,14 @@ fn build_view(spec: ViewSpec) -> SegmentView {
         })
         .collect();
     incoming_healers.sort_by_key(|h| std::cmp::Reverse(h.total));
+    let (rate_sec, active_rate_sec) = spec
+        .stay
+        .map_or((duration_sec, f64::max(1.0, spec.active_sec)), |r| {
+            (r.sec, r.active_sec)
+        });
     SegmentView {
-        out_dps: out_total as f64 / duration_sec,
-        active_dps: out_total as f64 / f64::max(1.0, spec.active_sec),
+        out_dps: out_total as f64 / rate_sec,
+        active_dps: out_total as f64 / active_rate_sec,
         in_dps: in_total as f64 / duration_sec,
         // Built from the same frozen aggregate as the bars above it, so a finalized zone session,
         // which keeps no event ring at all, reports defence exactly.
@@ -909,6 +918,7 @@ pub fn build_selected(st: &EngineState, id: &str, now: i64) -> Option<SegmentVie
             start_ts: st.zone_start_ts,
             end_ts: st.zone_last_ts,
             enc: None,
+            stay: Some(live_stay_rate(st)),
         }));
     }
     // A finalized zone session: rebuild its full breakdown from the frozen aggregate.
@@ -927,6 +937,7 @@ pub fn build_selected(st: &EngineState, id: &str, now: i64) -> Option<SegmentVie
             start_ts: zs.start_ts,
             end_ts: zs.last_ts,
             enc: None,
+            stay: Some(stay_rate(zs.finalized_ms, zs.active_ms, zs.agg.loose.ms())),
         }));
     }
     let is_current = st.current.as_ref().is_some_and(|e| e.id == id);
@@ -948,5 +959,6 @@ pub fn build_selected(st: &EngineState, id: &str, now: i64) -> Option<SegmentVie
         start_ts: e.start_ts,
         end_ts: e.last_ts,
         enc: Some(e),
+        stay: None,
     }))
 }
