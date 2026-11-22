@@ -62,13 +62,18 @@ import { needsRecipe } from '@shared/gapRecipe'
 import { ZoneMapButton } from './ZoneMapLinks'
 import { shownName } from '@shared/gapEdits'
 
-/** One line of small cells with a small chip: 6px padding above and below a 24px chip, plus the border. */
-const ROW_HEIGHT = 37
+/** Two lines in the Name cell (22 + 18) and two stacked chips in Seen as, 2px above and below, plus the border. */
+const ROW_HEIGHT = 46
 const COLUMNS = 8
-/** Below this the table scrolls sideways instead of squeezing Name to nothing; no row moves it. */
-const TABLE_MIN_WIDTH = 1100
+/** Below this the table scrolls sideways instead of squeezing Name; no row moves it. Name has about 320 px here. */
+const TABLE_MIN_WIDTH = 1200
 /** Every body cell: one line, clipped at its column's edge, so a cell can never widen the table. */
 const CLIP = { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } as const
+/** A zone list takes the row's two lines before it clips. */
+const TWO_LINES = { display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', whiteSpace: 'normal', lineHeight: 1.25 } as const
+
+/** A row's time without the year and seconds, the room Name needs (owner, 2026-11-21); the hover has all of it. */
+const shortStamp = (s: string): string => /^\d{4}-(\d\d-\d\d \d\d:\d\d)/.exec(s)?.[1] ?? s
 
 /** The spacer rows that reserve the full scroll height, so only a screenful of rows is mounted. */
 function PadRow({ height }: { height: number }): JSX.Element | null {
@@ -110,20 +115,22 @@ const GapTableRow = memo(function GapTableRow({
 }): JSX.Element {
   return (
     <TableRow hover selected={open} onClick={() => onToggle(row.name)} sx={{ cursor: 'pointer', height: ROW_HEIGHT, opacity: done ? 0.5 : 1 }} data-testid="gaps-row">
-      <TableCell sx={{ ...CLIP, fontWeight: 600, pl: depth > 0 ? 3 + depth * 2 : undefined }}>
+      <TableCell sx={{ ...CLIP, fontWeight: 600, py: 0.25, pl: depth > 0 ? 3 + depth * 2 : undefined }}>
         <GapNameCell row={row} verdict={verdict} need={need} chipContext={chipContext} held={held} depth={depth} />
       </TableCell>
       {/* Beside the name (owner, 2026-10-19): the work buttons where the eye already is. */}
       <TableCell sx={{ ...CLIP, py: 0 }}>
         <GapRowButtons row={row} pageText={work.pageText} isDone={done} onDone={work.onDone} compact />
       </TableCell>
-      <TableCell sx={CLIP}>
+      <TableCell sx={{ ...CLIP, py: 0, px: 1 }}>
         <SeenAsChips kinds={row.kinds} />
       </TableCell>
-      <TableCell sx={{ ...CLIP, color: 'text.secondary' }}>{gapZone(row)}</TableCell>
+      <TableCell sx={{ py: 0, color: 'text.secondary' }} title={gapZone(row)}>
+        <Box sx={TWO_LINES}>{gapZone(row)}</Box>
+      </TableCell>
       <TableCell align="right" sx={CLIP}>{row.count.toLocaleString()}</TableCell>
-      <TableCell sx={{ ...CLIP, color: 'text.secondary' }}>{row.first}</TableCell>
-      <TableCell sx={{ ...CLIP, color: 'text.secondary' }}>{row.last}</TableCell>
+      <TableCell sx={{ ...CLIP, color: 'text.secondary' }} title={row.first}>{shortStamp(row.first)}</TableCell>
+      <TableCell sx={{ ...CLIP, color: 'text.secondary' }} title={row.last}>{shortStamp(row.last)}</TableCell>
       <TableCell sx={CLIP}>
         <GapActionChips row={row} verdict={verdict} ctx={chipContext} />
       </TableCell>
@@ -241,12 +248,12 @@ function DetailsPane({ row, actions }: { row: GapRow; actions: PaneActions }): J
  */
 const HEADERS: readonly (readonly [string, GapSortKey, 'left' | 'right', number | string | undefined])[] = [
   ['Name', 'name', 'left', undefined],
-  ['Seen as', 'kinds', 'left', '10%'],
-  ['Zone', 'zone', 'left', '20%'],
-  ['Times', 'count', 'right', 80],
-  ['First', 'first', 'left', 175],
-  ['Last', 'last', 'left', 175],
-  ['To do', 'todo', 'left', '15%']
+  ['Seen as', 'kinds', 'left', 124],
+  ['Zone', 'zone', 'left', '14%'],
+  ['Times', 'count', 'right', 72],
+  ['First', 'first', 'left', 118],
+  ['Last', 'last', 'left', 118],
+  ['To do', 'todo', 'left', '12%']
 ]
 /** Four 24 px icon buttons and the cell's padding. */
 const WORK_WIDTH = 136
