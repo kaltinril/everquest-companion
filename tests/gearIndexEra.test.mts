@@ -98,14 +98,15 @@ test("LIFE'S GUARD: the dropper edge overrules the zone, and the chip names the 
   assert.equal(eraHides(guard, false), false, 'and it must still be there with the filter off')
 })
 
-test('layer 3 is counted in the build census, and only its ONE definitive edge overrules a row', () => {
+test('layer 3 is counted in the build census, and only its two definitive edges overrule a row', () => {
   // Re-measured 2026-08-13 after JOS-341: 2,532 rows carry a derivation (was 361). FLOORS.
   assert.ok(index.stats.eraDerivedRows >= 2000, `only ${String(index.stats.eraDerivedRows)} derived rows`)
   assert.equal(index.stats.eraDerivedRows, rows.filter((r) => r.eraDerived !== undefined).length)
 
   // THE PROPERTY, restated for the two directions layer 3 now has. A row that already had an era
-  // claim of its own may carry a derivation ONLY when that derivation is the definitive dropper
-  // edge; everything else still speaks into silence alone. And no row may carry a derivation and
+  // claim of its own may carry a derivation ONLY when that derivation is definitive (every dropper
+  // badged, or every recipe walled by a drop-only material); everything else still speaks into
+  // silence alone. And no row may carry a derivation and
   // still read `era?` — a derivation that resolved nothing is `null`, never a third verdict.
   let definitive = 0
   for (const row of rows) {
@@ -113,7 +114,7 @@ test('layer 3 is counted in the build census, and only its ONE definitive edge o
     if (derived === undefined) continue
     if (derived.definitive ?? false) {
       definitive++
-      assert.equal(derived.basis, 'drop-mob', `${row.name} claims a definitive ${derived.basis} edge`)
+      assert.ok(derived.basis === 'drop-mob' || derived.basis === 'component-zone', `${row.name} claims a definitive ${derived.basis} edge`)
     } else {
       assert.equal(row.eraTag, undefined, `${row.name} carries BOTH a banner and a non-definitive derivation`)
     }

@@ -50,11 +50,18 @@ interface PageRow {
 
 /** A row about a name the data knows by design: the name test says nothing about it. */
 export function aboutKnownPage(r: PageRow): boolean {
-  return r.viaRedirect !== undefined || (r.domain === 'mob' && (r.questGaps !== undefined || r.zoneTitled === true))
+  return r.viaRedirect !== undefined || isQuestRow(r) || (r.domain === 'mob' && r.zoneTitled === true)
 }
 
+/** A Mobs row with quest gaps, or the same row served under Merchants (gaps_roles.rs `served_under`). */
+const isQuestRow = (r: PageRow): boolean => r.questGaps !== undefined && (r.domain === 'mob' || r.domain === 'merchant')
+
 /** A quest page title as two lists compare it (gap_index.rs `quest_title_key`). */
-const questTitleKey = (title: string): string => title.trim().toLowerCase().replace(/`/g, "'")
+const questTitleKey = (title: string): string =>
+  title.trim().toLowerCase().replace(/`/g, "'").replace(/[?!.]+$/, '').trimEnd()
+
+/** The family page a quest is listed through (gap_index.rs `quest_hub_key`). */
+const questHubKey = (key: string): string => `${key.replace(/^the /, '').replace(/ \([^)]*\)$/, '')} quests`
 
 /** The quest pages each giver's mob key gives, off the quest catalog's `giver` (gap_index.rs `quests_by_giver`). */
 export function questsByGiver(quests: readonly { name?: string; page?: string; giver?: string }[]): Map<string, string[]> {
@@ -75,7 +82,10 @@ function stillLacking(p: PageNow, saved: readonly string[], givenBy: PagesNow['g
   const keys = [p.name ?? '', p.page, ...(p.otherNames ?? [])].map(mobKey).filter((k) => k !== '')
   const given = new Set(keys.flatMap((k) => givenBy(k)).map(questTitleKey))
   const listed = new Set((p.relatedQuests ?? []).map(questTitleKey))
-  return saved.filter((q) => given.has(questTitleKey(q)) && !listed.has(questTitleKey(q)))
+  return saved.filter((q) => {
+    const key = questTitleKey(q)
+    return given.has(key) && !listed.has(key) && !listed.has(questHubKey(key))
+  })
 }
 
 /** A quest-giver row with the quests its page still lacks, or null when none is left or the page is not found. */
@@ -112,8 +122,9 @@ function zonePageExists(r: PageRow, name: string, pages: PagesNow): boolean {
  * a quest-giver row with fewer quests, or null when today's data no longer says it.
  */
 export function knownPageRowNow<T extends PageRow>(r: T, pages: PagesNow): T | null {
-  if (typeof r.name !== 'string' || (r.domain !== 'item' && r.domain !== 'mob')) return r
-  if (r.domain === 'mob' && r.questGaps !== undefined) return questRowNow(r, r.name, pages)
+  if (typeof r.name !== 'string') return r
+  if (isQuestRow(r)) return questRowNow(r, r.name, pages)
+  if (r.domain !== 'item' && r.domain !== 'mob') return r
   if (r.viaRedirect !== undefined) return stillRedirected(r.domain, r.name, r.viaRedirect, pages) ? r : null
   return zonePageExists(r, r.name, pages) ? null : r
 }

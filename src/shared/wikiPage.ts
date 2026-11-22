@@ -657,7 +657,7 @@ const PAGE_OF: Record<GapDomain, (row: GapRow, c: PageContext) => string> = {
   // A mob its target line calls a merchant takes the merchant layout before any trade (owner, 2026-10-22);
   // a new mob page takes its fight estimates in its blank fields (shared/gapFight.ts).
   mob: (row, c) => (row.questGaps ? questGiverAddText(row.questGaps) : roleOf(row) === 'Merchant' ? merchantPage(withDescription(mobFacts(row, [], c.kills, { ...c.seen, zoneName: c.zoneName }), row, c)) : withRespawnField(withFightFields(mobPage(withDescription(mobFacts(row, c.loot, c.kills, { ...c.seen, zoneName: c.zoneName, dropGroups: c.dropGroups }), row, c), c.commonLoot), row), row)),
-  merchant: (row, c) => merchantPage(withDescription(mobFacts(row, [], c.kills, { ...c.seen, zoneName: c.zoneName }), row, c)),
+  merchant: (row, c) => (row.questGaps ? questGiverAddText(row.questGaps) : merchantPage(withDescription(mobFacts(row, [], c.kills, { ...c.seen, zoneName: c.zoneName }), row, c))),
   spell: (row, c) => spellPage({ name: row.name, npcOnly: npcOnlySpell(row, c.isMob), client: c.spellFacts?.[row.name], shot: c.spellShots?.[row.name], castBy: castBySentence(row, c.isMob) }),
   faction: (row) => `${factionLine({ faction: factionOf(row), adjust: row.adjust, raised: row.raised })}\n`,
   image: (row) => `| ${'imagefilename'.padEnd(17)} = ${row.image ?? ''}\n`,

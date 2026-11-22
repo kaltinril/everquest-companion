@@ -2616,10 +2616,15 @@ only: no engine, parser, protocol, network or dependency change.
 
 ### The plan buys first, folds, and keeps its columns (2026-11-20, branch `plan-buy-first`)
 
-- `planTree` shuts a material with a recipe as `closed: 'bought'` when the wiki's words, a guide's
-  merchant (`soldByMerchant`) or the log (`PlanAsk.paid`) say it can be bought. `PlanAsk.opened` /
-  `PlanMemory.opened` is the reader's "Make it instead". Pass `paid` wherever a tree is built for
-  the player, or Home's "Working towards" count and the plan disagree.
+- Since 2026-11-21 a material with a recipe always opens; `PlanNode.bought` says the wiki's words, a
+  guide's merchant (`soldByMerchant`) or the log (`PlanAsk.paid`) call it sold. The gather list and
+  `treeRecipes` treat a bought node as a thing to get, so its recipe adds no material or skill. No
+  make-or-get switch and no extra wording: the source line's "Bought" is the indicator (owner). Pass
+  `paid` wherever a tree is built for the player, or Home's "Working towards" count and the plan
+  disagree.
+- A made item is out of era, over its own banner, when every recipe needs a Dropped-only material
+  whose zones are all unopened (`eraDerive.recipeDropWall`, definitive). Do not widen it to foraged
+  or bought materials: Clump of Dough lists every egg as alternatives, and Fine Plate molds are sold.
 - Unfolded made materials are `PlanMemory.expanded`, by item key, so they survive a Back from a
   link out. A new item starts folded. "What to gather" reads the tree, not what is unfolded.
 - `materialGrid.ts` is the one material table. Nesting goes in `nameCell(depth)` only; do not wrap

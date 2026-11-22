@@ -57,7 +57,7 @@ import {
   skillNeeds,
   skillRoutes
 } from '../src/shared/tradeskillPlanLevels'
-import { NO_PLAN, parsePlanMemory, withClosed, withCount, withItem, withRecipe } from '../src/shared/tradeskillPlanMemory'
+import { NO_PLAN, parsePlanMemory, withCount, withExpanded, withItem, withRecipe } from '../src/shared/tradeskillPlanMemory'
 import { bought, depot, fixtureSnap, ing, recipe, SEP_12 } from './tradeskillFixtures.mts'
 
 // ---- the fixture -------------------------------------------------------------------------------
@@ -246,17 +246,24 @@ test('the tree stops at the depth limit and says the material is made', () => {
   assert.equal(opened.length, MAX_RECIPE_DEPTH - 1)
 })
 
-test('a material whose recipes list nothing is a leaf, and the reader can close one that would open', () => {
+test('a material whose recipes list nothing is a leaf, and one that can be bought still shows its recipe', () => {
   const deps = fixtureDeps()
   const gadget = planTree(deps, root(deps, 'gadget'))
   assert.deepEqual(gadget.materials.map((n) => n.closed), ['unlisted', 'unlisted'])
-  const pie = planTree(deps, root(deps, 'pie'), { closed: new Set(['pie tin']) })
-  const tin = node(pie.materials, 'Pie Tin')
-  assert.deepEqual([tin.made, tin.closed, tin.makeable?.id, tin.recipes], [null, 'reader', 'pie tin#1', 3])
-  assert.ok(node(pie.materials, 'Metal Bits').made, 'the other made material still opens')
-  const open = node(planTree(deps, root(deps, 'pie')).materials, 'Pie Tin')
+  const pie = planTree(deps, root(deps, 'pie'))
+  const open = node(pie.materials, 'Pie Tin')
+  assert.equal(open.bought, false)
   assert.equal(madeWithText(open), 'Made with (the first of 3 recipes): Blacksmithing · trivial 30')
   assert.equal(treeDrawsGuide(deps, pie), false)
+
+  const buying = planTree(deps, root(deps, 'pie'), { paid: (key) => key === 'pie tin' })
+  const sold = node(buying.materials, 'Pie Tin')
+  assert.deepEqual([sold.bought, sold.made?.recipe.id, sold.closed, sold.recipes], [true, 'pie tin#1', null, 3])
+  // Its recipe is on screen, and the plan still buys it: on the gather list as a thing to get, and no skill for it.
+  const gather = gatherFor(buying, { count: 1, have: holds({}), price: noPrice })
+  assert.ok(gather.leaves.some((l) => l.node.name === 'Pie Tin'))
+  assert.equal(gather.made.some((m) => m.node.name === 'Pie Tin'), false)
+  assert.equal(skillNeeds(buying, []).needs.find((n) => n.tradeskill === 'Blacksmithing')?.trivial, 18)
 })
 
 // ---- where you stand ---------------------------------------------------------------------------
@@ -407,13 +414,13 @@ test('the total is stated only when every line still to get has a price from the
   assert.equal(lineCostText(gather.leaves[0]), '1.50 pp')
   assert.equal(lineCostText(gather.leaves[1]), '')
 
-  // Closing the flask (the reader buys it) and holding one: every line left has a price.
-  const closed = planTree(deps, root(deps, 'egg oil'), { closed: new Set(['water flask']) })
-  const priced = gatherFor(closed, { count: 2, have: holds({ 'water flask': 2 }), price: planPrice(craft) })
+  // A flask the log shows bought, and two held: every line left has a price.
+  const buying = planTree(deps, root(deps, 'egg oil'), { paid: (key) => key === 'water flask' })
+  const priced = gatherFor(buying, { count: 2, have: holds({ 'water flask': 2 }), price: planPrice(craft) })
   assert.deepEqual(priced.leaves.map((l) => [l.node.name, l.toGet]), [['Eggs', 2], ['Water Flask', 0]])
   assert.equal(priced.total, 3_000)
   assert.equal(gatherTotalText(priced), 'Total for what is still to get: 3.00 pp, at the price your log shows you last paid for each.')
-  const all = gatherFor(closed, { count: 1, have: holds({ 'water flask': 1, eggs: 5 }), price: noPrice })
+  const all = gatherFor(buying, { count: 1, have: holds({ 'water flask': 1, eggs: 5 }), price: noPrice })
   assert.equal(gatherTotalText(all), 'You hold everything on this list.')
 })
 
@@ -430,8 +437,7 @@ test('a stored plan is read back, and anything unreadable is no plan', () => {
   assert.deepEqual(parsePlanMemory(JSON.stringify({ item: 'fleeting quiver', recipe: 'fleeting quiver#0', count: 3, closed: ['aviak egg oil', 7, 'aviak egg oil', ''] })), {
     item: 'fleeting quiver',
     recipe: 'fleeting quiver#0',
-    count: 3,
-    closed: ['aviak egg oil']
+    count: 3
   })
   // No item: nothing else is kept but the count, which is the reader's own.
   assert.deepEqual(parsePlanMemory(JSON.stringify({ item: 5, recipe: 'x', count: 12, closed: ['a'] })), { ...NO_PLAN, count: 12 })
@@ -439,14 +445,14 @@ test('a stored plan is read back, and anything unreadable is no plan', () => {
 })
 
 test('choosing another item keeps the count and drops the rest; the same item keeps its choices', () => {
-  const plan = withClosed(withCount(withRecipe(withItem(NO_PLAN, 'pie'), 'pie#1'), '4'), 'pie tin', true)
-  assert.deepEqual(plan, { item: 'pie', recipe: 'pie#1', count: 4, closed: ['pie tin'] })
+  const plan = withExpanded(withCount(withRecipe(withItem(NO_PLAN, 'pie'), 'pie#1'), '4'), 'pie tin', true)
+  assert.deepEqual(plan, { item: 'pie', recipe: 'pie#1', count: 4, expanded: ['pie tin'] })
   assert.equal(withItem(plan, 'pie'), plan)
   assert.deepEqual(withItem(plan, 'pie', 'pie#0'), { ...plan, recipe: 'pie#0' })
-  assert.deepEqual(withItem(plan, 'quiver'), { item: 'quiver', recipe: null, count: 4, closed: [] })
-  assert.deepEqual(withClosed(plan, 'pie tin', false).closed, [])
-  // Closing twice lists the key once.
-  assert.deepEqual(withClosed(plan, 'pie tin', true).closed, ['pie tin'])
+  assert.deepEqual(withItem(plan, 'quiver'), { item: 'quiver', recipe: null, count: 4 })
+  assert.equal(withExpanded(plan, 'pie tin', false).expanded, undefined)
+  // Unfolding twice lists the key once.
+  assert.deepEqual(withExpanded(plan, 'pie tin', true).expanded, ['pie tin'])
 })
 
 // ---- the committed data: Fleeting Quiver -------------------------------------------------------

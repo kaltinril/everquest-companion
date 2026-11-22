@@ -31,11 +31,18 @@ test('a known NPC with quest gaps is an Update page whose chip edits the page an
   assert.deepEqual(updateWhy(ollix, 'hasPage'), [actions[0]?.why])
 })
 
-test('two quests are both named, and Copy gives exactly the related_quests bullets', () => {
+test('two quests are both named, and Copy says where the related_quests bullets go', () => {
   const nikko: GapRow = { ...ollix, name: 'Nikko Canti', questGaps: { page: 'Nikko Canti', quests: ['Something Fishy', 'Alchemical Solution'] } }
   assert.equal(gapActions(nikko, 'unchecked')[0]?.why, 'The wiki page for Nikko Canti does not list the 2 quests it gives: Something Fishy and Alchemical Solution.')
-  assert.equal(questGiverAddText(nikko.questGaps ?? { page: '', quests: [] }), '* [[Something Fishy]]\n* [[Alchemical Solution]]\n')
-  assert.equal(wikiPageText(nikko, [], {}), '* [[Something Fishy]]\n* [[Alchemical Solution]]\n')
+  const text = 'On Nikko Canti, add under | related_quests = (replace * None if it is there):\n\n* [[Something Fishy]]\n* [[Alchemical Solution]]\n'
+  assert.equal(questGiverAddText(nikko.questGaps ?? { page: '', quests: [] }), text)
+  assert.equal(wikiPageText(nikko, [], {}), text)
+})
+
+test('a merchant row with a quest gap says so, and Copy gives the quest lines and no template switch', () => {
+  const morpa: GapRow = { ...ollix, domain: 'merchant', name: 'Innkeep Morpa', questGaps: { page: 'Innkeep Morpa', quests: ['Muffin Run'] } }
+  assert.deepEqual(updateWhy(morpa, 'hasPage'), ['The wiki page for Innkeep Morpa does not list the quest it gives: Muffin Run.'])
+  assert.equal(wikiPageText(morpa, [], {}), 'On Innkeep Morpa, add under | related_quests = (replace * None if it is there):\n\n* [[Muffin Run]]\n')
 })
 
 test('nothing is left to capture: the page exists and the lines are the whole edit', () => {

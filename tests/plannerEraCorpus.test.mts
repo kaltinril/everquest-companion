@@ -349,7 +349,13 @@ test('THE FOUR OWNER EXAMPLES, by name, off the committed corpus', () => {
   assert.equal(layeredVerdict(guard.zones, guard.tag), 'in-era', 'and layers 1-2 really do call it farmable')
 })
 
-test('layer 3 speaks into silence — and over it for exactly one edge', () => {
+/** The recipe wall: a made item whose named material drops only in zones the server has not opened. */
+function assertRecipeWall(page: string, key: string, wall: { target: string; detail: string }): void {
+  assert.ok((corpus.items[key]?.craftedBy?.length ?? 0) > 0, `${page} is walled by a recipe it does not have`)
+  assert.equal(layeredVerdict(wall.detail.split(', '), undefined), 'out-of-era', `${page}: ${wall.target} drops in era`)
+}
+
+test('layer 3 speaks into silence — and over it for exactly two edges', () => {
   // THE PROPERTY, over every page the derivation answers for. It used to be one sentence ("layers
   // 1-2 were silent"); JOS-341 split it in two, and the split IS the safety argument:
   //   * a NON-definitive edge may only speak where the page's own layers 1-2 verdict was `unknown`,
@@ -374,6 +380,10 @@ test('layer 3 speaks into silence — and over it for exactly one edge', () => {
       continue
     }
     definitive++
+    if (derived.basis === 'component-zone') {
+      assertRecipeWall(row.page, key, derived)
+      continue
+    }
     assert.equal(derived.basis, 'drop-mob', `${row.page} claims a definitive ${derived.basis} edge`)
     const droppers = new Set([
       ...(corpus.items[key]?.dropsFrom ?? []).map((s) => s.mob),

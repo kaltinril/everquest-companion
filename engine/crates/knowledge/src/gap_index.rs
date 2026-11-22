@@ -124,9 +124,24 @@ fn mob_notices_of<'a>(mobs: impl Iterator<Item = &'a Value>) -> Vec<(String, Str
     out
 }
 
-/// A quest page title as two lists compare it: case apart, the game's backtick as the wiki's apostrophe.
+/// A quest page title as two lists compare it: case apart, the game's backtick as the wiki's
+/// apostrophe, end punctuation dropped (Dorian G`Wyn's page links `What`s going on here?`).
 fn quest_title_key(title: &str) -> String {
-    title.trim().to_lowercase().replace('`', "'")
+    let key = title.trim().to_lowercase().replace('`', "'");
+    key.trim_end_matches(['?', '!', '.']).trim_end().to_string()
+}
+
+/// The family page a quest is listed through: `The Bread Shipment (Feerrott)` under `Bread Shipment Quests`.
+fn quest_hub_key(key: &str) -> String {
+    let base = key.strip_prefix("the ").unwrap_or(key);
+    let base = base.strip_suffix(')').and_then(|b| b.rsplit_once(" (")).map_or(base, |(stem, _)| stem);
+    format!("{base} quests")
+}
+
+/// Whether a page's `related_quests` links this quest, by its own title or its family's page.
+fn quest_listed(listed: &[String], quest: &str) -> bool {
+    let key = quest_title_key(quest);
+    listed.contains(&key) || listed.contains(&quest_hub_key(&key))
 }
 
 /// The quest pages each giver's mob key gives, off the quest catalog's `giver`.
@@ -164,7 +179,7 @@ fn mob_quest_gaps_of<'a>(mobs: impl Iterator<Item = &'a Value>, quests: &[Value]
         let mut missing: Vec<String> = Vec::new();
         for given in names.iter().filter_map(|n| by_giver.get(&mob_key(n))) {
             for q in given {
-                if !listed.contains(&quest_title_key(q)) && !missing.iter().any(|x| quest_title_key(x) == quest_title_key(q)) {
+                if !quest_listed(&listed, q) && !missing.iter().any(|x| quest_title_key(x) == quest_title_key(q)) {
                     missing.push(q.clone());
                 }
             }
@@ -258,5 +273,26 @@ mod tests {
                 ("Ollix".to_string(), "Lord Ollix Everling".to_string(), tale),
             ]
         );
+    }
+
+    #[test]
+    fn a_quest_linked_with_end_punctuation_or_through_its_family_page_is_listed() {
+        // Owner, 2026-11-21: Dorian G`Wyn's page links the quest with a `?`, Innkeep Morpa's its hub.
+        let mobs: Value = serde_json::from_str(
+            r#"{"mobs":[
+          {"page":"Dorian G`Wyn","name":"Dorian G`Wyn","relatedQuests":["What`s going on here?"]},
+          {"page":"Innkeep Morpa","name":"Innkeep Morpa","relatedQuests":["Bread Shipment Quests"]},
+          {"page":"Innkeep Other","name":"Innkeep Other","relatedQuests":["Muffin Quests"]}
+        ]}"#,
+        )
+        .unwrap();
+        let quests = vec![
+            json!({"page":"What's going on here","giver":"Dorian G`Wyn"}),
+            json!({"page":"The Bread Shipment (Feerrott)","giver":"Innkeep Morpa"}),
+            json!({"page":"The Bread Shipment (Halas)","giver":"Innkeep Other"}),
+        ];
+        let gaps = mob_quest_gaps_of(mobs["mobs"].as_array().unwrap().iter(), &quests);
+        let pages: Vec<&str> = gaps.iter().map(|(_, page, _)| page.as_str()).collect();
+        assert_eq!(pages, ["Innkeep Other", "Innkeep Other"], "only the page that links neither is a gap");
     }
 }

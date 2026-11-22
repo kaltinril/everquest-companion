@@ -65,8 +65,13 @@ CE (Community Edition) or some nonsense instead of test ... test makes it sound 
 version". Analysed the same day in three steps: a map of every place the build's identity is set or
 matched on, a design, and a skeptic who checked each of the design's safety claims against the
 installer and updater sources under `node_modules` (27 claims: 18 hold, 5 refuted and corrected
-below, 4 settled only by a real install). No code is written yet: the name, the depth and the
-version scheme are the owner's.
+below, 4 settled only by a real install). The depth and the version scheme are the owner's.
+
+Done 2026-11-21 (owner: "do all the safe stuff now"): the name is EQ Legends Companion CE, in the
+seven hand-typed titles only (title bar, window, tray menu, tray tooltip, tray window, the two HTML
+titles). `productName`, `shortcutName`, the exe, the installer, the updater, the folders and the
+version still say TEST: they change together after a real install test. Level A below must still
+set `executableName` before it changes `productName`.
 
 ### What existing installs depend on (never change these)
 
