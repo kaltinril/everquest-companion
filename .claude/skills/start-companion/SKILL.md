@@ -26,8 +26,8 @@ it with `powershell -ExecutionPolicy Bypass -File .\start_companion.ps1`.
 2. **Copy the owner's settings down from the installed build, every time** (owner, 2026-11-12:
    "always copy my settings down from prod to the dev"). Prod is `%APPDATA%\everquest-companion-test`
    (the installed TEST build the owner plays on), dev is `%APPDATA%\everquest-companion-dev`. With
-   the dev app closed (the installed one may stay open; never close it), first copy the dev files
-   about to be replaced into `%APPDATA%\everquest-companion-dev.bak-<date>`, then copy prod over dev:
+   the dev app closed (the installed one may stay open; never close it), copy prod over dev with no
+   backup of dev (owner, 2026-11-21: "i don't need the dev settings always copy down prod settings"):
    the files `everquest-companion-progress.json`, `message-overlay.json`, `resist-ledger.json`,
    `shot-settings.json`, `item-knowledge-cache.json`, `mob-knowledge-cache.json`,
    `spell-resist-cache.json`, and the folders `gaps-characters`, `picture-inbox`, `image-cache`,
