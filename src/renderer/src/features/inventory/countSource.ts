@@ -196,3 +196,11 @@ export function turnedInHover(s: CountSource, count: number): string {
 export function rebaselineInstant(source: InventorySource | undefined): number | null {
   return source?.generatedAt ?? source?.readAt ?? null
 }
+
+/**
+ * The source the '+' hover speaks for. `rebaseline` with no export it can date counts as `both`
+ * (reconcile.ts), so a recorded turn-in does take its items off the log's count there.
+ */
+export function turnInHoverSource(s: CountSource, source: InventorySource | undefined): CountSource {
+  return s === 'rebaseline' && rebaselineInstant(source) === null ? 'both' : s
+}

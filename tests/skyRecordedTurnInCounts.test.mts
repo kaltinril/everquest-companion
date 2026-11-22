@@ -11,10 +11,12 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import { reconcile } from '../src/renderer/src/features/inventory/reconcile'
 import {
   recordTurnInTitle,
   recordedTurnInMovesCounts,
+  turnInHoverSource,
   turnedInHover
 } from '../src/renderer/src/features/inventory/countSource'
 import { computeHeldCounts, computeLogOnlyCounts } from '../src/renderer/src/features/posky/heldCounts'
@@ -115,4 +117,30 @@ test('a hover written for this is one sentence of 7 to 15 words', () => {
     assert.ok(words >= 7 && words <= 15, `${String(words)} words: ${text}`)
     assert.equal(text.split(/[.!?](\s|$)/).filter((p) => p.trim()).length, 1, text)
   }
+})
+
+// With no export it can date, "Set from export, then log" counts as `both`, so the log's count
+// does go down on a '+', and the old hover said the counts stay the same (bug hunt, 2026-11-19).
+test('rebaseline with no datable export speaks as the source it counts as', () => {
+  assert.equal(moves('rebaseline', false), true, 'the reconcile takes the items off the log count')
+  const undated = turnInHoverSource('rebaseline', undefined)
+  assert.equal(undated, 'both')
+  assert.equal(recordedTurnInMovesCounts(undated), true)
+  assert.doesNotMatch(recordTurnInTitle(undated), /stay the same/)
+})
+
+test('rebaseline with a dated export keeps its words, and no other source is touched', () => {
+  const dated = { path: 'x', loadedAt: 'x', readAt: DUMP_AT }
+  assert.equal(moves('rebaseline', true), false)
+  assert.equal(turnInHoverSource('rebaseline', dated), 'rebaseline')
+  assert.match(recordTurnInTitle(turnInHoverSource('rebaseline', dated)), /stay the same/)
+  for (const s of ['log', 'inventory', 'both', 'handins'] as const) {
+    assert.equal(turnInHoverSource(s, undefined), s)
+    assert.equal(turnInHoverSource(s, dated), s)
+  }
+})
+
+test("the '+' button asks for the hover through the export's date", () => {
+  const src = readFileSync(new URL('../src/renderer/src/features/posky/TurnInControls.tsx', import.meta.url), 'utf8')
+  assert.match(src, /recordTurnInTitle\(turnInHoverSource\(countSource, heldProgressNow\(\)\?\.inventorySource\)\)/)
 })
