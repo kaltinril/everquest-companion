@@ -57,6 +57,12 @@ const COLUMNS: { key: BazaarSortKey; label: string; right: boolean }[] = [
   { key: 'lastDay', label: 'Last seen', right: true }
 ]
 
+/** Tight side padding: at the default window the stock 16 px left Offers, Traded 30d and Last seen off the list. */
+const LIST_TABLE_SX = {
+  '& th:not(:first-of-type), & td:not(:first-of-type)': { px: 0.5 },
+  '& th:first-of-type, & td:first-of-type': { pr: 0.5 }
+} as const
+
 function SortHead({ sort, onSort }: { sort: BazaarSort; onSort: (s: BazaarSort) => void }): JSX.Element {
   return (
     <TableHead>
@@ -340,7 +346,7 @@ export default function BazaarView({ onOpenLoot }: { onOpenLoot: (item: string) 
         <>
           <PickedPanel item={picked} endDay={sum.lastDay} ignoreOutliers={ctl.ignoreOutliers} hidden={detailHidden} setHidden={setDetailHidden} onOpenLoot={onOpenLoot} />
           <Box ref={scrollRef} sx={{ overflow: 'auto', maxHeight: 'calc(100vh - 140px)', overscrollBehavior: 'contain' }} data-testid="bazaar-scroll">
-            <Table size="small" stickyHeader>
+            <Table size="small" stickyHeader sx={LIST_TABLE_SX}>
               <SortHead sort={sort} onSort={onSort} />
               <TableBody>
                 <BazaarPadRow height={win.topPad} />

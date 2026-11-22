@@ -37,7 +37,8 @@ export function priceOf(item: BazaarItem, pp: number | null): string {
 export function ItemName({ item, bold, onOpenLoot }: { item: BazaarItem; bold?: boolean; onOpenLoot: (item: string) => void }): JSX.Element {
   return (
     <KnownItemTooltip name={item.item} clickThrough>
-      <span>
+      {/* Shrinks with a dotted end in the list's Item column; the card and the title hold the whole name. */}
+      <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         <DonorName name={nameOf(item)} bold={bold} onOpen={() => onOpenLoot(item.item)} />
       </span>
     </KnownItemTooltip>
