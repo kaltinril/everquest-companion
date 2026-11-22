@@ -328,9 +328,15 @@ test('the peak tooltip says when the peak leaves the pet out', () => {
   const plain = peakTitle(mkSeries())
   assert.equal(plain, 'Peak 5s rolling outgoing rate in the visible window.')
   assert.ok(!plain.includes('without your pet'))
-  const apart = 'Peak 5s rolling rate without your pet, in the visible window.'
+  // The gold line still sums the group when the pet is apart, so the hover names it.
+  const apart = 'Peak 5s rolling rate of you + group, without your pet, in the visible window.'
   assert.equal(peakTitle({ ...mkSeries(), petApart: true }), apart)
   assert.equal(peakTitle(withPetApart(mkSeries(), true)), apart, 'the path the card uses')
+  assert.equal(
+    peakTitle({ ...mkSeries(), hasGroup: false, petApart: true }),
+    'Peak 5s rolling rate without your pet, in the visible window.'
+  )
+  assert.ok(apart.split(/\s+/).length <= 15, 'one sentence of at most 15 words')
   assert.equal(peakTitle({ ...mkSeries(), petApart: false }), plain)
   // The window is the series own, rounded to whole seconds.
   assert.ok(peakTitle({ ...mkSeries(), smoothMs: 2600 }).startsWith('Peak 3s '))
