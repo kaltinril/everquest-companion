@@ -5,8 +5,8 @@
 // throws, and must answer exactly what it answers over a plain copy.
 //
 // Not run here, read by hand on 2026-11-21 and found read-only: `recentDistinct`
-// (useNotablePickups), `deriveLootNames` (useProgress), `tallyDroppedBy` (ItemDetailDialog), the
-// `history.filter(isKept)` in gearData. `useLootRows` spreads each row into its own object, so
+// (useNotablePickups), `deriveLootNames` (useProgress), `tallyDroppedBy` (ItemDetailDialog),
+// `iconRows` (gapIcons), the `history.filter(isKept)` in gearData. `useLootRows` spreads each row into its own object, so
 // `filterLootEvents` and `groupLootRows` never hold a ledger row.
 
 import { test } from 'node:test'
