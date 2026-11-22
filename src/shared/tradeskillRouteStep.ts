@@ -28,6 +28,8 @@ export interface RouteCtx {
   level: number
   /** The tradeskill's recipes in ladder order, the era setting already applied. */
   recipes: readonly BookRecipe[]
+  /** The Recipes tab's Hide trivial switch. Explore then lists nothing at or under the level. */
+  hideTrivial?: boolean
 }
 
 export interface RouteStep {
