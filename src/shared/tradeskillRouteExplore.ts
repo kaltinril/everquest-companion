@@ -14,7 +14,7 @@
 import { sourceItemKey } from './itemSources'
 import { yieldText, type BookRecipe } from './tradeskillBook'
 import type { GuideStep } from './guideData'
-import { placedLadder, stepRange, wikiNameOf, type PlacedStep } from './tradeskillGuide'
+import { guideStepRecipe, placedLadder, stepRange, wikiNameOf, type PlacedStep } from './tradeskillGuide'
 import { recipeHistory } from './tradeskillHistory'
 import { lastPaid } from './tradeskillMoney'
 import { plainStep, recipeStep, type RouteCtx, type RouteStep } from './tradeskillRouteStep'
@@ -195,12 +195,6 @@ export function explore(ctx: RouteCtx): Explored {
 
 // ---- the community route --------------------------------------------------------------------------
 
-/** The tradeskill's own recipe that makes a guide's item, else any recipe that makes it. */
-function recipeNamed(ctx: RouteCtx, wikiName: string): BookRecipe | null {
-  const key = sourceItemKey(wikiName)
-  return ctx.recipes.find((r) => r.key === key) ?? ctx.facts.index.byItem.get(key)?.at(0) ?? null
-}
-
 /** What the app could join to a guide's step: a wiki recipe, only a wiki item, or nothing. */
 type Joined = 'recipe' | 'item' | 'nothing'
 
@@ -240,7 +234,7 @@ export function communitySteps(ctx: RouteCtx, level: number | null): RouteStep[]
   for (const [i, placed] of ladder.steps.entries()) {
     if (placed.state === 'done') continue
     const wikiName = wikiNameOf(ctx.facts.guides, placed.step.item)
-    const recipe = wikiName === null ? null : recipeNamed(ctx, wikiName)
+    const recipe = guideStepRecipe(ctx.facts.index, ctx.tradeskill, wikiName)
     const aside = recipe === null ? guideMaterialsLine(ctx.facts.guides, placed.step) : ''
     const place = { id: `guide:${String(i)}`, range: placed.range, to: placed.step.to ?? null, why: guideWhy(placed, joinedOf(recipe, wikiName)), aside }
     steps.push(recipe === null ? plainStep(wikiName ?? placed.step.item, wikiName !== null, place) : recipeStep(ctx.facts, recipe, place))

@@ -24,6 +24,7 @@ import {
   guideMaterialsFor,
   guidePayload,
   guideQtyPrefix,
+  guideStepRecipe,
   indexGuides,
   levelMarkerText,
   levelingCreditText,
@@ -296,6 +297,15 @@ test('an item a guide names carries the era mark of the wiki recipe that makes i
   assert.equal(guideItemRecipe(index, 'Golden Ruby Ring')?.id, 'golden ruby ring#0')
   assert.equal(guideItemRecipe(index, 'Ruby'), null)
   assert.equal(guideItemRecipe(index, null), null)
+})
+
+test('a guide step opens the open tradeskill\'s own recipe, else any recipe of the item, else none', () => {
+  const index = fixtureBook()
+  assert.equal(guideStepRecipe(index, 'Tailoring', 'Aviak Egg Oil')?.id, 'aviak egg oil#1')
+  assert.equal(guideStepRecipe(index, 'Brewing', 'Aviak Egg Oil')?.id, 'aviak egg oil#0')
+  assert.equal(guideStepRecipe(index, 'Pottery', 'Aviak Egg Oil')?.id, 'aviak egg oil#0')
+  assert.equal(guideStepRecipe(index, 'Tailoring', 'Ruby'), null)
+  assert.equal(guideStepRecipe(index, 'Tailoring', null), null)
 })
 
 // ---- merchants --------------------------------------------------------------------------------

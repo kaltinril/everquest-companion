@@ -14,7 +14,7 @@
 import { GUIDE_CREDITS, guideCreditLine } from './guideCredits'
 import type { GuideLadder, GuideMaterial, GuideRecipe, GuideStep, RecipeList, RecipeMaterial, TradeskillGuidesFile } from './guideData'
 import { sourceItemKey } from './itemSources'
-import { subRecipes, type BookIndex, type BookRecipe } from './tradeskillBook'
+import { skillRecipes, subRecipes, type BookIndex, type BookRecipe } from './tradeskillBook'
 import type { Tradeskill } from './tradeskills'
 
 /** The guides' ids in `tradeskillGuides.json` and `GUIDE_CREDITS`. */
@@ -292,6 +292,13 @@ export function placedLadder(guide: GuideIndex, tradeskill: Tradeskill, level: n
 export function guideItemRecipe(index: BookIndex, wikiName: string | null): BookRecipe | null {
   if (wikiName === null) return null
   return index.byItem.get(sourceItemKey(wikiName))?.[0] ?? null
+}
+
+/** The recipe a guide's step opens: the open tradeskill's own for the item, else any that makes it. */
+export function guideStepRecipe(index: BookIndex, tradeskill: Tradeskill, wikiName: string | null): BookRecipe | null {
+  if (wikiName === null) return null
+  const key = sourceItemKey(wikiName)
+  return skillRecipes(index, tradeskill).find((r) => r.key === key) ?? guideItemRecipe(index, wikiName)
 }
 
 // ---- the words on screen ----------------------------------------------------------------------
