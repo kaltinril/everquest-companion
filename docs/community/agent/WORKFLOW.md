@@ -251,6 +251,10 @@ disagree, RULES.md wins; fix this file.
 
 ## Owner rulings that shape work
 
+- **Real bugs get fixed, not listed** (owner, 2026-11-21: "if there are real bugs found fix them, why
+  do you need to list them?"). Settle each audit item yourself. Bring back only what changes a number's
+  meaning, removes something asked for, or is a real product choice. Correctness still wins.
+
 - **No unreleased tabs** (owner, 2026-10-28: "no reason to hide them ever just always show the
   tabs"; 2026-10-29: "everyone should always see all tabs"). The `UNRELEASED` gate is removed
   outright (no flag, no `EQ_UNRELEASED`); a new surface ships visible.

@@ -613,3 +613,9 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
 
 - Rule tried: an item's first sighting within 60 s of a completed NPC trade, no earlier mention. Replayed with the log's own give lines hidden, 15 known rewards: 2 right, 0 wrong, 13 missed; of 6 other firings 1 is provably wrong and 5 cannot be judged. At 300 s: 3 right, 2 wrong. Not shipped.
 - The game prints `You have been given: X` for some rewards and nothing for others (Beacon Mount), so a silent reward cannot be read from the log.
+
+## The Painting's repeatable hand-in (2026-11-21, the owner's log)
+
+- 4 Capt. Orlin's Spiced Ale to Palatos Kynarn is one hand-in: +5 Craftkeepers, +5 High Council of Erudin, -1 Heretics; High Guard of Erudin was already at max (the wiki states +5). At 52 copper an ale, 2 gold 8 copper a hand-in.
+- A stack counts: one trade of 100 ales printed 25 replies. 1,704 ales made 426 hand-ins. Craftkeepers reached max at 17:20:22 and High Council at 17:21:46, nearly all of it in about 8 minutes; 1,804 ales bought for about 94 platinum.
+- The game prints no receive line for this quest's items: Beacon Mount, Ak`Anon's Portrait. Only the NPC's words hint at them (`Here is the portrait ...`). The log also never lists what went into a combine, so a Copy page cannot state a recipe's materials from it.
