@@ -20,11 +20,16 @@
 // THE PROJECTION HAPPENS HERE, ONCE (owner ruling 4's shape): quests project into this file's own
 // row model as they are indexed, so the view filters and sorts ITS OWN rows, never the catalog's.
 //
+// A REPEATABLE TURN-IN COMES FIRST (owner, 2026-11-21: "why can't we somehow show that?"): it is the
+// easy route to max. Where the page names the one step that repeats (The Painting's four ales to
+// Palatos Kynarn), the row for a faction that step moves shows THAT step: its NPC, its cost, its
+// receipt. A faction only a later step moves keeps the whole-quest row, unmarked.
+//
 // ZONE IS A STRING FOR NOW: the app has no zone deep link (appRouting reaches mobs, loot, quests,
 // levels — not maps), so the start zone renders as text. The day Maps grows a focus payload, the
 // zone here is the string to hand it.
 
-import type { QuestData, QuestEntry } from '@shared/types'
+import type { QuestData, QuestEntry, QuestFactionHit, QuestRepeatStep } from '@shared/types'
 import { factionNameKey } from '../../../../shared/outputs/factions'
 import type { Era } from '../../../../shared/planner/era'
 import { inEraQuests } from '../../../../shared/questEra'
@@ -47,6 +52,12 @@ export interface FactionQuestRef {
   coin?: string
   /** the items to hand in — the "save these" list, each linkable to its Loot drill-down */
   items: string[]
+  /** how many of the item one turn-in takes, when a repeat step says */
+  itemCount?: number
+  /** this turn-in can be repeated, and repeating it moves this faction */
+  repeatable?: true
+  /** on a row showing a repeat step: the page's own start zone, still the home-zone vote */
+  stepOfPage?: { startZone?: string }
   /** the reward items, linkable the same way */
   rewards: string[]
   /** the signed per-turn-in delta for THIS faction, only when the page stated one */
@@ -72,8 +83,8 @@ export interface ReceiptHit {
 }
 
 /** The quest's receipt, raises then losses, each half in page order. */
-function receiptOf(q: QuestEntry): ReceiptHit[] {
-  const hits = (q.factions ?? []).map(
+function receiptOf(lines: readonly QuestFactionHit[]): ReceiptHit[] {
+  const hits = lines.map(
     (h): ReceiptHit => ({
       name: h.name,
       key: factionNameKey(h.name),
@@ -113,7 +124,8 @@ function toRef(q: QuestEntry, amount: number | undefined): FactionQuestRef {
     page: q.page,
     items: q.requiredItems ?? [],
     rewards: [],
-    hits: receiptOf(q),
+    hits: receiptOf(q.factions ?? []),
+    ...(q.repeatable === true && q.repeatStep === undefined ? { repeatable: true as const } : {}),
     ...(q.giver === undefined ? {} : { giver: q.giver }),
     ...(q.startZone === undefined ? {} : { startZone: q.startZone }),
     ...(q.minLevel === undefined ? {} : { minLevel: q.minLevel }),
@@ -125,11 +137,44 @@ function toRef(q: QuestEntry, amount: number | undefined): FactionQuestRef {
   return ref
 }
 
+/** The row for the one step that repeats: its NPC, cost and receipt, none of the later steps'. */
+function stepRef(q: QuestEntry, step: QuestRepeatStep, amount: number | undefined): FactionQuestRef {
+  return {
+    name: q.name,
+    page: q.page,
+    giver: step.giver,
+    items: step.items,
+    rewards: [],
+    hits: receiptOf(step.factions),
+    repeatable: true,
+    stepOfPage: q.startZone === undefined ? {} : { startZone: q.startZone },
+    ...(step.zone === undefined ? {} : { startZone: step.zone }),
+    ...(q.minLevel === undefined ? {} : { minLevel: q.minLevel }),
+    ...(q.classes === undefined ? {} : { classes: q.classes }),
+    ...(step.coin === undefined ? {} : { coin: step.coin }),
+    ...(step.count === undefined ? {} : { itemCount: step.count }),
+    ...(amount === undefined ? {} : { amount })
+  }
+}
+
+/** One faction's row for a quest: the repeat step when that step moves it, else the whole quest. */
+function refFor(q: QuestEntry, hit: QuestFactionHit): FactionQuestRef {
+  const step = q.repeatStep
+  const key = factionNameKey(hit.name)
+  const own = step?.factions.find((h) => h.up === hit.up && factionNameKey(h.name) === key)
+  return step === undefined || own === undefined ? toRef(q, hit.amount) : stepRef(q, step, own.amount)
+}
+
 /** Biggest known payout first, unknown amounts after, names as the stable tail. */
 function byPayout(a: FactionQuestRef, b: FactionQuestRef): number {
   const av = a.amount === undefined ? -1 : Math.abs(a.amount)
   const bv = b.amount === undefined ? -1 : Math.abs(b.amount)
   return bv - av || a.name.localeCompare(b.name)
+}
+
+/** A faction's raises: what can be repeated first, then by payout. */
+function byRepeatThenPayout(a: FactionQuestRef, b: FactionQuestRef): number {
+  return Number(b.repeatable === true) - Number(a.repeatable === true) || byPayout(a, b)
 }
 
 /** The most frequent start zone among the raising quests, or nothing when none states one. */
@@ -138,12 +183,13 @@ function homeZoneOf(raise: readonly FactionQuestRef[]): string | undefined {
   let best: string | undefined
   let bestN = 0
   for (const r of raise) {
-    if (r.startZone === undefined) continue
-    const n = (counts.get(r.startZone) ?? 0) + 1
-    counts.set(r.startZone, n)
+    const zone = r.stepOfPage === undefined ? r.startZone : r.stepOfPage.startZone
+    if (zone === undefined) continue
+    const n = (counts.get(zone) ?? 0) + 1
+    counts.set(zone, n)
     if (n > bestN) {
       bestN = n
-      best = r.startZone
+      best = zone
     }
   }
   return best
@@ -167,7 +213,7 @@ function fileSilent(q: QuestEntry, silentByZone: Map<string, FactionQuestRef[]>)
 /** Sort a faction's lists and attach its home zone's silent quests. Split from the builder at
  *  the measured complexity ceiling. */
 function finishWork(work: FactionWork, silentByZone: ReadonlyMap<string, FactionQuestRef[]>): void {
-  work.raise.sort(byPayout)
+  work.raise.sort(byRepeatThenPayout)
   work.lower.sort(byPayout)
   const home = homeZoneOf(work.raise)
   if (home === undefined) return
@@ -190,7 +236,7 @@ export function buildFactionWorkIndex(quests: readonly QuestEntry[], era?: Era):
         work = { raise: [], lower: [], nearby: [] }
         index.set(key, work)
       }
-      ;(hit.up ? work.raise : work.lower).push(toRef(q, hit.amount))
+      ;(hit.up ? work.raise : work.lower).push(refFor(q, hit))
     }
   }
   for (const work of index.values()) finishWork(work, silentByZone)

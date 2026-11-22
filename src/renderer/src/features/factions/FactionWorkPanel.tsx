@@ -14,7 +14,7 @@
 // eighteen chips would bury the one fact this panel exists to say.
 
 import { type JSX } from 'react'
-import { Box, Stack, Typography } from '@mui/material'
+import { Box, Chip, Stack, Typography } from '@mui/material'
 import type { HeldCounts } from '@shared/types'
 import type { ZoneShort } from '@shared/maps'
 import { wikiPageUrl } from '@shared/wiki'
@@ -115,6 +115,7 @@ function ItemLinks({
   label,
   names,
   coin,
+  count,
   held,
   wished,
   onOpenLoot,
@@ -124,6 +125,8 @@ function ItemLinks({
   names: readonly string[]
   /** a coin cost beside (or instead of) the items — the guard-donation quests' "2 gold" */
   coin?: string
+  /** how many of the one listed item a turn-in takes */
+  count?: number
   held?: HeldCounts
   /** wishlist keys — a wished name is drawn loud (♥, bold, the warning color) */
   wished?: ReadonlySet<string>
@@ -135,7 +138,7 @@ function ItemLinks({
   const rest = names.slice(LIST_CAP)
   return (
     <Typography variant="caption" color="text.secondary" data-testid={testId} sx={{ display: 'block' }}>
-      {label}{' '}
+      {label} {count !== undefined && `${String(count)} x `}
       {shown.map((n, i) => {
         const have = held?.[n.toLowerCase()] ?? 0
         const hot = wished?.has(rewardKeyOf(n)) === true
@@ -270,6 +273,16 @@ function QuestLine({
         >
           {quest.name}
         </Box>
+        {tone === 'up' && quest.repeatable === true && (
+          <Chip
+            label="Repeatable"
+            size="small"
+            variant="outlined"
+            color="success"
+            data-testid="factions-repeatable"
+            sx={{ ml: 0.75, height: 18, fontSize: 11, '& .MuiChip-label': { px: 0.625 } }}
+          />
+        )}
         <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 1 }}>
           {quest.giver !== undefined && <GiverLink giver={quest.giver} onOpenMob={links.onOpenMob} />}
           {quest.startZone !== undefined && (
@@ -289,6 +302,7 @@ function QuestLine({
           label="turn in:"
           names={quest.items}
           coin={quest.coin}
+          count={quest.itemCount}
           held={held}
           wished={links.wished}
           onOpenLoot={links.onOpenLoot}
