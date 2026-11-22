@@ -25,32 +25,27 @@
 // height modestly so the list keeps room on a short screen.
 
 import { type JSX, type ReactNode, memo, useCallback, useMemo, useRef, useState } from 'react'
-import { Box, Button, Chip, Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Typography } from '@mui/material'
+import { Box, Button, Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Typography } from '@mui/material'
 import {
-  charactersOff,
   doneKey,
   factionOf,
   gapZone,
   mobPageOf,
   logSaysText,
   pageSaysText,
-  onMobPage,
   type GapActionContext,
   type GapRow,
   type GapSort,
   type GapSortKey,
-  type GapSuggest,
   type GapVerdict,
   type GapVerdicts
 } from '@shared/gaps'
 import { unfoldedEntries, type GapEntry } from '@shared/gapGroups'
 import { seenByKey } from '@shared/gapsAllCharacters'
-import { otherPageTitle } from '@shared/gapImages'
 import { replaceWhy } from '@shared/gapDrops'
-import { gapHeld, heldChipLabel, heldLine, heldTitle, heldWhere, type GapHeld, type HeldIndex } from '@shared/gapHeld'
-import { GAP_JOB_LABEL, GAP_JOB_TIP, gapJob, type GapJob } from '@shared/gapJob'
+import { gapHeld, heldLine, heldWhere, type GapHeld, type HeldIndex } from '@shared/gapHeld'
+import { gapJob } from '@shared/gapJob'
 import { needsWords } from '@shared/gapReady'
-import { wikiPageUrl } from '@shared/wiki'
 import { Tooltip } from '../../lib/Tooltip'
 import { useWindowedRows } from '../../lib/useWindowedRows'
 import GapActionChips from './GapActionChips'
@@ -61,11 +56,8 @@ import ShotPanel from './ShotPanel'
 import { WithRowPicture } from './RowPicture'
 import GapRowButtons from './GapRowButtons'
 import MobHeadingButtons from './MobHeadingButtons'
-import { ForcedChip } from './ForcedQuests'
-import { EditedChip } from './GapRowEdit'
+import { GapNameCell, SuggestCaption } from './GapNameCell'
 import { ZoneMapButton } from './ZoneMapLinks'
-import { updateWhy } from '@shared/gapUpdateWhy'
-import { heldPlain } from '@shared/gapHeldTier'
 import { shownName } from '@shared/gapEdits'
 
 /** One line of small cells with a small chip: 6px padding above and below a 24px chip, plus the border. */
@@ -76,37 +68,6 @@ const TABLE_MIN_WIDTH = 1100
 /** Every body cell: one line, clipped at its column's edge, so a cell can never widen the table. */
 const CLIP = { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } as const
 
-/** Beside an image row named by the game: its page's title when that is spelled otherwise (owner, 2026-10-21). */
-function PageTitleCaption({ row }: { row: GapRow }): JSX.Element | null {
-  const title = otherPageTitle(row)
-  if (title === undefined) return null
-  return (
-    <Typography variant="caption" color="text.secondary" component="span" sx={{ ml: 1, fontWeight: 400 }} data-testid="gaps-page-title">
-      (wiki page: {title})
-    </Typography>
-  )
-}
-
-/** Beside the name: the one known name within reach, linked to its page so the owner can fix it. */
-function SuggestCaption({ s }: { s: GapSuggest }): JSX.Element {
-  return (
-    <Typography variant="caption" color="text.secondary" component="span" sx={{ ml: 1, fontWeight: 400 }} data-testid="gaps-suggest">
-      Probably{' '}
-      <Box
-        component="a"
-        href={wikiPageUrl(s.page)}
-        target="_blank"
-        rel="noreferrer"
-        onClick={(e) => e.stopPropagation()}
-        sx={{ color: 'inherit', textDecoration: 'underline dotted' }}
-      >
-        {s.name}
-      </Box>{' '}
-      ({charactersOff(s.distance)})
-    </Typography>
-  )
-}
-
 /** The spacer rows that reserve the full scroll height, so only a screenful of rows is mounted. */
 function PadRow({ height }: { height: number }): JSX.Element | null {
   if (height <= 0) return null
@@ -114,53 +75,6 @@ function PadRow({ height }: { height: number }): JSX.Element | null {
     <TableRow style={{ height }}>
       <TableCell colSpan={COLUMNS} sx={{ p: 0, border: 0 }} />
     </TableRow>
-  )
-}
-
-/** Beside an Items row's name: who holds it right now (review C6), the counts and places in the tooltip. */
-function HeldChip({ held }: { held: readonly GapHeld[] }): JSX.Element {
-  // No +0 copy held: the Update tag's colour, and the tier in the label (owner, 2026-10-25).
-  return (
-    <Tooltip title={heldTitle(held)}>
-      <Chip label={heldChipLabel(held)} size="small" color={heldPlain(held) ? 'success' : JOB_COLOR.update} variant="outlined" sx={{ ml: 1 }} data-testid="gaps-held" />
-    </Tooltip>
-  )
-}
-
-/** The theme colour of each job's tag: two that no other chip on a row wears. */
-const JOB_COLOR: Record<GapJob, 'secondary' | 'primary'> = { new: 'secondary', update: 'primary' }
-
-/**
- * Before the name (owner, 2026-10-21): "New page" or "Update page", the row's job (shared/gapJob.ts);
- * an update's tooltip says what its page lacks (`why`, shared/gapUpdateWhy.ts; owner, 2026-10-25).
- */
-function JobChip({ job, why = [] }: { job: GapJob; why?: readonly string[] }): JSX.Element {
-  return (
-    <Tooltip title={why.length > 0 ? why.join(' ') : GAP_JOB_TIP[job]}>
-      <Chip label={GAP_JOB_LABEL[job]} size="small" color={JOB_COLOR[job]} variant="outlined" sx={{ mr: 1, height: 20 }} data-testid={`gaps-job-${job}`} />
-    </Tooltip>
-  )
-}
-
-/** After the job tag (owner, 2026-10-21): Ready when nothing is left to capture (shared/gapReady.ts). */
-function ReadyChip({ need }: { need: string }): JSX.Element | null {
-  if (need !== '') return null
-  return (
-    <Tooltip title="Nothing left to capture in game: copy the page and post it.">
-      <Chip label="Ready" size="small" color="success" sx={{ mr: 1, height: 20 }} data-testid="gaps-ready" />
-    </Tooltip>
-  )
-}
-
-/** After the name of a row not yet Ready: what is left to capture, a word each (`needs: lore`). */
-function NeedsHint({ need }: { need: string }): JSX.Element | null {
-  if (need === '') return null
-  return (
-    <Tooltip title="Capture these in game and the row turns Ready.">
-      <Typography variant="caption" color="text.secondary" component="span" sx={{ ml: 1, fontWeight: 400 }} data-testid="gaps-needs">
-        needs: {need}
-      </Typography>
-    </Tooltip>
   )
 }
 
@@ -195,22 +109,7 @@ const GapTableRow = memo(function GapTableRow({
   return (
     <TableRow hover selected={open} onClick={() => onToggle(row.name)} sx={{ cursor: 'pointer', height: ROW_HEIGHT, opacity: done ? 0.5 : 1 }} data-testid="gaps-row">
       <TableCell sx={{ ...CLIP, fontWeight: 600, pl: depth > 0 ? 3 + depth * 2 : undefined }}>
-        {depth > 0 && (
-          <Box component="span" sx={{ color: 'text.secondary', mr: 1 }}>
-            •
-          </Box>
-        )}
-        <JobChip job={gapJob(row, chipContext)} why={updateWhy(row, verdict, chipContext)} />
-        <ReadyChip need={need} />
-        {/* Under its mob's heading a faction or drop row is the faction or item alone. */}
-        {depth === 2 && onMobPage(row) ? factionOf(row) : shownName(row)}
-        <NeedsHint need={need} />
-        <ForcedChip row={row} />
-        <EditedChip row={row} />
-        {row.suggest !== undefined && <SuggestCaption s={row.suggest} />}
-        <PageTitleCaption row={row} />
-        {row.maybePlayer === true && <Chip label="may be a player" size="small" color="warning" variant="outlined" sx={{ ml: 1 }} data-testid="gaps-maybe-player" />}
-        {held !== undefined && held.length > 0 && <HeldChip held={held} />}
+        <GapNameCell row={row} verdict={verdict} need={need} chipContext={chipContext} held={held} depth={depth} />
       </TableCell>
       {/* Beside the name (owner, 2026-10-19): the work buttons where the eye already is. */}
       <TableCell sx={{ ...CLIP, py: 0 }}>
