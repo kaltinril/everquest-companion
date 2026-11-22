@@ -26,9 +26,14 @@ export function outRate(series: DpsSeries, i: number): number {
   return series.you[i] + (series.petApart ? 0 : series.pet[i]) + series.group[i]
 }
 
+/** The band's name: "others" once a stranger's damage is in it, since a stranger is no group. */
+export function bandLabel(series: DpsSeries): string {
+  return series.hasOther === true ? 'others' : 'group'
+}
+
 /** The gold line's name: exactly what `outRate` sums, for the legend and the hover alike. */
 export function outLabel(series: DpsSeries): string {
-  return `you${series.petApart ? '' : ' + pet'}${series.hasGroup ? ' + group' : ''}`
+  return `you${series.petApart ? '' : ' + pet'}${series.hasGroup ? ` + ${bandLabel(series)}` : ''}`
 }
 
 /** The series the card draws under a pet layout. Not apart hands back the SAME object, so the
@@ -71,7 +76,7 @@ export function curveRows(series: DpsSeries, t: number, hidden: readonly ChartLi
   }
   add('out', true, outLabel(series), p.out)
   add('pet', series.hasPet, 'pet', p.pet)
-  add('group', series.hasGroup, 'group', p.group)
+  add('group', series.hasGroup, bandLabel(series), p.group)
   add('inc', series.hasInc, 'incoming', p.inc)
   return rows
 }

@@ -44,7 +44,7 @@ import {
   yAt,
   type DpsChart
 } from '../src/renderer/src/features/combat/dpsChart'
-import { ROW_KIND, curveRows, outLabel, peakTitle, rateRows, withPetApart } from '../src/renderer/src/features/combat/dpsAt'
+import { ROW_KIND, bandLabel, curveRows, outLabel, peakTitle, rateRows, withPetApart } from '../src/renderer/src/features/combat/dpsAt'
 import { formatRate } from '../src/renderer/src/lib/formatRate'
 
 const BUCKET = 1000
@@ -312,6 +312,15 @@ test('the gold line is named for exactly what it sums', () => {
   assert.equal(outLabel(mkSeries()), 'you + pet + group')
   assert.equal(outLabel({ ...solo, petApart: true }), 'you')
   assert.equal(outLabel({ ...mkSeries(), petApart: true }), 'you + group')
+})
+
+test('a band holding a stranger is called others, on the gold line and on its own row', () => {
+  const series: DpsSeries = { ...mkSeries(), hasOther: true }
+  assert.equal(bandLabel(mkSeries()), 'group')
+  assert.equal(bandLabel(series), 'others')
+  assert.equal(outLabel(series), 'you + pet + others')
+  assert.equal(outLabel({ ...series, petApart: true }), 'you + others')
+  assert.deepEqual(curveRows(series, 0, []).map((r) => r.label), ['you + pet + others', 'pet', 'others', 'incoming'])
 })
 
 test('the peak tooltip says when the peak leaves the pet out', () => {

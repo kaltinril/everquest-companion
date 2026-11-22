@@ -93,3 +93,13 @@ test('the smoothing window and the rates still follow the grid, whichever grid i
   assert.equal(Math.round(done.you[done.n - 1]), 100)
   assert.equal(live.durationMs, done.durationMs)
 })
+
+test('the series knows when a stranger is in the group band', () => {
+  const withKind = (kind: TimelineView['events'][number]['kind']): TimelineView => {
+    const t = tl(2000)
+    return { ...t, events: [...t.events, { t: 0, kind, lane: 'Melee', category: 'melee', amount: 50 }] }
+  }
+  assert.equal(buildDpsSeries(tl(2000)).hasOther, false)
+  assert.equal(buildDpsSeries(withKind('member')).hasOther, false, 'a group mate is the group')
+  assert.equal(buildDpsSeries(withKind('other')).hasOther, true)
+})
