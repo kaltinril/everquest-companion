@@ -22,6 +22,7 @@ import { zoneBaseName } from './zones'
 import { gapJob } from './gapJob'
 import { itemsSoldOf } from './gapItemsSold'
 import { mobKey } from './mobKey'
+import { dialogueOf, dialogueText } from './gapDialogue'
 
 /** What the description reads beside the row; each part optional, so a page copies without it. */
 export interface MerchantExtras {
@@ -205,6 +206,13 @@ function hailWorthQuoting(row: GapRow, extras: MerchantExtras): boolean {
   return row.domain === 'merchant' || roleOf(row) !== undefined || extras.nameplate?.(row.name) !== undefined || !/^(a|an|the)\s/i.test(row.name)
 }
 
+/** The whole conversation when the log holds one (gapDialogue.ts), else the hail and its answer. */
+function talkQuote(row: GapRow, said: string | undefined, greeting: string | undefined, extras: MerchantExtras): string | undefined {
+  const talk = dialogueOf(row)
+  if (talk !== undefined) return dialogueText(row.name, talk, said, (l) => maskedGreeting(l, extras.ownNames ?? []))
+  return greeting === undefined ? undefined : `:You say, 'Hail ${row.name}'\n\n${row.name} says, '${greeting}'`
+}
+
 /** A new merchant page's description; undefined for a page that exists or when nothing says one. */
 export function merchantDescription(row: GapRow, extras: MerchantExtras): MerchantDescription | undefined {
   if (gapJob(row, { isMob: extras.isMob }) !== 'new') return undefined
@@ -213,7 +221,7 @@ export function merchantDescription(row: GapRow, extras: MerchantExtras): Mercha
   const greeting = said === undefined ? undefined : maskedGreeting(said, extras.ownNames ?? [])
   // A generic mob's bark is no description (owner, 2026-11-10: a kobold's "Grrrrr. Bark."): the hail
   // answer is quoted for a merchant, a mob with a role or a nameplate, or a named NPC.
-  const quote = greeting === undefined || !hailWorthQuoting(row, extras) ? undefined : `:You say, 'Hail ${row.name}'\n\n${row.name} says, '${greeting}'`
+  const quote = !hailWorthQuoting(row, extras) ? undefined : talkQuote(row, said, greeting, extras)
   const text = [sentence?.text, quote].filter((t) => t !== undefined).join('\n\n')
   return text === '' ? undefined : { text, ...(sentence === undefined ? {} : { sentence }), ...(greeting === undefined ? {} : { greeting }) }
 }

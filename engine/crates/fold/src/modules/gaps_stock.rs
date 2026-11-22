@@ -43,6 +43,10 @@ use crate::modules::consider::mob_key;
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, HashMap};
 
+#[path = "gaps_dialogue.rs"]
+mod dialogue;
+use dialogue::Dialogues;
+
 /// Items kept per merchant: a big vendor lists a few dozen; the cap bounds a long log's resells.
 const STOCK_CAP: usize = 200;
 
@@ -114,6 +118,8 @@ pub struct Stock {
     greetings: HashMap<String, String>,
     /// Mob key → each con label seen (`L50 ally`) and how often, for its Merchants row.
     cons: HashMap<String, BTreeMap<String, u32>>,
+    /// Each NPC's whole conversation, for a new page's description (`gaps_dialogue.rs`).
+    dialogues: Dialogues,
 }
 
 impl Stock {
@@ -122,6 +128,7 @@ impl Stock {
         self.hailed = None;
         self.greetings.clear();
         self.cons.clear();
+        self.dialogues = Dialogues::default();
     }
 
     /// A /con of `mob`: its label as the Mobs row tallies it (gaps_details.rs).
@@ -144,6 +151,16 @@ impl Stock {
     /// A hail notes its name; that NPC's first `says` within ANSWER_MS is its answer. True when an
     /// answer changed.
     fn heard(&mut self, text: &str, ts: i64) -> bool {
+        let talked = self.dialogues.line(text, ts);
+        self.greeted(text, ts) | talked
+    }
+
+    /// A trade opened with an NPC: what it says next is no answer to a keyword.
+    pub(super) fn trade_opened(&mut self) {
+        self.dialogues.traded();
+    }
+
+    fn greeted(&mut self, text: &str, ts: i64) -> bool {
         if let Some(name) = hail_of(text) {
             self.hailed = Some((name.to_string(), ts));
             return false;
@@ -186,6 +203,7 @@ impl Stock {
         if let Some(said) = self.greetings.get(key) {
             v["greeting"] = json!(said);
         }
+        self.dialogues.serve(key, v);
     }
 
     /// `[{item, copper?}]` A to Z, each under its page title where the data has one; None for a name
