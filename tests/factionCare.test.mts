@@ -20,6 +20,7 @@ const clean = (dontCare: Iterable<string>): WorkFilters => ({
   coinOnly: false,
   query: '',
   rewardsOnly: false,
+  repeatableOnly: false,
   cleanOnly: true,
   dontCare: new Set([...dontCare].map(factionNameKey))
 })

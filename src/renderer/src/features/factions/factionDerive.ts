@@ -145,6 +145,7 @@ export function narrowDerived(
     classes: [],
     slot: 'ANY',
     coinOnly: false,
+    repeatableOnly: false,
     query: q,
     rewardsOnly: search.rewardsOnly,
     cleanOnly: false,

@@ -72,6 +72,8 @@ export function WorkFilterControls({
   onSlot,
   coinOnly,
   onCoinOnly,
+  repeatableOnly,
+  onRepeatableOnly,
   cleanOnly,
   onCleanOnly,
   dontCareCount
@@ -82,13 +84,15 @@ export function WorkFilterControls({
   onSlot: (v: SlotFilter) => void
   coinOnly: boolean
   onCoinOnly: (on: boolean) => void
+  repeatableOnly: boolean
+  onRepeatableOnly: (on: boolean) => void
   cleanOnly: boolean
   onCleanOnly: (on: boolean) => void
   /** how many factions carry the don't-care mark — the clean switch's label says it */
   dontCareCount: number
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
+    <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap" alignItems="center" sx={{ mb: 1 }}>
       <ChipMultiSelect
         options={CLASS_ABBRS}
         value={classes}
@@ -124,6 +128,12 @@ export function WorkFilterControls({
         checked={coinOnly}
         onChange={onCoinOnly}
         testId="factions-coin-only"
+      />
+      <FilterSwitch
+        label="Repeatable only"
+        checked={repeatableOnly}
+        onChange={onRepeatableOnly}
+        testId="factions-repeatable-only"
       />
       {/* THE EASY-RAISE HUNT (owner ask, 2026-10-12): only quests whose every stated loss lands
           on a faction marked don't-care. Marks are made by clicking a faction on any quest's

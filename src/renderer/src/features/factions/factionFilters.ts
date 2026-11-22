@@ -106,6 +106,12 @@ export interface WorkFilters {
   /** only the pure DONATION quests: a stated coin turn-in and no items to collect at all */
   coinOnly: boolean
   /**
+   * Only turn-ins that can be repeated, the rows wearing the Repeatable chip. Narrows the raises
+   * and the costs. Drops the home-zone candidates: a page that states no faction effect is no
+   * route to raising this one, repeatable or not.
+   */
+  repeatableOnly: boolean
+  /**
    * The EFFECTIVE search inside one faction's work, lowercased — '' when the panel should show
    * everything. The caller (factionDerive.deriveRows) blanks it for a faction whose NAME matched
    * the search, which is the user's own rule: a name hit shows the whole faction, anything else
@@ -131,12 +137,16 @@ export interface WorkFilters {
  *  row visibility through the search haystack, and a name-matched faction with no work must not
  *  vanish for having none. */
 export function filtersActive(f: WorkFilters): boolean {
-  return f.classes.length > 0 || f.slot !== 'ANY' || f.coinOnly || f.cleanOnly
+  return f.classes.length > 0 || f.slot !== 'ANY' || f.coinOnly || f.repeatableOnly || f.cleanOnly
 }
 
 /** The gold-only reading: money changes hands and nothing has to be farmed first. */
 function matchesCoinOnly(ref: FactionQuestRef, on: boolean): boolean {
   return !on || (ref.coin !== undefined && ref.items.length === 0)
+}
+
+function matchesRepeatable(ref: FactionQuestRef, on: boolean): boolean {
+  return !on || ref.repeatable === true
 }
 
 /** Does one quest carry the search — everywhere, or (rewards-only) in what it GRANTS? */
@@ -189,7 +199,8 @@ export function filterWork(
     matchesQuery(q, f.query, f.rewardsOnly) &&
     matchesClasses(q, f.classes) &&
     matchesSlot(q, f.slot, slotsByKey) &&
-    matchesCoinOnly(q, f.coinOnly)
+    matchesCoinOnly(q, f.coinOnly) &&
+    matchesRepeatable(q, f.repeatableOnly)
   return {
     raise: work.raise.filter((q) => hunts(q) && (!f.cleanOnly || isCleanQuest(q, f.dontCare))),
     // The LOWER list takes the query, the class filter and the gold-only reading, never the
@@ -200,11 +211,12 @@ export function filterWork(
       (q) =>
         matchesQuery(q, f.query, f.rewardsOnly) &&
         matchesClasses(q, f.classes) &&
-        matchesCoinOnly(q, f.coinOnly)
+        matchesCoinOnly(q, f.coinOnly) &&
+        matchesRepeatable(q, f.repeatableOnly)
     ),
     ...(work.homeZone === undefined ? {} : { homeZone: work.homeZone }),
-    // Silence is not a receipt: the clean reading has nothing to judge a candidate by.
-    nearby: f.cleanOnly ? [] : work.nearby.filter(hunts)
+    // Silence is not a receipt: neither reading has anything to judge a candidate by.
+    nearby: f.cleanOnly || f.repeatableOnly ? [] : work.nearby.filter(hunts)
   }
 }
 
