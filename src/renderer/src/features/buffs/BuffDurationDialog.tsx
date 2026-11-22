@@ -30,7 +30,7 @@ import {
 } from '@mui/material'
 import type { BuffStat } from '@shared/types'
 import { parseTypedDuration, type BuffDurationOverride } from '@shared/buffTrust'
-import { estimatorSourceTitle, fmtPrecise } from './format'
+import { automaticNote, estimatePrefix, estimatorSourceTitle, fmtPrecise } from './format'
 
 type Mode = 'auto' | 'log' | 'fixed'
 
@@ -99,6 +99,7 @@ export function BuffDurationDialog({
 
   const typed = parseTypedDuration(draft)
   const auto = automaticMs(stat, choice)
+  const autoSource = choice === undefined ? stat.estimatorSource : undefined
   const canSave = mode !== 'fixed' || typed !== null
 
   const save = (): void => {
@@ -131,8 +132,8 @@ export function BuffDurationDialog({
             control={<Radio size="small" data-testid="buff-duration-auto" />}
             label={
               <ChoiceLabel
-                title={`Automatic · ${fmtPrecise(auto)}`}
-                note="The wiki duration, raised to your longest recent cast"
+                title={`Automatic · ${auto == null ? '' : estimatePrefix(autoSource)}${fmtPrecise(auto)}`}
+                note={automaticNote(autoSource)}
               />
             }
           />
