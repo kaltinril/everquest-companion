@@ -72,6 +72,8 @@ pub struct Fire {
     pub at: i64,
     /// The alert's label (`AlertDef.name`).
     pub rule: String,
+    /// The alert's id (`AlertDef.id`): what tells two alerts of one name and sound apart.
+    pub alert_id: String,
     /// `<packId>/<soundId>` — the key the app plays.
     pub sound: String,
     /// The text that matched: the raw log line.
@@ -663,6 +665,7 @@ impl RuleSet {
             let fire = Fire {
                 at: ev.ts(),
                 rule: rule.name.clone(),
+                alert_id: rule.id.clone(),
                 sound: rule.sound.clone(),
                 message: firing.text.clone(),
                 captures: firing.captures,
@@ -703,6 +706,7 @@ impl RuleSet {
         Some(Fire {
             at: now_ms,
             rule: due.fired.rule.clone(),
+            alert_id: id,
             sound: due.fired.sound.clone(),
             message: due.fired.message.clone(),
             // The words the arming match took, carried across the wait: a warning armed a minute ago
@@ -978,6 +982,7 @@ mod tests {
             vec![Fire {
                 at: 1000,
                 rule: "Charm break".to_owned(),
+                alert_id: "a1".to_owned(),
                 sound: "classic/ding".to_owned(),
                 message: "Your charm spell has worn off.".to_owned(),
                 // The three speech fields are absent, and that is the claim: this def declares no

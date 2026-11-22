@@ -1039,6 +1039,7 @@ impl World {
             kind: FireMessageKind::Fire,
             at: fire.at,
             rule: fire.rule.clone(),
+            alert_id: Some(fire.alert_id.clone()),
             sound: fire.sound.clone(),
             message: fire.message.clone(),
             // What it says, carried verbatim. Nothing is decided here and nothing is defaulted: an

@@ -432,6 +432,7 @@ impl EventSink for FoldSink {
             .map(|f| crate::ingest::Fire {
                 at: f.at,
                 rule: f.rule,
+                alert_id: f.alert_id,
                 sound: f.sound,
                 message: f.message,
                 // The speech fields cross the seam as the plain map and options they already are:

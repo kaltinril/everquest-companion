@@ -364,6 +364,8 @@ pub struct Fire {
     pub at: i64,
     /// The alert's label.
     pub rule: String,
+    /// The alert's id, which tells two alerts of one name and sound apart.
+    pub alert_id: String,
     /// `<packId>/<soundId>` — the key the app plays. Resolved by the fold, never a reference.
     pub sound: String,
     /// The text that matched.
