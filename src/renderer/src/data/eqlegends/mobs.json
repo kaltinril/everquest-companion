@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-22T06:28:30.018Z",
+  "scrapedAt": "2026-11-22T08:45:32.069Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -233844,8 +233844,7 @@
         "-1",
         "5"
       ],
-      "image": "npc_sister_of_erollisi.png",
-      "noImage": true
+      "image": "npc_sister_of_erollisi.png"
     },
     {
       "page": "Sister of the Spire",
@@ -244151,8 +244150,7 @@
         "-1",
         "5"
       ],
-      "image": "npc_tegea_prendyn.png",
-      "noImage": true
+      "image": "npc_tegea_prendyn.png"
     },
     {
       "page": "Teir`Dal Elite",
