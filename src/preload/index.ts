@@ -74,6 +74,7 @@ import { graphicsBridge } from './graphics'
 // and normalizer live together in shared/buffTrust.ts.
 import { buffTrustBridge } from './buffTrust'
 import { logArchiveBridge } from './logArchive'
+import { lootFrameBridge } from './lootFrame'
 import { gapsCharactersBridge } from './gapsCharacters'
 import { macrosBridge } from './macros'
 import { presencePrefsBridge } from './presencePrefs'
@@ -191,6 +192,7 @@ const api = {
   // …and the buff externals allowlist (./buffTrust.ts), likewise.
   ...buffTrustBridge,
   ...logArchiveBridge,
+  ...lootFrameBridge,
   ...gapsCharactersBridge,
   ...macrosBridge,
   ...respawnBridge,

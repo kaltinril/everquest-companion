@@ -80,6 +80,7 @@
 
 import { MODULE_WORLD_CHANGED } from '../../../shared/types'
 import type { CharacterRef, ModuleChanged, ModuleSnapshot } from '../../../shared/types'
+import { createLootFrameReader, LOOT_MODULE, type LootFrame, type LootMark } from '../../../shared/lootFrame'
 
 /**
  * The three bridge members this store needs. Declared structurally rather than as `typeof
@@ -88,6 +89,8 @@ import type { CharacterRef, ModuleChanged, ModuleSnapshot } from '../../../share
  */
 export interface ModuleBridge {
   getModuleSnapshot: (moduleId: string) => Promise<ModuleSnapshot | null>
+  /** The loot ledger as what this window lacks (shared/lootFrame.ts). Absent: it is read whole. */
+  getLootFrame?: (known: LootMark | null) => Promise<LootFrame | null>
   onModuleChanged: (cb: (c: ModuleChanged) => void) => () => void
   onCharacter: (cb: (c: CharacterRef | null) => void) => () => void
 }
@@ -261,6 +264,12 @@ export function createModuleStore(deps: {
    *  world-changed frame). Replies from an older generation are dropped on arrival. */
   let generation = 0
   let detach: (() => void) | null = null
+  // Forgotten wherever `generation` moves: a copy of the old world is no base for an append.
+  const lootFrames = bridge.getLootFrame ? createLootFrameReader(bridge.getLootFrame) : null
+
+  function readModule(id: string): Promise<ModuleSnapshot | null> {
+    return id === LOOT_MODULE && lootFrames ? lootFrames.read() : bridge.getModuleSnapshot(id)
+  }
 
   function markDirty(id: string): void {
     dirty.add(id)
@@ -282,7 +291,7 @@ export function createModuleStore(deps: {
     entry.stale = false
     entry.pendingSeq = -1
     const born = generation
-    void bridge.getModuleSnapshot(id).then((snap) => {
+    void readModule(id).then((snap) => {
       // A reply taken from a world that has since been rebuilt describes a character nobody is
       // looking at any more. Dropping it is the whole job of the generation counter.
       if (born !== generation) return
@@ -305,6 +314,7 @@ export function createModuleStore(deps: {
     if (c.moduleId === MODULE_WORLD_CHANGED) {
       // A reply already out was asked of the old world: drop it, or a baseline seeds from it.
       generation += 1
+      lootFrames?.forget()
       for (const [id, entry] of entries) {
         entry.fetching = false
         if (entry.subs.size > 0) markDirty(id)
@@ -328,6 +338,7 @@ export function createModuleStore(deps: {
 
   function onCharacterSwitch(): void {
     generation += 1
+    lootFrames?.forget()
     dirty.clear()
     for (const [id, entry] of entries) {
       resetEntry(entry)
@@ -355,6 +366,7 @@ export function createModuleStore(deps: {
     entries.clear()
     dirty.clear()
     generation += 1
+    lootFrames?.forget()
   }
 
   return {

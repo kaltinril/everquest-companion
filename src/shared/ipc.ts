@@ -4,6 +4,8 @@ export const IPC = {
   // ---- module transport (the one pattern for loot/turnins/kills/leveling/character) ----
   // renderer -> main
   getModuleSnapshot: 'module:getSnapshot',
+  // The loot ledger as what the asking window lacks (shared/lootFrame.ts).
+  getLootFrame: 'module:getLootFrame',
   // main -> renderer: A MODULE'S CURSOR MOVED (JOS-493).
   //
   // Not an increment and never a payload — `{ moduleId, seq }`, the dirty bit the data-server
