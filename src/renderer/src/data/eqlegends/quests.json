@@ -8063,7 +8063,8 @@
           "up": true
         }
       ],
-      "repeatable": true
+      "repeatable": true,
+      "repeatMixed": true
     },
     {
       "name": "Deck of Spontaneous Generation Quest",
@@ -18861,7 +18862,8 @@
           "amount": -2
         }
       ],
-      "repeatable": true
+      "repeatable": true,
+      "repeatMixed": true
     },
     {
       "name": "Karana's Blessing",
@@ -22827,7 +22829,8 @@
           "amount": 5
         }
       ],
-      "repeatable": true
+      "repeatable": true,
+      "repeatMixed": true
     },
     {
       "name": "Mooto's Proof",
