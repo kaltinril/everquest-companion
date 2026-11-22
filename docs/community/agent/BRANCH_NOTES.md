@@ -3294,3 +3294,10 @@ what a later change must know. Each fix has a unit test that failed before it.
 - A capture refused as too large is remembered in `logArchive.refusedTooLarge` by head, size and version. It stops holding for another log, a shorter file or a new version. `liveTooLarge.known` answers from memory because the status report must never wait on the disk.
 - The recipe table's Trivial cell may hold the textless notice icon only: the e2e `rows()` reads that cell's text as a number or nothing.
 - The Tradeskills e2e is two specs split at the level raise. Steps that raise the level or depend on it belong in `tradeskills-log.e2e.mts`. `npm run typecheck` does not cover `tests/`.
+
+## Second batch (2026-11-21)
+
+- Loot append frames (`shared/lootFrame.ts`): main answers `module:getLootFrame` with the rows past a window's `{ gen, length }` mark, comparing every held row by value; any non-prefix change raises `gen` and sends the whole ledger. A reply must also match the array it was asked against. Window rows now live across pickups, so no loot reader may write to a row or sort the ledger in place (`tests/lootFrameFrozen.test.mts`). A null re-ask still keeps the overlay's last rows until the next cursor (existing, pinned behaviour).
+- A stay's outgoing headline divides by your fight time plus `Agg.loose` (`LooseClock`, ownclock.rs): stretches of landed damage with no fight of yours open, ended by a fight or 60 s of quiet, a second at least, and a dropped row takes its time with it. `durationSec` stays your fights alone, because per-minute figures read it, so print a headline's time with `headlineClockSec`, never `durationSec`.
+- Item window: a short junk token before `Class:` is accepted only with a class code after it and `Race` opening the next row; without the Race check, full-screen captures read as junk windows.
+- The screen pass's 16 owner entries and the bug hunt's 17 are decided; each audit line says how. Check the Bazaar column fit and the Combat log at 900x600 first: neither was measured.
