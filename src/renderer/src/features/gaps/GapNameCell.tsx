@@ -1,10 +1,10 @@
-// The Name cell of a Gaps row, on its one fixed line (GapsTable's FIXED LAYOUT).
+// The Name cell of a Gaps row: two lines inside GapsTable's one fixed row height.
 //
-// WHAT TO DO BEATS THE END OF A LONG NAME (owner, 2026-11-21: "i can't read what i need to do
-// because the name is so long it cuts off the reason chips"). The job tags stand first and never
-// shrink. Then a long name gives up its room before anything after it does, down to a floor of
-// NAME_FLOOR characters so it can still be told from its neighbours; only past that floor do the
-// reasons clip. The whole name is on the name's hover and in the details pane.
+// THE NAME AND WHAT TO DO EACH GET A LINE (owner, 2026-11-21: "i can't read what i need to do because
+// the name is so long it cuts off the reason chips", then, of one line shared between them, "things
+// are cut off still"). The job tags and the name are the first line; what the row still needs, who
+// holds it and any other note are the second, which a row with none of them does not draw. A name
+// too long for its whole line still has its hover and the details pane.
 
 import { type JSX } from 'react'
 import { Box, Chip, Typography } from '@mui/material'
@@ -19,11 +19,6 @@ import { wikiPageUrl } from '@shared/wiki'
 import { Tooltip } from '../../lib/Tooltip'
 import { ForcedChip } from './ForcedQuests'
 import { EditedChip } from './GapRowEdit'
-
-/** The fewest characters of a long name kept on screen. A shorter name always shows whole. */
-const NAME_FLOOR = 14
-/** Far above the reasons' 1: the name takes all of a shortage until it reaches its floor. */
-const NAME_SHRINKS_FIRST = 100_000
 
 const ONE_LINE = { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } as const
 
@@ -105,14 +100,14 @@ function NeedsHint({ need }: { need: string }): JSX.Element | null {
   )
 }
 
-/** The name, the first thing on the row to give up room; its hover always has all of it. */
+/** The name, with all of it on its hover. */
 function RowName({ name }: { name: string }): JSX.Element {
   return (
     <Box
       component="span"
       title={name}
       data-testid="gaps-row-name"
-      sx={{ ...ONE_LINE, flex: `0 ${String(NAME_SHRINKS_FIRST)} auto`, minWidth: `${String(Math.min(name.length, NAME_FLOOR))}ch` }}
+      sx={{ ...ONE_LINE, flex: '0 1 auto', minWidth: 0 }}
     >
       {name}
     </Box>
@@ -130,23 +125,36 @@ export interface GapNameCellProps {
   depth: number
 }
 
-/** The cell's one line: job tags, then the name, then what the row still asks for. */
+/** The second line: its first item sits flush left, its chips fit the line, and with nothing in it it takes no room. */
+const REASONS_SX = {
+  ...ONE_LINE,
+  display: 'block',
+  height: 18,
+  lineHeight: '18px',
+  '&:empty': { display: 'none' },
+  '& > *:first-of-type': { ml: 0 },
+  '& .MuiChip-root': { height: 18, fontSize: 11, verticalAlign: 'top' }
+} as const
+
+/** The cell: job tags and the name, then what the row still asks for. */
 export function GapNameCell({ row, verdict, need, chipContext, held, depth }: GapNameCellProps): JSX.Element {
   // Under its mob's heading a faction or drop row is the faction or item alone.
   const name = depth === 2 && onMobPage(row) ? factionOf(row) : shownName(row)
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
-      <Box component="span" sx={{ flex: 'none', display: 'inline-flex', alignItems: 'center' }}>
-        {depth > 0 && (
-          <Box component="span" sx={{ color: 'text.secondary', mr: 1 }}>
-            •
-          </Box>
-        )}
-        <JobChip job={gapJob(row, chipContext)} why={updateWhy(row, verdict, chipContext)} />
-        <ReadyChip need={need} />
+    <Box sx={{ minWidth: 0 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', minWidth: 0, height: 22 }}>
+        <Box component="span" sx={{ flex: 'none', display: 'inline-flex', alignItems: 'center' }}>
+          {depth > 0 && (
+            <Box component="span" sx={{ color: 'text.secondary', mr: 1 }}>
+              •
+            </Box>
+          )}
+          <JobChip job={gapJob(row, chipContext)} why={updateWhy(row, verdict, chipContext)} />
+          <ReadyChip need={need} />
+        </Box>
+        <RowName name={name} />
       </Box>
-      <RowName name={name} />
-      <Box component="span" sx={{ ...ONE_LINE, flex: '0 1 auto', minWidth: 0 }} data-testid="gaps-row-reasons">
+      <Box sx={REASONS_SX} data-testid="gaps-row-reasons">
         <NeedsHint need={need} />
         <ForcedChip row={row} />
         <EditedChip row={row} />
