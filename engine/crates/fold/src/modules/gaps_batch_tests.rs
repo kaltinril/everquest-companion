@@ -38,6 +38,28 @@ fn a_player_target_withdraws_its_row_and_an_npc_target_gives_the_row_its_role() 
     assert!(kogg.get("maybePlayer").is_none());
 }
 
+/// Owner, 2026-11-21, of Malloy the Songbird: the row carries the keywords said to it and their answers,
+/// through the fold's own path for an unparsed line; a trade opened ends what a keyword's answer holds.
+#[test]
+fn a_mob_row_serves_the_whole_conversation() {
+    let mut m = module();
+    let npc = "Malloy the Songbird";
+    feed(&mut m, 1, json!({ "kind": "consider", "mob": npc, "level": 61 }));
+    feed(&mut m, 1_000, line("You say, 'Hail, Malloy the Songbird'"));
+    feed(&mut m, 1_500, line("Malloy the Songbird says, 'Hello! Are you just [traveling] through?'"));
+    assert!(row(&m, "mob", npc).get("dialogue").is_none(), "a hail answer alone is the row's greeting");
+    feed(&mut m, 3_000, line("You say, 'traveling'"));
+    feed(&mut m, 3_500, line("Malloy the Songbird says, 'Very well, then.'"));
+    feed(&mut m, 4_000, json!({ "kind": "offer", "item": "Bone Chips", "npc": npc }));
+    feed(&mut m, 40_000, line("Malloy the Songbird says, 'Thanks for that.'"));
+    let served = row(&m, "mob", npc);
+    assert_eq!(served["greeting"], json!("Hello! Are you just [traveling] through?"));
+    assert_eq!(
+        served["dialogue"],
+        json!({ "hail": ["Hello! Are you just [traveling] through?"], "asked": [{ "said": "traveling", "lines": ["Very well, then."] }] })
+    );
+}
+
 /// Owner, 2026-10-23: "if an NPC is a merchant, do not show it on mobs, only show it on merchants".
 /// A conned vendor the catalog lacks, then a price quote: one Merchants row, no Mobs row, and the
 /// counts say the same. A plain mob beside it stays a Mobs row.

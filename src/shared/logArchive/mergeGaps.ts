@@ -9,6 +9,7 @@
 // must build without it.
 
 import { isRewardChest } from '../rewardChest'
+import { dialogueOf, mergeDialogue, type Dialogue } from '../gapDialogue'
 
 interface Tally {
   entries: { name: string; n: number }[]
@@ -57,6 +58,8 @@ interface Row {
   suggest?: unknown
   zoneTitled?: true
   viaRedirect?: string
+  /** an NPC's whole conversation (gaps_dialogue.rs): every keyword either log heard (`mergeDialogue`) */
+  dialogue?: Dialogue
 }
 
 /** A kill and a faction its lines moved (gaps_trade.rs), how often, and the zone last seen in. */
@@ -262,10 +265,12 @@ function mergeFight(a: FightTier[] | undefined, b: FightTier[] | undefined): Fig
  */
 function mergeRow(had: Row, r: Row): Row {
   const fight = mergeFight(had.fight, r.fight)
+  const dialogue = mergeDialogue(dialogueOf(had), dialogueOf(r))
   const out: Row = {
     ...had,
     ...r,
     ...(fight === undefined ? {} : { fight }),
+    ...(dialogue === undefined ? {} : { dialogue }),
     name: nameOf(had, r),
     kinds: [...had.kinds, ...r.kinds.filter((k) => !had.kinds.includes(k))],
     count: had.count + r.count,

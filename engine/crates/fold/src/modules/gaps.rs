@@ -222,7 +222,10 @@ impl GapsModule {
             Kind::CastBegin | Kind::OtherCastBegin => self.spell(ev),
             Kind::PetClaim | Kind::PetSay => self.own_pet(ev.str("name")),
             // Handing an item to it is meeting it (owner, 2026-10-19: a fallen froglok, only traded with).
-            Kind::Offer => self.turn_in(ev) | self.npc_met(ev.str("npc"), "offered", ev),
+            Kind::Offer => {
+                self.stock.trade_opened();
+                self.turn_in(ev) | self.npc_met(ev.str("npc"), "offered", ev)
+            }
             Kind::AllyPetLeader => self.player_pet(ev.str("pet")),
             Kind::SkillUp => self.skill_up(ev),
             // A trade's end and experience, for the quest log (gaps_quest_log.rs); nothing else.
