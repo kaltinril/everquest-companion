@@ -58,6 +58,8 @@
     "src/preload/respawn.ts",
     // …and `logArchive.ts` (Keep log history, docs/plans/log-archive), likewise.
     "src/preload/logArchive.ts",
+    // …and `lootFrame.ts` (the loot ledger as what a window lacks), likewise.
+    "src/preload/lootFrame.ts",
     // …and `gapsCharacters.ts` (the Gaps tab's All characters), likewise.
     "src/preload/gapsCharacters.ts",
     // …and `macros.ts` (the Macros tab's library and game-file reads, fork #11), likewise.

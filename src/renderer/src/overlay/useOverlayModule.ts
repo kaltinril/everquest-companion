@@ -32,7 +32,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 // RELATIVE, so the unit suite (no `@shared/*` alias) can run this hook: tests/overlayModuleRows.
-import { MODULE_WORLD_CHANGED, type ModuleChanged } from '../../../shared/types'
+import { MODULE_WORLD_CHANGED, type ModuleChanged, type ModuleSnapshot } from '../../../shared/types'
+import { createLootFrameReader, LOOT_MODULE } from '../../../shared/lootFrame'
 
 const baseName = (path: string): string => path.split(/[\\/]/).pop() ?? path
 
@@ -64,6 +65,11 @@ export function useOverlayModule<Snap>(moduleId: string, empty: Snap, enabled = 
     let dropOnNull = false
     /** The log the rows held are of, by base name. Undefined until this window has been told. */
     let heldLog: string | null | undefined
+    // The loot ledger arrives as what this window lacks (shared/lootFrame.ts); the copy it is
+    // appended to is forgotten at every re-ask below that is not about a moved cursor.
+    const lootFrames = moduleId === LOOT_MODULE ? createLootFrameReader(window.eqOverlay.getLootFrame) : null
+    const read = (): Promise<ModuleSnapshot<Snap> | null> =>
+      lootFrames ? (lootFrames.read() as Promise<ModuleSnapshot<Snap> | null>) : window.eqOverlay.getModuleSnapshot<Snap>(moduleId)
 
     /** Take the rows down: they are of a world that is gone. */
     const drop = (): void => {
@@ -72,11 +78,13 @@ export function useOverlayModule<Snap>(moduleId: string, empty: Snap, enabled = 
     }
 
     const hydrate = (): void => {
+      // Asked because the world changed hands: what is held is no base for an append.
+      if (dropOnNull) lootFrames?.forget()
       hydrated = false
       pendingSeq = -1
       asked += 1
       const mine = asked
-      void window.eqOverlay.getModuleSnapshot<Snap>(moduleId).then((snap) => {
+      void read().then((snap) => {
         // An answer to an older ask may be of the character this window has left (fork #9).
         if (cancelled || mine !== asked) return
         hydrated = true
@@ -86,6 +94,8 @@ export function useOverlayModule<Snap>(moduleId: string, empty: Snap, enabled = 
         // draws rather than inventing rows — unless the world those rows came from is gone.
         if (!snap) {
           if (gone) drop()
+          // A cursor heard during this read is still unanswered: the empty reply says nothing of it.
+          if (pendingSeq > knownSeq) hydrate()
           return
         }
         knownSeq = snap.seq
@@ -127,6 +137,7 @@ export function useOverlayModule<Snap>(moduleId: string, empty: Snap, enabled = 
       // A REBUILD OF THE SAME LOG: the rows are still this character's, and they stay while it is
       // asked again. The engine is "not live" for that instant, and an empty overlay would flash.
       if (was === log) {
+        lootFrames?.forget()
         hydrate()
         return
       }

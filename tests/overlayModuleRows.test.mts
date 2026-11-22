@@ -7,6 +7,7 @@ import assert from 'node:assert/strict'
 import { mountHook, type HookHost } from './hookHost.mjs'
 import { useOverlayModule } from '../src/renderer/src/overlay/useOverlayModule'
 import { MODULE_WORLD_CHANGED, type CharacterRef, type ModuleChanged } from '../src/shared/types'
+import { createLootFrames, type LootFrame, type LootMark } from '../src/shared/lootFrame'
 
 type Rows = readonly string[]
 const EMPTY: Rows = []
@@ -166,3 +167,86 @@ test('a cursor re-ask that comes back with no snapshot changes nothing', async (
   assert.deepEqual(r.rows(), ['a1'])
   r.host.unmount()
 })
+
+test('A CURSOR HEARD DURING A READ THAT CAME BACK EMPTY IS STILL ASKED FOR', async () => {
+  const r = await mounted('eqlog_Aye_freeport.txt', ['a1'])
+  r.changed({ moduleId: 'rows', seq: 6 })
+  // This one lands while the read for 6 is out, and that read answers no snapshot.
+  r.changed({ moduleId: 'rows', seq: 7 })
+  await answer(r, null)
+  assert.equal(r.asks.length, 1, 'the newer cursor was dropped with the empty answer')
+  await answer(r, { seq: 7, state: ['a1', 'a2'] })
+  assert.deepEqual(r.rows(), ['a1', 'a2'])
+  r.host.unmount()
+})
+
+// ---- the loot module, read as append frames (shared/lootFrame.ts) ------------------------------
+
+function lootRig(initial: Rows) {
+  const frames = createLootFrames()
+  const marks: (LootMark | null)[] = []
+  let ledger = initial
+  let onChanged: (c: ModuleChanged) => void = () => undefined
+  let onCharacter: (c: CharacterRef | null) => void = () => undefined
+  const getLootFrame = (known: LootMark | null): Promise<LootFrame | null> => {
+    marks.push(known)
+    return Promise.resolve(structuredClone(frames.answer({ seq: marks.length * 10, state: [...ledger] }, known)))
+  }
+  const eqOverlay = {
+    getModuleSnapshot: () => Promise.reject(new Error('loot must be read through its frames')),
+    getLootFrame,
+    onModuleChanged: (cb: (c: ModuleChanged) => void) => {
+      onChanged = cb
+      return () => undefined
+    },
+    onCharacter: (cb: (c: CharacterRef | null) => void) => {
+      onCharacter = cb
+      return () => undefined
+    },
+    logReadReport: () => Promise.resolve({ logFile: 'eqlog_Aye_freeport.txt' })
+  }
+  ;(globalThis as { window?: unknown }).window = { eqOverlay }
+  const host = mountHook(() => useOverlayModule<Rows>('loot', EMPTY))
+  return {
+    host,
+    marks,
+    set: (rows: Rows) => {
+      ledger = rows
+    },
+    changed: (c: ModuleChanged) => {
+      onChanged(c)
+    },
+    character: (c: CharacterRef | null) => {
+      onCharacter(c)
+    }
+  }
+}
+
+test('THE XP OVERLAY READS LOOT AS FRAMES: a pickup carries the window-s mark', async () => {
+  const r = lootRig(['a'])
+  await settle()
+  assert.deepEqual(r.host.render(), ['a'])
+  r.set(['a', 'b'])
+  r.changed({ moduleId: 'loot', seq: 100 })
+  await settle()
+  assert.deepEqual(r.host.render(), ['a', 'b'])
+  assert.deepEqual(r.marks, [null, { gen: 1, length: 1 }])
+  r.host.unmount()
+})
+
+for (const [what, happen] of [
+  ['another character', (r: ReturnType<typeof lootRig>) => { r.character(who(LOG_B)) }],
+  ['a rebuild of the same log', (r: ReturnType<typeof lootRig>) => { r.character(who(LOG_A)) }],
+  ['the world changing hands', (r: ReturnType<typeof lootRig>) => { r.changed({ moduleId: MODULE_WORLD_CHANGED, seq: -1 }) }]
+] as const) {
+  test(`AFTER ${what.toUpperCase()} the overlay-s next loot read carries no mark`, async () => {
+    const r = lootRig(['a'])
+    await settle()
+    r.set(['z'])
+    happen(r)
+    await settle()
+    assert.equal(r.marks[r.marks.length - 1], null)
+    assert.deepEqual(r.host.render(), ['z'])
+    r.host.unmount()
+  })
+}
