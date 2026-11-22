@@ -28,6 +28,116 @@ export interface CommunityRelease {
 
 export const COMMUNITY_RELEASE_NOTES: readonly CommunityRelease[] = [
   {
+    "version": "0.1.0-test.54",
+    "date": "2026-11-21",
+    "title": "repeatable faction quests, a recipe form on Wiki Gaps, and screen fixes",
+    "groups": [
+      {
+        "heading": "Factions",
+        "items": [
+          {
+            "text": "Quests the wiki says can be repeated wear a Repeatable chip and come first in a faction's list."
+          },
+          {
+            "text": "A \"Repeatable only\" switch shows just those."
+          },
+          {
+            "text": "Where one step of a longer quest repeats, the row shows that step. The Painting now reads Palatos Kynarn, 4 Capt. Orlin's Spiced Ale, and the factions that one hand-in moves."
+          }
+        ]
+      },
+      {
+        "heading": "Wiki Gaps",
+        "items": [
+          {
+            "text": "A crafted item with no recipe on the wiki now asks for one: search for its materials, pick the container, and Copy writes the whole recipe in the wiki's format."
+          },
+          {
+            "text": "A long name no longer hides what a row still needs."
+          },
+          {
+            "text": "Quest rows appear only for quests a page really lacks, and Copy says where to add them."
+          },
+          {
+            "text": "A new NPC page's Copy carries the whole conversation."
+          },
+          {
+            "text": "An item window with a Class line behind its icon is read as a window."
+          }
+        ]
+      },
+      {
+        "heading": "Tradeskills",
+        "items": [
+          {
+            "text": "Make an item always shows how to make something, with \"Bought\" on what a merchant sells."
+          },
+          {
+            "text": "A recipe that needs a material dropped only in zones not yet open is hidden as out of era."
+          },
+          {
+            "text": "Explore follows the Hide trivial switch."
+          },
+          {
+            "text": "A From the guides row opens its recipe."
+          },
+          {
+            "text": "On the Wish list, a crafted item that cannot be worn files under Crafted."
+          }
+        ]
+      },
+      {
+        "heading": "Combat",
+        "items": [
+          {
+            "text": "A zone's overall DPS counts the time others fought without you."
+          },
+          {
+            "text": "The DPS chart calls a stranger's damage \"others\", not \"group\"."
+          },
+          {
+            "text": "In a short window the combat log gives up its room first."
+          },
+          {
+            "text": "A drilled paste with the pet nested opens on the figure the panel prints."
+          }
+        ]
+      },
+      {
+        "heading": "Small fixes",
+        "items": [
+          {
+            "text": "Bazaar: all ten columns fit at the default window, and ticking Every tier no longer wipes a watch."
+          },
+          {
+            "text": "Alerts: two alerts with the same name stay apart."
+          },
+          {
+            "text": "Log archive: an automatic archive that stopped says why, and a log too large to archive is not tried again at every launch."
+          },
+          {
+            "text": "Loot history: a new pickup sends only the new rows to each window."
+          },
+          {
+            "text": "Void motes, Timers, Plane of Sky and Preferences: several hovers and labels now say what is true."
+          },
+          {
+            "text": "The app's title now reads EQ Legends Companion CE."
+          }
+        ]
+      },
+      {
+        "heading": "Data",
+        "items": [
+          {
+            "text": "Wiki pages refreshed to today (38 pages changed)."
+          }
+        ]
+      }
+    ],
+    "knownIssues": "The Raid Targets tab's Hide and By class loadout switches fail their automated checks, as they did in test.53; the cause is not known yet. The Repeatable chip marks only quests the wiki states plainly, so a repeat route described in looser wording is not marked. Wiki Gaps can suggest a quest for an NPC the quest does not really start at. The game prints no line for some quest rewards, so those items cannot be tied to their quest. The Macros Send has not yet been tried in game: keep the copy it makes until you have logged in and seen your macros. A macro moved to another button can leave a hotbar button firing the wrong macro; the review before a Send warns about it. A \"(guessed)\" pet owner can be wrong until /pet who leader settles it. Fishing and forage counts for an archived log appear after a Refresh. The Wiki Gaps icon rows read the wiki data this build shipped with, so a page fixed on the wiki stays a row until the next build or until it is marked Done. Plane of Sky runes moved to the currencies tab are not in the game's inventory export; set the count by hand or use the log count. The Void motes tab estimates a drop's chance from the size of the mob's loot list, because the wiki lists no drop rates; a row's hover says what it assumed. It does not count spells (a mote raises a spell rank too) or progress already banked toward a tier, and it assumes copies are farmed at Refined. The healing meters still divide by the whole fight's length. A buff's percent stats (haste, run speed) and regen are not raised with rank yet, and the Upgrades tab does not count bigger stats as a reason to upgrade a buff. Shorter pauses cannot change the spacing a Windows voice puts between words. A Copy page read is kept for half an hour, so a page made on the wiki within that time is not seen until it passes. A merchant page the wiki already has gets no \"items sold\" or \"location\" check. An item page the wiki already has gets no check that it lists a merchant you were quoted by. Joining another player's private instance is not told apart from the open world of that zone; only an instance you create yourself is. A pet summoned shortly before its first \"My leader is\" line can carry a \"(2)\" after its name in the meters until the next restart. Another player's spells never count toward a mob's resists: the game prints only your own resists to you. The con card does not list a mob's immunities yet (the mob page does). Saved characters read \"needs refresh\" on Wiki Gaps until logged in once with this build. A +0 worked back from a window often leaves Weight as ?. A groupmate's charmed pet can still lose its credit when a damage-over-time it cast before the charm ticks on a groupmate. A mob or item added to the wiki after this build shows no wiki details until the next build (or a Copy click in Wiki Gaps). Copy on a wiki page that still holds the template's placeholders keeps them. Capture finds the game window only when it is titled \"EverQuest Legends\" or \"EverQuest\". All characters needs each character logged in here once with this build. The screenshot reader reads English only. The installer is not code-signed, so Windows shows \"Windows protected your PC\" the first time (More info, then Run anyway). Builds before test.20 do not update themselves; install one by hand once."
+  },
+  {
     "version": "0.1.0-test.53",
     "date": "2026-11-20",
     "title": "a Tradeskills section, a Macros tab, and group mates' pets that stay on the meter",
