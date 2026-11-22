@@ -3,6 +3,7 @@
 // PURE AND NODE-TESTED (the `gearPrefs.ts` precedent): relative value imports, no React. Stored
 // by `useVoidMotePrefs` (useGearPrefs.ts), validated on every read.
 
+import type { ClassAbbr } from '../../../../shared/classCombo'
 import type { GearStatKey } from '../../../../shared/planner/gear'
 import type { PlannerInventoryHost } from '../../../../shared/planner/inventorySlots'
 import type { ItemSupply, SupplyGap, SupplyKind } from '../../../../shared/planner/itemSupply'
@@ -17,6 +18,7 @@ import {
   type MotePlanStep,
   type MoteTarget
 } from '../../../../shared/planner/voidMotes'
+import { classDisplayName } from '../../../../shared/spellLevels'
 import { ROLE_LABEL } from '../plan/planBlurb'
 import { PLAN_ROLES } from './areaMemory'
 import { columnLabel, statText } from './gearColumns'
@@ -72,6 +74,16 @@ export function moteTargetLabel(target: MoteTarget): string {
 export function moteGainText(advice: Pick<MoteAdvice, 'gain'>, target: MoteTarget): string {
   if (advice.gain <= 0) return ''
   return `+${isRole(target) ? advice.gain.toFixed(1) : statText(advice.gain, target)}`
+}
+
+/**
+ * The Gain header's hover. A focus is scored for the gear area's class pick, which this tab does
+ * not show, so the hover names it; one stat's own points do not depend on a class.
+ */
+export function moteGainHint(target: MoteTarget, classes: readonly ClassAbbr[]): string {
+  const base = 'What the next tier adds for your target'
+  if (!isRole(target)) return base
+  return `${base}, scored for ${classes.length === 0 ? 'every class' : classes.map(classDisplayName).join(', ')}`
 }
 
 /** `AC 66→70 · STR 28→30`: every stat the next tier moves; `-` where the worn tier states none. */

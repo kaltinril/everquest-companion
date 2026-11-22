@@ -55,6 +55,7 @@ import {
   MOTE_TARGET_ROLES,
   moteChangesText,
   moteEmptyText,
+  moteGainHint,
   moteGainText,
   moteGateText,
   moteHoursText,
@@ -266,7 +267,7 @@ export default function VoidMotePanel({ compare, indexReady, indexRefused, class
             <TableHead>
               <TableRow>
                 {HEAD.map((h) => (
-                  <TableCell key={h.label} title={h.hint} align={h.align} sx={{ ...CELL, color: 'text.secondary' }}>
+                  <TableCell key={h.label} title={h.label === 'Gain' ? moteGainHint(motes.target, classes) : h.hint} align={h.align} sx={{ ...CELL, color: 'text.secondary' }}>
                     {h.label}
                   </TableCell>
                 ))}

@@ -28,6 +28,7 @@ import {
 import {
   DEFAULT_MOTE_PREFS,
   moteChangesText,
+  moteGainHint,
   moteGainText,
   moteGateText,
   moteHoursText,
@@ -430,6 +431,13 @@ test('the tab words: the source, what it assumed, and why a row is not yet a pic
   assert.equal(moteGateText({ gate: 'rare', gain: 3 }), 'Below +7, but copies barely exist')
   assert.equal(moteGateText({ gate: 'pick', gain: 3 }), '')
   assert.equal(moteGateText({ gate: 'pick', gain: 0 }), 'No gain for your target')
+})
+
+test('the Gain hover names the class pick a focus is scored for, and only a focus', () => {
+  assert.equal(moteGainHint('tank', ['WIZ']), 'What the next tier adds for your target, scored for Wizard')
+  assert.equal(moteGainHint('tank', ['SHD', 'ENC']), 'What the next tier adds for your target, scored for Shadow Knight, Enchanter')
+  assert.equal(moteGainHint('tank', []), 'What the next tier adds for your target, scored for every class')
+  assert.equal(moteGainHint('AC', ['WIZ']), 'What the next tier adds for your target', 'a stat has no class in it')
 })
 
 test('the tab words: the worn items left off the list are named with the reason', () => {
