@@ -37,10 +37,12 @@ import { IPC } from '../../shared/ipc'
 import type { CombatSnapshot, FightSearchResult, SnapshotOpts } from '../../shared/combat'
 import {
   serveCombatSnapshot,
+  serveLootFrame,
   serveModuleSnapshot,
   serveSearchFights,
   type ModuleSnap
 } from '../dataServer/serveShim'
+import type { LootFrame } from '../../shared/lootFrame'
 
 /**
  * `limit`, as this channel has always clamped it: a renderer bug can't ask for an unbounded payload
@@ -91,6 +93,7 @@ export function registerWorldIpc(): void {
     IPC.getModuleSnapshot,
     (_e, moduleId: string): Promise<ModuleSnap | null> => serveModuleSnapshot(moduleId)
   )
+  ipcMain.handle(IPC.getLootFrame, (_e, known: unknown): Promise<LootFrame | null> => serveLootFrame(known))
   ipcMain.handle(
     IPC.getCombatSnapshot,
     (_e, opts: SnapshotOpts | undefined): Promise<CombatSnapshot> =>

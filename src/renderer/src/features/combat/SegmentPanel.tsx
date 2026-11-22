@@ -28,7 +28,7 @@ import { useModule } from '../../lib/useModule'
 import { selfMeterLabel, withSelfLabel } from './selfMeterLabel'
 import { useShowSelfName } from './useSelfMeterName'
 import type { CharacterSnap } from '@shared/types'
-import { formatEntityText, formatSegmentText, formatTargetText } from './copyText'
+import { formatDrillText, formatSegmentText, formatTargetText } from './copyText'
 import { formatNum as fmt } from '../../lib/formatRate'
 import type { HealingView, SegmentView, SourceView, TimelineView } from '@shared/combat'
 import type { HealHeadline } from '@shared/healHeadline'
@@ -407,7 +407,7 @@ export function SegmentBody({
       // row regardless of the subject's `.name`, keeping `copyText` a pure function of its args.
       // The SAME pets the body nests into this list — `MeterPanel.pets` IS what was nested, so the
       // clipboard can no longer drop a row the reader can see on screen.
-      return formatEntityText(seg, panel.subject, panel.pets, selfLabel)
+      return formatDrillText(seg, panel.subject, panel.pets, { selfLabel, total: head.total, dps: head.dps })
     }
     return d.targetDetail && d.targetName
       ? formatTargetText(seg, d.targetName, d.targetDetail)

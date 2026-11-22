@@ -14,7 +14,7 @@ import { characterId } from '../log/config'
 import { getActiveCharacter } from '../session'
 import { getLogArchivePrefs, logArchiveOn, setLogArchivePrefs } from '../storeLogArchive'
 import { HELD_TEXT, type DumpAdvice, type LogArchiveReply, type LogArchiveStatus, type SegmentRow } from '../../shared/logArchive/panel'
-import { driveOf, rotateBlockers } from '../../shared/logArchive/preflight'
+import { autoArchiveFailure, driveOf, rotateBlockers } from '../../shared/logArchive/preflight'
 import type { Segment } from '../../shared/logArchive/segment'
 import { CAPTURED_MODULES } from '../../shared/logArchive/modules'
 import { archiveName, backupLog, sweepTemp } from './backup'
@@ -42,6 +42,8 @@ import { listSegments, resolveArchivePath, writeSegment } from './segmentStore'
 let busy: string | null = null
 /** Why this run could not finish an interrupted archive, for the card (`interruptedReason`). */
 let notFinished: string | null = null
+/** Why the last automatic archive stopped, for the character it was about (`autoFailed`). */
+let autoStopped: { character: string; text: string } | null = null
 /** The captured modules the running engine serves, learned once it has caught up; null before. */
 let engineModules: ReadonlySet<string> | null = null
 /** The engine's respawn snapshot carries `learned` (see `lacksLearned`). */
@@ -236,9 +238,15 @@ export function logArchiveStatus(): LogArchiveStatus {
     dumps: null,
     rotateBlockers: [],
     autoPaused: false,
+    autoFailed: null,
     busy
   }
   return on ? fillOn(base, dir, a) : base
+}
+
+/** Why the last automatic archive stopped, when it was this character's log. */
+function autoFailedFor(a: { character: string } | null): string | null {
+  return autoStopped !== null && autoStopped.character === a?.character ? autoStopped.text : null
 }
 
 function fillOn(base: LogArchiveStatus, dir: string, a: { character: string; logPath: string } | null): LogArchiveStatus {
@@ -252,6 +260,7 @@ function fillOn(base: LogArchiveStatus, dir: string, a: { character: string; log
   base.skipped = listing.skipped
   base.dumps = base.live !== null ? dumpAdvice(base.live.path, base.live.modifiedMs) : null
   base.autoPaused = a !== null && logWasPutBack(dir, a.character, a.logPath)
+  base.autoFailed = autoFailedFor(a)
   base.rotateBlockers = rotateBlockers({
     on: true,
     hasLog: base.live !== null,
@@ -295,6 +304,7 @@ async function exclusive(label: string, fn: () => LogArchiveReply | Promise<LogA
 /** The switch. Turning it on or off changes what the tabs show, so the merge context is reset. */
 export function setLogArchiveEnabled(enabled: boolean): LogArchiveReply {
   setLogArchivePrefs({ enabled })
+  autoStopped = null
   liveHistory.forgetHistoryContext()
   // Open screens fetch again now, and the celebration watches re-seed instead of firing for history.
   pushWorldChanged()
@@ -374,10 +384,23 @@ export function rotateNow(): Promise<LogArchiveReply> {
     if (!r.ok && r.logTouched) notFinished = r.reason
     if (!r.ok) return reply(false, r.logTouched ? `Interrupted: ${r.reason}` : `Not archived: ${r.reason}`)
     liveHistory.noteSealedThisAttach(r.segment.id)
+    autoStopped = null
     const gap = r.segment.gapLines ?? 0
     const extra = gap > 0 ? ` ${gap} line(s) written during the move are in the archive but not in the totals.` : ''
     return reply(true, `Archived to ${r.segment.archivePath ?? dir}. Your history is kept.${extra}`)
   })
+}
+
+/** The automatic check's archive: `rotateNow`, and the card keeps why it stopped. `rotateNow` reads
+ *  the attached character before its first wait, so this is the character it archives. */
+export async function rotateAutomatically(): Promise<LogArchiveReply> {
+  const a = attached()
+  const r = await rotateNow()
+  // Another action held the door, so this try learned nothing about the log.
+  if (r.status.busy !== null) return r
+  const text = autoArchiveFailure(r)
+  autoStopped = text === null || a === null ? null : { character: a.character, text }
+  return { ...r, status: logArchiveStatus() }
 }
 
 /** Step 3.6: put the newest archived log back in front of the live one, then restart the app. */

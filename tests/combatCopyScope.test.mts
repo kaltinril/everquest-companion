@@ -12,10 +12,10 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { MAX_WIDTH, fmtDur, formatSegmentText, type ShownSources } from '../src/renderer/src/features/combat/copyText'
+import { MAX_WIDTH, fmtDur, formatDrillText, formatEntityText, formatSegmentText, type ShownSources } from '../src/renderer/src/features/combat/copyText'
 import { headlineClockSec } from '../src/renderer/src/features/combat/headlineClock'
 import { scopeRate, scopeSources, scopeTotals } from '../src/renderer/src/features/combat/meterScope'
-import { meterSources } from '../src/renderer/src/features/combat/petRows'
+import { meterPanel, meterSources, panelRate, panelTotals } from '../src/renderer/src/features/combat/petRows'
 import type { MeterScope, RosterSnap } from '../src/shared/roster'
 import type { SegmentView, SourceView } from '../src/shared/combat'
 
@@ -153,4 +153,41 @@ test('the Combat tab copies the rows and headline its panel is showing', () => {
     'utf8'
   )
   assert.match(panelText, /formatSegmentText\([^)]*rows: panel\.sources/, 'copy reads the bare segment again')
+})
+
+// THE DRILLED PASTE (bug hunt 2026-11-19): with the pet nested, the panel's header is you plus the
+// pet and the table holds the pet's row, but the paste printed your own total above that table.
+function drilled(pets: SourceView[]): { subject: SourceView; pets: SourceView[]; total: number; dps: number } {
+  const panel = meterPanel([YOU, PET], pets.length > 0, { entityId: 'you' })
+  assert.equal(panel.level, 2)
+  if (panel.level !== 2) throw new Error('not drilled')
+  const { total } = panelTotals(panel, SEG.outTotal, SEG.outDps)
+  return { subject: panel.subject, pets: panel.pets, total, dps: panelRate(panel, SEG.outDps) }
+}
+
+test('a drilled paste with the pet nested opens on the figure the panel prints', () => {
+  const d = drilled([PET])
+  assert.equal(d.total, 40230)
+  const lines = formatDrillText(SEG, d.subject, d.pets, { selfLabel: null, total: d.total, dps: d.dps }).split('\n')
+  assert.equal(lines[1], 'With pet · 40.2k · 483 dps')
+  assert.match(lines[2], /^You · 31\.2k · 375 dps · 260 hits/)
+  assert.ok(lines.some((l) => l.startsWith('Vebarn (pet)')), 'the pet row stays in the table')
+  assert.ok(lines.every((l) => l.length <= MAX_WIDTH))
+})
+
+test('the drilled paste names the self row with the label the meter shows', () => {
+  const d = drilled([PET])
+  const lines = formatDrillText(SEG, d.subject, d.pets, { selfLabel: 'Drammin (You)', total: d.total, dps: d.dps }).split('\n')
+  assert.match(lines[2], /^Drammin \(You\) · 31\.2k/)
+})
+
+test('a drilled paste with no pet nested is the plain block, byte for byte', () => {
+  const d = drilled([])
+  const shown = { selfLabel: null, total: d.total, dps: d.dps }
+  assert.equal(formatDrillText(SEG, d.subject, d.pets, shown), formatEntityText(SEG, d.subject, d.pets, null))
+})
+
+test('the panel hands the drilled paste its own headline', () => {
+  const panel = readFileSync(new URL('../src/renderer/src/features/combat/SegmentPanel.tsx', import.meta.url), 'utf8')
+  assert.match(panel, /formatDrillText\(seg, panel\.subject, panel\.pets, \{ selfLabel, total: head\.total, dps: head\.dps \}\)/)
 })

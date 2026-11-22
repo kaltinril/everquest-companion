@@ -3,6 +3,7 @@
 // PURE AND NODE-TESTED (the `gearPrefs.ts` precedent): relative value imports, no React. Stored
 // by `useVoidMotePrefs` (useGearPrefs.ts), validated on every read.
 
+import type { ClassAbbr } from '../../../../shared/classCombo'
 import type { GearStatKey } from '../../../../shared/planner/gear'
 import type { PlannerInventoryHost } from '../../../../shared/planner/inventorySlots'
 import type { ItemSupply, SupplyGap, SupplyKind } from '../../../../shared/planner/itemSupply'
@@ -17,6 +18,7 @@ import {
   type MotePlanStep,
   type MoteTarget
 } from '../../../../shared/planner/voidMotes'
+import { classDisplayName } from '../../../../shared/spellLevels'
 import { ROLE_LABEL } from '../plan/planBlurb'
 import { PLAN_ROLES } from './areaMemory'
 import { columnLabel, statText } from './gearColumns'
@@ -74,6 +76,16 @@ export function moteGainText(advice: Pick<MoteAdvice, 'gain'>, target: MoteTarge
   return `+${isRole(target) ? advice.gain.toFixed(1) : statText(advice.gain, target)}`
 }
 
+/**
+ * The Gain header's hover. A focus is scored for the gear area's class pick, which this tab does
+ * not show, so the hover names it; one stat's own points do not depend on a class.
+ */
+export function moteGainHint(target: MoteTarget, classes: readonly ClassAbbr[]): string {
+  const base = 'What the next tier adds for your target'
+  if (!isRole(target)) return base
+  return `${base}, scored for ${classes.length === 0 ? 'every class' : classes.map(classDisplayName).join(', ')}`
+}
+
 /** `AC 66→70 · STR 28→30`: every stat the next tier moves; `-` where the worn tier states none. */
 export function moteChangesText(advice: Pick<MoteAdvice, 'changes'>): string {
   const one = (key: GearStatKey, from: number | undefined, to: number): string =>
@@ -81,20 +93,18 @@ export function moteChangesText(advice: Pick<MoteAdvice, 'changes'>): string {
   return advice.changes.map((c) => one(c.key, c.from, c.to)).join(' · ')
 }
 
-/** `512 copies`: what the next tier costs without the mote. */
-export function moteCopiesText(advice: Pick<MoteAdvice, 'copies'>): string {
-  return `${advice.copies.toLocaleString('en-US')} ${advice.copies === 1 ? 'copy' : 'copies'}`
-}
-
 /** `190 h`, `5.1 h`: the hours of play the mote saves. */
 export function moteHoursText(advice: Pick<MoteAdvice, 'hours'>): string {
   return `${advice.hours >= 20 ? Math.round(advice.hours).toLocaleString('en-US') : String(advice.hours)} h`
 }
 
-/** The hours cell's hover: what the tier costs, and which road would mostly pay for it. */
+/**
+ * The hours cell's hover: what the tier costs, and which road would mostly pay for it. In item
+ * experience, the unit the source hover uses: a dropped +4 copy is worth 16, so 128 is not 128 copies.
+ */
 export function moteHoursTitle(advice: Pick<MoteAdvice, 'copies' | 'road'>): string {
   const road = advice.road === 'copies' ? 'mostly by farming copies' : 'mostly by ordinary motes'
-  return `Without a mote: ${moteCopiesText(advice)} of experience, ${road}`
+  return `Without a mote: ${advice.copies.toLocaleString('en-US')} item experience, ${road}`
 }
 
 export const SUPPLY_LABEL: Record<SupplyKind, string> = {

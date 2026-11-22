@@ -17,6 +17,7 @@ import { HEAD_BYTES, logStampKey, parseSegment, SEGMENT_VERSION, type Segment } 
 import { eligibleSegments, type LiveLog } from '../src/shared/logArchive/eligible'
 import { listSegments, segmentPath, writeSegment } from '../src/main/logArchive/segmentStore'
 import { createHistoryMerge, readHeadBytes, type HistoryDeps } from '../src/main/logArchive/history'
+import { createLootFrames, type LootRows } from '../src/shared/lootFrame'
 
 const sha = (s: string | Buffer): string => createHash('sha256').update(s).digest('hex')
 
@@ -397,3 +398,32 @@ test("read path: archived respawn evidence says what the wiki says today, not th
   ])
 })
 
+// ── the merged ledger, as append frames (shared/lootFrame.ts) ───────────────────────────────────
+
+test('loot frames: a live pickup under archived rows sends one row', () => {
+  const t = harness({ segments: [sealedLoot] })
+  const frames = createLootFrames()
+  const live = [{ ts: 2, item: 'new' }]
+  const first = frames.answer({ seq: 1, state: t.h.mergeHistory('loot', 1, live) }, null) as LootRows
+  assert.equal(first.rows.length, 2)
+  const next = [...live, { ts: 3, item: 'newer' }]
+  const second = frames.answer({ seq: 2, state: t.h.mergeHistory('loot', 2, next) }, { gen: first.gen, length: 2 }) as LootRows
+  assert.equal(second.gen, first.gen)
+  assert.equal(second.from, 2)
+  assert.deepEqual(second.rows, [{ ts: 3, item: 'newer' }])
+})
+
+test('loot frames: the archive leaving the merge is not an append, whatever the lengths', () => {
+  let on = true
+  const t = harness({ on: () => on, segments: [sealedLoot] })
+  const frames = createLootFrames()
+  const first = frames.answer({ seq: 1, state: t.h.mergeHistory('loot', 1, [{ ts: 2, item: 'new' }]) }, null) as LootRows
+  assert.equal(first.rows.length, 2)
+  on = false
+  // Regrown to the same two rows, so only the rows themselves can tell.
+  const same = [{ ts: 2, item: 'new' }, { ts: 3, item: 'newer' }]
+  const second = frames.answer({ seq: 2, state: t.h.mergeHistory('loot', 2, same) }, { gen: first.gen, length: 2 }) as LootRows
+  assert.notEqual(second.gen, first.gen)
+  assert.equal(second.from, 0)
+  assert.deepEqual(second.rows, same)
+})

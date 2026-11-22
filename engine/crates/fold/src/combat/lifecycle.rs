@@ -254,6 +254,7 @@ pub fn zone_summary(st: &EngineState) -> SegmentSummary {
     let total = Agg::sum(&st.zone_agg.out);
     let dur = zone_duration_sec(st);
     let active_sec = f64::min(dur, zone_active_sec(st));
+    let rate = live_stay_rate(st);
     SegmentSummary {
         id: "zone".to_string(),
         kind: "zone",
@@ -261,9 +262,9 @@ pub fn zone_summary(st: &EngineState) -> SegmentSummary {
         zone: st.zone.clone(),
         duration_sec: dur,
         total,
-        dps: total as f64 / dur,
+        dps: total as f64 / rate.sec,
         active_sec,
-        active_dps: total as f64 / f64::max(1.0, active_sec),
+        active_dps: total as f64 / rate.active_sec,
         start_ts: 0,
         active: false,
         enemy_heal_total: Agg::sum_heal(&st.zone_agg.enemy_heal),
@@ -307,12 +308,44 @@ pub fn zone_active_sec(st: &EngineState) -> f64 {
     (st.zone_active_ms + cur) as f64 / 1000.0
 }
 
+/// What a stay's whole total divides by. The total holds every row, so the time covers your fights
+/// and the stretches when others landed damage with no fight of yours open. `duration_sec` stays your
+/// fights alone, because per-minute figures read it.
+#[derive(Debug, Clone, Copy)]
+pub struct StayRate {
+    pub sec: f64,
+    pub active_sec: f64,
+}
+
+/// A stay's rate clocks from its raw milliseconds, each floored at a second.
+pub fn stay_rate(fight_ms: i64, active_ms: i64, loose_ms: i64) -> StayRate {
+    let fight = fight_ms as f64 / 1000.0;
+    let loose = loose_ms as f64 / 1000.0;
+    StayRate {
+        sec: f64::max(1.0, fight + loose),
+        active_sec: f64::max(1.0, f64::min(fight, active_ms as f64 / 1000.0) + loose),
+    }
+}
+
+/// The live stay's rate clocks, the open fight included.
+pub fn live_stay_rate(st: &EngineState) -> StayRate {
+    let (span, active) = st
+        .current
+        .as_ref()
+        .map_or((0, 0), |e| (e.last_ts - e.start_ts, e.active_ms));
+    stay_rate(
+        st.zone_finalized_ms + span,
+        st.zone_active_ms + active,
+        st.zone_agg.loose.ms(),
+    )
+}
+
 /// The zone-session list for the snapshot: the LIVE session first (id `zone`), then the finalized
 /// history NEWEST-FIRST. The live entry's timing and total are computed fresh; the finalized ones
 /// reuse what was frozen at finalize, because their aggregates are immutable.
 pub fn zone_session_summaries(st: &EngineState) -> Vec<ZoneSessionSummary> {
     let live_total = Agg::sum(&st.zone_agg.out);
-    let live_dur = zone_duration_sec(st);
+    let live_rate = live_stay_rate(st);
     let mut out = vec![ZoneSessionSummary {
         id: "zone".to_string(),
         zone: st.zone.clone().unwrap_or_else(|| "Session".to_string()),
@@ -320,12 +353,12 @@ pub fn zone_session_summaries(st: &EngineState) -> Vec<ZoneSessionSummary> {
         start_ts: st.zone_start_ts,
         end_ts: 0,
         total: live_total,
-        dps: live_total as f64 / live_dur,
+        dps: live_total as f64 / live_rate.sec,
         live: true,
     }];
     for s in st.zone_history.iter().rev() {
         let total = Agg::sum(&s.agg.out);
-        let dur_sec = f64::max(1.0, s.finalized_ms as f64 / 1000.0);
+        let rate = stay_rate(s.finalized_ms, s.active_ms, s.agg.loose.ms());
         out.push(ZoneSessionSummary {
             id: s.id.clone(),
             zone: s.zone.clone(),
@@ -333,7 +366,7 @@ pub fn zone_session_summaries(st: &EngineState) -> Vec<ZoneSessionSummary> {
             start_ts: s.start_ts,
             end_ts: s.last_ts,
             total,
-            dps: total as f64 / dur_sec,
+            dps: total as f64 / rate.sec,
             live: false,
         });
     }

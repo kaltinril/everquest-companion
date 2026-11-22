@@ -405,6 +405,14 @@ export const RESPAWN_LINGER_MS = 30 * 60 * 1000
  */
 export const RESPAWN_MAX_ROWS = 60
 
+/**
+ * A count of rows that holds `elsewhere` rows of other zones. At the cap more may be running than
+ * were published, so it reads `60+`: a plain 60 was untrue with 70 clocks running.
+ */
+export function cappedRowCount(count: number, elsewhere: number): string {
+  return elsewhere >= RESPAWN_MAX_ROWS ? `${String(count)}+` : String(count)
+}
+
 /** Most recently-killed mobs offered as watch candidates in the view. */
 export const RESPAWN_MAX_RECENT = 40
 

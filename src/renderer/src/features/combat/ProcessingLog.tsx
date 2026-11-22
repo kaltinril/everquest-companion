@@ -65,6 +65,7 @@ export function ProcessingLog({
         />
       }
       height={220}
+      shrinkTo={110}
     >
       <Box
         ref={ref}

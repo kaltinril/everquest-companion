@@ -268,6 +268,8 @@ export interface DpsSeries {
   peakOut: number
   hasPet: boolean
   hasGroup: boolean
+  /** a stranger's damage (kind `other`) is in the group band, so the band is not only your group. */
+  hasOther?: boolean
   hasInc: boolean
   /** true when any damage at all landed in the window. */
   hasAny: boolean
@@ -300,6 +302,7 @@ export function buildDpsSeries(tl: TimelineView, live = false): DpsSeries {
   const rawInc = new Float64Array(n)
   let hasPet = false
   let hasGroup = false
+  let hasOther = false
   let hasInc = false
   let hasAny = false
   const scale = sampleScale(tl)
@@ -324,6 +327,7 @@ export function buildDpsSeries(tl: TimelineView, live = false): DpsSeries {
       // have drawn a stranger's whole raid as damage TAKEN on the most common configuration there is.
       rawGroup[i] += e.amount
       hasGroup = true
+      hasOther ||= e.kind === 'other'
     } else {
       rawInc[i] += e.amount
       hasInc = true
@@ -358,6 +362,7 @@ export function buildDpsSeries(tl: TimelineView, live = false): DpsSeries {
     peakOut,
     hasPet,
     hasGroup,
+    hasOther,
     hasInc,
     hasAny,
     durationMs,

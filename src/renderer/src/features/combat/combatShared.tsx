@@ -487,6 +487,7 @@ export function DashCard({
   children,
   fill,
   height,
+  shrinkTo,
   testId
 }: {
   title: string
@@ -500,6 +501,11 @@ export function DashCard({
   fill?: boolean
   /** FIXED card height (`flex: 0 0 <height>px`) — the combat log's ring. */
   height?: number
+  /**
+   * With `height`: in a short window the card takes 30% of the column, down to this many px, so the
+   * panels above it keep the room. `height` stays the ceiling, so its ring can never grow the card.
+   */
+  shrinkTo?: number
   /** Marks the card as one of the dashboard's measurable panels (e2e layout assertions). */
   testId?: string
 }): React.JSX.Element {
@@ -515,7 +521,11 @@ export function DashCard({
         ...(fill
           ? { height: '100%', minHeight: 0, overflow: 'hidden' }
           : height != null
-            ? { flex: `0 0 ${height}px`, minHeight: 0, maxHeight: height }
+            ? {
+                flex: shrinkTo != null ? `0 0 clamp(${shrinkTo}px, 30%, ${height}px)` : `0 0 ${height}px`,
+                minHeight: 0,
+                maxHeight: height
+              }
             : { flex: '0 0 auto' })
       }}
     >

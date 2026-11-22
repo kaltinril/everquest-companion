@@ -46,6 +46,7 @@ import {
   conditionFieldValErr,
   conditionRawErr,
   draftFromPrimitive,
+  hasFireHistory,
   primitiveFromDraft,
   retypeDraft,
   triggerBadge,
@@ -201,4 +202,11 @@ test('a multi-key where survives draft → trigger, so editing one field does no
     kind: 'resist',
     where: { caster: 'you' }
   })
+})
+
+test('an app-signal alert offers no fire history the engine never records', () => {
+  const app = { type: 'app', signal: 'respawnSoon' } as const
+  assert.equal(hasFireHistory(app, 0), false, 'it would read "No fires recorded yet" after firing')
+  assert.equal(hasFireHistory(app, 2), true, 'anything recorded is still shown')
+  assert.equal(hasFireHistory({ type: 'raw', regex: 'x' }, 0), true, 'a log alert keeps its history')
 })

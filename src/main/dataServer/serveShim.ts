@@ -61,6 +61,7 @@ import { startSlowReadLog } from './slowReads'
 import { noteCombatRead } from './logReadState'
 import { liveHistory } from '../logArchive/liveHistory'
 import { withArchivedDrops } from '../../shared/logArchive/mergeDropsSeen'
+import { createLootFrames, LOOT_MODULE, type LootFrame } from '../../shared/lootFrame'
 import { withoutKillFactionSamples } from '../../shared/gapKillFactionSamples'
 import { engineSideOpts, withArchivedFights } from '../../shared/logArchive/mergeFights'
 import { withArchivedHits } from '../../shared/logArchive/searchFights'
@@ -292,6 +293,17 @@ export async function serveModuleSnapshot(moduleId: string): Promise<ModuleSnap 
   // request per module id is all the engine needs to answer them. The projection is decided by the
   // module id alone, which is what makes joining safe.
   return readShim().serveShared('module.snapshot', { module: moduleId }, (r) => projectModule(moduleId, r), () => null)
+}
+
+/** The last ledger any window was answered from. */
+const lootFrames = createLootFrames()
+
+/**
+ * `module:getLootFrame`: the same full read as `serveModuleSnapshot`, answered as the rows the
+ * asking window lacks (shared/lootFrame.ts). Main holds one ledger for this, whichever window asks.
+ */
+export async function serveLootFrame(known: unknown): Promise<LootFrame | null> {
+  return lootFrames.answer(await serveModuleSnapshot(LOOT_MODULE), known)
 }
 
 /**

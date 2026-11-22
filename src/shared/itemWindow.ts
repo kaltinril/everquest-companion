@@ -586,6 +586,16 @@ function headOf(lines: readonly string[], clsAt: number, clsLine: string, raceLi
  */
 const CLASS_LINE = new RegExp(`^(?:\\S{1,2}\\s+)?Class\\s*(?:[:;.]|\\s(?:${[...CLASS_CODES, 'ALL', 'NONE'].join('|')})\\b)`, 'i')
 
+/**
+ * A Class line behind the icon read as a short word or two (owner, 2026-11-21: Beacon Mount's lantern
+ * read `‘we Class: ALL`, and the window with no Class line was refused as a failed Lore tab). The
+ * colon and a class code keep a lore's prose out; Race opening the row under the list keeps out a
+ * whole screen's text, where columns of other windows run together (`dull Class: DRU SHM ...`).
+ */
+const CLASS_BEHIND_ICON = new RegExp(`^(?:\\S{1,5}\\s+){1,2}Class\\s*[:;.]\\s*(?:${[...CLASS_CODES, 'ALL', 'NONE'].join('|')})\\b`, 'i')
+const classBehindIcon = (lines: readonly string[], at: number): boolean =>
+  CLASS_BEHIND_ICON.test(lines[at]) && /^(?:\S{1,2}\s+)?Race\s*[:;.]/i.test(lines[listAt(lines, at, CLASS_CODES).end + 1] ?? '')
+
 /** A line of class or race codes only: a long list the window wrapped onto the next line. */
 const onlyCodes = (line: string, codes: readonly string[]): boolean =>
   line.split(/\s+/).every((w) => codes.includes(w.replace(/[^A-Za-z]/g, '').toUpperCase()))
@@ -620,7 +630,7 @@ function petBelow(below: readonly string[]): { rest: string[]; tail: string; rea
 export function readItemWindow(raw: readonly string[]): ItemWindowRead {
   const kept = raw.filter((l) => cleanLine(l) !== '')
   const lines = kept.map((l) => cleanLine(l))
-  const clsAt = lines.findIndex((l) => CLASS_LINE.test(l))
+  const clsAt = lines.findIndex((l, i) => CLASS_LINE.test(l) || classBehindIcon(lines, i))
   if (clsAt < 0) return loreRead(lines, kept)
   const cls = listAt(lines, clsAt, CLASS_CODES)
   const race = raceAfter(lines, cls.end)

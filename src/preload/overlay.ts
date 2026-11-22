@@ -15,6 +15,7 @@ import type {
 } from '../shared/types'
 import { OVERLAY_KINDS } from '../shared/types'
 import { mapsBridge } from './maps'
+import { lootFrameBridge } from './lootFrame'
 import type { OverlayTextSizePrefs } from '../shared/overlayTextScale'
 import type { OverlayBgAlphaPrefs } from '../shared/overlayBgAlpha'
 import type { ScopeSelection } from '../shared/scopeSelection'
@@ -92,6 +93,7 @@ const overlayApi = {
   /** Hydrate a module's full state (`module:getSnapshot`). Null when the id is unknown. */
   getModuleSnapshot: <S>(id: string): Promise<ModuleSnapshot<S> | null> =>
     ipcRenderer.invoke(IPC.getModuleSnapshot, id),
+  ...lootFrameBridge,
   /**
    * Subscribe to `module:changed` pushes — the SERVED world's dirty bit (JOS-493); the caller
    * filters by moduleId.

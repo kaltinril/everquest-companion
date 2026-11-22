@@ -50,6 +50,8 @@ export interface LogArchiveStatus {
   rotateBlockers: string[]
   /** The player put this log back, so the automatic archive leaves it until Archive now. */
   autoPaused: boolean
+  /** Why the last automatic archive of this log stopped, until one succeeds. Kept in memory. */
+  autoFailed: string | null
   /** An action in progress, if any. */
   busy: string | null
 }

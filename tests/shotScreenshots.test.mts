@@ -86,6 +86,13 @@ test('VIAL OF SWAMP WATER (THE OWNER\'S, D1): THE FLAGS AS THE WINDOW PRINTS THE
   assert.deepEqual(lines(s), ['No Trade, Quest<br>', 'Size: TINY WT: 1.0<br>', 'Class: NONE<br>', 'Race: NONE<br>'])
 })
 
+test("BEACON MOUNT (THE OWNER'S, 2026-11-21): NO SLOT AND NO STATS, THE ICON READ AS A WORD BEFORE Class:, STILL A WINDOW", async () => {
+  const s = await read('beacon-mount.png', textOnly)
+  assert.deepEqual(lines(s), ['No Trade<br>', 'Size: MEDIUM WT: 12.0<br>', 'Class: ALL<br>', 'Race: ALL<br>'])
+  assert.equal(s.read.name, 'Beacon Mount')
+  assert.equal(shotKind({ read: s.read, lines: s.lines, icons: s.icons, ms: s.ms }), 'window')
+})
+
 test("SUREFALL FLETCHING KIT (MALKIL'S CONTAINER, 2026-10-21): CAPACITY, SIZE CAPACITY, AND THE DEITY PRINTED WITHOUT ITS LABEL", async () => {
   const s = await read('surefall-fletching-kit.png', textOnly)
   assert.deepEqual(lines(s), ['No Trade<br>', 'Size: SMALL WT: 0.1<br>', 'Capacity: 8 Size Capacity: GIANT<br>', 'Class: ALL<br>', 'Race: ALL<br>', 'Deity: Karana<br>'])

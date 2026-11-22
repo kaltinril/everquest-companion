@@ -39,7 +39,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   defect in them. (1) In-app text size is webContents.setZoomFactor (src/main/windows.ts:350). At
   110% every CSS px is 1.1 screen px, so the drawer's height in CSS px drops by about 9%. The menu
   has 74px ...
-- CONFIRMED, OWNER [low, confusing] The card's note says 'the text size above' when the only text
+- FIXED 2026-11-21 (names "In-app text size") [low, confusing] The card's note says 'the text size above' when the only text
   size above it is its own Text size row Seen: Search 'sidebar': cards in order: Left menu@200 only;
   'In-app text size card on screen above it: false'. The note still reads 'This sizes the left menu
   only; the text size above still scales it.' The nearest thing called text size above the sentence
@@ -108,7 +108,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   scrollWidth 444 against clientWidth 412; the table is 444.4px wide in a box whose visible right
   edge is x=664; the "Last raised" cell text runs 606.1..680.4, so 16px of every date is outside the
   box until the list is scrolled sideways. 125%, real log with short names ...
-- CONFIRMED, OWNER [low, cosmetic] At the minimum window every row is two lines tall once a long
+- LEFT 2026-11-21 (not a bug: two-line rows at the minimum window, nothing cut or untrue) [low, cosmetic] At the minimum window every row is two lines tall once a long
   skill name is in the list Seen: Table 592px wide, no sideways scroll, nothing cut. Every one of
   the 47 rows is 53px tall instead of 33px because the Last raised text wraps (text box 39px tall:
   "11/19/2026," over "7:09:09 PM"); the headings "This session" and "Per hour" wrap too (header 61px
@@ -187,7 +187,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   tests/respawnAlert.test.mts on the pure functions. (1) respawnAlertHeard with [{name:'Camp is
   about to pop', enabled:false, trigger:{type:'app',signal:'respawnSoon'}}] returns 'off' with
   offNames ['Camp is ...
-- CONFIRMED, OWNER [low, missing] A respawn alert that fired leaves "Recent fires (0)" and "No fires
+- FIXED 2026-11-21 (history button hidden on app-signal alerts with no fires) [low, missing] A respawn alert that fired leaves "Recent fires (0)" and "No fires
   recorded yet." on its row Seen: Speech seam recorded "a wan ghoul knight in 20 seconds"; seconds
   later the seeded row's history button has aria-label "Recent fires (0)" and the opened panel reads
   "Recent fires No fires recorded yet." This is the named gap JOS-499 in main (it applies to every
@@ -203,7 +203,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   serving, and drops it otherwise. ... Test: Option A: 1. A Rust test in the engine alerts module:
   after `alerts.appFired {alertId:'respawn-soon', context:'a wan ghoul knight - open +0'}`, the
   module snapshot's history['respawn-soon'] holds one record with that ...
-- CONFIRMED, OWNER [low, untrue-words] "60 running in other zones" when 70 watched clocks are
+- FIXED 2026-11-21 ("60+" at the cap) [low, untrue-words] "60 running in other zones" when 70 watched clocks are
   running there Seen: [data-testid="respawn-empty"]: "No clocks in Befallen. 60 running in other
   zones."; scope switch "BEFALLEN (0) ALL ZONES (60)"; All zones draws 60 rows; eq.getRespawn()
   holds 70 watches. Back in the zone the switch reads (70)/(70). The cap on other zones' rows is
@@ -295,7 +295,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
 
 ## Plane of Sky: Cleanup hand counts and turn-in controls
 
-- CONFIRMED, OWNER [medium, untrue-words] The '+' hover says the items are subtracted, but under
+- FIXED 2026-11-21 (the hover under Both names the log count) [medium, untrue-words] The '+' hover says the items are subtracted, but under
   Both with an inventory export loaded nothing is subtracted Seen: [data-testid=posky-record-turnin]
   title = 'Record another turn-in. The items it required are subtracted, so the quest goes back to
   what you hold toward running it again.' Pressing it: Azarack Skin 1/1 -> 1/1 and Wind Rune Heda
@@ -394,7 +394,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
 
 ## Combat: DPS chart, header, Copy
 
-- CONFIRMED, OWNER [medium, untrue-words] The chart calls a stranger's damage 'group' when you are
+- FIXED 2026-11-21 ("others" once a stranger is in the band) [medium, untrue-words] The chart calls a stranger's damage 'group' when you are
   in no group Seen: Snapshot entity kind 'other:Zebuxoruk', roster {members: [], seen: false},
   roster popover 'No group signal yet this session - the Group scope is showing everyone.' The meter
   row reads '1 Zebuxoruk other 2.8k · 51 dps'. The DPS card beside it: legend 'you + pet + group' |
@@ -410,7 +410,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   reporter's suggestion; 'allies' is wrong ... Test: Unit tests in tests/dpsChartLines.test.mts (or
   a new small file if it is near the line ceiling). (a) buildDpsSeries on a TimelineView with you
   plus one kind:'other' event gives hasGroup true and hasOther true. With you ...
-- CONFIRMED, OWNER [medium, confusing] Its own bar does not give a line for you alone once anyone
+- PARTLY FIXED 2026-11-21 (the words; the gold line still sums the group) [medium, confusing] Its own bar does not give a line for you alone once anyone
   else hits the mob, and the peak tooltip says only 'without your pet' Seen: Preferences hint: 'The
   DPS chart draws you and your pet as two lines.' On screen the gold line is 'you + group' (legend
   and hover), head '141 dps peak', peak tooltip 'Peak 5s rolling rate without your pet, in the
@@ -444,7 +444,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   Unit test in tests/timelineHitTest.test.mts, or tests/dpsChartHover.test.mts, on the pure function
   that makes the words. Move the row-making out of the TSX into dpsAt.ts as an exported function,
   for example ...
-- CONFIRMED, OWNER [medium, confusing] A folded pet row prints a DPS the header over it contradicts
+- LEFT 2026-11-21 (would change a DPS calculation; each row keeps its own clock per meter-dps-clock.md) [medium, confusing] A folded pet row prints a DPS the header over it contradicts
   (same damage, two rates), and Copy pastes both Seen: p2 e4: panel header 'a greater kobold (5) +2
   87 dps (act 104 dps)· 5.8k · 1:07' over its only row '1 You 5.8k · 172 dps' (172 = You 142 +
   Gonekn 30, each over its own clock; 5.8k over the 1:07 shown is 87). With its owner: pair box '172
@@ -478,7 +478,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   bundle can ... Test: Unit test, tests/chartTooltipPlace.test.mts, on the exported pure
   place(cursor, size, off, limit): 1. When the card fits after the cursor, it is placed at
   cursor+off. 2. When it does not fit after the cursor, it flips ...
-- CONFIRMED, OWNER [medium, cut-off] At the 900x600 minimum window the dashboard is a strip: 42 px
+- FIXED 2026-11-21 (the log takes 30% of the column, 110 to 220 px; not measured) [medium, cut-off] At the 900x600 minimum window the dashboard is a strip: 42 px
   tall at 125% text, panels 89 px tall at 100% Seen: 125%: header y 56..178 (122 px now that the
   second row wraps; 94 px at 100%), log 285..453, dashboard region y 190..232 = 42 px tall with
   scrollHeight 1316 (four stacked 444x320 panels). The DPS card sits at y 522..842 of that scroller:
@@ -555,7 +555,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   already +10." with 0 rows and no other line. Only unmatched pieces (22 of them, tiers +0 to +8):
   "Every worn piece the item data knows is already +10." above a not-ranked line naming all 22. In
   both no known piece is worn, so no piece is ...
-- CONFIRMED, OWNER [low, untrue-words] Two header hovers do not match the rows, and a three-mote row
+- FIXED 2026-11-21 (both hovers reworded; the arrow stays) [low, untrue-words] Two header hovers do not match the rows, and a three-mote row
   mixes a three-tier arrow with one-tier numbers Seen: Item header hover: "A worn item, and the tier
   this week takes it to". 19 of 21 rows carry "-" (hover "Below +7: ordinary motes get it there")
   yet show an arrow, e.g. "Gauntlets of Fiery Might +5→+6": this week takes them nowhere. # header
@@ -572,7 +572,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   tests/voidMoteEmptyText.test.mts or a new tests/voidMoteWords.test.mts, against voidMotePrefs.ts:
   1. `moteTierText(7, 0)` is "+7→+8". 2. `moteTierText(5, 3)` is "+5→+6" under option (a), or
   whatever the ...
-- CONFIRMED, OWNER [low, confusing] The Saves hover counts "copies of experience", which overstates
+- FIXED 2026-11-21 (states item experience) [low, confusing] The Saves hover counts "copies of experience", which overstates
   the copies for a dropped item Seen: Row "Drop of Crystallized Flame +7→+8": Saves hover "Without a
   mote: 128 copies of experience, mostly by farming copies", source "Camp: 1 in 2, 4.4 min respawn".
   The plan document prices a dropped copy at 16 experience (8 copies for this tier), and the source
@@ -588,7 +588,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   the owner wants the requirement's "copies": pass the supply kind ... Test: Unit test in
   tests/voidMotes.test.mts, next to the "tab words" test: 1. assert.equal(moteHoursTitle({ copies:
   128, road: 'copies' }), 'Without a mote: 128 item experience, mostly by farming copies'). 2. ...
-- CONFIRMED, OWNER [low, confusing] With no list, the picker and the three order buttons are live
+- FIXED 2026-11-21 (picks greyed with no list) [low, confusing] With no list, the picker and the three order buttons are live
   and change nothing on screen Seen: With the text "No inventory dump for this character yet. Type
   /outputfile inventory in game." showing, the picker (aria-disabled null) and all three buttons
   (disabled null) are enabled. Pressing Biggest gain moves aria-pressed to it and no word on the tab
@@ -605,7 +605,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   inside the component, and no pure word-making function changes, so the check is e2e. In
   tests/e2e/gearVoidMoteSteps.mts, on the existing no-dump (or index-loading) launch, assert that
   ...
-- CONFIRMED, OWNER [low, confusing] The gains depend on the Gear tab's class pick, and this tab
+- FIXED 2026-11-21 (Gain hover names the class pick) [low, confusing] The gains depend on the Gear tab's class pick, and this tab
   never names it Seen: Target Tank, no class picked: Thelvorn +0.8, Lustrous Russet Boots +9.5, Ring
   of Pureblood +11.3, Polished Mithril Mask +7.1 above Lustrous Russet Bracer +8.7. After picking
   Wizard on the Gear tab and returning: +0.2, +9.2, +11.1, Mask +6.8 below Bracer. No text on the
@@ -646,7 +646,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   "Watch"; its panel reads Watch=on, Every tier=off, "Alert on WTS (someone selling)"=off, "Alert on
   WTB (someone buying)"=off. The box above lists "Tovi WTS Fleeting Quiver +4 25k (at or under your
   31k)". The 31k is shown nowhere on the +4 row or panel. With +4 set to WTB ...
-- CONFIRMED, OWNER [medium, confusing] Bazaar: ticking "Every tier" on a tier's own watch silently
+- FIXED 2026-11-21 (the tick is blocked while an every-tier watch exists; nothing merged) [medium, confusing] Bazaar: ticking "Every tier" on a tier's own watch silently
   replaces the existing every-tier watch and its prices Seen: Stored list before: [{tier 4, wts
   false, wtb false}, {tier null, wts true, wtsMax 31000}]. After the one tick: [{tier null, wts
   false, wtb false, wtsMax null}]. The +0 row's chip goes from "Watch: WTS ≤ 31k" to "Watch"; the +0
@@ -718,7 +718,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   and the ... Test: Unit test in tests/buffsFormat.test.mts. If the statCells helper is added: for
   {medianMs: 4500, p25: 4250, p75: 4750, minMs: 4000, maxMs: 5000} it returns median '4.5s', iqr
   '4.3s - 4.8s' and range '4s - 5s'; the median ...
-- CONFIRMED, OWNER [low, untrue-words] Buffs duration dialog: "Automatic" is described as the wiki
+- FIXED 2026-11-21 (the Automatic note) [low, untrue-words] Buffs duration dialog: "Automatic" is described as the wiki
   duration raised to your longest cast when it is a death bound with no cast logged Seen: Dialog:
   "Flash of Light | Now 15s · At least this long - the target died still carrying it and no wear-off
   was ever printed | Automatic · 15s | The wiki duration, raised to your longest recent cast | From
@@ -735,7 +735,7 @@ to run is `scripts/ui-fix-wf.js` in the same folder.
   Add unit tests in tests/buffsFormat.test.mts for the new function: - deathBound, not overridden:
   the title is "Automatic · ≥ 15s" and the note contains neither "wiki" nor "cast". - cluster: the
   note does not say ...
-- CONFIRMED, OWNER [low, cut-off] Bazaar list: at the default window three of ten columns are
+- FIXED 2026-11-21 (tighter padding and a bounded Item cell, no column dropped; not measured) [low, cut-off] Bazaar list: at the default window three of ten columns are
   outside the list box, and the watch chip pushes them further Seen: No watch: box bazaar-scroll
   clientWidth 972, table scrollWidth 1169 (197 px hidden): "Offers" [1135.8-1232.7] cut by the box
   edge at 1224, "Traded 30d" and "Last seen" outside it. "Last seen" is the column the list is

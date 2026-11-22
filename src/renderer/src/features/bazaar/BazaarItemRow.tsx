@@ -17,6 +17,8 @@ export const SPARK_DAYS = 30
 /** Every row is this tall (measured in the real renderer on 1,353 rows: 53 px, every one), which is what lets the list be windowed. */
 export const ROW_HEIGHT = 53
 const COLUMNS = 10
+/** The Item cell's content, in px: with the list's tight padding all ten columns fit the default window. */
+const ITEM_CELL_MAX = 220
 
 /** The spacer rows that reserve the full scroll height, so only a screenful of rows is mounted (lib/useWindowedRows). */
 export function BazaarPadRow({ height }: { height: number }): JSX.Element | null {
@@ -48,14 +50,15 @@ function ItemRow({ item, endDay, picked, iconId, wished, watch, onPick, onOpenLo
   return (
     <TableRow hover selected={picked} onClick={() => onPick(item.key)} sx={{ cursor: 'pointer', height: ROW_HEIGHT }} data-testid={`bazaar-row-${item.key}`}>
       <TableCell sx={{ fontWeight: picked ? 700 : 400 }}>
-        <Stack direction="row" spacing={0.75} alignItems="center" sx={{ flexWrap: 'nowrap' }}>
+        {/* A bounded box, so a long name or a two-sided watch chip cannot push the last columns off the list. */}
+        <Stack direction="row" spacing={0.75} alignItems="center" sx={{ flexWrap: 'nowrap', minWidth: 0, maxWidth: ITEM_CELL_MAX }}>
           <ItemIcon iconId={iconId} />
           <ItemName item={item} onOpenLoot={onOpenLoot} />
           {item.combined !== undefined && (
-            <Chip size="small" variant="outlined" label={item.combined.tiers.every((t) => t.tier === 0) ? 'not seen upgraded' : `${tiers} tiers at +${item.combined.at}`} sx={{ height: 18, fontSize: 10 }} />
+            <Chip size="small" variant="outlined" label={item.combined.tiers.every((t) => t.tier === 0) ? 'not seen upgraded' : `${tiers} tiers at +${item.combined.at}`} sx={{ height: 18, fontSize: 10, flexShrink: 0 }} />
           )}
-          {wished && <Chip size="small" variant="outlined" color="secondary" label="♥ wish" sx={{ height: 18, fontSize: 10 }} data-testid="bazaar-wish-chip" />}
-          {chip !== null && <Chip size="small" color="info" label={chip} sx={{ height: 18, fontSize: 10 }} data-testid="bazaar-watch-chip" />}
+          {wished && <Chip size="small" variant="outlined" color="secondary" label="♥ wish" sx={{ height: 18, fontSize: 10, flexShrink: 0 }} data-testid="bazaar-wish-chip" />}
+          {chip !== null && <Chip size="small" color="info" label={chip} title={chip} sx={{ height: 18, fontSize: 10, flexShrink: 0, maxWidth: 96 }} data-testid="bazaar-watch-chip" />}
         </Stack>
       </TableCell>
       <TableCell>

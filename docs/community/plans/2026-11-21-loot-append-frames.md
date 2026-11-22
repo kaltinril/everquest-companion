@@ -1,4 +1,4 @@
-# Loot history: stop re-sending it whole on each pickup (designed, not built)
+# Loot history: stop re-sending it whole on each pickup (step 1 built 2026-11-21)
 
 Read from the code at `e54fdce12`; nothing was built or re-measured. On 2026-11-20 the owner heard
 this explained and had no complaint, so building it is the owner's choice.
@@ -27,6 +27,8 @@ this explained and had no complaint, so building it is the owner's choice.
 - Estimated main stall after it: 40 to 65 ms. Not measured. Engine build, parse, first load and
   renderer folds stay as they are.
 - Risks: shared rows now live across pickups (pin with a frozen-row test); main retains the ledger.
+
+Built as designed, with one correction: a reply must also match the `gen` and the exact array it was asked against, or racing reads can duplicate rows. Not checked: timing, e2e (the `loot-append` spec is not written), the running app.
 
 ## Later steps, each separate
 

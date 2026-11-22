@@ -17,6 +17,14 @@ export function primitiveBadge(t: AlertTriggerPrimitive): string {
   return `app:${t.signal}`
 }
 
+/**
+ * Does this row have a fire history to open? The engine records no app-signal fire (the named gap
+ * in main/ipc/alerts.ts), so such a row would say "No fires recorded yet" right after it fired.
+ */
+export function hasFireHistory(t: AlertTrigger, fires: number): boolean {
+  return t.type !== 'app' || fires > 0
+}
+
 /** Compact trigger badge; a composite renders `any(…, …)` / `all(…, …)` (Task #47). */
 export function triggerBadge(t: AlertTrigger): string {
   if ('conditions' in t) {
