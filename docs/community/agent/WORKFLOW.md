@@ -49,8 +49,8 @@ disagree, RULES.md wins; fix this file.
   (`npx electron-builder --win --dir -c.directories.output=release/dev`) and say where it is.
 - **Before the owner tests in the dev app, copy their settings down from the installed build**
   (owner, 2026-11-12: "always copy my settings down from prod to the dev"):
-  `%APPDATA%\everquest-companion-test` to `%APPDATA%\everquest-companion-dev`, one way, dev backed
-  up first. The file list and what to leave alone are step 2 of the `start-companion` skill.
+  `%APPDATA%\everquest-companion-test` to `%APPDATA%\everquest-companion-dev`, one way, with no
+  backup of dev (owner, 2026-11-21). The file list and what to leave alone are step 2 of the `start-companion` skill.
 - **That copy does not carry the remembered view choices** (measured 2026-11-16: 56 of prod's 69
   differed or were missing in dev). Pet layout, Fight/Overall, drills, Gaps marks, Gear and Planner
   filters live in each app's `Local Storage\leveldb`, keyed by page origin: prod under `file://`,
