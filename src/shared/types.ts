@@ -538,6 +538,25 @@ export interface QuestEntry {
   /** the coin turn-in the page states, as words ("2 gold") — the guard-donation quests' cost,
    *  which an item-link parser is structurally blind to (questPage.ts parseCoinCost) */
   coin?: string
+  /** the page says this quest or one of its steps can be repeated (questRepeat.ts) */
+  repeatable?: boolean
+  /** it repeats, but its turn-ins pay different factions and no one step was read, so the merged
+   *  receipt is not what one repeat pays: marked, not ranked as the easy route */
+  repeatMixed?: boolean
+  /** the one step that repeats, when the page's repeat sentence sits inside a longer quest */
+  repeatStep?: QuestRepeatStep
+}
+
+/** One repeatable hand-in, as the page states it: its NPC, its cost, and only ITS faction lines. */
+export interface QuestRepeatStep {
+  giver: string
+  /** where this NPC stands, when the page says; absent rather than the quest's own start zone */
+  zone?: string
+  items: string[]
+  /** how many of the item one hand-in takes, when more than one */
+  count?: number
+  coin?: string
+  factions: QuestFactionHit[]
 }
 
 export interface QuestData {

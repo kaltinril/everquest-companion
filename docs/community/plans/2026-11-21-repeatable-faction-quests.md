@@ -1,10 +1,22 @@
-# Repeatable faction quests on the Factions tab (designed, not built)
+# Repeatable faction quests on the Factions tab (built 2026-11-21)
 
 Owner, 2026-11-21, after maxing factions by handing Palatos Kynarn ale: "is there anything that
 really notates that you can easily get the faction up", "check if the app shows this as an easy
-route to max faction", "why can't we somehow show that?". The last question to the owner was whether
-to build both steps below. **No answer yet: do not build until the owner says so.** Wiki notes do not
-fix this: the Factions tab reads neither a mob's description nor an item's notes.
+route to max faction", "why can't we somehow show that?". The owner said to build it the same day.
+Wiki notes do not fix this: the Factions tab reads neither a mob's description nor an item's notes.
+
+## What was built
+
+- `scripts/sources/questRepeat.ts` reads the signals and the step. 22 of the 913 catalog quests are
+  marked: 2 with a read step (The Painting, Guard Shilster's Stout), 15 with their own receipt, 3
+  mixed, 2 that state no factions (Research Aid, The Bread Shipment). Bone Chips Quests (a list of quests) and The Icestar Remembers are not marked.
+- **Mixed** (`repeatMixed`: Deathfist Slashed Belts, Karana Clovers, Moonstones Quest): the page has
+  turn-ins that pay different factions and no one step was read, so the catalog's merged receipt is
+  not what one repeat pays. They keep the chip and their payout rank; only a sure repeat sorts first.
+- Not marked, looser wording, left for a later pass: Coldain Ring Quests, Shaman Epic Quest, Langseax
+  Quest, The Velium Focus, Note for Janam, Pickled Frogloks. Seller and price are not on the row:
+  the owner does not want more text on this screen.
+- Checked by typecheck, lint and focused tests. The chip has not been seen in the running app.
 
 ## What the app does today
 

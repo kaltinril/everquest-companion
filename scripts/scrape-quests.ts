@@ -39,6 +39,7 @@ import { fileURLToPath } from 'url'
 import { isMain } from './sources/isMain'
 import { createCache } from './sources/diskCache'
 import { isEmptyParse, parseQuestPage, titleKey, type ParsedQuestPage } from './sources/questPage'
+import { repeatFields } from './sources/questRepeat'
 import type { QuestData, QuestEntry } from '../src/shared/types'
 import { WikiError, wikiGet } from './sources/wikiApi'
 
@@ -428,7 +429,7 @@ export function buildCatalog(
     const parsed = parseQuestPage(p.title, wt, isItem)
     const reason = nonQuestReason(parsed)
     if (reason) run.skipped.push({ page: p.title, reason })
-    else run.quests.push(toQuestEntry(parsed))
+    else run.quests.push({ ...toQuestEntry(parsed), ...repeatFields(parsed, wt, isItem) })
   }
   run.quests.sort((a, b) => a.page.localeCompare(b.page))
   return run
