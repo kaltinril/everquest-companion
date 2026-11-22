@@ -124,6 +124,37 @@ test('BLACK LIZARD SCALE: A QUEST FLAG, NO SLOT, THE VALUE LINE IN COPPER', () =
   assert.equal(r.valueCopper, 38)
 })
 
+// The OCR of the owner's Beacon Mount (2026-11-21): the lantern icon read as `‘we` before `Class:`.
+const BEACON_OCR = ['| Beacon Mount =', '| | Description Lore', ': Beacon Mount', '£ No Trade', '‘we Class: ALL', 'Race: ALL', 'Size: MEDIUM', 'Weight: 12.0', 'PB Unmodified', '| This item can be used in tradeskills.']
+
+test('BEACON MOUNT: AN ICON READ AS A SHORT WORD BEFORE Class: IS STILL THE WINDOW (NO SLOT, NO STATS)', () => {
+  const r = readItemWindow(BEACON_OCR)
+  assert.equal(r.statsblock, '\nNo Trade<br>\nSize: MEDIUM WT: 12.0<br>\nClass: ALL<br>\nRace: ALL<br>')
+  assert.equal(r.name, 'Beacon Mount')
+  assert.equal(r.loreTab, true)
+  assert.equal(r.lore, undefined)
+})
+
+test('AN ICON READ AS A WORD BEFORE A CLASS LIST THAT WRAPS: RACE UNDER THE LIST STILL MAKES IT THE WINDOW', () => {
+  const r = readItemWindow(['| Some Blade', '‘we Class: WAR CLR PAL RNG SHD DRU MNK BRD ROG', 'BST', 'Race: ALL', 'Weight: 1.0'])
+  assert.ok(r.statsblock.includes('Class: WAR CLR PAL RNG SHD DRU MNK BRD ROG BST<br>'), r.statsblock)
+  assert.ok(r.statsblock.includes('Race: ALL<br>'), r.statsblock)
+})
+
+test("A WHOLE SCREEN'S TEXT IS NOT A WINDOW: A CLASS WORD WITH NO RACE OPENING THE NEXT ROW (THE OWNER'S CAPTURES)", () => {
+  for (const screen of [['dull Class: DRU SHM NEC WIZ MAG ENC', 'MOTES - none here. Race: ALL | ry'], ['Cr n Class: None & Fl iB) 130', 'Cogn Race: None x howe']]) {
+    assert.equal(readItemWindow(screen).statsblock, '', screen[0])
+  }
+})
+
+test("A LORE'S PROSE WITH THE WORD CLASS IS STILL A LORE: NO COLON AND CODE, OR TOO MANY WORDS BEFORE IT", () => {
+  for (const prose of ['Made for the warrior class of Halas', 'Only the very best Class: ALL may wield this']) {
+    const r = readItemWindow(['| Old Blade', 'Description Lore', prose])
+    assert.equal(r.statsblock, '', prose)
+    assert.equal(r.lore, prose)
+  }
+})
+
 test('A LORE TAB (NO CLASS LINE) GIVES ITS TEXT AND NO STATSBLOCK', () => {
   const r = readItemWindow(['| Ruined Robe', 'Description Lore', 'The Cloth Seems To Be Moving'])
   assert.equal(r.statsblock, '')
