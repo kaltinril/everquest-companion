@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-21T07:52:34.249Z",
+  "scrapedAt": "2026-11-22T06:28:30.018Z",
   "source": "eqlwiki.com — Category:Quests + quest subcategories + recentchanges delta (scripts/scrape-delta.mts)",
   "quests": [
     {
@@ -36349,7 +36349,9 @@
         "Svinal Wyspin"
       ],
       "requiredItems": [
-        "Capt. Orlin's Spiced Ale"
+        "Capt. Orlin's Spiced Ale",
+        "Metal Disk",
+        "Copper Band"
       ],
       "expReward": true,
       "factions": [
