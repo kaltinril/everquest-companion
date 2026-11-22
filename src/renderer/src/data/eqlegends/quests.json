@@ -1113,7 +1113,8 @@
           "up": true,
           "amount": 20
         }
-      ]
+      ],
+      "repeatable": true
     },
     {
       "name": "Bandit Sisters",
@@ -3444,7 +3445,8 @@
           "up": true,
           "amount": 10
         }
-      ]
+      ],
+      "repeatable": true
     },
     {
       "name": "Boysenberry Pie Quest",
@@ -7170,7 +7172,8 @@
           "up": false,
           "amount": -2
         }
-      ]
+      ],
+      "repeatable": true
     },
     {
       "name": "Crushbone Shoulderpads Quest",
@@ -7239,7 +7242,8 @@
           "name": "Craknek Warriors",
           "up": false
         }
-      ]
+      ],
+      "repeatable": true
     },
     {
       "name": "Crustacean Shell Armor Quest",
@@ -8058,7 +8062,8 @@
           "name": "Coalition of Tradefolk Underground",
           "up": true
         }
-      ]
+      ],
+      "repeatable": true
     },
     {
       "name": "Deck of Spontaneous Generation Quest",
@@ -8625,7 +8630,8 @@
           "name": "Pirates Of Gunthak",
           "up": false
         }
-      ]
+      ],
+      "repeatable": true
     },
     {
       "name": "Drosco the Zombie (evil)",
@@ -12834,7 +12840,41 @@
           "up": true,
           "amount": 5
         }
-      ]
+      ],
+      "repeatable": true,
+      "repeatStep": {
+        "giver": "Guard Shilster",
+        "zone": "Northern Karana",
+        "items": [],
+        "coin": "5 gold",
+        "factions": [
+          {
+            "name": "Corrupt Qeynos Guards",
+            "up": true,
+            "amount": 5
+          },
+          {
+            "name": "Guards of Qeynos",
+            "up": false,
+            "amount": -1
+          },
+          {
+            "name": "Kane Bayle",
+            "up": true,
+            "amount": 5
+          },
+          {
+            "name": "Circle Of Unseen Hands",
+            "up": true,
+            "amount": 5
+          },
+          {
+            "name": "Bloodsabers",
+            "up": true,
+            "amount": 5
+          }
+        ]
+      }
     },
     {
       "name": "Guild Summons - Abbey of Deep Musing Cleric",
@@ -18704,7 +18744,8 @@
           "up": false,
           "amount": -1
         }
-      ]
+      ],
+      "repeatable": true
     },
     {
       "name": "Journal Strongbox",
@@ -18819,7 +18860,8 @@
           "up": false,
           "amount": -2
         }
-      ]
+      ],
+      "repeatable": true
     },
     {
       "name": "Karana's Blessing",
@@ -19463,7 +19505,8 @@
           "name": "Crimson Hands",
           "up": false
         }
-      ]
+      ],
+      "repeatable": true
     },
     {
       "name": "Kobold Molars (Good)",
@@ -19504,7 +19547,8 @@
           "up": false,
           "amount": -1
         }
-      ]
+      ],
+      "repeatable": true
     },
     {
       "name": "Kobold Shaman Artifacts",
@@ -19918,7 +19962,8 @@
           "up": true,
           "amount": 5
         }
-      ]
+      ],
+      "repeatable": true
     },
     {
       "name": "Legion Lager Quest",
@@ -22781,7 +22826,8 @@
           "up": true,
           "amount": 5
         }
-      ]
+      ],
+      "repeatable": true
     },
     {
       "name": "Mooto's Proof",
@@ -22958,7 +23004,8 @@
           "up": false,
           "amount": -1
         }
-      ]
+      ],
+      "repeatable": true
     },
     {
       "name": "Muffin Quests",
@@ -24773,7 +24820,8 @@
           "up": true,
           "amount": 5
         }
-      ]
+      ],
+      "repeatable": true
     },
     {
       "name": "Orc Vest",
@@ -25566,7 +25614,8 @@
           "up": true,
           "amount": 5
         }
-      ]
+      ],
+      "repeatable": true
     },
     {
       "name": "Pickled Frogloks",
@@ -28298,7 +28347,8 @@
       "requiredItems": [
         "Lightstone",
         "Greater Lightstone"
-      ]
+      ],
+      "repeatable": true
     },
     {
       "name": "Reserve Militia",
@@ -33317,7 +33367,8 @@
           "up": true,
           "amount": 5
         }
-      ]
+      ],
+      "repeatable": true
     },
     {
       "name": "Test of Protection",
@@ -33944,7 +33995,8 @@
       "requiredItems": [
         "Bag of Bread Loaves"
       ],
-      "coin": "2 gold"
+      "coin": "2 gold",
+      "repeatable": true
     },
     {
       "name": "The Bread Shipment (East Freeport)",
@@ -36334,7 +36386,38 @@
           "name": "Steel Warriors",
           "up": true
         }
-      ]
+      ],
+      "repeatable": true,
+      "repeatStep": {
+        "giver": "Palatos Kynarn",
+        "zone": "East Freeport",
+        "items": [
+          "Capt. Orlin's Spiced Ale"
+        ],
+        "count": 4,
+        "factions": [
+          {
+            "name": "Craftkeepers",
+            "up": true,
+            "amount": 5
+          },
+          {
+            "name": "High Council of Erudin",
+            "up": true,
+            "amount": 5
+          },
+          {
+            "name": "Heretics",
+            "up": false,
+            "amount": -1
+          },
+          {
+            "name": "High Guard of Erudin",
+            "up": true,
+            "amount": 5
+          }
+        ]
+      }
     },
     {
       "name": "The Penance",
@@ -40751,7 +40834,8 @@
           "plain": true,
           "up": false
         }
-      ]
+      ],
+      "repeatable": true
     },
     {
       "name": "Werewolf Hunters",
@@ -41517,7 +41601,8 @@
           "name": "Hall of the Ebon Mask",
           "up": false
         }
-      ]
+      ],
+      "repeatable": true
     },
     {
       "name": "Words of Darkness Quest",
