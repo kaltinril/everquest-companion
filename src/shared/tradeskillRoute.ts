@@ -106,6 +106,8 @@ export interface RouteAsk {
   goal: BookGoal
   /** "Only use materials I have". Read by Cheapest and Fastest; the other goals ignore it. */
   heldOnly?: boolean
+  /** The Recipes tab's Hide trivial switch. Read by Explore; the climbing routes already start above the level. */
+  hideTrivial?: boolean
 }
 
 const NOT_MEASURED = 'Nobody has measured how often a combine fails or raises the skill in this game, so no chance, no number of combines and no total is shown.'
@@ -220,7 +222,7 @@ function guideRoute(ctx: RouteCtx, level: number | null): Built {
 /** The route for one goal: what to make from the level up, and what the choice rests on. */
 export function buildRoute(facts: RouteFacts, ask: RouteAsk): Route {
   const recipes = skillRecipes(facts.index, ask.tradeskill)
-  const ctx: RouteCtx = { facts, tradeskill: ask.tradeskill, level: ask.level ?? 0, recipes }
+  const ctx: RouteCtx = { facts, tradeskill: ask.tradeskill, level: ask.level ?? 0, recipes, hideTrivial: ask.hideTrivial === true }
   const top = topTrivial(recipes)
   const builders: Record<BookGoal, () => Built> = {
     cheapest: () => cheapestRoute(ctx, top),

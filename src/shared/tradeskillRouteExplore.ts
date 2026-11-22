@@ -2,7 +2,8 @@
 // community route (owner, 2026-11-20: "fun (you want to explore more trivial or unique or fun
 // recipes)"; "Use wiki, the data from the google drive download, and my logs as help").
 //
-//   Explore    recipes the player has never made, from a little under the level up, grouped by
+//   Explore    recipes the player has never made, from a little under the level up (from just
+//              above it under the Recipes tab's Hide trivial, owner 2026-11-21), grouped by
 //              what the data says sets each apart: a quest takes the made item, a community guide
 //              names it, a combine yields something else or uses a container few recipes use, a
 //              material is dropped and not sold, the made item has stats or effects of its own.
@@ -174,7 +175,7 @@ function exploreRange(trivial: number, level: number): string {
  * the crafting module: what the player has made is not known before that.
  */
 export function explore(ctx: RouteCtx): Explored {
-  const floor = Math.max(0, ctx.level - EXPLORE_NEAR)
+  const floor = ctx.hideTrivial === true ? ctx.level + 1 : Math.max(0, ctx.level - EXPLORE_NEAR)
   const reasons: Reasons = { ctx, callouts: guideCallouts(ctx), containers: containerCounts(ctx.recipes) }
   const groups = new Map<ExploreGroupId, ExploreGroup>(EXPLORE_GROUPS.map((id) => [id, { id, heading: EXPLORE_HEADINGS[id], steps: [], more: 0 }]))
   const out: Explored = { groups: [], total: 0, plain: 0, floor }
