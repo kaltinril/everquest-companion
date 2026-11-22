@@ -28,10 +28,10 @@ import {
 import {
   DEFAULT_MOTE_PREFS,
   moteChangesText,
-  moteCopiesText,
   moteGainText,
   moteGateText,
   moteHoursText,
+  moteHoursTitle,
   motePlanLine,
   moteSourceText,
   moteSourceTitle,
@@ -412,8 +412,9 @@ test('the tab words: target names, the gain, the changes, the copies and the hou
     { key: 'WEIGHT', from: 1.5, to: 0.8 }
   ] as const
   assert.equal(moteChangesText({ changes: [...changes] }), 'AC 66→70 · SV VOID -→1 · WEIGHT 1.5→0.8')
-  assert.equal(moteCopiesText({ copies: 1 }), '1 copy')
-  assert.equal(moteCopiesText({ copies: 1024 }), '1,024 copies')
+  // The cost is item experience: a dropped +4 copy is worth 16 of it, so it is never "128 copies".
+  assert.equal(moteHoursTitle({ copies: 128, road: 'copies' }), 'Without a mote: 128 item experience, mostly by farming copies')
+  assert.equal(moteHoursTitle({ copies: 1024, road: 'motes' }), 'Without a mote: 1,024 item experience, mostly by ordinary motes')
   assert.equal(moteHoursText({ hours: 5.1 }), '5.1 h')
   assert.equal(moteHoursText({ hours: 1189.6 }), '1,190 h')
 })
