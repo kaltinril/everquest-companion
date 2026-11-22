@@ -103,6 +103,9 @@ export function createProgressStore(bridge: () => ProgressBridge): ProgressStore
 
 const store = createProgressStore(() => window.eq)
 
+/** The held copy as it stands, for a hover read at render. Asks nothing and watches nothing. */
+export const heldProgressNow = (): ProgressState | null => store.current()
+
 /** The window's progress and its one setter, shared by every useProgress. */
 export function useHeldProgress(): [ProgressState | null, (p: ProgressState) => void] {
   return [useSyncExternalStore(store.subscribe, store.current), store.set]

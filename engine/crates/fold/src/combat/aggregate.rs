@@ -10,7 +10,7 @@
 //! `out` / `inc` / `targets` publish their iteration order, so they are `JsMap`s, never `HashMap`s.
 
 use crate::combat::healing::HealAccum;
-use crate::combat::ownclock::OwnClock;
+use crate::combat::ownclock::{LooseClock, OwnClock};
 use crate::combat::procdetect::lane_canon_key;
 use crate::combat::procledger::ProcAccum;
 use crate::combat::procwindows::WindowAccum;
@@ -359,6 +359,8 @@ pub struct Agg {
     /// Your and your pets' attacking time taken together: the You scope's clock. Two writers: a row
     /// door (`stamp_self`) and a claim that moves a recorded row to your pet (`rekey.rs move_out`).
     pub self_clock: OwnClock,
+    /// Outgoing damage outside any fight of ours. Only a stay's aggregate ever stamps it.
+    pub loose: LooseClock,
     /// The instant and the fight (encounter counter, 0 for none) of the line being folded, set by
     /// `at` (ownclock.rs) before a row is written so every row door stamps its clock the same way.
     pub(crate) cur: (i64, u64),
@@ -433,10 +435,16 @@ impl Agg {
     /// claimed as a pet must not keep a second bar beside the pet's own. Safe because an `Other` row
     /// enters no you/pet total and no target/engaged set.
     pub fn drop_out(&mut self, id: &str) -> bool {
+        self.loose.forget_row(id);
         self.out.remove(id)
     }
 
     pub fn add_out(&mut self, r: &SourceRef, ev: &DamageEvent<'_>, ambiguous: bool) {
+        // Landed damage only: the total this time divides holds no misses, and your own opening
+        // miss lands just before its fight opens.
+        if self.cur.1 == 0 {
+            self.loose.stamp(&r.id, self.cur.0);
+        }
         add_to_source(self.out_row(r), ev, ambiguous);
     }
 

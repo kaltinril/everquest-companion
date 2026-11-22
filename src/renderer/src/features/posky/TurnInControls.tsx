@@ -19,7 +19,8 @@ import RemoveIcon from '@mui/icons-material/Remove'
 import { turnInBadgeLabel, type DerivedEvidence } from '@shared/questTurnIns'
 import type { QuestProgress } from './useProgress'
 import { useCountSource } from './useCountSource'
-import { recordTurnInTitle, turnedInHover } from '../inventory/countSource'
+import { heldProgressNow } from './progressStore'
+import { recordTurnInTitle, turnInHoverSource, turnedInHover } from '../inventory/countSource'
 
 /**
  * WHAT EACH DERIVED SOURCE SAYS FOR ITSELF (JOS-429). One sentence per rung of the ladder, in the
@@ -193,7 +194,7 @@ export function TurnInCounter({
       <IconButton
         size="small"
         data-testid="posky-record-turnin"
-        title={recordTurnInTitle(countSource)}
+        title={recordTurnInTitle(turnInHoverSource(countSource, heldProgressNow()?.inventorySource))}
         onClick={onRecordTurnIn}
       >
         <AddIcon fontSize="inherit" />

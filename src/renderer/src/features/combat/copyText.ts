@@ -17,7 +17,8 @@
 //
 // There are FIVE views to serialize, one per drill level the user can be looking at:
 //   level 1  formatSegmentText  — the ranked source meter (outgoing or incoming)
-//   level 2  formatEntityText   — one source's flat skill list (pets nested, per the pref)
+//   level 2  formatEntityText   — one source's flat skill list (pets nested, per the pref);
+//            formatDrillText    — the same block under the header the panel prints over it
 //   level 2  formatTargetText   — everything you+pet landed on one mob
 //   panel    formatMobsText     — the Damage-by-mob card's ranked rows
 //   panel    formatProcsText    — the Procs cell's ranked name/PPM/count list. Lives in
@@ -317,14 +318,47 @@ export function formatEntityText(
   pets: SourceView[] = [],
   selfLabel: string | null = null
 ): string {
+  return entityBlock(seg, entity, pets, { selfLabel, lead: [], stats: entityStats(entity) })
+}
+
+/** One source's own figures, the run under the subject line. */
+function entityStats(entity: SourceView): string[] {
   const stats = [formatNum(entity.total), formatRate(entity.dps), `${entity.hits} hits`]
   if (entity.crits > 0) stats.push(`${Math.round(entity.critPct)}% crit`)
   if (entity.misses > 0) stats.push(`${Math.round(entity.hitPct)}% hit`)
   if (entity.resists > 0) stats.push(`${Math.round(entity.resistPct)}% resist`)
+  return stats
+}
 
+/**
+ * THE DRILLED VIEW AS THE PANEL SHOWS IT. With a pet nested in, the panel's header is the subject
+ * plus that pet (`petRows.panelTotals`) and the table holds the pet's row, so the paste states that
+ * figure first and then names whose the hits and rates beneath it are. With no pet nested the two
+ * are one number and the block is `formatEntityText`'s.
+ */
+export function formatDrillText(
+  seg: SegmentView,
+  entity: SourceView,
+  pets: SourceView[],
+  shown: { selfLabel: string | null; total: number; dps: number }
+): string {
+  const { selfLabel } = shown
+  if (pets.length === 0) return formatEntityText(seg, entity, pets, selfLabel)
+  const who = pets.length > 1 ? 'With pets' : 'With pet'
+  const lead = statLines([who, formatNum(shown.total), formatRate(shown.dps)])
+  return entityBlock(seg, entity, pets, { selfLabel, lead, stats: [sourceName(entity, selfLabel), ...entityStats(entity)] })
+}
+
+/** The drilled block: subject line, any lead line, the stat run, then the one table. */
+function entityBlock(
+  seg: SegmentView,
+  entity: SourceView,
+  pets: SourceView[],
+  head: { selfLabel: string | null; lead: string[]; stats: string[] }
+): string {
   const rows = pets.length > 0 ? nestedRows(entity, pets) : null
   const skills = flattenSkills(entity)
-  const out = [subjectLine(sourceName(entity, selfLabel), seg), ...statLines(stats)]
+  const out = [subjectLine(sourceName(entity, head.selfLabel), seg), ...head.lead, ...statLines(head.stats)]
   if (skills.length === 0 && !rows) {
     out.push('No skill breakdown for this source.')
     return out.join('\n')

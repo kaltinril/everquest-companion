@@ -121,6 +121,86 @@ impl OwnClock {
     }
 }
 
+/// One stretch of a stay with outgoing rows landing damage and no fight of ours open: each row's
+/// first and last hit in it, so a row taken off the meter takes its time with it.
+#[derive(Debug, Clone, Default)]
+struct LooseSpan {
+    rows: Vec<(String, i64, i64)>,
+    last: i64,
+}
+
+impl LooseSpan {
+    fn ms(&self) -> i64 {
+        let first = self.rows.iter().map(|r| r.1).min();
+        let last = self.rows.iter().map(|r| r.2).max();
+        first.zip(last).map_or(0, |(f, l)| span(f, l))
+    }
+
+    fn note(&mut self, row: &str, ts: i64) {
+        self.last = self.last.max(ts);
+        match self.rows.iter_mut().find(|r| r.0 == row) {
+            Some(r) => (r.1, r.2) = (r.1.min(ts), r.2.max(ts)),
+            None => self.rows.push((row.to_string(), ts, ts)),
+        }
+    }
+}
+
+/// The time a stay's outgoing rows landed damage with no fight of ours open: the part of the
+/// stay's total that no fight's length covers. A fight opening, or a long quiet, ends a span, so
+/// time a fight already counts is never added.
+#[derive(Debug, Clone, Default)]
+pub struct LooseClock {
+    /// The encounter counter the open span began under.
+    fights: u64,
+    closed: Vec<LooseSpan>,
+    closed_ms: i64,
+    open: Option<LooseSpan>,
+}
+
+impl LooseClock {
+    /// The encounter counter now. A fight opened since the last swing ends the open span.
+    pub fn note_fights(&mut self, fights: u64) {
+        if fights != self.fights {
+            self.fights = fights;
+            self.close();
+        }
+    }
+
+    fn close(&mut self) {
+        if let Some(s) = self.open.take() {
+            self.closed_ms += s.ms();
+            self.closed.push(s);
+        }
+    }
+
+    pub fn stamp(&mut self, row: &str, ts: i64) {
+        if self
+            .open
+            .as_ref()
+            .is_some_and(|s| ts - s.last > LOOSE_SPAN_GAP_MS)
+        {
+            self.close();
+        }
+        self.open
+            .get_or_insert_with(LooseSpan::default)
+            .note(row, ts);
+    }
+
+    pub fn ms(&self) -> i64 {
+        self.closed_ms + self.open.as_ref().map_or(0, LooseSpan::ms)
+    }
+
+    /// A row dropped from the meter: its hits no longer count toward the stay's time.
+    pub fn forget_row(&mut self, row: &str) {
+        for s in self.closed.iter_mut().chain(self.open.iter_mut()) {
+            s.rows.retain(|r| r.0 != row);
+        }
+        self.closed.retain(|s| !s.rows.is_empty());
+        self.closed_ms = self.closed.iter().map(LooseSpan::ms).sum();
+        self.open.take_if(|s| s.rows.is_empty());
+    }
+}
+
 impl Agg {
     /// Name the line about to be folded: its instant and the fight it belongs to (0 for none).
     pub fn at(&mut self, ts: i64, fight: u64) {
@@ -160,6 +240,23 @@ mod tests {
             ts,
         };
         a.add_out_miss(&r, &m);
+    }
+
+    /// A row dropped from the meter takes its stretch of the stay's time with it, and one that
+    /// shared the stretch leaves the other row's swings counted.
+    #[test]
+    fn a_dropped_row_takes_its_loose_time_with_it() {
+        let mut c = LooseClock::default();
+        c.stamp("member:a", 0);
+        c.stamp("member:a", 30_000);
+        c.note_fights(1);
+        c.stamp("member:b", 100_000);
+        c.stamp("member:a", 110_000);
+        assert_eq!(c.ms(), 40_000);
+        c.forget_row("member:a");
+        assert_eq!(c.ms(), 1_000, "only b's lone swing is left");
+        c.forget_row("member:b");
+        assert_eq!(c.ms(), 0);
     }
 
     /// The You scope's clock is you and your pets together; a group-mate's swing is not in it.

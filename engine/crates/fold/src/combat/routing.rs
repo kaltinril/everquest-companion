@@ -254,6 +254,7 @@ fn both(st: &mut EngineState, ts: i64, fresh_only: bool, f: impl Fn(&mut Agg)) {
         f(&mut enc.agg);
     }
     st.zone_agg.at(ts, fight);
+    st.zone_agg.loose.note_fights(st.seq);
     f(&mut st.zone_agg);
 }
 

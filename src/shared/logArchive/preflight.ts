@@ -18,6 +18,19 @@ export function autoArchiveDue(p: { on: boolean; liveBytes: number; putBack: boo
   return p.on && p.liveBytes >= AUTO_ARCHIVE_BYTES && !p.putBack && p.tooLarge !== true
 }
 
+/**
+ * What the card says about an automatic archive that stopped, or null. A reason the card's
+ * "not available" line already states stays there, so nothing is said twice.
+ */
+export function autoArchiveFailure(r: {
+  ok: boolean
+  message: string
+  status: { enabled: boolean; rotateBlockers: string[] }
+}): string | null {
+  if (r.ok || !r.status.enabled || r.status.rotateBlockers.length > 0) return null
+  return `The automatic archive stopped: ${r.message.replace(/^Not archived: /, '')}`
+}
+
 export interface PreflightInput {
   /** Summarize and archive log is on. */
   on: boolean

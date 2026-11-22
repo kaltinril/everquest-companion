@@ -19,7 +19,7 @@ import { getActiveCharacter } from '../session'
 import { logArchiveOn } from '../storeLogArchive'
 import type { LogArchiveReply } from '../../shared/logArchive/panel'
 import { AUTO_ARCHIVE_BYTES, autoArchiveDue } from '../../shared/logArchive/preflight'
-import { attachedLogPutBack, learnEngineModules, refreshLackingHistories, rotateNow } from './actions'
+import { attachedLogPutBack, learnEngineModules, refreshLackingHistories, rotateAutomatically } from './actions'
 import { liveTooLarge } from './liveTooLarge'
 
 const WAIT_FOR_ENGINE_MS = 30_000
@@ -51,7 +51,7 @@ export async function autoArchiveCheck(): Promise<LogArchiveReply | null> {
   if (running || !autoArchiveDue({ on, liveBytes: bytes, putBack, tooLarge })) return null
   running = true
   try {
-    const r = await rotateNow()
+    const r = await rotateAutomatically()
     logInfo(`[everquest-companion] log archive (automatic): ${r.message}`)
     return r
   } finally {
