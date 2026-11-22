@@ -4,7 +4,7 @@
 // of the tree. The character is the one the tab's data is for, set by useGapEdits.
 
 import { useEffect, useMemo, useSyncExternalStore } from 'react'
-import { doneKey, type GapRow } from '@shared/gaps'
+import { editKey, type GapRow } from '@shared/gaps'
 import { tidyEdit, withGapEdits, type GapEdit, type GapEditMap } from '@shared/gapEdits'
 
 const EDITS_KEY = 'eq.gaps.edits'
@@ -31,7 +31,7 @@ function subscribe(l: () => void): () => void {
 
 /** The row's edit saved for the tab's character; null resets it. */
 export function saveGapEdit(row: GapRow, edit: GapEdit | null): void {
-  const key = doneKey(row)
+  const key = editKey(row)
   const tidy = edit === null ? null : tidyEdit(edit)
   // A key stored before keys were lower-cased goes too.
   const rest = Object.entries(all[who] ?? NONE).filter(([k]) => k.toLowerCase() !== key)

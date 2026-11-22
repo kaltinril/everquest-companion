@@ -16,7 +16,7 @@ import guidesJson from './data/tradeskillGuides.json'
 import { itemsByAnyName } from './itemOtherNames'
 import { sourceItemKey } from '../shared/itemSources'
 import { TRADESKILLS, tradeskillOf, type Tradeskill } from '../shared/tradeskills'
-import type { GapRecipeHelp, GapRecipeMaterial, RecipelessPage } from '../shared/gapRecipe'
+import { pageRecipeFacts, type GapRecipeHelp, type GapRecipeMaterial, type RecipelessPage } from '../shared/gapRecipe'
 import type { GuideMaterial, TradeskillGuidesFile } from '../shared/guideData'
 
 type Corpus = Readonly<Record<string, ItemDbEntry>>
@@ -158,6 +158,13 @@ export function recipeHelpFor(c: RecipeCatalog, corpus: Corpus, file: Tradeskill
   return { trades: c.trades, containers: c.containers, guide }
 }
 
+/** A page with no materials, with what its recipe entry does state. */
+function recipelessPage(e: ItemDbEntry): RecipelessPage {
+  const entry = e.craftedBy?.find((r) => tradeskillOf(r.tradeskill) !== undefined) ?? e.craftedBy?.[0]
+  const stated = tradeskillOf(entry?.tradeskill) === undefined ? undefined : entry?.tradeskill
+  return { name: e.name ?? e.page, page: e.page, ...(stated === undefined ? {} : { tradeskill: stated }), ...pageRecipeFacts(entry) }
+}
+
 /**
  * Of the named items, the pages that state no materials: no recipe, or recipes with an empty
  * list. A page with words in place of a recipe (`Non-Tradeskill (Quest)`) has said how it is made.
@@ -168,8 +175,7 @@ export function recipelessOf(corpus: Corpus, names: readonly string[]): Recipele
     const e = corpus[itemKey(name)]
     if (e === undefined || e.craftedNote !== undefined) continue
     if ((e.craftedBy ?? []).some((r) => r.ingredients.length > 0)) continue
-    const stated = e.craftedBy?.find((r) => tradeskillOf(r.tradeskill) !== undefined)?.tradeskill
-    out.set(e.page, { name: e.name ?? e.page, page: e.page, ...(stated === undefined ? {} : { tradeskill: stated }) })
+    out.set(e.page, recipelessPage(e))
   }
   return [...out.values()]
 }

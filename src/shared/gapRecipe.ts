@@ -43,12 +43,19 @@ export interface GapRecipe {
 }
 
 /** An Items row for a page that exists and states no materials (`GapRow.recipeUpdate`). */
-export interface RecipeUpdate {
+export interface RecipeUpdate extends PageRecipeFacts {
   page: string
 }
 
+/** What a page with no materials does state of its recipe. Copy replaces the field, so these stay. */
+export interface PageRecipeFacts {
+  trivial?: number
+  container?: string
+  yieldQty?: number
+}
+
 /** A page the player combined the item of, which states how to make it with no materials. */
-export interface RecipelessPage {
+export interface RecipelessPage extends PageRecipeFacts {
   name: string
   page: string
   /** The tradeskill the page itself names, when it names one. */
@@ -102,6 +109,27 @@ export function readRecipe(raw: unknown): GapRecipe | undefined {
   return { ...(tradeskill === undefined ? {} : { tradeskill }), ...Object.fromEntries(fields), materials }
 }
 
+/** The facts a page's recipe entry states, each only when it states it. */
+export function pageRecipeFacts(r: PageRecipeFacts | undefined): PageRecipeFacts {
+  return {
+    ...(r?.trivial === undefined ? {} : { trivial: r.trivial }),
+    ...(r?.container === undefined ? {} : { container: r.container }),
+    ...(r?.yieldQty === undefined ? {} : { yieldQty: r.yieldQty })
+  }
+}
+
+/**
+ * The recipe to write: what the player stated over what the page already states. Copy on a page that
+ * exists replaces its whole field, and must never lose a trivial the page has (155 such pages,
+ * 2026-11-21; the rule of 2026-10-23: Copy on an existing page never drops what is there).
+ */
+function fullRecipe(row: GapRow): GapRecipe | undefined {
+  const kept = row.edit?.recipe
+  const facts = pageRecipeFacts(row.recipeUpdate)
+  if (Object.keys(facts).length === 0) return kept
+  return { ...facts, ...kept, materials: kept?.materials ?? [] }
+}
+
 /** The tradeskill a recipe is written under: the player's pick, else the first the log saw. */
 export function recipeTrade(row: GapRow): string | undefined {
   return row.edit?.recipe?.tradeskill ?? row.details.tradeskills?.entries[0]?.name
@@ -124,7 +152,7 @@ export function needsRecipe(row: GapRow): boolean {
 
 /** The player has stated the recipe: a tradeskill, a container, and materials each with a count. */
 export function recipeStated(row: GapRow): boolean {
-  const recipe = row.edit?.recipe
+  const recipe = fullRecipe(row)
   if (recipe?.container === undefined || recipe.materials.length === 0) return false
   return recipeTrade(row) !== undefined && recipe.materials.every((m) => m.qty !== undefined)
 }
@@ -161,7 +189,7 @@ export function playercraftedValue(item: string, recipe: GapRecipe, trade: strin
 
 /** A new page's `|playercrafted` from the row's recipe; undefined when it has none to write. */
 export function recipeField(row: GapRow): string | undefined {
-  const recipe = row.edit?.recipe
+  const recipe = fullRecipe(row)
   const trade = recipeTrade(row)
   return recipe === undefined || trade === undefined ? undefined : playercraftedValue(row.edit?.name ?? row.name, recipe, trade)
 }
@@ -241,8 +269,8 @@ export function containerOptions(help: GapRecipeHelp, trade: string | undefined)
 
 /** What the form opens on: the kept recipe, else the tradeskill the log or the page names. */
 export function recipeDraft(row: GapRow): GapRecipe {
-  const kept = row.edit?.recipe
-  if (kept !== undefined) return kept
   const trade = recipeTrade(row)
-  return { ...(trade === undefined ? {} : { tradeskill: trade }), materials: [] }
+  const known = fullRecipe(row)
+  if (row.edit?.recipe !== undefined && known !== undefined) return known
+  return { ...(trade === undefined ? {} : { tradeskill: trade }), ...known, materials: [] }
 }

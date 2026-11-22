@@ -3,7 +3,7 @@
 // so the log's own name still finds it: the row shows the edited name, and Copy writes the edited
 // values into the page text, the draft and the live merge alike. Reset drops it; the log is untouched.
 
-import { doneKey, type GapDomain, type GapRow } from './gaps'
+import { editKey, type GapDomain, type GapRow } from './gaps'
 import { npcImageName } from './mobPageTitle'
 import { withEditedFields } from './gapMerchantDescription'
 import { readRecipe, type GapRecipe } from './gapRecipe'
@@ -108,7 +108,7 @@ export function withGapEdits(rows: readonly GapRow[], edits: GapEditMap): GapRow
   if (Object.keys(edits).length === 0) return rows as GapRow[]
   const byKey = foldedEdits(edits)
   return rows.map((row) => {
-    const edit = readEdit(byKey.get(doneKey(row)))
+    const edit = readEdit(byKey.get(editKey(row)))
     if (edit === undefined) return row
     const out: GapRow = { ...row, edit, ...(edit.kind === 'mob' ? { maybePlayer: false } : {}) }
     if (edit.distinct === true) delete out.suggest

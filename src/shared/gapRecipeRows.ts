@@ -9,7 +9,7 @@
 import { logStamp } from './gapExtraItems'
 import { iconKey } from './gapIcons'
 import type { CraftedItemRow } from './crafting'
-import type { RecipelessPage } from './gapRecipe'
+import { pageRecipeFacts, type RecipelessPage } from './gapRecipe'
 import type { GapKind, GapRow } from './gaps'
 
 const stamp = (ts: number): string => logStamp(new Date(ts).toISOString())
@@ -26,7 +26,7 @@ function recipeRow(page: RecipelessPage, c: CraftedItemRow): GapRow {
     first: stamp(c.firstTs),
     last: stamp(c.lastTs),
     details: { ...(trade === undefined ? {} : { tradeskills: { entries: [{ name: trade, n: combines }], distinct: 1, all: [trade] } }), samples: [] },
-    recipeUpdate: { page: page.page }
+    recipeUpdate: { page: page.page, ...pageRecipeFacts(page) }
   }
 }
 

@@ -30,7 +30,7 @@ import {
 } from '../src/shared/gapRecipe'
 import { combinedNames, recipeRows } from '../src/shared/gapRecipeRows'
 import type { TradeskillGuidesFile } from '../src/shared/guideData'
-import type { GapRow } from '../src/shared/gaps'
+import { doneKey, editKey, type GapRow } from '../src/shared/gaps'
 import { updateWhy } from '../src/shared/gapUpdateWhy'
 import { stillNeeded, wikiPageText } from '../src/shared/wikiPage'
 
@@ -220,6 +220,28 @@ test('the committed data answers: every tradeskill has a spelling and the search
   assert.equal(help.trades.length, 12)
   assert.ok((help.containers.Tailoring ?? []).length > 0)
   assert.deepEqual(help.guide, [])
+})
+
+test('Copy on an existing page keeps the trivial, container and yield the page already states', () => {
+  const page = { name: 'Picnic Basket', page: 'Picnic Basket', tradeskill: 'Tailoring', trivial: 45, container: 'Loom', yieldQty: 2 }
+  const [r] = recipeRows([page], [combine('Picnic Basket')], [])
+  assert.deepEqual(r.recipeUpdate, { page: 'Picnic Basket', trivial: 45, container: 'Loom', yieldQty: 2 })
+  assert.equal(wikiPageText(r, [], {}), "On Picnic Basket, replace | playercrafted = with:\n\n|playercrafted = \n\n* [[Tailoring]] (Trivial: 45)\n** '''Yield: Picnic Basket''' x2\n** In [[Loom]]:\n")
+  assert.deepEqual(recipeDraft(r), { tradeskill: 'Tailoring', trivial: 45, container: 'Loom', yieldQty: 2, materials: [] })
+  const picked = { ...r, edit: { recipe: { materials: [{ name: 'Silk', qty: 1 }] } } }
+  assert.deepEqual(stillNeeded(picked, [], {}, {}), [], 'the page states the container, so the materials finish it')
+  assert.ok(wikiPageText(picked, [], {}).includes('(Trivial: 45)'))
+  const changed = { ...r, edit: { recipe: { trivial: 50, materials: [{ name: 'Silk', qty: 1 }] } } }
+  assert.ok(wikiPageText(changed, [], {}).includes('(Trivial: 50)'), 'what the player states wins')
+})
+
+test('a Done mark on the New row does not hide the recipe Update row, and the typed recipe carries over', () => {
+  const made = picnic(BASKET)
+  const [update] = recipeRows([{ name: 'Picnic Basket', page: 'Picnic Basket' }], [combine('Picnic Basket')], [])
+  assert.notEqual(doneKey(update), doneKey(made), 'two jobs, two Done marks')
+  assert.equal(editKey(update), editKey(made), 'one recipe')
+  const [withEdit] = withGapEdits([update], { [editKey(made)]: { recipe: BASKET } })
+  assert.deepEqual(withEdit.edit?.recipe?.materials.map((m) => m.name), ['Woven Mandrake', 'Steel Boning'])
 })
 
 const combine = (item: string, fields: Partial<CraftedItemRow> = {}): CraftedItemRow =>
