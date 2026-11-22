@@ -11,6 +11,7 @@ code; nothing listed here is removed or narrowed without the owner's word (RULES
 | 2026-11-20 | owner | "i've done pet who leader over and overr and over and it's not showingf malkils pet damge". | Fixed the same night: a leader line moved a pet's earlier damage in every fight and the current stay, never in a CLOSED zone stay, so those kept it as "owner unknown", which Group hides (162k of Zarartik's 204k). Closed stays from the pet's first unowned action now move too. |
 
 | 2026-11-20 | owner | Screenshot: Malkil's pet on no meter at all, "i've done pet who leader over and overr and over". | Fixed the same night: the pet's own Lifebite (`Zarartik hit Zarartik ... by Lifebite`) was read as a second pet of that name, which stops all credit for good, and a repeated leader line kept that mark. A spell landing on its own caster is no longer twin evidence. Reproduced on the real log: 454 dps with the pet missing, the screenshot's numbers. |
+| 2026-11-21 | backlog (open-work plan) | Measure how often an inferred pet owner is right. | measured on 3 archives: 91 guesses, 25 right, 0 wrong, 57 with no later leader line, 9 not judged. All 25 are one group mate, so the rule is not shown for other owners or strangers' pets (MEASURED.md) |
 
 ## The five rules proposed on 2026-11-19
 

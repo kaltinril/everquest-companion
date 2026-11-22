@@ -1841,10 +1841,9 @@ Asks: `requirements/meter-scope.md`, `requirements/meter-dps-clock.md`.
   - Archives (`mergeCrafting.ts joinGathered`): counts and item counts add, the session is the
     newer log's, an item's `lastTs` the later. A side without the key reads as zeros, which is
     also how `mergeModule`'s empty template (`fishing: {}`) passes.
-  - Trap: a sealed archive keeps the state it was folded with. It gains `fishing` and `forage`
-    when it is refolded: by itself once the app's version moves (`refreshLackingHistories`), or by
-    Refresh on its card. Until then a joined total holds the live log's counts only (the owner's
-    October archive has 72 casts and 659 forages the dev build will not show before a refresh).
+  - A sealed archive keeps the state it was folded with and gains `fishing` and `forage` when
+    refolded. Every version bump does that at launch (`refreshLackingHistories`; test.53 filled all
+    three of the owner's), so only a dev build at an unchanged version still needs Refresh.
   - Not built: a screen; the zone a fish or a forage came from (Wiki Gaps keeps those for its own
     rows); pace per hour (the Skills tab states raises per hour for Fishing and Forage).
 - Archives: `crafting` is in `CAPTURED_MODULES` and `MERGE_RULES` (`mergeCrafting.ts`). Counts
@@ -2333,8 +2332,8 @@ only: no engine, parser, protocol, network or dependency change.
     unnamed ones in the whole), so the named rows can add up to under 100%. A part that rounds to
     0 reads "under 1%". The Foraging tile lists 5 items, then "Show all N" (window state only).
   - The Forage level is the `skills` row spelled `Forage` (the newest line), not a tradeskill row.
-  - TRAP (same as the Crafting module's): a sealed archive gains `fishing` and `forage` only when
-    refolded, so the panel and the tile count the live log alone until then.
+  - On a dev build at an unchanged version, a sealed archive without `fishing` and `forage` needs
+    Refresh, so the panel and the tile count the live log alone until then. A version bump refolds it.
   - TRAP: `tests/copyNoEmDash.test.mts` scans every string under `src/shared`, the generated table
     included. `generalAas.cellText` writes an em or en dash in a wiki cell as a spaced hyphen (none
     in the table today).
@@ -3288,3 +3287,10 @@ what a later change must know. Each fix has a unit test that failed before it.
 - TRAP for e2e steps: a NAMED helper (an arrow assigned to a const) inside `page.evaluate` fails in
   the page with `__name is not defined` (the test loader wraps it). Return plain data from the
   page and judge it in the test.
+
+## Backlog batch (2026-11-21, branch `backlog-small`)
+
+- A fire frame carries `alertId` (optional; the engine always sends it). `fireToFiring` resolves by id, and an id that is gone or disabled is dropped. Label and sound are only the fallback for a frame with no id.
+- A capture refused as too large is remembered in `logArchive.refusedTooLarge` by head, size and version. It stops holding for another log, a shorter file or a new version. `liveTooLarge.known` answers from memory because the status report must never wait on the disk.
+- The recipe table's Trivial cell may hold the textless notice icon only: the e2e `rows()` reads that cell's text as a number or nothing.
+- The Tradeskills e2e is two specs split at the level raise. Steps that raise the level or depend on it belong in `tradeskills-log.e2e.mts`. `npm run typecheck` does not cover `tests/`.

@@ -57,10 +57,8 @@ answers and his first look at the section in the dev app.
   capture needs the hidden e2e window shown off the desktop (`setPosition(-6000, -6000)` then
   `showInactive()`): a hidden window is not composited and `page.screenshot` times out.
 - Still not checked by anything: the ring on a merchant's map pin; hover cards.
-- Open: whether rows tied only by a quest page naming the item belong in the Faction goal; the
-  Wish list tab files a wished crafted item that cannot be worn under "Nothing says where these
-  come from"; the recipe line's You text is still cut when it also wears "trivial for you"; a
-  sealed archive shows fishing and forage only after a Refresh or a version bump.
+- Open: whether rows tied only by a quest page naming the item belong in the Faction goal. The Wish
+  list grouping and the cut You text were fixed 2026-11-21; sealed archives need no fix for players.
 
 Owner's answers, 2026-11-20 (rows in `requirements/skills-tab.md`): Cheapest stays ranked on cost
 and gains an "Only use materials I have" option; guide links stay in the README only; the Skills
