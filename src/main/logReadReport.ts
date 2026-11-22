@@ -16,8 +16,10 @@ import { getActiveCharacter } from './session'
 import { engineClientFacts, reattachEngineLog } from './dataServer/engineClientHost'
 import { engineSupervisorStatus } from './dataServer/engineHost'
 import { engineLaunchSay } from './dataServer/engineLaunchState'
-import { logReadFacts, noteLogReadError, onLogReadChange } from './dataServer/logReadState'
+import { captureReplyRefused, logReadFacts, noteLogReadError, onLogReadChange } from './dataServer/logReadState'
 import { onReadEdge } from './dataServer/readEdges'
+import { characterId } from './log/config'
+import { liveTooLarge } from './logArchive/liveTooLarge'
 import { createLogProbe, worthALook } from './logProbe'
 import { createLogReadRecovery } from './logReadRecovery'
 import { createLogReadStatus } from './logReadStatus'
@@ -113,7 +115,8 @@ export function lastLogReadReport(): LogReadReport {
 }
 
 export function buildLogReadReport(): LogReadReport {
-  const logPath = getActiveCharacter()?.logPath ?? null
+  const active = getActiveCharacter()
+  const logPath = active?.logPath ?? null
   const say = engineLaunchSay()
   const client = engineClientFacts()
   const notes = logReadFacts()
@@ -134,6 +137,8 @@ export function buildLogReadReport(): LogReadReport {
     logSize: client.logSize,
     probe: logPath === null ? null : logProbe.last(logPath),
     watchingFile: recovery.watching(),
-    archiveOn: logArchiveOn()
+    archiveOn: logArchiveOn(),
+    // From memory: this report never waits on the disk (tooLargeLog.ts).
+    archiveWontHelp: captureReplyRefused() || liveTooLarge.known(active === null ? null : { character: characterId(active), logPath: active.logPath })
   })
 }

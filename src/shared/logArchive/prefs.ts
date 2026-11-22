@@ -10,17 +10,40 @@
 //
 // ZERO-IMPORT, so the main-side adapter and the node tests read the same normalizer.
 
+/** The archive refused this log as too large (`tooLarge.ts`): which log, how long, and which app. */
+export interface ArchiveRefusal {
+  headSha256: string
+  bytes: number
+  appVersion: string
+}
+
 /** The persisted log-archive prefs. A blob so the feature can grow without a second shape. */
 export interface LogArchivePrefs {
   /** Summarize and archive log: archive on the player's click, and show archived history on the tabs. */
   enabled: boolean
+  /** By character id. Absent when no log was refused. */
+  refusedTooLarge?: Record<string, ArchiveRefusal>
 }
 
 /** OFF. Nothing turns it on except the player. */
 export const DEFAULT_LOG_ARCHIVE_PREFS: LogArchivePrefs = { enabled: false }
 
+function isRefusal(v: unknown): v is ArchiveRefusal {
+  if (v === null || typeof v !== 'object') return false
+  const r = v as Partial<ArchiveRefusal>
+  return typeof r.headSha256 === 'string' && typeof r.appVersion === 'string' && Number.isFinite(r.bytes)
+}
+
+/** Only well-formed records survive; a damaged one means the archive simply tries again. */
+function refusalsIn(raw: unknown): Record<string, ArchiveRefusal> {
+  if (raw === null || typeof raw !== 'object') return {}
+  return Object.fromEntries(Object.entries(raw).filter((entry): entry is [string, ArchiveRefusal] => isRefusal(entry[1])))
+}
+
 /** Defaulted from `unknown`. Anything but a literal `true` reads as off. */
 export function normalizeLogArchivePrefs(raw: unknown): LogArchivePrefs {
   if (raw === null || typeof raw !== 'object') return { ...DEFAULT_LOG_ARCHIVE_PREFS }
-  return { enabled: (raw as { enabled?: unknown }).enabled === true }
+  const stored = raw as { enabled?: unknown; refusedTooLarge?: unknown }
+  const refused = refusalsIn(stored.refusedTooLarge)
+  return { enabled: stored.enabled === true, ...(Object.keys(refused).length === 0 ? {} : { refusedTooLarge: refused }) }
 }

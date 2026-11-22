@@ -7,7 +7,7 @@
 
 import { humanBytes, humanDuration } from './engineLaunch'
 import { logReadNotes } from './logReadNotes'
-import { LOG_READ_ACTION, LOG_READ_TRY, LOG_READ_WORDS, type LogReadAction } from './logReadWords'
+import { LOG_READ_ACTION, LOG_READ_TRY, LOG_READ_TRY_NO_ARCHIVE, LOG_READ_WORDS, type LogReadAction } from './logReadWords'
 
 /** Where on the log-loading path an error was recorded. */
 export type LogReadStep = 'connect' | 'attach' | 'health' | 'fold'
@@ -168,6 +168,8 @@ export interface LogReadFacts {
   readonly nothingRecognised: number | null
   /** Is Summarize and archive log on? A note must not tell the player to turn on what is on. */
   readonly archiveOn: boolean
+  /** The archive cannot work on this log: no line may offer it. Absent reads as no. */
+  readonly archiveWontHelp?: boolean
 }
 
 /** One more thing to tell the player while the read itself is fine (`logReadNotes.ts`). */
@@ -525,7 +527,8 @@ const TRY_NOT_WATCHING: Partial<Record<LogReadWait, string>> = {
 }
 
 function tryLineFor(wait: LogReadWait, f: LogReadFacts): string | null {
-  return (f.watchingFile ? undefined : TRY_NOT_WATCHING[wait]) ?? LOG_READ_TRY[wait]
+  const noArchive = f.archiveWontHelp === true ? LOG_READ_TRY_NO_ARCHIVE[wait] : undefined
+  return noArchive ?? (f.watchingFile ? undefined : TRY_NOT_WATCHING[wait]) ?? LOG_READ_TRY[wait]
 }
 
 /** The facts, decided and scrubbed: the one object every window is handed. */
