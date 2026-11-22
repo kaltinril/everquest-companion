@@ -57,7 +57,7 @@ export function dialogueText(name: string, d: Dialogue, greeting: string | undef
   const hail = d.hail.length > 0 ? d.hail : greeting === undefined ? [] : [greeting]
   const says = (lines: readonly string[]): string[] => lines.map((l) => `${name} says, '${mask(l)}'`)
   const opening = hail.length === 0 ? [] : [`You say, 'Hail, ${name}'`, ...says(hail)]
-  const turns = orderedTurns(hail, d.asked).flatMap((t) => [`You say, '${t.said}'`, ...says(t.lines)])
+  const turns = orderedTurns(hail, d.asked).flatMap((t) => [`You say, '${mask(t.said)}'`, ...says(t.lines)])
   return [...opening, ...turns].join('\n\n')
 }
 

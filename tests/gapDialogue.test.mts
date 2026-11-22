@@ -65,6 +65,13 @@ test('a hail answered too late for the dialogue still opens the talk from the gr
   assert.ok(text.startsWith(`You say, 'Hail, ${NAME}'\n\n${NAME} says, '${HAIL}'\n\nYou say, 'adventures'`), text)
 })
 
+test("the player's name is masked in their own says too: the page is public", () => {
+  const talk: Dialogue = { hail: ['Hello.'], asked: [{ said: 'Drywrought seeks adventures', lines: ['Ah.'] }] }
+  const text = merchantDescription(row({ greeting: 'Hello.', dialogue: talk }), { ownNames: ['Drywrought'] })?.text ?? ''
+  assert.ok(text.includes("You say, '____ seeks adventures'"), text)
+  assert.ok(!text.includes('Drywrought'), text)
+})
+
 test('two logs join: every keyword either heard, each with its fullest answer', () => {
   const older: Dialogue = { hail: [HAIL], asked: [{ said: 'farmstead', lines: ['a', 'b', 'c'] }, { said: 'childhood', lines: ['old'] }] }
   const newer: Dialogue = { hail: [HAIL], asked: [{ said: 'Farmstead', lines: ['a'] }, { said: 'childhood', lines: ['new'] }, { said: 'traveling', lines: ['t'] }] }
