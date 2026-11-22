@@ -89,6 +89,17 @@ test('the hover promises a subtraction only where the reconcile makes one', () =
   assert.equal(recordedTurnInMovesCounts('log'), true)
 })
 
+test('under Both the hover says the log count moves and the export does not', () => {
+  const text = recordTurnInTitle('both')
+  assert.match(text, /subtracted from your log count, not your export/)
+  // No dump: the log is the whole count, and it goes down.
+  assert.equal(held('both', { recorded: true, dump: false }), 3)
+  // A dump of 5 written before the click vouches for all 5: the click moves nothing.
+  assert.equal(held('both', { recorded: true, dump: true }), 5)
+  const words = text.split(/\s+/).length
+  assert.ok(words >= 7 && words <= 15, `${String(words)} words: ${text}`)
+})
+
 test('…and its remedy is true: a count set by hand does go down for a later recorded turn-in', () => {
   assert.match(recordTurnInTitle('handins'), /set them by hand/)
   assert.equal(held('handins', { recorded: false, dump: false, stated: 5 }), 5)
