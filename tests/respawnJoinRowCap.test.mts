@@ -4,7 +4,7 @@
 // oldest rows, and the Respawn overlay then said "none killed here yet" of a mob killed there.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { RESPAWN_MAX_ROWS, type RespawnRow, type RespawnSnap } from '../src/shared/respawn'
+import { RESPAWN_MAX_ROWS, cappedRowCount, type RespawnRow, type RespawnSnap } from '../src/shared/respawn'
 import { mergeRespawn, withHistoryRows } from '../src/shared/logArchive/mergeRespawn'
 import { mergeModule } from '../src/shared/logArchive/mergeRules'
 import { respawnTierEmptyText, respawnTierView } from '../src/shared/respawnTiers'
@@ -93,4 +93,12 @@ test('the overlay then shows the clock where you stand, never "none killed here 
   // The sentence the cut rows used to produce, for the record of what was wrong.
   const cut = respawnTierView({ ...merged, rows: merged.rows.filter((r) => !r.zone.startsWith(LAKE)) }, 200_000, 'here')
   assert.ok(respawnTierEmptyText(cut, LAKE).includes('none killed in Lake Nerius yet'))
+})
+
+test('a count that holds the other zones never states the cap as the whole number', () => {
+  assert.equal(cappedRowCount(0, 0), '0')
+  assert.equal(cappedRowCount(RESPAWN_MAX_ROWS - 1, RESPAWN_MAX_ROWS - 1), '59')
+  assert.equal(cappedRowCount(RESPAWN_MAX_ROWS, RESPAWN_MAX_ROWS), '60+', 'at the cap more may be running')
+  assert.equal(cappedRowCount(RESPAWN_MAX_ROWS + 4, RESPAWN_MAX_ROWS), '64+', 'the zone you stand in adds to it')
+  assert.equal(cappedRowCount(64, 10), '64', 'under the cap every row was published')
 })
