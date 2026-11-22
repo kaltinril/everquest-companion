@@ -10,6 +10,7 @@
 import type { FactionFix, KillFaction } from './gapFactions'
 import { forageWhy, type ForageUpdate } from './gapForage'
 import type { IconUpdate } from './gapIcons'
+import type { RecipeUpdate } from './gapRecipe'
 import type { QuestGaps } from './gapQuestGivers'
 import type { GapEdit } from './gapEdits'
 import { replaceWhy } from './gapDrops'
@@ -347,6 +348,8 @@ export interface GapRow {
   forageUpdate?: ForageUpdate
   /** An Items row for a page that exists and states no icon id (shared/gapIcons.ts). */
   iconUpdate?: IconUpdate
+  /** An Items row for a page that exists and states no materials of an item the player combined (shared/gapRecipeRows.ts). */
+  recipeUpdate?: RecipeUpdate
   /** The player's own corrections to this row, by hand (shared/gapEdits.ts). */
   edit?: GapEdit
   /** A Respawns row, or a Mobs row whose kills agree on a respawn: the number and what it stands on (gapRespawns.ts). */

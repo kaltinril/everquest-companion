@@ -6,6 +6,7 @@
 import { doneKey, type GapDomain, type GapRow } from './gaps'
 import { npcImageName } from './mobPageTitle'
 import { withEditedFields } from './gapMerchantDescription'
+import { readRecipe, type GapRecipe } from './gapRecipe'
 
 export interface GapEdit {
   /** The name the page should carry (a template's `name` / `itemname`, a quest's title). */
@@ -16,7 +17,12 @@ export interface GapEdit {
   kind?: 'mob'
   /** The player says the name is its own, not a misspelling of the near name (owner, 2026-10-24: Pyrosilk Lined Shoes is not Cryosilk Lined Shoes): no "Probably", no redirect. */
   distinct?: true
+  /** A crafted item's recipe, as the player stated it (shared/gapRecipe.ts). */
+  recipe?: GapRecipe
 }
+
+/** The row's values were corrected by hand; a recipe alone is no correction of what the log says. */
+export const handEdited = (e: GapEdit | undefined): boolean => e !== undefined && (e.name !== undefined || e.fields !== undefined || e.kind !== undefined || e.distinct !== undefined)
 
 /** Every edit of one character, by `doneKey`. */
 export type GapEditMap = Readonly<Record<string, GapEdit>>
@@ -60,11 +66,13 @@ export function tidyEdit(e: GapEdit): GapEdit | null {
       .map(([k, v]): [string, string] => [k, clean(v)])
       .filter(([, v]) => v !== '')
   )
+  const recipe = readRecipe(e.recipe)
   const out: GapEdit = {
     ...(clean(e.name) === '' ? {} : { name: clean(e.name) }),
     ...(Object.keys(fields).length === 0 ? {} : { fields }),
     ...(e.kind === undefined ? {} : { kind: e.kind }),
-    ...(e.distinct === true ? { distinct: true as const } : {})
+    ...(e.distinct === true ? { distinct: true as const } : {}),
+    ...(recipe === undefined ? {} : { recipe })
   }
   return Object.keys(out).length === 0 ? null : out
 }
@@ -81,11 +89,13 @@ const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'obj
 export function readEdit(raw: unknown): GapEdit | undefined {
   if (!isRecord(raw)) return undefined
   const fields = isRecord(raw.fields) ? Object.entries(raw.fields).filter((e): e is [string, string] => typeof e[1] === 'string') : []
+  const recipe = readRecipe(raw.recipe)
   const out: GapEdit = {
     ...(typeof raw.name === 'string' && raw.name.trim() !== '' ? { name: raw.name } : {}),
     ...(fields.length === 0 ? {} : { fields: Object.fromEntries(fields) }),
     ...(raw.kind === 'mob' ? { kind: 'mob' as const } : {}),
-    ...(raw.distinct === true ? { distinct: true as const } : {})
+    ...(raw.distinct === true ? { distinct: true as const } : {}),
+    ...(recipe === undefined ? {} : { recipe })
   }
   return Object.keys(out).length === 0 ? undefined : out
 }

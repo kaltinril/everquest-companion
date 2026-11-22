@@ -5,7 +5,7 @@
 import { type JSX, type ReactNode, useState } from 'react'
 import { Button, Checkbox, Chip, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Stack, TextField } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
-import { EDIT_FIELDS, editable, type GapEdit } from '@shared/gapEdits'
+import { EDIT_FIELDS, editable, handEdited, type GapEdit } from '@shared/gapEdits'
 import type { GapRow } from '@shared/gaps'
 import { Tooltip } from '../../lib/Tooltip'
 import { saveGapEdit } from './gapEditsStore'
@@ -51,8 +51,8 @@ function EditForm({ row, onClose }: { row: GapRow; onClose: () => void }): JSX.E
         </Stack>
       </DialogContent>
       <DialogActions>
-        {row.edit !== undefined && (
-          <Button color="warning" onClick={() => save(null)} data-testid="gaps-edit-reset">
+        {handEdited(row.edit) && (
+          <Button color="warning" onClick={() => save(row.edit?.recipe === undefined ? null : { recipe: row.edit.recipe })} data-testid="gaps-edit-reset">
             Reset
           </Button>
         )}
@@ -79,7 +79,7 @@ export function EditRowButton({ row, compact, Action }: { row: GapRow; compact: 
 
 /** Beside a row's name: it carries the player's own corrections. */
 export function EditedChip({ row }: { row: GapRow }): JSX.Element | null {
-  if (row.edit === undefined) return null
+  if (!handEdited(row.edit)) return null
   return (
     <Tooltip title={`You edited this row; the log has it as ${row.name}.`}>
       <Chip label="edited" size="small" variant="outlined" color="info" sx={{ ml: 1, height: 20 }} data-testid="gaps-edited" />

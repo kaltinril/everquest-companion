@@ -7,6 +7,7 @@ import { respawnAction } from './gapRespawns'
 import { questGiverAction } from './gapQuestGivers'
 import { wikiEditUrl, wikiUploadUrl } from './gapUrls'
 import { iconWhy } from './gapIcons'
+import { recipeWhy } from './gapRecipe'
 
 /** An image row's chip: upload the file; the page's imagefilename line added, or fixed when it names another file. */
 function imageAction(row: GapRow, file = row.image ?? ''): GapAction {
@@ -24,5 +25,6 @@ export function fieldAction(row: GapRow): GapAction | undefined {
   if (row.questGaps !== undefined) return questGiverAction(row)
   // An item page that states no icon id: the one field of an ITEM page this file words (gapIcons.ts).
   if (row.iconUpdate !== undefined) return { kind: 'addToWiki', label: 'Add icon to item page', why: iconWhy(row.name), href: wikiEditUrl(row.iconUpdate.page) }
+  if (row.recipeUpdate !== undefined) return { kind: 'addToWiki', label: 'Add recipe to item page', why: recipeWhy(row.name), href: wikiEditUrl(row.recipeUpdate.page) }
   return FIELD_ACTION[row.domain]?.(row)
 }

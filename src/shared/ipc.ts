@@ -1111,6 +1111,12 @@ export const IPC = {
   // The item pages in the committed corpus that state no icon id, `{ name, page }[]`
   // (src/main/gapItemIcons.ts), for the Items rows of the ones the player has met. No payload.
   gapIconlessItems: 'gaps:iconlessItems',
+  // Of the items the player combined, the pages that state no materials (src/main/gapRecipes.ts). Payload: (names: string[]).
+  gapRecipelessItems: 'gaps:recipelessItems',
+  // The recipe form's item search, with each item's icon and source words. Payload: (query: string).
+  gapRecipeSearch: 'gaps:recipeSearch',
+  // The recipe form's offers for one item: tradeskills, containers, a guide's materials. Payload: (item: string).
+  gapRecipeHelp: 'gaps:recipeHelp',
   // Which item names the wiki data has no page for (src/main/gapUnknownItems.ts), for the rows of
   // items no log line names: the inventory export's, a capture's. Payload: (names: string[]).
   gapUnknownItems: 'gaps:unknownItems',

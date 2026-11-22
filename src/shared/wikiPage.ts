@@ -25,6 +25,7 @@ import { isRewardChest, mobSourceOf } from './rewardChest'
 import { wikiZoneLink } from './gapWikiZone'
 import { forageAddText } from './gapForage'
 import { iconAddText } from './gapIcons'
+import { recipeAddText, recipeField, recipeNeed, withRecipeNotes, type GapRecipe } from './gapRecipe'
 import { questGiverAddText } from './gapQuestGivers'
 import { catalogSellers, logSpot, type VendorFinder, type VendorPlacing } from './gapMobPage'
 import type { LootEvent } from './types'
@@ -138,6 +139,9 @@ export interface ItemFacts {
   crafted: boolean
   /** The tradeskills its combines raised in the same second (engine gaps_craft.rs). */
   tradeskills?: string[]
+  /** `|playercrafted` from the recipe the player stated (shared/gapRecipe.ts): it replaces the bare tradeskill. */
+  recipeField?: string
+  recipeNotes?: GapRecipe['notes']
   /** Where the player foraged it, as the wiki spells the zones (owner, 2026-10-20). */
   foragedIn?: string[]
   /** A loot line stored it in the tradeskill depot, where the game files only tradeskill items. */
@@ -271,12 +275,14 @@ export function itemFacts(row: GapRow, loot: readonly LootEvent[], zoneName: Zon
  * How the player came by it besides a drop or a merchant (owner, 2026-10-20, every fact the game
  * gives): a combine and the tradeskill it raised, the zones it was foraged in, the tradeskill depot.
  */
-function madeAndForaged(row: GapRow, zoneName: ZoneNamer): Pick<ItemFacts, 'crafted' | 'tradeskills' | 'foragedIn' | 'tradeskillIngredient'> {
+function madeAndForaged(row: GapRow, zoneName: ZoneNamer): Pick<ItemFacts, 'crafted' | 'tradeskills' | 'foragedIn' | 'tradeskillIngredient' | 'recipeField' | 'recipeNotes'> {
   const tradeskills = (row.details.tradeskills?.entries ?? []).map((e) => e.name)
   const foragedIn = tallyZones(row.details.forageZones, zoneName).sort((a, b) => a.localeCompare(b))
   const tradeskillIngredient = (row.details.dispositions?.entries ?? []).some((e) => e.name === 'depot')
+  const stated = recipeField(row)
   return {
     crafted: row.kinds.includes('crafted') || row.kinds.includes('failed-combine'),
+    ...(stated === undefined ? {} : { recipeField: stated, recipeNotes: row.edit?.recipe?.notes }),
     ...(tradeskills.length > 0 ? { tradeskills } : {}),
     ...(foragedIn.length > 0 ? { foragedIn } : {}),
     ...(tradeskillIngredient ? { tradeskillIngredient } : {})
@@ -408,7 +414,10 @@ export function itemPage(f: ItemFacts, shot: ItemPageShot = {}): string {
   if (byZone.size > 0) fields.push(['dropsfrom', zoneBlocks(byZone)])
   // The tradeskill only: trivial, container and components are the player's to type (a skill-up
   // stops at trivial, so the log cannot state it). The wiki's order: playercrafted, soldby, foraged.
-  if (tradeskills.length > 0) fields.push(['playercrafted', bullets(tradeskills.map(wikiLink))])
+  // Unless the player stated the recipe (shared/gapRecipe.ts): then the field is the whole of it.
+  if (f.recipeField !== undefined) fields.push(['playercrafted', f.recipeField])
+  else if (tradeskills.length > 0) fields.push(['playercrafted', bullets(tradeskills.map(wikiLink))])
+  withRecipeNotes(fields, f.recipeNotes)
   if (f.soldBy.length > 0) fields.push(['soldby', itemWhereTable(f.soldBy)])
   if (foragedIn.length > 0) fields.push(['foraged', bullets(foragedIn.map(wikiZoneLink))])
   // The blueprint's groups: classes, slots, skill, kinds, zones (itemCategories.ts).
@@ -651,8 +660,9 @@ function itemPageParts(row: GapRow, c: PageContext): Parameters<typeof itemPage>
 const PAGE_OF: Record<GapDomain, (row: GapRow, c: PageContext) => string> = {
   // A page that exists and lacks a forage zone or the category: only the lines to add (gapForage.ts).
   // A page that exists and states no icon id: only that line, with the icon a capture matched (gapIcons.ts).
+  // A page that exists and states no materials: the recipe the player stated, and where it goes (gapRecipe.ts).
   item: (row, c) =>
-    row.iconUpdate ? iconAddText(c.itemShots?.[row.name]?.iconId) : row.forageUpdate ? forageAddText(row.forageUpdate) : itemPage(itemPageParts(row, c), c.itemShots?.[row.name]),
+    row.recipeUpdate ? recipeAddText(row) : row.iconUpdate ? iconAddText(c.itemShots?.[row.name]?.iconId) : row.forageUpdate ? forageAddText(row.forageUpdate) : itemPage(itemPageParts(row, c), c.itemShots?.[row.name]),
   // A known NPC's page lacking a quest it gives: only the related_quests lines to add (gapQuestGivers.ts).
   // A mob its target line calls a merchant takes the merchant layout before any trade (owner, 2026-10-22);
   // a new mob page takes its fight estimates in its blank fields (shared/gapFight.ts).
@@ -691,12 +701,14 @@ function sourceNeed(row: GapRow): string[] {
 const NEEDED_OF: Partial<Record<GapDomain, (row: GapRow, seen: PageExtras) => string[]>> = {
   item: (row, seen) => {
     if (row.forageUpdate) return []
+    // A page that exists lacks only its recipe; a crafted new page needs it beside its stats.
+    if (row.recipeUpdate) return recipeNeed(row)
     const shot = seen.itemShots?.[row.name]
     // The window showed a Lore tab: the page wants its text (owner, 2026-10-21: "item data and/or lore").
     const lore = shot?.loreTab === true && !shot.lore ? ['lore (paste the Lore tab below)'] : []
     const source = sourceNeed(row)
-    if ((shot?.tier ?? 0) > 0) return ['stats at +0 (the window pasted is upgraded)', ...lore, ...source]
-    return [...(shot?.statsblock ? [] : ['stats (paste a screenshot of the item window below)']), ...lore, ...source]
+    if ((shot?.tier ?? 0) > 0) return ['stats at +0 (the window pasted is upgraded)', ...lore, ...source, ...recipeNeed(row)]
+    return [...(shot?.statsblock ? [] : ['stats (paste a screenshot of the item window below)']), ...lore, ...source, ...recipeNeed(row)]
   },
   spell: (row, seen) => (spellPageValues(seen.spellFacts?.[row.name], seen.spellShots?.[row.name]).description === undefined ? ['description (paste the spell display window below)'] : []),
   faction: (row) => (row.adjust === undefined ? ['the amount (a kill that is not capped)'] : []),
