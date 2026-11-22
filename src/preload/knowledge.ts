@@ -115,6 +115,12 @@ export const knowledgeBridge = {
     ipcRenderer.invoke(IPC.gapItemForage, [...names]),
   /** The item pages the wiki data holds with no icon id (src/main/gapItemIcons.ts; shared/gapIcons.ts). */
   gapIconlessItems: (): Promise<import('../shared/gapIcons').IconlessPage[]> => ipcRenderer.invoke(IPC.gapIconlessItems),
+  /** Of the items the player combined, the pages that state no materials (src/main/gapRecipes.ts; shared/gapRecipe.ts). */
+  gapRecipelessItems: (names: readonly string[]): Promise<import('../shared/gapRecipe').RecipelessPage[]> => ipcRenderer.invoke(IPC.gapRecipelessItems, [...names]),
+  /** The recipe form's item search, with each item's icon and source words. */
+  gapRecipeSearch: (query: string): Promise<import('../shared/gapRecipe').GapRecipeMaterial[]> => ipcRenderer.invoke(IPC.gapRecipeSearch, query),
+  /** The recipe form's offers for one item: tradeskills, containers, a community guide's materials. */
+  gapRecipeHelp: (item: string): Promise<import('../shared/gapRecipe').GapRecipeHelp> => ipcRenderer.invoke(IPC.gapRecipeHelp, item),
   /** A new merchant page's description: the tradeskills each item's recipes name (src/main/gapItemTrades.ts). */
   gapItemTrades: (names: readonly string[]): Promise<Record<string, string[]>> => ipcRenderer.invoke(IPC.gapItemTrades, [...names]),
   /** A faction row's proof lines, by pair key, asked when it is opened or copied (src/main/gapKillFactionSamples.ts). */

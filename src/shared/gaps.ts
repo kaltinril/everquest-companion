@@ -10,6 +10,7 @@
 import type { FactionFix, KillFaction } from './gapFactions'
 import { forageWhy, type ForageUpdate } from './gapForage'
 import type { IconUpdate } from './gapIcons'
+import type { RecipeUpdate } from './gapRecipe'
 import type { QuestGaps } from './gapQuestGivers'
 import type { GapEdit } from './gapEdits'
 import { replaceWhy } from './gapDrops'
@@ -90,7 +91,16 @@ export const GAP_CAPTURE: Record<GapDomain, string> = {
  * /con prints it (`A gorgon`), then as a loot line spells it. Keys stored before kept the case, so a
  * stored key is always read lower-cased (`doneSet`, `foldedEdits`).
  */
-export const doneKey = (row: GapRow): string => `${row.domain}:${row.name}`.toLowerCase()
+export const doneKey = (row: GapRow): string => (row.recipeUpdate === undefined ? editKey(row) : `${editKey(row)}|recipe`)
+
+/**
+ * The key a row's hand edits are kept under: the name alone, so a recipe typed on a New page row is
+ * still there once the page exists. A Done mark is not carried over that way: "posted the page" is
+ * not "posted its recipe", so the Update row for the missing recipe has its own (`doneKey`).
+ */
+export function editKey(row: Pick<GapRow, 'domain' | 'name'>): string {
+  return `${row.domain}:${row.name}`.toLowerCase()
+}
 
 /** The stored marks as the set of keys `doneKey` makes. */
 export const doneSet = (marks: Readonly<Record<string, string>>): Set<string> => new Set(Object.keys(marks).map((k) => k.toLowerCase()))
@@ -347,6 +357,8 @@ export interface GapRow {
   forageUpdate?: ForageUpdate
   /** An Items row for a page that exists and states no icon id (shared/gapIcons.ts). */
   iconUpdate?: IconUpdate
+  /** An Items row for a page that exists and states no materials of an item the player combined (shared/gapRecipeRows.ts). */
+  recipeUpdate?: RecipeUpdate
   /** The player's own corrections to this row, by hand (shared/gapEdits.ts). */
   edit?: GapEdit
   /** A Respawns row, or a Mobs row whose kills agree on a respawn: the number and what it stands on (gapRespawns.ts). */

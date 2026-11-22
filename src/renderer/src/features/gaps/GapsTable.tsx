@@ -57,6 +57,8 @@ import { WithRowPicture } from './RowPicture'
 import GapRowButtons from './GapRowButtons'
 import MobHeadingButtons from './MobHeadingButtons'
 import { GapNameCell, SuggestCaption } from './GapNameCell'
+import GapRecipePanel from './GapRecipePanel'
+import { needsRecipe } from '@shared/gapRecipe'
 import { ZoneMapButton } from './ZoneMapLinks'
 import { shownName } from '@shared/gapEdits'
 
@@ -225,6 +227,7 @@ function DetailsPane({ row, actions }: { row: GapRow; actions: PaneActions }): J
           </Typography>
         )}
         <ShotPanel row={row} />
+        {needsRecipe(row) && <GapRecipePanel key={doneKey(row)} row={row} />}
         <GapDetailsPanel row={row} />
       </WithRowPicture>
     </Paper>

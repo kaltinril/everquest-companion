@@ -29,6 +29,7 @@ import { useGapReady, type GapReadiness } from './useGapReady'
 import type { HeldIndex } from '@shared/gapHeld'
 import { withExtraItemRows } from '@shared/gapExtraItems'
 import { withGapEdits } from '@shared/gapEdits'
+import { useRecipeRows } from './useRecipeRows'
 import { useExtraItemRows } from './useExtraItemRows'
 import { useIconRows } from './useIconRows'
 import { useExtraSpellRows } from './useExtraSpellRows'
@@ -148,10 +149,13 @@ export function useGapsList(opts: { background?: boolean } = {}): GapsList {
   // And known items whose page states no icon id, of the ones this loot and these exports show
   // (owner, 2026-11-20: Dark Ironbound Tome). After the extra items, so one of those keeps the name.
   const icons = useIconRows(engineData.snap?.rows, extraItems, { loot: engineData.loot, held: holding })
+  // And known items the player combined whose page states no materials (owner, 2026-11-21: Picnic Basket).
+  const beforeRecipes = useMemo(() => (icons.length === 0 ? extraItems : [...extraItems, ...icons]), [extraItems, icons])
+  const recipes = useRecipeRows(engineData.snap?.rows, beforeRecipes)
   // Added after useGapsData applied the hand edits, so they take them here (a captured item's Edit name, 2026-10-24).
   const extra = useMemo(
-    () => withGapEdits(extraSpells.length + icons.length === 0 ? extraItems : [...extraItems, ...extraSpells, ...icons], engineData.edits),
-    [extraItems, extraSpells, icons, engineData.edits]
+    () => withGapEdits(extraSpells.length + icons.length + recipes.length === 0 ? extraItems : [...extraItems, ...extraSpells, ...icons, ...recipes], engineData.edits),
+    [extraItems, extraSpells, icons, recipes, engineData.edits]
   )
   const data = useMemo(() => (engineData.snap && extra.length > 0 ? { ...engineData, snap: withExtraItemRows(engineData.snap, extra) } : engineData), [engineData, extra])
   const shownQuery = useGapsQuery()

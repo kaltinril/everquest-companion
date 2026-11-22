@@ -87,6 +87,8 @@ function pageExists(row: GapRow): boolean {
   if ((row as { forageUpdate?: unknown }).forageUpdate !== undefined) return false
   // An icon row copies one line to set, as a forage row copies the lines to add.
   if (row.iconUpdate !== undefined) return false
+  // A recipe row copies the one field to replace, and says where.
+  if (row.recipeUpdate !== undefined) return false
   return existingEditor(row, readGapVerdict(row.domain, row.name)) !== undefined
 }
 
@@ -94,6 +96,7 @@ function pageExists(row: GapRow): boolean {
 function copyWords(row: GapRow): { label: string; tip: string } {
   if (row.forageUpdate !== undefined) return { label: 'Copy wiki page', tip: forageButtons(row.forageUpdate).copyTip }
   if (row.iconUpdate !== undefined) return { label: 'Copy icon line', tip: iconButtons(row.iconUpdate).copyTip }
+  if (row.recipeUpdate !== undefined) return { label: 'Copy recipe', tip: `The recipe, ready to replace |playercrafted on ${row.recipeUpdate.page}.` }
   if (row.suggest !== undefined && (row.domain === 'item' || row.domain === 'spell' || row.domain === 'zone')) {
     return { label: 'Copy redirect', tip: `A redirect from the game's spelling to ${row.suggest.page}, so both spellings reach one page.` }
   }
@@ -157,7 +160,7 @@ function CopyPageButton({ text, row, compact }: { text: () => string; row: GapRo
   // item and it does the lookup"). A redirect (either kind: the page is known) or forage row copies only.
   const copy = (): void => {
     void copyText(text()).then(setCopied)
-    if (row.suggest === undefined && row.viaRedirect === undefined && row.forageUpdate === undefined && row.iconUpdate === undefined) void lookupOnCopy(row.domain, row.name)
+    if (row.suggest === undefined && row.viaRedirect === undefined && row.forageUpdate === undefined && row.iconUpdate === undefined && row.recipeUpdate === undefined) void lookupOnCopy(row.domain, row.name)
   }
   const onClick = row.domain === 'quest' ? openRead : readsMobPage(row) ? openMobRead : copy
   return (
@@ -190,6 +193,7 @@ function editorOf(row: GapRow): { target: string; create: string; existing: bool
     const i = iconButtons(row.iconUpdate)
     return { target: i.page, create: i.edit, existing: true }
   }
+  if (row.recipeUpdate !== undefined) return { target: row.recipeUpdate.page, create: 'Edit item page', existing: true }
   // A notice row's page exists: it is edited, the notice off (owner, 2026-10-22).
   if (row.domain === 'notice') return { target: row.page ?? row.name, create: 'Edit page', existing: true }
   // A known NPC's page exists: its related_quests gain the quests it gives (gapQuestGivers.ts).

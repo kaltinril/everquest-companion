@@ -14,6 +14,7 @@ import { verdictsFrom, type KnowledgeCacheFile } from '../gapVerdictsRead'
 import { itemPageMobs } from '../gapItemMobs'
 import { itemPageForage } from '../gapItemForage'
 import { iconlessItems } from '../gapItemIcons'
+import { recipeHelp, recipeItemSearch, recipelessItems } from '../gapRecipes'
 import { unknownItems, unknownSpells } from '../gapUnknownItems'
 import { itemTrades } from '../gapItemTrades'
 import { killFactionSamples } from '../gapKillFactionSamples'
@@ -28,6 +29,7 @@ export const ITEM_CACHE_VERSION = 4
 export const MOB_CACHE_VERSION = 1
 
 const MAX_NAMES = 1000
+const MAX_QUERY = 120
 /** Every faction row a Copy can hold: one per kill-faction pair, a few thousand on a long log. */
 const MAX_PAIRS = 20000
 
@@ -84,6 +86,11 @@ export function registerGapVerdictsIpc(): void {
     Array.isArray(names) ? itemPageForage(names.filter((n): n is string => typeof n === 'string').slice(0, MAX_NAMES)) : {}
   )
   ipcMain.handle(IPC.gapIconlessItems, () => iconlessItems())
+  ipcMain.handle(IPC.gapRecipelessItems, (_e, names: unknown) =>
+    Array.isArray(names) ? recipelessItems(names.filter((n): n is string => typeof n === 'string').slice(0, MAX_NAMES)) : []
+  )
+  ipcMain.handle(IPC.gapRecipeSearch, (_e, query: unknown) => (typeof query === 'string' ? recipeItemSearch(query.slice(0, MAX_QUERY)) : []))
+  ipcMain.handle(IPC.gapRecipeHelp, (_e, item: unknown) => recipeHelp(typeof item === 'string' ? item.slice(0, MAX_QUERY) : ''))
   ipcMain.handle(IPC.gapItemTrades, (_e, names: unknown) =>
     Array.isArray(names) ? itemTrades(names.filter((n): n is string => typeof n === 'string').slice(0, MAX_NAMES)) : {}
   )
