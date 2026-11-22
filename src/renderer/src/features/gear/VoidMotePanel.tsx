@@ -74,8 +74,8 @@ const HINT = 'Void-Touched Potential: three a week from raids, each skips a whol
 
 /** One clause per header (the tooltip diet). */
 const HEAD: readonly { label: string; hint: string; align?: 'right' }[] = [
-  { label: '#', hint: "A number marks one of this week's motes; a dash is not yet" },
-  { label: 'Item', hint: 'A worn item, and the tier this week takes it to' },
+  { label: '#', hint: "How many of this week's motes it gets; a dash means not yet" },
+  { label: 'Item', hint: "A worn item and its next tier, or where this week's motes take it" },
   { label: 'Slot', hint: 'Where your inventory dump says you wear it' },
   { label: 'Gain', hint: 'What the next tier adds for your target', align: 'right' },
   { label: 'Next tier', hint: 'Every stat the next tier changes' },
