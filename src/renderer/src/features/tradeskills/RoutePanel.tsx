@@ -17,6 +17,7 @@
 
 import { type JSX, useMemo } from 'react'
 import { Box, Chip, FormControlLabel, Paper, Stack, Switch, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
+import { useHideTrivial } from './tradeskillMemory'
 import { HELD_ONLY_LABEL, HELD_ONLY_TIP, heldKnown, heldOnlyBlockedText } from '@shared/tradeskillHeld'
 import { haveLookup } from '@shared/tradeskillMaterials'
 import {
@@ -286,7 +287,9 @@ interface BookRouteProps {
 
 /** One of the four goals built from the recipe book: what it ranks on, its steps, and the shopping list for the next one. */
 function BookRoute({ tradeskill, level, goal, heldOnly, facts, eraOnly, onOpenRecipe }: BookRouteProps): JSX.Element {
-  const route = useMemo(() => buildRoute(facts, { tradeskill, level, goal, heldOnly }), [facts, tradeskill, level, goal, heldOnly])
+  // The Recipes tab's switch, read here too: a recipe hidden there as trivial is not offered here.
+  const [hideTrivial] = useHideTrivial()
+  const route = useMemo(() => buildRoute(facts, { tradeskill, level, goal, heldOnly, hideTrivial }), [facts, tradeskill, level, goal, heldOnly, hideTrivial])
   return (
     <>
       <Basis route={route} />
