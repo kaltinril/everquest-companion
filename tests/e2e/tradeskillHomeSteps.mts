@@ -3,7 +3,7 @@
  * subtitle, "Pick up where you left off", wishing a crafted item and "Working towards", the
  * sources line, and the Skills tab's door to the section. A STEP MODULE, the
  * tradeskillHeldSteps.mts precedent: the launched app and the staged log are already standing in
- * tradeskills.e2e.mts. It runs last.
+ * tradeskills-log.e2e.mts. It runs last.
  *
  * What it holds:
  *   - Home says what the section draws on, and every tile carries a level bar; a bar's fill is

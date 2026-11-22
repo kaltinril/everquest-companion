@@ -3,7 +3,7 @@
  * the Foraging tile on Home (owner, 2026-11-20: "there are AA's that pertain to crafting, we
  * should somehow show stuff related to that"; fork #6: "Fishing and Foraging also come to mind").
  * A STEP MODULE, the tradeskillRouteSteps.mts precedent: the launched app and the staged log are
- * already standing in tradeskills.e2e.mts, and that spec is at its line budget. It runs last.
+ * already standing in tradeskills-log.e2e.mts, and that spec is at its line budget. It runs last.
  *
  * What it holds:
  *   - a workbench lists the AAs for its tradeskill on one line; a purchase line appended to the
