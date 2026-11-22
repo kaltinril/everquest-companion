@@ -8,8 +8,8 @@ Wiki notes do not fix this: the Factions tab reads neither a mob's description n
 ## What was built
 
 - `scripts/sources/questRepeat.ts` reads the signals and the step. 22 of the 913 catalog quests are
-  marked: 2 with a read step (The Painting, Guard Shilster's Stout), 17 with their own receipt, 3
-  mixed. Bone Chips Quests (a list of quests) and The Icestar Remembers are not marked.
+  marked: 2 with a read step (The Painting, Guard Shilster's Stout), 15 with their own receipt, 3
+  mixed, 2 that state no factions (Research Aid, The Bread Shipment). Bone Chips Quests (a list of quests) and The Icestar Remembers are not marked.
 - **Mixed** (`repeatMixed`: Deathfist Slashed Belts, Karana Clovers, Moonstones Quest): the page has
   turn-ins that pay different factions and no one step was read, so the catalog's merged receipt is
   not what one repeat pays. They keep the chip and their payout rank; only a sure repeat sorts first.
