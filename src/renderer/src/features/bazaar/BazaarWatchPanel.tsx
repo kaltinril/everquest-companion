@@ -5,7 +5,7 @@
 
 import { type JSX, useEffect, useState } from 'react'
 import { Checkbox, FormControlLabel, Stack, Switch, TextField, Typography } from '@mui/material'
-import { findWatch, sharePercent, watchOnItem } from '@shared/bazaarWatch'
+import { everyTierTaken, findWatch, sharePercent, watchOnItem } from '@shared/bazaarWatch'
 import { formatPlatExact, platFieldCommit, type BazaarItem } from '@shared/bazaar'
 import { useBazaarWatch } from './useBazaarWatch'
 
@@ -44,6 +44,7 @@ export default function BazaarWatchPanel({ item }: { item: BazaarItem }): JSX.El
   // A combined row stands for every tier, so its watch is any on the item, and a new one is every tier.
   const combined = item.combined !== undefined
   const w = combined ? watchOnItem(list, item.item) : findWatch(list, item.item, item.tier)
+  const everyTaken = w !== null && everyTierTaken(list, w)
   const toggle = (on: boolean): void => {
     if (on) put({ item: item.item, tier: combined ? null : item.tier, wts: false, wtb: false, wtsMax: null, wtsShare: null, wtbMin: null })
     else if (w !== null) remove(w.item, w.tier)
@@ -54,6 +55,8 @@ export default function BazaarWatchPanel({ item }: { item: BazaarItem }): JSX.El
         <FormControlLabel control={<Switch size="small" checked={w !== null} onChange={(_e, on) => toggle(on)} data-testid="bazaar-watch-on" />} label="Watch" />
         {w !== null && !combined && (
           <FormControlLabel
+            disabled={everyTaken}
+            title={everyTaken ? 'This item already has an every-tier watch; ticking this would overwrite it.' : undefined}
             control={
               <Checkbox
                 size="small"
