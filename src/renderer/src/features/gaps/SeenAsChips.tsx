@@ -1,6 +1,5 @@
 // SeenAsChips — the Seen as cell: the first two kinds and a count, the rest on hover (owner, 2026-11-10:
-// the cell is "fixed width and gets chips cut off"); a second chip that does not fit stacks under the
-// first, in the row's two lines (2026-11-21). The details pane lists every kind (GapsTable.tsx).
+// the cell is "fixed width and gets chips cut off"); the details pane lists every kind (GapsTable.tsx).
 
 import type { JSX } from 'react'
 import { Chip, Stack, Typography } from '@mui/material'
@@ -12,9 +11,9 @@ export const seenAs = (kinds: readonly string[]): { shown: string[]; more: numbe
 export default function SeenAsChips({ kinds }: { kinds: readonly string[] }): JSX.Element {
   const { shown, more } = seenAs(kinds)
   return (
-    <Stack direction="row" useFlexGap alignItems="center" sx={{ flexWrap: 'wrap', columnGap: 0.5, rowGap: '2px' }}>
+    <Stack direction="row" spacing={0.5} alignItems="center" sx={{ flexWrap: 'nowrap' }}>
       {shown.map((k) => (
-        <Chip key={k} label={k} size="small" variant="outlined" sx={{ height: 20, maxWidth: '100%' }} />
+        <Chip key={k} label={k} size="small" variant="outlined" />
       ))}
       {more > 0 && (
         <Tooltip title={kinds.join(', ')}>
