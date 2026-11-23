@@ -189,7 +189,7 @@ export const TOAST_INTRO_MS = TOAST_MAX_DURATION_MS
 /** The line the introduction card prints under its subtitle — what the window IS, and the two
  *  ways out of it. Lives here (not in the component) so a test can pin the promise it makes. */
 export const TOAST_INTRO_BODY =
-  'This window belongs to EQ Legends Companion, not to EverQuest. Close it with the ×, or switch it off any time in Preferences → Overlays.'
+  'This window belongs to EQ Legends Companion CE, not to EverQuest. Close it with the ×, or switch it off any time in Preferences → Overlays.'
 
 /**
  * The one card the celebration overlay shows about itself. Pure and argument-free: it is the same
@@ -200,7 +200,7 @@ export function introToastPayload(): ToastPayload {
   return {
     id: TOAST_INTRO_ID,
     kind: 'intro',
-    title: 'EQ Legends Companion - celebration overlay',
+    title: 'EQ Legends Companion CE - celebration overlay',
     subtitle: 'Boss kills, Sky quest completions and level-ups will appear here.',
     durationMs: TOAST_INTRO_MS
   }

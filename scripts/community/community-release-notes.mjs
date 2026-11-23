@@ -1,12 +1,13 @@
-// Writes src/shared/communityReleaseNotes.ts from the `Test build 0.1.0-test.N:` commits.
+// Writes src/shared/communityReleaseNotes.ts from the `Community build 0.1.N:` commits (and the
+// `Test build 0.1.0-test.N:` commits before 0.1.55).
 //
 // The commit body IS the release notes players read on GitHub (RELEASING.md), so the in-app
 // What's new list is generated from the same text instead of being typed twice.
 //
 // Which releases: every `community-*` tag (test.20 on, the public ones), plus the package.json
-// version when it has no tag yet (the release being prepared). For each, the NEWEST
-// `Test build <version>:` commit reachable from the tag (or HEAD) is the notes, the same pick the
-// publish script makes.
+// version when it has no tag yet (the release being prepared). For each, the NEWEST notes commit
+// for that version reachable from the tag (or HEAD) is the notes, the same pick the publish script
+// makes.
 //
 // Run from the repo root on Node 24:  node scripts/community/community-release-notes.mjs
 // then commit the regenerated file. tests/communityReleaseNotes.test.mts fails the gate when the
@@ -14,6 +15,7 @@
 
 import { execFileSync } from 'node:child_process'
 import { readFileSync, writeFileSync } from 'node:fs'
+import { newerFirst } from './communityVersion.mjs'
 
 const OUT = 'src/shared/communityReleaseNotes.ts'
 
@@ -21,23 +23,13 @@ function git(...args) {
   return execFileSync('git', args, { encoding: 'utf8' })
 }
 
-function versionKey(v) {
-  const m = /^(\d+)\.(\d+)\.(\d+)-test\.(\d+)$/.exec(v)
-  if (!m) throw new Error(`not a community version: ${v}`)
-  return m.slice(1).map(Number)
-}
-
-function newerFirst(a, b) {
-  const ka = versionKey(a)
-  const kb = versionKey(b)
-  for (let i = 0; i < ka.length; i++) if (ka[i] !== kb[i]) return kb[i] - ka[i]
-  return 0
-}
-
-/** The newest `Test build <version>:` commit reachable from `ref`: date, subject, body. */
+/**
+ * The newest notes commit for `version` reachable from `ref`: date, subject, body. Its subject is
+ * `Community build <version>:` from 0.1.55 on, and `Test build <version>:` before that.
+ */
 function notesCommit(version, ref) {
-  const raw = git('log', ref, '-1', '--date=short', '--format=%ad%x00%s%x00%b', `--grep=^Test build ${version}:`)
-  if (raw.trim() === '') throw new Error(`no "Test build ${version}:" commit reachable from ${ref}`)
+  const raw = git('log', ref, '-1', '-E', '--date=short', '--format=%ad%x00%s%x00%b', `--grep=^(Community|Test) build ${version}:`)
+  if (raw.trim() === '') throw new Error(`no "Community build ${version}:" commit reachable from ${ref}`)
   const [date, subject, body] = raw.split('\0')
   return { date, title: subject.slice(subject.indexOf(':') + 1).trim(), body }
 }

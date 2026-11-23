@@ -76,11 +76,11 @@ Lock one and it becomes click-through. The same menu resets every overlay's posi
 **Requires 64-bit Windows 10 or 11.** Windows 8.1 and older cannot run it: the installer checks
 and stops with a message.
 
-1. Download the newest `everquest-companion-test-Setup-<version>.exe` from this repo's
+1. Download the newest `everquest-companion-ce-Setup-<version>.exe` from this repo's
    [**Releases**](https://github.com/kaltinril/everquest-companion/releases/latest) page.
 2. Run it. Windows SmartScreen will say "Windows protected your PC", because the installer is not
    code-signed: click **More info**, then **Run anyway**. It is a one-click, per-user install with
-   no admin prompt. It adds a Start-menu and a desktop shortcut named **EQ Legends Companion TEST**.
+   no admin prompt. It adds a Start-menu and a desktop shortcut named **EQ Legends Companion CE**.
 3. In EverQuest, type `/log on`.
 
 The app finds your log by itself, usually in
