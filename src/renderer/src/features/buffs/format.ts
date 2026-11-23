@@ -58,16 +58,6 @@ export function remainingFraction(elapsedMs: number, estimatedMs: number): numbe
 }
 
 /**
- * True when a buff has run past its expected window (Task #30): elapsed exceeds the
- * p75 of observed durations, with at least 2 samples backing the estimate. Used to
- * flip the remaining-time from a (would-be-negative) countdown to a subtle "overdue"
- * hint. `p75`/`n` come straight off the ActiveBuff; null p75 or n<2 → not overdue.
- */
-export function isOverdue(elapsedMs: number, p75: number | null, n: number): boolean {
-  return p75 != null && n >= 2 && elapsedMs > p75
-}
-
-/**
  * WHAT THE PROVENANCE CHIP MEANS, in the user's words (JOS-117 + JOS-212 + JOS-379). All three
  * learned sources wear the same "log" chip because the number came from the log either way, but
  * they make DIFFERENT claims, so the tooltip must not be shared: 'observed' says the log ran longer
@@ -163,20 +153,18 @@ export interface EstimateState {
 }
 
 /**
- * Overdue (Task #30 + #34): run past the estimated window → show "past estimate" instead
- * of a bottomed-out countdown. Past p75 with n≥2 counts, and so does being past the estimate
- * itself, whatever its source (expiry is message-driven, so the card sits "past estimate" until
- * the wear-off line lands).
+ * Overdue (Task #30 + #34): run past the estimate, whatever its source → show "past estimate"
+ * instead of a bottomed-out countdown (expiry is message-driven, so the card sits there until the
+ * wear-off line lands).
  *
- * The second arm used to cover only the stated sources (db, deathBound, manual). "From my log" is
- * a median, which about half of casts outlive and which sits under p75, and one logged cast never
- * reaches n≥2: both left the card on a countdown with nothing left to count.
+ * THE ESTIMATE ALONE DECIDES, the same number the bar empties against. Being past the all-time p75
+ * used to count too, but an 'observed' estimate is the longest of the last five casts and usually
+ * sits above p75, so the card read "past estimate" over a bar with time left on it.
  */
 export function estimateState(buff: ActiveBuff, elapsed: number): EstimateState {
   const est = buff.estimatedMs != null && buff.estimatedMs > 0 ? buff.estimatedMs : null
   const spread = buff.p25 != null && buff.p75 != null ? (buff.p75 - buff.p25) / 2 : null
-  const overdue = isOverdue(elapsed, buff.p75, buff.n) || (est != null && elapsed > est)
-  return { est, spread, overdue }
+  return { est, spread, overdue: est != null && elapsed > est }
 }
 
 /**

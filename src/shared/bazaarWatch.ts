@@ -119,7 +119,7 @@ export function findWatch(list: BazaarWatchlist, item: string, tier: number): Ba
  * has on (its price wins over the every-tier one); a side it leaves off falls to the every-tier
  * watch, so a WTB tick on +4 never silences "Every tier" WTS on +4.
  */
-export function alertingWatch(list: BazaarWatchlist, o: LiveOffer): BazaarWatch | null {
+export function alertingWatch(list: BazaarWatchlist, o: Pick<LiveOffer, 'item' | 'tier' | 'dir'>): BazaarWatch | null {
   const own = findWatch(list, o.item, o.tier)
   if (own === null) return null
   const sideOn = o.dir === 'sell' ? own.wts : own.wtb
@@ -168,6 +168,21 @@ export function watchChipLabel(w: BazaarWatch): string {
   const wtb = w.wtbMin !== null ? `WTB ≥ ${formatPlatExact(w.wtbMin)}` : 'WTB'
   const on = [w.wts ? wts : '', w.wtb ? wtb : ''].filter((s) => s !== '')
   return on.length === 0 ? 'Watch' : `Watch: ${on.join(' + ')}`
+}
+
+/**
+ * The chip on a list row: per side, the watch an offer at this tier would alert under
+ * (`alertingWatch`), so a +4 row with its own WTB also names the every-tier WTS that alerts on +4.
+ * `tier` null is a row standing for every tier ("All tiers as one"), which shows `watchOnItem`.
+ * A string, so the memoized row compares it by value.
+ */
+export function rowWatchChip(list: BazaarWatchlist, item: string, tier: number | null): string | null {
+  const own = tier === null ? watchOnItem(list, item) : findWatch(list, item, tier)
+  if (own === null) return null
+  if (tier === null) return watchChipLabel(own)
+  const sell = alertingWatch(list, { item, tier, dir: 'sell' }) ?? own
+  const buy = alertingWatch(list, { item, tier, dir: 'buy' }) ?? own
+  return watchChipLabel({ ...own, wts: sell.wts, wtsMax: sell.wtsMax, wtsShare: sell.wtsShare, wtb: buy.wtb, wtbMin: buy.wtbMin })
 }
 
 /** The list with `w` in place of the watch on the same item and tier, or added. */

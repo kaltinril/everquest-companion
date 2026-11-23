@@ -169,9 +169,11 @@ export type BannerDef = Pick<AlertDef, 'name' | 'bannerText'>
  * THE OVERRIDE IS A TEMPLATE, LIKE THE SPOKEN PHRASE (upstream issue #53). A pattern's capture
  * groups and the `{target}` auto token resolve in it through the same one-pass `applyCaptures`
  * the speech resolver uses, so "Puma on {player}" prints the name the way it is spoken. The
- * captures are the firing's; a Test or an app signal has none and every token then renders
- * literally, which is `applyCaptures`'s documented answer for a value that is not there. The
- * NAME is never templated: it is what the user typed to file the alert under, not a sentence.
+ * captures are the firing's: an app signal brings its own values, and a Test of one brings that
+ * signal's samples (`sampleCapturesFor`). A Test of any other trigger has none and every token
+ * then renders literally, which is `applyCaptures`'s documented answer for a value that is not
+ * there. The NAME is never templated: it is what the user typed to file the alert under, not a
+ * sentence.
  *
  * Returns null only when there is nothing truthful to print (a def with a blank name and no
  * override), in which case no banner is sent at all.

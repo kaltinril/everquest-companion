@@ -11,6 +11,7 @@ import {
   freshWatchAlerts,
   normalizeBazaarWatchlist,
   removeWatch,
+  rowWatchChip,
   sharePercent,
   setWatch,
   watchAlertCaptures,
@@ -339,6 +340,28 @@ test('the watch chip names every threshold that can alert: a price and a share o
   assert.equal(watchChipLabel(watch({ ...q, wtb: true })), 'Watch: WTB')
   // A side that is off is not named, whatever thresholds it still holds.
   assert.equal(watchChipLabel(watch({ ...q, wtsMax: 12500, wtsShare: 0.8 })), 'Watch')
+})
+
+test('a tier row’s chip names each side the way an offer at that tier would alert', () => {
+  const q = { item: 'Fleeting Quiver' }
+  const every = watch({ ...q, wts: true, wtsMax: 20000 })
+  const tier4 = watch({ ...q, tier: 4, wtb: true, wtbMin: 9500 })
+  const list = setWatch(setWatch(EMPTY_WATCHLIST, every), tier4)
+  // +4 has its own WTB, and the every-tier WTS still alerts there.
+  assert.equal(rowWatchChip(list, 'Fleeting Quiver', 4), 'Watch: WTS ≤ 20k + WTB ≥ 9.5k')
+  // A tier with no watch of its own shows the every-tier one.
+  assert.equal(rowWatchChip(list, 'Fleeting Quiver', 2), 'Watch: WTS ≤ 20k')
+  // The side the tier has on keeps the tier's own price.
+  const own = setWatch(list, watch({ ...q, tier: 4, wts: true, wtsMax: 15000 }))
+  assert.equal(rowWatchChip(own, 'Fleeting Quiver', 4), 'Watch: WTS ≤ 15k')
+  assert.equal(rowWatchChip(list, 'Cloak of Flames', 4), null)
+})
+
+test('a row standing for every tier shows the item’s every-tier watch', () => {
+  const q = { item: 'Fleeting Quiver' }
+  const list = setWatch(setWatch(EMPTY_WATCHLIST, watch({ ...q, tier: 4, wtb: true })), watch({ ...q, wts: true }))
+  assert.equal(rowWatchChip(list, 'Fleeting Quiver', null), 'Watch: WTS')
+  assert.equal(rowWatchChip(EMPTY_WATCHLIST, 'Fleeting Quiver', null), null)
 })
 
 test('a typed share of the median reads as typed, in the field and on the chip', () => {

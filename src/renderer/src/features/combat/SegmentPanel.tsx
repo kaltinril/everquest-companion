@@ -411,8 +411,9 @@ export function SegmentBody({
     }
     return d.targetDetail && d.targetName
       ? formatTargetText(seg, d.targetName, d.targetDetail)
-      : // The rows and headline ON SCREEN: scoped, and with the pet folded in when the layout nests it.
-        formatSegmentText(seg, mode === 'in' ? 'in' : 'out', selfLabel, { rows: panel.sources, ...head })
+      : // The rows and headline ON SCREEN: scoped, the pet folded in when the layout nests it, and
+        // each pet under its owner when the layout groups them.
+        formatSegmentText(seg, mode === 'in' ? 'in' : 'out', selfLabel, { rows: panel.sources, groups: panel.groups, ...head })
   }
 
   return (

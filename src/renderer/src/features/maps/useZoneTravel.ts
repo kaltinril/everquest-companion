@@ -12,7 +12,7 @@
 //   this map already make (`mobsInZone`). No second notion of "which mobs are here". Under the
 //   era switch it leaves out the mobs out of era, as the list beside the map and Where to level
 //   do (`zoneBands.zoneBandOf`).
-//   THE PORTS come from main, once (`getZonePorts`), because they are derived from the spell and
+//   THE PORTS come from main, once per EverQuest folder (`zonePortsPull`), derived from the spell and
 //   item corpora that live there.
 //
 // ── "CLOSEST" IS A SEARCH, SINCE THE OWNER ASKED FOR ONE ────────────────────────────────────
@@ -45,6 +45,7 @@ import {
 import { metVersion } from '@shared/metInLog'
 import type { ZoneLevelBand } from '@shared/zoneLevels'
 import { zoneBandOf } from './zoneBands'
+import { watchZonePorts } from './zonePortsPull'
 
 export interface ZoneTravel {
   /** what the zone's own mobs say it is for, or null when the bestiary states no level here */
@@ -74,18 +75,7 @@ export interface ZoneTravel {
 }
 
 /**
- * The port table is STATIC and shared by every zone, so it is fetched once per window and kept.
- * `useLevelUnlocks`'s arrangement exactly, and for the same reason: the corpora it derives from
- * cannot change while the app runs, so there is no invalidation to get wrong.
- */
-let pending: Promise<ZonePort[]> | null = null
-function allPorts(): Promise<ZonePort[]> {
-  pending ??= window.eq.getZonePorts().catch(() => [])
-  return pending
-}
-
-/**
- * The whole graph, fetched once and kept - the port table's arrangement. Until it arrives the
+ * The whole graph, fetched once and kept. Until it arrives the
  * search runs over the one map on screen, which is exactly what the first version did and is the
  * honest interim: one hop, from labels already in hand, rather than nothing.
  *
@@ -121,14 +111,14 @@ export function useZoneTravel(stem: string | null, zoneName: string | null, data
   const eraOnly = useTravelEra()
   useEffect(() => {
     let alive = true
-    void allPorts().then((rows) => {
-      if (alive) setPorts(rows)
-    })
+    // The port table is shared by every zone and held per EverQuest folder (zonePortsPull.ts).
+    const stopPorts = watchZonePorts(setPorts)
     void allGraph().then((g) => {
       if (alive) setGraph(g)
     })
     return () => {
       alive = false
+      stopPorts()
     }
   }, [])
 

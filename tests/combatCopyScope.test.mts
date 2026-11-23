@@ -16,6 +16,7 @@ import { MAX_WIDTH, fmtDur, formatDrillText, formatEntityText, formatSegmentText
 import { headlineClockSec } from '../src/renderer/src/features/combat/headlineClock'
 import { scopeRate, scopeSources, scopeTotals } from '../src/renderer/src/features/combat/meterScope'
 import { meterPanel, meterSources, panelRate, panelTotals } from '../src/renderer/src/features/combat/petRows'
+import { petGroupRows } from '../src/shared/combatPetGroups'
 import type { MeterScope, RosterSnap } from '../src/shared/roster'
 import type { SegmentView, SourceView } from '../src/shared/combat'
 
@@ -190,4 +191,29 @@ test('a drilled paste with no pet nested is the plain block, byte for byte', () 
 test('the panel hands the drilled paste its own headline', () => {
   const panel = readFileSync(new URL('../src/renderer/src/features/combat/SegmentPanel.tsx', import.meta.url), 'utf8')
   assert.match(panel, /formatDrillText\(seg, panel\.subject, panel\.pets, \{ selfLabel, total: head\.total, dps: head\.dps \}\)/)
+})
+
+// "WITH ITS OWNER": the panel draws each pet under its master with the pair's figures in a box. The
+// paste listed the same sources ranked one by one, so a pet landed rows away from its owner.
+test('the With its owner layout pastes each pet under its owner, with the pair’s figures', () => {
+  const big = source({ id: 'member:bob', name: 'Bob', kind: 'member', total: 20000, dps: 240, pct: 64, hits: 90 })
+  const rows = [YOU, big, PET]
+  const shown: ShownSources = { rows, groups: petGroupRows(rows), total: 60230, dps: 723, activeDps: 723 }
+  const lines = formatSegmentText({ ...SEG, entities: rows, outTotal: 60230, outDps: 723 }, 'out', null, shown).split('\n')
+  assert.deepEqual(
+    lines.slice(3).map((l) => l.trimEnd()),
+    [
+      '   Source        Total      DPS  Crit  Hit',
+      '1  You           31.2k  375 dps   12%  82%',
+      '   Vebarn (pet)   9.0k  108 dps        77%',
+      '   Together      40.2k  483 dps',
+      '2  Bob           20.0k  240 dps'
+    ]
+  )
+  assert.ok(lines.every((l) => l.length <= MAX_WIDTH))
+})
+
+test('the Combat tab hands the paste the groups it is drawing', () => {
+  const panel = readFileSync(new URL('../src/renderer/src/features/combat/SegmentPanel.tsx', import.meta.url), 'utf8')
+  assert.match(panel, /rows: panel\.sources, groups: panel\.groups/)
 })

@@ -122,3 +122,35 @@ test('an alert the player deleted stays deleted', () => {
   assert.equal(seedBazaarAlertOnce(list, store, neverSeed), list)
   assert.deepEqual(writes, [])
 })
+
+test("a list that has the alert is returned as it is: no second copy, the player's edit kept", () => {
+  const edited: AlertDef = { ...firstSeed, name: 'Quiver watch', enabled: false, audio: 'sound', cooldownMs: 5000 }
+  const list = [other, edited]
+  assert.equal(withBazaarAlert(list, undefined, neverSeed), list)
+})
+
+test("the player's default sound pack reaches the seed", () => {
+  const seen: unknown[] = []
+  const spy = (seeds: readonly AlertDef[], prefs: unknown): AlertDef[] => {
+    seen.push(prefs)
+    return seed(seeds)
+  }
+  const { store } = stubStore({ soundPacks: { defaultPackId: 'my-pack' } })
+  seedBazaarAlertOnce([other], store, spy)
+  assert.deepEqual(seen, [{ defaultPackId: 'my-pack' }])
+})
+
+test('a list that already holds the alert before the stamp: only the stamp is written', () => {
+  const { store, data, writes } = stubStore()
+  const list = [{ ...firstSeed, cooldownMs: 0 }]
+  assert.equal(seedBazaarAlertOnce(list, store, neverSeed), list)
+  assert.deepEqual(writes, ['alertBazaarSeed'])
+  assert.equal(data.alertBazaarSeed, true)
+})
+
+test('Reset alerts brings a deleted alert back, whatever the stamp says', () => {
+  assert.deepEqual(
+    withBazaarAlert([], undefined, seed).map((a) => a.id),
+    [BAZAAR_WATCH_ALERT_ID]
+  )
+})
