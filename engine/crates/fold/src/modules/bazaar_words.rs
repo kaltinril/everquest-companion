@@ -136,7 +136,7 @@ pub fn price_at(t: &[Tok], i: usize) -> Option<(f64, usize)> {
     static PRICE: OnceLock<Regex> = OnceLock::new();
     let rx = re(
         &PRICE,
-        r"(?i)^(\d{1,3}(?:[ ,]\d{3})+|\d+(?:\.\d+)?)\s*(k|m|mil)?\s*(pp|p|plat|platinum|g|gp|gold|s|sp|silver|c|cp|copper)?$",
+        r"(?i)^(\d{1,3}(?: \d{3})+|\d+(?:\.\d+)?)\s*(k|m|mil)?\s*(pp|p|plat|platinum|g|gp|gold|s|sp|silver|c|cp|copper)?$",
     );
     (1..=3)
         .rev()
@@ -156,7 +156,7 @@ pub fn price_at(t: &[Tok], i: usize) -> Option<(f64, usize)> {
             if span > 1 && !lettered && (!thousands || each_after) {
                 return None;
             }
-            let num: f64 = m[1].replace([' ', ','], "").parse().ok()?;
+            let num: f64 = m[1].replace(' ', "").parse().ok()?;
             let mult = m.get(2).map_or(1.0, |k| {
                 if k.as_str().eq_ignore_ascii_case("k") {
                     1e3
