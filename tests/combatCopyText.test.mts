@@ -433,7 +433,7 @@ test('formatTargetText carries the ~ estimate prefix on every derived number but
       // The stat run wraps on a separator rather than running past the paste width.
       '~12.0k · 27% of outgoing · ~118 hits · ~13 crit · ~27 avoided',
       '~1 resisted',
-      'you + pet combined',
+      'all sources combined',
       '',
       'Skill          Total  Hits    Avg  Max  Crit  Miss  Resist',
       // Max is the ONE unprefixed column: an observed maximum is a lower bound, not a scaled

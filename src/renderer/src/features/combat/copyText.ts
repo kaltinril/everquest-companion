@@ -398,7 +398,7 @@ function roundsFooter(r: SourceView['rounds']): string[] {
 /**
  * Level 2, mob drill. Derived from the encounter's event ring, so the whole block wears the
  * `~` treatment whenever that ring was downsampled and/or truncated — including the footer that
- * says what `~` means. The "you + pet combined" line is not decoration: this list answers what
+ * says what `~` means. The "all sources combined" line is not decoration: this list answers what
  * killed the mob, not who, and the panel says so too.
  */
 export function formatTargetText(seg: SegmentView, target: string, detail: TargetDetail): string {
@@ -409,7 +409,7 @@ export function formatTargetText(seg: SegmentView, target: string, detail: Targe
   if (detail.misses > 0) stats.push(`${a}${detail.misses} avoided`)
   if (detail.resists > 0) stats.push(`${a}${detail.resists} resisted`)
 
-  const out = [subjectLine(`Damage to ${target}`, seg), ...statLines(stats), 'you + pet combined']
+  const out = [subjectLine(`Damage to ${target}`, seg), ...statLines(stats), 'all sources combined']
   if (detail.rows.length === 0) {
     out.push('Nothing landed on this mob in the selected segment.')
     return out.join('\n')

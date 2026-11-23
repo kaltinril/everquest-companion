@@ -200,9 +200,9 @@ export function TargetSkillBars({
           {detail.misses > 0 ? ` · ${a}${detail.misses} avoided` : ''}
           {detail.resists > 0 ? ` · ${a}${detail.resists} resisted` : ''}
         </Typography>
-        <Tooltip title="You and your pet are combined in this per-mob list - it answers “what killed this mob”, not “who”. Use the source rows above for per-source splits.">
+        <Tooltip title="Everyone’s damage to this mob, combined. Use the source rows above to split it.">
           <Typography variant="caption" color="text.disabled">
-            you + pet combined
+            all sources combined
           </Typography>
         </Tooltip>
       </Stack>
