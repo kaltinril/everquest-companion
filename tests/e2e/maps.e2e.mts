@@ -573,9 +573,9 @@ async function stepPane(page: Page): Promise<void> {
   await stepOpenMobDoor(page)
   await stepPaneClose(page)
   await stepCrossZone(page)
-  await stepCrossZoneMob(page)
-  // LAST of all: it leaves you on yet another map.
+  // On the map that jump drew (its marker proves it landed; the zone chip moves before a map does).
   await stepConnectionLabel(page)
+  await stepCrossZoneMob(page)
 }
 
 async function main(): Promise<void> {

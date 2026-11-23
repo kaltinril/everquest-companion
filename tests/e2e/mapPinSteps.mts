@@ -119,8 +119,10 @@ export async function stepOpenMobDoor(page: Page): Promise<void> {
 }
 
 /**
- * CLICK A `to <Zone>` LABEL ⇒ THAT MAP OPENS. Asserted through the zone chip, which only changes
- * once the new map has actually arrived. Leaves you elsewhere: the spec runs it LAST.
+ * CLICK A `to <Zone>` LABEL ⇒ THAT MAP OPENS. Asserted through the zone chip, which names the map
+ * ASKED FOR and so changes before that map is drawn. The spec must run this on a map known to have
+ * landed: after a chip-only wait, the labels on screen can still be the previous map's, and they
+ * vanish mid-click. Leaves you elsewhere.
  */
 export async function stepConnectionLabel(page: Page): Promise<void> {
   const link = (await countOf(page, POINT_LINK)) > 0 ? POINT_LINK : POINT_DOT_LINK
