@@ -36,13 +36,13 @@
 // rather than by ticks.
 //
 // THE READ HALF IS THE STORE-SCHEMA SALVAGE PRECEDENT (JOS-272), one granularity coarser. A ledger
-// that does not parse is PRESERVED beside itself as `resist-ledger.corrupt.json` — never deleted,
+// that does not parse is PRESERVED beside itself as `resist-ledger.corrupt[.N].json` — never deleted,
 // never silently replaced by an empty one — and then read for whatever WHOLE per-character buckets
 // survive. A bucket is the right unit: they are independent, each one is re-derivable by re-folding
 // that character's log, and a HALF bucket would be an under-count that looks exactly like a fact.
 // Nothing here ever closes an unbalanced bracket to make a truncated file parse.
 
-import { readFileSync, renameSync } from 'node:fs'
+import { existsSync, readFileSync, renameSync } from 'node:fs'
 import {
   createWriteGate,
   nodeIo,
@@ -52,7 +52,7 @@ import {
   type AsyncDurableIo,
   type DurableIo
 } from '../telemetry/durableWrite'
-import { balancedObjectSequence, parseIf, quarantinePathFor, salvageJsonObject, stripTornPadding } from '../tornJson'
+import { balancedObjectSequence, parseIf, quarantineSlots, salvageJsonObject, stripTornPadding } from '../tornJson'
 import { BASELINE_SOURCE_KEY, type ResistRow } from '../../shared/resistTypes'
 
 /** One character's bucket as it sits in the file. */
@@ -149,7 +149,10 @@ function salvageLedger(raw: string, version: number): { sources: LedgerSource[];
 
 /** Move the unreadable file aside, KEEPING it. Answers where it went, or why it could not go. */
 function preserve(path: string): { at?: string; why?: string } {
-  const at = quarantinePathFor(path)
+  // The first FREE slot: a rename replaces what is there, and an earlier copy can hold other
+  // characters' learned resists, which no log re-derives.
+  const slots = quarantineSlots(path)
+  const at = slots.find((slot) => !existsSync(slot)) ?? slots[slots.length - 1]
   try {
     renameSync(path, at)
     return { at }
