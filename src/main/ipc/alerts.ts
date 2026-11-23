@@ -6,6 +6,8 @@ import { ipcMain } from 'electron'
 import { IPC } from '../../shared/ipc'
 import { normalizeEarlyWarnSec } from '../../shared/earlyWarning'
 import { sanitizeCooldownMs } from '../../shared/alertCooldown'
+import { createAppFireLog } from '../../shared/alertAppFires'
+import { sendToMain } from '../windows'
 // THE ENGINE'S COPY OF THE SAME PREFERENCE (JOS-482, boundary verdict 3). Additive: the store is
 // still persistence truth and `alertsModule.setDefs` is still what keeps THIS process's evaluator in
 // sync — the push is a fourth line after those two, and it is a no-op on a launch that asked for no
@@ -73,19 +75,15 @@ export function registerAlertsIpc(): void {
     pushAppKnowledge('alerts.define')
     return list
   })
-  // renderer reports an 'app'-triggered fire (bossDefeat) so the module's recent-
-  // fires history stays the single source of truth. We record it and flush so the
-  // fire rides the same module:delta transport event/raw fires use (Task #22).
-  // A NAMED GAP (JOS-499). An app-signal fire — bossDefeat, questComplete — is a firing only the
-  // RENDERER can detect, and it was recorded by this process's alerts module so the recent-fires
-  // history stayed one source of truth and the event feed grew a row. The engine has no
-  // `alerts.appFired` command, so there is nowhere to record it: the SOUND is unaffected (the
-  // player plays an app signal itself, which is what the `origin: 'app'` echo rule exists for),
-  // and what is lost is the history row and the feed row for those two signals. The channel stays
-  // registered so the renderer's send is received rather than silently unhandled, and closing it
-  // needs an engine-side command — a follow-up ticket, not a deletion.
-  ipcMain.on(IPC.appFired, (_e, payload: { alertId: string; context: string }) => {
-    if (!payload?.alertId) return
+  // An app-signal fire (Bazaar match, respawn ending, raid target, Sky quest) is a firing only the
+  // RENDERER can detect, and the engine has no `alerts.appFired` command to take one (JOS-499). The
+  // sound never depended on this: the player plays an app signal itself. The Recent fires row is
+  // kept HERE for the launch, as the engine keeps its own, and the Alerts tab reads the two
+  // together (shared/alertAppFires.ts). The event feed row is still a named gap.
+  const appFires = createAppFireLog((id) => getAlerts().some((a) => a.id === id))
+  ipcMain.handle(IPC.getAppFires, () => appFires.history())
+  ipcMain.on(IPC.appFired, (_e, payload: unknown) => {
+    if (appFires.record(payload)) sendToMain(IPC.onAppFires, appFires.history())
   })
   // ---- event feed (Task #59): renderer-detected events ----
   // Only the renderer's posky/turn-in machinery can see a Sky quest complete, so it reports

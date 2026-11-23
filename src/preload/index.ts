@@ -79,6 +79,7 @@ import { gapsCharactersBridge } from './gapsCharacters'
 import { macrosBridge } from './macros'
 import { presencePrefsBridge } from './presencePrefs'
 import { respawnBridge } from './respawn'
+import { alertFiresBridge } from './alertFires'
 import { updatesBridge } from './updates'
 // The main window's text size (JOS-123), split out for the same file-mass reason. Its shapes are
 // a single number; the ladder and the normalizer live in shared/uiScale.ts.
@@ -196,6 +197,7 @@ const api = {
   ...gapsCharactersBridge,
   ...macrosBridge,
   ...respawnBridge,
+  ...alertFiresBridge,
   // …and the main window's text size (./uiScale.ts), likewise.
   ...uiScaleBridge,
   // …and the overlay-snapping switch (./overlaySnap.ts), likewise.

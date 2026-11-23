@@ -96,6 +96,10 @@ export const IPC = {
   // renderer reports an 'app'-triggered fire (e.g. bossDefeat) so the module's
   // history stays the single source of truth (Task #22). Payload {alertId, context}.
   appFired: 'alerts:appFired',
+  // The app-signal fires main holds for this launch (shared/alertAppFires.ts): read, and pushed to
+  // the main window each time one is recorded.
+  getAppFires: 'alerts:getAppFires',
+  onAppFires: 'alerts:onAppFires',
   /**
    * main -> renderer(main app): ONE ALERT THAT FIRED, to be played (JOS-499 item 7).
    *
