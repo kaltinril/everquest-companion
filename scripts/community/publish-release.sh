@@ -65,7 +65,8 @@ if [ -f "$dir/win-unpacked/resources/app.asar" ]; then
   done
   echo "asar: $modules node_modules entries, every runtime dependency present"
 else
-  echo "note: $dir/win-unpacked is gone, so the asar was not re-checked; it was checked at the build"
+  [ $publish -eq 0 ] || fail "no $dir/win-unpacked/resources/app.asar; a build is not published without checking its asar"
+  echo "note: $dir/win-unpacked/resources/app.asar is gone, so the asar was not re-checked"
 fi
 
 # The tester notes are the body of the version-bump commit on main_community (until 2026-10-26 it
