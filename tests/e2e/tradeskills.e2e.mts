@@ -4,8 +4,8 @@
  *
  * What it holds, on a fixture log given a Jewelry Making level and an inventory dump:
  *   - the nav row sits under Research, and the open menu still fits the default window;
- *   - Home draws a door per tradeskill: a tile with the log's level for one the log has shown, a
- *     small button under "Not in your log yet" for one it has not;
+ *   - Home draws a tile per tradeskill in one grid: the log's level for one the log has shown,
+ *     "Not in log" and an empty bar for one it has not;
  *   - a tile opens its workbench, whose table opens on the recipe marked next: the first one
  *     above the level, with nothing above it in the list that is not at or under the level;
  *   - the panel shows that recipe's materials with the wiki's source words, and item names are
@@ -31,6 +31,7 @@ import { buildIfStale, check, countOf, dumpArtifacts, failures, note, reportRun,
 import { mainWindow } from './appWindow.mjs'
 import { launchOnFixture } from './logFixture.mjs'
 import { E2E_LEVEL as LEVEL } from './tradeskillLogSteps.mjs'
+import { NOT_IN_LOG_TEXT } from '../../src/shared/tradeskillHome'
 import { TRADESKILLS } from '../../src/shared/tradeskills'
 
 const sel = (id: string): string => `[data-testid="${id}"]`
@@ -99,15 +100,20 @@ async function stepHome(page: Page): Promise<string> {
   await page.click(NAV)
   const mounted = await settle(() => countOf(page, HOME), (n) => n === 1, { timeoutMs: 20_000 })
   check('the Tradeskills view opens on Home', mounted === 1 && (await countOf(page, VIEW)) === 1)
-  // A door is a full tile (the log has shown the tradeskill) or a small button (it has not): `data-tile` is on both.
+  // `data-tile` says whether the log has shown the tradeskill: `seen` or `unseen`.
   const doors = await settle(() => countOf(page, '[data-testid^="tradeskill-tile-"][data-tile]'), (n) => n === TRADESKILLS.length, { timeoutMs: 20_000 })
   check('Home draws one door per tradeskill', doors === TRADESKILLS.length, `saw ${String(doors)}`)
   const level = await settle(() => textOf(page, `${tile('Jewelcrafting')} ${sel('tradeskill-tile-level')}`), (t) => t === String(LEVEL), { timeoutMs: 30_000 })
   check("the Jewelcrafting tile shows the log's Jewelry Making level", level === String(LEVEL), level)
-  const heading = await textOf(page, sel('tradeskills-unseen-heading'))
-  const inRow = await countOf(page, `${sel('tradeskills-unseen')} ${tile('Pottery')}[data-tile="unseen"] button`)
-  check('a tradeskill the log never showed is a small button under "Not in your log yet"', inRow === 1 && heading === 'Not in your log yet', `${String(inRow)} / ${heading}`)
-  check('…with no level bar and no next recipe', (await countOf(page, `${tile('Pottery')} ${sel('tradeskill-bar')}`)) === 0 && (await countOf(page, `${tile('Pottery')} ${sel('tradeskill-tile-next')}`)) === 0)
+  const words = await textOf(page, `${sel('tradeskills-tiles')} > ${tile('Pottery')}[data-tile="unseen"] ${sel('tradeskill-tile-not-in-log')}`)
+  check('a tradeskill the log never showed is a tile of the grid reading "Not in log"', words === NOT_IN_LOG_TEXT, words)
+  check('…with its top', (await textOf(page, `${tile('Pottery')} ${sel('tradeskill-bar-of')}`)) === 'of 300')
+  check('…one button, an empty bar, no level number and no next recipe',
+    (await countOf(page, `${tile('Pottery')} button`)) === 1 &&
+      (await countOf(page, `${tile('Pottery')} ${sel('tradeskill-bar')}[data-fill="0.000"]`)) === 1 &&
+      (await countOf(page, `${tile('Pottery')} ${sel('tradeskill-tile-level')}`)) === 0 &&
+      (await countOf(page, `${tile('Pottery')} ${sel('tradeskill-tile-next')}`)) === 0)
+  check('the old row of small buttons is gone', (await countOf(page, sel('tradeskills-unseen'))) === 0)
   const text = await textOf(page, tile('Jewelcrafting'))
   check('the tile states its wiki recipes', /\d+ wiki recipes/.test(text), text)
   const next = /trivial (\d+)/.exec(await textOf(page, `${tile('Jewelcrafting')} ${sel('tradeskill-tile-next')}`))
