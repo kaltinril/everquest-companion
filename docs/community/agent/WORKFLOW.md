@@ -195,7 +195,9 @@ disagree, RULES.md wins; fix this file.
 - **Known e2e reds/flakes:** `respawn-timers.e2e.mts` fails one step ("never claims the mob is
   standing there") on plain upstream main since 2026-08-17. `maps.e2e`, `engine-boots`,
   `engine-absent`, `sky-achievements`, `sky-reward-inference` can flake under parallel load; run
-  serially. The `feedback` and `telemetry` specs, the runner's skip list and the first-run notice
+  serially. `maps` also failed about one run in three alone until 2026-11-23: the zone chip names
+  the map asked for, so a step waiting only on the chip clicked the previous map's label as it
+  vanished. After a zone change, wait on something the drawn map sets. The `feedback` and `telemetry` specs, the runner's skip list and the first-run notice
   were removed 2026-11-20; the measurements below that name them are history.
   Measured 2026-10-18 (full run on main_community, then serial, then the same specs on test.26):
   58/68 green; the 10 reds were identical on test.26. By design on the TEST build: `feedback`,
