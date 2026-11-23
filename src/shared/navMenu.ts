@@ -41,6 +41,11 @@ export function stepNavStep(steps: readonly number[], cur: number, dir: 1 | -1):
   return steps[want] ?? cur
 }
 
+/** Whether `value` sits at either end of its ladder, where that way's press changes nothing. */
+export function navStepEnds(steps: readonly number[], value: number): { atMin: boolean; atMax: boolean } {
+  return { atMin: value <= Math.min(...steps), atMax: value >= Math.max(...steps) }
+}
+
 /** How a stop is said: "14px". */
 export function navPx(n: number): string {
   return `${String(n)}px`

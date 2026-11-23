@@ -11,7 +11,8 @@ import {
   NAV_TEXT_DEFAULT,
   NAV_TEXT_KEY,
   NAV_TEXT_STEPS,
-  navPx
+  navPx,
+  navStepEnds
 } from '@shared/navMenu'
 import { useNavStep } from '../../components/useNavMenu'
 import { PrefStepper } from './PrefStepper'
@@ -39,8 +40,7 @@ function NavMenuSetting(): JSX.Element {
           kind="size"
           value={navPx(text)}
           name="the left menu"
-          atMin={text <= Math.min(...NAV_TEXT_STEPS)}
-          atMax={text >= Math.max(...NAV_TEXT_STEPS)}
+          {...navStepEnds(NAV_TEXT_STEPS, text)}
           onStep={stepText}
           testid="pref-nav-text"
         />
@@ -50,8 +50,7 @@ function NavMenuSetting(): JSX.Element {
           kind="spacing"
           value={navPx(row)}
           name="the left menu"
-          atMin={row <= Math.min(...NAV_ROW_STEPS)}
-          atMax={row >= Math.max(...NAV_ROW_STEPS)}
+          {...navStepEnds(NAV_ROW_STEPS, row)}
           onStep={stepRow}
           testid="pref-nav-row"
         />
