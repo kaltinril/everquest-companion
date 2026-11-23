@@ -69,6 +69,14 @@ function loadMode(): Mode {
 const bosses = getBossData()
 
 /**
+ * The tally before the kill records answer. This tab is the first reader of `kills` (the
+ * always-mounted detector reads `met`), so there is a moment with no statuses at all, and counting
+ * them would claim `0 / 0 defeated`. `useModule`'s null also covers an engine with nothing to say
+ * on this launch, so the words are "waiting", which stays true there, and not "loading".
+ */
+const NO_ROSTER_YET = 'Waiting for kill data…'
+
+/**
  * The toolbar's tally line — the denominator every filter is measured against (see the roster
  * note in BossView), folded outside the component because the view is at the measured
  * per-function ceiling and this is a pure sentence over inputs the view already owns.
@@ -306,7 +314,7 @@ export default function BossView({ onOpenMob }: { onOpenMob: (t: MobTarget) => v
   // The tally counts the ROSTER, never `filtered` — the denominator the filters are measured
   // against, so it must not move when a switch is flipped. Since issue #32 the roster is the
   // VISIBLE one (useHiddenRoster): a hidden target leaves the denominator too.
-  const tally = tallyLine(mode, roster, lockOf, week)
+  const tally = statuses.length === 0 ? NO_ROSTER_YET : tallyLine(mode, roster, lockOf, week)
   const section = {
     compact,
     minCol: compact ? 116 : 180,

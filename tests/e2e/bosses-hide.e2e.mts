@@ -38,6 +38,7 @@ import {
   settleGone
 } from './appHarness.mjs'
 import { mainWindow, makeUserData, removeUserData } from './appWindow.mjs'
+import { stepLoadoutSectionsAreHonest } from './loadoutSectionSteps.mjs'
 import { launchOnFixture, stageFixture, type FixtureLog } from './logFixture.mjs'
 
 const NAV_OVERVIEW = '[data-testid="nav-overview"]'
@@ -71,10 +72,33 @@ function peekState(page: Page): Promise<boolean | null> {
   }, SHOW_HIDDEN)
 }
 
+/** Record every text the tally shows from here on, so a flash too short to poll is still caught. */
+function watchTally(page: Page): Promise<void> {
+  return page.evaluate((sel) => {
+    const seen: string[] = []
+    ;(window as unknown as { tallySeen: string[] }).tallySeen = seen
+    new MutationObserver(() => {
+      const text = document.querySelector(sel)?.textContent
+      if (text && seen[seen.length - 1] !== text) seen.push(text)
+    }).observe(document.body, { subtree: true, childList: true, characterData: true })
+  }, TALLY)
+}
+
+function tallySeen(page: Page): Promise<string[]> {
+  return page.evaluate(() => (window as unknown as { tallySeen: string[] }).tallySeen)
+}
+
 async function stepHideOneCard(page: Page): Promise<{ cards: number; total: number } | null> {
-  const cards = await countOf(page, CARD)
-  const total = await tallyTotal(page)
-  if (!check('the roster reads cleanly before anything is hidden', cards > 0 && total !== null)) return null
+  // WAIT FOR THE ROSTER, THEN READ IT. The tab is the first reader of the `kills` module since the
+  // always-mounted celebration moved to `met` (444180476), so for the one round trip that fetch
+  // takes (about 80 ms, 1 s once) there are no cards and the tally says it is waiting.
+  // A one-shot read here passes or fails by luck: the same tree measured both ways on 2026-11-22.
+  const cards = await settle(() => countOf(page, CARD), (n) => n > 0, { timeoutMs: 30_000 })
+  const total = await settle(() => tallyTotal(page), (n) => n === cards, { timeoutMs: 8_000 })
+  const seen = await tallySeen(page)
+  check('THE TALLY NEVER CLAIMS AN EMPTY ROSTER while the kills load',
+    seen.length > 0 && !seen.some((t) => t.startsWith('0 / 0')), seen.join(' | '))
+  if (!check('the roster reads cleanly before anything is hidden', cards > 0 && total === cards)) return null
   check('a fresh install has NO Hidden switch at all', (await peekState(page)) === null)
 
   await page.click(`${CARD} ${HIDE}`, { timeout: 15_000 })
@@ -140,12 +164,16 @@ async function main(): Promise<void> {
     try {
       page = await mainWindow(first.app)
       await page.waitForSelector(NAV_OVERVIEW, { timeout: 60_000 })
+      await watchTally(page)
       if (!check('the Bosses tab opens', await openBosses(page))) {
         throw new Error('never reached the Bosses tab - nothing below can be asserted')
       }
       base = await stepHideOneCard(page)
       if (base) {
         await stepPeekAndRestore(page, base)
+        // THE ONE LAUNCH THAT ALWAYS HOLDS A KILL: bosses-week reads the real log, whose newest
+        // character may have none, so the loadout HEADER is proved here on the committed fixture.
+        await stepLoadoutSectionsAreHonest(page)
         // Arm the restart: hide one card again and leave the peek wherever it lies — the set
         // must come back, the peek must not.
         await page.click(`${CARD} ${HIDE}`, { timeout: 15_000 })
