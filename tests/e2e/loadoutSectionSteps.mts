@@ -31,6 +31,7 @@ const BY_LOADOUT = '[data-testid="boss-by-loadout"]'
 const HEADER = '[data-testid="boss-loadout-header"]'
 /** Spelled again rather than imported: this file must not make bosses-week export its constants. */
 const CARD = '[data-testid="boss-card"]'
+const TALLY = '[data-testid="boss-tally"]'
 
 /** One loadout section header: which sentence it is, and what it drew. */
 interface HeaderFact {
@@ -40,18 +41,36 @@ interface HeaderFact {
   text: string
 }
 
-/** Every loadout header on screen, plus the cards under them, read in ONE paint. */
-function loadoutView(page: Page): Promise<{ headers: HeaderFact[]; cards: number }> {
+/** One paint of the by-loadout view. */
+interface LoadoutView {
+  headers: HeaderFact[]
+  cards: number
+  /** the tally's denominator: every target on the roster */
+  rosterTotal: number
+  /** the count on the trailing `Not defeated (N)` section; 0 when that section is not drawn */
+  notDefeated: number
+}
+
+/** Every loadout header on screen, plus the cards and the counts around them, read in ONE paint. */
+function loadoutView(page: Page): Promise<LoadoutView> {
   return page.evaluate(
-    (sel) => ({
-      headers: [...document.querySelectorAll(sel.header)].map((h) => ({
-        kind: h.getAttribute('data-loadout') ?? '',
-        chips: h.querySelectorAll('.MuiChip-root').length,
-        text: (h.textContent ?? '').trim()
-      })),
-      cards: document.querySelectorAll(sel.card).length
-    }),
-    { header: HEADER, card: CARD }
+    (sel) => {
+      const total = /^\s*\d+\s*\/\s*(\d+)/.exec(document.querySelector(sel.tally)?.textContent ?? '')
+      const trailing = [...document.querySelectorAll('.MuiTypography-subtitle2')]
+        .map((n) => /^Not defeated\s*\((\d+)\)/.exec((n.textContent ?? '').trim()))
+        .find((m) => m !== null)
+      return {
+        headers: [...document.querySelectorAll(sel.header)].map((h) => ({
+          kind: h.getAttribute('data-loadout') ?? '',
+          chips: h.querySelectorAll('.MuiChip-root').length,
+          text: (h.textContent ?? '').trim()
+        })),
+        cards: document.querySelectorAll(sel.card).length,
+        rosterTotal: Number(total?.[1] ?? -1),
+        notDefeated: Number(trailing?.[1] ?? 0)
+      }
+    },
+    { header: HEADER, card: CARD, tally: TALLY }
   )
 }
 
@@ -79,10 +98,17 @@ export async function stepLoadoutSectionsAreHonest(page: Page): Promise<void> {
     return
   }
   const view = await settleStable(() => loadoutView(page), { timeoutMs: 20_000 })
+  // A LOADOUT HEADER NEEDS A DATED KILL, so how many there are is a fact about the log. bosses-week
+  // runs on whichever character was played last, and one with no raid kills correctly draws a lone
+  // `Not defeated (32)` section and no header. The claim that holds on every log: a header exists
+  // exactly when some target is outside that section. A view that failed to mount draws neither,
+  // reads as 32 targets with kills and no header, and still fails here. bosses-hide runs this step
+  // on a fixture holding a kill, so the header itself is driven whatever the owner last played.
+  const dated = view.rosterTotal - view.notDefeated
   check(
     'THE BY-LOADOUT VIEW MOUNTS - it had never been driven before this',
-    view.headers.length > 0,
-    `${String(view.headers.length)} headers`
+    view.rosterTotal > 0 && dated >= 0 && view.headers.length > 0 === dated > 0,
+    `${String(view.headers.length)} headers, ${String(dated)} of ${String(view.rosterTotal)} targets with a dated kill`
   )
   check(
     'every header is one of the three sentences and nothing else',
@@ -101,7 +127,7 @@ export async function stepLoadoutSectionsAreHonest(page: Page): Promise<void> {
   )
   if (mixed.length === 0) {
     note(
-      'bosses-week: nothing on this log is currently gated, so the unresolved header is structurally covered only'
+      'by-loadout: nothing on this log is currently gated, so the unresolved header is structurally covered only'
     )
   }
   check('the cards are still under the headers, not dropped', view.cards > 0, String(view.cards))

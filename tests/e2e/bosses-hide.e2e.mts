@@ -38,6 +38,7 @@ import {
   settleGone
 } from './appHarness.mjs'
 import { mainWindow, makeUserData, removeUserData } from './appWindow.mjs'
+import { stepLoadoutSectionsAreHonest } from './loadoutSectionSteps.mjs'
 import { launchOnFixture, stageFixture, type FixtureLog } from './logFixture.mjs'
 
 const NAV_OVERVIEW = '[data-testid="nav-overview"]'
@@ -72,9 +73,13 @@ function peekState(page: Page): Promise<boolean | null> {
 }
 
 async function stepHideOneCard(page: Page): Promise<{ cards: number; total: number } | null> {
-  const cards = await countOf(page, CARD)
+  // WAIT FOR THE ROSTER, THEN READ IT. The tab is the first reader of the `kills` module since the
+  // always-mounted celebration moved to `met` (444180476), so its toolbar paints `0 / 0 defeated`
+  // for the one round trip that fetch takes (about 80 ms, 1 s once) and the cards arrive after it.
+  // A one-shot read here passes or fails by luck: the same tree measured both ways on 2026-11-22.
+  const cards = await settle(() => countOf(page, CARD), (n) => n > 0, { timeoutMs: 30_000 })
   const total = await tallyTotal(page)
-  if (!check('the roster reads cleanly before anything is hidden', cards > 0 && total !== null)) return null
+  if (!check('the roster reads cleanly before anything is hidden', cards > 0 && total === cards)) return null
   check('a fresh install has NO Hidden switch at all', (await peekState(page)) === null)
 
   await page.click(`${CARD} ${HIDE}`, { timeout: 15_000 })
@@ -146,6 +151,9 @@ async function main(): Promise<void> {
       base = await stepHideOneCard(page)
       if (base) {
         await stepPeekAndRestore(page, base)
+        // THE ONE LAUNCH THAT ALWAYS HOLDS A KILL: bosses-week reads the real log, whose newest
+        // character may have none, so the loadout HEADER is proved here on the committed fixture.
+        await stepLoadoutSectionsAreHonest(page)
         // Arm the restart: hide one card again and leave the peek wherever it lies — the set
         // must come back, the peek must not.
         await page.click(`${CARD} ${HIDE}`, { timeout: 15_000 })
