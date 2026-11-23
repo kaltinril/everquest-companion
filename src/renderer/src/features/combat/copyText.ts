@@ -27,6 +27,7 @@
 // The layout primitives every block shares live in copyTable.ts.
 
 import type { SegmentView, SourceView } from '@shared/combat'
+import type { PetGroupRow } from '@shared/combatPetGroups'
 import { flattenSkills, type MobBreakdown, type SkillRow, type TargetDetail } from './dashboardData'
 import { defenseHeadlineParts, defenseRowText, defenseRows, riposteLine, ripostesTakenLine } from './defenseRows'
 import { landEvidence } from './landEvidence'
@@ -81,6 +82,8 @@ export interface ShownSources {
   total: number
   dps: number
   activeDps: number
+  /** the "With its owner" layout's rows over `rows`, when the panel is drawing them. */
+  groups?: PetGroupRow[]
 }
 
 /** The whole direction, unscoped: what a caller with no panel pastes. */
@@ -119,8 +122,20 @@ function segmentStats(seg: SegmentView, mode: 'out' | 'in', shown: ShownSources)
   return stats
 }
 
+/**
+ * One "With its owner" row as the panel draws it: the master with the row's rank, the pets beneath
+ * it, and for a pair the figures in its total box. Every one of those is a number the row shows.
+ */
+function groupCells(g: PetGroupRow, rank: number, cells: (e: SourceView, rank: string) => string[], width: number): string[][] {
+  const lines = g.lines.map((l, i) => cells(l.source, i === 0 ? String(rank) : ''))
+  if (lines.length === 1) return lines
+  const together = ['', 'Together', formatNum(g.total), formatRate(g.dps)]
+  while (together.length < width) together.push('')
+  return [...lines, together]
+}
+
 /** The ranked source table. Optional columns appear only when some row HAS that data. */
-function sourceTable(rows: SourceView[], mode: 'out' | 'in', selfLabel: string | null = null): string[] {
+function sourceTable(rows: SourceView[], mode: 'out' | 'in', selfLabel: string | null, groups?: PetGroupRow[]): string[] {
   const showCrit = rows.some((r) => r.crits > 0)
   const showHit = rows.some((r) => r.misses > 0)
   const showResist = rows.some((r) => r.resists > 0)
@@ -134,16 +149,19 @@ function sourceTable(rows: SourceView[], mode: 'out' | 'in', selfLabel: string |
   if (showHit) cols.push({ header: 'Hit', align: 'right' })
   if (showResist) cols.push({ header: 'Resist', align: 'right' })
 
+  const cellsOf = (e: SourceView, rank: string): string[] => {
+    const cells = [rank, sourceName(e, selfLabel), formatNum(e.total), formatRate(e.dps)]
+    if (showCrit) cells.push(e.crits > 0 ? pctText(e.critPct) : '')
+    // Same omission the meter row makes: hit% is only meaningful once a swing was avoided.
+    if (showHit) cells.push(e.misses > 0 ? pctText(e.hitPct) : '')
+    if (showResist) cells.push(e.resists > 0 ? pctText(e.resistPct) : '')
+    return cells
+  }
   return table(
     cols,
-    rows.map((e, i) => {
-      const cells = [String(i + 1), sourceName(e, selfLabel), formatNum(e.total), formatRate(e.dps)]
-      if (showCrit) cells.push(e.crits > 0 ? pctText(e.critPct) : '')
-      // Same omission the meter row makes: hit% is only meaningful once a swing was avoided.
-      if (showHit) cells.push(e.misses > 0 ? pctText(e.hitPct) : '')
-      if (showResist) cells.push(e.resists > 0 ? pctText(e.resistPct) : '')
-      return cells
-    })
+    groups
+      ? groups.flatMap((g, i) => groupCells(g, i + 1, cellsOf, cols.length))
+      : rows.map((e, i) => cellsOf(e, String(i + 1)))
   )
 }
 
@@ -210,7 +228,7 @@ export function formatSegmentText(
     return out.join('\n')
   }
 
-  out.push('', ...sourceTable(rows, mode, selfLabel))
+  out.push('', ...sourceTable(rows, mode, selfLabel, shown.groups))
   if (mode === 'in') out.push(...healFooter(seg))
   return out.join('\n')
 }
