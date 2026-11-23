@@ -7,8 +7,8 @@
 //! may choose:
 //!
 //!   * `log`   — the MEDIAN of their own recent clean cycles, with no DB floor. A median, because
-//!               the point of choosing it is to stop one outlier deciding the bar. With no clean
-//!               cycle yet there is nothing to take a median of, and the automatic estimate stands.
+//!     the point of choosing it is to stop one outlier deciding the bar. With no clean
+//!     cycle yet there is nothing to take a median of, and the automatic estimate stands.
 //!   * `fixed` — exactly the number they typed.
 //!
 //! A choice is about the SPELL, so it applies to every caster of that line; `log` still reads each
