@@ -57,13 +57,14 @@ export function settingsRecoveryNotice(
 }
 
 const NOTICE_KINDS: readonly unknown[] = ['recovered', 'restored-backup', 'reset']
+const isNoticeKind = (v: unknown): v is SettingsRecoveryNotice['kind'] => NOTICE_KINDS.includes(v)
 
 /** A stored value, as the notice it should be; null for anything else. */
 function storedNotice(v: unknown): SettingsRecoveryNotice | null {
   if (typeof v !== 'object' || v === null) return null
   const { kind, title, text } = v as Partial<SettingsRecoveryNotice>
-  if (!NOTICE_KINDS.includes(kind) || typeof title !== 'string' || typeof text !== 'string') return null
-  return { kind: kind as SettingsRecoveryNotice['kind'], title, text }
+  if (!isNoticeKind(kind) || typeof title !== 'string' || typeof text !== 'string') return null
+  return { kind, title, text }
 }
 
 /** Where a notice waits until the player has closed it (the settings store, in main). */

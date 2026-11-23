@@ -15,7 +15,8 @@ const MAX_TEXT = 300
 
 export type FireHistory = Record<string, AlertFireRecord[]>
 
-const ownFires = (history: FireHistory, id: string): AlertFireRecord[] => (Object.hasOwn(history, id) ? history[id] : [])
+/** One alert's rows, by own key only: an id can be spelled like `constructor`. */
+const ownFires = (history: FireHistory, id: string): AlertFireRecord[] => new Map(Object.entries(history)).get(id) ?? []
 
 export interface AppFireLog {
   /** Take one report from the renderer. False when it names no known alert. */
