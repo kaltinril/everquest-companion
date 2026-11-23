@@ -801,6 +801,23 @@ silence measured: 8.4 s). Whether this is issue #9 I cannot say: it needs every 
 use to be busy with normal-priority work, which I only emulated. Separately, engine memory grows in
 a straight line with the log and reached 11.1 to 11.3 GiB at 2 GB.
 
+Diagnosis of 2026-11-22 (owner's PC, 5 watchdog kills, read from code and logs, nothing measured live):
+
+- All 5 report `connect, connect`: the probe never reached hello. Windows completes a loopback
+  connect without the engine's code, and the engine logged sockets the app closed before hello, so
+  main or the OS was late. Failed announces print before the World exists, so no engine lock explains them.
+- Proven: no socket write happens under the world lock (per-connection writer, unbounded queue). A
+  connection serves one request at a time, each fold wait up to 5 s (`SNAPSHOT_PATIENCE`), so
+  `session.health` can queue behind a snapshot. A request given up on is still computed.
+- Ranked, none proven: (1) the BelowNormal app starved by bursts of Normal-priority work on every
+  core (.NET builds lined up with two bad stretches; none found for the 19:28 kill); (2) main's event
+  loop stalling alone; (3) the serial reader amplifying either; (4) the once-a-minute state write's
+  fsync stalling ingest (does not explain the connect failures). A steady 60% on 16 CPUs is not enough.
+- To separate them: log a 1 s timer in main that fires over 1 s late, and an engine dispatch or tail
+  turn over 1 s. Main alone late is (2), an engine turn alone is (4), both during a build is (1).
+  With the app closed: 16 Normal-priority spinners for 60 s, "yield CPU to the game" on, then off.
+- Keeping the engine at Normal is an owner ruling (`processPriority.ts`), and does not help if main is late.
+
 - (stands, record only) 14 app launches (99 MB to 2 GB) ended no engine and logged no failed probe.
   In each one the engine had free cores and ran at Normal priority, because the e2e harness switches
   off the app's BelowNormal. During 500 MB to 2 GB reads, 1,140 probes on new connections took at
