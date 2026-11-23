@@ -116,3 +116,33 @@ fn a_saved_choice_decides_when_an_unwitnessed_debuff_row_goes() {
     feed(&mut chosen, &[later]);
     assert_eq!(active(&chosen), json!([]));
 }
+
+/// A mez already running moves to a saved choice at once, as a buff row does, and comes back with
+/// Automatic. A define that changes nothing announces nothing.
+#[test]
+fn a_saved_choice_moves_a_crowd_control_hold_already_running() {
+    let mut fold = fold_of(&[
+        r#"{"kind":"castBegin","seq":0,"ts":1000,"raw":"c","spell":"Mesmerization"}"#,
+        r#"{"kind":"cc","seq":1,"ts":2000,"raw":"m","mob":"a spiroc banisher","verb":"mesmerized","candidates":[{"name":"Mesmerization","durationMs":24000}]}"#,
+    ]);
+    let hold = |fold: &Fold| {
+        let timers = fold.registry.buff_timers().expect("the hold module");
+        let held = timers.holds();
+        assert_eq!(held.len(), 1, "one hold");
+        (held[0].duration_ms, timers.revision())
+    };
+    let (before, rev) = hold(&fold);
+    assert!(before.is_some_and(|ms| ms != 12_000), "{before:?}");
+
+    let chosen = json!({ "mesmerization": { "mode": "fixed", "ms": 12000 } });
+    choose(&mut fold, chosen.clone());
+    let (moved, moved_rev) = hold(&fold);
+    assert_eq!(moved, Some(12_000));
+    assert!(moved_rev > rev, "the change is announced");
+
+    choose(&mut fold, chosen);
+    assert_eq!(hold(&fold), (Some(12_000), moved_rev), "the same choice again moves nothing");
+
+    choose(&mut fold, json!({}));
+    assert_eq!(hold(&fold).0, before);
+}
