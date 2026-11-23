@@ -5,7 +5,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { RESPAWN_MAX_ROWS, cappedRowCount, type RespawnRow, type RespawnSnap } from '../src/shared/respawn'
-import { mergeRespawn, withHistoryRows } from '../src/shared/logArchive/mergeRespawn'
+import { mergeRespawn, standingAcross, withHistoryRows } from '../src/shared/logArchive/mergeRespawn'
 import { mergeModule } from '../src/shared/logArchive/mergeRules'
 import { respawnTierEmptyText, respawnTierView } from '../src/shared/respawnTiers'
 
@@ -79,6 +79,26 @@ test("across several archives the zone kept whole is today's, not the zone an ar
   assert.equal(inLake(merged.rows).length, TIERS.length)
   assert.equal(merged.rows.length, TIERS.length + RESPAWN_MAX_ROWS)
   assert.deepEqual(Object.keys(merged).sort(), Object.keys(live).sort(), 'the served state has the live shape')
+})
+
+test('a blank live zone over three archives keeps whole the zone the newest one ended in', () => {
+  const keys = ['the named', ...mobKeys(70)]
+  const live = snap('', [], keys)
+  const states = [snap('Zone 1', [], []), snap('Zone 2', [], []), snap(TIERS[1], [], [])]
+  const standing = standingAcross(states, live)
+  assert.equal(standing, TIERS[1])
+  const first = withHistoryRows(states[0], lakeRows(), live, standing)
+  const second = withHistoryRows(states[1], elsewhere(70), live, standing)
+  const third = withHistoryRows(states[2], [], live, standing)
+  const merged = mergeModule('respawn', [first, second, third], live).state as RespawnSnap
+  assert.equal(inLake(merged.rows).length, TIERS.length, 'the oldest archive keeps its clocks of that zone')
+  assert.equal(merged.rows.length, TIERS.length + RESPAWN_MAX_ROWS)
+  assert.equal(Object.hasOwn(merged, 'liveZone'), false, 'the served state has the live shape')
+})
+
+test('the standing zone is the live one when the live log has read a zone line', () => {
+  assert.equal(standingAcross([snap('Zone 1', [], [])], snap(LAKE, [], [])), LAKE)
+  assert.equal(standingAcross([snap('', [], [])], snap('', [], [])), undefined)
 })
 
 test('the overlay then shows the clock where you stand, never "none killed here yet"', () => {

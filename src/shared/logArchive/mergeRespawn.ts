@@ -300,11 +300,26 @@ export function withCurrentWiki(archived: unknown, wikiNow: RespawnWikiNow): unk
  * An archived state with its history rows for every mob `live` watches, `live`'s watch list, and
  * the zone `live` stands in (`liveZone`, for the row cap: `standingOf`; the join with the live state
  * drops it). A row the archived state already has is left as captured. Anything else comes back as is.
+ * `standing` is `standingAcross`'s answer, for a fresh live log with no zone line yet.
  */
-export function withHistoryRows(archived: unknown, history: readonly RespawnRow[], live: unknown): unknown {
+export function withHistoryRows(archived: unknown, history: readonly RespawnRow[], live: unknown, standing?: string): unknown {
   if (!isRespawnSnap(archived) || !isRespawnSnap(live)) return archived
   const watches = watchesOf(live)
   const have = new Set(archived.rows.map((r) => r.id))
   const extra = history.filter((r) => watches.has(r.key) && !have.has(r.id))
-  return { ...archived, prefs: live.prefs, rows: [...archived.rows, ...extra], liveZone: live.zone }
+  return { ...archived, prefs: live.prefs, rows: [...archived.rows, ...extra], liveZone: standing ?? live.zone }
+}
+
+/**
+ * The zone the player stands in, for every archive-to-archive join: the live log's, or, before its
+ * first zone line, the zone the newest archive ended in. An intermediate join sees only its own
+ * newer side, so with three or more archives it would keep the wrong zone whole.
+ */
+export function standingAcross(archived: readonly unknown[], live: unknown): string | undefined {
+  if (isRespawnSnap(live) && live.zone !== '') return live.zone
+  for (let i = archived.length - 1; i >= 0; i--) {
+    const state = archived[i]
+    if (isRespawnSnap(state) && state.zone !== '') return state.zone
+  }
+  return undefined
 }

@@ -41,7 +41,7 @@ import { archivedFightRows } from '../../shared/logArchive/mergeFights'
 import { hasMergeRule, mergeModule } from '../../shared/logArchive/mergeRules'
 import { MET_MODULE, metFromModules } from '../../shared/metNames'
 import { firstStart, withCorrections } from '../../shared/logArchive/mergeCombo'
-import { withCurrentWiki, withHistoryRows, type RespawnWikiNow } from '../../shared/logArchive/mergeRespawn'
+import { standingAcross, withCurrentWiki, withHistoryRows, type RespawnWikiNow } from '../../shared/logArchive/mergeRespawn'
 import type { ComboCorrection } from '../../shared/classCombo'
 import { HEAD_BYTES, logStampKey, type Segment } from '../../shared/logArchive/segment'
 import { listSegments, type SkippedFile } from './segmentStore'
@@ -123,7 +123,8 @@ function archivedFor(shown: readonly Segment[], moduleId: string, live: unknown,
   const kept = shown.filter((s) => Object.hasOwn(s.modules, moduleId))
   if (moduleId === 'respawn') {
     const wikiNow = deps.respawnWiki
-    const states = kept.map((s) => withHistoryRows(s.modules.respawn.state, s.respawnHistory ?? [], live))
+    const standing = standingAcross(kept.map((s) => s.modules.respawn.state), live)
+    const states = kept.map((s) => withHistoryRows(s.modules.respawn.state, s.respawnHistory ?? [], live, standing))
     return wikiNow === undefined ? states : states.map((s) => withCurrentWiki(s, wikiNow))
   }
   const states = kept.map((s) => s.modules[moduleId].state)
