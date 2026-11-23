@@ -24,7 +24,7 @@
  *
  * Run: `npm run test:e2e -- loot-append`.
  */
-import { closeSync, fsyncSync, openSync, writeSync } from 'node:fs'
+import { closeSync, fsyncSync, openSync, utimesSync, writeSync } from 'node:fs'
 import type { ElectronApplication, Page } from 'playwright-core'
 import { buildIfStale, check, dumpArtifacts, failures, note, reportRun, settle, sleep } from './appHarness.mjs'
 import { mainWindow, overlayWindow } from './appWindow.mjs'
@@ -248,12 +248,16 @@ async function crossed(rig: Rig, tag: string, mark: number, sent: readonly strin
 
 /** The first reply a window gets after the world moved: asked with no mark, answered from row 0. */
 async function restarted(rig: Rig, tag: string, mark: number): Promise<void> {
-  const frames = (await wire(rig.app)).slice(mark)
   for (const win of rig.windows) {
-    const first = frames.find((f) => f.who === win.name && !f.none)
+    // An unchanged ledger already equals a full read, so the law can pass before this reply lands.
+    const all = await settle(() => wire(rig.app), (w) => w.slice(mark).some((f) => f.who === win.name && !f.none), { timeoutMs: WAIT_MS })
+    const first = all.slice(mark).find((f) => f.who === win.name && !f.none)
     check(`${tag}: ${win.name} asked again with no mark and got the ledger from row 0`, first?.known === null && first.from === 0, JSON.stringify(first ? { known: first.known, from: first.from, rows: first.items.length } : null))
   }
 }
+
+/** The log stamps whole seconds, so a row that must draw on top is written in a second of its own. */
+const nextSecond = (): Promise<void> => sleep(1_100)
 
 /** The table on screen: the newest pickup is its top row, and no token is drawn twice. */
 async function drawn(rig: Rig, tag: string, newest: string): Promise<void> {
@@ -268,6 +272,7 @@ async function drawn(rig: Rig, tag: string, newest: string): Promise<void> {
 async function stepOnePickup(rig: Rig): Promise<void> {
   const mark = (await wire(rig.app)).length
   const mote = 'Mote of Infinitesimal Potential'
+  await nextSecond()
   pick(rig, 'Primitive', [mote])
   await lawHolds(rig, 'one pickup')
   await crossed(rig, 'one pickup', mark, [mote])
@@ -285,6 +290,7 @@ async function stepSinglesInARow(rig: Rig): Promise<void> {
   for (let i = 0; i < 4; i += 1) {
     const mark = (await wire(rig.app)).length
     const item = token()
+    await nextSecond()
     pick(rig, 'Primitive', [item])
     await lawHolds(rig, `single ${String(i + 1)}`)
     await crossed(rig, `single ${String(i + 1)}`, mark, [item])
@@ -336,6 +342,7 @@ async function stepCharacterSwitch(rig: Rig): Promise<void> {
 
   mark = (await wire(rig.app)).length
   const there = token()
+  await nextSecond()
   pick(rig, OTHER, [there])
   await lawHolds(rig, 'a pickup on the other character')
   await crossed(rig, 'a pickup on the other character', mark, [there])
@@ -397,7 +404,10 @@ async function main(): Promise<void> {
   // The other character's own row, in its log before launch, so the two ledgers differ from the start.
   const theirs = token()
   writeLines(log.others[OTHER], [looted(theirs)])
-  // The app opens on the log written last, and this spec starts on the first character.
+  // The app opens on the log written last, and this spec starts on the first character. Two writes
+  // in a row can share a file-time tick, so the other log is dated a minute back.
+  const earlier = new Date(Date.now() - 60_000)
+  utimesSync(log.others[OTHER], earlier, earlier)
   log.append("You say, 'ready'")
   const { app, close } = await launchOnFixture(log, { env: { NODE_USE_ENV_PROXY: '1', HTTPS_PROXY: 'http://127.0.0.1:9' } })
   const page = await mainWindow(app)
