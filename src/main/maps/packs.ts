@@ -27,7 +27,9 @@
 //     outcome is recorded in `MapData.sources` — an unlabelled merge would be exactly the kind
 //     of silent inference world-model law 1 forbids.
 
+import { createHash } from 'node:crypto'
 import { readFileSync, readdirSync, statSync } from 'node:fs'
+import { readdir, stat } from 'node:fs/promises'
 import { join } from 'node:path'
 import { scoreQuery, tokenize } from '../../shared/fuzzy'
 import { isSafePackId } from '../security'
@@ -287,6 +289,14 @@ export interface MapLibrary {
   search: (query: string, opts?: MapSearchOpts) => MapSearchHit[]
   /** Drop every cache and re-scan the roots (a pack was installed/removed). */
   refresh: () => void
+  /**
+   * Compare the map files on disk with the last look and `refresh` when they differ. True when
+   * they did. The first call only takes the baseline. Reads names, sizes and times, off the main
+   * thread; nothing here opens a map, and nothing leaves this machine.
+   */
+  refreshIfChanged: () => Promise<boolean>
+  /** Counts refreshes, so what is built from the maps (zoneGraph.ts) knows to build again. */
+  generation: () => number
 }
 
 /** One walk's label points per file path (`MapLibrary.labels`); null for an unreadable file. */
@@ -367,14 +377,100 @@ function memoLabels(
   }
 }
 
+/** How many files are stat-ed at once: the walk shares libuv's small thread pool with the app. */
+const STAT_BATCH = 32
+
+/** One directory's map files as `name:size:mtime`, sorted. A file gone mid-walk is left out. */
+async function dirFileRows(dir: string, names: readonly string[]): Promise<string[]> {
+  const rows: string[] = []
+  for (let i = 0; i < names.length; i += STAT_BATCH) {
+    const batch = names.slice(i, i + STAT_BATCH)
+    const stats = await Promise.all(batch.map((name) => stat(join(dir, name)).catch(() => null)))
+    stats.forEach((s, at) => {
+      if (s !== null) rows.push(`${batch[at]}:${String(s.size)}:${String(s.mtimeMs)}`)
+    })
+  }
+  return rows.sort()
+}
+
+/** A directory's subfolders and map files; a missing or unreadable one is empty, as in `listNames`. */
+async function listMapDir(dir: string): Promise<{ files: string[]; dirs: string[] }> {
+  try {
+    const entries = await readdir(dir, { withFileTypes: true })
+    return {
+      files: entries.filter((e) => e.isFile() && /\.txt$/i.test(e.name)).map((e) => e.name),
+      dirs: entries.filter((e) => e.isDirectory()).map((e) => e.name)
+    }
+  } catch {
+    return { files: [], dirs: [] }
+  }
+}
+
+/**
+ * A fingerprint of every map file the roots can offer. Each file is stat-ed, because a directory's
+ * own time does not move when a file in it is overwritten, which is how a map pack gets updated.
+ */
+async function mapFilesStamp(opts: MapLibraryOptions): Promise<string> {
+  const hash = createHash('sha1')
+  const addDir = async (dir: string): Promise<string[]> => {
+    const { files, dirs } = await listMapDir(dir)
+    hash.update(`${dir}\n${(await dirFileRows(dir, files)).join('\n')}\n`)
+    return dirs.sort()
+  }
+  const roots = opts.eqRoot ? [join(opts.eqRoot, MAPS_SUBDIR)] : []
+  if (opts.userPacksRoot) roots.push(opts.userPacksRoot)
+  for (const root of roots) {
+    for (const name of await addDir(root)) await addDir(join(root, name))
+  }
+  return hash.digest('hex')
+}
+
+/**
+ * `refreshIfChanged`: overlapping calls share one walk, so one change is one refresh. `baseline`
+ * is taken when the packs are first scanned: a pack copied in between that scan and the player's
+ * first visit to the Maps tab is the change this exists to find.
+ */
+function changeCheck(opts: MapLibraryOptions, refresh: () => void): { check: () => Promise<boolean>; baseline: () => void } {
+  let last: string | null = null
+  let running: Promise<boolean> | null = null
+  const check = async (): Promise<boolean> => {
+    const stamp = await mapFilesStamp(opts)
+    const changed = last !== null && stamp !== last
+    last = stamp
+    if (changed) refresh()
+    return changed
+  }
+  const shared = (): Promise<boolean> => {
+    running ??= check().finally(() => {
+      running = null
+    })
+    return running
+  }
+  return {
+    check: shared,
+    baseline: () => {
+      if (last === null) void shared()
+    }
+  }
+}
+
 export function createMapLibrary(opts: MapLibraryOptions): MapLibrary {
   const onError = opts.onError ?? ((): void => undefined)
+  let generation = 0
   let scanned: PackIndex[] | null = null
   let corpus: CorpusRow[] | null = null
   // Insertion-ordered = LRU: a hit re-inserts at the end, eviction takes the first key.
   const cache = new Map<string, MapData>()
 
-  const packs = (): PackIndex[] => (scanned ??= discoverPacks(opts))
+  const changes = changeCheck(opts, refresh)
+
+  function packs(): PackIndex[] {
+    if (scanned === null) {
+      scanned = discoverPacks(opts)
+      changes.baseline()
+    }
+    return scanned
+  }
 
   const readText = textReader(onError)
 
@@ -465,6 +561,13 @@ export function createMapLibrary(opts: MapLibraryOptions): MapLibrary {
     return { ok: true, data }
   }
 
+  function refresh(): void {
+    generation += 1
+    scanned = null
+    corpus = null
+    cache.clear()
+  }
+
   return {
     packs: () => packs().map(({ pack: { dir: _dir, ...info } }) => info),
     zones: (packId) => {
@@ -486,10 +589,8 @@ export function createMapLibrary(opts: MapLibraryOptions): MapLibrary {
         ? inZone(searchOpts.zone, tokens, limit, searchOpts.prefs ?? {})
         : rank(corpusRows(), tokens, limit)
     },
-    refresh: () => {
-      scanned = null
-      corpus = null
-      cache.clear()
-    }
+    refresh,
+    refreshIfChanged: changes.check,
+    generation: () => generation
   }
 }

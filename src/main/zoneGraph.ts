@@ -27,7 +27,8 @@
 //
 // MEMOIZED AGAINST THE LIBRARY INSTANCE, not forever: `mapLibrary()` hands back a fresh object when
 // the EQ directory changes (its own header says so), and a graph read off the old directory would
-// then describe maps the player no longer has.
+// then describe maps the player no longer has. The same goes for a library that refreshed because
+// its files changed on disk (`generation`, packs.ts `refreshIfChanged`).
 //
 // A ZONE WITH NO LABELLED SEAMS IS ABSENT, not present-and-empty. Measured: 90 of 213 maps label
 // at least one seam. The search adds the reverse of every stated edge, so a zone absent here is
@@ -38,7 +39,7 @@ import type { LabelMemo } from './maps/packs'
 import { zoneExits, type ZoneExit, type ZoneGraph } from '../shared/zoneTravel'
 import type { ZoneShort } from '../shared/maps'
 
-let CACHE: { library: unknown; graph: Promise<ZoneGraph> } | null = null
+let CACHE: { library: unknown; generation: number; graph: Promise<ZoneGraph> } | null = null
 
 /** One turn of the event loop, so a long build does not hold the main process. */
 const yieldTurn = (): Promise<void> => new Promise((resolve) => setImmediate(resolve))
@@ -60,9 +61,10 @@ const yieldTurn = (): Promise<void> => new Promise((resolve) => setImmediate(res
  */
 export function zoneGraph(): Promise<ZoneGraph> {
   const library = mapLibrary()
-  if (CACHE !== null && CACHE.library === library) return CACHE.graph
+  if (CACHE !== null && CACHE.library === library && CACHE.generation === library.generation()) return CACHE.graph
+  const generation = library.generation()
   const graph = buildGraph(library)
-  CACHE = { library, graph }
+  CACHE = { library, generation, graph }
   graph.catch(() => {
     if (CACHE?.graph === graph) CACHE = null
   })

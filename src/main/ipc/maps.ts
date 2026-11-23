@@ -96,6 +96,9 @@ export function registerMapsIpc(): void {
   // Likewise no argument. The first call parses every map in the default pack once (`zoneGraph`
   // memoizes); a Map cannot cross IPC, so it goes as entries and the renderer rebuilds it.
   ipcMain.handle(IPC.mapsGraph, async () => [...(await zoneGraph())])
+  // Asked once per visit to the Maps tab: the files may have changed since the last look (a pack
+  // copied in, a map updated). Local only: names, sizes and times off the disk.
+  ipcMain.handle(IPC.mapsRefresh, () => mapLibrary().refreshIfChanged())
   ipcMain.handle(IPC.mapsMobPlaces, () => mobPlaces())
   ipcMain.on(IPC.overlaySetMarkZones, (_e, kind: OverlayKind, rects: unknown, hidden: unknown) => {
     setOverlayMarkZones(kind, rects, hidden === true)
