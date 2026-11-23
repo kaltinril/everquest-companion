@@ -13,18 +13,42 @@ import assert from 'node:assert/strict'
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { load } from 'js-yaml'
 import { FROZEN_EXE, identityProblems } from '../scripts/community/check-release-identity.mts'
 
-interface BuilderConfig {
-  appId: string
-  productName: string
-  executableName: string
-  publish: { provider: string; url: string; channel: string }[]
-  nsis: Record<string, unknown>
+// Read as text, the way enginePackaging.test.mts reads this file: no YAML parser is a direct
+// dependency of this repo.
+const builderLines = readFileSync('electron-builder.yml', 'utf8').split(/\r?\n/)
+
+/** The lines of one top-level block, comments and blanks dropped, indentation off. */
+function block(key: string): string[] {
+  const start = builderLines.indexOf(`${key}:`)
+  assert.notEqual(start, -1, `electron-builder.yml has no top-level ${key}`)
+  const end = builderLines.findIndex((line, i) => i > start && /^\S/.test(line) && !line.startsWith('#'))
+  return builderLines
+    .slice(start + 1, end === -1 ? undefined : end)
+    .map((line) => line.trim())
+    .filter((line) => line !== '' && !line.startsWith('#'))
 }
 
-const builder = load(readFileSync('electron-builder.yml', 'utf8')) as BuilderConfig
+/** The value of a `key: value` line among `lines`, or undefined. */
+function value(lines: readonly string[], key: string): string | undefined {
+  const prefix = `${key}: `
+  return lines.find((line) => line.startsWith(prefix))?.slice(prefix.length)
+}
+
+const builder = {
+  appId: value(builderLines, 'appId'),
+  productName: value(builderLines, 'productName'),
+  executableName: value(builderLines, 'executableName'),
+  publish: block('publish'),
+  nsis: {
+    guid: value(block('nsis'), 'guid'),
+    oneClick: value(block('nsis'), 'oneClick'),
+    perMachine: value(block('nsis'), 'perMachine'),
+    shortcutName: value(block('nsis'), 'shortcutName'),
+    artifactName: value(block('nsis'), 'artifactName')
+  }
+}
 const pkg = JSON.parse(readFileSync('package.json', 'utf8')) as { name: string; productName?: string }
 const channelTs = readFileSync('src/main/channel.ts', 'utf8')
 const installer = readFileSync('build/installer.nsh', 'utf8')
@@ -32,14 +56,12 @@ const installer = readFileSync('build/installer.nsh', 'utf8')
 test('the ids existing installs depend on have not moved', () => {
   assert.equal(builder.appId, 'com.kaltinril.everquest-companion.test')
   assert.equal(builder.executableName, 'EQ Legends Companion TEST')
-  assert.equal(`${builder.executableName}.exe`, FROZEN_EXE)
+  assert.equal(`${String(builder.executableName)}.exe`, FROZEN_EXE)
   assert.equal(builder.nsis.guid, undefined, 'a set guid replaces the one made from appId')
   assert.deepEqual(builder.publish, [
-    {
-      provider: 'generic',
-      url: 'https://github.com/kaltinril/everquest-companion/releases/latest/download/',
-      channel: 'test'
-    }
+    '- provider: generic',
+    'url: https://github.com/kaltinril/everquest-companion/releases/latest/download/',
+    'channel: test'
   ])
   assert.equal(pkg.name, 'everquest-companion-test')
   assert.equal(pkg.productName, undefined, 'a productName here would change app.getName()')
@@ -47,8 +69,8 @@ test('the ids existing installs depend on have not moved', () => {
 })
 
 test('the one-click per-user shape that puts the install folder under the package name', () => {
-  assert.equal(builder.nsis.oneClick, true)
-  assert.equal(builder.nsis.perMachine, false)
+  assert.equal(builder.nsis.oneClick, 'true')
+  assert.equal(builder.nsis.perMachine, 'false')
 })
 
 test('what players see says CE', () => {
