@@ -130,13 +130,35 @@ async function checkHome(page: Page): Promise<void> {
   const unseen = await unseenPanels(page)
   if (unseen.length === 0) note('the log has shown every tradeskill: no "Not in log" tile is drawn and none was checked')
   else {
-    const odd = unseen.filter((d) => !d.inGrid || d.words !== NOT_IN_LOG_TEXT || d.numbers !== 0 || d.buttons !== 1 || d.bars !== 1 || d.fill !== 0 || d.next !== 0)
+    const odd = unseen.filter((d) => !d.inGrid || d.words !== NOT_IN_LOG_TEXT || d.numbers !== 0 || d.buttons !== 2 || d.bars !== 1 || d.fill !== 0 || d.next !== 0)
     check('a tradeskill the log never showed is a tile of the grid reading "Not in log", with an empty bar, no number and no next recipe', odd.length === 0, odd.map((d) => d.name).join(', '))
   }
   check('the old row of small buttons is gone', (await countOf(page, sel('tradeskills-unseen'))) === 0)
   const sources = await textOf(page, sel('tradeskills-sources'))
   check('the foot of Home names the sources', sources.startsWith('Sources:') && /wiki data/i.test(sources) && /your own log/i.test(sources), sources)
   check('…as words: no link on Home leaves for another host', (await foreignLinks(page, HOME)).length === 0)
+}
+
+/** Hides one not-in-log tile, finds it on the bottom line, and brings it back, leaving Home as it was. */
+async function checkHideTile(page: Page): Promise<void> {
+  const [first] = await unseenPanels(page)
+  if (first === undefined) {
+    note('the log has shown every tradeskill: no tile to hide, the Hide steps did not run')
+    return
+  }
+  const tile = sel(`tradeskill-tile-${first.name}`)
+  const line = sel('tradeskills-hidden-line')
+  const back = `${line} ${sel(`tradeskill-hidden-${first.name}`)}`
+  check('nothing is on the hidden line until the player hides something', (await countOf(page, line)) === 0)
+  await page.click(`${tile} ${sel('tradeskill-tile-hide')}`)
+  check('Hide takes the tile out of the grid', await settleGone(page, tile, { timeoutMs: 10_000 }))
+  check('…and puts it on the line at the bottom', (await settle(() => countOf(page, back), (n) => n === 1, { timeoutMs: 10_000 })) === 1)
+  check('…without opening its workbench', (await countOf(page, BENCH)) === 0)
+  const kept = await page.evaluate(() => localStorage.getItem('eq.tradeskills.hiddenTiles'))
+  check('the choice is stored', (kept ?? '').includes(first.name), kept ?? 'nothing stored')
+  await page.click(back)
+  check('a click on the line brings the tile back', (await settle(() => countOf(page, tile), (n) => n === 1, { timeoutMs: 10_000 })) === 1)
+  check('…and the empty line goes away', await settleGone(page, line, { timeoutMs: 10_000 }))
 }
 
 /** Opens the workbench "Pick up where you left off" names; false when the panel is not drawn. */
@@ -200,6 +222,7 @@ async function checkSkillsDoor(page: Page): Promise<void> {
 export async function stepHomeAndWish(page: Page): Promise<void> {
   if (!check('Home opens from any screen of the section', await goHome(page))) return
   await checkHome(page)
+  await checkHideTile(page)
   if (await checkPickUp(page)) await checkWish(page)
   await checkSkillsDoor(page)
 }

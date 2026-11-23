@@ -226,6 +226,47 @@ export function unseenFace(tradeskill: Tradeskill, served: boolean): UnseenFace 
   return { level: NOT_IN_LOG_TEXT, of, tip: UNSEEN_DOOR_TIP, label: `${tradeskill}: ${NOT_IN_LOG_TEXT}${of === '' ? '' : ` ${of}`}` }
 }
 
+// A not-in-log tile starts visible, and the player may fold it to one line at the bottom of Home
+// (owner, 2026-11-22: "this way it starts out visible and they CHOSE to hide it"). Only such a tile
+// folds: a tradeskill that rises in the log becomes an ordinary tile, whatever was stored for it.
+
+export const HIDE_TILE_TEXT = 'Hide'
+
+export const HIDDEN_LINE_LABEL = 'Hidden, click to show:'
+
+export const SHOW_ALL_HIDDEN_TEXT = 'Show all'
+
+export function hideTileTip(tradeskill: Tradeskill): string {
+  return `Move ${tradeskill} to one line at the bottom. You can bring it back from there.`
+}
+
+export function showTileTip(tradeskill: Tradeskill): string {
+  return `Show the ${tradeskill} panel again`
+}
+
+/** The stored choice, in the app's tradeskill order. Anything unreadable hides nothing. */
+export function parseHiddenTiles(raw: string | null): Tradeskill[] {
+  try {
+    const stored: unknown = JSON.parse(raw ?? '[]')
+    if (!Array.isArray(stored)) return []
+    const names = stored as unknown[]
+    return TRADESKILLS.filter((tradeskill) => names.includes(tradeskill))
+  } catch {
+    return []
+  }
+}
+
+/** The not-in-log tiles the grid draws, and the ones the player folded to the line below it. */
+export function splitHidden(
+  unseen: readonly TradeskillTile[],
+  hidden: readonly Tradeskill[]
+): { shown: TradeskillTile[]; folded: TradeskillTile[] } {
+  return {
+    shown: unseen.filter((tile) => !hidden.includes(tile.tradeskill)),
+    folded: unseen.filter((tile) => hidden.includes(tile.tradeskill))
+  }
+}
+
 /** Every tile's recipe line: "143 wiki recipes" (the wiki's, under the era setting). */
 export function tileRecipesText(recipes: number): string {
   return recipes === 1 ? '1 wiki recipe' : `${String(recipes)} wiki recipes`

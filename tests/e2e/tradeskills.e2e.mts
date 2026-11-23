@@ -108,8 +108,9 @@ async function stepHome(page: Page): Promise<string> {
   const words = await textOf(page, `${sel('tradeskills-tiles')} > ${tile('Pottery')}[data-tile="unseen"] ${sel('tradeskill-tile-not-in-log')}`)
   check('a tradeskill the log never showed is a tile of the grid reading "Not in log"', words === NOT_IN_LOG_TEXT, words)
   check('…with its top', (await textOf(page, `${tile('Pottery')} ${sel('tradeskill-bar-of')}`)) === 'of 300')
-  check('…one button, an empty bar, no level number and no next recipe',
-    (await countOf(page, `${tile('Pottery')} button`)) === 1 &&
+  check('…its door and its Hide button, an empty bar, no level number and no next recipe',
+    (await countOf(page, `${tile('Pottery')} button`)) === 2 &&
+      (await countOf(page, `${tile('Pottery')} ${sel('tradeskill-tile-hide')}`)) === 1 &&
       (await countOf(page, `${tile('Pottery')} ${sel('tradeskill-bar')}[data-fill="0.000"]`)) === 1 &&
       (await countOf(page, `${tile('Pottery')} ${sel('tradeskill-tile-level')}`)) === 0 &&
       (await countOf(page, `${tile('Pottery')} ${sel('tradeskill-tile-next')}`)) === 0)
