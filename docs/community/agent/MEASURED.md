@@ -144,8 +144,15 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
   denomination. NOT CHECKED: whether the faction receipts the app counts survive that 4-block cap.
 - **Levels.** 08-18: grouping gives a small experience bonus. 06-23: zone experience modifiers
   changed. 11-10: Reincarnation resets each class and the race of a level-50 three-class loadout
-  to level 1 for reincarnation AAs (early access now, everyone on 2026-12-08). NOT CHECKED: what
-  the app's level history does with that reset.
+  to level 1 for reincarnation AAs (early access now, everyone on 2026-12-08). What the app's level
+  history does with that reset (2026-11-22, the owner's two): the dings restart at 2 and
+  `buildLevelSegments` reads the drop as a class swap, so each reincarnation is a dashed break, one
+  of the Level over time chart's "class swaps" (23 on his log, 2 of them these) and an `afterSwap`
+  feed row. The label is wrong and was left alone. One reincarnation prints a race line and three
+  class lines in one second as cost-0 AA purchases (`Class Reincarnation: Warrior`, then `... 2`
+  through "improved"). None of his 240 purchase lines repeats an ability and rank, so the re-log a
+  comment in `progressionStatsTypes.ts` describes is not seen on this log. The Reincarnations panel
+  (`shared/reincarnationClimbs.ts`) guards against it anyway.
 - **Log lines.** 07-07: the rank is in `begin casting` lines; heal crits are logged. 09-15: the
   rank suffix is in interrupt, fizzle, wore-off and damage lines. 08-25: several item rewards
   print a count.
