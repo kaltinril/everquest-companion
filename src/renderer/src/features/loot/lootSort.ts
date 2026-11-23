@@ -107,6 +107,16 @@ export function compareLootRows(
   return (a, b) => sign * cmp(a, b) || byItem(a, b)
 }
 
+/**
+ * THE FLAT LEDGER'S ORDER: the ledger is oldest first, in the order the log wrote it, so its reverse
+ * is newest first down to the rows of one second, the last one written on top. Here rather than in
+ * lootGrouping.ts so a node test can reach it (the header above). The GROUPED table is a different
+ * order: rows that tie there on count and second fall to the item name, A to Z.
+ */
+export function newestFirst<T>(ledger: readonly T[]): T[] {
+  return [...ledger].reverse()
+}
+
 /** Non-mutating sort — the caller's array is tally output it may still be holding. */
 export function sortLootRows<T extends SortableLootRow>(rows: readonly T[], sort: LootSort, invOf?: InvOf): T[] {
   return [...rows].sort(compareLootRows(sort, invOf))

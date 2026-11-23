@@ -2,7 +2,7 @@ import type { LootDisposition, LootEvent } from '@shared/types'
 import { isAcquisition } from '@shared/lootDisposition'
 import type { InventoryRow } from '../inventory/reconcile'
 import { questItemNames } from './lootItemData'
-import { DEFAULT_LOOT_SORT, naturalDir, sortLootRows, type InvOf, type LootSort } from './lootSort'
+import { DEFAULT_LOOT_SORT, naturalDir, newestFirst, sortLootRows, type InvOf, type LootSort } from './lootSort'
 import { buildOwnedRows } from './ownedItems'
 
 // A loot event with two precomputed keys — computed ONCE per history change so the
@@ -47,7 +47,7 @@ export function filterLootEvents({
   if (questOnly) list = list.filter((e) => questItemNames.has(e.countKey))
   // eslint-disable-next-line eqc/no-domain-munging -- JOS-459 cutover ledger item 3: no served view source answers this yet, so the renderer still derives KeyedLoot. Becomes a view descriptor when the source lands.
   if (q) list = list.filter((e) => e.itemKey.includes(q))
-  return [...list].reverse() // most recent first
+  return newestFirst(list)
 }
 
 interface Group {

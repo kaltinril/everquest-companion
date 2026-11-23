@@ -35,11 +35,13 @@ import {
   isLootSortKey,
   naturalDir,
   nextLootSort,
+  newestFirst,
   DEFAULT_LOOT_SORT,
   type LootSort,
   type LootSortKey,
   type SortableLootRow
 } from '../src/renderer/src/features/loot/lootSort'
+import { createLootFrameReader, createLootFrames, type LootFrame, type LootMark } from '../src/shared/lootFrame'
 
 /** Every column the grouped table sorts on (the header's own list). */
 const KEYS: readonly LootSortKey[] = ['item', 'count', 'inventory', 'source', 'zones', 'recent']
@@ -123,6 +125,34 @@ test('every order is TOTAL — no order depends on the input order', () => {
     // …and a fully tied set lands in name order rather than in arrival order.
     assert.deepEqual(forward, ['Alpha', 'Beta', 'Gamma'])
   }
+})
+
+test('THE FLAT LEDGER: rows of one second draw last written first, after a full read and after an append alike', async () => {
+  const ts = 1_700_000_000_000
+  const older = { ts: ts - 5_000, item: 'Older' }
+  const trio = ['Zebra Hide', 'Alpha Rune', 'Mid Stone'].map((item) => ({ ts, item }))
+  const server = createLootFrames()
+  let ledger: { ts: number; item: string }[] = [older]
+  let seq = 1
+  const froms: number[] = []
+  const ask = (known: LootMark | null): Promise<LootFrame | null> => {
+    const reply = server.answer({ seq, state: ledger }, known)
+    if (reply !== null && 'from' in reply) froms.push(reply.from)
+    return Promise.resolve(reply)
+  }
+  const reader = createLootFrameReader(ask)
+  await reader.read()
+  ledger = [older, ...trio]
+  seq = 2
+  const appended = (await reader.read())?.state as typeof ledger
+  assert.equal(froms.at(-1), 1, 'the second read was an append of the three new rows')
+  const full = (await createLootFrameReader(ask).read())?.state as typeof ledger
+  assert.equal(froms.at(-1), 0, 'a reader with no copy gets the whole ledger')
+  const want = ['Mid Stone', 'Alpha Rune', 'Zebra Hide', 'Older']
+  assert.deepEqual(newestFirst(appended).map((r) => r.item), want)
+  assert.deepEqual(newestFirst(full).map((r) => r.item), want)
+  assert.equal(appended.length, 4, 'the ledger itself is not reordered in place')
+  assert.equal(appended[0].item, 'Older')
 })
 
 test('sortLootRows does not mutate its input', () => {
