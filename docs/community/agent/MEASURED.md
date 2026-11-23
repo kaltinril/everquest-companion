@@ -293,6 +293,13 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
   Greater 2. Condensed two to one upward, the item experience an hour usable at a tier: +4 18.6, +5
   12.5, +6 7.8, +7 4.55, +8 2.6, +9 1.45. Hours for one tier by motes alone: 0.9, 2.6, 8.2, 28, 98,
   353. Active play over the same logs: 494 h in 14.3 weeks.
+- **Fragments of Potential** (owner's logs, 2026-11-10 to 11-22, 64 active hours): none before the
+  11-10 patch; 98 looted (Infinitesimal 63, Minor 1, Major 28, Greater 6), 64 of them from Reward
+  Chests. Usable item experience an hour, condensed two to one: +4 5.04, +5 3.79, +6 2.76, +7 1.89,
+  +8 1.38, +9 0.97. Loot lines read `You looted N Fragment of <grade> Potential from <source> and
+  stored it in your currency`. The game's window for Fragment of Minor Potential (2026-11-22): Item
+  Upgrade 3, Item Max Tier 2, Spell Upgrade 4. The wiki gives 3, a limit of +1, and 4: whether Max
+  Tier 2 means "raises an item to +2" (the wiki's limit) or "usable on a +2" is not tested.
 - **Raid cadence:** a raid boss at D4 1.3 kills a week (Innoruuk, 14 in 11 weeks); each plane entered
   at D4 1 to 3 times a week; `<Zone> - Group[ N (Adj)]` is also the group RAID instance (the first
   void mote arrived with the Innoruuk kill in `The Plane of Hate - Group`).

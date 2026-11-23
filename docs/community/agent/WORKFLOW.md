@@ -419,6 +419,10 @@ disagree, RULES.md wins; fix this file.
   hung). Say so in every brief; to see a test fail against the old code, copy the changed file to a
   scratch folder and restore it. `git merge-tree --write-tree a b` is the safe trial merge: it
   writes only unreferenced objects.
+- Never use `cmd start` for a low-priority job, from either shell (2026-11-22: Git Bash garbled
+  `cmd //c 'start "" /belownormal ...'` and Windows put a "cannot find '\\'" dialog on the owner's
+  screen mid-game). Use PowerShell: `$p = Start-Process <exe> -ArgumentList ... -WindowStyle Hidden
+  -PassThru; $p.PriorityClass = 'BelowNormal'`. Say so in every brief that asks for low priority.
 
 - **A scratch Playwright probe of the e2e app** (`tests/e2e/appWindow.mts` `mainWindow`,
   `logFixture.mts` `stageFixture` + `appendAt` + `launchOnFixture`) is the way to watch a tab
