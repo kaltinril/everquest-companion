@@ -205,10 +205,10 @@ test("THE OWNER'S ORDER OF SCARCITY: a weekly raid boss's drop, then a raid zone
 
 // ---- hours, and the tier gate -------------------------------------------------------------------
 
-test('moteHours: the tier over copies plus the share of ordinary motes; no stated road counts motes alone', () => {
-  // +7 is 128 experience; motes bring 4.55 an hour and one item's share of them is a twentieth.
-  assert.deepEqual(moteHours(7, undefined), { hours: 562.6, road: 'motes' })
-  assert.deepEqual(moteHours(7, { kind: 'unknown', roads: 0 }), { hours: 562.6, road: 'motes' })
+test('moteHours: the tier over copies plus the share of motes and fragments; no stated road counts those alone', () => {
+  // +7 is 128 experience; motes bring 4.55 an hour, fragments 1.89, and one item's share is a twentieth.
+  assert.deepEqual(moteHours(7, undefined), { hours: 397.5, road: 'motes' })
+  assert.deepEqual(moteHours(7, { kind: 'unknown', roads: 0 }), { hours: 397.5, road: 'motes' })
   const farm = moteHours(7, supplyOf('Earring of Experimentation'))
   assert.equal(farm.road, 'copies')
   assert.ok(farm.hours < 2, String(farm.hours))
@@ -415,7 +415,7 @@ test('the tab words: target names, the gain, the changes, the copies and the hou
   assert.equal(moteChangesText({ changes: [...changes] }), 'AC 66→70 · SV VOID -→1 · WEIGHT 1.5→0.8')
   // The cost is item experience: a dropped +4 copy is worth 16 of it, so it is never "128 copies".
   assert.equal(moteHoursTitle({ copies: 128, road: 'copies' }), 'Without a mote: 128 item experience, mostly by farming copies')
-  assert.equal(moteHoursTitle({ copies: 1024, road: 'motes' }), 'Without a mote: 1,024 item experience, mostly by ordinary motes')
+  assert.equal(moteHoursTitle({ copies: 1024, road: 'motes' }), 'Without a mote: 1,024 item experience, mostly by motes and fragments')
   assert.equal(moteHoursText({ hours: 5.1 }), '5.1 h')
   assert.equal(moteHoursText({ hours: 1189.6 }), '1,190 h')
 })
@@ -425,7 +425,7 @@ test('the tab words: the source, what it assumed, and why a row is not yet a pic
   assert.equal(moteSourceText(supplyOf('Earring of Experimentation')), 'Camp: every kill, 12 min respawn')
   assert.equal(moteSourceText(supplyOf("Blood's Unity")), 'Camp: 1 in 5, 15 min respawn, hard fight')
   assert.equal(moteSourceText(supplyOf('Indicolite Vambraces')), 'Raid zone: 1 in 71')
-  assert.equal(moteSourceTitle(undefined), 'No page lists where it comes from, so only ordinary motes are counted')
+  assert.equal(moteSourceTitle(undefined), 'No page lists where it comes from, so only motes and fragments are counted')
   assert.equal(moteSourceTitle(supplyOf('Bone Chip Ring')), `a skeleton: about ${String(perWeek('Bone Chip Ring'))} experience a week over 3 sources; respawn, spawn points assumed`)
   assert.equal(moteGateText({ gate: 'early', gain: 3 }), 'Below +7: ordinary motes get it there')
   assert.equal(moteGateText({ gate: 'rare', gain: 3 }), 'Below +7, but copies barely exist')

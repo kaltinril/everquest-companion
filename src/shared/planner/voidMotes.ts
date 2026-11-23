@@ -44,7 +44,14 @@ export const MOTE_RULES = {
    */
   moteExpPerHour: [18.6, 18.6, 18.6, 18.6, 18.6, 12.5, 7.8, 4.55, 2.6, 1.45],
   /**
-   * The share of those motes counted toward ONE item: a character wears about twenty pieces and has
+   * The same for Fragments of Potential, which began dropping with the 2026-11-10 patch and so are
+   * measured apart, from that date (owner's logs: 64 active hours, 98 fragments, 64 from Reward
+   * Chests), at the wiki's fragment points, lower grades condensed two to one. Few high grades were
+   * seen, so +7 and up rest mostly on condensed Major and Greater.
+   */
+  fragmentExpPerHour: [5.04, 5.04, 5.04, 5.04, 5.04, 3.79, 2.76, 1.89, 1.38, 0.97],
+  /**
+   * The share of those motes and fragments counted toward ONE item: a character wears about twenty pieces and has
    * spells to raise, and every one draws on the same motes. A judgment. At 0.5 the motes swamp the
    * copies and the tier alone orders every scarce item, whatever it drops from (the first cut:
    * Hate's trash armour at +9 led every raid boss's drop, where the owner spent none on it).
@@ -195,7 +202,8 @@ const round3 = (n: number): number => Math.round(n * 1000) / 1000
  */
 export function moteHours(tier: number, supply: ItemSupply | undefined): { hours: number; road: MoteRoad } {
   const exp = expToNextTier(tier) ?? 0
-  const byMotes = (MOTE_RULES.moteExpPerHour[tier] ?? 0) * MOTE_RULES.moteShare
+  const earned = (MOTE_RULES.moteExpPerHour[tier] ?? 0) + (MOTE_RULES.fragmentExpPerHour[tier] ?? 0)
+  const byMotes = earned * MOTE_RULES.moteShare
   const byCopies = (supply?.perWeek ?? 0) / SUPPLY.hoursPerWeek
   const rate = byCopies + byMotes
   return { hours: rate > 0 ? Math.round((exp / rate) * 10) / 10 : 0, road: byCopies > byMotes ? 'copies' : 'motes' }

@@ -124,6 +124,7 @@ only).
 | `hard.mechanics` | 2 | judgment, hand-kept list |
 | `hoursPerWeek` | 20 | turns a weekly kill into an hourly rate; the order does not change from 5 to 35 |
 | `moteExpPerHour` | 18.6, 12.5, 7.8, 4.55, 2.6, 1.45 (+4 to +9) | measured, one player, level 50, D4 |
+| `fragmentExpPerHour` | 5.04, 3.79, 2.76, 1.89, 1.38, 0.97 (+4 to +9) | measured 2026-11-22, one player, since fragments began on 2026-11-10: 64 active hours, 98 fragments (64 from Reward Chests), wiki fragment points, condensed two to one. Assumes fragments condense like motes (the owner hands them to the Construct; the log prints no result). Adds 28% to 77% to the motes' rate, most at the top tiers, where few high grades were seen |
 | `moteShare` | 0.05 | judgment: one item's share of the ordinary motes, among about twenty worn pieces and the spells. Was 0.5 in the first cut: the motes then swamped the copies, so the six factors moved nothing at +7 and up and the tier alone ordered every scarce item (see "Review") |
 | `minTier` / `rareMinTier` / `rarePerWeek` | 7 / 5 / 0.5 | the owner's rule and exception; 0.5 sits between the Sky test rewards (0.07 to 0.34) and a raid boss's drop (1.0) |
 
