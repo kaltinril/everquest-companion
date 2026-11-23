@@ -72,13 +72,32 @@ function peekState(page: Page): Promise<boolean | null> {
   }, SHOW_HIDDEN)
 }
 
+/** Record every text the tally shows from here on, so a flash too short to poll is still caught. */
+function watchTally(page: Page): Promise<void> {
+  return page.evaluate((sel) => {
+    const seen: string[] = []
+    ;(window as unknown as { tallySeen: string[] }).tallySeen = seen
+    new MutationObserver(() => {
+      const text = document.querySelector(sel)?.textContent
+      if (text && seen[seen.length - 1] !== text) seen.push(text)
+    }).observe(document.body, { subtree: true, childList: true, characterData: true })
+  }, TALLY)
+}
+
+function tallySeen(page: Page): Promise<string[]> {
+  return page.evaluate(() => (window as unknown as { tallySeen: string[] }).tallySeen)
+}
+
 async function stepHideOneCard(page: Page): Promise<{ cards: number; total: number } | null> {
   // WAIT FOR THE ROSTER, THEN READ IT. The tab is the first reader of the `kills` module since the
-  // always-mounted celebration moved to `met` (444180476), so its toolbar paints `0 / 0 defeated`
-  // for the one round trip that fetch takes (about 80 ms, 1 s once) and the cards arrive after it.
+  // always-mounted celebration moved to `met` (444180476), so for the one round trip that fetch
+  // takes (about 80 ms, 1 s once) there are no cards and the tally says it is waiting.
   // A one-shot read here passes or fails by luck: the same tree measured both ways on 2026-11-22.
   const cards = await settle(() => countOf(page, CARD), (n) => n > 0, { timeoutMs: 30_000 })
-  const total = await tallyTotal(page)
+  const total = await settle(() => tallyTotal(page), (n) => n === cards, { timeoutMs: 8_000 })
+  const seen = await tallySeen(page)
+  check('THE TALLY NEVER CLAIMS AN EMPTY ROSTER while the kills load',
+    seen.length > 0 && !seen.some((t) => t.startsWith('0 / 0')), seen.join(' | '))
   if (!check('the roster reads cleanly before anything is hidden', cards > 0 && total === cards)) return null
   check('a fresh install has NO Hidden switch at all', (await peekState(page)) === null)
 
@@ -145,6 +164,7 @@ async function main(): Promise<void> {
     try {
       page = await mainWindow(first.app)
       await page.waitForSelector(NAV_OVERVIEW, { timeout: 60_000 })
+      await watchTally(page)
       if (!check('the Bosses tab opens', await openBosses(page))) {
         throw new Error('never reached the Bosses tab - nothing below can be asserted')
       }
