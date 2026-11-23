@@ -1,18 +1,20 @@
 // IPC: the notice for a settings file that was damaged at launch (shared/settingsRecovery.ts).
 //
 // The outcome exists only on the launch that did the recovery (the next launch finds a healthy
-// file), so it is held in memory: the main window reads it when it mounts, and it is dropped when
-// the player closes the notice so a reloaded window does not show it twice.
+// file), and that launch may never open the main window, so the words wait in the settings store
+// until the player closes the card. An added optional key: an older build ignores it.
 
 import { ipcMain } from 'electron'
 import { IPC } from '../../shared/ipc'
-import { settingsRecoveryNotice } from '../../shared/settingsRecovery'
-import { schemaMigration } from '../store'
+import { holdRecoveryNotice, settingsRecoveryNotice } from '../../shared/settingsRecovery'
+import { schemaMigration, settingsStore } from '../store'
 
 export function registerSettingsRecoveryIpc(): void {
-  let notice = settingsRecoveryNotice(schemaMigration)
-  ipcMain.handle(IPC.settingsRecoveryGet, () => notice)
-  ipcMain.on(IPC.settingsRecoverySeen, () => {
-    notice = null
+  const notice = holdRecoveryNotice(settingsRecoveryNotice(schemaMigration), {
+    load: () => settingsStore.get('pendingSettingsNotice'),
+    save: (held) => settingsStore.set('pendingSettingsNotice', held),
+    clear: () => settingsStore.delete('pendingSettingsNotice')
   })
+  ipcMain.handle(IPC.settingsRecoveryGet, () => notice.get())
+  ipcMain.on(IPC.settingsRecoverySeen, () => notice.seen())
 }

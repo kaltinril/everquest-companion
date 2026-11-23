@@ -55,3 +55,54 @@ export function settingsRecoveryNotice(
     text: `Your settings file was damaged and could not be read. Your settings were restored from ${source}. Changes made after that are missing. ${kept}`
   }
 }
+
+const NOTICE_KINDS: readonly unknown[] = ['recovered', 'restored-backup', 'reset']
+
+/** A stored value, as the notice it should be; null for anything else. */
+function storedNotice(v: unknown): SettingsRecoveryNotice | null {
+  if (typeof v !== 'object' || v === null) return null
+  const { kind, title, text } = v as Partial<SettingsRecoveryNotice>
+  if (!NOTICE_KINDS.includes(kind) || typeof title !== 'string' || typeof text !== 'string') return null
+  return { kind: kind as SettingsRecoveryNotice['kind'], title, text }
+}
+
+/** Where a notice waits until the player has closed it (the settings store, in main). */
+export interface RecoveryNoticePorts {
+  load: () => unknown
+  save: (notice: SettingsRecoveryNotice) => void
+  clear: () => void
+}
+
+export interface RecoveryNoticeHolder {
+  get: () => SettingsRecoveryNotice | null
+  /** The player closed it: it is not shown again, on this launch or the next. */
+  seen: () => void
+}
+
+/**
+ * The notice to show, kept until the player closes it. The launch that did the recovery may never
+ * open the main window (started and quit from the tray), and the next launch finds a healthy file,
+ * so the words are stored. A store that refuses the write costs only that: the notice still shows
+ * on this launch.
+ */
+export function holdRecoveryNotice(fresh: SettingsRecoveryNotice | null, ports: RecoveryNoticePorts): RecoveryNoticeHolder {
+  let notice = fresh ?? storedNotice(ports.load())
+  if (fresh !== null) {
+    try {
+      ports.save(fresh)
+    } catch {
+      // Shown this launch all the same.
+    }
+  }
+  return {
+    get: () => notice,
+    seen: () => {
+      notice = null
+      try {
+        ports.clear()
+      } catch {
+        // Closed for this launch; a later launch may show it once more.
+      }
+    }
+  }
+}
