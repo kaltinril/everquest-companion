@@ -4,7 +4,8 @@
 //
 //   restart (localStorage)    the open workbench (absent: Home), the recipe table's switches
 //                             (Hide trivial, Can make now, Missing on the wiki), whether Home's
-//                             Foraging tile is opened to what was found
+//                             Foraging tile is opened to what was found, which not-in-log tiles
+//                             the player folded to Home's bottom line
 //   session (sessionStorage)  the search text, the picked recipe and the open tab (recipes, your
 //                             route, your history, the guides), for the open workbench only (and
 //                             whether a link from another tab chose that recipe)
@@ -13,8 +14,9 @@
 // The era toggle is not here: it is the shared `eq.planner.era` (plannerData.useEraOnly).
 // A stored value degrades, never errors: anything unreadable is the default.
 
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { asTradeskill } from '@shared/tradeskillBook'
+import { parseHiddenTiles } from '@shared/tradeskillHome'
 import type { Tradeskill } from '@shared/tradeskills'
 import { useBoolPref, useRawPref } from '../combat/useCombatPrefs'
 
@@ -23,6 +25,7 @@ const HIDE_TRIVIAL_KEY = 'eq.tradeskills.hideTrivial'
 const CAN_MAKE_KEY = 'eq.tradeskills.canMake'
 const WIKI_GAPS_KEY = 'eq.tradeskills.wikiGaps'
 const FORAGE_OPEN_KEY = 'eq.tradeskills.forageOpen'
+const HIDDEN_TILES_KEY = 'eq.tradeskills.hiddenTiles'
 const BENCH_KEY = 'eq.tradeskills.bench'
 const MAX_SEARCH = 80
 
@@ -49,6 +52,36 @@ export function useWikiGapsOnly(): [boolean, (next: boolean) => void] {
 /** Home's Foraging tile, opened to its items, session line and AA; closed until the reader opens it. */
 export function useForageOpen(): [boolean, (next: boolean) => void] {
   return useBoolPref(FORAGE_OPEN_KEY, false)
+}
+
+export interface HiddenTiles {
+  hidden: readonly Tradeskill[]
+  hide: (tradeskill: Tradeskill) => void
+  show: (tradeskill: Tradeskill) => void
+  showAll: () => void
+}
+
+/** The not-in-log tiles the player folded to Home's bottom line. None until they choose. */
+export function useHiddenTiles(): HiddenTiles {
+  const [raw, setRaw] = useRawPref(HIDDEN_TILES_KEY)
+  return useMemo(() => {
+    const hidden = parseHiddenTiles(raw)
+    const save = (next: readonly Tradeskill[]): void => {
+      setRaw(next.length === 0 ? null : JSON.stringify(next))
+    }
+    return {
+      hidden,
+      hide: (tradeskill) => {
+        save([...hidden, tradeskill])
+      },
+      show: (tradeskill) => {
+        save(hidden.filter((name) => name !== tradeskill))
+      },
+      showAll: () => {
+        save([])
+      }
+    }
+  }, [raw, setRaw])
 }
 
 /** The workbench's tabs: the recipe book, the goal route, the player's own combines, the leveling guide. */

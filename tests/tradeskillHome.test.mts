@@ -14,7 +14,7 @@ import { buildTradeskillBook, wikiItemName } from '../src/main/tradeskillBook'
 import { GUIDE_CREDITS } from '../src/shared/guideCredits'
 import type { TradeskillGuidesFile } from '../src/shared/guideData'
 import type { SkillRow } from '../src/shared/skills'
-import { indexBook, tradeskillTiles } from '../src/shared/tradeskillBook'
+import { indexBook, tradeskillTiles, type TradeskillTile } from '../src/shared/tradeskillBook'
 import { LEVELING_GUIDE_ID, RECIPE_GUIDE_ID, guidePayload, indexGuides } from '../src/shared/tradeskillGuide'
 import { indexCrafting } from '../src/shared/tradeskillHistory'
 import {
@@ -27,10 +27,12 @@ import {
   doorsLine,
   homeDoors,
   lastRunText,
+  parseHiddenTiles,
   pickUp,
   pickUpHeldText,
   pickUpWhyText,
   sourceParts,
+  splitHidden,
   tileRecipesText,
   unseenFace,
   type PickUpAsk
@@ -226,6 +228,21 @@ test("Home's doors: the tradeskills with a level by level, then the ones the log
   assert.equal(tileRecipesText(0), '0 wiki recipes')
   // A skill that is no tradeskill (Forage) makes no tile and moves none.
   assert.deepEqual(homeDoors(tradeskillTiles(index, [...OWNER_ROWS, skill('Forage', 119)])), doors)
+})
+
+test('NOTHING IS HIDDEN UNTIL THE PLAYER CHOOSES, and a stored choice that cannot be read hides nothing', () => {
+  assert.deepEqual(parseHiddenTiles(null), [])
+  for (const bad of ['', 'not json', '{"Pottery":true}', '7', 'null', '["Not A Tradeskill", 3]']) assert.deepEqual(parseHiddenTiles(bad), [], bad)
+  assert.deepEqual(parseHiddenTiles('["Pottery","Tinkering","Pottery","Nope"]').sort(), ['Pottery', 'Tinkering'])
+})
+
+test('a hidden tile leaves the grid for the line; a tradeskill that rises in the log is never folded', () => {
+  const tileOf = (tradeskill: Tradeskill, level: number | null): TradeskillTile => ({ tradeskill, level, recipes: 1, next: null })
+  const doors = homeDoors([tileOf('Baking', 5), tileOf('Pottery', null), tileOf('Tinkering', null)])
+  const { shown, folded } = splitHidden(doors.unseen, ['Pottery', 'Baking'])
+  assert.deepEqual(shown.map((tile) => tile.tradeskill), ['Tinkering'])
+  assert.deepEqual(folded.map((tile) => tile.tradeskill), ['Pottery'], 'Baking has a level, so its stored hide means nothing')
+  assert.deepEqual(doors.seen.map((tile) => tile.tradeskill), ['Baking'])
 })
 
 test('a tile the log has not shown says so, states a top only where one is measured, and never a 0', () => {

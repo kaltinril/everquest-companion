@@ -10,8 +10,9 @@
 //     Foraging                   its own tile (ForagingTile.tsx)
 //     a tradeskill not in the    by name: "Not in log" where the number goes (never 0: the level
 //     log                        is not known), its top when one is measured, an empty bar, its
-//                                wiki recipes, and no next recipe
+//                                wiki recipes, no next recipe, and a Hide button
 //                                Every tradeskill's tile opens its workbench.
+//   Hidden line                  the not-in-log tiles the player chose to hide (HiddenTilesLine.tsx)
 //   Sources                      the wiki data's date and the two guides, as words
 //
 // The tradeskills the log had not shown were a row of small buttons until the owner read them as
@@ -20,26 +21,28 @@
 // `unseenFace`; the bar and the "caps at 200" note are shared/tradeskillLevelBar.ts; the sources
 // line is `sourceParts`. No guide is linked anywhere in the app: the line is text.
 //
-// Every door keeps `data-testid="tradeskill-tile-<Tradeskill>"` on an element that holds a
-// `button`, with `data-tile` saying whether the log has shown it (`seen`) or not (`unseen`).
+// Every door keeps `data-testid="tradeskill-tile-<Tradeskill>"` on an element whose first `button`
+// opens it, with `data-tile` saying whether the log has shown it (`seen`) or not (`unseen`).
 
 import { type JSX, type ReactNode, useMemo } from 'react'
-import { Box, Card, CardActionArea, Stack, Typography } from '@mui/material'
+import { Box, Button, Card, CardActionArea, Stack, Typography } from '@mui/material'
 import { SKILLS_MODULE, type SkillRow } from '@shared/skills'
 import { tradeskillTiles, type BookIndex, type TradeskillTile } from '@shared/tradeskillBook'
 import type { GuideIndex } from '@shared/tradeskillGuide'
-import { SOURCES_LABEL, doorsLine, homeDoors, sourceParts, tileRecipesText, unseenFace } from '@shared/tradeskillHome'
+import { HIDE_TILE_TEXT, SOURCES_LABEL, doorsLine, hideTileTip, homeDoors, sourceParts, splitHidden, tileRecipesText, unseenFace } from '@shared/tradeskillHome'
 import { levelBar, type LevelBar } from '@shared/tradeskillLevelBar'
 import type { Tradeskill } from '@shared/tradeskills'
 import { LogReadInline } from '../../components/LogReadInline'
 import { Tooltip } from '../../lib/Tooltip'
 import { ForagingTile } from './ForagingTile'
+import { HiddenTilesLine } from './HiddenTilesLine'
 import { useMasteryRank } from './useMasteryRank'
 import { HomePickUp, type HomeFacts, type OpenRecipe } from './HomePickUp'
 import { HomeWished, type OpenPlan } from './HomeWished'
 import { BarOf, CapNote, SkillBar } from './SkillBar'
 import { useBookScrapedAt, useCrafting, useGuides, useHeld, useSkillLevels } from './tradeskillData'
 import { ItemLink } from './tradeskillLinks'
+import { useHiddenTiles } from './tradeskillMemory'
 
 /** The level with "of 300" beside it. `Tile` is drawn only for a tradeskill the log has shown, so there is one. */
 function TileLevel({ bar }: { bar: LevelBar }): JSX.Element | null {
@@ -130,13 +133,18 @@ interface UnseenTileProps {
   /** Whether the engine has read the skills: until then the tile says nothing of the log. */
   served: boolean
   onOpen: (t: Tradeskill) => void
+  /** Folds the tile to the line at the bottom of Home. */
+  onHide: (t: Tradeskill) => void
 }
 
-/** A tradeskill the log has not shown: a whole tile that opens its workbench, with no level number and no next recipe. */
-function UnseenTile({ tile, served, onOpen }: UnseenTileProps): JSX.Element {
+/**
+ * A tradeskill the log has not shown: a whole tile that opens its workbench, with no level number
+ * and no next recipe. Hide sits beside the tile's button and not inside it: a button cannot hold one.
+ */
+function UnseenTile({ tile, served, onOpen, onHide }: UnseenTileProps): JSX.Element {
   const face = unseenFace(tile.tradeskill, served)
   return (
-    <Card variant="outlined" data-testid={`tradeskill-tile-${tile.tradeskill}`} data-tile="unseen">
+    <Card variant="outlined" sx={{ position: 'relative' }} data-testid={`tradeskill-tile-${tile.tradeskill}`} data-tile="unseen">
       <Tooltip title={face.tip} describeChild>
         <CardActionArea
           onClick={() => {
@@ -166,6 +174,19 @@ function UnseenTile({ tile, served, onOpen }: UnseenTileProps): JSX.Element {
             {tileRecipesText(tile.recipes)}
           </Typography>
         </CardActionArea>
+      </Tooltip>
+      <Tooltip title={hideTileTip(tile.tradeskill)} describeChild>
+        <Button
+          size="small"
+          aria-label={`${HIDE_TILE_TEXT} ${tile.tradeskill}`}
+          onClick={() => {
+            onHide(tile.tradeskill)
+          }}
+          sx={{ position: 'absolute', right: 4, bottom: 4, minWidth: 0, px: 0.75, py: 0, textTransform: 'none', color: 'text.secondary' }}
+          data-testid="tradeskill-tile-hide"
+        >
+          {HIDE_TILE_TEXT}
+        </Button>
       </Tooltip>
     </Card>
   )
@@ -201,6 +222,8 @@ export function TradeskillsHome({ index, onOpen, onOpenRecipe, onPlan, planner }
   const facts = useMemo((): HomeFacts => ({ index, guides, levels, craft, held }), [index, guides, levels, craft, held])
   const doors = useMemo(() => homeDoors(tradeskillTiles(index, levels.rows)), [index, levels.rows])
   const rank = useMasteryRank()
+  const hiddenTiles = useHiddenTiles()
+  const { shown, folded } = splitHidden(doors.unseen, hiddenTiles.hidden)
   return (
     <Box sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto' }} data-testid="tradeskills-home">
       <HomePickUp facts={facts} onOpen={onOpen} onOpenRecipe={onOpenRecipe} />
@@ -218,10 +241,11 @@ export function TradeskillsHome({ index, onOpen, onOpenRecipe, onPlan, planner }
         ))}
         {/* Forage has no recipes and so no workbench: its tile is the whole of it, and what it found opens under its row (ForagingTile.tsx). */}
         <ForagingTile />
-        {doors.unseen.map((tile) => (
-          <UnseenTile key={tile.tradeskill} tile={tile} served={levels.served} onOpen={onOpen} />
+        {shown.map((tile) => (
+          <UnseenTile key={tile.tradeskill} tile={tile} served={levels.served} onOpen={onOpen} onHide={hiddenTiles.hide} />
         ))}
       </Box>
+      <HiddenTilesLine tiles={folded} onShow={hiddenTiles.show} onShowAll={hiddenTiles.showAll} />
       <SourcesLine guides={guides} />
     </Box>
   )
