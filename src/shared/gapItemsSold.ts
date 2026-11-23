@@ -35,6 +35,24 @@ export function itemsSoldField(row: object): { itemsSold?: SoldSeen[] } {
   return sold.length === 0 ? {} : { itemsSold: sold }
 }
 
+/**
+ * Several characters' lists for one merchant as one, A to Z as the engine serves them. An item keeps
+ * a price only when every character that was quoted one heard the same: a quote moves with Charisma,
+ * which the log never shows, so of two different prices neither can be written as the merchant's.
+ */
+export function unionSold(lists: readonly (readonly SoldSeen[])[]): SoldSeen[] {
+  const byKey = new Map<string, { item: string; prices: Set<number> }>()
+  for (const s of lists.flat()) {
+    const key = s.item.toLowerCase()
+    const had = byKey.get(key) ?? { item: s.item, prices: new Set<number>() }
+    if (s.copper !== undefined) had.prices.add(s.copper)
+    byKey.set(key, had)
+  }
+  return [...byKey.entries()]
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(([, { item, prices }]) => (prices.size === 1 ? { item, copper: [...prices][0] } : { item }))
+}
+
 /** `104pp 9gp 9sp 9cp`: the wiki's merchant price, zero parts left out. */
 export function ddpCoin(copper: number): string {
   let rest = Math.max(0, Math.round(copper))

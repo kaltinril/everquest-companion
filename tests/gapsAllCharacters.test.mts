@@ -209,6 +209,24 @@ test("the join keeps the attached character's merchant stock, hail answer and qu
   assert.deepEqual(j.gaps?.totals.merchant, 1)
 })
 
+test('a merchant only the other characters met keeps the stock of all of them, whichever was joined last', () => {
+  const merchant = (count: number, itemsSold: unknown[]): GapRow => ({ ...row('merchant', 'Kogg', count), kinds: ['quoted'], itemsSold }) as GapRow
+  const input = (label: string, rows: GapRow[]) => ({ label, gaps: gaps(rows), loot: [], kills: null })
+  const live = input('Live', [row('item', 'Bat Wing', 1)])
+  const a = input('A', [merchant(3, [{ item: 'Ale', copper: 10 }, { item: 'Mead', copper: 52 }, { item: 'Rum', copper: 7 }])])
+  const b = input('B', [merchant(1, [{ item: 'ale', copper: 10 }, { item: 'Bread' }, { item: 'Rum', copper: 9 }])])
+  const stock = (inputs: Parameters<typeof joinCharacters>[0]): unknown =>
+    (joinCharacters(inputs, null).gaps?.rows.find((r) => r.name === 'Kogg') as unknown as { itemsSold: unknown }).itemsSold
+  // Bread only B saw, Mead only A saw; Ale agreed on; Rum heard at two prices, so neither is stated.
+  const want = [{ item: 'Ale', copper: 10 }, { item: 'Bread' }, { item: 'Mead', copper: 52 }, { item: 'Rum' }]
+  assert.deepEqual(stock([live, a, b]), want)
+  const flipped = stock([live, b, a]) as { item: string }[]
+  assert.deepEqual(flipped.map((s) => s.item.toLowerCase()), want.map((s) => s.item.toLowerCase()), 'the join order does not decide the list')
+  // The attached character's own list still stands whole over both.
+  const own = input('Live', [merchant(5, [{ item: 'Ale', copper: 11 }])])
+  assert.deepEqual(stock([own, a, b]), [{ item: 'Ale', copper: 11 }])
+})
+
 test("the join never brings back an attached character's row that fell past a domain's cap", () => {
   const many = gaps(Array.from({ length: 500 }, (_, i) => row('item', `Item ${String(i).padStart(4, '0')}`, 2)))
   const j = joinCharacters([{ label: 'Live', gaps: gaps([row('item', 'Zed', 1)]), loot: [], kills: null }, { label: 'Alt', gaps: many, loot: [], kills: null }], null)

@@ -25,6 +25,7 @@ import { mergeLoot } from './logArchive/mergeLoot'
 import { mergeModule } from './logArchive/mergeRules'
 import type { Segment } from './logArchive/segment'
 import type { GapDomain, GapRow, GapsSnap } from './gaps'
+import { itemsSoldOf, unionSold, type SoldSeen } from './gapItemsSold'
 import { aboutKnownPage } from './gapsRecheckPages'
 import type { KillsSnap } from './kills'
 import type { OwnershipPayload } from './planner/ownership'
@@ -307,6 +308,28 @@ function servedOnly(g: GapsSnap, joined: GapsSnap): GapsSnap {
 }
 
 /**
+ * A merchant the attached character never met, as every other character saw its stock. The join
+ * takes `itemsSold` from the last side, so of two alts the one joined last decided the list. A row
+ * the attached character has is left alone: its reading stands (`joinCharacters`).
+ */
+function withOthersStock(joined: GapsSnap, cuts: readonly (GapsSnap | null)[]): GapsSnap {
+  const own = new Set((cuts[0]?.rows ?? []).map(seenByKey))
+  const lists = new Map<string, SoldSeen[][]>()
+  for (const g of cuts.slice(1)) {
+    for (const r of g?.rows ?? []) {
+      const sold = itemsSoldOf(r)
+      const k = seenByKey(r)
+      if (sold.length > 0 && !own.has(k)) lists.set(k, [...(lists.get(k) ?? []), sold])
+    }
+  }
+  const rows = joined.rows.map((r) => {
+    const seen = lists.get(seenByKey(r))
+    return seen === undefined ? r : ({ ...r, itemsSold: unionSold(seen) } as GapRow)
+  })
+  return { ...joined, rows }
+}
+
+/**
  * The characters joined one after another with the archive's merge rules, each one's rows cut to
  * the window first; loot and kills join whole, as in `ownSince`. A character whose state the rule
  * will not join (a kills shape from another build) adds nothing to that module and is not counted
@@ -323,8 +346,10 @@ export function joinCharacters(inputs: readonly CharacterInputs[], cut: { stamp:
   let loot: LootSnap = []
   let kills: KillsSnap | null = null
   const seenBy = new Map<string, string[]>()
+  const cuts: (GapsSnap | null)[] = []
   for (const c of inputs) {
     const cutG = cutGaps(c, cut)
+    cuts.push(cutG)
     if (cutG !== null) noteSeen(seenBy, cutG.rows, c.label)
     gaps = joinStep(gaps, cutG, mergeGaps)
     const l = Array.isArray(c.loot) ? (c.loot as LootSnap) : null
@@ -333,6 +358,7 @@ export function joinCharacters(inputs: readonly CharacterInputs[], cut: { stamp:
   }
   const own = inputs.length > 1 ? cutGaps(inputs[0], cut) : null
   if (own !== null && gaps !== null) gaps = joinStep(gaps, servedOnly(own, gaps), mergeGaps)
+  if (gaps !== null && inputs.length > 2) gaps = withOthersStock(gaps, cuts)
   return { gaps, loot: inputs.length > 1 ? [...loot].sort((x, y) => x.ts - y.ts) : loot, kills, seenBy }
 }
 
