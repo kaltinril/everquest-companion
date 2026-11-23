@@ -69,6 +69,37 @@ export interface SwitchTurn {
    * more recent than anything this turn could still be describing.
    */
   owns: () => boolean
+  /** Resolves the instant a newer switch begins, so a wait inside this turn can end at once. */
+  readonly superseded: Promise<void>
+}
+
+/** Ends the current turn's `superseded`. */
+let supersede: (() => void) | null = null
+
+/** The one thing that runs before the attached log is left (the Gaps save, gapsCharacters.ts). */
+let beforeSwitch: (() => Promise<void>) | null = null
+
+/** Fill the one slot. The function bounds its own time: nothing here puts a clock on it. */
+export function setBeforeSwitch(fn: (() => Promise<void>) | null): void {
+  beforeSwitch = fn
+}
+
+/**
+ * Run the slot when this turn really leaves a log (`from` is attached and `to` is another log, or
+ * none). It can neither break the switch, since a failure goes to `failed`, nor hold a superseded
+ * pick: that pick returns at once, as JOS-458's 500 ms target asks, and the save carries on.
+ */
+export async function leaveLog(
+  turn: SwitchTurn,
+  logs: { from: string | null; to: string | null },
+  failed: (err: unknown) => void
+): Promise<void> {
+  if (beforeSwitch === null || logs.from === null || logs.from === logs.to) return
+  try {
+    await Promise.race([beforeSwitch(), turn.superseded])
+  } catch (err) {
+    failed(err)
+  }
 }
 
 /**
@@ -80,7 +111,11 @@ export interface SwitchTurn {
  * that would otherwise finish and re-attach the log the user just told us to stop reading.
  */
 export function beginSwitch(): SwitchTurn {
+  supersede?.()
   generation += 1
   const gen = generation
-  return { gen, owns: () => generation === gen }
+  const superseded = new Promise<void>((resolve) => {
+    supersede = resolve
+  })
+  return { gen, owns: () => generation === gen, superseded }
 }

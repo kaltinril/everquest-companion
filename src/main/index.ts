@@ -54,7 +54,7 @@ import { initProcessPriority } from './processPriority'
 import { startEngineSupervisor, stopEngineSupervisor } from './dataServer/engineHost'
 import { recoverLogArchiveAtLaunch } from './logArchive/actions'
 import { startAutoArchive } from './logArchive/autoArchive'
-import { startGapsCharacterSaves } from './gapsCharacters'
+import { saveGapsOnLeaving, startGapsCharacterSaves } from './gapsCharacters'
 import { getProcessPriorityPrefs } from './storeProcessPriority'
 import { initPresenceEffects, stopPresenceEffects } from './presenceEffects'
 import { provisionDefaultPacks } from './provisionPacks'
@@ -382,6 +382,10 @@ if (!gotSingleInstanceLock) {
   })
 }
 
+/** The last window has closed: its teardown is owed, once, on whichever event gets there first. */
+let windowsClosed = false
+let tornDown = false
+
 /**
  * STOPPING THE WATCHER, BELT AND BRACES. `window-all-closed` below is the ordinary teardown, but
  * it is not the only way this process ends: an auto-updater `quitAndInstall`, an `app.quit()`
@@ -397,6 +401,9 @@ if (!gotSingleInstanceLock) {
  * cover. A thread cannot outlive its process, so both the hazard and its workaround are gone.
  */
 app.on('before-quit', () => {
+  // A quit that lands while the last window's Gaps save is still running: its teardown runs now,
+  // because this process may not turn the event loop again.
+  if (windowsClosed) teardownAfterWindowsClosed()
   teardownStep('main:stopPresence', stopPresenceEffects)
   // …and the data-server engine, on BOTH quit events and for a stronger version of the reason the
   // presence watcher is: the engine is a CHILD PROCESS, and Windows does not kill children with
@@ -482,7 +489,9 @@ function teardownStep(label: string, fn: () => void): void {
   }
 }
 
-app.on('window-all-closed', () => {
+function teardownAfterWindowsClosed(): void {
+  if (tornDown) return
+  tornDown = true
   teardownStep('main:stopSession', stopSession)
   // Stop the presence watcher thread + the cursor stream. Both already unref, but an unref'd
   // worker is still a running thread: nothing else would end it.
@@ -508,5 +517,14 @@ app.on('window-all-closed', () => {
   // no app-side register to flush, and writing one here would be this process publishing its own
   // (empty) opinion over the file the engine has been maintaining, at the one moment nothing is
   // left to correct it. That is the exact asymmetry `stopEngineClient` refuses for the same file.
-  if (process.platform !== 'darwin') app.quit()
+}
+
+app.on('window-all-closed', () => {
+  windowsClosed = true
+  // THE ATTACHED CHARACTER'S GAPS, WHILE THE ENGINE CAN STILL ANSWER (gapsCharacters.ts). Bounded
+  // and never rejecting, and `finally` so that nothing about it can leave a windowless process.
+  void saveGapsOnLeaving().finally(() => {
+    teardownAfterWindowsClosed()
+    if (process.platform !== 'darwin') app.quit()
+  })
 })

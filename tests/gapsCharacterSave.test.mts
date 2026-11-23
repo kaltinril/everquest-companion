@@ -4,6 +4,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { gapsSaver, type SaveDeps } from '../src/main/gapsCharacterSave'
 import { noteModuleMoved, takeMoved } from '../src/main/gapSourceMoves'
+import { beginSwitch, leaveLog, setBeforeSwitch, type SwitchTurn } from '../src/main/switchController'
 import { GAP_SOURCE_MODULES, parseSavedGaps, type SavedGaps } from '../src/shared/gapsAllCharacters'
 
 const KALT = { name: 'Kaltinril', server: 'oggok', logPath: 'C:/eq/Logs/eqlog_Kaltinril_oggok.txt' }
@@ -37,6 +38,113 @@ function play(state: { seq: number }): void {
   state.seq++
   noteModuleMoved('loot')
 }
+
+const never = <T,>(): Promise<T> => new Promise<T>(() => undefined)
+const turnOf = (superseded: Promise<void> = never()): SwitchTurn => ({ gen: 1, owns: () => true, superseded })
+
+test('LEAVING saves what is owed, and a character never saved before is saved with no cursor moved', async () => {
+  const { state, save } = rig()
+  await save.leaving(1_000)
+  assert.equal(state.written.length, 1)
+  await save.leaving(1_000)
+  assert.equal(state.written.length, 1, 'nothing moved since: no second write')
+  play(state)
+  await save.leaving(1_000)
+  assert.equal(state.written.length, 2)
+})
+
+test('LEAVING waits out a tick already saving, then saves what moved during it', async () => {
+  let release = (): void => undefined
+  const gate = new Promise<void>((resolve) => {
+    release = resolve
+  })
+  let held = true
+  const { state, save } = rig({
+    readModule: async (module) => {
+      if (held) await gate
+      return { seq: state.seq, state: { module } }
+    }
+  })
+  const tick = save()
+  play(state)
+  const out = save.leaving(1_000)
+  held = false
+  release()
+  await Promise.all([tick, out])
+  assert.equal(state.written.at(-1)?.modules.loot.seq, state.seq, 'the last write holds the newest seq')
+})
+
+test('LEAVING NEVER HOLDS THE WAY OUT: a hung engine ends at the limit, writes nothing late, and is owed again', async () => {
+  let hung = true
+  let release: (v: { seq: number; state: unknown }) => void = () => undefined
+  const late = new Promise<{ seq: number; state: unknown }>((resolve) => {
+    release = resolve
+  })
+  const { state, save } = rig({
+    readModule: (module) => (hung ? late : Promise.resolve({ seq: state.seq, state: { module } }))
+  })
+  const t0 = Date.now()
+  await save.leaving(30)
+  assert.ok(Date.now() - t0 < 1_000, 'it returned at the limit')
+  assert.equal(state.written.length, 0)
+  assert.match(state.logged.join('\n'), /no answer within 30 ms/)
+  // The answer arrives after the switch, when the engine may be another character's: not written.
+  release({ seq: 99, state: {} })
+  await new Promise((resolve) => setImmediate(resolve))
+  assert.equal(state.written.length, 0)
+  // The hung attempt no longer blocks saves, and what it took is owed.
+  hung = false
+  await save()
+  assert.equal(state.written.length, 1)
+})
+
+test('LEAVING NEVER REJECTS when the save itself throws', async () => {
+  const { state, save } = rig({
+    ready: () => {
+      throw new Error('no engine host')
+    }
+  })
+  await save.leaving(1_000)
+  assert.match(state.logged.join('\n'), /save before leaving failed: no engine host/)
+})
+
+test('THE SWITCH SLOT runs only when a log is really left', async (t) => {
+  t.after(() => setBeforeSwitch(null))
+  let runs = 0
+  setBeforeSwitch(() => {
+    runs++
+    return Promise.resolve()
+  })
+  const failed = (): void => assert.fail('nothing failed')
+  await leaveLog(turnOf(), { from: null, to: 'b.txt' }, failed)
+  await leaveLog(turnOf(), { from: 'a.txt', to: 'a.txt' }, failed)
+  assert.equal(runs, 0, 'no character to leave, or the same log again')
+  await leaveLog(turnOf(), { from: 'a.txt', to: 'b.txt' }, failed)
+  await leaveLog(turnOf(), { from: 'a.txt', to: null }, failed)
+  assert.equal(runs, 2)
+})
+
+test('THE SWITCH SLOT cannot break a switch, and a superseded pick does not wait for it', async (t) => {
+  t.after(() => setBeforeSwitch(null))
+  const errors: unknown[] = []
+  setBeforeSwitch(() => Promise.reject(new Error('disk full')))
+  await leaveLog(turnOf(), { from: 'a.txt', to: 'b.txt' }, (e) => errors.push(e))
+  assert.equal(errors.length, 1)
+  setBeforeSwitch(() => {
+    throw new Error('threw before its promise')
+  })
+  await leaveLog(turnOf(), { from: 'a.txt', to: 'b.txt' }, (e) => errors.push(e))
+  assert.equal(errors.length, 2)
+
+  setBeforeSwitch(never)
+  const first = beginSwitch()
+  const waiting = leaveLog(first, { from: 'a.txt', to: 'b.txt' }, (e) => errors.push(e))
+  const second = beginSwitch()
+  await waiting
+  assert.equal(first.owns(), false)
+  assert.equal(second.owns(), true)
+  assert.equal(errors.length, 2)
+})
 
 test('the first save writes the three modules under the character; nothing moved since is no engine read', async () => {
   const { state, save } = rig()

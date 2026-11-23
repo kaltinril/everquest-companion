@@ -66,7 +66,7 @@ import { setSlayer } from './storeSlayer'
 // WHO OWNS THE WORLD RIGHT NOW (JOS-457). Every switch takes a turn and re-asks `owns()` after
 // every point it could have been suspended; a turn that has lost touches nothing shared and
 // returns. The whole argument — why a generation and not a queue or a mutex — is in that file.
-import { beginSwitch, type SwitchTurn } from './switchController'
+import { beginSwitch, leaveLog, type SwitchTurn } from './switchController'
 import { sendToMain } from './windows'
 import type { CharacterRef, EqConfig } from '../shared/types'
 
@@ -201,7 +201,7 @@ export async function applyEqDirChange(): Promise<EqConfig> {
     // reason that survives the fold: a `tailCharacter` still in flight would otherwise finish and
     // cheerfully attach the ENGINE to the log the user just told us to stop reading.
     const turn = beginSwitch()
-    await Promise.resolve()
+    await leaveLog(turn, { from: character?.logPath ?? null, to: null }, beforeSwitchFailed)
     if (!turn.owns()) return config
     // Nothing is attached, so there is no "our log went quiet" to ask about (JOS-432).
     stopWatchingForQuietSwitch()
@@ -347,6 +347,11 @@ function watchForFirstLog(): void {
 // hides, nothing suspends, and the overlays simply stay where the user put them while the engine
 // catches up. `presenceProtocol.ts ringDisposition` lost its replay term for the same reason.
 
+/** The save before a switch failed: said in the log, and the switch goes on. */
+const beforeSwitchFailed = (err: unknown): void => {
+  logError('main:beforeSwitch', err)
+}
+
 /**
  * A switch that lost its turn, on its way out: say so once, and answer NULL.
  *
@@ -410,9 +415,11 @@ export async function tailCharacter(ref: CharacterRef): Promise<boolean> {
   // attach is sent from `sendWorldRebuilt` below — so the turn still decides which pick gets to
   // announce itself, and a superseded pick announces nothing. The await is what makes that
   // meaningful: without a suspension point there is no interleaving to guard, and the guard would
-  // be decoration. It is `Promise.resolve()` rather than nothing so the shape survives the next
-  // edit that adds real asynchronous work here.
-  await Promise.resolve()
+  // be decoration.
+  //
+  // THE WORK IT NOW HOLDS is the bounded Gaps save of the character being left (`leaveLog`): the
+  // engine still answers for that character here, and after the attach below it never will again.
+  await leaveLog(turn, { from: character?.logPath ?? null, to: ref.logPath }, beforeSwitchFailed)
   if (!turn.owns()) return preempted(ref, turn) !== null
   character = ref
   // ONE STORE WRITE FOR THE WHOLE ATTACH. The log path and the three dump loads below each wrote

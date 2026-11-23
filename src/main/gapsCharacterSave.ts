@@ -23,15 +23,32 @@ export interface SaveDeps {
   log: (message: string) => void
 }
 
-/** The save, holding what it last wrote: call it on each tick. */
-export function gapsSaver(deps: SaveDeps): () => Promise<void> {
+/** The save: call it on each tick. `leaving` is the one bounded save before a switch or a quit. */
+export interface GapsSave {
+  (): Promise<void>
+  /**
+   * Save what is owed before the attached character is left, for at most `limitMs`. Never rejects.
+   * Past the limit the attempt is dropped: it writes nothing later, when the engine may be answering
+   * for another character, and the moved flags stay owed.
+   */
+  leaving: (limitMs: number) => Promise<void>
+}
+
+/** One attempt under way. `dropped` is set when a `leaving` gave up waiting for it. */
+interface Attempt {
+  dropped: boolean
+  done: Promise<void>
+}
+
+/** The save, holding what it last wrote. */
+export function gapsSaver(deps: SaveDeps): GapsSave {
   /** The seqs last written per character, so an unmoved snapshot is not written again. */
   const lastSeqs = new Map<string, string>()
-  let saving = false
+  let running: Attempt | null = null
 
   /** The character a save is owed for now, or null: none attached, engine not live, or nothing moved. */
   function owedSave(): { c: CharacterRef; id: string } | null {
-    if (saving || !deps.ready()) return null
+    if (running !== null || !deps.ready()) return null
     const c = deps.active()
     if (c === null) return null
     const id = deps.idOf(c)
@@ -41,12 +58,7 @@ export function gapsSaver(deps: SaveDeps): () => Promise<void> {
     return { c, id }
   }
 
-  /** Save the attached character's Gaps inputs when the engine is live on its log and something moved. */
-  return async function saveAttachedGaps(): Promise<void> {
-    const owed = owedSave()
-    if (owed === null) return
-    const { c, id } = owed
-    saving = true
+  async function attempt({ c, id }: { c: CharacterRef; id: string }, me: Attempt): Promise<void> {
     // `owedSave` took the moved flags before anything was read. An attempt that neither wrote nor
     // found the file current puts them back: without that a failed save was never tried again until
     // a cursor moved, and a player who then went quiet or quit left the file behind until that
@@ -54,7 +66,7 @@ export function gapsSaver(deps: SaveDeps): () => Promise<void> {
     let settled = false
     try {
       const got = await Promise.all(GAP_SOURCE_MODULES.map(deps.readModule))
-      if (deps.active()?.logPath !== c.logPath) return
+      if (me.dropped || deps.active()?.logPath !== c.logPath) return
       if (got.some((m) => m === null)) {
         deps.log(`${SKIPPED}: the engine did not answer`)
         return
@@ -75,8 +87,46 @@ export function gapsSaver(deps: SaveDeps): () => Promise<void> {
     } catch (err) {
       deps.log(`[everquest-companion] gaps characters: save failed: ${(err as Error).message}`)
     } finally {
-      saving = false
+      if (running === me) running = null
       if (!settled) restoreMoved(GAP_SOURCE_MODULES)
     }
   }
+
+  /** Save the attached character's Gaps inputs when the engine is live on its log and something moved. */
+  async function save(): Promise<void> {
+    const owed = owedSave()
+    if (owed === null) return
+    const me: Attempt = { dropped: false, done: Promise.resolve() }
+    running = me
+    me.done = attempt(owed, me)
+    await me.done
+  }
+
+  async function leaving(limitMs: number): Promise<void> {
+    let expired = false
+    // A tick's attempt may hold the moved flags: wait it out, then save whatever it left owed.
+    const untilIdle = async (): Promise<void> => {
+      while (running !== null && !expired) await running.done
+    }
+    const work = (async (): Promise<void> => {
+      await untilIdle()
+      if (!expired) await save()
+      await untilIdle()
+    })().catch((err: unknown) => {
+      deps.log(`[everquest-companion] gaps characters: save before leaving failed: ${(err as Error).message}`)
+    })
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const limit = new Promise<'late'>((resolve) => {
+      timer = setTimeout(() => resolve('late'), limitMs)
+    })
+    const first = await Promise.race([work, limit])
+    clearTimeout(timer)
+    if (first !== 'late') return
+    expired = true
+    if (running !== null) running.dropped = true
+    running = null
+    deps.log(`${SKIPPED}: no answer within ${String(limitMs)} ms of leaving the character`)
+  }
+
+  return Object.assign(save, { leaving })
 }
