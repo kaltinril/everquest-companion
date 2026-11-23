@@ -9,11 +9,12 @@
 #   1. the tag must be exactly `community-<package.json version>` (a tag never ships another version);
 #   2. typecheck, lint, and the unit suite, where only the known reds may fail, by name
 #      (scripts/community/known-reds.sh);
-#   3. build the engine (release) and the TEST installer, unsigned, publishing nothing;
+#   3. build the engine (release) and the installer, unsigned, publishing nothing;
 #   4. scripts/community/publish-release.sh --publish, which re-checks the installer, the update
-#      file and the blockmap, that the tagged commit is on main_community and contains the version's
-#      `Test build` notes commit, then creates the release with the installer, test.yml, the blockmap,
-#      the previous release's blockmap and SHA256SUMS.txt, marked Latest.
+#      file, the blockmap and the identity every install depends on, that the tagged commit is on
+#      main_community and contains the version's notes commit, then creates the release with the
+#      installer, test.yml, the blockmap, the previous release's blockmap and SHA256SUMS.txt, NOT
+#      marked Latest. No install takes it until the owner promotes it (RELEASING.md).
 #
 # Least privilege: the only token with write is this job's, and it is used only by `gh` in step 4.
 # Actions are pinned to the same commit SHAs build.yml uses. The tag reaches scripts as the env var

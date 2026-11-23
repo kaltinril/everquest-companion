@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Publish a TEST build to the fork's GitHub Releases page.
+# Publish a Community Edition build to the fork's GitHub Releases page, NOT marked Latest: installs
+# only take it once the owner promotes it (gh release edit community-<version> --latest).
 #
 #   scripts/community/publish-release.sh [--version <v>] [--target <commit>] [--publish]
 #
@@ -30,22 +31,25 @@ done
 
 fail() { echo "STOP: $*" >&2; exit 1; }
 
-case "$version" in
-  *-test.*) ;;
-  *) fail "version $version is not a 0.1.0-test.N build; only TEST builds are published from the fork" ;;
-esac
+# Plain x.y.z only, from 0.1.55 on. A new 0.1.0-test.N would sort below the releases already out, and
+# the updater would never offer it.
+[[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || fail "version $version is not a plain x.y.z; community builds are numbered 0.1.N since 0.1.55"
 
 tag="community-$version"
 dir="release/$version"
-exe="everquest-companion-test-Setup-$version.exe"
+exe="everquest-companion-ce-Setup-$version.exe"
 [ -f "$dir/$exe" ] || fail "no installer at $dir/$exe; cut the build first (RELEASING.md step 1)"
-# The update feed (test.20 on): installs read test.yml (the channel file electron-builder names after 0.1.0-test.N) from the newest release, and the blockmap
-# lets them download only what changed. test.yml must name this version and this installer.
-[ -f "$dir/test.yml" ] || fail "no $dir/test.yml; the build did not write its update file"
-grep -q "^version: $version" "$dir/test.yml" || fail "$dir/test.yml does not name version $version"
-grep -q "$exe" "$dir/test.yml" || fail "$dir/test.yml does not name $exe"
+# The update feed (test.20 on): every install asks the newest release for test.yml, whatever the
+# version looks like (the channel is pinned in electron-builder.yml), and the blockmap lets it
+# download only what changed.
 blockmap="$dir/$exe.blockmap"
 [ -f "$blockmap" ] || fail "no $blockmap"
+
+# The hard stop: test.yml, the frozen exe name and the updater settings inside win-unpacked. A real
+# publish needs win-unpacked; a release that loses these strands every install that takes it.
+identity_args=("$dir" "$version" "$exe")
+if [ $publish -eq 1 ]; then identity_args+=(--require-unpacked); fi
+node --import tsx scripts/community/check-release-identity.mts "${identity_args[@]}" || fail "this build's identity is wrong; nothing was published"
 
 # The installer must carry its whole dependency tree (test.13 shipped without `conf`).
 if [ -f "$dir/win-unpacked/resources/app.asar" ]; then
@@ -69,8 +73,8 @@ fi
 # origin/main_community but may have no local branch of that name.
 notes_ref=main_community
 git rev-parse -q --verify "$notes_ref" >/dev/null || notes_ref=origin/main_community
-notes_commit=$(git log --format=%H --grep="^Test build $version:" -1 "$notes_ref")
-[ -n "$notes_commit" ] || fail "no 'Test build $version:' commit on main_community"
+notes_commit=$(git log --format=%H -E --grep="^(Community|Test) build $version:" -1 "$notes_ref")
+[ -n "$notes_commit" ] || fail "no 'Community build $version:' commit on main_community"
 # Each release lists only what changed since the one before. The cumulative list lives once, on
 # test.20 (the first release), and every later release links to it below.
 first_tag=community-0.1.0-test.20
@@ -82,7 +86,7 @@ if [ -z "$target" ]; then
   target=$(git rev-parse origin/main_community)
 fi
 target=$(git rev-parse "$target^{commit}")
-git merge-base --is-ancestor "$notes_commit" "$target" || fail "$target does not contain the test.N commit $notes_commit"
+git merge-base --is-ancestor "$notes_commit" "$target" || fail "$target does not contain the notes commit $notes_commit"
 git branch -r --contains "$target" | grep -q 'origin/main_community$' || fail "$target is not on origin/main_community; push first (RELEASING.md step 3)"
 
 if gh release view "$tag" --repo "$repo_slug" >/dev/null 2>&1; then
@@ -93,7 +97,7 @@ notes=$(mktemp)
 trap 'rm -f "$notes"' EXIT
 {
   cat <<EOF
-**EQ Legends Companion TEST $version**, a community build of [EQ Legends Companion](https://github.com/jmoyers/everquest-companion) with the fork's changes on top.
+**EQ Legends Companion CE (Community Edition) $version**, a community build of [EQ Legends Companion](https://github.com/jmoyers/everquest-companion) with the fork's changes on top.
 
 **To install:** download \`$exe\` below and run it. The installer is not code-signed, so Windows shows "Windows protected your PC" the first time: click **More info**, then **Run anyway**. It installs beside the official app, not over it, and keeps its own settings.
 
@@ -102,7 +106,7 @@ trap 'rm -f "$notes"' EXIT
 \`SHA256SUMS.txt\` holds the installer's checksum, to compare with \`Get-FileHash $exe\`.
 
 EOF
-  [ "$tag" = "$first_tag" ] || echo "Below is what changed since the previous build. Everything this build adds to the official app is listed on [TEST 0.1.0-test.20](https://github.com/$repo_slug/releases/tag/$first_tag), the first release."
+  [ "$tag" = "$first_tag" ] || echo "Below is what changed since the previous build. Everything this build adds to the official app is listed on [0.1.0-test.20](https://github.com/$repo_slug/releases/tag/$first_tag), the first release."
   printf '\n---\n\n'
   git log -1 --format=%b "$notes_commit"
 } >"$notes"
@@ -115,14 +119,27 @@ EOF
 # previous release without one, simply means full downloads.
 # Only that version's OWN blockmap: the previous release also carries the one before it, and a
 # '*.exe.blockmap' pattern snowballed (test.35 shipped 16 of them, test.20 to test.35).
+#
+# THE ONE-TIME BRIDGE. The updater builds the old blockmap's address from the NEW installer's name
+# with the version swapped, so an install on 0.1.0-test.54 asks for
+# everquest-companion-ce-Setup-0.1.0-test.54.exe.blockmap, a name that release never had. When the
+# previous release has only its -test- blockmap, upload a copy under the -ce- name. Once the
+# previous release is itself a CE one, the first download below finds it and this does nothing.
 extra=()
 prevdir=$(mktemp -d)
 trap 'rm -f "$notes"; rm -rf "$prevdir"' EXIT
 prev_tag=$(gh release view --repo "$repo_slug" --json tagName -q .tagName 2>/dev/null || true)
 if [ -n "$prev_tag" ] && [ "$prev_tag" != "$tag" ]; then
-  prev_blockmap="everquest-companion-test-Setup-${prev_tag#community-}.exe.blockmap"
+  prev_version=${prev_tag#community-}
+  prev_blockmap="everquest-companion-ce-Setup-$prev_version.exe.blockmap"
+  prev_old_name="everquest-companion-test-Setup-$prev_version.exe.blockmap"
   if gh release download "$prev_tag" --repo "$repo_slug" --pattern "$prev_blockmap" --dir "$prevdir" >/dev/null 2>&1; then
     [ -f "$prevdir/$prev_blockmap" ] && extra+=("$prevdir/$prev_blockmap")
+  elif gh release download "$prev_tag" --repo "$repo_slug" --pattern "$prev_old_name" --dir "$prevdir" >/dev/null 2>&1; then
+    if [ -f "$prevdir/$prev_old_name" ]; then
+      mv "$prevdir/$prev_old_name" "$prevdir/$prev_blockmap"
+      extra+=("$prevdir/$prev_blockmap")
+    fi
   fi
 fi
 if [ ${#extra[@]} -gt 0 ]; then
@@ -146,6 +163,14 @@ if [ $publish -eq 0 ]; then
   exit 0
 fi
 
-gh release create "$tag" --repo "$repo_slug" --target "$target" --latest \
-  --title "EQ Legends Companion TEST $version" --notes-file "$notes" \
+# STAGED: public but NOT Latest, so the feed (/releases/latest/download/) keeps serving the previous
+# release and no install takes this one until the owner promotes it. There is no way back after
+# that: allowDowngrade is off, so a bad build can only be fixed by a newer one.
+gh release create "$tag" --repo "$repo_slug" --target "$target" --latest=false \
+  --title "EQ Legends Companion CE (Community Edition) $version" --notes-file "$notes" \
   "$dir/$exe" "$dir/SHA256SUMS.txt" "$dir/test.yml" "$blockmap" "${extra[@]}"
+
+echo
+echo "Published $tag, NOT marked Latest: no install will take it yet."
+echo "Try it from https://github.com/$repo_slug/releases/download/$tag/ , then, on the owner's word:"
+echo "  gh release edit $tag --repo $repo_slug --latest"
