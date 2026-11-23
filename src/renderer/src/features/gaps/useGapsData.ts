@@ -18,7 +18,8 @@ import { killIndex, type KillMap, type KillsSnap } from '@shared/kills'
 import { lootedItemNames, type DropAliases, type DropGroups } from '@shared/gapDrops'
 import { lastGapsSnap, type GapsWiki } from '@shared/gapDerive'
 import { learnedOf, type LearnedEvidence } from '@shared/respawnLearn'
-import { memoLast } from '@shared/gapMemo'
+import { memoLast, perObject } from '@shared/gapMemo'
+import { questZoneCheck, withoutForeignQuests, type QuestElsewhere } from '@shared/gapQuestZones'
 import { catalogNameTest, commonLootNames, sellersOf, vendorFinder } from '@shared/gapMobPage'
 import { catalogZoneCounts, wikiZoneNamer } from '@shared/gapWikiZone'
 import type { PageExtras, ZoneNamer } from '@shared/wikiPage'
@@ -72,6 +73,12 @@ const isMobOf = (): ReturnType<typeof catalogNameTest> => (isMob ??= catalogName
 /** A quest's catalog entry when the wiki has its page (the Quests rows' Make page / Update page). */
 let questEntry: ReturnType<typeof questCatalogFinder> | undefined
 const questEntryOf = (): ReturnType<typeof questCatalogFinder> => (questEntry ??= questCatalogFinder((questsJson as { quests: QuestCatalogEntry[] }).quests))
+/** Whether a quest line starts where its NPC's page does not stand; the catalogs are walked at the first quest row. */
+let questZones: QuestElsewhere | undefined
+const questElsewhere: QuestElsewhere = (page, quest) => (questZones ??= questZoneCheck(MOB_CATALOG, (questsJson as { quests: QuestCatalogEntry[] }).quests))(page, quest)
+/** Per snapshot object, so the tab and the overlay's held copy each keep their own stable answer. */
+const placedQuests = perObject((snap: GapsSnap) => withoutForeignQuests(snap, questElsewhere))
+const withPlacedQuests = (snap: GapsSnap | null): GapsSnap | null => (snap == null ? snap : placedQuests(snap))
 let commonLoot: ReturnType<typeof commonLootNames> | undefined
 let vendorAt: ReturnType<typeof vendorFinder> | undefined
 let mobPage: ReturnType<typeof mobPageFinder> | undefined
@@ -293,7 +300,10 @@ export function useGapsData(all: AllCharacters | null = null, opts: GapsDataOpti
     return joinCharacters([live, ...otherInputs(deferredAll.others, isMobOf())], deferredAll.cut)
   }, [deferredAll, liveEngine, liveLoot, liveKills])
   const feeds = { engine: liveEngine, loot: liveLoot, kills: liveKills }
-  const { engine, loot, killMobs } = joined === null ? ownInputs(feeds, cut, only === undefined ? lastOwnCut : lastOwnCutOnly) : joinedInputs(joined)
+  const inputs = joined === null ? ownInputs(feeds, cut, only === undefined ? lastOwnCut : lastOwnCutOnly) : joinedInputs(joined)
+  const { loot, killMobs } = inputs
+  // One place for the live rows, the day window and the other characters' saved rows (gapQuestZones.ts).
+  const engine = withPlacedQuests(inputs.engine)
   // The item pages' side of each drop, asked of main (the corpus is main-only), and only when Drops
   // is derived. The same array while the loot is the same, so useItemMobs' effect does not rerun.
   const wantDrops = only === undefined || only === 'drop'
