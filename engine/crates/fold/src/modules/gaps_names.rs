@@ -153,12 +153,29 @@ fn zone_loose(zone: &str) -> String {
     loose.strip_prefix("the ").unwrap_or(&loose).to_string()
 }
 
+/// The wiki's names for a zone that share no telling word with the log's, as `(wiki, log)` under
+/// [`zone_loose`]: the same pairs as `src/shared/zones.ts`. Without them `An ancient cyclops
+/// (Southern Ro)` was offered as a new page in The Southern Desert of Ro (owner, 2026-11-22).
+const ZONE_SHORT_FORMS: [(&str, &str); 7] = [
+    ("south ro", "southern desert of ro"),
+    ("southern ro", "southern desert of ro"),
+    ("north ro", "northern desert of ro"),
+    ("northern ro", "northern desert of ro"),
+    ("lower guk", "ruins of old guk"),
+    ("upper guk", "city of guk"),
+    ("beholders maze", "gorge of king xorbb"),
+];
+
 /// Whether the zone the log names is one a page states, allowing the wiki's short forms (`Eastern
 /// Karana` for `The Eastern Plains of Karana`, `Lake Rathe` for `Lake Rathetear`, `Unrest` for `The
-/// Estate of Unrest`, both under [`zone_loose`]): equal, one within the other, or a telling word
-/// shared. Lenient on purpose: a miss here makes a known mob a row, a false match keeps today's answer.
+/// Estate of Unrest`, both under [`zone_loose`]): equal, one within the other, a listed short form,
+/// or a telling word shared. Lenient on purpose: a miss here makes a known mob a row, a false match
+/// keeps today's answer.
 fn zone_matches(here: &str, stated: &str) -> bool {
     if here == stated || here.contains(stated) || stated.contains(here) {
+        return true;
+    }
+    if ZONE_SHORT_FORMS.iter().any(|&(wiki, log)| (stated == wiki && here == log) || (stated == log && here == wiki)) {
         return true;
     }
     const COMMON: [&str; 14] = ["north", "south", "east", "west", "northern", "southern", "eastern", "western", "greater", "lesser", "upper", "lower", "plane", "plains"];
@@ -249,6 +266,22 @@ mod zone_tests {
         assert!(!m("The Rathe Mountains", "The Warrens"), "the owner's kobold");
         assert!(!m("The Rathe Mountains", "Lake Rathetear"));
         assert!(!m("Toxxulia Forest", "Greater Faydark"));
+    }
+
+    /// The owner's cyclops (2026-11-22), and the other pages the same miss made new-page rows.
+    #[test]
+    fn a_wiki_short_name_with_no_word_in_common_is_the_same_zone() {
+        let m = |here: &str, stated: &str| zone_matches(&zone_loose(here), &zone_loose(stated));
+        assert!(m("The Southern Desert of Ro", "Southern Ro"));
+        assert!(m("The Southern Desert of Ro", "South Ro"));
+        assert!(m("The Northern Desert of Ro", "North Ro"));
+        assert!(m("The Ruins of Old Guk", "Lower Guk"));
+        assert!(m("The City of Guk", "Upper Guk"));
+        assert!(m("Gorge of King Xorbb", "Beholder's Maze"));
+        assert!(m("The Ruins of Old Guk 4 (Refined) [instance 2]", "Lower Guk"), "at any tier");
+        assert!(!m("The Northern Desert of Ro", "Southern Ro"), "the other Ro keeps its own page");
+        assert!(!m("The City of Guk", "Lower Guk"), "the other Guk too");
+        assert!(!m("Ocean of Tears", "Southern Ro"), "the cyclops of another zone is not this page");
     }
 }
 
