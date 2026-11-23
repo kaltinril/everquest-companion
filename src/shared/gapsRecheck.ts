@@ -61,7 +61,7 @@ export function withoutNowKnown(gaps: unknown, known: KnownNow, pages: PagesNow)
 }
 
 /** `totals` with each dropped domain's count taken off, never below zero. */
-function lowered(totals: unknown, dropped: Record<string, number>): unknown {
+export function lowered(totals: unknown, dropped: Record<string, number>): unknown {
   if (typeof totals !== 'object' || totals === null) return totals
   const out: Record<string, unknown> = { ...(totals as Record<string, unknown>) }
   for (const [domain, n] of Object.entries(dropped)) {

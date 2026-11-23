@@ -103,7 +103,7 @@ export function moteHoursText(advice: Pick<MoteAdvice, 'hours'>): string {
  * experience, the unit the source hover uses: a dropped +4 copy is worth 16, so 128 is not 128 copies.
  */
 export function moteHoursTitle(advice: Pick<MoteAdvice, 'copies' | 'road'>): string {
-  const road = advice.road === 'copies' ? 'mostly by farming copies' : 'mostly by ordinary motes'
+  const road = advice.road === 'copies' ? 'mostly by farming copies' : 'mostly by motes and fragments'
   return `Without a mote: ${advice.copies.toLocaleString('en-US')} item experience, ${road}`
 }
 
@@ -146,7 +146,7 @@ const GAP_TEXT: Record<SupplyGap, string> = {
 
 /** The source cell's hover: who, how much a week, and what the estimate had to assume. */
 export function moteSourceTitle(supply: ItemSupply | undefined): string {
-  if (supply?.perWeek === undefined) return 'No page lists where it comes from, so only ordinary motes are counted'
+  if (supply?.perWeek === undefined) return 'No page lists where it comes from, so only motes and fragments are counted'
   const from = supply.from === undefined ? '' : `${supply.from}: `
   const roads = supply.roads > 1 ? ` over ${String(supply.roads)} sources` : ''
   const assumed = supply.assumed === undefined ? '' : `; ${supply.assumed.map((g) => GAP_TEXT[g]).join(', ')} assumed`

@@ -20,8 +20,10 @@ import { indexCrafting } from '../src/shared/tradeskillHistory'
 import {
   DOORS_LINE,
   HOME_SUBTITLE,
+  NOT_IN_LOG_TEXT,
   NO_TRADESKILL_SEEN_LINE,
-  UNSEEN_HEADING,
+  UNSEEN_DOOR_TIP,
+  UNSEEN_DOOR_WAITING_TIP,
   doorsLine,
   homeDoors,
   lastRunText,
@@ -29,7 +31,8 @@ import {
   pickUpHeldText,
   pickUpWhyText,
   sourceParts,
-  unseenDoorText,
+  tileRecipesText,
+  unseenFace,
   type PickUpAsk
 } from '../src/shared/tradeskillHome'
 import { CAP_NOTE, SPECIALIZATION_CAP, barLabel, barOfText, barTip, capTip, levelBar, skillTop } from '../src/shared/tradeskillLevelBar'
@@ -209,7 +212,7 @@ test('the last run states its pace only when the run is long enough to state one
 
 // ---- the sources line ---------------------------------------------------------------------------
 
-test("Home's doors: a full tile for each tradeskill the log has shown, one compact row for the rest", () => {
+test("Home's doors: the tradeskills with a level by level, then the ones the log has not shown by name", () => {
   const index = ownerIndex()
   // The owner's five: the highest level first. The other seven by name, each with its wiki recipes.
   const doors = homeDoors(tradeskillTiles(index, OWNER_ROWS))
@@ -218,15 +221,33 @@ test("Home's doors: a full tile for each tradeskill the log has shown, one compa
   assert.equal(doors.seen.length + doors.unseen.length, TRADESKILLS.length)
   assert.ok(doors.unseen.every((t) => t.level === null))
   assert.equal(doorsLine(doors, true), DOORS_LINE)
-  assert.equal(UNSEEN_HEADING, 'Not in your log yet')
-  assert.equal(unseenDoorText({ tradeskill: 'Pottery', recipes: 143 }), 'Pottery · 143 recipes')
-  assert.equal(unseenDoorText({ tradeskill: 'Tinkering', recipes: 1 }), 'Tinkering · 1 recipe')
-  assert.equal(unseenDoorText({ tradeskill: 'Alchemy', recipes: 0 }), 'Alchemy · 0 recipes')
+  assert.equal(tileRecipesText(143), '143 wiki recipes')
+  assert.equal(tileRecipesText(1), '1 wiki recipe')
+  assert.equal(tileRecipesText(0), '0 wiki recipes')
   // A skill that is no tradeskill (Forage) makes no tile and moves none.
   assert.deepEqual(homeDoors(tradeskillTiles(index, [...OWNER_ROWS, skill('Forage', 119)])), doors)
 })
 
-test('the log has shown no tradeskill: all twelve are in the compact row, and the line above says so', () => {
+test('a tile the log has not shown says so, states a top only where one is measured, and never a 0', () => {
+  assert.equal(NOT_IN_LOG_TEXT, 'Not in log')
+  assert.deepEqual(unseenFace('Pottery', true), { level: NOT_IN_LOG_TEXT, of: 'of 300', tip: UNSEEN_DOOR_TIP, label: 'Pottery: Not in log of 300' })
+  for (const tradeskill of ['Tinkering', 'Poison Making', 'Spell Research'] as const) {
+    assert.deepEqual(unseenFace(tradeskill, true), { level: NOT_IN_LOG_TEXT, of: '', tip: UNSEEN_DOOR_TIP, label: `${tradeskill}: Not in log` })
+  }
+  for (const tradeskill of TRADESKILLS) assert.doesNotMatch(`${unseenFace(tradeskill, true).level} ${unseenFace(tradeskill, true).label}`, /\b0\b/)
+})
+
+test('before the engine has read the skills a tile says nothing of the log, and still says it opens', () => {
+  for (const tradeskill of TRADESKILLS) {
+    const face = unseenFace(tradeskill, false)
+    assert.deepEqual([face.level, face.of, face.label], ['', '', tradeskill])
+    assert.equal(face.tip, UNSEEN_DOOR_WAITING_TIP)
+    assert.doesNotMatch(`${face.tip} ${face.label}`, /\blog\b/i)
+  }
+  assert.match(UNSEEN_DOOR_WAITING_TIP, /workbench/)
+})
+
+test('the log has shown no tradeskill: all twelve have no level, and the line above says so', () => {
   const doors = homeDoors(tradeskillTiles(ownerIndex(), []))
   assert.deepEqual(doors.seen, [])
   assert.deepEqual(doors.unseen.map((t) => t.tradeskill), [...TRADESKILLS].sort((a, b) => a.localeCompare(b)))
@@ -234,7 +255,7 @@ test('the log has shown no tradeskill: all twelve are in the compact row, and th
   assert.match(NO_TRADESKILL_SEEN_LINE, /^Your log has not shown any tradeskill go up yet\. /)
   // Until the engine has read the skills the line does not blame the log.
   assert.equal(doorsLine(doors, false), DOORS_LINE)
-  for (const line of [DOORS_LINE, NO_TRADESKILL_SEEN_LINE, UNSEEN_HEADING, unseenDoorText({ tradeskill: 'Pottery', recipes: 2 })]) assert.doesNotMatch(line, EM_DASH)
+  for (const line of [DOORS_LINE, NO_TRADESKILL_SEEN_LINE, NOT_IN_LOG_TEXT, UNSEEN_DOOR_TIP, UNSEEN_DOOR_WAITING_TIP, tileRecipesText(2)]) assert.doesNotMatch(line, EM_DASH)
 })
 
 test('the sources line names the wiki data by its date and each guide by title, author and version or copy date', () => {
