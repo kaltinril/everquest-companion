@@ -88,6 +88,22 @@ export function combinedRate(sources: readonly SourceView[]): number {
   return sources.reduce((n, s) => n + s.dps, 0)
 }
 
+/** One printed line of the grouped list: a source (a row's first line has the rank), or a pair's total. */
+export type PetGroupPrintLine =
+  | { kind: 'source'; source: SourceView; rank: number | null }
+  | { kind: 'pair'; total: number; dps: number }
+
+/**
+ * The grouped rows in reading order, for a surface that prints lines instead of drawing bars (the
+ * Combat tab's paste): each master with its rank, its pets beneath, then the pair's own figures.
+ */
+export function petGroupPrintLines(groups: readonly PetGroupRow[]): PetGroupPrintLine[] {
+  return groups.flatMap((g, i) => {
+    const lines: PetGroupPrintLine[] = g.lines.map((l, at) => ({ kind: 'source', source: l.source, rank: at === 0 ? i + 1 : null }))
+    return g.lines.length > 1 ? [...lines, { kind: 'pair', total: g.total, dps: g.dps }] : lines
+  })
+}
+
 /**
  * The grouped level-1 list. A pet joins its master only when the master has a row in this list: an
  * unbound pet, or one whose master dealt nothing (or was scoped out), stays a row of its own with
