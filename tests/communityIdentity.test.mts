@@ -107,7 +107,7 @@ const problemsIn = (dir: string, exe = EXE): string[] =>
 
 test('the guard passes a build with its identity intact', () => {
   withBuild(
-    () => {},
+    () => undefined,
     (dir) => assert.deepEqual(problemsIn(dir), [])
   )
 })

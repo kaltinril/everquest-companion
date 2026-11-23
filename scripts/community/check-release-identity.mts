@@ -40,7 +40,7 @@ function topLevel(text: string): Map<string, string> {
   const out = new Map<string, string>()
   for (const line of text.split(/\r?\n/)) {
     const m = /^([A-Za-z][\w-]*):\s*(.*?)\s*$/.exec(line)
-    if (m) out.set(m[1]!, m[2]!.replace(/^(['"])(.*)\1$/, '$2'))
+    if (m) out.set(m[1], m[2].replace(/^(['"])(.*)\1$/, '$2'))
   }
   return out
 }
