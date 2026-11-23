@@ -9,6 +9,7 @@ import {
   ENGINE_FORGIVE_MAX_LIVE,
   ENGINE_HEALTH_INTERVAL_MS,
   ENGINE_HEALTH_TIMEOUT_MS,
+  ENGINE_OWN_CONNECTION_TIMEOUT_MS,
   ENGINE_RESUME_GRACE_MS
 } from '../src/main/dataServer/engineProtocol'
 import { harness, launched, settle, type Harness } from './dataServerSupervisorHarness.mts'
@@ -62,7 +63,8 @@ test('the own connection answering keeps the launch, and the next probe is sched
 test('a real wedge: the own connection stays silent and the launch ends at the bounded wait', async () => {
   const { h, own } = await quietLaunch()
   await failedBeat(h)
-  h.clock.advance(ENGINE_HEALTH_TIMEOUT_MS - 1)
+  assert.ok(ENGINE_OWN_CONNECTION_TIMEOUT_MS > ENGINE_HEALTH_TIMEOUT_MS, 'one snapshot queued ahead must fit inside the wait')
+  h.clock.advance(ENGINE_OWN_CONNECTION_TIMEOUT_MS - 1)
   await settle()
   assert.equal(h.reports.length, 0, 'not before the limit')
   h.clock.advance(1)
@@ -77,7 +79,7 @@ test('an answer already delivered when the wait expires still counts', async () 
   const { h, own } = await quietLaunch()
   await failedBeat(h)
   // The timer fires and, in the same turn, the answer lands: the stall case.
-  h.clock.advance(ENGINE_HEALTH_TIMEOUT_MS)
+  h.clock.advance(ENGINE_OWN_CONNECTION_TIMEOUT_MS)
   own.asks[0].answer()
   await settle()
   assert.equal(h.reports.length, 0)
@@ -111,7 +113,7 @@ test('a stop during the ask reports nothing, whatever arrives afterwards', async
   h.supervisor.stop()
   own.asks[0].answer()
   await settle()
-  h.clock.advance(ENGINE_HEALTH_TIMEOUT_MS)
+  h.clock.advance(ENGINE_OWN_CONNECTION_TIMEOUT_MS)
   await settle()
   assert.equal(h.reports.filter((r) => r.name === 'EngineUnhealthy').length, 0)
   assert.ok(!h.logs.some((l) => l.includes('not ended')), 'and it forgave nothing')

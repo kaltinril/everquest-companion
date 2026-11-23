@@ -135,6 +135,15 @@ export const ENGINE_HEALTH_TIMEOUT_MS = 5_000
 export const ENGINE_HEARD_FRESH_MS = 20_000
 
 /**
+ * How long the watchdog waits for `session.health` on the app's OWN connection before it ends a
+ * launch. Longer than a probe's limit on purpose: a connection is served one request at a time, and
+ * one snapshot ahead of this ask may wait 5 s on the fold (`SNAPSHOT_PATIENCE`, engine `world.rs`),
+ * so a 5 s limit could end an engine that was only working through its queue (2026-11-22). The cost
+ * is up to 15 s more before a truly hung engine is replaced.
+ */
+export const ENGINE_OWN_CONNECTION_TIMEOUT_MS = 20_000
+
+/**
  * Once the log is live, how many failed beats in a row proof of life may forgive. An engine that
  * cannot accept a new connection also cannot serve a window's own connection, so past this the
  * launch is ended as before. While the log is still being read there is no cap: every forgiveness
