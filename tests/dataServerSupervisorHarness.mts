@@ -24,6 +24,8 @@ export function harness(
     /** PROOF OF LIFE (supervisorHealth.ts): when the app's own connection last heard the engine,
      *  and whether the log is live. Absent, the watchdog is the two-strike rule alone. */
     proof?: { heardAt: () => number | null; live: () => boolean }
+    /** THE SECOND OPINION (supervisorHealth.ts): the app's own connection, asked directly. */
+    ownConnection?: (token: string) => Promise<unknown>
   } = {}
 ) {
   const clock = fakeClock()
@@ -85,6 +87,7 @@ export function harness(
     onServedExit: () => servedExits.push(clock.now()),
     ...(opts.deaf === true ? {} : { onEngineSaid: (line: string) => said.push(line) }),
     ...(opts.proof === undefined ? {} : { engineHeardAt: opts.proof.heardAt, engineIsLive: opts.proof.live }),
+    ...(opts.ownConnection === undefined ? {} : { ownConnectionHealth: opts.ownConnection }),
     powerEvents: (handlers) => (power = handlers)
   }
   return {

@@ -30,6 +30,13 @@
 // `ENGINE_HEARD_FRESH_MS`, and newer than the evidence used last time, the beat is forgiven and
 // the next ordinary probe is scheduled. Only a transient reason is forgiven, only for a launch
 // that has answered once, and once the log is live only `ENGINE_FORGIVE_MAX_LIVE` times running.
+//
+// AND A QUIET PLAYER LEAVES NO WITNESS (fork, 2026-11-22, the owner's own install). Nothing is sent
+// on the app's connection while nothing happens in the log, so on a busy PC four working engines
+// were ended with `connect, connect` and no frame inside the 20 s, after 551 to 6,640 s of service.
+// So with no fresh evidence the watch MAKES some: one `session.health` on the connection already
+// open (`ownConnectionHealth`), bounded by the health timeout. An answer forgives the beat under the
+// same rules and the same cap; no connection, no answer or a closed one ends the launch as before.
 
 import type { ByteChannel } from '../../shared/dataServer/ndjson'
 import {
@@ -71,6 +78,12 @@ export interface HealthWatchDeps {
   now?(): number
   /** Has the engine caught up on the log? Unknown counts as yes, the stricter side. */
   engineIsLive?(): boolean
+  /**
+   * THE SECOND OPINION. One `session.health` on the app's own open connection to the launch holding
+   * `token`; resolves on an answer and rejects when there is no such connection or it closed. It
+   * must never open a connection. Absent: a verdict with no fresh evidence stands, as it always did.
+   */
+  ownConnectionHealth?: (token: string) => Promise<unknown>
   /** TEST SEAMS — every clock this watchdog has. */
   healthIntervalMs?: number
   healthTimeoutMs?: number
@@ -247,21 +260,78 @@ class HealthWatch implements LaunchHealthWatch {
       this.schedule(this.intervalMs)
       return
     }
+    if (this.askOwnConnection(round, reasons, err)) return
     this.on.onUnhealthy(reasons, err)
+  }
+
+  /** May this verdict be set aside at all, whatever the evidence? Every refusal is a reason the
+   *  kill stands. */
+  private forgivable(reasons: readonly HealthFailure[]): boolean {
+    // A launch that never answered has proved nothing, and a reason a serving engine cannot
+    // produce (a refusal, a protocol mismatch) is not a stall.
+    if (this.first || !reasons.every(isTransientHealthFailure)) return false
+    const live = this.deps.engineIsLive?.() ?? true
+    return !(live && this.forgivenRun >= ENGINE_FORGIVE_MAX_LIVE)
+  }
+
+  /**
+   * THE SECOND OPINION (file header): true when the verdict now waits on the app's own connection.
+   * The wait sits in `cancel`, so a stop or a suspend disarms it, and `round` drops a late answer.
+   * The timeout gives pending I/O one turn first: an answer already on the socket when a stall
+   * ends must not lose to the timer (`socketChannel.ts failIfStillConnecting`, the same trap).
+   */
+  private askOwnConnection(round: number, reasons: readonly HealthFailure[], err: unknown): boolean {
+    const ask = this.deps.ownConnectionHealth
+    if (ask === undefined || !this.forgivable(reasons)) return false
+    this.deps.debug(
+      `data-server engine: health probe failed (${reasons.join(', ')}); asking on the app's own connection`
+    )
+    let settled = false
+    const settle = (answered: boolean): void => {
+      if (settled) return
+      settled = true
+      if (this.spent(round)) return
+      this.cancel?.()
+      this.cancel = null
+      if (answered) this.forgiveOnAnswer(reasons)
+      else this.on.onUnhealthy(reasons, err)
+    }
+    this.cancel = this.deps.timer(() => {
+      setImmediate(() => {
+        settle(false)
+      })
+    }, this.timeoutMs)
+    void new Promise((resolve) => {
+      resolve(ask(this.target.token))
+    }).then(
+      () => {
+        settle(true)
+      },
+      () => {
+        settle(false)
+      }
+    )
+    return true
+  }
+
+  /** The app's own connection answered: the beat is forgiven and counts toward the cap. */
+  private forgiveOnAnswer(reasons: readonly HealthFailure[]): void {
+    this.forgivenRun += 1
+    this.deps.debug(
+      `data-server engine: health probe failed (${reasons.join(', ')}) but the engine answered on ` +
+        `the app's own connection; not ended (${String(this.forgivenRun)} in a row)`
+    )
+    this.schedule(this.intervalMs)
   }
 
   /**
    * PROOF OF LIFE: is this verdict set aside because the app's own connection heard the engine a
-   * moment ago? See the file header. Every refusal below is a reason the kill stands.
+   * moment ago? See the file header.
    */
   private forgiven(reasons: readonly HealthFailure[]): boolean {
-    // A launch that never answered has proved nothing, and a reason a serving engine cannot
-    // produce (a refusal, a protocol mismatch) is not a stall.
-    if (this.first || !reasons.every(isTransientHealthFailure)) return false
+    if (!this.forgivable(reasons)) return false
     const heard = this.freshEvidence()
     if (heard === null) return false
-    const live = this.deps.engineIsLive?.() ?? true
-    if (live && this.forgivenRun >= ENGINE_FORGIVE_MAX_LIVE) return false
     const age = (this.deps.now?.() ?? heard) - heard
     this.forgivenStamp = heard
     this.forgivenRun += 1

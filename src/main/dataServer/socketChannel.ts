@@ -77,6 +77,21 @@ export function socketChannel(socket: Socket): ByteChannel {
 }
 
 /**
+ * A CONNECT TIMEOUT THAT FIRED AFTER A STALL IN THIS PROCESS MAY BE ABOUT THIS PROCESS (fork,
+ * 2026-11-22, the owner's own install). Loopback connects are completed by the OS against the listen
+ * backlog: measured, 20 of 20 finished in 0.2 to 3.3 ms while the listener's event loop was blocked.
+ * But libuv runs timers before the next poll when a stall ends in an I/O or `setImmediate` callback,
+ * so a 3 s stall with a finished connect pending reported a timeout 5 times of 5 (Node 24 and
+ * Electron 45's runtime). `setImmediate` runs after that poll, so `connect` is delivered first if it
+ * has happened at all, and only a socket still connecting then has really timed out.
+ */
+export function failIfStillConnecting(socket: Pick<Socket, 'connecting'>, fail: () => void): void {
+  setImmediate(() => {
+    if (socket.connecting) fail()
+  })
+}
+
+/**
  * Open one loopback connection to the engine and hand back its channel.
  *
  * THE CONNECT HAS ITS OWN TIMEOUT because a socket that never completes its handshake never emits
@@ -86,14 +101,18 @@ export function socketChannel(socket: Socket): ByteChannel {
  *
  * The socket is `unref`'d, for `presence.ts`'s reason: nothing this supervisor holds may be the
  * reason a quitting process stays alive.
+ *
+ * THE TIMEOUT IS NOT BELIEVED UNTIL PENDING I/O HAS HAD ITS TURN: see `failIfStillConnecting`.
  */
 export async function connectToEngine(port: number, timeoutMs: number): Promise<ByteChannel> {
   return new Promise<ByteChannel>((resolve, reject) => {
     const socket = connect({ host: ENGINE_HOST, port })
     socket.unref()
     socket.setTimeout(timeoutMs, () => {
-      socket.destroy()
-      reject(new Error(`connecting to the engine on port ${String(port)} timed out`))
+      failIfStillConnecting(socket, () => {
+        socket.destroy()
+        reject(new Error(`connecting to the engine on port ${String(port)} timed out`))
+      })
     })
     socket.once('error', (err: Error) => {
       reject(err)

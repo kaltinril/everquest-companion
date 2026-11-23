@@ -843,6 +843,20 @@ export async function engineRequest<O extends RequestOp>(
 // ── the composition root's two verbs ────────────────────────────────────────────────────────────
 
 /**
+ * THE WATCHDOG'S SECOND OPINION (`supervisorHealth.ts`): one `session.health` on the connection
+ * already open to THIS launch. It rejects at once when there is none: a connection still in its
+ * handshake is refused too, because `request` would queue behind it and an answer there would say
+ * nothing about the connection that had been open.
+ */
+export async function ownConnectionHealth(token: string): Promise<void> {
+  const l = live
+  if (l?.engine.token !== token || l.client.state !== 'ready') {
+    throw new EngineError('unavailable', 'the app has no open connection to this launch')
+  }
+  await l.client.request('session.health', {})
+}
+
+/**
  * Arm the client. Called by `engineHost.ts` from inside its own `EQC_ENGINE` guard, so this file
  * never reads the flag and there is one gate rather than two.
  */
