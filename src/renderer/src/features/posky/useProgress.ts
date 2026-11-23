@@ -29,7 +29,7 @@ import { setCountSource, useCountSource } from './useCountSource'
 import { questKey } from './keys'
 import { ambiguousQuestNames, computeSharedItems, type SharedItemsMap } from './sharedItems'
 import { skyDroppersFor, type DropperMob } from './poskyDroppers'
-import { countTurnIns, newlyCompletedTurnIns } from './turnInCelebration'
+import { countTurnIns, newlyCompletedTurnIns, settleRefusals } from './turnInCelebration'
 import { questDropRecency } from './questSort'
 import { useDerivedCompletions } from './derivedCompletions'
 import { useHeldProgress } from './progressStore'
@@ -528,9 +528,11 @@ function useTurnInLedger(
   // counts, nor windows the dump, nor charges the items it never spent — the log's own share
   // (`logCounts`, the reconcile window) reads this list and needs no second filter.
   const rejected = useMemo(() => rejectedTurnIns(progress), [progress])
+  // Every reader below takes the trades with each refusal on the item it really handed back.
+  const trades = useMemo(() => settleRefusals(turnInsRaw ?? EMPTY_TRADES, posky.quests), [turnInsRaw])
   const detected = useMemo<TurnInInstants>(
-    () => withoutRejected(countTurnIns(turnInsRaw ?? [], posky.quests), rejected),
-    [turnInsRaw, rejected]
+    () => withoutRejected(countTurnIns(trades, posky.quests), rejected),
+    [trades, rejected]
   )
   // The log's turn-ins merged with the persisted ones, as the all-time count the rest of the tab
   // reads. No since-the-dump count any more (JOS-141): consumption is windowed by SOURCE rather
@@ -578,7 +580,7 @@ function useTurnInLedger(
   // reset and this file crossed its ceiling). They restate a quest from the ledger derived above.
   const turnInsReady = turnInsRaw != null
   const actions = useTurnInActions(turnIns, turnInsReady ? detected : null, rejected, setProgress)
-  return { turnIns, detected, logCounts, turnInsReady, trades: turnInsRaw ?? EMPTY_TRADES, ...actions }
+  return { turnIns, detected, logCounts, turnInsReady, trades, ...actions }
 }
 
 /**
