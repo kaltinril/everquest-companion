@@ -17,6 +17,7 @@
 
 import type { PoskyQuest, TurnInEvent } from '@shared/types'
 import type { TurnInInstants } from '@shared/questTurnIns'
+import { settleRefusalsBy } from '../../../../shared/turnInRefusals'
 import { itemCountKey } from '../../lib/itemName'
 import { questKey } from './keys'
 
@@ -47,6 +48,14 @@ export function countTurnIns(turnIns: readonly TurnInEvent[], quests: PoskyQuest
     }
   }
   return out
+}
+
+/** The rows with each refusal on the item it really handed back (`shared/turnInRefusals.ts`). */
+export function settleRefusals(
+  turnIns: readonly TurnInEvent[],
+  quests: readonly PoskyQuest[]
+): readonly TurnInEvent[] {
+  return settleRefusalsBy(turnIns, quests, itemCountKey)
 }
 
 /** A turn-in that just happened, and which number it was for that quest. */

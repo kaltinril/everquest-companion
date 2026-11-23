@@ -19,7 +19,8 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
   countTurnIns,
-  newlyCompletedTurnIns
+  newlyCompletedTurnIns,
+  settleRefusals
 } from '../src/renderer/src/features/posky/turnInCelebration'
 import { questKey } from '../src/renderer/src/features/posky/keys'
 import poskyRaw from '../src/renderer/src/data/eqlegends/posky.json' with { type: 'json' }
@@ -157,6 +158,50 @@ test('a cancelled offer credits nothing, even when the trade later completes', (
   const offered = monkFists.items.map((i) => i.name)
   const detected = countTurnIns([{ ts: 1, npc: 'Holwin', items: offered, given: [] }], quests)
   assert.equal(detected[questKey(monkFists)], undefined)
+})
+
+// The owner's log, 2026-09-20: the right rune came last, the wrong one was what Holwin handed back.
+const one = (item: string): { item: string; count: number } => ({ item, count: 1 })
+const FISTS = ['Nebulous Sapphire', 'Brass Knuckles', 'Wind Rune Neza']
+const wrongRuneTrade: TurnInEvent = {
+  ts: 7,
+  npc: 'Holwin',
+  items: ['Nebulous Sapphire', 'Brass Knuckles', 'Wind Rune Izah', 'Wind Rune Neza'],
+  given: ['Nebulous Sapphire', 'Brass Knuckles', 'Wind Rune Izah'].map(one),
+  back: [one('Wind Rune Neza')]
+}
+
+test('a refusal of a spare offer: the quest it completed is credited and the spare went back', () => {
+  const [row] = settleRefusals([wrongRuneTrade], quests)
+  assert.deepEqual(row.given, FISTS.map(one))
+  assert.deepEqual(row.back, [one('Wind Rune Izah')])
+  assert.deepEqual(countTurnIns([row], quests)[questKey(monkFists)], [7])
+})
+
+test('a refused quest item stays uncredited: the NPC kept fewer offers than the quest asks', () => {
+  const row: TurnInEvent = { ts: 1, npc: 'Holwin', items: FISTS, given: FISTS.slice(0, 2).map(one), back: [one(FISTS[2])] }
+  assert.deepEqual(settleRefusals([row], quests), [row])
+  assert.equal(countTurnIns([row], quests)[questKey(monkFists)], undefined)
+})
+
+test('a trade refused whole stays uncredited', () => {
+  const row: TurnInEvent = { ts: 1, npc: 'Holwin', items: FISTS, given: [], back: FISTS.map(one) }
+  assert.deepEqual(settleRefusals([row], quests), [row])
+})
+
+test('a row that already makes its quest is left alone', () => {
+  const row: TurnInEvent = { ...wrongRuneTrade, given: FISTS.map(one), back: [one('Wind Rune Izah')] }
+  assert.equal(settleRefusals([row], quests)[0], row)
+})
+
+test('a trade with another giver, same items, is not corrected', () => {
+  const row: TurnInEvent = { ...wrongRuneTrade, npc: 'Kizdean Gix' }
+  assert.equal(settleRefusals([row], quests)[0], row)
+})
+
+test('rows with no refusal, or from an older archive, come back as the same list', () => {
+  const rows: TurnInEvent[] = [{ ts: 1, npc: 'Holwin', items: FISTS }, { ts: 2, npc: 'Holwin', items: FISTS, given: FISTS.map(one) }]
+  assert.equal(settleRefusals(rows, quests), rows)
 })
 
 test('a completed hand-in still credits, from `given` and from an older row without it', () => {

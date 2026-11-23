@@ -666,6 +666,25 @@ impl BuffTimersModule {
         }
     }
 
+    /// A saved duration choice arrives with no log line, so every live hold re-reads the estimator
+    /// here, as the buff rows do in `buffs_defines.rs`. Published only when a length moved.
+    fn restat_holds(&mut self) {
+        let core_rc = Rc::clone(&self.core);
+        let core = core_rc.borrow();
+        let mut moved = false;
+        for held in self.holds.values_mut().filter(|h| !h.line_key.is_empty()) {
+            let est = core.stats.estimate_for(&held.line_key, &held.caster);
+            if held.duration_ms != est.ms || held.source != est.source {
+                held.duration_ms = est.ms;
+                held.source = est.source;
+                moved = true;
+            }
+        }
+        if moved {
+            self.rev += 1;
+        }
+    }
+
     /// Drop landings nothing ended and ends nobody needs any more.
     fn sweep(&mut self, now_ms: i64) {
         let keys: Vec<String> = self.holds.iter().map(|(k, _)| k.to_string()).collect();
@@ -945,5 +964,11 @@ impl EqModule for BuffTimersModule {
     /// The view pull seam. See `EqModule::as_buff_timers`.
     fn as_buff_timers(&self) -> Option<&BuffTimersModule> {
         Some(self)
+    }
+
+    fn after_define(&mut self, family: &str) {
+        if family == "buffTrust" {
+            self.restat_holds();
+        }
     }
 }

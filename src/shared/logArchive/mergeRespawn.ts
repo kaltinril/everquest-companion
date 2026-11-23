@@ -222,14 +222,25 @@ function withFloor(snap: RespawnSnap, shared: ReadonlySet<string>): RespawnSnap 
  * field has none. Re-read here over the joined learned gaps, pooled as the engine pools them (the
  * mob, in every place of the row's zone; a shared name's gaps under ten minutes left out, by the
  * row or by today's watch list). It only ever lowers `agreedMs`, so it can lower a wiki floor and
- * never raise an estimate; the row's own gaps, samples and typed number are not touched.
+ * never raise an estimate; the row's own gaps and typed number are not touched.
+ *
+ * A row with no gap of its own (the mob was killed elsewhere in the zone, or the archive holds no
+ * row for it) takes the pool as its count and bound, as `respawn_places.rs pooled_gaps` does on one
+ * log. Without them the ladder stops at the wiki rung and the agreed gap lowers nothing.
  */
 function withAgreed(row: RespawnRow, learned: readonly Learned[], shared: ReadonlySet<string>): RespawnRow {
   const base = zoneBase(row.zone)
   const pool = learned.filter((l) => l.key === row.key && zoneBase(l.zone) === base).flatMap((l) => l.gapsMs)
-  const agreed = agreedGap(pool, row.sharedName === true || shared.has(row.key) ? RESPAWN_SHARED_NAME_FLOOR_MS : 0)
+  const floor = row.sharedName === true || shared.has(row.key) ? RESPAWN_SHARED_NAME_FLOOR_MS : 0
+  const agreed = agreedGap(pool, floor)
   if (agreed === undefined || (row.agreedMs !== undefined && row.agreedMs <= agreed)) return row
-  return withEstimate({ ...row, agreedMs: agreed })
+  const out: RespawnRow = { ...row, agreedMs: agreed }
+  if (row.samples === 0) {
+    const counted = pool.filter((g) => g >= floor)
+    out.samples = counted.length
+    out.observedMs = Math.min(...counted)
+  }
+  return withEstimate(out)
 }
 
 /**
@@ -300,11 +311,26 @@ export function withCurrentWiki(archived: unknown, wikiNow: RespawnWikiNow): unk
  * An archived state with its history rows for every mob `live` watches, `live`'s watch list, and
  * the zone `live` stands in (`liveZone`, for the row cap: `standingOf`; the join with the live state
  * drops it). A row the archived state already has is left as captured. Anything else comes back as is.
+ * `standing` is `standingAcross`'s answer, for a fresh live log with no zone line yet.
  */
-export function withHistoryRows(archived: unknown, history: readonly RespawnRow[], live: unknown): unknown {
+export function withHistoryRows(archived: unknown, history: readonly RespawnRow[], live: unknown, standing?: string): unknown {
   if (!isRespawnSnap(archived) || !isRespawnSnap(live)) return archived
   const watches = watchesOf(live)
   const have = new Set(archived.rows.map((r) => r.id))
   const extra = history.filter((r) => watches.has(r.key) && !have.has(r.id))
-  return { ...archived, prefs: live.prefs, rows: [...archived.rows, ...extra], liveZone: live.zone }
+  return { ...archived, prefs: live.prefs, rows: [...archived.rows, ...extra], liveZone: standing ?? live.zone }
+}
+
+/**
+ * The zone the player stands in, for every archive-to-archive join: the live log's, or, before its
+ * first zone line, the zone the newest archive ended in. An intermediate join sees only its own
+ * newer side, so with three or more archives it would keep the wrong zone whole.
+ */
+export function standingAcross(archived: readonly unknown[], live: unknown): string | undefined {
+  if (isRespawnSnap(live) && live.zone !== '') return live.zone
+  for (let i = archived.length - 1; i >= 0; i--) {
+    const state = archived[i]
+    if (isRespawnSnap(state) && state.zone !== '') return state.zone
+  }
+  return undefined
 }

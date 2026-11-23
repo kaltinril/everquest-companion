@@ -391,6 +391,10 @@ export interface TurnInEvent {
   /** What the trade really took, with stack counts: no cancelled or refused offer. Absent on a
    *  row folded before it existed (an older archive segment). */
   given?: { item: string; count: number }[]
+  /** What the NPC's refusals took out of `given`, read as its last offers because the log never
+   *  names the item handed back (`settleRefusals` corrects that from the quest list). Absent on a
+   *  trade with no refusal and on a row folded before it existed. */
+  back?: { item: string; count: number }[]
 }
 
 /** A level-up ("You have gained a level! Welcome to level N!"). */

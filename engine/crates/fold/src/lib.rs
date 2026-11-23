@@ -145,6 +145,10 @@ pub trait EqModule {
         None
     }
 
+    /// A `define` of `family` has landed in the module that owns it. For a module that reads
+    /// what that one holds: `buffTimers` restates its holds from the choices `buffs` just took.
+    fn after_define(&mut self, _family: &str) {}
+
     /// The respawn watch rows.
     fn as_respawn(&self) -> Option<&modules::respawn::RespawnModule> {
         None
@@ -560,15 +564,22 @@ impl Registry {
     /// `false` for a family no registered module claims — `snapshot_of`'s rule. A linear scan over
     /// at most twenty entries, made a handful of times per session.
     pub fn define(&mut self, family: &str, payload: &Value) -> bool {
+        let mut claimed = false;
         for m in &mut self.mods {
             if let Some(d) = m.as_defines() {
                 if d.family() == family {
                     d.define(payload);
-                    return true;
+                    claimed = true;
+                    break;
                 }
             }
         }
-        false
+        if claimed {
+            for m in &mut self.mods {
+                m.after_define(family);
+            }
+        }
+        claimed
     }
 
     /// Every alert fire any module produced since the last drain, in registration order. Empty for
