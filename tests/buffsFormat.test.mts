@@ -31,6 +31,14 @@ test('one logged cast is enough to be past it', () => {
   assert.equal(estimateState(observed, 60_000).overdue, true)
 })
 
+test('a card with time left on its bar never reads past estimate, wherever p75 sits', () => {
+  // 'observed' is the longest of the last five casts, so the all-time p75 usually sits below it.
+  const observed = buff({ estimatedMs: 100_000, durationSource: 'observed', p25: 50_000, p75: 60_000, n: 5 })
+  assert.equal(estimateState(observed, 80_000).overdue, false, 'past p75, 20 s still on the bar')
+  assert.equal(estimateState(observed, 100_000).overdue, false)
+  assert.equal(estimateState(observed, 101_000).overdue, true)
+})
+
 test('the stated sources keep their rule: past the number is past the estimate', () => {
   for (const durationSource of ['db', 'deathBound', 'manual'] as const) {
     const stated = buff({ estimatedMs: 30_000, durationSource })
