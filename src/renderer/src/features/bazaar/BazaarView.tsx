@@ -12,7 +12,7 @@
 import { type JSX, memo, useCallback, useDeferredValue, useMemo, useRef, useState } from 'react'
 import { Box, Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Typography } from '@mui/material'
 import { itemTierKey } from '@shared/itemStats'
-import { findWatch, watchOnItem, type BazaarWatchlist } from '@shared/bazaarWatch'
+import { findWatch, rowWatchChip, type BazaarWatchlist } from '@shared/bazaarWatch'
 import { factsAsked, factsPass, questNamesOf, type FactsFilter } from '@shared/bazaarFacts'
 import { offersCsv, offersOf } from '@shared/bazaarCsv'
 import {
@@ -358,7 +358,7 @@ export default function BazaarView({ onOpenLoot }: { onOpenLoot: (item: string) 
                     picked={i.key === picked.key}
                     iconId={factsOf(i.item)?.iconId}
                     wished={wished.has(itemTierKey(i.item))}
-                    watch={i.combined !== undefined ? watchOnItem(watch, i.item) : findWatch(watch, i.item, i.tier)}
+                    chip={rowWatchChip(watch, i.item, i.combined !== undefined ? null : i.tier)}
                     onPick={onPick}
                     onOpenLoot={onOpenLoot}
                   />

@@ -8,7 +8,6 @@
 import { type JSX, memo, useMemo } from 'react'
 import { Chip, Stack, TableCell, TableRow } from '@mui/material'
 import { formatPlat, sparkline, type BazaarItem } from '@shared/bazaar'
-import { watchChipLabel, type BazaarWatch } from '@shared/bazaarWatch'
 import { BazaarSparkline } from './BazaarChart'
 import { ItemIcon, ItemName, priceOf } from './BazaarItemCells'
 import { Move } from './BazaarMove'
@@ -36,16 +35,15 @@ interface Props {
   picked: boolean
   iconId: number | undefined
   wished: boolean
-  /** The watchlist entry on this item (the list's own object, so it is stable), or null. */
-  watch: BazaarWatch | null
+  /** What the watch chip says (`rowWatchChip`), or null with no watch. A string, so the memo holds. */
+  chip: string | null
   /** Picks this row by its key; one callback for every row, so the memo holds. */
   onPick: (key: string) => void
   onOpenLoot: (item: string) => void
 }
 
-function ItemRow({ item, endDay, picked, iconId, wished, watch, onPick, onOpenLoot }: Props): JSX.Element {
+function ItemRow({ item, endDay, picked, iconId, wished, chip, onPick, onOpenLoot }: Props): JSX.Element {
   const spark = useMemo(() => sparkline(item.points, endDay, SPARK_DAYS), [item, endDay])
-  const chip = watch === null ? null : watchChipLabel(watch)
   const tiers = item.combined?.tiers.length ?? 1
   return (
     <TableRow hover selected={picked} onClick={() => onPick(item.key)} sx={{ cursor: 'pointer', height: ROW_HEIGHT }} data-testid={`bazaar-row-${item.key}`}>
