@@ -379,6 +379,21 @@ test('switching it on for a mob no longer watched watches it again; off for one 
   assert.equal(respawnWithSharedName(prefs, 'Elite Guard', 'Elite Guard', false), prefs)
 })
 
+test('switching it on for a mob no longer watched brings its kept typed number back with the watch', () => {
+  const prefs: RespawnPrefs = { watches: [{ key: 'b', display: 'b' }], keptCustom: [{ key: 'elite guard', customSec: 900 }, { key: 'c', customSec: 60 }] }
+  const next = stored(respawnWithSharedName(prefs, 'Elite Guard', 'Elite Guard', true))
+  assert.deepEqual(next.watches[1], { key: 'elite guard', display: 'Elite Guard', customSec: 900, sharedName: true })
+  assert.deepEqual(next.keptCustom, [{ key: 'c', customSec: 60 }], 'a name lives in one list, and the other kept number stays')
+})
+
+test('a full list refuses the switch for a mob not watched, and its kept number stays kept', () => {
+  const prefs: RespawnPrefs = {
+    watches: Array.from({ length: RESPAWN_MAX_WATCHES }, (_, i) => ({ key: `mob ${String(i)}`, display: `mob ${String(i)}` })),
+    keptCustom: [{ key: 'elite guard', customSec: 900 }]
+  }
+  assert.equal(respawnWithSharedName(prefs, 'Elite Guard', 'Elite Guard', true), prefs)
+})
+
 test('the store normalizer keeps only a true switch, and a whole-list replace carries it through', () => {
   const read = normalizeRespawnPrefs({ watches: [{ key: 'a', display: 'a', sharedName: true }, { key: 'b', display: 'b', sharedName: 'yes' }, { key: 'c', display: 'c', sharedName: false }] })
   assert.deepEqual(read.watches, [{ key: 'a', display: 'a', sharedName: true }, { key: 'b', display: 'b' }, { key: 'c', display: 'c' }])

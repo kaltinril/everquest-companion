@@ -175,20 +175,27 @@ export function respawnWithCustom(prefs: RespawnPrefs, key: string, display: str
 /**
  * SEVERAL MOBS SHARE THIS NAME, OR NOT (owner, 2026-11-09: "identical named mobs" ruin the clock; the
  * estimate then ignores gaps under ten minutes). The switch is set on the watch in place, a typed
- * number kept; switching it on for a mob whose watch went away meanwhile watches it again, as a
- * typed number does; switching it off for a mob not watched is a no-op. The kept list is untouched:
- * the switch is a fact about the watch and goes with it.
+ * number kept; switching it on for a mob whose watch went away meanwhile watches it again through
+ * `respawnWithWatch`, so its kept number comes back with it and a full list refuses it whole;
+ * switching it off for a mob not watched is a no-op. The switch is a fact about the watch and goes
+ * with it: the kept list never holds one.
  */
 export function respawnWithSharedName(prefs: RespawnPrefs, key: string, display: string, shared: boolean): RespawnPrefs {
   const want = canonRespawnKey(key)
   if (want.length === 0) return prefs
   const had = prefs.watches.find((w) => w.key === want)
-  if (had === undefined && !shared) return prefs
-  const entry: RespawnWatchPref = { key: want, display: had?.display ?? display }
-  if (had?.customSec !== undefined) entry.customSec = had.customSec
+  if (had === undefined) return shared ? watchedAsShared(prefs, want, display) : prefs
+  const entry: RespawnWatchPref = { key: want, display: had.display }
+  if (had.customSec !== undefined) entry.customSec = had.customSec
   if (shared) entry.sharedName = true
-  const watches = had === undefined ? [...prefs.watches, entry] : prefs.watches.map((w) => (w.key === want ? entry : w))
-  return { ...prefs, watches }
+  return { ...prefs, watches: prefs.watches.map((w) => (w.key === want ? entry : w)) }
+}
+
+/** A mob not watched, watched again with the switch on. A refused watch hands `prefs` back. */
+function watchedAsShared(prefs: RespawnPrefs, want: string, display: string): RespawnPrefs {
+  const next = respawnWithWatch(prefs, want, display)
+  if (next === prefs) return prefs
+  return { ...next, watches: next.watches.map((w) => (w.key === want ? { ...w, sharedName: true } : w)) }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
