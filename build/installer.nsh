@@ -333,7 +333,7 @@ Var pid
     # oneClick hides the details pane, so this is visible in install.log only when the build
     # sets ENABLE_LOGGING_ELECTRON_BUILDER (electron-builder.yml
     # `nsis.customNsisBinary.debugLogging: true`) - i.e. exactly the debug-log case.
-    DetailPrint "Wine/CrossOver detected - skipping the running-app check (process enumeration is not reliable in a bottle). Close EQ Legends Companion yourself if it is open."
+    DetailPrint "Wine/CrossOver detected - skipping the running-app check (process enumeration is not reliable in a bottle). Close ${PRODUCT_NAME} yourself if it is open."
   ${Else}
     !insertmacro IS_POWERSHELL_AVAILABLE
     !insertmacro _CHECK_APP_RUNNING
@@ -410,7 +410,7 @@ Var pid
   # Interactive uninstall. Yes (default button, and the /SD fallback) keeps everything.
   # Deliberately ONE line: this file has a history of "compiles clean, installer dies",
   # and a line continuation inside a macro body is not worth re-litigating.
-  MessageBox MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON1|MB_TOPMOST|MB_SETFOREGROUND "Keep your settings and history?$\r$\n$\r$\nThey'll be restored if you reinstall EQ Legends Companion TEST.$\r$\n(Choosing No deletes them permanently.)" /SD IDYES IDYES eqKeepUserData
+  MessageBox MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON1|MB_TOPMOST|MB_SETFOREGROUND "Keep your settings and history?$\r$\n$\r$\nThey'll be restored if you reinstall ${PRODUCT_NAME}.$\r$\n(Choosing No deletes them permanently.)" /SD IDYES IDYES eqKeepUserData
 
   ${If} $installMode == "all"
     SetShellVarContext current

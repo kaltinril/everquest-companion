@@ -99,7 +99,7 @@ test runners) or one job at a time.
 **Cut a test build.** Bump the version and write the tester notes as a commit on a work branch
 off `main_community`, merge it, then `npm run dist`. Read the previous build's notes first; they
 list what the testers caught. The installer is
-`release/<version>/everquest-companion-test-Setup-<version>.exe` in this clone, next to the
+`release/<version>/everquest-companion-ce-Setup-<version>.exe` in this clone, next to the
 earlier builds (RULES.md, rule 17). `npm run dist` runs in this clone, never in a worktree (rule
 16): a junctioned `node_modules` ships an asar missing dependencies. Before handing a build out,
 `npx @electron/asar list release/<version>/win-unpacked/resources/app.asar` must list

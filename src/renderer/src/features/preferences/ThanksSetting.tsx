@@ -75,8 +75,9 @@ export function ThanksSetting(): JSX.Element {
           author is thanked first, with his repo findable on purpose and labelled as the original. */}
       <Stack spacing={0.25} data-testid="prefs-thanks-original">
         <Typography variant="body2">
-          This app is a community continuation of EQ Companion, built by jmoyers. Nearly everything
-          you use here started as his work, and it would not exist without it. Thank you.
+          EQ Legends Companion CE (Community Edition) is a community continuation of EQ Companion,
+          built by jmoyers. Nearly everything you use here started as his work, and it would not
+          exist without it. Thank you.
         </Typography>
         <Link
           href="https://github.com/jmoyers/everquest-companion"
