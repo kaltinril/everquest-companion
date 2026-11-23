@@ -39,5 +39,7 @@ export const mapsBridge = {
   /** Every druid, wizard and item port the corpora state — a static table, fetched once. */
   getZonePorts: (): Promise<ZonePort[]> => ipcRenderer.invoke(IPC.mapsPorts),
   /** Every zone's stated exits, as entries (a Map does not cross IPC) — fetched once, kept. */
-  getZoneGraph: (): Promise<[ZoneShort, ZoneExit[]][]> => ipcRenderer.invoke(IPC.mapsGraph)
+  getZoneGraph: (): Promise<[ZoneShort, ZoneExit[]][]> => ipcRenderer.invoke(IPC.mapsGraph),
+  /** Look at the map files on disk; true when they changed and the answers above are stale. */
+  refreshMapFiles: (): Promise<boolean> => ipcRenderer.invoke(IPC.mapsRefresh)
 }

@@ -30,7 +30,7 @@
 // labelled the shared seam still reaches it. Map packs vary; 93 of the default 213 label theirs.
 
 import { useEffect, useMemo, useState } from 'react'
-import { saveTravelEra, useTravelEra } from './useMapData'
+import { saveTravelEra, useMapsRevision, useTravelEra } from './useMapData'
 import type { MapData } from '@shared/maps'
 import {
   landings,
@@ -85,7 +85,11 @@ export interface ZoneTravel {
  * every later card with no exits at all.
  */
 let pendingGraph: Promise<ZoneGraph | null> | null = null
-function allGraph(): Promise<ZoneGraph | null> {
+let graphRevision = 0
+function allGraph(revision: number): Promise<ZoneGraph | null> {
+  // The map files changed on disk (useMapData `checkMapFiles`): the kept graph describes the old ones.
+  if (revision !== graphRevision) pendingGraph = null
+  graphRevision = revision
   pendingGraph ??= window.eq
     .getZoneGraph()
     .then((rows): ZoneGraph | null => (rows.length === 0 ? null : new Map(rows)))
@@ -109,18 +113,19 @@ export function useZoneTravel(stem: string | null, zoneName: string | null, data
   const [ports, setPorts] = useState<ZonePort[] | null>(null)
   const [graph, setGraph] = useState<ZoneGraph | null>(null)
   const eraOnly = useTravelEra()
+  const revision = useMapsRevision()
   useEffect(() => {
     let alive = true
     // The port table is shared by every zone and held per EverQuest folder (zonePortsPull.ts).
     const stopPorts = watchZonePorts(setPorts)
-    void allGraph().then((g) => {
+    void allGraph(revision).then((g) => {
       if (alive) setGraph(g)
     })
     return () => {
       alive = false
       stopPorts()
     }
-  }, [])
+  }, [revision])
 
   const exits = useMemo(() => (data === null ? [] : zoneExits(data.points)), [data])
 

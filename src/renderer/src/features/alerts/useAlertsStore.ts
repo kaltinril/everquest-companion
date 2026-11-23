@@ -5,8 +5,8 @@
 //
 // Recent fires come from the alerts module's per-alert ring buffer (the single
 // source of truth), hydrated + kept live via useModule: event/raw fires arrive as
-// module deltas, and renderer 'app' fires are routed back through main (appFired)
-// so they land in the same history.
+// module deltas. Renderer 'app' fires go to main (appFired), which holds them for the
+// launch because the engine cannot take one; the two are read together below.
 //
 // Everything else is persisted via IPC (alerts:save / alerts:reset /
 // alertPrefs:set); after any write we call refreshAlertStore() so the always-
@@ -22,11 +22,14 @@ import type {
   SoundPack
 } from '@shared/types'
 import type { SoundPackPrefs } from '@shared/soundPacks'
+import { withAppFires, type FireHistory } from '@shared/alertAppFires'
 import { useModule } from '../../lib/useModule'
 import { onAlertStoreChange, refreshAlertStore } from './player'
 import { invalidateSoundCaches } from './soundCache'
 
 
+
+const NO_HISTORY: FireHistory = {}
 
 export interface AlertsStore {
   alerts: AlertDef[]
@@ -74,7 +77,20 @@ export function useAlertsStore(): AlertsStore {
 
   // Live recent-fires history from the alerts module (single source of truth).
   const snap = useModule<AlertsSnap>('alerts')
-  const history = snap?.history ?? {}
+  // …plus the app-signal fires main holds, which the engine has no way to record.
+  const [appFires, setAppFires] = useState<FireHistory>(NO_HISTORY)
+  useEffect(() => {
+    let alive = true
+    void window.eq.getAppFires().then((held) => {
+      if (alive) setAppFires(held)
+    })
+    const off = window.eq.onAppFires(setAppFires)
+    return () => {
+      alive = false
+      off()
+    }
+  }, [])
+  const history = useMemo(() => withAppFires(snap?.history ?? NO_HISTORY, appFires), [snap?.history, appFires])
   const spellLastCast = snap?.spellLastCast ?? {}
   const poisonSlowSeen = snap?.poisonSlowSeen ?? null
 

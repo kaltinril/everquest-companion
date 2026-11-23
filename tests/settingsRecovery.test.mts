@@ -7,7 +7,7 @@ import assert from 'node:assert/strict'
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { settingsRecoveryNotice } from '../src/shared/settingsRecovery'
+import { holdRecoveryNotice, settingsRecoveryNotice } from '../src/shared/settingsRecovery'
 import { migrateStoreFile } from '../src/main/storeFile'
 
 const KEPT = 'C:\\Users\\me\\AppData\\Roaming\\app\\progress.corrupt.json'
@@ -87,4 +87,69 @@ test('the real store-file outcomes map to the three notices', () => {
   } finally {
     rmSync(empty, { recursive: true, force: true })
   }
+})
+
+// ---- the notice outlives a launch that never opened the window --------------------------------
+
+const NOTICE = { kind: 'reset', title: 'Your settings were reset', text: `kept at ${KEPT}` } as const
+
+/** A settings store of one key, as main hands the holder. */
+function fakeNoticeStore(initial?: unknown): { value: unknown; ports: Parameters<typeof holdRecoveryNotice>[1] } {
+  const box = {
+    value: initial,
+    ports: {
+      load: (): unknown => box.value,
+      save: (notice: unknown): void => {
+        box.value = notice
+      },
+      clear: (): void => {
+        box.value = undefined
+      }
+    }
+  }
+  return box
+}
+
+test('a notice no window showed is still there on the next launch', () => {
+  const store = fakeNoticeStore()
+  assert.deepEqual(holdRecoveryNotice(NOTICE, store.ports).get(), NOTICE)
+  // Next launch: the file is healthy, so main has nothing fresh to say.
+  assert.deepEqual(holdRecoveryNotice(null, store.ports).get(), NOTICE)
+})
+
+test('closing the notice ends it, on this launch and the next', () => {
+  const store = fakeNoticeStore()
+  const held = holdRecoveryNotice(NOTICE, store.ports)
+  held.seen()
+  assert.equal(held.get(), null)
+  assert.equal(store.value, undefined)
+  assert.equal(holdRecoveryNotice(null, store.ports).get(), null)
+})
+
+test('a newer recovery replaces a notice still waiting', () => {
+  const store = fakeNoticeStore({ ...NOTICE, title: 'older' })
+  assert.deepEqual(holdRecoveryNotice(NOTICE, store.ports).get(), NOTICE)
+  assert.deepEqual(store.value, NOTICE)
+})
+
+test('a stored value that is not a notice shows nothing', () => {
+  for (const bad of ['text', 7, {}, { kind: 'other', title: 't', text: 'x' }, { kind: 'reset', title: 1, text: 'x' }]) {
+    assert.equal(holdRecoveryNotice(null, fakeNoticeStore(bad).ports).get(), null)
+  }
+})
+
+test('a store that refuses the write still shows the notice this launch', () => {
+  const refusing = {
+    load: (): unknown => undefined,
+    save: (): void => {
+      throw new Error('ENOSPC')
+    },
+    clear: (): void => {
+      throw new Error('ENOSPC')
+    }
+  }
+  const held = holdRecoveryNotice(NOTICE, refusing)
+  assert.deepEqual(held.get(), NOTICE)
+  held.seen()
+  assert.equal(held.get(), null)
 })

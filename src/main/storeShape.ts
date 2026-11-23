@@ -23,6 +23,7 @@ import type { RespawnPrefs } from '../shared/respawn'
 import type { RespawnAlertSetting } from '../shared/respawnAlert'
 import type { BazaarWatchlist } from '../shared/bazaarWatch'
 import type { SoundPackPrefs } from '../shared/soundPacks'
+import type { SettingsRecoveryNotice } from '../shared/settingsRecovery'
 import type { WindowBounds } from './store'
 
 /**
@@ -166,6 +167,11 @@ export interface StoreShape {
   overlaySnap?: OverlaySnapPrefs
   /** The key that recovers lost overlays (shared/overlayHotkey.ts; main/overlayRecover.ts). Absent: off. */
   overlayRecoverHotkey?: string
+  /**
+   * The damaged-settings notice while the player has not closed it (shared/settingsRecovery.ts).
+   * Additive and optional: absent means nothing to say, and an older build ignores the key.
+   */
+  pendingSettingsNotice?: SettingsRecoveryNotice
   /**
    * THE OVERLAYS' TEXT SIZE, as a preference rather than twelve copies of one number (JOS-405;
    * shared/overlayTextScale.ts). `{ shared, independent }`, defaulting to `{ 1, false }`.

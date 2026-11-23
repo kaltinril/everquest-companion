@@ -22,7 +22,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { mkdirSync, mkdtempSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { isSafePackId } from '../src/main/security'
@@ -456,4 +456,125 @@ test('labels() through a memo answers the same, and reads each file once per wal
     for (const path of memo.keys()) memo.set(path, [])
     for (const zone of lib.zones()) assert.deepEqual(lib.labels(zone, {}, memo), [], zone)
   })
+})
+
+// --- the files changed while the app runs ------------------------------------
+
+/** A fixture + library with the first check already taken, torn down after `fn`. */
+async function withCheckedLibrary(fn: (lib: MapLibrary, fx: Fixture) => Promise<void>): Promise<void> {
+  const fx = makeFixture()
+  try {
+    const lib = createMapLibrary({ eqRoot: fx.eqRoot, userPacksRoot: fx.userPacksRoot })
+    assert.equal(await lib.refreshIfChanged(), false, 'the first check only takes the baseline')
+    await fn(lib, fx)
+  } finally {
+    rmSync(fx.root, { recursive: true, force: true })
+  }
+}
+
+test('a pack copied in after the first scan is found by the first check', async () => {
+  const fx = makeFixture()
+  try {
+    const lib = createMapLibrary({ eqRoot: fx.eqRoot, userPacksRoot: fx.userPacksRoot })
+    assert.ok(!lib.zones().includes('newzone'), 'the startup scan')
+    // The walk the scan started runs off the main thread; give it time to finish on a loaded machine.
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    writeFileSync(join(fx.eqRoot, 'maps', 'NewZone.txt'), GEOMETRY)
+    assert.equal(await lib.refreshIfChanged(), true)
+    assert.ok(lib.zones().includes('newzone'))
+  } finally {
+    rmSync(fx.root, { recursive: true, force: true })
+  }
+})
+
+test('nothing changed on disk: the check keeps every cache', async () => {
+  await withCheckedLibrary(async (lib) => {
+    const first = lib.get('befallen')
+    const generation = lib.generation()
+    assert.equal(await lib.refreshIfChanged(), false)
+    assert.equal(lib.generation(), generation)
+    const again = lib.get('befallen')
+    assert.ok(first.ok && again.ok)
+    assert.equal(again.data, first.data, 'still the cached parse')
+  })
+})
+
+test('a map file added to a pack is found by the next check', async () => {
+  await withCheckedLibrary(async (lib, fx) => {
+    assert.ok(!lib.zones().includes('newzone'))
+    writeFileSync(join(fx.eqRoot, 'maps', 'NewZone.txt'), GEOMETRY)
+    assert.equal(await lib.refreshIfChanged(), true)
+    assert.ok(lib.zones().includes('newzone'))
+    assert.equal(lib.get('newzone').ok, true)
+  })
+})
+
+test('a new pack folder is found, and so is a file copied into it afterwards', async () => {
+  await withCheckedLibrary(async (lib, fx) => {
+    const dir = join(fx.userPacksRoot, 'freshpack')
+    mkdirSync(dir)
+    await lib.refreshIfChanged()
+    assert.ok(!lib.packs().some((p) => p.id === 'freshpack'), 'an empty folder is not a pack')
+    writeFileSync(join(dir, 'Befallen_1.txt'), 'P 3, 3, 0, 0, 0, 0, 2, Fresh_Label')
+    assert.equal(await lib.refreshIfChanged(), true)
+    assert.ok(lib.packs().some((p) => p.id === 'freshpack'))
+  })
+})
+
+test('a map file edited in place is parsed again, even at the same size', async () => {
+  await withCheckedLibrary(async (lib, fx) => {
+    const path = join(fx.eqRoot, 'maps', 'Befallen_1.txt')
+    const before = lib.get('befallen', { labels: 'default' })
+    assert.ok(before.ok)
+    const text = readFileSync(path, 'utf8')
+    writeFileSync(path, text.replace('Sparse', 'Sharps'))
+    utimesSync(path, new Date(1_800_000_000_000), new Date(1_800_000_000_000))
+    const generation = lib.generation()
+    assert.equal(await lib.refreshIfChanged(), true)
+    assert.ok(lib.generation() > generation, 'what is built from the maps knows to build again')
+    const after = lib.get('befallen', { labels: 'default' })
+    assert.ok(after.ok)
+    assert.ok(after.data.points.some((p) => p.display.includes('Sharps')))
+  })
+})
+
+test('a removed map file is gone after the check', async () => {
+  await withCheckedLibrary(async (lib, fx) => {
+    rmSync(join(fx.eqRoot, 'maps', 'Thurgadina1.txt'))
+    rmSync(join(fx.eqRoot, 'maps', 'Thurgadina1_1.txt'))
+    assert.equal(await lib.refreshIfChanged(), true)
+    assert.ok(!lib.zones().includes('thurgadina1'))
+  })
+})
+
+test('the check reads the disk only: nothing under the EQ root is touched', async () => {
+  await withCheckedLibrary(async (lib, fx) => {
+    const before = treeSnapshot(fx.eqRoot)
+    await lib.refreshIfChanged()
+    assert.deepEqual(treeSnapshot(fx.eqRoot), before)
+  })
+})
+
+test('two checks at once are one walk with one answer', async () => {
+  await withCheckedLibrary(async (lib, fx) => {
+    writeFileSync(join(fx.eqRoot, 'maps', 'Another.txt'), GEOMETRY)
+    const generation = lib.generation()
+    const answers = await Promise.all([lib.refreshIfChanged(), lib.refreshIfChanged()])
+    assert.deepEqual(answers, [true, true])
+    assert.equal(lib.generation(), generation + 1, 'one refresh, not two')
+  })
+})
+
+test('a missing EQ folder is a quiet no-change', async () => {
+  const lib = createMapLibrary({ eqRoot: join(tmpdir(), 'no-such-eq-root-for-maps') })
+  assert.equal(await lib.refreshIfChanged(), false)
+  assert.equal(await lib.refreshIfChanged(), false)
+})
+
+test('the zone graph is built again after a refresh, and the tab asks on each visit', () => {
+  const read = (rel: string): string => readFileSync(new URL(`../src/${rel}`, import.meta.url), 'utf8')
+  assert.match(read('main/zoneGraph.ts'), /CACHE\.generation === library\.generation\(\)/)
+  assert.match(read('main/ipc/maps.ts'), /IPC\.mapsRefresh, \(\) => mapLibrary\(\)\.refreshIfChanged\(\)/)
+  assert.match(read('renderer/src/features/maps/useMapData.ts'), /window\.eq\s*\.refreshMapFiles\(\)/)
+  assert.match(read('renderer/src/features/maps/useZoneTravel.ts'), /useMapsRevision\(\)/)
 })

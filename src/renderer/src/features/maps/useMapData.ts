@@ -18,8 +18,8 @@
 // lands a render after the tab's first paint, so every Maps visit painted the empty state and
 // then the map. The last zone answered and the pack listing are held at module scope and handed
 // to the next mount under the same key (zone and the two pack prefs; the listing has no key).
-// Both slots are dropped when main says the EQ folder changed (`onEqConfigChanged`), which is
-// the one event that can make a held answer wrong: packs do not install themselves in v1 (§9.2).
+// Both slots are dropped when main says the EQ folder changed (`onEqConfigChanged`), and when a
+// visit's check finds the map files changed on disk (`refreshMapFiles`, once per Maps mount).
 //   * A FAILURE IS DATA. `maps:get` answers `{ok:false, error}` for the ordinary "this machine
 //     has no map file for that zone" case, and the view renders that as a quiet state. Nothing
 //     in this module throws, and the `.catch` exists only for a torn-down bridge.
@@ -142,6 +142,35 @@ export function forgetMapAnswers(): void {
   heldLoad = null
 }
 
+/** Counts the times the map files were found changed; the hooks below ask again when it moves. */
+let mapsRevision = 0
+const revisionListeners = new Set<() => void>()
+
+function onMapsRevision(cb: () => void): () => void {
+  revisionListeners.add(cb)
+  return () => {
+    revisionListeners.delete(cb)
+  }
+}
+
+/** The revision, as a value a hook can depend on. */
+export function useMapsRevision(): number {
+  return useSyncExternalStore(onMapsRevision, () => mapsRevision)
+}
+
+/** One look at the files on disk. A change drops the held answers and every mounted hook re-asks. */
+function checkMapFiles(): void {
+  void window.eq
+    .refreshMapFiles()
+    .then((changed) => {
+      if (!changed) return
+      forgetMapAnswers()
+      mapsRevision += 1
+      for (const cb of revisionListeners) cb()
+    })
+    .catch(() => undefined)
+}
+
 /** Attach the one listener that drops the held answers, on the first hold (as characterEpoch does). */
 function watchEqConfig(): void {
   if (watchingEqConfig || typeof window === 'undefined') return
@@ -156,11 +185,13 @@ function watchEqConfig(): void {
  *
  * Both are main-side scans behind a memoized library keyed on the EQ root, so a remount was
  * already cheap in main; the held listing saves the IPC round trip and the render it landed in.
- * There is no push channel for pack changes in v1 (nothing installs packs yet — §9.2); the EQ
- * folder changing is the one event that re-lists (`forgetMapAnswers`).
+ * There is no push channel for pack changes in v1 (nothing installs packs yet — §9.2): the EQ
+ * folder changing re-lists (`forgetMapAnswers`), and so does each visit that finds the files changed.
  */
 export function useMapPacks(): MapPacksState {
   const [state, setState] = useState<MapPacksState>(() => heldPacks ?? NO_PACKS)
+  const revision = useMapsRevision()
+  useEffect(checkMapFiles, [])
   useEffect(() => {
     if (heldPacks !== null) return
     let cancelled = false
@@ -169,7 +200,8 @@ export function useMapPacks(): MapPacksState {
         if (cancelled) return
         const next = { packs: list.packs, zones, error: list.error ?? null, ready: true }
         watchEqConfig()
-        heldPacks = next
+        // An answer from before a change is shown until the re-ask lands, but never held.
+        if (revision === mapsRevision) heldPacks = next
         setState(next)
       })
       .catch(() => {
@@ -178,7 +210,7 @@ export function useMapPacks(): MapPacksState {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [revision])
   return state
 }
 
@@ -206,6 +238,7 @@ function heldLoadFor(zone: ZoneShort | null, geometry: string | undefined, label
  */
 export function useMapData(zone: ZoneShort | null, prefs: MapPackPrefs): MapLoad {
   const { geometry, labels } = prefs
+  const revision = useMapsRevision()
   const [load, setLoad] = useState<MapLoad>(
     () => heldLoadFor(zone, geometry, labels) ?? { data: null, error: null, loading: zone != null }
   )
@@ -232,7 +265,7 @@ export function useMapData(zone: ZoneShort | null, prefs: MapPackPrefs): MapLoad
           ? { data: res.data, error: null, loading: false }
           : { data: null, error: res.error, loading: false }
         watchEqConfig()
-        heldLoad = { key: [zone, geometry, labels], load: next }
+        if (revision === mapsRevision) heldLoad = { key: [zone, geometry, labels], load: next }
         setLoad(next)
       })
       .catch((err: unknown) => {
@@ -241,7 +274,7 @@ export function useMapData(zone: ZoneShort | null, prefs: MapPackPrefs): MapLoad
     return () => {
       cancelled = true
     }
-  }, [zone, geometry, labels])
+  }, [zone, geometry, labels, revision])
   return load
 }
 

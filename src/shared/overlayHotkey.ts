@@ -18,6 +18,8 @@ export interface KeyPress {
 export interface HotkeyAnswer {
   hotkey: string | null
   message?: string
+  /** The saved key that is off since start: still stored, and Preferences can forget it. */
+  savedOff?: string
 }
 
 const MODIFIERS = new Set(['Ctrl', 'Control', 'CommandOrControl', 'CmdOrCtrl', 'Alt', 'Super', 'Meta', 'Command', 'Cmd', 'Shift'])
@@ -73,16 +75,21 @@ export function makeRecoverHotkey(ports: HotkeyPorts): RecoverHotkey {
   let current: string | null = null
   // Why the saved key is off since start; dropped once a key is set or the key is turned off.
   let startNote: string | undefined
+  // The saved key that note is about; it stays in the store until a key is set or it is forgotten.
+  let savedOff: string | undefined
+  const refusal = (message: string): HotkeyAnswer =>
+    savedOff === undefined ? { hotkey: current, message } : { hotkey: current, message, savedOff }
   const set = (accel: string | null): HotkeyAnswer => {
     if (accel === null) {
       if (current !== null) ports.unregister(current)
       current = null
       startNote = undefined
+      savedOff = undefined
       ports.clear()
       return { hotkey: null }
     }
     const problem = hotkeyProblem(accel)
-    if (problem !== undefined) return { hotkey: current, message: problem }
+    if (problem !== undefined) return refusal(problem)
     if (accel === current) return { hotkey: current }
     let ok = false
     try {
@@ -90,10 +97,11 @@ export function makeRecoverHotkey(ports: HotkeyPorts): RecoverHotkey {
     } catch {
       ok = false
     }
-    if (!ok) return { hotkey: current, message: `${accel} is taken by Windows or another program.` }
+    if (!ok) return refusal(`${accel} is taken by Windows or another program.`)
     if (current !== null) ports.unregister(current)
     current = accel
     startNote = undefined
+    savedOff = undefined
     ports.save(accel)
     return { hotkey: current }
   }
@@ -105,7 +113,9 @@ export function makeRecoverHotkey(ports: HotkeyPorts): RecoverHotkey {
     // A key the rules refuse never comes back by itself; a key held elsewhere does.
     const later = hotkeyProblem(saved) === undefined ? ' It comes back when the app starts with the key free.' : ''
     startNote = `Your saved key is off. ${refused}${later}`
+    savedOff = saved
   }
-  const get = (): HotkeyAnswer => (current === null && startNote !== undefined ? { hotkey: null, message: startNote } : { hotkey: current })
+  const get = (): HotkeyAnswer =>
+    current === null && startNote !== undefined ? { hotkey: null, message: startNote, savedOff } : { hotkey: current }
   return { start, set, get }
 }

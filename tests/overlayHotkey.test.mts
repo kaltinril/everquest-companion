@@ -141,3 +141,33 @@ test('the recover key is the only globalShortcut in the app', () => {
   )
   assert.deepEqual(users.map((u) => u.pathname.replace(/^.*\/src\//, 'src/')), ['src/main/overlayRecover.ts'])
 })
+
+test('a saved key that is off can be forgotten: the answer names it until it is gone', () => {
+  const { hotkey, calls } = fakeKeys({ saved: 'Ctrl+Alt+R', taken: ['Ctrl+Alt+R', 'Ctrl+Alt+O'] })
+  hotkey.start()
+  assert.equal(hotkey.get().savedOff, 'Ctrl+Alt+R')
+  // A refused pick changes nothing about the saved key, so the way to forget it stays.
+  const refused = hotkey.set('Ctrl+Alt+O')
+  assert.equal(refused.hotkey, null)
+  assert.equal(refused.savedOff, 'Ctrl+Alt+R')
+  assert.deepEqual(hotkey.set(null), { hotkey: null })
+  assert.ok(calls.includes('clear'), 'the saved key is deleted')
+  assert.deepEqual(hotkey.get(), { hotkey: null })
+})
+
+test('a key in force, or a new key taken over a saved one, names no saved key', () => {
+  const free = fakeKeys({ saved: 'Ctrl+Alt+R' })
+  free.hotkey.start()
+  assert.equal(free.hotkey.get().savedOff, undefined)
+  const replaced = fakeKeys({ saved: 'Ctrl+Alt+R', taken: ['Ctrl+Alt+R'] })
+  replaced.hotkey.start()
+  assert.equal(replaced.hotkey.set('Ctrl+Alt+O').savedOff, undefined)
+  assert.equal(replaced.hotkey.get().savedOff, undefined)
+})
+
+test('Preferences offers to forget a saved key that is off', () => {
+  const code = readFileSync(new URL('../src/renderer/src/features/preferences/OverlayRecoverSetting.tsx', import.meta.url), 'utf8')
+  assert.equal(code.match(/setSavedOff\(r\.savedOff\)/g)?.length, 2, 'from the get answer and from the set answer')
+  assert.match(code, /hotkey === null && savedOff !== undefined/)
+  assert.match(code, /Forget \$\{savedOff\}/)
+})

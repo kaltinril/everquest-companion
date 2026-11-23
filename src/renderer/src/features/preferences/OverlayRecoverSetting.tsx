@@ -13,6 +13,8 @@ function OverlayRecoverSetting(): JSX.Element {
   const [hotkey, setHotkey] = useState<string | null | undefined>(undefined)
   const [listening, setListening] = useState(false)
   const [note, setNote] = useState<string | undefined>(undefined)
+  // A saved key that is off since start: the field reads Off, so "Turn off" would say nothing.
+  const [savedOff, setSavedOff] = useState<string | undefined>(undefined)
   useEffect(() => {
     void window.eq
       .overlayRecoverHotkey('get')
@@ -20,6 +22,7 @@ function OverlayRecoverSetting(): JSX.Element {
         setHotkey(r.hotkey)
         // Why a saved key is off since the app started (shared/overlayHotkey.ts).
         setNote(r.message)
+        setSavedOff(r.savedOff)
       })
       .catch(() => undefined)
   }, [])
@@ -29,6 +32,7 @@ function OverlayRecoverSetting(): JSX.Element {
       .then((r) => {
         setHotkey(r.hotkey)
         setNote(r.message)
+        setSavedOff(r.savedOff)
       })
       .catch(() => setNote('The hotkey could not be set.'))
   }
@@ -55,6 +59,11 @@ function OverlayRecoverSetting(): JSX.Element {
         {hotkey != null && (
           <Button size="small" onClick={() => set(null)}>
             Turn off
+          </Button>
+        )}
+        {hotkey === null && savedOff !== undefined && (
+          <Button size="small" onClick={() => set(null)} data-testid="pref-overlay-recover-forget">
+            {`Forget ${savedOff}`}
           </Button>
         )}
         <Button size="small" onClick={() => void window.eq.recoverOverlays()}>

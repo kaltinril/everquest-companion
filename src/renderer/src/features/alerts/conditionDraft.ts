@@ -18,8 +18,8 @@ export function primitiveBadge(t: AlertTriggerPrimitive): string {
 }
 
 /**
- * Does this row have a fire history to open? The engine records no app-signal fire (the named gap
- * in main/ipc/alerts.ts), so such a row would say "No fires recorded yet" right after it fired.
+ * Does this row have a fire history to open? An app-signal fire is held for one launch only
+ * (shared/alertAppFires.ts), so with none held the row cannot say it has never fired.
  */
 export function hasFireHistory(t: AlertTrigger, fires: number): boolean {
   return t.type !== 'app' || fires > 0

@@ -1,4 +1,4 @@
-// components/SettingsRecoveryNotice.tsx: "your settings file was damaged", said once per launch.
+// components/SettingsRecoveryNotice.tsx: "your settings file was damaged", said until it is closed.
 //
 // Main recovers a damaged settings file at startup and builds the words
 // (shared/settingsRecovery.ts). This card shows them until the player closes it, so a restore from

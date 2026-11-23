@@ -96,6 +96,10 @@ export const IPC = {
   // renderer reports an 'app'-triggered fire (e.g. bossDefeat) so the module's
   // history stays the single source of truth (Task #22). Payload {alertId, context}.
   appFired: 'alerts:appFired',
+  // The app-signal fires main holds for this launch (shared/alertAppFires.ts): read, and pushed to
+  // the main window each time one is recorded.
+  getAppFires: 'alerts:getAppFires',
+  onAppFires: 'alerts:onAppFires',
   /**
    * main -> renderer(main app): ONE ALERT THAT FIRED, to be played (JOS-499 item 7).
    *
@@ -727,6 +731,8 @@ export const IPC = {
   /** Every zone's stated exits, read once off every map in the default pack (owner ask
    *  2026-09-12: the closest port, not the closest within one hop). No argument. */
   mapsGraph: 'maps:graph',
+  /** Look at the map files on disk; true when they changed since the last look. Local only. */
+  mapsRefresh: 'maps:refresh',
   /** The mob catalog cut to what places a mob (page, name, level, zones, loc), for the Map pins
    *  overlay, which must not bundle the 3 MB catalog every overlay window would then load. */
   mapsMobPlaces: 'maps:mobPlaces',
