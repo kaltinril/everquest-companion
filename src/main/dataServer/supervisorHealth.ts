@@ -35,8 +35,9 @@
 // on the app's connection while nothing happens in the log, so on a busy PC four working engines
 // were ended with `connect, connect` and no frame inside the 20 s, after 551 to 6,640 s of service.
 // So with no fresh evidence the watch MAKES some: one `session.health` on the connection already
-// open (`ownConnectionHealth`), bounded by the health timeout. An answer forgives the beat under the
-// same rules and the same cap; no connection, no answer or a closed one ends the launch as before.
+// open (`ownConnectionHealth`), bounded by `ENGINE_OWN_CONNECTION_TIMEOUT_MS`. An answer forgives the
+// beat under the same rules and the same cap; no connection, no answer or a closed one ends the
+// launch as before.
 
 import type { ByteChannel } from '../../shared/dataServer/ndjson'
 import {
@@ -52,6 +53,7 @@ import {
   ENGINE_HEARD_FRESH_MS,
   ENGINE_LOCAL_SOCKET_GRACE_MS,
   ENGINE_LOCAL_SOCKET_STREAK,
+  ENGINE_OWN_CONNECTION_TIMEOUT_MS,
   ENGINE_RESUME_GRACE_MS,
   type EngineTimer,
   type HealthFailure
@@ -87,6 +89,7 @@ export interface HealthWatchDeps {
   /** TEST SEAMS — every clock this watchdog has. */
   healthIntervalMs?: number
   healthTimeoutMs?: number
+  ownConnectionTimeoutMs?: number
   resumeGraceMs?: number
   localSocketGraceMs?: number
   localSocketStreak?: number
@@ -164,6 +167,7 @@ class HealthWatch implements LaunchHealthWatch {
   private cancel: (() => void) | null = null
   private readonly intervalMs: number
   private readonly timeoutMs: number
+  private readonly ownConnectionMs: number
   private readonly graceMs: number
   private readonly localGraceMs: number
   private readonly localStreak: number
@@ -176,6 +180,7 @@ class HealthWatch implements LaunchHealthWatch {
   ) {
     this.intervalMs = deps.healthIntervalMs ?? ENGINE_HEALTH_INTERVAL_MS
     this.timeoutMs = deps.healthTimeoutMs ?? ENGINE_HEALTH_TIMEOUT_MS
+    this.ownConnectionMs = deps.ownConnectionTimeoutMs ?? ENGINE_OWN_CONNECTION_TIMEOUT_MS
     this.graceMs = deps.resumeGraceMs ?? ENGINE_RESUME_GRACE_MS
     this.localGraceMs = deps.localSocketGraceMs ?? ENGINE_LOCAL_SOCKET_GRACE_MS
     this.localStreak = deps.localSocketStreak ?? ENGINE_LOCAL_SOCKET_STREAK
@@ -300,7 +305,7 @@ class HealthWatch implements LaunchHealthWatch {
       setImmediate(() => {
         settle(false)
       })
-    }, this.timeoutMs)
+    }, this.ownConnectionMs)
     void new Promise((resolve) => {
       resolve(ask(this.target.token))
     }).then(
