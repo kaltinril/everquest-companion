@@ -191,6 +191,24 @@ test('a log archived before agreedMs existed still lowers the wiki floor from it
   assert.equal(alone?.estimateMs, 529_000)
 })
 
+test('a row with no gap of its own takes the agreeing gaps as its count, as one log would read them', () => {
+  const live = wikiFloored({ samples: 0, kills: 1, source: 'wiki', baseTs: 900 })
+  delete live.observedMs
+  // No archived row for the mob, only its learned gaps (`respawn_places.rs pooled_gaps` reads the same).
+  const joined = mergeRespawn(snap([], { learned: learned([531, 530, 529]) }), snap([live]))?.rows[0]
+  assert.equal(joined?.samples, 3)
+  assert.equal(joined?.observedMs, 529_000)
+  assert.equal(joined?.estimateMs, 529_000)
+  assert.equal(joined?.source, 'observed')
+  // A shared name counts only its gaps of ten minutes or more.
+  const shared = { prefs: { watches: [{ key: 'enynti', display: 'Enynti', sharedName: true as const }] } }
+  const own = { ...live, sharedName: true as const }
+  const long = mergeRespawn(snap([], { learned: learned([90, 75, 740, 730, 720]) }), snap([own], shared))?.rows[0]
+  assert.equal(long?.samples, 3)
+  assert.equal(long?.observedMs, 720_000)
+  assert.equal(long?.estimateMs, 720_000)
+})
+
 test('the joined gaps are read as one log: the lowest agreeing trio, not the smaller of two verdicts', () => {
   const older = snap([row({ observedMs: 540_000, estimateMs: 540_000, agreedMs: 540_000 })], { learned: learned([550, 545, 540]) })
   const newer = snap([wikiFloored({ samples: 2, observedMs: 527_000, baseTs: 900 })], { learned: learned([529, 527]) })

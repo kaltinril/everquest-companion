@@ -222,14 +222,25 @@ function withFloor(snap: RespawnSnap, shared: ReadonlySet<string>): RespawnSnap 
  * field has none. Re-read here over the joined learned gaps, pooled as the engine pools them (the
  * mob, in every place of the row's zone; a shared name's gaps under ten minutes left out, by the
  * row or by today's watch list). It only ever lowers `agreedMs`, so it can lower a wiki floor and
- * never raise an estimate; the row's own gaps, samples and typed number are not touched.
+ * never raise an estimate; the row's own gaps and typed number are not touched.
+ *
+ * A row with no gap of its own (the mob was killed elsewhere in the zone, or the archive holds no
+ * row for it) takes the pool as its count and bound, as `respawn_places.rs pooled_gaps` does on one
+ * log. Without them the ladder stops at the wiki rung and the agreed gap lowers nothing.
  */
 function withAgreed(row: RespawnRow, learned: readonly Learned[], shared: ReadonlySet<string>): RespawnRow {
   const base = zoneBase(row.zone)
   const pool = learned.filter((l) => l.key === row.key && zoneBase(l.zone) === base).flatMap((l) => l.gapsMs)
-  const agreed = agreedGap(pool, row.sharedName === true || shared.has(row.key) ? RESPAWN_SHARED_NAME_FLOOR_MS : 0)
+  const floor = row.sharedName === true || shared.has(row.key) ? RESPAWN_SHARED_NAME_FLOOR_MS : 0
+  const agreed = agreedGap(pool, floor)
   if (agreed === undefined || (row.agreedMs !== undefined && row.agreedMs <= agreed)) return row
-  return withEstimate({ ...row, agreedMs: agreed })
+  const out: RespawnRow = { ...row, agreedMs: agreed }
+  if (row.samples === 0) {
+    const counted = pool.filter((g) => g >= floor)
+    out.samples = counted.length
+    out.observedMs = Math.min(...counted)
+  }
+  return withEstimate(out)
 }
 
 /**
