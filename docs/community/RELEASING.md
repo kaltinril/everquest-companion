@@ -177,9 +177,11 @@ unpromoted. Deleting a release is the owner's call.
     TEST exes are removed. The TEST settings are kept and win, since they already exist. An
     original app that an earlier TEST install had overwritten needs one reinstall from the
     original repo's Releases page.
-  - *Only the original app*: on first launch the TEST build copies the original app's settings,
-    learned messages, resist history, item cache, sound packs and UI choices (`channel.ts`
-    `SEED_ENTRIES`); the original app is never changed.
+  - *Only the original app*: on first launch this build copies the original app's settings,
+    learned messages, resist history, item cache, installed sound packs, the player's own imported
+    sounds (`my-sounds`) and UI choices (`userDataSeed.ts` `SEED_ENTRIES`); the original app is
+    never changed. An install seeded by an earlier build gets the imported sounds on its next
+    launch, once.
 - **The front page** is the root `README.md` on `main_community`, the default branch since
   2026-10-09. Until 2026-11-19 it was `.github/README.md`, shown by GitHub in place of the original
   app's README at the root; that copy is removed and the root page is the project's own, so there

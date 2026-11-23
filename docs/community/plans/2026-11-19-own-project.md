@@ -58,7 +58,7 @@ Left alone on purpose, for Part 4: `SECURITY.md`, `TELEMETRY.md`, `AGENTS.md`, e
 `electron-builder.yml`. Not yet looked at by a person: `fork-workflow.svg` parses as XML but was
 never rendered; open it once.
 
-## Part 2: the rename from TEST to Community Edition (planned, waits on the owner)
+## Part 2: the rename from TEST to Community Edition (Level A built 2026-11-23, first release not cut)
 
 Owner, 2026-11-19: "We should also probably start naming our builds as Everquest Legends Companion
 CE (Community Edition) or some nonsense instead of test ... test makes it sound like it's not a real
@@ -72,6 +72,23 @@ seven hand-typed titles only (title bar, window, tray menu, tray tooltip, tray w
 titles). `productName`, `shortcutName`, the exe, the installer, the updater, the folders and the
 version still say TEST: they change together after a real install test. Level A below must still
 set `executableName` before it changes `productName`.
+
+Done 2026-11-23 (owner: "rename to Community Edition (CE) yes, do whatever install test you need"):
+Level A, version 0.1.55 at the next release (the plan's 0.1.52 was written before test.52 to test.54
+shipped), the `-ce-` installer name, staged publishing, the identity guards and the blockmap bridge.
+
+Install rehearsal, 2026-11-23, 49 of 49 checks: the repo's real NSIS scripts with every name swapped
+for a throwaway identity, over a stub Electron payload, on the owner's PC with their real install
+fingerprinted before and after (unchanged). Old TEST-named build to new CE-named build, by the
+quit path (`--updated /S`), the running path (`--updated /S --force-run`) and a double-click, then
+uninstall: one Apps entry named CE, same GUID, one folder, exe name unchanged, Start shortcut
+renamed with no old one left, a deleted desktop shortcut stays deleted on the quit path, settings kept.
+
+Not rehearsed, so watch them on the first real update: the real app's payload, the updater fetching
+`test.yml` and the bridged blockmap over the network, the oldest updating build (test.20), a
+taskbar or Start pin's label, the downgrade prompt, a machine with PowerShell blocked. No second
+account, VM or Windows Sandbox exists on this PC. The first release goes out not-Latest so the
+canary in steps 14 and 15 below can catch these before players get it.
 
 ### What existing installs depend on (never change these)
 

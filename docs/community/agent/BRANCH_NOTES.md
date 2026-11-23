@@ -1051,7 +1051,7 @@ where one exists.
 - Saves go through `buffTrust:setDuration`, merged on main. `buffTrust:set` (the Preferences card)
   keeps the stored durations, because each surface holds its own copy and would wipe the other's.
 - A change re-announces the buffs module, so the table and buff bars move at once. A crowd-control
-  hold already running keeps its length until the next cast or sample.
+  hold already running takes a saved choice at once (`Registry::define` calls `after_define`; `buff_timers.rs restat_holds`).
 
 ## Open items with no feature area yet
 
@@ -2832,9 +2832,9 @@ what a later change must know. Each fix has a unit test that failed before it.
   settingsRecoveryNotice()` is the only place the words live. "Recovered" means `salvagedFrom` set
   AND `wrote` true; a salvage that could not be written back is a reset (the app is on defaults).
   Trap: do not key on `fileMissing`, a failed migrated write leaves it false.
-- The notice is in memory for one launch (`main/ipc/settingsRecovery.ts`), cleared by
-  `settingsRecovery:seen`. It is not stored; a launch that never opens the main window never shows
-  it.
+- The notice waits in the optional store key `pendingSettingsNotice` (`holdRecoveryNotice`,
+  `main/ipc/settingsRecovery.ts`) until the player presses OK; a fresh recovery replaces it. Older
+  builds ignore the key.
 - The card sits top centre under the title bar on purpose: the bottom edge belongs to the
   what's-new strip, and bottom right belongs to the switch nudge and toasts.
 - `salvagedBackup.savedAtMs` is the backup file's mtime and is optional: a stat failure must never
@@ -2842,7 +2842,8 @@ what a later change must know. Each fix has a unit test that failed before it.
 - Quarantine: `tornJson.ts quarantineSlots()` gives five names; `quarantineStore` takes the first
   free one and reuses the LAST when full, never the first. `quarantinePathFor` is still the first
   slot. Trap: `renameSync` replaces an existing file on Windows. The resist ledger
-  (`resist/ledgerFile.ts`) still uses the single name, which is fine because it is re-derived.
+  (`resist/ledgerFile.ts`) takes the first free slot too: it holds other characters' learned
+  resists, which no log on this PC can re-derive.
 - Launch pick: `log/discovery.ts savedLogHonoured` is the rule. The under-the-folder check applies
   only when the player chose the EQ folder (a non-blank `eqInstallDir`) and not under `EQ_LOG_PATH`.
   With no chosen folder the saved log is kept on existence alone: it rescues a launch where
@@ -3215,7 +3216,7 @@ what a later change must know. Each fix has a unit test that failed before it.
   the define itself (`BuffInstances::restat_all`, `buffs_restat.rs`) and then announces. An
   `ActiveBuff` carries the numbers it was projected with, so anything new that changes
   `estimate_for`'s answer without a log line must call `restat_all` too, or the table and the cards
-  disagree. The crowd-control hold sentence stays true.
+  disagree. A saved choice now moves a running crowd-control hold too.
 - `reproject_row` (`buffs_restat.rs`) is the one per-row re-projection for both a new sample and a
   choice; it keeps the row's own `started_ts`, caster and count. `buffs_instances.rs` is near its
   factoring ceiling: new re-projection code goes in `buffs_restat.rs`.
@@ -3303,3 +3304,39 @@ what a later change must know. Each fix has a unit test that failed before it.
 - A stay's outgoing headline divides by your fight time plus `Agg.loose` (`LooseClock`, ownclock.rs): stretches of landed damage with no fight of yours open, ended by a fight or 60 s of quiet, a second at least, and a dropped row takes its time with it. `durationSec` stays your fights alone, because per-minute figures read it, so print a headline's time with `headlineClockSec`, never `durationSec`.
 - Item window: a short junk token before `Class:` is accepted only with a class code after it and `Race` opening the next row; without the Race check, full-screen captures read as junk windows.
 - The screen pass's 16 owner entries and the bug hunt's 17 are decided; each audit line says how. Check the Bazaar column fit and the Combat log at 900x600 first: neither was measured.
+
+## Batch of 2026-11-23: rules its fixes left in force
+
+- **CE is display only.** Frozen for good: appId, `executableName` (TEST), package name,
+  `PROD_DIR_NAME`, `channel: test`, `test.yml`, the updater cache. Pinned by
+  `tests/communityIdentity.test.mts`, enforced by `scripts/community/check-release-identity.mts`.
+  Releases publish not-Latest; `gh release edit community-<v> --latest` is a separate owner step.
+  Versions are plain 0.1.N from 0.1.55. The first CE release bridges the previous blockmap to its
+  `-ce-` name.
+- **Loot order.** The flat ledger is newest first within a second, on append and full read (measured).
+  A character switch remounts the Loot tab and Group by item returns to on, so a spec reading rows
+  after a switch reads the grouped table, where ties sort A to Z. That was the "oldest first" report.
+- **Gaps save on leaving.** `switchController.ts leaveLog` runs the one `setBeforeSwitch` slot;
+  `gapsSaver.leaving(ms)` is bounded at 2 s, never rejects, and a timed-out attempt is dropped so it
+  cannot write another character's answer. `window-all-closed` waits for it, then tears down;
+  `before-quit` runs that teardown if it lands first. Tray Quit closes the window, so it saves too.
+  A quit that closes no window (the updater's install, an OS logoff) makes no save.
+- **All characters stock.** `withOthersStock` (`gapsAllCharacters.ts`) covers only rows the attached
+  character lacks. `mergeRow` still takes the newer side for the archive merge.
+- **Turn-ins.** Refusal lines print with the trade (141 of 141 within 1 s), so `turnins.rs` applies no
+  age window. The log never names the refused item; `back` plus `shared/turnInRefusals.ts` settles it
+  from the quest list. "You must turn in all quest items at once" does NOT return the items: they
+  stay in the window (5 of 12 bounce sessions then completed). Never treat it as a cancel.
+- **Respawn join.** `standingAcross` gives every archive join the same standing zone. A zero-sample
+  row with an agreed pool takes that pool's count and bound.
+- **Log archive trap.** Never clear the rotation journal for a segment still `captured`:
+  `placeArchivedBuckets` then calls `withdraw`, which deletes that segment's stash.
+- **App-signal fires** live in main for the launch (`createAppFireLog`) and merge in
+  `useAlertsStore`, not the module snapshot, because the module cursor is the engine's. The event
+  feed row is still a gap: it needs an engine command.
+- **Maps refresh.** `refreshIfChanged` stats every file because a directory's time does not move on
+  an overwrite. `generation()` invalidates the zone graph; the renderer re-asks through
+  `useMapsRevision`. The port table is held per EverQuest folder (`zonePortsPull.ts`).
+- **Combat copy.** Under "With its owner" the level-1 paste follows `petGroupPrintLines` (master,
+  pets, `Together`). The per-mob drill reads "all sources combined": its events are everything but
+  `enemy`, so a group's damage is in it.

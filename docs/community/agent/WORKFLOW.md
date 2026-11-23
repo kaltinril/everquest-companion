@@ -379,6 +379,14 @@ disagree, RULES.md wins; fix this file.
 - No finished work branch may be left unmerged before a build (a posky rescrape was once left
   out); the check is step 1.2 of the `community-release` skill.
 - The window hides to the tray on close; applying a downloaded update needs tray Quit.
+- **An installer change can be rehearsed with no VM** (2026-11-23, the CE rename). Build two stub
+  Electron apps from the repo's `build/installer.nsh` with every name swapped (appId, product, exe,
+  package, shortcut, settings folder, the literal `RMDir` path, publish off), install old, run new
+  with `--updated /S`, with `--updated /S --force-run` and bare, uninstall, remove what is left.
+  Refuse to run if a real name survives in a live line of the patched script: that `RMDir` deletes
+  real settings, and the exe name is what the stock installer's `taskkill` matches. Fingerprint the
+  real install, settings and shortcuts before and after. It proves the installer's mechanics, not the
+  real payload or the network update.
 - Launching the packaged app with the repo as cwd makes it use `engine/target/release` (the
   creator's candidate order): a launch artifact, not a player issue.
 
