@@ -141,7 +141,11 @@ fn a_saved_choice_moves_a_crowd_control_hold_already_running() {
     assert!(moved_rev > rev, "the change is announced");
 
     choose(&mut fold, chosen);
-    assert_eq!(hold(&fold), (Some(12_000), moved_rev), "the same choice again moves nothing");
+    assert_eq!(
+        hold(&fold),
+        (Some(12_000), moved_rev),
+        "the same choice again moves nothing"
+    );
 
     choose(&mut fold, json!({}));
     assert_eq!(hold(&fold).0, before);

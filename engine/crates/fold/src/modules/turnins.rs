@@ -226,16 +226,28 @@ mod tests {
     #[test]
     fn a_slow_trade_refused_whole_gives_nothing() {
         let mut m = TurnInsModule::new(Some("Drywrought"));
-        fold(&mut m, r#"{"kind":"offer","seq":0,"ts":0,"raw":"o","item":"A","npc":"Sir Mollin"}"#);
-        fold(&mut m, r#"{"kind":"offer","seq":1,"ts":5000,"raw":"o","item":"B","npc":"Sir Mollin"}"#);
-        fold(&mut m, r#"{"kind":"offer","seq":2,"ts":15000,"raw":"o","item":"C","npc":"Sir Mollin"}"#);
+        fold(
+            &mut m,
+            r#"{"kind":"offer","seq":0,"ts":0,"raw":"o","item":"A","npc":"Sir Mollin"}"#,
+        );
+        fold(
+            &mut m,
+            r#"{"kind":"offer","seq":1,"ts":5000,"raw":"o","item":"B","npc":"Sir Mollin"}"#,
+        );
+        fold(
+            &mut m,
+            r#"{"kind":"offer","seq":2,"ts":15000,"raw":"o","item":"C","npc":"Sir Mollin"}"#,
+        );
         for seq in 3..6 {
             let line = format!(
                 r#"{{"kind":"unknown","seq":{seq},"ts":20000,"raw":"[x] Sir Mollin says, 'I have no need for this, Drywrought. You can have it back.'"}}"#
             );
             fold(&mut m, &line);
         }
-        fold(&mut m, r#"{"kind":"trade","seq":6,"ts":20000,"raw":"t","npc":"Sir Mollin"}"#);
+        fold(
+            &mut m,
+            r#"{"kind":"trade","seq":6,"ts":20000,"raw":"t","npc":"Sir Mollin"}"#,
+        );
         assert_eq!(given_of(&m), json!([]));
     }
 
@@ -244,14 +256,34 @@ mod tests {
     #[test]
     fn a_refusal_keeps_what_it_took_out_on_the_row() {
         let mut m = TurnInsModule::new(Some("Drywrought"));
-        for (seq, item) in ["Nebulous Sapphire", "Brass Knuckles", "Wind Rune Izah", "Wind Rune Neza"].iter().enumerate() {
-            let line = format!(r#"{{"kind":"offer","seq":{seq},"ts":{},"raw":"o","item":"{item}","npc":"Holwin"}}"#, 1000 * seq);
+        for (seq, item) in [
+            "Nebulous Sapphire",
+            "Brass Knuckles",
+            "Wind Rune Izah",
+            "Wind Rune Neza",
+        ]
+        .iter()
+        .enumerate()
+        {
+            let line = format!(
+                r#"{{"kind":"offer","seq":{seq},"ts":{},"raw":"o","item":"{item}","npc":"Holwin"}}"#,
+                1000 * seq
+            );
             fold(&mut m, &line);
         }
-        fold(&mut m, r#"{"kind":"unknown","seq":4,"ts":4000,"raw":"[x] Holwin says, 'I have no need for this, Drywrought. You can have it back.'"}"#);
-        fold(&mut m, r#"{"kind":"trade","seq":5,"ts":4000,"raw":"t","npc":"Holwin"}"#);
+        fold(
+            &mut m,
+            r#"{"kind":"unknown","seq":4,"ts":4000,"raw":"[x] Holwin says, 'I have no need for this, Drywrought. You can have it back.'"}"#,
+        );
+        fold(
+            &mut m,
+            r#"{"kind":"trade","seq":5,"ts":4000,"raw":"t","npc":"Holwin"}"#,
+        );
         let row = &m.snapshot()["state"][0];
-        assert_eq!(row["back"], json!([{ "item": "Wind Rune Neza", "count": 1 }]));
+        assert_eq!(
+            row["back"],
+            json!([{ "item": "Wind Rune Neza", "count": 1 }])
+        );
         assert_eq!(row["given"].as_array().map(Vec::len), Some(3));
     }
 
@@ -259,19 +291,40 @@ mod tests {
     #[test]
     fn a_trade_with_no_refusal_has_no_back_field() {
         let mut m = TurnInsModule::new(Some("Drywrought"));
-        fold(&mut m, r#"{"kind":"offer","seq":0,"ts":1,"raw":"o","item":"A","npc":"Holwin"}"#);
-        fold(&mut m, r#"{"kind":"trade","seq":1,"ts":2,"raw":"t","npc":"Holwin"}"#);
+        fold(
+            &mut m,
+            r#"{"kind":"offer","seq":0,"ts":1,"raw":"o","item":"A","npc":"Holwin"}"#,
+        );
+        fold(
+            &mut m,
+            r#"{"kind":"trade","seq":1,"ts":2,"raw":"t","npc":"Holwin"}"#,
+        );
         assert!(m.snapshot()["state"][0].get("back").is_none());
     }
 
     #[test]
     fn a_cancel_clears_what_a_refusal_took_out() {
         let mut m = TurnInsModule::new(Some("Drywrought"));
-        fold(&mut m, r#"{"kind":"offer","seq":0,"ts":1000,"raw":"o","item":"A","npc":"Holwin"}"#);
-        fold(&mut m, r#"{"kind":"unknown","seq":1,"ts":2000,"raw":"[x] Holwin says, 'I have no need for this, Drywrought. You can have it back.'"}"#);
-        fold(&mut m, r#"{"kind":"unknown","seq":2,"ts":3000,"raw":"[x] You have cancelled the trade."}"#);
-        fold(&mut m, r#"{"kind":"offer","seq":3,"ts":4000,"raw":"o","item":"B","npc":"Holwin"}"#);
-        fold(&mut m, r#"{"kind":"trade","seq":4,"ts":5000,"raw":"t","npc":"Holwin"}"#);
+        fold(
+            &mut m,
+            r#"{"kind":"offer","seq":0,"ts":1000,"raw":"o","item":"A","npc":"Holwin"}"#,
+        );
+        fold(
+            &mut m,
+            r#"{"kind":"unknown","seq":1,"ts":2000,"raw":"[x] Holwin says, 'I have no need for this, Drywrought. You can have it back.'"}"#,
+        );
+        fold(
+            &mut m,
+            r#"{"kind":"unknown","seq":2,"ts":3000,"raw":"[x] You have cancelled the trade."}"#,
+        );
+        fold(
+            &mut m,
+            r#"{"kind":"offer","seq":3,"ts":4000,"raw":"o","item":"B","npc":"Holwin"}"#,
+        );
+        fold(
+            &mut m,
+            r#"{"kind":"trade","seq":4,"ts":5000,"raw":"t","npc":"Holwin"}"#,
+        );
         assert!(m.snapshot()["state"][0].get("back").is_none());
     }
 
@@ -280,10 +333,22 @@ mod tests {
     #[test]
     fn a_bounce_leaves_the_offers_in_the_trade() {
         let mut m = TurnInsModule::new(Some("Drywrought"));
-        fold(&mut m, r#"{"kind":"offer","seq":0,"ts":0,"raw":"o","item":"Kiola Nut","npc":"Tumpy Irontoe"}"#);
-        fold(&mut m, r#"{"kind":"unknown","seq":1,"ts":1000,"raw":"[x] You must turn in all quest items at once in order to complete this quest."}"#);
-        fold(&mut m, r#"{"kind":"offer","seq":2,"ts":3000,"raw":"o","item":"Water Flask","npc":"Tumpy Irontoe"}"#);
-        fold(&mut m, r#"{"kind":"trade","seq":3,"ts":5000,"raw":"t","npc":"Tumpy Irontoe"}"#);
+        fold(
+            &mut m,
+            r#"{"kind":"offer","seq":0,"ts":0,"raw":"o","item":"Kiola Nut","npc":"Tumpy Irontoe"}"#,
+        );
+        fold(
+            &mut m,
+            r#"{"kind":"unknown","seq":1,"ts":1000,"raw":"[x] You must turn in all quest items at once in order to complete this quest."}"#,
+        );
+        fold(
+            &mut m,
+            r#"{"kind":"offer","seq":2,"ts":3000,"raw":"o","item":"Water Flask","npc":"Tumpy Irontoe"}"#,
+        );
+        fold(
+            &mut m,
+            r#"{"kind":"trade","seq":3,"ts":5000,"raw":"t","npc":"Tumpy Irontoe"}"#,
+        );
         assert_eq!(
             given_of(&m),
             json!([{ "item": "Kiola Nut", "count": 1 }, { "item": "Water Flask", "count": 1 }])
