@@ -58,6 +58,7 @@ import { LedgerColumn, type FeedItem } from './LedgerColumn'
 // window; since JOS-75 it reads the tab's own SCOPE, like every other number here, and states
 // which one it got. The Overview card keeps its hour — that surface has no timescale to follow.
 import { AaPacePanel } from './AaPacePanel'
+import { ReincarnationPanel } from './ReincarnationPanel'
 import { useCreditedProgression } from './useCreditedProgression'
 
 /**
@@ -366,6 +367,10 @@ function ChartsColumn(p: {
   onCustom: (range: SliceRange) => void
   /** The RAW custom pick, so the two datetime fields display what was typed (JOS-436). */
   custom: SliceRange | null
+  /** The whole history, unscoped, for the Reincarnations panel. */
+  levels: LevelingSnap['levels']
+  spends: AASpendEvent[]
+  prog: ProgressionSnap
 }): JSX.Element {
   const { chrome, scope, charts } = p
   return (
@@ -399,6 +404,9 @@ function ChartsColumn(p: {
       {/* ALWAYS mounted since JOS-75: it is the window's own read, narrowed by a drag while one
           exists. Below the plots it explains, so the picture stays the first thing on the tab. */}
       <RangeStatsPanel stats={scope.stats} scope={scope.kind} zoneCaption={scope.zoneCaption} onClear={charts.clear} />
+      {/* The one panel in this column that follows no scope: a climb is a fixed stretch of history.
+          It draws nothing for a character with no reincarnation. */}
+      <ReincarnationPanel levels={p.levels} spends={p.spends} snap={p.prog} />
     </Stack>
   )
 }
@@ -619,6 +627,9 @@ export default function LevelingView({
               onPick={setId}
               onCustom={setCustom}
               custom={custom}
+              levels={state.levels}
+              spends={spends}
+              prog={prog}
             />
           ) : (
             <LogReadInline module="leveling" served={snap !== null} sx={{ p: 2 }}>
