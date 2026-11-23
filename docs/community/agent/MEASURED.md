@@ -147,10 +147,10 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
   to level 1 for reincarnation AAs (early access now, everyone on 2026-12-08). What the app's level
   history does with that reset (2026-11-22, the owner's two): the dings restart at 2 and
   `buildLevelSegments` reads the drop as a class swap, so each reincarnation is a dashed break, one
-  of the Level over time chart's "class swaps" (23 on his log, 2 of them these) and an `afterSwap`
+  of the Level over time chart's "class swaps" (23 on the owner's log, 2 of them these) and an `afterSwap`
   feed row. The label is wrong and was left alone. One reincarnation prints a race line and three
   class lines in one second as cost-0 AA purchases (`Class Reincarnation: Warrior`, then `... 2`
-  through "improved"). None of his 240 purchase lines repeats an ability and rank, so the re-log a
+  through "improved"). None of the owner's 240 purchase lines repeats an ability and rank, so the re-log a
   comment in `progressionStatsTypes.ts` describes is not seen on this log. The Reincarnations panel
   (`shared/reincarnationClimbs.ts`) guards against it anyway.
 - **Log lines.** 07-07: the rank is in `begin casting` lines; heal crits are logged. 09-15: the
