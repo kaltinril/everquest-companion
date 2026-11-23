@@ -2545,12 +2545,14 @@ only: no engine, parser, protocol, network or dependency change.
     line itself; `tradeskill-no-materials` is now a wrapper around it.
   - Home (owner asked whether the overview should be simpler; the page ran past one 860 px
     screen):
-    - `homeDoors` (shared/tradeskillHome.ts): a tradeskill the log has shown keeps its full tile;
-      the rest are one row of small buttons under the tiles, "Not in your log yet"
-      (`tradeskills-unseen`), each "<Tradeskill> · N recipes". Every door keeps
-      `tradeskill-tile-<Tradeskill>` on an element holding a `button`, with `data-tile` = `seen`
-      or `unseen`. `tradeskill-tile-unseen` is gone. No tradeskill seen: all twelve in the row and
-      `NO_TRADESKILL_SEEN_LINE` above, said only once the skills module is served.
+    - `homeDoors` (shared/tradeskillHome.ts): a tradeskill the log has shown has a tile with its
+      level. The rest were a row of small buttons until 2026-11-22 (owner: they read as comments);
+      each is now a full tile of the same grid, after Foraging, by name: `NOT_IN_LOG_TEXT` where
+      the number goes (never 0, the level is unknown; a default awaiting the owner's word), "of N"
+      only where `skillTop` knows one, an empty bar, no next recipe (`unseenFace`). Every door
+      keeps `tradeskill-tile-<Tradeskill>` on an element holding a `button`, with `data-tile` =
+      `seen` or `unseen`. No tradeskill seen: all twelve are such tiles and
+      `NO_TRADESKILL_SEEN_LINE` is above, said only once the skills module is served.
     - Foraging is a tile of the same grid (`tradeskills-tiles`), after the tradeskills: level and
       "Found, Failed, Found rate" on one line (`data-value` on each). A click opens the session
       line, the items and the AA in `tradeskill-forage-detail`, a grid item spanning every column;

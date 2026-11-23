@@ -19,6 +19,7 @@ import type { SkillRow } from './skills'
 import { nextRecipe, skillRecipes, tradeskillLevel, type BookIndex, type BookRecipe, type TradeskillTile } from './tradeskillBook'
 import { guideCreditOf, type GuideIndex, type GuideStamp } from './tradeskillGuide'
 import { rateText, type CraftBook } from './tradeskillHistory'
+import { skillTop } from './tradeskillLevelBar'
 import { onHand, type HaveLookup } from './tradeskillMaterials'
 import { TRADESKILLS, type Tradeskill } from './tradeskills'
 
@@ -178,16 +179,14 @@ export const SOURCES_LABEL = 'Sources:'
 // ---- the doors to the workbenches --------------------------------------------------------------
 
 /**
- * Home's doors, split by whether the log has shown the tradeskill go up (owner's question,
- * 2026-11-20: should the overview be simpler; the capture ran past one screen, most of it tiles
- * for tradeskills the player had never touched). A tradeskill the log has shown keeps its full
- * tile. The rest are one compact row of small buttons under the tiles: the same door to the
- * same workbench, with no level bar and no next recipe to draw for a level nobody knows.
+ * Home's doors, split by whether the log has shown the tradeskill go up. Both kinds are full tiles
+ * of one grid (owner, 2026-11-22: small buttons read as comments, not as something to click). A
+ * tile the log has not shown has no level number and no next recipe: nobody knows its level.
  */
 export interface HomeDoors {
-  /** Full tiles, in `tradeskillTiles`' order: the highest level first. */
+  /** Tiles with a level, in `tradeskillTiles`' order: the highest level first. */
   seen: TradeskillTile[]
-  /** The compact row, by name. */
+  /** Tiles the log has not shown, by name. They follow Foraging in the grid. */
   unseen: TradeskillTile[]
 }
 
@@ -195,20 +194,46 @@ export function homeDoors(tiles: readonly TradeskillTile[]): HomeDoors {
   return { seen: tiles.filter((tile) => tile.level !== null), unseen: tiles.filter((tile) => tile.level === null) }
 }
 
-/** The heading of the compact row. */
-export const UNSEEN_HEADING = 'Not in your log yet'
+/**
+ * Where a not-in-log tile's level number would go. Never 0: the app knows only that the log has
+ * not shown the skill rise, and it may have been raised before the log began. A default awaiting
+ * the owner's word (2026-11-22); this line is the one to change.
+ */
+export const NOT_IN_LOG_TEXT = 'Not in log'
 
-/** A compact door's hover. */
+/** A not-in-log tile's hover. */
 export const UNSEEN_DOOR_TIP = 'Your log has not shown this skill go up yet. Opens its workbench.'
 
-/** A compact door's words: "Pottery · 143 recipes" (the wiki's, under the era setting). */
-export function unseenDoorText(tile: Pick<TradeskillTile, 'tradeskill' | 'recipes'>): string {
-  return `${tile.tradeskill} · ${tile.recipes === 1 ? '1 recipe' : `${String(tile.recipes)} recipes`}`
+/** The same hover before the engine has read the skills, when nothing can be said of the log. */
+export const UNSEEN_DOOR_WAITING_TIP = "Opens this tradeskill's workbench, with its recipes from the wiki."
+
+/** The words of a tile with no level. */
+export interface UnseenFace {
+  /** `NOT_IN_LOG_TEXT`; '' until the engine has read the skills. */
+  level: string
+  /** "of 300"; '' where no top is measured, and until the engine has read the skills. */
+  of: string
+  tip: string
+  /** The empty bar, for a screen reader. */
+  label: string
+}
+
+/** `served` is whether the engine has read the skills: until then the log is not blamed for a missing level. */
+export function unseenFace(tradeskill: Tradeskill, served: boolean): UnseenFace {
+  if (!served) return { level: '', of: '', tip: UNSEEN_DOOR_WAITING_TIP, label: tradeskill }
+  const top = skillTop(tradeskill)
+  const of = top === null ? '' : `of ${String(top)}`
+  return { level: NOT_IN_LOG_TEXT, of, tip: UNSEEN_DOOR_TIP, label: `${tradeskill}: ${NOT_IN_LOG_TEXT}${of === '' ? '' : ` ${of}`}` }
+}
+
+/** Every tile's recipe line: "143 wiki recipes" (the wiki's, under the era setting). */
+export function tileRecipesText(recipes: number): string {
+  return recipes === 1 ? '1 wiki recipe' : `${String(recipes)} wiki recipes`
 }
 
 export const DOORS_LINE = 'Pick a tradeskill to open its workbench.'
 
-/** Said in place of `DOORS_LINE` when the log has shown no tradeskill at all, so every door is in the compact row. */
+/** Said in place of `DOORS_LINE` when the log has shown no tradeskill at all, so no tile has a level. */
 export const NO_TRADESKILL_SEEN_LINE = 'Your log has not shown any tradeskill go up yet. Pick one below to open its workbench.'
 
 /**
