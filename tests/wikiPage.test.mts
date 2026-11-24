@@ -2,7 +2,7 @@
 // `Fire Beetle Eye` page: the era banner, only the fields the log fills, `dropsfrom` by zone.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { dropsSeen, itemPage, itemWhereTable, mobFacts, mobPage, spellPage, stillNeeded, wikiCoin, wikiPageText } from '../src/shared/wikiPage'
+import { dropsSeen, groupLine, itemPage, itemWhereTable, lootLine, mobFacts, mobPage, spellPage, stillNeeded, wikiCoin, wikiPageText } from '../src/shared/wikiPage'
 import { sellersOf, vendorFinder } from '../src/shared/gapMobPage'
 import { wikiZoneNamer } from '../src/shared/gapWikiZone'
 import { killIndex, type KillMap } from '../src/shared/kills'
@@ -155,7 +155,7 @@ test('drops are counted in corpses per zone and mob from the loot ledger; a mob 
   const forager: GapRow = { domain: 'mob', name: 'a lizardman forager', kinds: [], count: 1, first: '', last: '', details: { samples: [] } }
   assert.deepEqual(mobFacts(forager, loot, kills).loot, [{ item: 'Black Lizard Talon', drops: 2 }])
   assert.equal(mobFacts(forager, loot, kills).kills, 10)
-  assert.match(wikiPageText(forager, loot, kills), /<li> \{\{:Black Lizard Talon\}\} <span class='drare'>\(Rare\)<\/span> <span class='ddb'>\[Overall: ~20%\]<\/span> <\/li>/)
+  assert.match(wikiPageText(forager, loot, kills), /<li> \{\{:Black Lizard Talon\}\} <span class='drare'>\(Rare\)<\/span> <\/li>/)
 })
 
 test("a mob page's level range covers every /con, past the eight readings a row serves", () => {
@@ -242,8 +242,8 @@ test('a mob page lists a drop group as its group line, rated by any member, and 
   ]
   const kills = { 'a kobold': { count: 20, mob: 'a kobold' } } as unknown as Parameters<typeof wikiPageText>[2]
   const text = wikiPageText(kobold, loot, kills, { dropGroups: groups })
-  assert.ok(text.includes("<li> [[Rusty Weapons]] <span class='drare'>(Rare)</span> <span class='ddb'>[Overall: ~10%]</span> </li>"), text)
-  assert.ok(text.includes("<li> [[Cloth Armor]] <span class='drare'>(Rare)</span> <span class='ddb'>[Overall: ~5%]</span> </li>"), text)
+  assert.ok(text.includes("<li> [[Rusty Weapons]] <span class='drare'>(Rare)</span> </li>"), text)
+  assert.ok(text.includes("<li> [[Cloth Armor]] <span class='drare'>(Rare)</span> </li>"), text)
   assert.ok(text.includes('<li> {{:Kobold Scalp}} '), text)
   assert.ok(!text.includes('Rusty Long Sword') && !text.includes('Dusty Burlap'), text)
   // The same loot on a plain row (no zone title) takes every zone, as before.
@@ -373,4 +373,11 @@ test('AN ITEM SEEN ONLY IN A CAPTURE OR THE BAGS IS NOT READY UNTIL SOMETHING SA
   assert.ok(stillNeeded(captured, [], {}, shots).some((n) => n.startsWith('where it comes from')))
   const looted = { ...captured, kinds: ['looted'] } as GapRow
   assert.deepEqual(stillNeeded(looted, [], {}, shots), [])
+})
+
+test('a copied loot line carries the rarity word but never a rate: the wiki drop database writes the percent (owner, 2026-11-23)', () => {
+  assert.equal(lootLine('Bone Chips', 8, 20), "<li> {{:Bone Chips}} <span class='drare'>(Uncommon)</span> </li>")
+  assert.equal(groupLine('Rusty Weapons', 2, 20), "<li> [[Rusty Weapons]] <span class='drare'>(Rare)</span> </li>")
+  assert.equal(lootLine('Bone Chips', 3, 5), '<li> {{:Bone Chips}} </li>')
+  for (const line of [lootLine('Ale', 1, 50), groupLine('Rusty Weapons', 50, 50)]) assert.doesNotMatch(line, /ddb|Overall|%/)
 })
