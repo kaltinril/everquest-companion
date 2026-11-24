@@ -156,7 +156,8 @@ fn hostile_presence(st: &EngineState, enc: &Encounter, now: i64) -> (usize, bool
 /// The CC hold is a veto on ONE path, not on closure. It vetoes only the death-close, because that
 /// is the judgement it informs ("is this engaged instance still alive?"); the fallback asks whether
 /// anything at all has happened, and a CC application or refresh stamps `last_activity_ts`, so an
-/// actively refreshed mez still holds the fight open.
+/// actively refreshed mez still holds the fight open. An own mez not yet worn off
+/// (`Encounter::mez_on`) is the one veto on both paths, so a long mez left to run keeps its fight.
 ///
 /// A hold only ever speaks for an engaged hostile. Two entities are excluded because they cannot
 /// answer its question: a RETIRED instance (handled at the retirement site — the stamp is gone) and
@@ -169,8 +170,10 @@ pub fn eval_closure(st: &mut EngineState, now: i64) {
     let since_activity = now - st.last_activity_ts;
 
     // Fallback: no damage and no CC for the idle window (mob fled / deaggroed). Evaluated FIRST, so
-    // it is reachable regardless of any outstanding hold.
-    if since_activity >= FALLBACK_IDLE_MS {
+    // it is reachable regardless of any outstanding CC hold. Only a mob still held on your own mez
+    // vetoes it: that mob is in the fight, and its wait counts (owner, 2026-11-23).
+    let held = enc.held_on_mez(now, &st.pet_names);
+    if since_activity >= FALLBACK_IDLE_MS && !held {
         finalize_current(st);
         return;
     }
@@ -178,7 +181,7 @@ pub fn eval_closure(st: &mut EngineState, now: i64) {
     // The death-close below is a pure conjunction and the linger is one of its terms, so while the
     // linger has not elapsed nothing it reads can finalize: the hold walk and the presence walk
     // over `engaged` are skipped for every damage line inside a fight, which is nearly all of them.
-    if since_damage < LINGER_MS {
+    if since_damage < LINGER_MS || held {
         return;
     }
 
