@@ -651,12 +651,44 @@ impl EngineState {
         }
     }
 
+    /// A swing (landed or not) at one of ours by something not on our side engages it in the open
+    /// fight: a group member, your pet, or a member's bound pet being attacked proves the attacker
+    /// is in this pull, though no damage of ours has touched it yet. It opens no fight and moves no
+    /// damage clock, as presence never does. Without it the death-close ended a pull while that mob
+    /// was still fighting the group, and the next swing at it opened a fight of its own (owner,
+    /// 2026-11-23: "when I tab to a new mob the DPS seems to show only the damage for that mob").
+    pub fn engage_swing_at_ours(&mut self, attacker: &str, target: &str, ts: i64) {
+        if self.current.is_none() {
+            return;
+        }
+        let t_key = id_key_ref(target);
+        let admitted = &self.roster.admitted;
+        let ours = admitted.contains(t_key.as_ref())
+            || self.pet_names.contains(t_key.as_ref())
+            || (self.ally.bind_of(&t_key)).is_some_and(|b| admitted.contains(&b.charmer_key));
+        let a_key = id_key_ref(attacker);
+        let friendly = a_key.is_empty()
+            || self.ally_friendly(&a_key)
+            || admitted.contains(a_key.as_ref())
+            || self.ever_pet.contains(a_key.as_ref())
+            || self.others.is_recorded(&a_key)
+            || self.ally.bind_of(&a_key).is_some();
+        if !ours || friendly {
+            return;
+        }
+        let inst = self.resolve(attacker, ts, false);
+        if let Some(enc) = self.current.as_mut() {
+            enc.engage(&inst.instance_id, ts);
+        }
+    }
+
     /// Presence refresh — record that `name` is still in the current fight as of `ts`. The LIVENESS
     /// axis only: it moves nothing on the damage timeline, so DPS denominators and the fled-mob
     /// fallback clock are unaffected.
     ///
     /// Conservative in both directions: it never engages anything (only already-engaged instances
-    /// are refreshed, so a miss or resist cannot open or join an encounter) and it never resolves or
+    /// are refreshed; the swings that do engage, a mob's at you or at one of ours, are routed to
+    /// `engage_hostile` and `engage_swing_at_ours`, and nothing here opens an encounter) and it never resolves or
     /// creates a world instance, matching engaged ids by name prefix instead. Name-level matching
     /// refreshes every engaged twin sharing the name, because the log cannot tell twins apart on a
     /// miss line and a retired twin is "gone" via `is_retired` anyway.

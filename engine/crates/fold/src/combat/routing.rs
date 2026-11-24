@@ -281,6 +281,7 @@ pub fn route(st: &mut EngineState, ev: &DamageEvent<'_>) -> Option<Attribution> 
         note_other_hostile(st, ev.attacker);
     }
     if at == Attribution::Ignore {
+        st.engage_swing_at_ours(ev.attacker, ev.target, ev.ts);
         // Offered to the two models that read it — the record-everything ladder first, then a third
         // party's charm pet. Both book aggregate-only; what neither claims stays dropped.
         infer_summoned_pet(st, ev.attacker, ev.target, ev.ts);
@@ -502,6 +503,7 @@ pub fn route_miss(st: &mut EngineState, ev: &MissLine<'_>) {
     // An ally pet's swing at a friendly proves the break whether or not it connected.
     note_ally_pet_evidence(st, ev.attacker, ev.target, ev.ts);
     if at == Attribution::Ignore {
+        st.engage_swing_at_ours(ev.attacker, ev.target, ev.ts);
         // The same two offers the damage path makes, in the same order. No hostile-evidence read on
         // the incoming side: that rung was measured on landed damage, and a swing that connected
         // with nothing is not what was measured.
@@ -524,6 +526,9 @@ pub fn route_miss(st: &mut EngineState, ev: &MissLine<'_>) {
 
     if at == Attribution::Incoming {
         let att = st.resolve(ev.attacker, ev.ts, false);
+        // A mob swinging at you is in the open fight whether or not it connected, as a landed hit
+        // engages it (`route_incoming_damage`). Never opens one.
+        engage_hostile(st, &att, ev.ts);
         let (id, name) = (att.instance_id, att.label);
         both(st, ev.ts, true, |agg| agg.add_inc_miss(&id, &name, &fold));
         // An incoming swing absorbed by YOUR rune is a mitigation instant and belongs to the healing
