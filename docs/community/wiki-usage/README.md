@@ -34,8 +34,10 @@ the lookup)"; `../requirements/wiki-traffic.md`). Pinned by `tests/wikiTraffic.t
 | `lookupItemOnCopy` (`src/main/itemLookup.ts`): search, then the page | Copy on a Gaps item row whose name no cache answers (`src/main/gapCopyLookup.ts`) | `item copy` |
 | `lookupMobOnCopy` (`src/main/mobLookup.ts`): search, then the page | Copy on a Gaps mob row, the same way | `mob copy` |
 | `readQuestPage` (`src/main/gapQuestLive.ts`): the quest page, at most one more read | Copy on a Gaps quest row | `quest copy` |
+| `createObsClient` (`src/main/dropObs/client.ts`): Bot-password login, `meta=userinfo`, a CSRF token, then `action=eozobservations` `operation=status` and `operation=submit` (POST) | The player's own switch, Settings → Game → "Send loot to the wiki's drop database" (off by default), and its Test sign-in button; the drain (`src/main/dropObs/drain.ts`) sends at most one batch per 30 s, a second between requests, backing off up to an hour | `drop observations` |
 
-Nothing else asks the wiki. Hover cards, the item dialog, the mob page, the con card and the loot
+The one write is the drop-database submission (owner, 2026-11-23, `../requirements/drop-db-submit.md`):
+the player's own corpse loot, sent only while the player's switch is on. Nothing else asks the wiki. Hover cards, the item dialog, the mob page, the con card and the loot
 toast answer from the committed data and what a Copy cached. The engine's miss announcements are
 answered from that local data or left unanswered. Images come from the bundle or the image cache;
 a missing one shows the placeholder. The app asks no GitHub pack either: new item icons are pulled

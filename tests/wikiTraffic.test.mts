@@ -7,6 +7,11 @@
 // import `electron` (knowledgeCache.ts, errorLog.ts), so a resolve hook hands them a stub whose
 // `app.getPath` is a throwaway directory; the modules are imported after it is registered.
 // The source pins at the bottom name the only files that may open a wiki client or call a Copy door.
+//
+// THE ONE EXCEPTION (owner, 2026-11-23, requirements/drop-db-submit.md and wiki-traffic.md): sending
+// the player's own loot to the wiki's drop database (`action=eozobservations`). Off until the player
+// turns it on in Settings; pinned below to its one client and its one drain, and driven against a
+// stubbed fetch in tests/dropObsDrain.test.mts.
 
 import { test, after } from 'node:test'
 import assert from 'node:assert/strict'
@@ -172,4 +177,16 @@ test('THE APP INSTALLS THE IMAGE HANDLER WITHOUT A FETCHER', () => {
   const call = index.slice(index.indexOf('installImageCacheProtocol(protocol'), index.indexOf('installSpeechCacheProtocol('))
   assert.ok(call.length > 0)
   assert.doesNotMatch(call, /fetchImpl/)
+})
+
+// Owner, 2026-11-23: "hook the app up to the wiki's drop database". The one write the app sends, and
+// only with the player's switch on.
+test('ONLY THE DROP-DATABASE CLIENT ASKS action=eozobservations, only its service opens one, and its drain does nothing while the switch is off', () => {
+  assert.deepEqual(filesMatching(/eozobservations/), ['src/main/dropObs/client.ts'])
+  assert.deepEqual(filesMatching(/\bcreateObsClient\(/), ['src/main/dropObs/client.ts', 'src/main/dropObs/service.ts'])
+  assert.deepEqual(filesMatching(/\bdrainOnce\(/),['src/main/dropObs/drain.ts', 'src/main/dropObs/service.ts'])
+  const service = code('src/main/dropObs/service.ts')
+  assert.match(service, /if \(running \|\| !s\.enabled \|\| s\.stopped !== null/, 'the background tick returns at once while the switch is off')
+  assert.match(code('src/main/dropObs/drain.ts'), /if \(!s\.enabled\) return 'off'/)
+  assert.match(code('src/main/dropObs/state.ts'), /enabled: false,/, 'off by default')
 })

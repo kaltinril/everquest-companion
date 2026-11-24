@@ -23,3 +23,12 @@ Nothing here is removed or narrowed without the owner's word (RULES.md, rule 19)
   `observedAt` for offline delivery), newest first. The screen shows how many before the switch
   is turned on.
 - No `characterName` (the spec wants explicit consent to publish it).
+- Player corpses: a source named for any character in the Logs folder or a current group member
+  is not sent. Other players the app has seen are not known to main yet (the Gaps tab's marked
+  players live in the renderer), so a corpse of a stranger is sent as an NPC until that list
+  reaches main.
+- A source the line named is taken as the corpse (`explicit-corpse`), whether or not the line said
+  "corpse" (the `You looted X from Y and ...` forms make the word optional); `Reward Chest` is not.
+- A wiki assertion failure (`assertuserfailed`) stops sending for this launch only: the next
+  launch, or Test sign-in, signs in again. The credential stops (`eoz-login`, `eoz-email`,
+  `eoz-blocked`, `permissiondenied`, `eoz-disabled`, a failed login) last until Test sign-in.
