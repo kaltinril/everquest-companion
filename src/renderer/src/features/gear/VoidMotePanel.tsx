@@ -53,6 +53,7 @@ import {
   MOTE_ORDER_HINT,
   MOTE_ORDER_LABEL,
   MOTE_TARGET_ROLES,
+  MOTES_ON_HAND,
   moteChangesText,
   moteEmptyText,
   moteGainHint,
@@ -103,10 +104,34 @@ interface ControlsProps {
   disabled: boolean
 }
 
-/** The two picks: what a gain is measured in, and what the list is ranked by. */
+/**
+ * The three picks: how many motes there are to spend, what a gain is measured in, and what the list
+ * is ranked by. The count stays live with no list: it is a fact about the player, not the rows.
+ */
 function MoteControls({ motes, setMotes, disabled }: ControlsProps): JSX.Element {
   return (
     <>
+      <Stack direction="row" spacing={0.75} alignItems="center" sx={{ flexShrink: 0 }}>
+        <Typography variant="caption" color="text.secondary" component="span">
+          Motes on hand
+        </Typography>
+        <ToggleButtonGroup
+          size="small"
+          exclusive
+          data-testid="gear-motes-onhand"
+          value={motes.onHand}
+          onChange={(_e: unknown, v: number | null) => {
+            if (v !== null) setMotes({ ...motes, onHand: v })
+          }}
+          sx={segmented('quiet')}
+        >
+          {MOTES_ON_HAND.map((n) => (
+            <ToggleButton key={n} value={n} title={`You have ${String(n)} void ${n === 1 ? 'mote' : 'motes'} to spend`} data-testid={`gear-motes-onhand-${String(n)}`}>
+              {n}
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
+      </Stack>
       <TextField
         select
         size="small"
@@ -222,7 +247,7 @@ export default function VoidMotePanel({ compare, indexReady, indexRefused, class
   const hosts = useMemo(() => [...equipped.values()], [equipped])
   const opts = useMemo(() => ({ target: motes.target, classes }), [motes.target, classes])
   const list = useMemo(() => sortMoteAdvice(moteAdvice(hosts, byKey, opts), motes.order), [hosts, byKey, opts, motes.order])
-  const plan = useMemo(() => motePlan(hosts, byKey, opts), [hosts, byKey, opts])
+  const plan = useMemo(() => motePlan(hosts, byKey, opts, motes.onHand), [hosts, byKey, opts, motes.onHand])
   const unranked = useMemo(() => moteUnranked(hosts, byKey), [hosts, byKey])
 
   return (
@@ -241,11 +266,11 @@ export default function VoidMotePanel({ compare, indexReady, indexRefused, class
         <Typography
           variant="body2"
           data-testid="gear-motes-plan"
-          title={list.length === 0 ? HINT : `${motePlanLine(plan)}. ${HINT}`}
+          title={list.length === 0 ? HINT : `${motePlanLine(plan, motes.onHand)}. ${HINT}`}
           noWrap
           sx={{ flex: '1 1 0', minWidth: 160 }}
         >
-          {list.length === 0 ? 'One lifts a worn item a full tier' : motePlanLine(plan)}
+          {list.length === 0 ? 'One lifts a worn item a full tier' : motePlanLine(plan, motes.onHand)}
         </Typography>
         <MoteControls motes={motes} setMotes={setMotes} disabled={list.length === 0} />
       </Stack>

@@ -396,8 +396,8 @@ test('sanitizeMotePrefs: each field falls back alone, and garbage is the default
   assert.deepEqual(sanitizeMotePrefs(null), DEFAULT_MOTE_PREFS)
   assert.deepEqual(sanitizeMotePrefs('open'), DEFAULT_MOTE_PREFS)
   // `open` is a field of the old Gear-tab panel's stored value: read past, never kept.
-  assert.deepEqual(sanitizeMotePrefs({ open: true, target: 'tank', order: 'effort' }), { target: 'tank', order: 'effort' })
-  assert.deepEqual(sanitizeMotePrefs({ open: true, target: 'WEIGHT', order: 'best' }), { target: 'balanced', order: 'recommended' })
+  assert.deepEqual(sanitizeMotePrefs({ open: true, target: 'tank', order: 'effort' }), { target: 'tank', order: 'effort', onHand: 3 })
+  assert.deepEqual(sanitizeMotePrefs({ open: true, target: 'WEIGHT', order: 'best' }), { target: 'balanced', order: 'recommended', onHand: 3 })
   assert.equal(sanitizeMotePrefs({ target: 'SV_FIRE' }).target, 'SV_FIRE')
 })
 

@@ -28,10 +28,19 @@ export interface VoidMotePrefs {
   /** what a gain is measured in: a focus, or one stat */
   target: MoteTarget
   order: MoteOrder
+  /**
+   * how many void motes the player has to spend now, 0 to 3 (owner, 2026-11-23): the week's plan
+   * spends exactly that many. Remembered on this machine, like the other two, not per character:
+   * the tab's choices are one `localStorage` key (`useVoidMotePrefs`).
+   */
+  onHand: number
 }
 
-/** The Gear tab's own BEST column is the balanced focus, so it leads. */
-export const DEFAULT_MOTE_PREFS: VoidMotePrefs = { target: 'balanced', order: 'recommended' }
+/** The picker's choices: none up to the most the game lets you hold. */
+export const MOTES_ON_HAND: readonly number[] = Array.from({ length: MOTE_RULES.perWeek + 1 }, (_, i) => i)
+
+/** The Gear tab's own BEST column is the balanced focus, so it leads; a full week's motes by default. */
+export const DEFAULT_MOTE_PREFS: VoidMotePrefs = { target: 'balanced', order: 'recommended', onHand: MOTE_RULES.perWeek }
 
 /** The picker's two groups, in the order it draws them. */
 export const MOTE_TARGET_ROLES: readonly GearRole[] = PLAN_ROLES
@@ -46,7 +55,8 @@ export function sanitizeMotePrefs(raw: unknown): VoidMotePrefs {
   const o = raw as Record<string, unknown>
   return {
     target: MOTE_TARGETS.find((t) => t === o.target) ?? DEFAULT_MOTE_PREFS.target,
-    order: MOTE_ORDERS.find((v) => v === o.order) ?? DEFAULT_MOTE_PREFS.order
+    order: MOTE_ORDERS.find((v) => v === o.order) ?? DEFAULT_MOTE_PREFS.order,
+    onHand: MOTES_ON_HAND.find((n) => n === o.onHand) ?? DEFAULT_MOTE_PREFS.onHand
   }
 }
 
@@ -205,8 +215,12 @@ export function motePlanText(plan: readonly MotePlanStep[]): string {
     .join(' · ')
 }
 
-/** The line above the list: where the week's motes go, and how many are left to hold. */
+/**
+ * The line above the list: where the week's motes go, and how many are left to hold. `motes` is
+ * how many the player has on hand; with none there is nothing to plan, which is not "not ready".
+ */
 export function motePlanLine(plan: readonly MotePlanStep[], motes: number = MOTE_RULES.perWeek): string {
+  if (motes <= 0) return 'No void motes to spend this week'
   if (plan.length === 0) return `Nothing you wear is ready for a mote yet: hold them`
   const held = motes - plan.length
   return `This week: ${motePlanText(plan)}${held > 0 ? ` · hold ${String(held)}` : ''}`
