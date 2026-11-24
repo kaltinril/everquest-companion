@@ -15,6 +15,7 @@
 
 import { createHash } from 'node:crypto'
 import type { LootEvent } from '../../shared/types'
+import { zoneBaseName } from '../../shared/gapWikiZone'
 
 /** One `loot` module row as the engine serves it (engine/crates/fold/src/modules/loot.rs). */
 export type LootRowIn = Pick<LootEvent, 'ts' | 'item' | 'source' | 'zone' | 'count'> & { disposition?: string }
@@ -91,7 +92,9 @@ function quantityOf(row: LootRowIn): number | null {
 /** The row's event, or null when it is not sent. `occurrence`: identical rows before it at its ts. */
 export function obsEvent(row: LootRowIn, ctx: EventContext, occurrence: number): ObsEvent | null {
   const npc = corpseOf(row, ctx.players)
-  const zone = clean(row.zone ?? '')
+  // The place, never the instance: the log's `Befallen 4 (Refined)` is the wiki's `Befallen`, so
+  // every tier's reports land on the one zone the mob's page names (shared/gapWikiZone.ts).
+  const zone = zoneBaseName(clean(row.zone ?? ''))
   const item = clean(row.item)
   const quantity = quantityOf(row)
   const server = clean(ctx.server)

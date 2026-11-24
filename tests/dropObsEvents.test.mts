@@ -108,3 +108,8 @@ test('a batch holds at most 100 events and fits the byte limit; its ID is a hash
   assert.equal(nextBatch(events, 'v', { ...LIM, events: 7 })?.events.length, 7, 'the status limit is honoured')
   assert.equal(nextBatch([], 'v', LIM), null)
 })
+
+test('the zone is the place, never the instance tier: every tier reports under the wiki zone', () => {
+  for (const zone of ['Befallen 4 (Refined)', 'Befallen (Awakened)', 'Befallen']) assert.equal(obsEvent(row({ zone }), ctx, 0)?.zone, 'Befallen', zone)
+  assert.equal(obsEvent(row({ zone: 'The Plane of Hate - Group 4 (Refined)' }), ctx, 0)?.zone, 'The Plane of Hate')
+})
