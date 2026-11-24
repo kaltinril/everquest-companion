@@ -11,7 +11,7 @@
 //
 // PURE, relative value imports (the shared/planner house rule).
 
-import type { ItemSource } from '../itemSources'
+import { sourceItemKey, type ItemSource } from '../itemSources'
 import type { RaidTarget } from '../types'
 import { statedLevel } from './zoneLevels'
 
@@ -77,6 +77,20 @@ export const SUPPLY = {
   instancesPerHour: 1,
   /** a raid target's full loot is once a week per difficulty; the +4 copy is the Refined kill */
   raidKillsPerWeek: 1,
+  /**
+   * Kills a week AFTER the week's first, of a `RERUN_BOSSES` boss or for a `RERUN_FAVOURS` item:
+   * up to once a day, so six (tester Malkil, 2026-11-23: "raids can be run once a day"). The
+   * CEILING, as `raidRunsPerWeek` is: the owner killed Innoruuk and Cazic-Thule a second time at D4
+   * the next day in 3 of 11 weeks, never a third (owner's logs to 2026-11-23).
+   */
+  lockoutRerunsPerWeek: 6,
+  /**
+   * Items such a later kill gives from its own table (wiki: "inside the lockout a kill still gives
+   * one drop"; Malkil: "only a single item on subsequent runs"). The owner's later D4 kills of
+   * Cazic-Thule gave 1, 2 and 0 of its table's items; Innoruuk's gave one beside the Eye of
+   * Innoruuk and the Shattered Emerald that every kill gives.
+   */
+  lockoutRerunDrops: 1,
   /** a stated respawn this long (seconds) is a raid-style target: weekly, like the roster's */
   raidRespawn: 86_400,
   /**
@@ -99,6 +113,32 @@ export const SUPPLY = {
 
 /** Mobs whose fight has a mechanic that slows farming, hand-kept (owner, 2026-11-19: "Lord Rick"). */
 export const MECHANIC_MOBS: ReadonlySet<string> = new Set(['lord rikantus everling'])
+
+/**
+ * The raid bosses whose later kills in a lockout week still drop one item from their table, up to
+ * daily (`SUPPLY.lockoutRerunsPerWeek`): the five the tester named (Malkil, 2026-11-23), by
+ * `mobKey`. Every other raid target keeps its one weekly kill.
+ */
+export const RERUN_BOSSES: ReadonlySet<string> = new Set(['lord nagafen', 'lady vox', 'cazic thule', 'innoruuk', 'master yael'])
+
+/** An item a raid mob's later kills in the week give at a rate of their own, not 1 in the table. */
+export interface RerunFavour {
+  /** the item, by `sourceItemKey` */
+  item: string
+  /** the mobs, by `mobKey` */
+  mobs: readonly string[]
+  /** the chance a later kill gives it */
+  chance: number
+}
+
+/**
+ * Slime Blood from the Plane of Fear's minibosses after the week's first run (Malkil, 2026-11-23:
+ * "an increased chance to drop from minibosses in Fear on subsequent runs"). MEASURED, not only his
+ * word: the owner's D4 later-week kills of Dread, Fright and Terror (Oct 15, 21 and 29) gave it 8
+ * times in 9; their week-first D4 kills gave it once in 15 (the owner's own loot lines; the
+ * group's other loot is not in the log). Nine kills is a small count.
+ */
+export const RERUN_FAVOURS: readonly RerunFavour[] = [{ item: 'slime blood of cazic-thule', mobs: ['dread', 'fright', 'terror'], chance: 8 / 9 }]
 
 // ---- the shapes ---------------------------------------------------------------------------------
 
@@ -123,6 +163,8 @@ export interface ItemSupply {
   /** the leading road's chance a kill drops it, and its kills a week */
   chance?: number
   kills?: number
+  /** the leading road's chance a LATER kill in a raid's lockout week drops it, when such kills count */
+  rerun?: number
   /** the leading road's stated respawn, seconds */
   respawn?: number
   assumed?: SupplyGap[]
@@ -168,9 +210,32 @@ interface Road {
   perWeek: number
   chance?: number
   kills?: number
+  rerun?: number
   respawn?: number
   assumed: SupplyGap[]
   hard: SupplyHard[]
+}
+
+/** The chance one later kill in the lockout week gives this item: favoured, one of the five's, or none. */
+function rerunChance(itemKey: string, mob: string, loot: number): number {
+  const key = mobKey(mob)
+  const favoured = RERUN_FAVOURS.find((f) => f.item === itemKey && f.mobs.includes(key))
+  if (favoured !== undefined) return favoured.chance
+  return RERUN_BOSSES.has(key) ? Math.min(1, SUPPLY.lockoutRerunDrops / Math.max(1, loot)) : 0
+}
+
+/**
+ * Each mob once. The catalog and an item page can name one mob two ways (`Cazic Thule` and
+ * `Cazic Thule (God)`: Shield of Rainbow Hues was counted twice), and the first, the catalog's, is kept.
+ */
+function distinctMobs(sources: readonly ItemSource[]): ItemSource[] {
+  const seen = new Set<string>()
+  return sources.filter((s) => {
+    const key = mobKey(s.mob)
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
 }
 
 /** A proper name with no article: the catalog writes a named mob that way (`Cauldronbubble`). */
@@ -222,18 +287,49 @@ function killsPerWeek(facts: CampFacts, cls: MobClass, inRaidZone: boolean): { k
   return { kills: SUPPLY.hoursPerWeek * campKillsPerHour(facts.respawn ?? SUPPLY.respawnDefault, up), assumed }
 }
 
-/** One mob that drops the thing: how many it yields a week of play. */
-function dropRoad(source: ItemSource, ctx: SupplyContext): Road {
-  const facts = ctx.camp(source)
+/** A mob's week: its kills, the copies they drop, what had to be assumed, and a later kill's chance. */
+interface Week {
+  kills: number
+  copies: number
+  assumed: SupplyGap[]
+  rerun?: number
+}
+
+/**
+ * A raid target's week: the full-loot first kill, plus, for one of the five bosses or a favoured
+ * item, the later kills up to daily (`rerunChance`); the copies are the sum of both.
+ */
+function raidWeek(itemKey: string, mob: string, loot: number, chance: number): Week {
+  const rerun = rerunChance(itemKey, mob, loot)
+  const reruns = rerun > 0 ? SUPPLY.lockoutRerunsPerWeek : 0
+  const week: Week = { kills: SUPPLY.raidKillsPerWeek + reruns, copies: chance * SUPPLY.raidKillsPerWeek + rerun * reruns, assumed: [] }
+  if (reruns > 0) week.rerun = rerun
+  return week
+}
+
+/** What kind of mob this is: a raid target (by the roster or a day-long respawn), named or common, and whether it stands in a raid zone. */
+function mobClassOf(source: ItemSource, facts: CampFacts, ctx: SupplyContext): { raid: boolean; inRaidZone: boolean; cls: MobClass } {
   const raid = ctx.raid.mobs.has(mobKey(source.mob)) || (facts.respawn ?? 0) >= SUPPLY.raidRespawn
   const inRaidZone = source.zones.length > 0 && source.zones.every((z) => ctx.raid.zones.has(zoneKey(z)))
-  const cls: MobClass = raid ? 'raid' : isNamed(source.mob) ? 'named' : 'common'
-  const chance = Math.min(1, SUPPLY.dropsPerKill[cls] / Math.max(1, facts.loot ?? SUPPLY.lootDefault[cls]))
-  const counted = raid ? { kills: SUPPLY.raidKillsPerWeek, assumed: [] } : killsPerWeek(facts, cls, inRaidZone)
-  const assumed: SupplyGap[] = facts.loot === undefined ? ['loot', ...counted.assumed] : counted.assumed
+  return { raid, inRaidZone, cls: raid ? 'raid' : isNamed(source.mob) ? 'named' : 'common' }
+}
+
+/** One mob that drops the thing (`itemKey`): how many it yields a week of play. */
+function dropRoad(source: ItemSource, ctx: SupplyContext, itemKey: string): Road {
+  const facts = ctx.camp(source)
+  const { raid, inRaidZone, cls } = mobClassOf(source, facts, ctx)
+  const loot = facts.loot ?? SUPPLY.lootDefault[cls]
+  const chance = Math.min(1, SUPPLY.dropsPerKill[cls] / Math.max(1, loot))
+  const camp = (): Week => {
+    const counted = killsPerWeek(facts, cls, inRaidZone)
+    return { ...counted, copies: chance * counted.kills }
+  }
+  const week = raid ? raidWeek(itemKey, source.mob, loot, chance) : camp()
+  const assumed: SupplyGap[] = facts.loot === undefined ? ['loot', ...week.assumed] : week.assumed
   const { by, why } = hardness(source, cls, inRaidZone)
   const kind: SupplyKind = raid ? 'raid' : inRaidZone ? 'raidZone' : 'camp'
-  const road: Road = { kind, from: source.mob, perWeek: (chance * counted.kills) / by, chance, kills: counted.kills, assumed, hard: why }
+  const road: Road = { kind, from: source.mob, perWeek: week.copies / by, chance, kills: week.kills, assumed, hard: why }
+  if (week.rerun !== undefined) road.rerun = week.rerun
   if (facts.respawn !== undefined && kind === 'camp') road.respawn = facts.respawn
   return road
 }
@@ -245,7 +341,7 @@ function partPerWeek(part: RewardPart, ctx: SupplyContext): { perWeek: number; a
     return { perWeek: (chance * SUPPLY.raidKillsPerWeek) / SUPPLY.hard.raid / part.count, assumed: ['loot'], hard: ['raid'] }
   }
   if (part.sources.length === 0) return { perWeek: (SUPPLY.partsPerHour * SUPPLY.hoursPerWeek) / part.count, assumed: ['source'], hard: [] }
-  const roads = part.sources.map((s) => dropRoad(s, ctx))
+  const roads = distinctMobs(part.sources).map((s) => dropRoad(s, ctx, sourceItemKey(part.name)))
   const lead = roads.reduce((a, b) => (b.perWeek > a.perWeek ? b : a))
   return { perWeek: roads.reduce((sum, r) => sum + r.perWeek, 0) / part.count, assumed: lead.assumed, hard: lead.hard }
 }
@@ -279,7 +375,7 @@ export interface SupplyItem {
  * week. No stated road at all leaves `perWeek` absent: the data says nothing, so nothing is claimed.
  */
 export function itemSupply(item: SupplyItem, sources: readonly ItemSource[], ctx: SupplyContext): ItemSupply {
-  const roads = [...sources.map((s) => dropRoad(s, ctx)), ...ctx.rewards(item.key).map((r) => rewardRoad(r, ctx))]
+  const roads = [...distinctMobs(sources).map((s) => dropRoad(s, ctx, item.key)), ...ctx.rewards(item.key).map((r) => rewardRoad(r, ctx))]
   if (roads.length === 0 && item.playerCrafted) {
     roads.push({ kind: 'crafted', from: '', perWeek: SUPPLY.craftedPerHour * SUPPLY.hoursPerWeek, assumed: ['source'], hard: [] })
   }
@@ -290,6 +386,7 @@ export function itemSupply(item: SupplyItem, sources: readonly ItemSource[], ctx
   if (lead.from !== '') out.from = lead.from
   if (lead.chance !== undefined) out.chance = round3(lead.chance)
   if (lead.kills !== undefined) out.kills = round3(lead.kills)
+  if (lead.rerun !== undefined) out.rerun = round3(lead.rerun)
   if (lead.respawn !== undefined) out.respawn = lead.respawn
   if (lead.assumed.length > 0) out.assumed = lead.assumed
   if (lead.hard.length > 0) out.hard = lead.hard

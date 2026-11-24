@@ -127,9 +127,11 @@ export const SUPPLY_LABEL: Record<SupplyKind, string> = {
   unknown: 'Not listed'
 }
 
-/** `1 in 8`: a chance as a player says it. */
+/** `1 in 8`, `89% of kills`: a chance as a player says it (a high one reads as a share, not "1 in 1"). */
 function oneIn(chance: number): string {
-  return chance >= 0.95 ? 'every kill' : `1 in ${String(Math.max(2, Math.round(1 / chance)))}`
+  if (chance >= 0.95) return 'every kill'
+  if (chance > 0.6) return `${String(Math.round(chance * 100))}% of kills`
+  return `1 in ${String(Math.max(2, Math.round(1 / chance)))}`
 }
 
 /** `9.5 min`, `2 h`: a stated respawn. */
@@ -142,7 +144,11 @@ export function moteSourceText(supply: ItemSupply | undefined): string {
   if (supply === undefined) return SUPPLY_LABEL.unknown
   const label = SUPPLY_LABEL[supply.kind]
   if (supply.kind === 'quest' || supply.kind === 'crafted') return `${label}: copies come at +0`
-  if (supply.kind === 'raid') return `${label}: weekly kill${supply.chance === undefined ? '' : `, ${oneIn(supply.chance)}`}`
+  if (supply.kind === 'raid') {
+    // The week's first kill, then the later ones when they count (`itemSupply.RERUN_BOSSES`, `RERUN_FAVOURS`).
+    const later = supply.rerun === undefined ? '' : `; daily repeats, ${oneIn(supply.rerun)}`
+    return `${label}: weekly kill${supply.chance === undefined ? '' : `, ${oneIn(supply.chance)}`}${later}`
+  }
   if (supply.chance === undefined) return label
   const hard = (supply.hard ?? []).some((h) => h === 'level' || h === 'mechanics') ? ', hard fight' : ''
   return `${label}: ${oneIn(supply.chance)}${supply.respawn === undefined ? '' : `, ${respawnText(supply.respawn)} respawn`}${hard}`
