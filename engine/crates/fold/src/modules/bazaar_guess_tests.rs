@@ -53,3 +53,31 @@ fn each_different_guess_is_listed() {
         ])
     );
 }
+
+/// Owner ruling, 2026-11-23: in "WTS 3k each: A | B | C 10k" the item with a price of its own after
+/// the lead is listed as sold with no price, its line beneath it, and adds nothing to its prices.
+#[test]
+fn an_irregular_price_line_lists_the_item_with_no_price_and_its_line() {
+    let said = "WTS 3k each: Bone Chips | Fruit | Fleeting Quiver 10k";
+    let rows = fold(&[&format!(
+        "[Wed Sep 23 17:00:00 2026] Leric tells General:1, '{said}'"
+    )]);
+    let row = |item: &str| {
+        rows.as_array()
+            .unwrap()
+            .iter()
+            .find(|r| r["item"] == item)
+            .cloned()
+            .unwrap()
+    };
+    assert_eq!(row("Bone Chips")["prices"], json!([3000.0]));
+    assert_eq!(row("Fruit")["prices"], json!([3000.0]));
+    let quiver = row("Fleeting Quiver");
+    assert_eq!(quiver["dir"], "sell");
+    assert_eq!(quiver["n"], 0);
+    assert_eq!(quiver["prices"], json!([]));
+    assert_eq!(
+        quiver["quotes"],
+        json!([{ "at": "17:00:00", "who": "Leric", "price": null, "msg": said }])
+    );
+}

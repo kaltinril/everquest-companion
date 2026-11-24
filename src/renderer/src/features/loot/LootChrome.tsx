@@ -13,7 +13,7 @@
 // across it and ate the click. The rule travelled with the code: labels and accessible names say
 // what a popper used to, and `tests/tooltipCursor.test.mts` pins the absence structurally.
 
-import { type JSX, useCallback, useEffect, useState } from 'react'
+import { type JSX, useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Alert,
   Box,
@@ -30,6 +30,8 @@ import {
   Typography
 } from '@mui/material'
 import RefreshIcon from '@mui/icons-material/Refresh'
+import type { CharacterSnap } from '@shared/characterTypes'
+import { characterFlag, characterFlagId, readCharacterFlags, withCharacterFlag } from '@shared/characterFlags'
 import type { CountSource } from '@shared/types'
 import type { WindowLootRates } from '@shared/lootRates'
 import type { Timeslice } from '@shared/timeslice'
@@ -37,6 +39,8 @@ import { tabLineText } from '@shared/logReadWords'
 import { useTabLine } from '../../components/LogReadInline'
 import { formatDateTime, formatTime } from '../../lib/formatDate'
 import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
+import { useModule } from '../../lib/useModule'
+import { useRawPref } from '../combat/useCombatPrefs'
 import { COUNT_SOURCE_OPTIONS } from '../inventory/countSource'
 import type { GroupRow } from './lootGrouping'
 import { LOOT_RATE_TITLE, lootRateText } from './lootRateText'
@@ -67,6 +71,21 @@ export function useLootSort(): [LootSort, (key: LootSortKey) => void] {
     setSort((cur) => nextLootSort(cur, key))
   }, [])
   return [sort, onSort]
+}
+
+// Group by item is remembered per character (owner, 2026-11-23: "LOOT drops? probably per
+// character instead"). It was component state, so every character switch, which remounts this
+// tab, and every restart put it back on. The rules are shared/characterFlags.ts; the Wiki Gaps
+// tab's grouping stays one app-wide choice (`eq.gaps.grouped`, useGrouping.ts).
+const GROUP_BY_ITEM_KEY = 'eq.loot.groupByItem.byCharacter'
+
+/** Group by item for the attached character: on until that character turns it off. */
+export function useGroupByItem(): [boolean, (on: boolean) => void] {
+  const me = characterFlagId(useModule<CharacterSnap>('character')?.character)
+  const [text, setText] = useRawPref(GROUP_BY_ITEM_KEY)
+  const flags = useMemo(() => readCharacterFlags(text), [text])
+  const set = useCallback((on: boolean) => setText(JSON.stringify(withCharacterFlag(flags, me, on))), [flags, me, setText])
+  return [characterFlag(flags, me, true), set]
 }
 
 /** When main's chokidar watch last re-read the `*-Inventory.txt` underneath us — surfaced quietly

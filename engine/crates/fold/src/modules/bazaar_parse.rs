@@ -32,7 +32,7 @@
 //! * a trade (WTT) is a barter: its numbers count the other thing, so it never carries a price.
 
 use super::bazaar_words::{
-    bare_at, loose, mark_guesses, price_at, re, tokens, unglued, Tok, AFTER_BARE_PRICE,
+    bare_at, loose, mark_guesses, no_word, price_at, re, tokens, unglued, Tok, AFTER_BARE_PRICE,
 };
 use regex::Regex;
 use std::collections::HashMap;
@@ -441,6 +441,7 @@ impl<'a> Parser<'a> {
             return;
         };
         if self.out[last].price_pp.is_some() {
+            self.own_after_lead(last, pp, at);
             self.second_price(last, pp, at, at + used);
             return;
         }
@@ -454,6 +455,23 @@ impl<'a> Parser<'a> {
             }
         }
         self.price_end = Some((last, at + used));
+    }
+
+    /// "WTS 3k each: A | B | C 10k", "paying 15k for A 20k": an item a price BEFORE it priced (a
+    /// lead, so `priced_here` is false) states a different price of its own right after its name,
+    /// with nothing but a tier, a count or a separator between. Which one holds cannot be read, so
+    /// that item is listed with no price and the line beneath it (owner, 2026-11-23: "if it's a
+    /// weird non-formal scenario you can list the item as being sold or requested but just put no
+    /// price, and show the line below"). The other items keep the lead. Words between leave the
+    /// price to something else, as in [`Self::second_price`]; the lead's own price again is no
+    /// second price.
+    fn own_after_lead(&mut self, last: usize, pp: f64, at: usize) {
+        let start = self.starts[last];
+        let end = self.item_at(start).map_or(at + 1, |(_, w)| start + w);
+        let right_after = end <= at && self.t[end..at].iter().all(no_word);
+        if !self.priced_here && right_after && self.out[last].price_pp != Some(pp) {
+            self.out[last].sure = false;
+        }
     }
 
     /// A second, different price right after the first, with nothing but a separator, "to" or

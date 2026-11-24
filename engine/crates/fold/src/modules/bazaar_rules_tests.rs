@@ -398,3 +398,42 @@ fn a_zero_price_is_no_price() {
         ["sell Bone Chips 0.02pp"]
     );
 }
+
+/// Owner ruling, 2026-11-23: a price before an item and a different one right after it ("WTS 3k
+/// each: A | B | C 10k") cannot be read, so that item is listed with no price. Only that item:
+/// the rest keep the lead, and ordinary lines keep theirs.
+#[test]
+fn an_own_price_after_a_lead_price_lists_the_item_unpriced() {
+    let line = "WTS 3k each: Fleeting Quiver | Rain Caller | Diamond 10k";
+    assert_eq!(sure(line), [true, true, false]);
+    assert_eq!(
+        read(line)[..2],
+        ["sell Fleeting Quiver 3000pp", "sell Rain Caller 3000pp"]
+    );
+    // With its tier or count between, and after a price before "for".
+    assert_eq!(
+        sure("WTS 3k each: Fleeting Quiver | Rain Caller +5 10k"),
+        [true, false]
+    );
+    assert_eq!(sure("WTS 3k each: Bones, Gears x2 10k"), [true, false]);
+    assert_eq!(sure("paying 15k for fleeting quiver 20k"), [false]);
+    // The lead's own price again is no second price; words between give the price to something else.
+    assert_eq!(
+        sure("WTS 3k each: Fleeting Quiver | Rain Caller 3k"),
+        [true, true]
+    );
+    assert_eq!(
+        sure("WTS 3k each: Fleeting Quiver | Rain Caller, also an unlisted thing 10k"),
+        [true, true]
+    );
+    // Prices stated after their items, and a price before "for" with the next item's own, stay.
+    assert_eq!(sure("WTS Fleeting Quiver 5k, Rain Caller 6k"), [true, true]);
+    assert_eq!(
+        sure("WTS 5k for Fleeting Quiver, Bone Chips 3k"),
+        [true, true]
+    );
+    assert_eq!(
+        sure("WTS Mithril Champion Arrows +7 20k, +6 11k"),
+        [true, true]
+    );
+}

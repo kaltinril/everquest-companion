@@ -60,7 +60,24 @@ interface Row {
   viaRedirect?: string
   /** an NPC's whole conversation (gaps_dialogue.rs): every keyword either log heard (`mergeDialogue`) */
   dialogue?: Dialogue
+  /** an item's quest facts (gaps_quests.rs, shared/itemQuestFacts.ts), restated by shape */
+  questFacts?: QuestFacts
 }
+
+/** What `mergeRow` reads of an item's quest facts: who it was turned in to, how often. The rest passes as it is. */
+interface QuestFacts {
+  turnedInTo?: { npc: string; n: number }[]
+  [field: string]: unknown
+}
+
+/**
+ * How two snapshots join. `oneCharacter` (the archive merge: one character's archive under its
+ * live log, every class loadout in the one log) adds its turn-ins up. `acrossCharacters` (the Gaps
+ * tab's All characters join) never adds one character's turn-ins to another's: owner, 2026-11-23,
+ * "each character shows it's own turn in, because I believe the achivements are not cross
+ * server/character. Cross load-out on the same server? yeah it all counts".
+ */
+export type GapsJoin = 'oneCharacter' | 'acrossCharacters'
 
 /** A kill and a faction its lines moved (gaps_trade.rs), how often, and the zone last seen in. */
 interface KillFaction {
@@ -250,6 +267,32 @@ function mergeFight(a: FightTier[] | undefined, b: FightTier[] | undefined): Fig
 }
 
 /**
+ * One character's turn-ins to each NPC over both sides, added (the archive and the live log hold
+ * different trades); one entry per case-folded NPC, its first spelling kept, in the fold's order
+ * (gaps_quests.rs serves a BTreeMap, so by name). Undefined when neither side names one.
+ */
+function joinTurnIns(a: QuestFacts['turnedInTo'], b: QuestFacts['turnedInTo']): QuestFacts['turnedInTo'] {
+  if (a === undefined && b === undefined) return undefined
+  const byNpc = new Map<string, { npc: string; n: number }>()
+  for (const t of [...(a ?? []), ...(b ?? [])]) {
+    const had = byNpc.get(t.npc.toLowerCase())
+    byNpc.set(t.npc.toLowerCase(), { npc: had?.npc ?? t.npc, n: (had?.n ?? 0) + t.n })
+  }
+  return [...byNpc.values()].sort((x, y) => (x.npc < y.npc ? -1 : x.npc > y.npc ? 1 : 0))
+}
+
+/**
+ * Both sides' quest facts for one character: the newer side's, as for every served field, with the
+ * turn-ins of both added (`joinTurnIns`), so a turn-in made before the archive was cut still counts.
+ * Undefined when a side has none: the row's spread already keeps the one that does.
+ */
+function joinQuestFacts(a: QuestFacts | undefined, b: QuestFacts | undefined): QuestFacts | undefined {
+  if (a === undefined || b === undefined) return undefined
+  const turnedInTo = joinTurnIns(a.turnedInTo, b.turnedInTo)
+  return { ...b, ...(turnedInTo === undefined ? {} : { turnedInTo }) }
+}
+
+/**
  * One name on both sides. The tallied fields join; every other field the fold serves on a row (a
  * merchant's `itemsSold`, `greeting` and `role`, an NPC's `questFacts`, a `suggest`, `maybePlayer`)
  * takes the NEWER side, which is the live fold's current reading. The older side used to win them
@@ -262,15 +305,20 @@ function mergeFight(a: FightTier[] | undefined, b: FightTier[] | undefined): Fig
  * `viaRedirect`) follows the newer side, absent or not. `maybePlayer` stands only when BOTH sides say
  * it: a side's row without it is that log's proof of an NPC (an answered hail, a kill), whichever
  * side holds the proof.
+ *
+ * An item's turn-ins are the exception to "newer side": within one character they add up
+ * (`joinQuestFacts`); across characters (`join` is `acrossCharacters`) the newer side's stand.
  */
-function mergeRow(had: Row, r: Row): Row {
+function mergeRow(had: Row, r: Row, join: GapsJoin): Row {
   const fight = mergeFight(had.fight, r.fight)
   const dialogue = mergeDialogue(dialogueOf(had), dialogueOf(r))
+  const questFacts = join === 'oneCharacter' ? joinQuestFacts(had.questFacts, r.questFacts) : undefined
   const out: Row = {
     ...had,
     ...r,
     ...(fight === undefined ? {} : { fight }),
     ...(dialogue === undefined ? {} : { dialogue }),
+    ...(questFacts === undefined ? {} : { questFacts }),
     name: nameOf(had, r),
     kinds: [...had.kinds, ...r.kinds.filter((k) => !had.kinds.includes(k))],
     count: had.count + r.count,
@@ -400,14 +448,18 @@ function withoutChest(r: Row): Row {
   return { ...r, details }
 }
 
-/** `older` then `newer`, a row on both sides added together; null when either is not a gaps state. */
-export function mergeGaps(older: unknown, newer: unknown): Snap | null {
+/**
+ * `older` then `newer`, a row on both sides added together; null when either is not a gaps state.
+ * `join` says whether the two are one character's (the archive merge, the default) or two
+ * characters' (`GapsJoin`).
+ */
+export function mergeGaps(older: unknown, newer: unknown, join: GapsJoin = 'oneCharacter'): Snap | null {
   if (!isSnap(older) || !isSnap(newer)) return null
   const out = new Map<string, Row>()
   for (const r of [...older.rows, ...newer.rows].map(withoutChest)) {
     const k = `${r.domain}|${r.name.toLowerCase()}`
     const had = out.get(k)
-    out.set(k, had === undefined ? { ...r } : mergeRow(had, r))
+    out.set(k, had === undefined ? { ...r } : mergeRow(had, r, join))
   }
   const { rows, counted } = served(out.values())
   return { rows, ...perDomain(older, newer, counted), killFactions: mergeKillFactions(older, newer), mobLocs: mergeMobLocs(older, newer), mobSpecials: mergeMobSpecials(older, newer), mobCoin: mergeMobCoin(older, newer), ownPets: [...new Set([...(older.ownPets ?? []), ...(newer.ownPets ?? [])])].sort() }

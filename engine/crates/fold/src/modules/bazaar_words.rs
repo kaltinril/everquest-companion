@@ -189,6 +189,13 @@ pub fn bare_at(t: &[Tok], i: usize, used: usize) -> bool {
         .any(|x| x.raw.bytes().any(|b| b.is_ascii_alphabetic()))
 }
 
+/// A token with no word in it: a separator, a number, a tier (`+5`, `5+`) or a count (`x2`, `2x`).
+pub fn no_word(x: &Tok) -> bool {
+    x.raw
+        .chars()
+        .all(|c| !c.is_ascii_alphabetic() || c.eq_ignore_ascii_case(&'x'))
+}
+
 /// Mark the offers read through a guess `sure = false`: listed, never counted (owner, 2026-10-13).
 /// An `or` before another price or count ("400p each or 700p for both", "20k or 2x Lion Skins")
 /// makes the line a choice, where "or best offer" and "A or B 15pp each" do not; and a count over

@@ -286,6 +286,12 @@ function joinStep<T>(acc: T | null, next: T | null, rule: (a: unknown, b: unknow
   return (rule(acc, next) as T | null) ?? acc
 }
 
+/**
+ * Two characters' Gaps joined: the archive's rules, except that one character's turn-ins are never
+ * added to another's (owner, 2026-11-23: "each character shows it's own turn in"; `GapsJoin`).
+ */
+const acrossCharacters = (a: unknown, b: unknown): unknown => mergeGaps(a, b, 'acrossCharacters')
+
 /** One character's rows cut to the window, or null when its state is no gaps snapshot. */
 function cutGaps(c: CharacterInputs, cut: { stamp: string; ms: number } | null): GapsSnap | null {
   const g = asGaps(c.gaps)
@@ -351,13 +357,13 @@ export function joinCharacters(inputs: readonly CharacterInputs[], cut: { stamp:
     const cutG = cutGaps(c, cut)
     cuts.push(cutG)
     if (cutG !== null) noteSeen(seenBy, cutG.rows, c.label)
-    gaps = joinStep(gaps, cutG, mergeGaps)
+    gaps = joinStep(gaps, cutG, acrossCharacters)
     const l = Array.isArray(c.loot) ? (c.loot as LootSnap) : null
     loot = joinStep(loot, l, mergeLoot) ?? loot
     kills = joinStep(kills, asKills(c.kills), mergeKills)
   }
   const own = inputs.length > 1 ? cutGaps(inputs[0], cut) : null
-  if (own !== null && gaps !== null) gaps = joinStep(gaps, servedOnly(own, gaps), mergeGaps)
+  if (own !== null && gaps !== null) gaps = joinStep(gaps, servedOnly(own, gaps), acrossCharacters)
   if (gaps !== null && inputs.length > 2) gaps = withOthersStock(gaps, cuts)
   return { gaps, loot: inputs.length > 1 ? [...loot].sort((x, y) => x.ts - y.ts) : loot, kills, seenBy }
 }
