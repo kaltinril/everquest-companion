@@ -2,8 +2,9 @@
 // motes tab draws (VoidMoteView.tsx).
 //
 // One row per WORN item below +10: what the next tier gains the chosen target, the hours of play
-// it would otherwise cost, and where copies come from; above the list, where the week's three
-// motes go. The ranking and every number are `shared/planner/voidMotes.ts` (the supply estimate is
+// it would otherwise cost, and where copies come from; above the list, where the motes on hand go
+// and what a highlight means; beneath it, why. The ranking and every number are
+// `shared/planner/voidMotes.ts` (the supply estimate is
 // on each gear row, `itemSupply.ts`); the words are `voidMotePrefs.ts`; this file lays them out.
 //
 // It reads the same `plannerInventory` join the Gear tab's hover card does (`GearCompareData`), so
@@ -44,6 +45,7 @@ import {
   sortMoteAdvice,
   type MoteAdvice,
   type MoteOrder,
+  type MotePlanStep,
   type MoteTarget
 } from '@shared/planner/voidMotes'
 import { segmented } from '../combat/segmented'
@@ -53,6 +55,7 @@ import {
   MOTE_ORDER_HINT,
   MOTE_ORDER_LABEL,
   MOTE_TARGET_ROLES,
+  MOTES_ON_HAND,
   moteChangesText,
   moteEmptyText,
   moteGainHint,
@@ -60,7 +63,9 @@ import {
   moteGateText,
   moteHoursText,
   moteHoursTitle,
+  moteLegendText,
   motePlanLine,
+  motePlanReasons,
   moteSourceText,
   moteSourceTitle,
   moteTargetLabel,
@@ -75,7 +80,7 @@ const HINT = 'Void-Touched Potential: three a week from raids, each skips a whol
 
 /** One clause per header (the tooltip diet). */
 const HEAD: readonly { label: string; hint: string; align?: 'right' }[] = [
-  { label: '#', hint: "How many of this week's motes it gets; a dash means not yet" },
+  { label: 'Motes', hint: "How many of this week's motes go on this item; a dash means not yet" },
   { label: 'Item', hint: "A worn item and its next tier, or where this week's motes take it" },
   { label: 'Slot', hint: 'Where your inventory dump says you wear it' },
   { label: 'Gain', hint: 'What the next tier adds for your target', align: 'right' },
@@ -103,10 +108,35 @@ interface ControlsProps {
   disabled: boolean
 }
 
-/** The two picks: what a gain is measured in, and what the list is ranked by. */
+/**
+ * The three picks: how many motes there are to spend, what a gain is measured in, and what the list
+ * is ranked by. The count stays live with no list: it is a fact about the player, not the rows.
+ */
 function MoteControls({ motes, setMotes, disabled }: ControlsProps): JSX.Element {
   return (
     <>
+      {/* "On hand", short: the row is the panel title's, and at 1280 px the picks must still share it. */}
+      <Stack direction="row" spacing={0.75} alignItems="center" title="How many void motes you have to spend now" sx={{ flexShrink: 0 }}>
+        <Typography variant="caption" color="text.secondary" component="span">
+          On hand
+        </Typography>
+        <ToggleButtonGroup
+          size="small"
+          exclusive
+          data-testid="gear-motes-onhand"
+          value={motes.onHand}
+          onChange={(_e: unknown, v: number | null) => {
+            if (v !== null) setMotes({ ...motes, onHand: v })
+          }}
+          sx={segmented('quiet')}
+        >
+          {MOTES_ON_HAND.map((n) => (
+            <ToggleButton key={n} value={n} title={`You have ${String(n)} void ${n === 1 ? 'mote' : 'motes'} to spend`} data-testid={`gear-motes-onhand-${String(n)}`}>
+              {n}
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
+      </Stack>
       <TextField
         select
         size="small"
@@ -204,6 +234,61 @@ function MoteRow({ advice, picks, target, onOpenLoot }: RowProps): JSX.Element {
   )
 }
 
+interface ListProps {
+  /** the rows, in the order picked */
+  list: readonly MoteAdvice[]
+  /** the week's plan: always the Recommended one, whatever the order */
+  plan: readonly MotePlanStep[]
+  motes: VoidMotePrefs
+  classes: readonly ClassAbbr[]
+  onOpenLoot?: (item: string) => void
+}
+
+/** The table, with the line that says what its highlights mean above it. */
+function MoteList({ list, plan, motes, classes, onOpenLoot }: ListProps): JSX.Element {
+  const legend = moteLegendText(motes.order, plan)
+  const reasons = motePlanReasons(plan, motes.target, motes.onHand)
+  return (
+    <>
+      {/* What the highlight means, said under every sort (Malkil, 2026-11-23). */}
+      {legend !== '' && (
+        <Typography variant="caption" color="text.secondary" data-testid="gear-motes-legend" sx={{ px: 1, pb: 0.5, flexShrink: 0 }}>
+          {legend}
+        </Typography>
+      )}
+      <Box data-testid="gear-motes-list" sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto' }}>
+        <Table size="small" stickyHeader>
+          <TableHead>
+            <TableRow>
+              {HEAD.map((h) => (
+                <TableCell key={h.label} title={h.label === 'Gain' ? moteGainHint(motes.target, classes) : h.hint} align={h.align} sx={{ ...CELL, color: 'text.secondary' }}>
+                  {h.label}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {list.map((a) => (
+              <MoteRow key={a.cell} advice={a} picks={planMotesOn(plan, a.cell)} target={motes.target} onOpenLoot={onOpenLoot} />
+            ))}
+          </TableBody>
+        </Table>
+      </Box>
+      {/* Why the motes go where they do, one line an item (Malkil, 2026-11-23): outside the scroller,
+          so it stays in sight under a long list. */}
+      {reasons.length > 0 && (
+        <Box data-testid="gear-motes-why" sx={{ px: 1, pt: 0.5, flexShrink: 0, borderTop: 1, borderColor: 'divider' }}>
+          {reasons.map((line) => (
+            <Typography key={line} variant="caption" color="text.secondary" component="p" data-testid="gear-motes-why-line" sx={{ m: 0 }}>
+              {line}
+            </Typography>
+          ))}
+        </Box>
+      )}
+    </>
+  )
+}
+
 export interface VoidMotePanelProps {
   /** what is worn, and the corpus by key — the hover card's own join */
   compare: GearCompareData
@@ -222,7 +307,7 @@ export default function VoidMotePanel({ compare, indexReady, indexRefused, class
   const hosts = useMemo(() => [...equipped.values()], [equipped])
   const opts = useMemo(() => ({ target: motes.target, classes }), [motes.target, classes])
   const list = useMemo(() => sortMoteAdvice(moteAdvice(hosts, byKey, opts), motes.order), [hosts, byKey, opts, motes.order])
-  const plan = useMemo(() => motePlan(hosts, byKey, opts), [hosts, byKey, opts])
+  const plan = useMemo(() => motePlan(hosts, byKey, opts, motes.onHand), [hosts, byKey, opts, motes.onHand])
   const unranked = useMemo(() => moteUnranked(hosts, byKey), [hosts, byKey])
 
   return (
@@ -241,11 +326,11 @@ export default function VoidMotePanel({ compare, indexReady, indexRefused, class
         <Typography
           variant="body2"
           data-testid="gear-motes-plan"
-          title={list.length === 0 ? HINT : `${motePlanLine(plan)}. ${HINT}`}
+          title={list.length === 0 ? HINT : `${motePlanLine(plan, motes.onHand)}. ${HINT}`}
           noWrap
           sx={{ flex: '1 1 0', minWidth: 160 }}
         >
-          {list.length === 0 ? 'One lifts a worn item a full tier' : motePlanLine(plan)}
+          {list.length === 0 ? 'One lifts a worn item a full tier' : motePlanLine(plan, motes.onHand)}
         </Typography>
         <MoteControls motes={motes} setMotes={setMotes} disabled={list.length === 0} />
       </Stack>
@@ -262,24 +347,7 @@ export default function VoidMotePanel({ compare, indexReady, indexRefused, class
           })}
         </Typography>
       ) : (
-        <Box data-testid="gear-motes-list" sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto' }}>
-          <Table size="small" stickyHeader>
-            <TableHead>
-              <TableRow>
-                {HEAD.map((h) => (
-                  <TableCell key={h.label} title={h.label === 'Gain' ? moteGainHint(motes.target, classes) : h.hint} align={h.align} sx={{ ...CELL, color: 'text.secondary' }}>
-                    {h.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {list.map((a) => (
-                <MoteRow key={a.cell} advice={a} picks={planMotesOn(plan, a.cell)} target={motes.target} onOpenLoot={onOpenLoot} />
-              ))}
-            </TableBody>
-          </Table>
-        </Box>
+        <MoteList list={list} plan={plan} motes={motes} classes={classes} onOpenLoot={onOpenLoot} />
       )}
       {/* A worn piece with no row in the item data is named, never dropped in silence. */}
       {unranked.length > 0 && (

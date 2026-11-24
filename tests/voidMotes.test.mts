@@ -156,11 +156,15 @@ test('raidFactsOf and mobKey: match names and a page suffix fold, and only a zon
   assert.equal(mobKey('Cazic Thule (God)'), 'cazic thule', 'the item page writes the god with a suffix the roster lacks')
 })
 
-test('itemSupply: a raid target is one kill a week, its chance its loot list, and it is marked hard', () => {
+test('itemSupply: a raid target is its full-loot weekly kill, its chance its loot list, and it is marked hard', () => {
   const s = supplyOf('Bloodstar Pendant')
-  assert.deepEqual([s.kind, s.from, s.kills, s.chance, s.hard], ['raid', 'Innoruuk', SUPPLY.raidKillsPerWeek, 0.125, ['raid']])
-  // 2 drops a kill over 16 items, one +4 copy (16), halved for a raid: 1 experience a week.
-  assert.equal(s.perWeek, 1)
+  // Innoruuk is one of the five bosses whose later kills, up to daily, give one drop (2026-11-23,
+  // tests/voidMoteRaidWeek.test.mts): the weekly kill plus six more.
+  assert.deepEqual([s.kind, s.from, s.kills, s.chance, s.rerun, s.hard], ['raid', 'Innoruuk', SUPPLY.raidKillsPerWeek + SUPPLY.lockoutRerunsPerWeek, 0.125, 0.063, ['raid']])
+  // 2 drops over 16 items the first kill, 1 over 16 on six later ones, one +4 copy (16), halved for a raid.
+  assert.equal(s.perWeek, 4)
+  const roster = supplyOf('Shield of Rainbow Hues')
+  assert.deepEqual([roster.kills, roster.rerun], [SUPPLY.raidKillsPerWeek, undefined], "a Fear miniboss is not one of the five: one kill a week")
 })
 
 test('itemSupply: what a page does not state is assumed at its default and listed', () => {
@@ -341,7 +345,7 @@ test("WHAT THE OWNER SPENT MOTES ON (inferred from the log): Blood's Unity, Tali
   }
   assert.deepEqual(supplyOf("Blood's Unity").hard, ['level', 'mechanics'], 'a camp, but a level 65 mob with a listed mechanic')
   assert.ok(moteSourceText(supplyOf('Talisman of Kejaar Kerrath')).includes('copies come at +0'))
-  assert.equal(moteSourceText(supplyOf('Slime Blood of Cazic-Thule')), 'Raid boss: weekly kill, 1 in 8')
+  assert.equal(moteSourceText(supplyOf('Slime Blood of Cazic-Thule')), 'Raid boss: weekly kill, 1 in 8; daily repeats, 89% of kills', 'its later kills in the week (2026-11-23)')
 })
 
 test('sortMoteAdvice: a "not yet" row sits below every ready row in the recommended order, and no gain sinks in all three', () => {
@@ -358,33 +362,36 @@ test('sortMoteAdvice: a "not yet" row sits below every ready row in the recommen
 // ---- the week's plan ----------------------------------------------------------------------------
 
 test("THE OWNER'S PRACTICE: all three of the week's motes can land on one item, each tier weighed again", () => {
-  const { hosts, byKey } = worn([gear('Slime Blood of Cazic-Thule'), gear('Crushbone Belt'), gear('Bloodstar Pendant', { stats: { AC: 10 } })], [7, 7, 7])
+  // Slime Blood stood here until 2026-11-23: since its Fear miniboss copies on later runs in the week
+  // are counted (tests/voidMoteRaidWeek.test.mts) it is quick to farm, and the shield, from the same
+  // mobs' weekly kill only, is the scarce one.
+  const { hosts, byKey } = worn([gear('Shield of Rainbow Hues'), gear('Crushbone Belt'), gear('Bloodstar Pendant', { stats: { AC: 10 } })], [7, 7, 7])
   const plan = motePlan(hosts, byKey, OPTS)
   assert.deepEqual(plan.map((s) => [s.name, s.tier]), [
-    ['Slime Blood of Cazic-Thule', 7],
-    ['Slime Blood of Cazic-Thule', 8],
-    ['Slime Blood of Cazic-Thule', 9]
+    ['Shield of Rainbow Hues', 7],
+    ['Shield of Rainbow Hues', 8],
+    ['Shield of Rainbow Hues', 9]
   ])
   assert.equal(planMotesOn(plan, 'CHEST'), 3)
-  assert.equal(motePlanLine(plan), 'This week: Slime Blood of Cazic-Thule +7→+10')
+  assert.equal(motePlanLine(plan), 'This week: Shield of Rainbow Hues +7→+10 (3 motes)')
 })
 
 test('motePlan: a finished item frees the next mote, and two can land on the second item', () => {
-  const { hosts, byKey } = worn([gear('Slime Blood of Cazic-Thule'), gear('Bloodstar Pendant')], [9, 8])
+  const { hosts, byKey } = worn([gear('Shield of Rainbow Hues'), gear('Bloodstar Pendant')], [9, 8])
   const plan = motePlan(hosts, byKey, OPTS)
   assert.deepEqual(plan.map((s) => [s.name, s.tier]), [
-    ['Slime Blood of Cazic-Thule', 9],
+    ['Shield of Rainbow Hues', 9],
     ['Bloodstar Pendant', 8],
     ['Bloodstar Pendant', 9]
   ])
-  assert.equal(motePlanLine(plan), 'This week: Slime Blood of Cazic-Thule +9→+10 · Bloodstar Pendant +8→+10')
+  assert.equal(motePlanLine(plan), 'This week: Shield of Rainbow Hues +9→+10 (1 mote) · Bloodstar Pendant +8→+10 (2 motes)')
 })
 
 test("THE OWNER'S WORDS: \"I wouldn't use it on a crushbone belt\": a common piece below +7 never takes a mote, and the rest are held", () => {
   const { hosts, byKey } = worn([gear('Crushbone Belt', { stats: { AC: 300 } }), gear('Bloodstar Pendant')], [3, 9])
   const plan = motePlan(hosts, byKey, OPTS)
   assert.deepEqual(plan.map((s) => s.name), ['Bloodstar Pendant'], 'one mote finishes the pendant; the belt takes none')
-  assert.equal(motePlanLine(plan), 'This week: Bloodstar Pendant +9→+10 · hold 2')
+  assert.equal(motePlanLine(plan), 'This week: Bloodstar Pendant +9→+10 (1 mote) · hold 2')
   const none = worn([gear('Crushbone Belt')], [3])
   assert.deepEqual(motePlan(none.hosts, none.byKey, OPTS), [])
   assert.equal(motePlanLine([]), 'Nothing you wear is ready for a mote yet: hold them')
@@ -396,8 +403,8 @@ test('sanitizeMotePrefs: each field falls back alone, and garbage is the default
   assert.deepEqual(sanitizeMotePrefs(null), DEFAULT_MOTE_PREFS)
   assert.deepEqual(sanitizeMotePrefs('open'), DEFAULT_MOTE_PREFS)
   // `open` is a field of the old Gear-tab panel's stored value: read past, never kept.
-  assert.deepEqual(sanitizeMotePrefs({ open: true, target: 'tank', order: 'effort' }), { target: 'tank', order: 'effort' })
-  assert.deepEqual(sanitizeMotePrefs({ open: true, target: 'WEIGHT', order: 'best' }), { target: 'balanced', order: 'recommended' })
+  assert.deepEqual(sanitizeMotePrefs({ open: true, target: 'tank', order: 'effort' }), { target: 'tank', order: 'effort', onHand: 3 })
+  assert.deepEqual(sanitizeMotePrefs({ open: true, target: 'WEIGHT', order: 'best' }), { target: 'balanced', order: 'recommended', onHand: 3 })
   assert.equal(sanitizeMotePrefs({ target: 'SV_FIRE' }).target, 'SV_FIRE')
 })
 

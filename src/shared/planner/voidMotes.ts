@@ -298,12 +298,44 @@ export function sortMoteAdvice(list: readonly MoteAdvice[], order: MoteOrder): M
 
 // ---- the week's plan ----------------------------------------------------------------------------
 
-/** One of the week's motes: the item it goes on and the tier it lifts it from. */
+/**
+ * Why a mote was planned where it was: the row as the ranking saw it at that step, and how it stood
+ * against the other rows a mote could go on. The tab's reasoning lines are made from this alone
+ * (tester Malkil, 2026-11-23: "Perhaps it needs to describe its reasoning beneath the list"), so
+ * they can say nothing the ranking did not compute.
+ */
+export interface MoteWhy {
+  gain: number
+  hours: number
+  gate: MoteGate
+  supply?: ItemSupply
+  /** how many rows a mote could go on at this step, this one included */
+  ready: number
+  /** no ready row gained more, or saved more hours */
+  mostGain: boolean
+  mostHours: boolean
+}
+
+/** One of the week's motes: the item it goes on, the tier it lifts it from, and why. */
 export interface MotePlanStep {
   cell: PlanSlotId
   key: string
   name: string
   tier: number
+  why: MoteWhy
+}
+
+function whyOf(best: MoteAdvice, ready: readonly MoteAdvice[]): MoteWhy {
+  const why: MoteWhy = {
+    gain: best.gain,
+    hours: best.hours,
+    gate: best.gate,
+    ready: ready.length,
+    mostGain: ready.every((a) => a.gain <= best.gain),
+    mostHours: ready.every((a) => a.hours <= best.hours)
+  }
+  if (best.supply !== undefined) why.supply = best.supply
+  return why
 }
 
 /**
@@ -324,18 +356,21 @@ export function motePlan(
     const list = sortMoteAdvice(moteAdvice(worn, byKey, opts), 'recommended')
     const best = list[0]
     if (best === undefined || !isMoteReady(best)) break
-    steps.push({ cell: best.cell, key: best.key, name: best.name, tier: best.tier })
+    steps.push({ cell: best.cell, key: best.key, name: best.name, tier: best.tier, why: whyOf(best, list.filter(isMoteReady)) })
     worn = worn.map((h) => (h.slot === best.cell ? { ...h, tier: best.tier + 1 } : h))
   }
   return steps
 }
 
-/** The plan as one line per item: the tier it starts at and how many motes it takes. */
-export function planByItem(plan: readonly MotePlanStep[]): { name: string; from: number; motes: number }[] {
-  const out = new Map<PlanSlotId, { name: string; from: number; motes: number }>()
+/**
+ * The plan as one line per item: the tier it starts at, how many motes it takes, and why its FIRST
+ * mote went there (each later one was the best again when weighed a tier up).
+ */
+export function planByItem(plan: readonly MotePlanStep[]): { name: string; from: number; motes: number; why: MoteWhy }[] {
+  const out = new Map<PlanSlotId, { name: string; from: number; motes: number; why: MoteWhy }>()
   for (const s of plan) {
     const at = out.get(s.cell)
-    if (at === undefined) out.set(s.cell, { name: s.name, from: s.tier, motes: 1 })
+    if (at === undefined) out.set(s.cell, { name: s.name, from: s.tier, motes: 1, why: s.why })
     else at.motes++
   }
   return [...out.values()]

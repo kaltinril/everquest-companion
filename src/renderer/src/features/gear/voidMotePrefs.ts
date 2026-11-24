@@ -16,7 +16,8 @@ import {
   type MoteAdvice,
   type MoteOrder,
   type MotePlanStep,
-  type MoteTarget
+  type MoteTarget,
+  type MoteWhy
 } from '../../../../shared/planner/voidMotes'
 import { classDisplayName } from '../../../../shared/spellLevels'
 import { ROLE_LABEL } from '../plan/planBlurb'
@@ -28,10 +29,19 @@ export interface VoidMotePrefs {
   /** what a gain is measured in: a focus, or one stat */
   target: MoteTarget
   order: MoteOrder
+  /**
+   * how many void motes the player has to spend now, 0 to 3 (owner, 2026-11-23): the week's plan
+   * spends exactly that many. Remembered on this machine, like the other two, not per character:
+   * the tab's choices are one `localStorage` key (`useVoidMotePrefs`).
+   */
+  onHand: number
 }
 
-/** The Gear tab's own BEST column is the balanced focus, so it leads. */
-export const DEFAULT_MOTE_PREFS: VoidMotePrefs = { target: 'balanced', order: 'recommended' }
+/** The picker's choices: none up to the most the game lets you hold. */
+export const MOTES_ON_HAND: readonly number[] = Array.from({ length: MOTE_RULES.perWeek + 1 }, (_, i) => i)
+
+/** The Gear tab's own BEST column is the balanced focus, so it leads; a full week's motes by default. */
+export const DEFAULT_MOTE_PREFS: VoidMotePrefs = { target: 'balanced', order: 'recommended', onHand: MOTE_RULES.perWeek }
 
 /** The picker's two groups, in the order it draws them. */
 export const MOTE_TARGET_ROLES: readonly GearRole[] = PLAN_ROLES
@@ -46,7 +56,8 @@ export function sanitizeMotePrefs(raw: unknown): VoidMotePrefs {
   const o = raw as Record<string, unknown>
   return {
     target: MOTE_TARGETS.find((t) => t === o.target) ?? DEFAULT_MOTE_PREFS.target,
-    order: MOTE_ORDERS.find((v) => v === o.order) ?? DEFAULT_MOTE_PREFS.order
+    order: MOTE_ORDERS.find((v) => v === o.order) ?? DEFAULT_MOTE_PREFS.order,
+    onHand: MOTES_ON_HAND.find((n) => n === o.onHand) ?? DEFAULT_MOTE_PREFS.onHand
   }
 }
 
@@ -116,9 +127,11 @@ export const SUPPLY_LABEL: Record<SupplyKind, string> = {
   unknown: 'Not listed'
 }
 
-/** `1 in 8`: a chance as a player says it. */
+/** `1 in 8`, `89% of kills`: a chance as a player says it (a high one reads as a share, not "1 in 1"). */
 function oneIn(chance: number): string {
-  return chance >= 0.95 ? 'every kill' : `1 in ${String(Math.max(2, Math.round(1 / chance)))}`
+  if (chance >= 0.95) return 'every kill'
+  if (chance > 0.6) return `${String(Math.round(chance * 100))}% of kills`
+  return `1 in ${String(Math.max(2, Math.round(1 / chance)))}`
 }
 
 /** `9.5 min`, `2 h`: a stated respawn. */
@@ -131,7 +144,11 @@ export function moteSourceText(supply: ItemSupply | undefined): string {
   if (supply === undefined) return SUPPLY_LABEL.unknown
   const label = SUPPLY_LABEL[supply.kind]
   if (supply.kind === 'quest' || supply.kind === 'crafted') return `${label}: copies come at +0`
-  if (supply.kind === 'raid') return `${label}: weekly kill${supply.chance === undefined ? '' : `, ${oneIn(supply.chance)}`}`
+  if (supply.kind === 'raid') {
+    // The week's first kill, then the later ones when they count (`itemSupply.RERUN_BOSSES`, `RERUN_FAVOURS`).
+    const later = supply.rerun === undefined ? '' : `; daily repeats, ${oneIn(supply.rerun)}`
+    return `${label}: weekly kill${supply.chance === undefined ? '' : `, ${oneIn(supply.chance)}`}${later}`
+  }
   if (supply.chance === undefined) return label
   const hard = (supply.hard ?? []).some((h) => h === 'level' || h === 'mechanics') ? ', hard fight' : ''
   return `${label}: ${oneIn(supply.chance)}${supply.respawn === undefined ? '' : `, ${respawnText(supply.respawn)} respawn`}${hard}`
@@ -198,15 +215,82 @@ export function moteUnrankedText(hosts: readonly PlannerInventoryHost[]): string
   return `Not ranked: ${hosts.map(hostText).join(', ')} (not in the item data)`
 }
 
-/** `Indicolite Breastplate +9→+10 · Earring of Bashing +8→+10`: the week's motes, one item each. */
+/** `2 motes`, `1 mote`. */
+const motesText = (n: number): string => `${String(n)} ${n === 1 ? 'mote' : 'motes'}`
+
+/**
+ * `Indicolite Breastplate +9→+10 (1 mote) · Earring of Bashing +8→+10 (2 motes)`: the week's motes,
+ * one item each, with the count said in words (Malkil, 2026-11-23, read the table's bare number as
+ * the count; the line says it so nobody has to guess).
+ */
 export function motePlanText(plan: readonly MotePlanStep[]): string {
   return planByItem(plan)
-    .map((p) => `${p.name} +${String(p.from)}→+${String(p.from + p.motes)}`)
+    .map((p) => `${p.name} +${String(p.from)}→+${String(p.from + p.motes)} (${motesText(p.motes)})`)
     .join(' · ')
 }
 
-/** The line above the list: where the week's motes go, and how many are left to hold. */
+const ORDER_WORDS: Record<MoteOrder, string> = { recommended: 'recommended', gain: 'biggest gain', effort: 'most hours saved' }
+
+/**
+ * The line above the table: what a highlighted row and its number mean. The plan is the Recommended
+ * one under every sort (owner's default, 2026-11-23), so under another sort the line says so: the
+ * tester read "Biggest gain" keeping the highlights as a bug. `''` when nothing is highlighted.
+ */
+export function moteLegendText(order: MoteOrder, plan: readonly MotePlanStep[]): string {
+  if (plan.length === 0) return ''
+  const count = 'the number is how many motes that item gets'
+  if (order === 'recommended') return `Highlighted rows are where this week's motes go; ${count}. Sorting changes only the order.`
+  return `Sorted by ${ORDER_WORDS[order]}. The highlighted rows are still the Recommended plan for this week's motes; ${count}.`
+}
+
+/** `copies come from Terror and 3 others (Raid boss: weekly kill, 1 in 8)`: how copies are come by. */
+function copiesClause(supply: ItemSupply | undefined): string {
+  if (supply?.perWeek === undefined) return 'no page lists where copies come from'
+  if (supply.kind === 'crafted') return 'copies are crafted, at +0'
+  const others = supply.roads > 1 ? ` and ${String(supply.roads - 1)} ${supply.roads === 2 ? 'other' : 'others'}` : ''
+  return `copies come from ${supply.from ?? 'its source'}${others} (${moteSourceText(supply)})`
+}
+
+/**
+ * Why the first mote went on this item, from the ranking's own numbers: it led the ready rows on
+ * gain, on hours, on both, or on neither (then it is the best of the two multiplied, as the
+ * Recommended order is).
+ */
+function whyClause(why: MoteWhy, target: MoteTarget): string {
+  const label = moteTargetLabel(target)
+  const gain = moteGainText(why, target)
+  const hours = moteHoursText(why)
+  let text: string
+  if (why.ready <= 1) text = `the only item ready for one (${gain} ${label}, saves ${hours})`
+  else if (why.mostGain && why.mostHours) text = `the biggest gain for ${label} (${gain}) and the most hours saved (${hours})`
+  else if (why.mostGain) text = `the biggest gain for ${label} (${gain}), saving ${hours}`
+  else if (why.mostHours) text = `the most hours saved (${hours}), for ${gain} ${label}`
+  else text = `the best gain times hours saved (${gain} ${label} over ${hours})`
+  return why.gate === 'rare' ? `${text}, allowed below +${String(MOTE_RULES.minTier)} because copies barely exist` : text
+}
+
+/**
+ * The lines beneath the list (tester Malkil, 2026-11-23: "Perhaps it needs to describe its
+ * reasoning beneath the list"): one per planned item, then the motes held, if any. Built only from
+ * what the plan recorded (`MoteWhy`). No plan, no lines: the line above already says to hold them.
+ */
+export function motePlanReasons(plan: readonly MotePlanStep[], target: MoteTarget, motes: number = MOTE_RULES.perWeek): string[] {
+  if (plan.length === 0) return []
+  const lines = planByItem(plan).map((p) => {
+    const again = p.motes > 1 ? ', and still first when weighed again a tier up' : ''
+    return `${motesText(p.motes)} on ${p.name}, +${String(p.from)} to +${String(p.from + p.motes)}: ${whyClause(p.why, target)}${again}; ${copiesClause(p.why.supply)}.`
+  })
+  const held = motes - plan.length
+  if (held > 0) lines.push(`Hold ${String(held)}: nothing else you wear is ready for one yet.`)
+  return lines
+}
+
+/**
+ * The line above the list: where the week's motes go, and how many are left to hold. `motes` is
+ * how many the player has on hand; with none there is nothing to plan, which is not "not ready".
+ */
 export function motePlanLine(plan: readonly MotePlanStep[], motes: number = MOTE_RULES.perWeek): string {
+  if (motes <= 0) return 'No void motes to spend this week'
   if (plan.length === 0) return `Nothing you wear is ready for a mote yet: hold them`
   const held = motes - plan.length
   return `This week: ${motePlanText(plan)}${held > 0 ? ` · hold ${String(held)}` : ''}`
