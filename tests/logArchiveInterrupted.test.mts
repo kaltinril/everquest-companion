@@ -63,11 +63,16 @@ const deps = (over: Partial<RotateDeps> = {}): RotateDeps => ({
   ...over
 })
 
-test('recovery: an archive that cannot be finished gives its reason, and a later start still finishes it', async () => {
+// Since 2026-11-23 a recovery that cannot finish puts the moved log back in front of the live one
+// (logArchiveRecover.test.mts). The card's reason is then for the case where that stops too.
+
+const fullDisk = { append: (): never => { throw Object.assign(new Error('ENOSPC: no space left'), { code: 'ENOSPC' }) } }
+
+test('recovery: an archive that cannot be finished or put back gives both reasons, and a later start puts it back', async () => {
   const f = interrupted()
-  const failed = await recoverRotation(f.dir, deps({ backup: async () => ({ ok: false, reason: 'the disk refused the write' }) }))
+  const failed = await recoverRotation(f.dir, deps({ backup: async () => ({ ok: false, reason: 'the disk refused the write' }), joinIo: fullDisk }))
   const why = unfinishedReason(failed)
-  assert.ok(why !== null && why.includes('the disk refused the write'), String(failed))
+  assert.ok(why !== null && why.includes('the disk refused the write') && why.includes('ENOSPC'), String(failed))
   assert.ok(why.includes(f.movedPath), 'the reason says where the old log is kept')
   assert.equal(readFileSync(f.movedPath, 'utf8'), MOVED, 'the moved log is kept')
   assert.notEqual(readJournal(f.dir), null)
@@ -75,8 +80,8 @@ test('recovery: an archive that cannot be finished gives its reason, and a later
   const done = await recoverRotation(f.dir, deps())
   assert.equal(unfinishedReason(done), null)
   assert.equal(readJournal(f.dir), null)
-  assert.equal(listSegments(f.dir).segments[0].state, 'sealed')
   assert.ok(!existsSync(f.movedPath))
+  assert.ok(readFileSync(join(f.dir, '..', 'eqlog_Primitive_freeport.txt'), 'utf8').startsWith(MOVED), 'the old lines are back in the log')
 })
 
 test('recovery: a reason that does not name the old log has its place added', async () => {
@@ -84,8 +89,8 @@ test('recovery: a reason that does not name the old log has its place added', as
   const shorter = async (): Promise<never> => {
     throw new Error('the log is 5 bytes, shorter than the 9 captured')
   }
-  const why = unfinishedReason(await recoverRotation(f.dir, deps({ readPrefix: shorter })))
-  assert.equal(why, `the log is 5 bytes, shorter than the 9 captured; the old log is kept at ${f.movedPath}`)
+  const why = unfinishedReason(await recoverRotation(f.dir, deps({ readPrefix: shorter, joinIo: fullDisk })))
+  assert.equal(why, `the log is 5 bytes, shorter than the 9 captured; it could not be put back in front of your log either (ENOSPC: no space left). Its lines are safe in ${f.movedPath}`)
 })
 
 test('recovery: nothing to finish, or finished, gives no reason', () => {
@@ -101,6 +106,7 @@ test('preflight: an archive that could not be finished shows its reason, not adv
   assert.equal(known.length, 1)
   assert.ok(known[0].includes(reason), known[0])
   assert.doesNotMatch(known[0], /Restart the app/)
+  assert.match(known[0], /puts your log back whole/)
   // A run that died mid-archive has no reason yet: the next start finishes it.
   assert.match(rotateBlockers(ok)[0], /Restart the app to finish it first/)
   assert.match(rotateBlockers({ ...ok, interruptedReason: null })[0], /Restart the app to finish it first/)

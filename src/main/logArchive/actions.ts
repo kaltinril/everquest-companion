@@ -36,14 +36,15 @@ import { pushAppKnowledge } from '../dataServer/definePush'
 import { pushWorldChanged } from '../dataServer/serveDeltas'
 import type { RespawnRow } from '../../shared/respawn'
 import { lacksLearned, refreshSegment, sweepRefreshLeftovers } from './refresh'
-import { putBackLeftovers, readJournal, recoverRotation, restoreLog, rotateLog, unfinishedReason, type RotateDeps } from './rotate'
+import { putBackLeftovers, readJournal, recoverRotation, recoveredNote, restoreLog, rotateLog, unfinishedReason, type RotateDeps } from './rotate'
 import { listSegments, resolveArchivePath, writeSegment } from './segmentStore'
 
 let busy: string | null = null
 /** Why this run could not finish an interrupted archive, for the card (`interruptedReason`). */
 let notFinished: string | null = null
-/** Why the last automatic archive stopped, for the character it was about (`autoFailed`). */
-let autoStopped: { character: string; text: string } | null = null
+/** Why the last automatic archive stopped, for the character it was about (`autoFailed`); or what the
+ *  launch recovery did with an archive it could not finish (null character: any, its record gone). */
+let autoStopped: { character: string | null; text: string } | null = null
 /** The captured modules the running engine serves, learned once it has caught up; null before. */
 let engineModules: ReadonlySet<string> | null = null
 /** The engine's respawn snapshot carries `learned` (see `lacksLearned`). */
@@ -246,7 +247,8 @@ export function logArchiveStatus(): LogArchiveStatus {
 
 /** Why the last automatic archive stopped, when it was this character's log. */
 function autoFailedFor(a: { character: string } | null): string | null {
-  return autoStopped !== null && autoStopped.character === a?.character ? autoStopped.text : null
+  if (autoStopped === null || a === null) return null
+  return autoStopped.character === null || autoStopped.character === a.character ? autoStopped.text : null
 }
 
 function fillOn(base: LogArchiveStatus, dir: string, a: { character: string; logPath: string } | null): LogArchiveStatus {
@@ -454,8 +456,13 @@ export async function recoverLogArchiveAtLaunch(note: (line: string) => void): P
     if (!existsSync(dir)) return
     sweepTemp(dir)
     sweepRefreshLeftovers(dir)
+    // Whose archive it was, read before the recovery clears the journal: the card says what it did.
+    const journal = readJournal(dir)
+    const character = journal === null ? null : (rotateDeps.readSegment(dir, journal.segmentId)?.character ?? null)
     const done = await recoverRotation(dir, rotateDeps)
     notFinished = unfinishedReason(done)
+    const recovered = recoveredNote(done)
+    if (recovered !== null) autoStopped = { character, text: recovered }
     if (done !== null) note(`log archive: ${done}`)
     // Never swept: they hold log lines until the same archive's Put back joins them.
     for (const f of putBackLeftovers(dir)) note(`log archive: a put back did not finish; ${join(dir, f)} holds log lines and is kept`)

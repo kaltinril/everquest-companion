@@ -17,6 +17,19 @@
 // archive folder until a verified compressed copy exists. `recoverRotation` finishes an
 // interrupted run from wherever it stopped, at the next launch.
 //
+// AN ARCHIVE THAT CANNOT BE FINISHED IS UNDONE (owner, 2026-11-23: "if the archivable fails, we need
+// to recover for the user so they aren't screwed with no log data"). While the run that moved the
+// log goes on, nothing is missing: the engine keeps every line it read before the move. The next
+// launch is where the player would lose them, because the engine then reads only the fresh log and
+// an unsealed archive is not shown. So the launch recovery first tries to finish, as before; when it
+// cannot, it joins the moved file back in front of the live log under the log's own name (journal
+// step `returning`, joinLive.ts), before the engine reads anything. That one was chosen over the
+// others because the moved file is, byte for byte, what the log held at the move, whatever went
+// wrong after it (a refused compressed copy, a record that no longer matches, a missing record), so
+// moved + live is exactly the log the game would have had. Finishing needs the cause gone; pointing
+// the reader at the moved file needs the engine to read two files as one. A sealed archive is never
+// undone: its history is shown, and only the moved file's delete is left for the next start.
+//
 // The game may be running throughout: it opens the log by name for every line (ruling 0.5).
 
 import { closeSync, existsSync, openSync, readdirSync, readFileSync, readSync, renameSync, rmSync, statfsSync, statSync, writeFileSync } from 'node:fs'
@@ -37,7 +50,8 @@ export type { RestoreIo } from './joinLive'
 
 export const JOURNAL = 'rotation-journal.json'
 
-export type JournalStep = 'moving' | 'moved'
+/** `returning`: the moved log is being joined back in front of the live one; never finish it then. */
+export type JournalStep = 'moving' | 'moved' | 'returning'
 
 export interface Journal {
   v: 1
@@ -57,6 +71,8 @@ export interface RotateDeps {
   factionLedger?: (dir: string, segmentId: string, source: LedgerSource) => Promise<void>
   /** Test seam: throw here to simulate a crash after the named step. */
   crashAfter?: (step: string) => void
+  /** Test seam: the disk steps of putting a moved log back (joinLive.ts). */
+  joinIo?: RestoreIo
 }
 
 export type RotateResult = { ok: true; segment: Segment } | { ok: false; reason: string; logTouched: boolean }
@@ -171,8 +187,9 @@ export async function rotateLog(logPath: string, dir: string, captured: Segment,
 }
 
 /**
- * Step 3.4: finish or clear an interrupted rotation. Run at launch before the engine attaches.
- * Returns what it did, or null when there was no journal.
+ * Step 3.4: finish or clear an interrupted rotation, or put the moved log back when it cannot be
+ * finished. Run at launch before the engine attaches. Returns what it did, or null when there was
+ * no journal.
  */
 export async function recoverRotation(dir: string, deps: RotateDeps): Promise<string | null> {
   const j = readJournal(dir)
@@ -181,15 +198,20 @@ export async function recoverRotation(dir: string, deps: RotateDeps): Promise<st
     clearJournal(dir)
     return 'an archive was interrupted before the log was moved; nothing had changed'
   }
+  // A put back under way is finished, never archived: the moved file may hold some of the live log.
+  if (j.step === 'returning') return putMovedBack(dir, j, null, deps)
   try {
     const seg = await finishFromMoved(dir, { ...j, step: 'moved' }, deps)
     return `finished an interrupted archive: ${seg.id}`
   } catch (err) {
-    return `${NOT_FINISHED}${afterMove(err, j)}`
+    return undoOrSay(dir, j, err, deps)
   }
 }
 
 const NOT_FINISHED = 'an interrupted archive could not be finished: '
+const PUT_BACK = 'an interrupted archive could not be finished, so the log was put back whole: '
+const GONE = 'an interrupted archive was cleared: its old log is no longer at '
+const LAST_START = 'the last start began putting it back'
 
 /** Why the steps after the move stopped, always with where the old log is while it is there. */
 function afterMove(err: unknown, j: Journal): string {
@@ -197,10 +219,70 @@ function afterMove(err: unknown, j: Journal): string {
   return why.includes(j.movedPath) || !existsSync(j.movedPath) ? why : `${why}; the old log is kept at ${j.movedPath}`
 }
 
+/** The cause alone, without the "kept at" the finishing steps add: once the log is back it is not. */
+function causeOf(err: unknown, j: Journal): string {
+  return (err as Error).message.replace(`; the old log is kept at ${j.movedPath}`, '').replace(`; it is kept at ${j.movedPath}`, '')
+}
+
+/** The finish failed: undo it when that is safe, otherwise say why. */
+async function undoOrSay(dir: string, j: Journal, err: unknown, deps: RotateDeps): Promise<string> {
+  // A sealed archive is shown on the tabs; only the moved file's delete is left. Never undone.
+  if (deps.readSegment(dir, j.segmentId)?.state === 'sealed') return `${NOT_FINISHED}${afterMove(err, j)}`
+  if (!existsSync(j.movedPath)) {
+    // Moved or deleted outside the app. Nothing can be put back, and a journal kept would block
+    // every archive for good.
+    clearJournal(dir)
+    return `${GONE}${j.movedPath}, so nothing could be put back`
+  }
+  return putMovedBack(dir, j, causeOf(err, j), deps)
+}
+
+/** Join the moved file back in front of the live log, under the log's name. `why` is the reason
+ *  the archive could not be finished; null when a put back an earlier start began is continued. */
+async function putMovedBack(dir: string, j: Journal, why: string | null, deps: RotateDeps): Promise<string> {
+  try {
+    if (existsSync(j.movedPath)) {
+      writeJournal(dir, { ...j, step: 'returning' })
+      if (await alreadyJoined(j.movedPath, j.logPath)) rmSync(j.movedPath)
+      else {
+        waitingPieces(j.movedPath, 0)
+        joinAndName(j.logPath, j.movedPath, j.movedPath, deps.joinIo ?? {})
+      }
+    }
+    // A moved file that is gone in step `returning` already has the log's name.
+    clearJournal(dir)
+    return `${PUT_BACK}${why ?? LAST_START}`
+  } catch (err) {
+    try {
+      ensureFile(j.logPath)
+    } catch {
+      // The game makes it on its next line.
+    }
+    const held = [j.movedPath, ...piecesOf(j.movedPath).map((p) => p.path)].filter((p) => existsSync(p))
+    const safe = held.length > 0 ? `. Its lines are safe in ${held.join(' and ')}` : ''
+    const stop = (err as Error).message
+    const what = why === null ? `putting the log back stopped (${stop})` : `${why}; it could not be put back in front of your log either (${stop})`
+    return `${NOT_FINISHED}${what}${safe}`
+  }
+}
+
 /** Why the recovery could not finish, from what `recoverRotation` answered; null when it did, or
  *  had nothing to do. The card shows it (preflight.ts `interruptedReason`). */
 export function unfinishedReason(done: string | null): string | null {
   return done?.startsWith(NOT_FINISHED) === true ? done.slice(NOT_FINISHED.length) : null
+}
+
+/** What the card says when the recovery put the log back, or found nothing to put back; null
+ *  otherwise. Kept in memory until an archive succeeds (actions.ts `autoStopped`). */
+export function recoveredNote(done: string | null): string | null {
+  if (done?.startsWith(PUT_BACK) === true) {
+    return `An archive could not be finished (${done.slice(PUT_BACK.length)}), so the app put your log back whole. Nothing is missing.`
+  }
+  if (done?.startsWith(GONE) === true) {
+    const rest = done.slice(GONE.length).replace(/, so nothing could be put back$/, '')
+    return `An archive could not be finished, and its old log is no longer at ${rest} (moved or deleted outside the app), so nothing could be put back.`
+  }
+  return null
 }
 
 const RESTORING = '.restoring'
