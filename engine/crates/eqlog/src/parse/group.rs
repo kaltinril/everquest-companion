@@ -58,6 +58,17 @@ impl GroupRes {
                     re(format!(r"^{NAME} invites you to join a group\.$")),
                     "invite",
                 ),
+                // Your answer to that invite. Joining somebody's group names nobody else: the
+                // game prints `You have joined the group.` next and no `<Name> has joined` line
+                // for the members already in it, so this is the one line that names who you
+                // joined (2026-11-23: Malkil's group, never admitted, his damage read as a
+                // stranger's).
+                (
+                    re(format!(
+                        r"^You notify {NAME} that you agree to join the group\.$"
+                    )),
+                    "accept",
+                ),
                 (re(format!(r"^{NAME} tells the group, '")), "confirm"),
             ],
         }

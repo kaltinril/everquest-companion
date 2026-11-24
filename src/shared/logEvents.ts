@@ -979,12 +979,15 @@ export interface SessionStartEvent extends LogEventBase {
  *               — an OFFER, never a membership fact (it may be declined and often is: this log
  *               has 7 invites and only 5 of the joins that would answer them). Parsed so the
  *               UI can explain a missing member, never folded into the roster.
+ *   'accept'    `You notify <Name> that you agree to join the group.` — your answer to <Name>'s
+ *               invite. Joining somebody's group names none of its members, so the engine's
+ *               roster admits <Name> when `selfJoin` follows within 30 s (2026-11-23).
  *
  * `name` is absent exactly for the two self shapes.
  */
 export interface GroupEvent extends LogEventBase {
   kind: 'group'
-  change: 'join' | 'leave' | 'leader' | 'confirm' | 'selfJoin' | 'selfLeave' | 'invite'
+  change: 'join' | 'leave' | 'leader' | 'confirm' | 'selfJoin' | 'selfLeave' | 'invite' | 'accept'
   /** The member the line names. Absent for `selfJoin` / `selfLeave`. */
   name?: string
 }

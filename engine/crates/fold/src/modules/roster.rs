@@ -59,6 +59,11 @@ fn outranks(next: &str, cur: &str) -> bool {
     source_rank(next) >= source_rank(cur)
 }
 
+/// How long after you accept an invite the game's `You have joined the group.` may follow and
+/// still answer it. Measured: the two lines print in the same second or one apart (four
+/// acceptances, 2026-11-03 to 2026-11-23).
+const ACCEPT_JOIN_MS: i64 = 30_000;
+
 /// Which provenance rung each membership-bearing `change` writes.
 fn change_source(change: &str) -> Option<&'static str> {
     match change {
@@ -204,6 +209,10 @@ pub struct RosterModule {
     /// What other players' `/who` rows stated — see [`super::roster_who`]. Knowledge about NAMES,
     /// so like `never_member` it outlives a reset: a rebirth of yours changes nobody else's classes.
     who: super::roster_who::WhoSeen,
+    /// The invite you last accepted (`You notify <Name> that you agree to join the group.`): key,
+    /// spelling and ts. Taken by the `You have joined the group.` that follows within
+    /// `ACCEPT_JOIN_MS`, which admits that player; an acceptance no join answers admits nobody.
+    accepted: Option<(String, String, i64)>,
     /// Moves on every write to `log`, `admitted_keys`, `edits`, `epoch_ts` or `left_ts` — the
     /// inputs of `effective()` and `admitted()`, which is what the combat engine pulls. See
     /// [`crate::combat::RosterSource::revision`].
@@ -312,10 +321,27 @@ impl RosterModule {
         self.seen = true;
         self.last_signal_ts = self.last_signal_ts.max(ev.ts());
         let change = ev.str("change").unwrap_or_default();
-        if change == "invite" || change == "selfJoin" {
+        if change == "accept" {
+            self.accepted = ev
+                .str("name")
+                .map(|name| (id_key(name), name.to_string(), ev.ts()));
+            return;
+        }
+        if change == "selfJoin" {
+            // The group you just joined is the one whose invite you accepted: its inviter is in it.
+            // The members already there are never named, so this is the only way they get in.
+            if let Some((key, name, at)) = self.accepted.take() {
+                if ev.ts() - at <= ACCEPT_JOIN_MS {
+                    self.add(&key, &name, "joined", ev.ts());
+                }
+            }
+            return;
+        }
+        if change == "invite" {
             return;
         }
         if change == "selfLeave" {
+            self.accepted = None;
             self.log.clear();
             self.admitted_keys.clear();
             // …and every user edit written before the group ended described THAT group.
@@ -459,6 +485,7 @@ impl EqModule for RosterModule {
         self.announce.reset();
         self.party_exp = false;
         self.fan_out.reset();
+        self.accepted = None;
         // The never-a-member set is NOT cleared with the roster: it is knowledge about which names
         // are PETS, and a pet does not stop being one because the character was reborn. `self_key`
         // outlives it for the same reason.

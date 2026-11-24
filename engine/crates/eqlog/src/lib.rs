@@ -274,6 +274,20 @@ mod tests {
         );
     }
 
+    /// Accepting an invite names the player whose group you joined.
+    #[test]
+    fn accepting_an_invite_names_the_inviter() {
+        let p = bare();
+        let out = parse_one(
+            &p,
+            "[Mon Nov 23 21:50:08 2026] You notify Malkil that you agree to join the group.",
+        );
+        assert!(
+            out.starts_with(r#"{"kind":"group","change":"accept","name":"Malkil","#),
+            "{out}"
+        );
+    }
+
     #[test]
     fn a_typed_nuke_carries_dclass_and_an_empty_modifier_list() {
         let p = bare();
