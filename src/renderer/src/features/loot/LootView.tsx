@@ -50,7 +50,7 @@ import { LootTable, type LootTableContext } from './LootTables'
 // The chrome around the table — the toolbar, the caption and the notices — plus the two pieces of
 // view state that belong to them. JOS-160 moved it out when this file crossed its measured line
 // ceiling; nothing changed in the move.
-import { LootNotices, LootSourceToggle, LootSummary, LootToolbar, useLootSort, type LootSource } from './LootChrome'
+import { LootNotices, LootSourceToggle, LootSummary, LootToolbar, useGroupByItem, useLootSort, type LootSource } from './LootChrome'
 // THE DATA-SERVER SURFACE (JOS-484). The context is READ DIRECTLY rather than through
 // `useEngineClient`, and that is the whole gate: it holds null on every launch without a live engine
 // — which is every launch a user makes — so the toggle below never renders and the engine ledger is
@@ -375,7 +375,7 @@ export default function LootView(props: LootViewProps = {}): JSX.Element {
     inventoryInfo
   } = useInventoryRows()
   const [query, setQuery] = useState('')
-  const [groupByItem, setGroupByItem] = useState(true)
+  const [groupByItem, setGroupByItem] = useGroupByItem()
   const [questOnly, setQuestOnly] = useState(false)
   const [sort, onSort] = useLootSort()
   const [showInventoryOnly, setShowInventoryOnly] = useState(false)
