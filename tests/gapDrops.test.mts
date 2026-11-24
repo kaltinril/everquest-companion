@@ -53,8 +53,8 @@ test('a drop row copies its known_loot line and points at the mob page', () => {
   const kills = killIndex({ 'a gnoll': { display: 'a gnoll', count: 16 } } as unknown as KillMap)
   const [group, item] = dropGaps([loot('Bronze Axe', 'a gnoll'), loot('Hide Mask', 'a gnoll'), loot('Hide Mask', 'a gnoll')], catalog, groups).sort((a, b) => a.name.localeCompare(b.name))
   // A group line carries its rate the way the wiki writes one (review D2): 1 corpse over 16 kills.
-  assert.equal(wikiPageText(group, [], kills), "<li> [[Bronze Weapons]] <span class='drare'>(Rare)</span> <span class='ddb'>[Overall: ~6.3%]</span> </li>\n")
-  assert.equal(wikiPageText(item, [], kills), "<li> {{:Hide Mask}} <span class='drare'>(Rare)</span> <span class='ddb'>[Overall: ~12.5%]</span> </li>\n")
+  assert.equal(wikiPageText(group, [], kills), "<li> [[Bronze Weapons]] <span class='drare'>(Rare)</span> </li>\n")
+  assert.equal(wikiPageText(item, [], kills), "<li> {{:Hide Mask}} <span class='drare'>(Rare)</span> </li>\n")
   // One kill is no rate (owner, 2026-10-20: "I killed this guy 1 time"): the item alone.
   const few = killIndex({ 'a gnoll': { display: 'a gnoll', count: 1 } } as unknown as KillMap)
   assert.equal(wikiPageText(item, [], few), '<li> {{:Hide Mask}} </li>\n')
@@ -69,7 +69,7 @@ test('a group line rates the corpses that dropped ANY member over the mob kills;
   assert.equal(row.count, 2)
   const kills = (n: number): KillMap => killIndex({ 'a gnoll': { display: 'a gnoll', count: n } } as unknown as KillMap)
   assert.equal(wikiPageText(row, [], kills(4)), '<li> [[Bronze Weapons]] </li>\n', 'under ten kills: no rate')
-  assert.equal(wikiPageText(row, [], kills(10)), "<li> [[Bronze Weapons]] <span class='drare'>(Rare)</span> <span class='ddb'>[Overall: ~20%]</span> </li>\n")
+  assert.equal(wikiPageText(row, [], kills(10)), "<li> [[Bronze Weapons]] <span class='drare'>(Rare)</span> </li>\n")
   // Anything the log has no answer for is left off (owner, 2026-10-19).
   assert.equal(wikiPageText(row, [], {}), '<li> [[Bronze Weapons]] </li>\n')
   assert.equal(wikiPageText(row, [], kills(1)), '<li> [[Bronze Weapons]] </li>\n')
@@ -173,13 +173,13 @@ test("a group row's line takes the page's member rates summed (A lizard man scou
   const lines = rusty.replaces?.lines ?? []
   assert.equal(lines.length, 11)
   assert.ok(lines.includes('Worn Great Staff') && lines.includes('Cracked Staff') && !lines.includes('Rusty Knuckles'))
-  assert.equal(wikiPageText(cloth, [], {}), "<li> [[Large Cloth Armor]] <span class='drare'>(Rare)</span> <span class='ddb'>[Overall: ~12.4%]</span> </li>\n")
-  assert.equal(wikiPageText(rusty, [], {}), "<li> [[Rusty Weapons]] <span class='drare'>(Rare)</span> <span class='ddb'>[Overall: ~22.9%]</span> </li>\n")
+  assert.equal(wikiPageText(cloth, [], {}), "<li> [[Large Cloth Armor]] <span class='drare'>(Rare)</span> </li>\n")
+  assert.equal(wikiPageText(rusty, [], {}), "<li> [[Rusty Weapons]] <span class='drare'>(Rare)</span> </li>\n")
   // Without the page's rates (data that does not carry them yet), the log's rate: 1 corpse over 10 kills.
   const bare = dropGaps([at('Rusty Axe')], [{ ...page, dropRates: undefined }], sets)[0]
   assert.equal(bare.replaces?.rate, undefined)
   const kills = killIndex({ 'a lizardman scout': { display: 'a lizardman scout', count: 10 } } as unknown as KillMap)
-  assert.equal(wikiPageText(bare, [], kills), "<li> [[Rusty Weapons]] <span class='drare'>(Rare)</span> <span class='ddb'>[Overall: ~10%]</span> </li>\n")
+  assert.equal(wikiPageText(bare, [], kills), "<li> [[Rusty Weapons]] <span class='drare'>(Rare)</span> </li>\n")
   // Only listed members looted: nothing missing, no row.
   assert.deepEqual(dropGaps([at('Rusty Mace'), at('Large Cloth Cap')], [page], sets), [])
 })

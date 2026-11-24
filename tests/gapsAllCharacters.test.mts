@@ -354,7 +354,7 @@ test("days back keeps a drop's rate whole: corpses over kills of the whole log, 
   const own: OwnGaps = { gaps: noRows(), loot, kills: kills as never }
   const row = shownWith(own, [], [{ name: 'a skeleton', page: 'A skeleton', drops: ['Rusty Dagger'], zones: ['Befallen'] }]).rows.find((r) => r.domain === 'drop')
   assert.equal(row?.count, 20)
-  assert.match(wikiPageText(row!, ownSince(own, CUT).loot, killIndex(kills.mobs as never)), /\[Overall: ~100%\]/)
+  assert.match(wikiPageText(row!, ownSince(own, CUT).loot, killIndex(kills.mobs as never)), /<span class='drare'>\(Always\)<\/span>/)
 })
 
 test('days back leaves out a Factions row and an Images row the log last met before the window', () => {

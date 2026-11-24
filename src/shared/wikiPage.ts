@@ -361,8 +361,8 @@ export function rarityWord(pct: number): string {
 
 /**
  * One `known_loot` line in the wiki's own shape (owner, 2026-10-18): the rarity word in its `drare`
- * span and the rate in its `ddb` span, `[Overall: ~64%]`. The rate is the corpses that dropped it
- * over the player's kills, `~` marking it as seen in one log rather than the server's loot table.
+ * span, from the corpses that dropped it over the player's kills. The `ddb` rate span was dropped
+ * on 2026-11-23 (see `pctLine`): the wiki's drop database writes the percent now.
  */
 export function lootLine(item: string, drops: number, kills: number): string {
   return rateLine(`{{:${item}}}`, drops, kills)
@@ -371,8 +371,8 @@ export function lootLine(item: string, drops: number, kills: number): string {
 /**
  * A group's line (`[[Rusty Weapons]]`), rated the same way (review D2): the corpses that dropped
  * ANY member, over the mob's kills. The wiki writes a group line exactly as an item line, the
- * `drare` and `ddb` spans after the link (measured 2026-10-19 on the cached mob pages, 468 group
- * lines: `<li> [[Rusty Weapons]] <span class='drare'>(Rare)</span> <span class='ddb'>...`).
+ * `drare` span after the link (measured 2026-10-19 on the cached mob pages, 468 group lines:
+ * `<li> [[Rusty Weapons]] <span class='drare'>(Rare)</span> ...`).
  */
 export function groupLine(group: string, drops: number, kills: number): string {
   return rateLine(wikiLink(group), drops, kills)
@@ -401,8 +401,15 @@ function rateLine(link: string, drops: number, kills: number): string {
   return pctLine(link, Math.round((drops / kills) * 1000) / 10)
 }
 
+/**
+ * The rarity word only, never the rate (owner, 2026-11-23: "remove the overall %"). The wiki now
+ * fills each loot line's percent from its drop database (Special:DropDatabase), and "an authored
+ * loot rate always stays as written and overrides the automatic percentage" (API_Documentation),
+ * so a copied `[Overall: ~N%]` would hide the wiki's own figure. The app keeps showing the log's
+ * rate everywhere else ("keep the statistics in our own app"): only the copied text loses it.
+ */
 function pctLine(link: string, pct: number): string {
-  return `<li> ${link} <span class='drare'>(${rarityWord(pct)})</span> <span class='ddb'>[Overall: ~${String(pct)}%]</span> </li>`
+  return `<li> ${link} <span class='drare'>(${rarityWord(pct)})</span> </li>`
 }
 
 export function itemPage(f: ItemFacts, shot: ItemPageShot = {}): string {

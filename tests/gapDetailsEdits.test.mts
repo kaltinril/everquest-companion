@@ -110,7 +110,7 @@ test('D2: a group drop line keeps its rate whatever edit rides on the row (a Dro
   const at = (ts: number, item: string): LootEvent => ({ ts, item, source: 'a gnoll', zone: 'Eastern Karana' })
   const [drop] = dropGaps([at(5000, 'Bronze Axe'), at(9000, 'Bronze Dagger +1')], [{ page: 'A gnoll', name: 'a gnoll', drops: [] }], { 'Bronze Weapons': ['Bronze Axe', 'Bronze Dagger'] })
   const kills = killsOf('a gnoll', 10)
-  const line = "<li> [[Bronze Weapons]] <span class='drare'>(Rare)</span> <span class='ddb'>[Overall: ~20%]</span> </li>\n"
+  const line = "<li> [[Bronze Weapons]] <span class='drare'>(Rare)</span> </li>\n"
   assert.equal(copied(drop ?? assert.fail(), [], kills), line)
   for (const edit of [...MALFORMED, { name: 'Iron Weapons' }, { fields: { level: '12' } }]) assert.equal(copied(edited(drop ?? assert.fail(), edit), [], kills), line, JSON.stringify(edit))
 })
@@ -120,7 +120,7 @@ test("E3: a renamed or re-zoned mob keeps its loot rates and MONEY DROPS, which 
   const loot = [1, 2, 3].map((s) => ({ ts: s * 1000, item: 'Rabid Kobold Fang', source: 'a rabid kobold', zone: 'Qeynos Hills' }))
   const kills = killsOf('a rabid kobold', 12)
   const seen = { mobCoin: [{ mob: 'a rabid kobold', n: 4, min: [0, 0, 0, 1], max: [0, 2, 4, 9] }] }
-  const fang = "<li> {{:Rabid Kobold Fang}} <span class='drare'>(Uncommon)</span> <span class='ddb'>[Overall: ~25%]</span> </li>"
+  const fang = "<li> {{:Rabid Kobold Fang}} <span class='drare'>(Uncommon)</span> </li>"
   const money = '<li> 0 - 2 <span style="color:gold"><b>Golds</b></span></li>'
   const page = copied(edited(kobold, { name: 'A Rabid Kobold Pup', fields: { level: '3 - 5', zone: '[[Qeynos Hills]]' } }), loot, kills, seen)
   assert.match(page, /^\| name\s*= A Rabid Kobold Pup$/m)
