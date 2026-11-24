@@ -63,6 +63,8 @@ export interface BisSheet {
   total: number
   /** the loadout's value per chip (HASTE is the best single haste; ratios left out) */
   totals: Partial<Record<TierChip, number>>
+  /** how many cells have an item */
+  filled: number
 }
 
 /** How many candidates per cell the exact search tries. Runners-up read the full list. */
@@ -209,5 +211,6 @@ export function buildBisSheet(opts: BisOptions): BisSheet {
   })
   const secondary = byCell.get('SECONDARY')
   if (secondary !== undefined && gearHandedness(byCell.get('PRIMARY')?.pick?.row.skill) === '2h') secondary.closedByTwoHander = true
-  return { cells: PLAN_SLOTS.map((cell) => byCell.get(cell) ?? { cell, runnersUp: [] }), total: round3(total), totals }
+  const cellsOut = PLAN_SLOTS.map((cell) => byCell.get(cell) ?? { cell, runnersUp: [] })
+  return { cells: cellsOut, total: round3(total), totals, filled: cellsOut.filter((c) => c.pick !== undefined).length }
 }

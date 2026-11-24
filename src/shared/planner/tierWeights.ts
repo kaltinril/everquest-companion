@@ -220,10 +220,11 @@ function budgetKey(item: TierItem): string | undefined {
 }
 
 /**
- * The model for the picked classes and level, over the rows the caller admits (in era). Units and
- * budgets depend on the classes because HP and MANA do.
+ * The model for the picked classes and level, over the rows `admit` lets in (the caller's era
+ * verdict). Units and budgets depend on the classes because HP and MANA do.
  */
-export function buildTierModel(rows: readonly TierItem[], classes: readonly ClassAbbr[], level: number): TierModel {
+export function buildTierModel(all: readonly TierItem[], classes: readonly ClassAbbr[], level: number, admit?: (row: TierItem) => boolean): TierModel {
+  const rows = admit === undefined ? all : all.filter(admit)
   const conv = conversionsFor(classes, level)
   const cache = new WeakMap<TierItem, ChipValues>()
   const valuesOf = (item: TierItem): ChipValues => {

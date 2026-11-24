@@ -89,24 +89,35 @@ where one exists.
     Fishing Pole is out of era by the era join.
   - Not done: the plus-state does not scale it (no page states how a tier moves one); the compare
     card and `benefitMismatch` do not read it; no toolbar control; not looked at in the running app.
-- **Best in slot sheet** (2026-11-24, branch `bis-sheet`, NOT merged until the owner says;
-  `plans/2026-11-24-bis-sheet.md`, `requirements/bis-sheet.md`). P1 and P2 built; no UI yet.
-  - Files: `shared/planner/tierChips.ts` (chips, lanes, `bis1:` text format), `tierWeights.ts`
-    (units, `tierScore`, default board, presets), `bisSheet.ts` (candidates, readout),
-    `bisSearch.ts` (the exact choice). `roleWeights.ts` gained read-only exports only
-    (`focusWeightsOf`, `statLiveForClasses`, `hasteCredit`, the `RoleWeights` type).
-  - Score = lane weight x value / unit; unit = median positive stated value, measured from the rows
-    handed in. Never hard-code a unit.
-  - Laws: ratios only in the hands (1H, 2H) and RANGE (ranged), never ANY or other cells; a 1H ratio
-    in SECONDARY only for a dual-wield class (`DUAL_WIELD_CLASSES`); the class gate picks the
-    DEFAULT lane only and never scores; haste once per loadout in the sheet, `hasteCredit` per item.
-  - Lore: any flag starting "Lore" (spellings include `LORE EQUPPED`) = one cell in the whole sheet.
-  - `CHIP_KEYS` order IS the text format: append new chips, never insert.
-  - TRAP: branch and bound over the cells blew a 400k-node budget (ANY cells double-count lore
-    picks in the bound). The assignment (Hungarian) plus enumeration is exact and ~0.1 s.
-  - BEST column still reads `gearBisValue`; switching it waits on the owner (calibration numbers
-    in the plan, `tests/tierCalibration.test.mts`).
-
+- **Best in slot tab** (Malkil and the owner, 2026-11-24; branch `bis-sheet`, NOT merged until the owner
+  says; plan `plans/2026-11-24-bis-sheet.md` "Version 2 design", asks `requirements/bis-sheet.md`).
+  - Files: `shared/planner/tierChips.ts` (chips, lanes, step, board text `bis2:`), `tierWeights.ts`
+    (conversions, derived chips, units, budgets, score), `tierDefaults.ts` (class-guide defaults),
+    `bisSheet.ts` + `bisSearch.ts` (exact assignment) + `bisCaps.ts` (caps pass); renderer
+    `features/gear/BisView.tsx` (the tab, `BisTab` mount), `TierBoard.tsx`, `BisCells.tsx`,
+    `bisPrefs.ts` (`eq.gear.tiers`), `bisText.ts`, `useBisData.ts`.
+  - LAW: nothing on the board reads `roleWeights.ts` but `hasteCredit` and the weapon-kind helpers
+    (owner: "without my old calculations"). INT/WIS live only inside MANA, STA only inside HP, by the
+    game formulas (MEASURED.md, "BiS sheet research"). Resists are their average unless split.
+  - Lane weight = step^(3 - lane), C = 1; step 4 default. A unit = the median over in-era endgame
+    rows (drop level over 50 or a revamp era tag), so S means "what a good endgame item carries".
+  - BEST column: `GearFilterDeps.tier` -> `derivedOpts(filters, ownedHaste, tier)` ->
+    `gearFilter.bestValue`, slot-free (any stated ratio counts), worn-haste rule and Ignore haste kept.
+    Without a tier (pure callers) BEST is still `gearBisValue`. The board is read once per Gear mount.
+  - TRAPS: renderer modules that node tests import must use relative `../../../../shared/` paths, not
+    `@shared` (the node runner has no alias). `eqc/no-domain-munging` forbids `.filter` over
+    GearRow in the renderer: the era filter is `buildTierModel`'s `admit`, the filled count is
+    `BisSheet.filled`.
+  - Caps: the exact search ignores them; `bisCaps.improveUnderCaps` then moves one cell at a time
+    (a local optimum when a cap binds). Its pool per cell is the top 30 plus the top 12 by uncapped
+    stats.
+  - Kept laws: ratios only in the hands (1H, 2H) and RANGE (ranged), never ANY or other cells; a 1H
+    ratio in SECONDARY only for a dual-wield class; Lore = any flag starting "Lore" (`LORE EQUPPED`
+    too), one cell in the whole sheet; `CHIP_KEYS` order IS the text format: append, never insert.
+  - TRAP: branch and bound over the cells blew a 400k-node budget (ANY cells double-count lore picks
+    in the bound). The assignment (Hungarian) plus enumeration is exact and fast.
+  - Not done: P5 (effects chips, a "My tier list" focus on Recommended and Void motes, per-character
+    boards); the upgrade slider on the sheet; the Lore Group rule; not looked at in the running app.
 ## Maps (was map-improvements)
 
 - Owner ruling: nothing that does not relate to EQ Legends. `portsInClient` drops a cast port

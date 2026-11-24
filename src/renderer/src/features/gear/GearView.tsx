@@ -136,6 +136,7 @@ import GearTable, { ROW_HEIGHT } from './GearTable'
 import { useWishlist } from '../wishlist/useWishlist'
 import { wishFromGear } from '../wishlist/wishSearch'
 import { useGearPrefs, type GearPrefs } from './useGearPrefs'
+import { useTierScoring } from './useBisData'
 import { sanitizeGearForm, sanitizeGearSort, type GearFormMemory } from './areaMemory'
 import { useRemembered, useRememberedSearch } from './useAreaMemory'
 import {
@@ -267,8 +268,8 @@ function useTableRows(
   // The worn haste rides in `deps` beside the two injected verdicts - the same seam, for the same
   // reason: it comes off the dump. The knobs are in the key only for a column that READS them
   // (`readsDerivedOpts`): an AC sort is the same order whatever the dump says about haste.
-  const derived = derivedOpts(filters, deps.ownedHaste)
-  const knobs = readsDerivedOpts(inForce.key) ? [derived.ignoreHaste, derived.ownedHaste, derived.classes?.join(' ')] : []
+  const derived = derivedOpts(filters, deps.ownedHaste, deps.tier)
+  const knobs = readsDerivedOpts(inForce.key) ? [derived.ignoreHaste, derived.ownedHaste, derived.classes?.join(' '), derived.tier] : []
   const sorted = kept(SORTED, [filtered, inForce.key, inForce.dir, ...knobs], () => sortGearRows(filtered, inForce, derived))
   // WHY THE LIST IS EMPTY, when it is (the JOS-67 law: a filter that can hide everything must be
   // able to admit it). THREE filters can do it without the user having chosen them in the moment:
@@ -627,7 +628,9 @@ export default function GearView({ onOpenLoot, onOpenMob, onOpenMapZone }: GearV
   const era = useEraHidden()
   const owned = useOwnedOrLooted(ownership.map)
   const ownedHaste = useOwnedHaste(ownership.payload.entries, compare.byKey)
-  const deps = useMemo(() => ({ ...era, ...owned, ownedHaste }), [era, owned, ownedHaste])
+  // BEST reads the Best in slot tab's board (useBisData.ts), the same answer that tab ranks by.
+  const tier = useTierScoring(rows, classes.classes)
+  const deps = useMemo(() => ({ ...era, ...owned, ownedHaste, tier }), [era, owned, ownedHaste, tier])
   const table = useTableRows(rows, state, filters, { sort, deps, chosen: prefs.columns, showDrops: prefs.dropCols })
   const win = useWindowedRows({ count: table.rows.length, rowHeight: ROW_HEIGHT, scrollRef })
   const hint = useOwnedHint(ownership)
@@ -705,7 +708,7 @@ export default function GearView({ onOpenLoot, onOpenMob, onOpenMapZone }: GearV
           // The derived-score knobs (2026-08-15): the drawn EFF DMG / BEST cells read the same
           // options the sort just ranked by — the haste opt-out, the worn haste AND the class
           // picks, so a casting stat nobody picked can use scores nothing (the 1000-INT-warrior case).
-          derived={derivedOpts(filters, deps.ownedHaste)}
+          derived={derivedOpts(filters, deps.ownedHaste, deps.tier)}
           showDrops={prefs.dropCols}
           // JOS-338 — hovering a row opens the comparison card. Passed always: the card is useful
           // with no dump at all (the item half plus the command that fills the other half), and

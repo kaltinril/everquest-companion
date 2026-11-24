@@ -52,6 +52,8 @@ export type View =
   // VOID MOTES (owner, 2026-11-19): where a Void-Touched Potential is best spent on what you wear.
   // A gear-area tab of its own, not a panel over the Gear tab's catalog.
   | 'voidMotes'
+  // BEST IN SLOT (Malkil and the owner, 2026-11-24): the player's own S-to-F tier board and the sheet it picks.
+  | 'bis'
   | 'buffs'
   | 'timers'
   // FACTION STANDINGS (the third graduated `/outputfile` kind, 2026-09-05) — the tab that draws
@@ -134,6 +136,7 @@ export const VIEW_LABELS: Record<View, string> = {
   // deep-links into Loot, so will that drill's Back button.
   wishlist: 'Wish list',
   voidMotes: 'Void motes',
+  bis: 'Best in slot',
   buffs: 'Buffs',
   timers: 'Timers',
   factions: 'Factions',
@@ -180,6 +183,7 @@ const KNOWN_VIEWS: View[] = [
   'plan',
   'wishlist',
   'voidMotes',
+  'bis',
   'buffs',
   'timers',
   'factions',
@@ -248,7 +252,9 @@ export const GEAR_AREA_VIEWS: readonly View[] = (
   // the right-pushed placement hid the tab well enough that the owner reported it missing).
   // Void motes sits right of Exaltations (owner, 2026-11-19): both are boards about raising what
   // you already wear, and Character stays the sheet itself.
-  ['gear', 'plan', 'planner', 'voidMotes', 'character', 'wishlist'] as const
+  // Best in slot sits between Gear and Recommended (plans/2026-11-24-bis-sheet.md): the catalog, the
+  // best of it on your own tiers, then the route.
+  ['gear', 'bis', 'plan', 'planner', 'voidMotes', 'character', 'wishlist'] as const
 ).filter((v) => (KNOWN_VIEWS as readonly View[]).includes(v))
 
 /** Is this view drawn inside the gear area? (⇒ the nav row reads selected, the tab bar is up.) */

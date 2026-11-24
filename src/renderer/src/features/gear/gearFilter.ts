@@ -53,6 +53,7 @@ import {
   scaleGearRow,
   type GearDerivedOpts
 } from '../../../../shared/planner/gearScale'
+import { tierScore } from '../../../../shared/planner/tierWeights'
 import { WEAPON_PICKS, weaponPicksMatch, type WeaponPick } from '../../../../shared/planner/weaponType'
 import { isShieldLike } from '../../../../shared/planner/shield'
 import { benefitsClasses } from '../../../../shared/planner/usability'
@@ -228,6 +229,8 @@ export interface GearFilterDeps {
    * worn, the first haste item a real upgrade.
    */
   ownedHaste?: number
+  /** the Best in slot board BEST reads (`useTierScoring`); absent = the old balanced score */
+  tier?: GearDerivedOpts['tier']
 }
 
 // ---- the search text, parsed (the 2026-08-15 numeric-filter return — see the header) --------
@@ -332,6 +335,7 @@ function meetsThreshold(row: GearRow, t: StatThreshold, opts: GearDerivedOpts): 
 let lastOptsHaste: boolean | null = null
 let lastOptsOwned: number | null = null
 let lastOptsClasses: readonly ClassAbbr[] | null = null
+let lastOptsTier: GearDerivedOpts['tier'] | null = null
 let lastOpts: GearDerivedOpts = {}
 
 /**
@@ -340,19 +344,32 @@ let lastOpts: GearDerivedOpts = {}
  * and — since 2026-08-25 — the haste this character already WEARS (`ownedHaste`, 0 when nothing
  * equipped states one), which the scores credit an item's haste only above. The view reads it off
  * the ownership join (`gearOwnership.equippedHaste`); the pure callers pass nothing and get the
- * class-blind, nothing-worn reading.
+ * class-blind, nothing-worn reading. Since 2026-11-24 also the Best in slot board BEST reads (`tier`).
  */
-export function derivedOpts(filters: Pick<GearFilters, 'ignoreHaste' | 'classes'>, ownedHaste = 0): GearDerivedOpts {
-  if (filters.ignoreHaste !== lastOptsHaste || filters.classes !== lastOptsClasses || ownedHaste !== lastOptsOwned) {
+export function derivedOpts(filters: Pick<GearFilters, 'ignoreHaste' | 'classes'>, ownedHaste = 0, tier?: GearDerivedOpts['tier']): GearDerivedOpts {
+  if (filters.ignoreHaste !== lastOptsHaste || filters.classes !== lastOptsClasses || ownedHaste !== lastOptsOwned || tier !== lastOptsTier) {
     lastOptsHaste = filters.ignoreHaste
     lastOptsOwned = ownedHaste
     lastOptsClasses = filters.classes
+    lastOptsTier = tier
     lastOpts = {}
     if (filters.ignoreHaste) lastOpts.ignoreHaste = true
     if (ownedHaste > 0) lastOpts.ownedHaste = ownedHaste
     if (filters.classes.length > 0) lastOpts.classes = filters.classes
+    if (tier !== undefined) lastOpts.tier = tier
   }
   return lastOpts
+}
+
+/**
+ * BEST: the player's tier board when one is handed in (slot-free, so a weapon's ratio counts; haste
+ * by the worn-haste rule, and the Ignore haste chip drops it), else the old balanced score.
+ */
+function bestValue(row: GearRow, opts: GearDerivedOpts): number | undefined {
+  if (opts.tier === undefined) return gearBisValue(row.stats, opts)
+  const ownedHaste = opts.ignoreHaste === true ? Number.POSITIVE_INFINITY : opts.ownedHaste
+  const v = tierScore(row, { model: opts.tier.model, setup: opts.tier.setup, classes: opts.classes, ownedHaste })
+  return v === 0 ? undefined : v
 }
 
 // ---- the predicates ------------------------------------------------------------------------
@@ -439,7 +456,7 @@ export function effectMatches(row: GearRow, effect: EffectFilter, classes: reado
 function matchesIdentity(row: GearRow, filters: GearFilters, deps: GearFilterDeps): boolean {
   const query = queryOf(filters.text)
   if (!query.needles.every((n) => row.searchKey.includes(n))) return false
-  const opts = derivedOpts(filters, deps.ownedHaste)
+  const opts = derivedOpts(filters, deps.ownedHaste, deps.tier)
   if (!query.thresholds.every((t) => meetsThreshold(row, t, opts))) return false
   if (!slotMatches(row, filters.slots)) return false
   if (!matchesHeldKind(row, filters.weaponTypes)) return false
@@ -530,7 +547,7 @@ export function sortValue(row: GearRow, key: GearSortKey, opts: GearDerivedOpts 
   if (key === 'RATIO') return gearRatio(row.stats)
   if (key === 'EFF_HP') return gearEffectiveHp(row.stats)
   if (key === 'EFF_DMG') return gearEffectiveDamage(row.stats, opts)
-  if (key === 'BIS') return gearBisValue(row.stats, opts)
+  if (key === 'BIS') return bestValue(row, opts)
   if (key === 'SKILL_MOD') return skillModPercent(row.skillMods)
   return row.stats[key]
 }
@@ -644,6 +661,6 @@ export function gearTableRows<T extends GearRow>(
   return sortGearRows(
     filterGearRows(scaled, opts.filters, opts.deps),
     opts.sort ?? DEFAULT_GEAR_SORT,
-    derivedOpts(opts.filters, opts.deps?.ownedHaste)
+    derivedOpts(opts.filters, opts.deps?.ownedHaste, opts.deps?.tier)
   )
 }
