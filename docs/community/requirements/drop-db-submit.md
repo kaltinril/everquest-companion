@@ -7,7 +7,7 @@ Nothing here is removed or narrowed without the owner's word (RULES.md, rule 19)
 
 | Date | Asked by | The ask | Status |
 | --- | --- | --- | --- |
-| 2026-11-23 | owner, after Maergoth (wiki admin) on Discord | Hook the app up to the wiki's drop database, as the wiki's own tool (Eye of Zomm) does: convert the app's recorded loot to schema 1 and submit it through the API, so wiki loot lists get their percentages automatically and hand-written `[Overall: ~N%]` notes are no longer needed. Maergoth: "massage yours into something the wiki knows what to do with and submit it via some api calls". The wiki counts % per drop, not per kill. | slice 1 building on `drop-db-submit` |
+| 2026-11-23 | owner, after Maergoth (wiki admin) on Discord | Hook the app up to the wiki's drop database, as the wiki's own tool (Eye of Zomm) does: convert the app's recorded loot to schema 1 and submit it through the API, so wiki loot lists get their percentages automatically and hand-written `[Overall: ~N%]` notes are no longer needed. Maergoth: "massage yours into something the wiki knows what to do with and submit it via some api calls". The wiki counts % per drop, not per kill. | built 2026-11-24 (slice 1): `src/main/dropObs/` (events, client, drain, state, service), Preferences → Game card `DropObsSetting.tsx`; off by default; zone sent without its instance tier (`zoneBaseName`). Not yet tried against the live wiki. Copy wiki page stops writing `[Overall: ~N%]` the same day (gaps-tab.md) |
 
 ## Defaults taken (owner may overrule)
 
