@@ -38,6 +38,11 @@ disagree, RULES.md wins; fix this file.
   there instead of scanning drives (a drive-wide `find` times out).
 - **No prettier.** The repo has no prettier config; `npx prettier --write` reflows whole files to
   defaults. Never run it.
+- **`cargo fmt -p <crate>` rewrites dozens of unrelated files** (the trunk is not fmt-clean,
+  2026-11-23: about 60 in fold, 3 in engined). Run `rustfmt --edition 2021 <files you touched>`
+  instead, and tell helpers so.
+- **A worktree's `rm -rf node_modules/.cache/eslint` goes through the junction** and clears the main
+  clone's lint cache. Harmless (a cache), but the next lint there runs cold.
 
 ## The user's machine
 

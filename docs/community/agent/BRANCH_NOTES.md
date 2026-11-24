@@ -2732,6 +2732,7 @@ what a later change must know. Each fix has a unit test that failed before it.
 - `MoteAdvice.opens` is omitted for a Proc socket off a weapon hand (the game does open one there;
   the app just does not point at it). If the owner would rather keep the fact visible, word it in
   the panel instead of restoring `opens`.
+- 2026-11-23: `SUPPLY.lockoutRerunsPerWeek` (6) and `lockoutRerunDrops` (1) apply to `RERUN_BOSSES` only (Lord Nagafen, Lady Vox, Cazic-Thule, Innoruuk, Master Yael). `RERUN_FAVOURS` gives Slime Blood 8/9 on Fear miniboss later kills (9 kills, Oct 15-29). `distinctMobs` folds dropper names by `mobKey`. `MotePlanStep.why` is the only input to the reasoning lines. `onHand` lives in `eq.gear.motes`.
 
 ### Maps and the pins overlay
 
@@ -2825,6 +2826,7 @@ what a later change must know. Each fix has a unit test that failed before it.
   next ask. A new once-per-window consumer that is not behind heldPull would need the same re-check.
 - Still one load at a time (two would race for spell-resist-cache.json): the re-check starts the new
   load only after the old one settles.
+- 2026-11-23: the client's spell files come from `resist/spellFiles.ts` (engine twin `engined/src/spell_files.rs`): `spells_us.txt`, else the first other `spells_<suffix>.txt`, with matching `_str`/`dbstr` falling back to `_us`. `SpellTableNotice` wraps the Spells views; channel `spells:tableReport`.
 
 ### Settings stores and the session
 
@@ -2938,6 +2940,7 @@ what a later change must know. Each fix has a unit test that failed before it.
   `useSyncExternalStore`, so `useItemMarks` itself cannot be mounted there.
 - The marks store is module-global and remembers every name for the run: each test uses item names
   no other test in the file touches.
+- 2026-11-23: Group by item is per character: `eq.loot.groupByItem.byCharacter` (shared/characterFlags.ts). Wiki Gaps grouping stays app-wide.
 
 ### Log archive
 
@@ -2994,6 +2997,8 @@ what a later change must know. Each fix has a unit test that failed before it.
   its first engine read (its own read, then the start check). A stub meant to switch character
   during the reads must answer the first character for two asks, or the start check refuses and the
   post-read check (capture.ts, after historyIfStill) is never exercised.
+- 2026-11-23: an archive that cannot be finished is undone at launch: the moved log is joined back in front of the live one (journal step `returning`), never archived half-joined; a sealed archive is never undone; a leftover `.moving` file refuses a new archive.
+- 2026-11-23: Put back and the recovery share `joinLive.ts`: a hard link, else a copy created exclusively at the log's name (`COPYFILE_EXCL`). Nothing writes onto the log's name with an operation that can replace a file. A file id of 0 is never trusted as the same file.
 
 ### Engine: combat crediting
 
@@ -3033,6 +3038,9 @@ what a later change must know. Each fix has a unit test that failed before it.
 - Housekeeping from this run: I used `git stash` once in the worktree to see a test fail without its
   fix and popped it at once. The stash list is shared with the main clone; the owner's two entries
   are intact.
+- 2026-11-23: an own mez still on a mob (`Encounter::mez_on`, name key to bound) vetoes the idle fallback and the death-close until its wear-off line, its death or `MEZ_HOLD_MAX_MS` (180 s); roots do not count.
+- 2026-11-23: the record-everything defender test is `friendly_person`, NOT `ally_friendly`: the ally caster set holds every player-shaped caster, and a proper-named mob casts (`Undertow begins casting`), so every unlearned group-mate hit on it was dropped. `ally_friendly` stays on the charm-break proof only.
+- 2026-11-23: a mob's swing at you (hit or miss), at a member, your pet or a member's bound pet engages it in the open fight (`state.rs engage_swing_at_ours`); it never opens a fight or moves a clock. Accepting an invite admits the inviter (roster `accepted`, `ACCEPT_JOIN_MS` 30 s). The 20 s presence rule stays: mob pets vanish with no death line.
 
 ### Alerts
 
@@ -3173,6 +3181,7 @@ what a later change must know. Each fix has a unit test that failed before it.
 - Not examined: whether the ATTACHED character's own archive-merged quest-giver rows can carry stale
   `questGaps` (`mergeGaps.ts mergeRow` spreads the older row's field); main's re-check runs only on
   other characters.
+- 2026-11-23: `mergeGaps(..., join)`: `oneCharacter` (archives) adds `turnedInTo` per NPC; `acrossCharacters` never sums. Open: in All characters a row the attached character never turned in shows another character's count.
 
 ### Bazaar
 
@@ -3209,6 +3218,7 @@ what a later change must know. Each fix has a unit test that failed before it.
 - Measure: a corpus for `BAZAAR_CORPUS` can be made by filtering trade-word lines from the live log
   plus `Logs/companion-archive/*.log.gz` (the live log alone has too little chat); 2026-11-19
   numbers: trade 1972, offers 2326, priced 1376, counted 1309.
+- 2026-11-23: `own_after_lead` (bazaar_parse.rs, 436 of 440 lines): an item given a price before it ("3k each:") and a different one right after its name is listed with no price and adds nothing to history.
 
 ### Buffs
 
