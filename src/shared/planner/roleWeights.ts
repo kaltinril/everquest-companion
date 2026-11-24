@@ -185,7 +185,7 @@ function statIsLive(key: GearStatKey, gate: LiveGate): boolean {
  * which attribute it lands on — the test pins that no row spells either key, because a row that
  * did would be a focus pretending to know what class is reading it.
  */
-export interface RoleWeights {
+interface RoleWeights {
   /** per-stat coefficients, applied to the STATED value (class-independent, see above) */
   stats: Partial<Record<GearStatKey, number>>
   /** coefficient on whichever of INT/WIS the picked classes cast from; 0 on a pure melee */
@@ -524,23 +524,6 @@ function focusWeights(role: GearRole, survivability: number | undefined): RoleWe
   if (!DPS_FOCUSES.has(role)) return base
   const t = Math.min(1, Math.max(0, survivability ?? SURVIVABILITY_DEFAULT))
   return t === 0.5 ? base : survivalWeights(base, role, t)
-}
-
-/**
- * READ-ONLY DOORS FOR THE BEST IN SLOT BOARD (`tierWeights.ts`, plans/2026-11-24-bis-sheet.md). The
- * board's default tier list IS this table read per typical item (owner, 2026-11-24: *"the default
- * teir list will be what our formula shows"*), so it reads the resolved focus and the class gate
- * from here rather than restating either. Nothing below changes what `roleValue` answers.
- */
-export function focusWeightsOf(role: GearRole, survivability?: number): Readonly<RoleWeights> {
-  return focusWeights(role, survivability)
-}
-
-/** The class gate for one stat key, INT and WIS answered by the mana stat; no class picked = live. */
-export function statLiveForClasses(key: GearStatKey, classes: readonly ClassAbbr[]): boolean {
-  const gate = liveGate(classes)
-  if (key === 'INT' || key === 'WIS') return gate.manaStats.has(key)
-  return statIsLive(key, gate)
 }
 
 /** The two inputs the class layer and the haste rule need beside the item and the focus. */
