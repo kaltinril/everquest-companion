@@ -66,21 +66,29 @@ export interface ProgressView {
 
 const joined = (parts: (string | null)[]): string | null => parts.filter((p): p is string => p !== null).join(' · ') || null
 
-/** Switched off: what turning it on would send. */
+const readyLine = (left: number): string => `${plural(left, 'loot report', 'loot reports')} from your log ${left === 1 ? 'is' : 'are'} ready to send.`
+
+/** Off: what choosing a way to send would send. */
 function offView(left: number, sent: string | null): ProgressView {
   if (left === 0) return { tone: 'info', headline: 'No loot reports waiting.', detail: sent }
-  const headline = `${plural(left, 'loot report', 'loot reports')} from your log ${left === 1 ? 'is' : 'are'} ready to send.`
-  return { tone: 'info', headline, detail: sent ?? 'Turn the switch on to send them, newest first.' }
+  return { tone: 'info', headline: readyLine(left), detail: sent ?? 'Choose how to send them above.' }
 }
 
-/** Switched on: a retry waiting, sending, or caught up. */
+/** Manual, between runs: what Send now would send. */
+function waitingView(left: number, sent: string | null, last: string | null): ProgressView {
+  if (left === 0) return { tone: 'done', headline: 'All sent. New loot waits here until you press Send now.', detail: joined([sent, last]) }
+  return { tone: 'info', headline: readyLine(left), detail: joined([sent, last]) ?? 'Press Send now to send them, newest first.' }
+}
+
+/** Sending (in the background, or a Send run): a retry waiting, sending, or caught up. */
 function onView(st: DropObsStatus, left: number, sent: string | null, last: string | null): ProgressView {
   if (st.nextAttemptAt > 0 && st.lastError !== null) {
     const at = new Date(st.nextAttemptAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
     return { tone: 'warn', headline: `${errorWords(st.lastError)}. Trying again at ${at}.`, detail: joined([`${fmtCount(left)} left`, sent]) }
   }
   if (left > 0) return { tone: 'busy', headline: `Sending… ${fmtCount(left)} left, ${timeLeft(left)} to go.`, detail: joined([sent, last]) }
-  return { tone: 'done', headline: 'All caught up. New loot is sent within a minute or so.', detail: joined([sent, last]) }
+  const headline = st.mode === 'manual' ? 'All sent. New loot waits here until you press Send now.' : 'All caught up. New loot is sent within a minute or so.'
+  return { tone: 'done', headline, detail: joined([sent, last]) }
 }
 
 /** What the status box says. `now` is passed in so the tests can pin it. */
@@ -90,5 +98,7 @@ export function progressView(st: DropObsStatus, now: number): ProgressView {
   const last = st.lastSuccessAt > 0 ? `last sent ${ago(st.lastSuccessAt, now)}` : null
   if (st.stopped !== null) return { tone: 'warn', headline: `Sending stopped. ${st.stopped}`, detail: sent }
   if (left === null) return { tone: 'info', headline: 'Waiting for your log to load.', detail: sent }
-  return st.enabled ? onView(st, left, sent, last) : offView(left, sent)
+  if (st.mode === 'off') return offView(left, sent)
+  if (st.mode === 'manual' && !st.sendingNow) return waitingView(left, sent, last)
+  return onView(st, left, sent, last)
 }

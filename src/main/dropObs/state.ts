@@ -39,6 +39,9 @@ export interface ObsState {
   stopped: { code: string; message: string } | null
   /** The wiki account the saved Bot password last signed in as; '' until a sign-in has worked. */
   signedInAs: string
+  /** With `enabled`: send only when the player presses Send, never by itself. Files from before
+   *  this existed read false, so a switch that was on stays the background trickle it was. */
+  manual: boolean
 }
 
 export function defaultState(): ObsState {
@@ -55,7 +58,8 @@ export function defaultState(): ObsState {
     lastError: null,
     lastSuccessAt: 0,
     stopped: null,
-    signedInAs: ''
+    signedInAs: '',
+    manual: false
   }
 }
 
@@ -82,7 +86,8 @@ export function asState(raw: unknown): ObsState {
     lastError: typeof raw.lastError === 'string' ? raw.lastError : null,
     lastSuccessAt: num(raw.lastSuccessAt, 0),
     stopped,
-    signedInAs: s(raw.signedInAs)
+    signedInAs: s(raw.signedInAs),
+    manual: raw.manual === true
   }
 }
 

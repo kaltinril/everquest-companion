@@ -11,7 +11,8 @@ const NOW = Date.UTC(2026, 10, 24, 15, 0, 0)
 
 function st(over: Partial<DropObsStatus> = {}): DropObsStatus {
   return {
-    enabled: false,
+    mode: 'off',
+    sendingNow: false,
     username: 'Kal@Companion',
     hasPassword: true,
     encryptionAvailable: true,
@@ -36,36 +37,36 @@ test('setup stage: nothing saved, saved but never signed in, signed in', () => {
   assert.equal(setupStage(st()), 'signed-in')
 })
 
-test('switched off: the count that turning it on would send, never a wiki code', () => {
-  assert.deepEqual(progressView(st({ ready: 1234 }), NOW), { tone: 'info', headline: '1,234 loot reports from your log are ready to send.', detail: 'Turn the switch on to send them, newest first.' })
+test('off: the count that turning it on would send, never a wiki code', () => {
+  assert.deepEqual(progressView(st({ ready: 1234 }), NOW), { tone: 'info', headline: '1,234 loot reports from your log are ready to send.', detail: 'Choose how to send them above.' })
   assert.equal(progressView(st({ ready: 1 }), NOW).headline, '1 loot report from your log is ready to send.')
   assert.equal(progressView(st({ ready: 0 }), NOW).headline, 'No loot reports waiting.')
   assert.equal(progressView(st({ ready: null }), NOW).headline, 'Waiting for your log to load.')
 })
 
 test('sending: what is left (the batch in flight counted) and roughly how long', () => {
-  const v = progressView(st({ enabled: true, ready: 900, inFlight: 100, delivered: 340, lastSuccessAt: NOW - 5 * 60_000 }), NOW)
+  const v = progressView(st({ mode: 'background', ready: 900, inFlight: 100, delivered: 340, lastSuccessAt: NOW - 5 * 60_000 }), NOW)
   assert.equal(v.tone, 'busy')
   assert.equal(v.headline, 'Sending… 1,000 left, about 5 minutes to go.')
   assert.equal(v.detail, '340 reports sent so far · last sent 5 minutes ago')
 })
 
 test('caught up: done, with what went and when', () => {
-  const v = progressView(st({ enabled: true, ready: 0, delivered: 1, lastSuccessAt: NOW - 10_000 }), NOW)
+  const v = progressView(st({ mode: 'background', ready: 0, delivered: 1, lastSuccessAt: NOW - 10_000 }), NOW)
   assert.equal(v.tone, 'done')
   assert.match(v.headline, /^All caught up/)
   assert.equal(v.detail, '1 report sent so far · last sent just now')
 })
 
 test('a retry waiting says why in words and when it tries again', () => {
-  const v = progressView(st({ enabled: true, ready: 50, lastError: 'eoz-rate-limit', nextAttemptAt: NOW + 120_000 }), NOW)
+  const v = progressView(st({ mode: 'background', ready: 50, lastError: 'eoz-rate-limit', nextAttemptAt: NOW + 120_000 }), NOW)
   assert.equal(v.tone, 'warn')
   assert.match(v.headline, /^The wiki asked the app to slow down\. Trying again at /)
   assert.equal(v.detail, '50 left')
 })
 
 test('a stop leads with the reason main gave, ahead of everything else', () => {
-  const v = progressView(st({ enabled: true, ready: 50, stopped: 'The wiki signed this session out. Press Sign in again.' }), NOW)
+  const v = progressView(st({ mode: 'background', ready: 50, stopped: 'The wiki signed this session out. Press Sign in again.' }), NOW)
   assert.equal(v.tone, 'warn')
   assert.equal(v.headline, 'Sending stopped. The wiki signed this session out. Press Sign in again.')
 })
@@ -92,4 +93,17 @@ test('ago: seconds read as just now, then minutes, hours, days', () => {
   assert.equal(ago(NOW - 60_000, NOW), '1 minute ago')
   assert.equal(ago(NOW - 3 * 3600_000, NOW), '3 hours ago')
   assert.equal(ago(NOW - 72 * 3600_000, NOW), '3 days ago')
+})
+
+test('only when I press Send: between runs it says what Send now would send, and never claims to be sending', () => {
+  const idle = progressView(st({ mode: 'manual', ready: 40, delivered: 0 }), NOW)
+  assert.deepEqual(idle, { tone: 'info', headline: '40 loot reports from your log are ready to send.', detail: 'Press Send now to send them, newest first.' })
+  const done = progressView(st({ mode: 'manual', ready: 0, delivered: 12, lastSuccessAt: NOW - 120_000 }), NOW)
+  assert.equal(done.headline, 'All sent. New loot waits here until you press Send now.')
+  assert.equal(done.detail, '12 reports sent so far · last sent 2 minutes ago')
+})
+
+test('only when I press Send: a run in progress reads like sending, and ends on the manual wording', () => {
+  assert.equal(progressView(st({ mode: 'manual', sendingNow: true, ready: 150 }), NOW).headline, 'Sending… 150 left, about a minute to go.')
+  assert.equal(progressView(st({ mode: 'manual', sendingNow: true, ready: 0 }), NOW).headline, 'All sent. New loot waits here until you press Send now.')
 })

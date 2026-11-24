@@ -6,14 +6,17 @@
 
 import { ipcMain } from 'electron'
 import { IPC } from '../../shared/ipc'
-import { dropObsStatus, forgetDropObsAccount, saveDropObsAccount, setDropObsEnabled, startDropObsDrain, testDropObs } from '../dropObs/service'
+import { DROP_OBS_MODES, type DropObsMode } from '../../shared/dropObs'
+import { dropObsStatus, forgetDropObsAccount, saveDropObsAccount, sendDropObsNow, setDropObsMode, startDropObsDrain, testDropObs } from '../dropObs/service'
 
 export function registerDropObsIpc(): void {
   ipcMain.handle(IPC.dropObsStatus, () => dropObsStatus())
   ipcMain.handle(IPC.dropObsSaveAccount, (_e, username: unknown, password: unknown) =>
     saveDropObsAccount(typeof username === 'string' ? username.slice(0, 300) : '', typeof password === 'string' ? password.slice(0, 300) : '')
   )
-  ipcMain.handle(IPC.dropObsSetEnabled, (_e, enabled: unknown) => setDropObsEnabled(enabled === true))
+  // Anything but a known mode is Off: a garbled argument never starts sending.
+  ipcMain.handle(IPC.dropObsSetMode, (_e, mode: unknown) => setDropObsMode(DROP_OBS_MODES.includes(mode as DropObsMode) ? (mode as DropObsMode) : 'off'))
+  ipcMain.handle(IPC.dropObsSendNow, () => sendDropObsNow())
   ipcMain.handle(IPC.dropObsTest, () => testDropObs())
   ipcMain.handle(IPC.dropObsForget, () => forgetDropObsAccount())
   startDropObsDrain()

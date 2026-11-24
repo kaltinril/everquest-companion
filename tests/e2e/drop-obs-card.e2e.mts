@@ -3,13 +3,14 @@
  * 2026-11-24 row) — read on screen in the real app, with the network fenced off.
  *
  * `tests/dropObsView.test.mts` pins the words; this spec pins what a unit test cannot see: that the
- * card in Preferences → Game walks a new player through the two setup steps with the switch held
- * off, and that once a sign-in has worked the steps fold into one "Signed in as" line, the switch is
- * live, and the reports the wiki refused can be opened as a list.
+ * card in Preferences → Game walks a new player through the two setup steps with sending held off,
+ * and that once a sign-in has worked the steps fold into one "Signed in as" line, the three ways to
+ * send are offered (Off, in the background, only when I press Send), and the reports the wiki
+ * refused can be opened as a list.
  *
  * NOTHING HERE REACHES THE WIKI. The second launch is seeded with a state file whose sign-in has
- * "worked" and whose password is not a real ciphertext; the switch stays off, so the drain never
- * runs; and every launch goes through a dead proxy (WORKFLOW.md, scratch probes), so even a stray
+ * "worked" and whose password is not a real ciphertext; it is in "Only when I press Send" and Send
+ * now is never pressed, so the drain never runs; and every launch goes through a dead proxy (WORKFLOW.md, scratch probes), so even a stray
  * request would go nowhere. Save and sign in is never pressed: it would sign in to eqlwiki.
  *
  * Run: `npm run test:e2e -- drop-obs-card`
@@ -26,7 +27,9 @@ const DEAD_PROXY = { NODE_USE_ENV_PROXY: '1', HTTPS_PROXY: 'http://127.0.0.1:9',
 interface CardText {
   all: string
   status: string
-  switchDisabled: boolean
+  /** The two ways to send are held off until a sign-in is saved. */
+  sendModesDisabled: boolean
+  sendNow: string | null
   signedIn: string
   hasSteps: boolean
 }
@@ -44,17 +47,21 @@ function readCard(page: Page): Promise<CardText> {
   return page.evaluate(() => ({
     all: document.querySelector('[data-testid="pref-drop-obs"]')?.textContent ?? '',
     status: document.querySelector('[data-testid="drop-obs-status"]')?.textContent ?? '',
-    switchDisabled: (document.querySelector('[data-testid="drop-obs-switch"] input, input[data-testid="drop-obs-switch"]') as HTMLInputElement | null)?.disabled ?? true,
+    sendModesDisabled:
+      (document.querySelector('input[data-testid="drop-obs-mode-background"]') as HTMLInputElement | null)?.disabled !== false &&
+      (document.querySelector('input[data-testid="drop-obs-mode-manual"]') as HTMLInputElement | null)?.disabled !== false,
+    sendNow: document.querySelector('[data-testid="drop-obs-send-now"]')?.textContent ?? null,
     signedIn: document.querySelector('[data-testid="drop-obs-signed-in"]')?.textContent ?? '',
     hasSteps: document.querySelector('[data-testid="drop-obs-user"]') !== null
   }))
 }
 
-/** A state file whose sign-in has worked, switched off, with two refused reports. */
+/** A state file whose sign-in has worked, in manual mode, with two refused reports. */
 function seededState(): string {
   return JSON.stringify({
     version: 1,
-    enabled: false,
+    enabled: true,
+    manual: true,
     username: 'Tester@Companion',
     passwordEnc: 'bm90LWEtcmVhbC1jaXBoZXJ0ZXh0',
     delivered: ['eqc-1', 'eqc-2', 'eqc-3'],
@@ -80,7 +87,9 @@ async function freshPlayer(): Promise<void> {
     const c = await readCard(page)
     check('a new player sees the two numbered setup steps', c.hasSteps && c.all.includes('Make a Bot password on the wiki') && c.all.includes('Paste it here'), c.all.slice(0, 300))
     check('…told which grant to tick, by the name the wiki shows', c.all.includes('Submit attributed gameplay observations'))
-    check('…and the switch is held off until a sign-in is saved', c.switchDisabled && c.all.includes('Sign in above first.'))
+    check('…the three ways to send are offered, Off chosen', c.all.includes('Send in the background') && c.all.includes('Only when I press Send'))
+    check('…and both ways to send are held off until a sign-in is saved', c.sendModesDisabled && c.all.includes('Sign in above first.'))
+    check('…with no Send now button outside manual mode', c.sendNow === null)
     check('…while the status box already says what would be sent, in words', /ready to send|No loot reports waiting|Waiting for your log/.test(c.status), c.status)
     check('no wiki code on the card', !/eoz-|eqc-/.test(c.all), c.all)
   } finally {
@@ -97,7 +106,8 @@ async function signedInPlayer(): Promise<void> {
     await openCard(page)
     const c = await readCard(page)
     check('once signed in, the steps fold into one line', !c.hasSteps && c.signedIn.includes('Signed in as Tester'), c.signedIn)
-    check('…the switch is live', !c.switchDisabled)
+    check('…the ways to send are live', !c.sendModesDisabled)
+    check('…and manual mode shows its Send now button, sized to what is waiting', c.sendNow !== null && /^(Send [\d,]+ now|Nothing to send)$/.test(c.sendNow), String(c.sendNow))
     check('…and what went is counted', c.status.includes('3 reports sent so far'), c.status)
     await page.click('[data-testid="drop-obs-kept-toggle"]')
     await page.waitForTimeout(1500)

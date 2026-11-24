@@ -1,9 +1,16 @@
 // shared/dropObs.ts — what the Settings card "Send loot to the wiki's drop database" is told
 // (main/dropObs/service.ts answers; docs/community/requirements/drop-db-submit.md).
 
+/** How loot goes to the wiki: never, by itself as the player plays, or only when they press Send. */
+export type DropObsMode = 'off' | 'background' | 'manual'
+
+export const DROP_OBS_MODES: readonly DropObsMode[] = ['off', 'background', 'manual']
+
 export interface DropObsStatus {
-  /** The switch. Nothing is sent while it is off. */
-  enabled: boolean
+  /** The player's choice. Nothing is sent while it is off. */
+  mode: DropObsMode
+  /** A Send press is still working through what was waiting (manual mode only). */
+  sendingNow: boolean
   /** The Bot password's user name (`Name@Label`), '' when none is saved. */
   username: string
   hasPassword: boolean

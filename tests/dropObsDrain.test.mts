@@ -246,7 +246,7 @@ test('THE STATE FILE round-trips, leaves no temp file, and a torn or foreign fil
   try {
     const file = join(dir, 'wiki-observations.json')
     assert.deepEqual(loadState(file), defaultState(), 'no file: the default')
-    const s: ObsState = { ...defaultState(), enabled: true, username: 'A@b', signedInAs: 'A', delivered: ['eqc-1234567890'], inFlight: { schemaVersion: 1, batchId: 'eqcb-1234567890', clientVersion: 'v', events: [] } }
+    const s: ObsState = { ...defaultState(), enabled: true, username: 'A@b', signedInAs: 'A', manual: true, delivered: ['eqc-1234567890'], inFlight: { schemaVersion: 1, batchId: 'eqcb-1234567890', clientVersion: 'v', events: [] } }
     saveState(file, s)
     assert.deepEqual(loadState(file), s)
     assert.deepEqual(readdirSync(dir), ['wiki-observations.json'])
@@ -258,6 +258,7 @@ test('THE STATE FILE round-trips, leaves no temp file, and a torn or foreign fil
     writeFileSync(file, '{"version":1,"enabled":true,"username":"A@b"}')
     assert.equal(loadState(file).signedInAs, '')
     assert.equal(loadState(file).enabled, true)
+    assert.equal(loadState(file).manual, false, 'a switch that was on stays the background trickle it was')
   } finally {
     rmSync(dir, { recursive: true, force: true })
   }

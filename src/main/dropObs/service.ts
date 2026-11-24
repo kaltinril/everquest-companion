@@ -1,10 +1,14 @@
 // dropObs/service.ts — the drop-database submission, wired to Electron: the saved state in userData,
-// the password through safeStorage, the loot the engine serves, and a background drain that runs
-// only while the player's switch is on (docs/community/requirements/drop-db-submit.md).
+// the password through safeStorage, the loot the engine serves, and a drain that runs only as the
+// player chose (docs/community/requirements/drop-db-submit.md).
 //
 // OFF BY DEFAULT. Nothing here touches the network until the player saves a Bot password and either
-// presses Save and sign in or turns the switch on. The drain wakes every 30 s and does nothing while the
-// switch is off, sending is stopped, or a backoff is waiting (drain.ts).
+// presses Save and sign in or picks a way to send. Three modes (shared/dropObs.ts): Off; Send in the
+// background, where the drain sends whatever is ready as the player plays; and Only when I press
+// Send, where the drain sends only during a run the player started with Send now, and that run ends
+// when nothing is left (or sending stops). A run lives in memory: closing the app ends it, and a
+// batch it left in flight goes again at the next press. The drain wakes every 30 s and does nothing
+// while it is off, between runs in manual mode, stopped, or waiting out a backoff (drain.ts).
 //
 // WHERE THE LOOT COMES FROM: `serveModuleSnapshot('loot')`, the same full read every loot window
 // gets (the live log's rows, plus archived history when Keep log history is on). The character and
@@ -18,7 +22,7 @@ import { serveModuleSnapshot } from '../dataServer/serveShim'
 import { getActiveCharacter } from '../session'
 import { listCharacters } from '../log/config'
 import { LOOT_MODULE } from '../../shared/lootFrame'
-import { KEPT_SHOWN, type DropObsKeptItem, type DropObsReply, type DropObsStatus } from '../../shared/dropObs'
+import { KEPT_SHOWN, type DropObsKeptItem, type DropObsMode, type DropObsReply, type DropObsStatus } from '../../shared/dropObs'
 import { createObsClient, WikiRefusal, WikiUncertain } from './client'
 import { BATCH_SPACING_MS, drainOnce, newStatusCache, readyEvents, type DrainDeps, type DrainOutcome } from './drain'
 import { obsEvents, type ObsEvent, type LootRowIn } from './events'
@@ -33,6 +37,8 @@ let file: string | null = null
 let state: ObsState | null = null
 let timer: ReturnType<typeof setInterval> | null = null
 let running = false
+/** Manual mode: a Send press is working through what was waiting. */
+let pushing = false
 
 function st(): ObsState {
   if (state === null) {
@@ -132,15 +138,22 @@ function noteOutcome(s: ObsState, outcome: DrainOutcome, before: { delivered: nu
   logInfo(`[drop observations] batch booked: ${String(s.delivered.length - before.delivered)} delivered, ${String(Object.keys(s.kept).length - before.kept)} kept for review`)
 }
 
+/** Outcomes that end a manual run: nothing left, a stop only the player can clear, nothing to read. */
+const RUN_ENDS = new Set<DrainOutcome>(['idle', 'stopped', 'no-data', 'off'])
+
+const modeOf = (s: ObsState): DropObsMode => (!s.enabled ? 'off' : s.manual ? 'manual' : 'background')
+
 async function tick(): Promise<void> {
   const s = st()
-  if (running || !s.enabled || s.stopped !== null || Date.now() < s.nextAttemptAt) return
+  if (running || !s.enabled || (s.manual && !pushing) || s.stopped !== null || Date.now() < s.nextAttemptAt) return
   running = true
   try {
     const events = s.inFlight === null ? await currentEvents() : []
     const deps: DrainDeps = { state: s, save, client, events: () => events, credentials, clientVersion: clientVersion(), now: Date.now, cache }
     const before = { delivered: s.delivered.length, kept: Object.keys(s.kept).length }
-    noteOutcome(s, await drainOnce(deps), before)
+    const outcome = await drainOnce(deps)
+    noteOutcome(s, outcome, before)
+    if (RUN_ENDS.has(outcome)) pushing = false
   } finally {
     running = false
   }
@@ -157,7 +170,8 @@ export async function dropObsStatus(): Promise<DropObsStatus> {
   const s = st()
   const events = await currentEvents(EVENTS_TTL_MS)
   return {
-    enabled: s.enabled,
+    mode: modeOf(s),
+    sendingNow: s.enabled && s.manual && pushing,
     username: s.username,
     hasPassword: s.passwordEnc !== '',
     encryptionAvailable: await safeStorage.isAsyncEncryptionAvailable(),
@@ -215,18 +229,44 @@ export async function saveDropObsAccount(username: string, password: string): Pr
   return reply(true, 'Saved.')
 }
 
-/** The switch. Turning it on with a sign-in that has never worked signs in first, and stays off if
- *  that fails, so the player learns at once rather than from a stop thirty seconds later. */
-export async function setDropObsEnabled(enabled: boolean): Promise<DropObsReply> {
+/** A sign-in that has never worked, or one that stopped, is tried before anything is sent, so the
+ *  player learns at once rather than from a stop thirty seconds later. Null when it is fine. */
+async function signInFirst(s: ObsState): Promise<DropObsReply | null> {
+  if (s.signedInAs !== '' && s.stopped === null) return null
+  const test = await testDropObs()
+  return test.ok ? null : test
+}
+
+const MODE_SAID: Record<DropObsMode, string> = {
+  off: 'Off. Nothing is sent.',
+  background: 'Sending in the background. Your loot goes to the wiki as you play, newest first.',
+  manual: 'Nothing is sent until you press Send now.'
+}
+
+/** The player's choice. Background signs in first and stays as it was if that fails. */
+export async function setDropObsMode(mode: DropObsMode): Promise<DropObsReply> {
   const s = st()
-  if (enabled && (s.signedInAs === '' || s.stopped !== null)) {
-    const test = await testDropObs()
-    if (!test.ok) return test
+  if (mode === 'background') {
+    const failed = await signInFirst(s)
+    if (failed !== null) return failed
   }
-  s.enabled = enabled
+  s.enabled = mode !== 'off'
+  s.manual = mode === 'manual'
+  pushing = false
   save()
-  if (enabled) setTimeout(() => void tick(), 1000)
-  return reply(true, enabled ? 'On. Your loot is sent in the background, newest first.' : 'Off. Nothing is sent.')
+  if (mode === 'background') setTimeout(() => void tick(), 1000)
+  return reply(true, MODE_SAID[mode])
+}
+
+/** Manual mode's button: send everything waiting, one batch every 30 s, then stop. */
+export async function sendDropObsNow(): Promise<DropObsReply> {
+  const s = st()
+  if (!s.enabled || !s.manual) return reply(false, 'Choose "Only when I press Send" first.')
+  const failed = await signInFirst(s)
+  if (failed !== null) return failed
+  pushing = true
+  setTimeout(() => void tick(), 500)
+  return reply(true, 'Sending. It carries on while the app is open, then stops.')
 }
 
 /** Remove the saved sign-in and turn sending off. What the wiki already took stays booked, so
@@ -234,6 +274,8 @@ export async function setDropObsEnabled(enabled: boolean): Promise<DropObsReply>
 export async function forgetDropObsAccount(): Promise<DropObsReply> {
   const s = st()
   s.enabled = false
+  s.manual = false
+  pushing = false
   s.username = ''
   s.passwordEnc = ''
   s.signedInAs = ''

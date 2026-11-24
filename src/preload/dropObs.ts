@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron'
 import { IPC } from '../shared/ipc'
-import type { DropObsReply, DropObsStatus } from '../shared/dropObs'
+import type { DropObsMode, DropObsReply, DropObsStatus } from '../shared/dropObs'
 
 /** Send loot to the wiki's drop database (requirements/drop-db-submit.md). Off until the player turns it on. */
 export const dropObsBridge = {
@@ -8,8 +8,10 @@ export const dropObsBridge = {
   /** An empty password keeps the saved one. */
   dropObsSaveAccount: (username: string, password: string): Promise<DropObsReply> =>
     ipcRenderer.invoke(IPC.dropObsSaveAccount, username, password),
-  /** Only the player flips this, from the card. */
-  setDropObsEnabled: (enabled: boolean): Promise<DropObsReply> => ipcRenderer.invoke(IPC.dropObsSetEnabled, enabled),
+  /** Only the player chooses this, from the card. */
+  setDropObsMode: (mode: DropObsMode): Promise<DropObsReply> => ipcRenderer.invoke(IPC.dropObsSetMode, mode),
+  /** Manual mode: send everything waiting, then stop. */
+  dropObsSendNow: (): Promise<DropObsReply> => ipcRenderer.invoke(IPC.dropObsSendNow),
   dropObsTest: (): Promise<DropObsReply> => ipcRenderer.invoke(IPC.dropObsTest),
   /** Remove the saved sign-in and turn sending off. */
   dropObsForget: (): Promise<DropObsReply> => ipcRenderer.invoke(IPC.dropObsForget)

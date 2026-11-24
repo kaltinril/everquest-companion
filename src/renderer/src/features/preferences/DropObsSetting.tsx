@@ -1,22 +1,24 @@
 // DropObsSetting — Preferences → Game → "Send my loot to the wiki"
 // (docs/community/requirements/drop-db-submit.md; main/dropObs/service.ts; words in dropObsView.ts).
 //
-// OFF FOR EVERY PLAYER. While the switch is off nothing goes to the wiki; the card still shows how
-// much loot is ready, so the player knows what turning it on sends.
+// OFF FOR EVERY PLAYER. While it is Off nothing goes to the wiki; the card still shows how much loot
+// is ready, so the player knows what choosing a way to send would send.
 //
 // THE FLOW: until a sign-in has worked, the card is two numbered steps (make a Bot password on the
 // wiki; paste its user name and password, one button saves and signs in). After that the steps fold
-// into one "Signed in as …" line with Change and Remove, and the switch and the live status take the
-// card. Turning the switch on signs in first when the saved sign-in has not worked yet. The status is
-// asked again every few seconds while the card is open, so the count runs down as batches go.
+// into one "Signed in as …" line with Change and Remove. Then the player picks how loot is sent
+// (owner, 2026-11-24): Off, Send in the background (a trickle as they play), or Only when I press
+// Send (a Send now button that sends what is waiting and stops). Background and Send now sign in
+// first when the saved sign-in has not worked yet. The status is asked again every few seconds while
+// the card is open, so the count runs down as batches go.
 //
 // The password is encrypted on this computer and never shown again. Links open the system browser
 // (main's window-open handler), like every other wiki link in the app.
 
 import { type JSX, type ReactNode, useCallback, useEffect, useState } from 'react'
-import { Alert, Box, Button, Collapse, FormControlLabel, Link, Stack, Switch, TextField, Typography } from '@mui/material'
+import { Alert, Box, Button, Collapse, FormControlLabel, Link, Radio, RadioGroup, Stack, TextField, Typography } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import { BOT_PASSWORDS_URL, DROP_DATABASE_URL, type DropObsReply, type DropObsStatus } from '@shared/dropObs'
+import { BOT_PASSWORDS_URL, DROP_DATABASE_URL, type DropObsMode, type DropObsReply, type DropObsStatus } from '@shared/dropObs'
 import { fmtCount, keptReason, progressView, setupStage, type ProgressTone } from './dropObsView'
 
 const POLL_MS = 5000
@@ -190,6 +192,62 @@ function StatusBox(props: { st: DropObsStatus; run: Run }): JSX.Element {
   )
 }
 
+const MODES: { mode: DropObsMode; label: string; hint: string }[] = [
+  { mode: 'off', label: 'Off', hint: 'Nothing is sent.' },
+  { mode: 'background', label: 'Send in the background', hint: 'Your loot goes up a little at a time as you play.' },
+  { mode: 'manual', label: 'Only when I press Send', hint: 'Nothing goes until you press Send now; then what is waiting is sent and it stops.' }
+]
+
+/** How loot is sent, and in manual mode the Send now button with what it would send. */
+function ModeChoice(props: { st: DropObsStatus; run: Run; locked: boolean }): JSX.Element {
+  const { st, run, locked } = props
+  const left = st.ready === null ? 0 : st.ready + st.inFlight
+  return (
+    <Stack spacing={0.5}>
+      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+        How to send
+      </Typography>
+      <RadioGroup value={st.mode} onChange={(e) => void run(window.eq.setDropObsMode(e.target.value as DropObsMode))} data-testid="drop-obs-mode">
+        {MODES.map((m) => (
+          <FormControlLabel
+            key={m.mode}
+            value={m.mode}
+            disabled={locked && m.mode !== 'off'}
+            control={<Radio size="small" slotProps={{ input: { 'data-testid': `drop-obs-mode-${m.mode}` } as object }} />}
+            sx={{ alignItems: 'flex-start', '& .MuiRadio-root': { pt: 0.25 } }}
+            label={
+              <Box>
+                <Typography variant="body2">{m.label}</Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {m.hint}
+                </Typography>
+              </Box>
+            }
+          />
+        ))}
+      </RadioGroup>
+      {locked && (
+        <Typography variant="caption" color="text.secondary">
+          Sign in above first.
+        </Typography>
+      )}
+      {st.mode === 'manual' && (
+        <Box>
+          <Button
+            size="small"
+            variant="contained"
+            data-testid="drop-obs-send-now"
+            disabled={st.sendingNow || left === 0 || st.ready === null}
+            onClick={() => void run(window.eq.dropObsSendNow())}
+          >
+            {st.sendingNow ? 'Sending…' : left === 0 ? 'Nothing to send' : `Send ${fmtCount(left)} now`}
+          </Button>
+        </Box>
+      )}
+    </Stack>
+  )
+}
+
 export function DropObsSetting(): JSX.Element {
   const [st, setSt] = useState<DropObsStatus | null>(null)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
@@ -265,25 +323,7 @@ export function DropObsSetting(): JSX.Element {
         </Stack>
       )}
 
-      <Stack spacing={0.25}>
-        <FormControlLabel
-          control={
-            <Switch
-              size="small"
-              data-testid="drop-obs-switch"
-              checked={st.enabled}
-              disabled={stage === 'no-sign-in' && !st.enabled}
-              onChange={(e) => void run(window.eq.setDropObsEnabled(e.target.checked))}
-            />
-          }
-          label={<Typography variant="body2">Send my loot to the wiki</Typography>}
-        />
-        {stage === 'no-sign-in' && !st.enabled && (
-          <Typography variant="caption" color="text.secondary">
-            Sign in above first.
-          </Typography>
-        )}
-      </Stack>
+      <ModeChoice st={st} run={run} locked={stage === 'no-sign-in'} />
 
       <StatusBox st={st} run={run} />
       {msg !== null && (

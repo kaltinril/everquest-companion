@@ -181,12 +181,13 @@ test('THE APP INSTALLS THE IMAGE HANDLER WITHOUT A FETCHER', () => {
 
 // Owner, 2026-11-23: "hook the app up to the wiki's drop database". The one write the app sends, and
 // only with the player's switch on.
-test('ONLY THE DROP-DATABASE CLIENT ASKS action=eozobservations, only its service opens one, and its drain does nothing while the switch is off', () => {
+test('ONLY THE DROP-DATABASE CLIENT ASKS action=eozobservations, only its service opens one, and its drain does nothing while it is off or between Send presses', () => {
   assert.deepEqual(filesMatching(/eozobservations/), ['src/main/dropObs/client.ts'])
   assert.deepEqual(filesMatching(/\bcreateObsClient\(/), ['src/main/dropObs/client.ts', 'src/main/dropObs/service.ts'])
   assert.deepEqual(filesMatching(/\bdrainOnce\(/),['src/main/dropObs/drain.ts', 'src/main/dropObs/service.ts'])
   const service = code('src/main/dropObs/service.ts')
-  assert.match(service, /if \(running \|\| !s\.enabled \|\| s\.stopped !== null/, 'the background tick returns at once while the switch is off')
+  assert.match(service, /if \(running \|\| !s\.enabled \|\| \(s\.manual && !pushing\) \|\| s\.stopped !== null/, 'the tick returns at once while it is off, and in manual mode unless a Send press is running')
+  assert.match(code('src/main/dropObs/state.ts'), /manual: false/, 'manual is never on by default')
   assert.match(code('src/main/dropObs/drain.ts'), /if \(!s\.enabled\) return 'off'/)
   assert.match(code('src/main/dropObs/state.ts'), /enabled: false,/, 'off by default')
 })

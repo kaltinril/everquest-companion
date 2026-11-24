@@ -1104,8 +1104,10 @@ export const IPC = {
   dropObsStatus: 'dropObs:status',
   // Args: (username: string, password: string). An empty password keeps the saved one.
   dropObsSaveAccount: 'dropObs:saveAccount',
-  // Arg: boolean. The switch; only ever flipped by the player on the card.
-  dropObsSetEnabled: 'dropObs:setEnabled',
+  // Arg: DropObsMode ('off' | 'background' | 'manual'). Only ever chosen by the player on the card.
+  dropObsSetMode: 'dropObs:setMode',
+  // Manual mode: send everything waiting, a batch at a time, then stop. No payload.
+  dropObsSendNow: 'dropObs:sendNow',
   // Sign in and ask the wiki's status. No payload.
   dropObsTest: 'dropObs:test',
   // Remove the saved sign-in and turn sending off. What was delivered stays booked (no resends).
