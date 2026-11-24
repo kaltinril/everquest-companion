@@ -1108,6 +1108,8 @@ export const IPC = {
   dropObsSetEnabled: 'dropObs:setEnabled',
   // Sign in and ask the wiki's status. No payload.
   dropObsTest: 'dropObs:test',
+  // Remove the saved sign-in and turn sending off. What was delivered stays booked (no resends).
+  dropObsForget: 'dropObs:forget',
 
   // ---- misc pushes ----
   onLine: 'log:line',

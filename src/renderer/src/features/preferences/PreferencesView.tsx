@@ -298,11 +298,11 @@ function buildSections({ version, status, onWhatsNew }: SectionInputs): PrefSect
           keywords: 'log archive rotate clear compress backup history size shrink large slow loading',
           content: <LogArchiveSetting />
         },
-        // SEND LOOT TO THE WIKI'S DROP DATABASE (requirements/drop-db-submit.md). Off until the player turns it on.
+        // SEND MY LOOT TO THE WIKI: the drop database (requirements/drop-db-submit.md). Off until the player turns it on.
         {
           id: 'drop-obs',
-          label: "Send loot to the wiki's drop database",
-          keywords: 'wiki drop database loot percent rate submit upload eqlwiki bot password sign in observations',
+          label: 'Send my loot to the wiki',
+          keywords: 'wiki drop database drop list loot reports percent rate chance submit upload share eqlwiki bot password sign in observations',
           content: <DropObsSetting />
         }
       ]

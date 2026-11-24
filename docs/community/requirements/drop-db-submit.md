@@ -8,6 +8,7 @@ Nothing here is removed or narrowed without the owner's word (RULES.md, rule 19)
 | Date | Asked by | The ask | Status |
 | --- | --- | --- | --- |
 | 2026-11-23 | owner, after Maergoth (wiki admin) on Discord | Hook the app up to the wiki's drop database, as the wiki's own tool (Eye of Zomm) does: convert the app's recorded loot to schema 1 and submit it through the API, so wiki loot lists get their percentages automatically and hand-written `[Overall: ~N%]` notes are no longer needed. Maergoth: "massage yours into something the wiki knows what to do with and submit it via some api calls". The wiki counts % per drop, not per kill. | built 2026-11-24 (slice 1): `src/main/dropObs/` (events, client, drain, state, service), Preferences → Game card `DropObsSetting.tsx`; off by default; zone sent without its instance tier (`zoneBaseName`). Not yet tried against the live wiki. Copy wiki page stops writing `[Overall: ~N%]` the same day (gaps-tab.md) |
+| 2026-11-24 | owner | "Anything that is left for us to do in this connectivity to the WIKI first pass ... make sure it is easy to use, and intuitive and flows well, and the user can use it easily if they enable it." Work in a worktree; do not merge to main_community yet. | built 2026-11-24 on branch `drop-obs-ux`, not merged: the card is two numbered steps (make a Bot password, naming the exact grant; paste it, one Save and sign in button, Enter works) that fold into "Signed in as X" with Change and Remove once a sign-in has worked; turning the switch on signs in first and stays off if that fails; the status reads again every 5 s and says what is left, roughly how long, what went and when, in words (no wiki codes); a stop has a Sign in again button; the reports the wiki refused open as a list with a reason. Entry renamed "Send my loot to the wiki". Still not tried against the live wiki |
 
 ## Defaults taken (owner may overrule)
 
@@ -30,5 +31,10 @@ Nothing here is removed or narrowed without the owner's word (RULES.md, rule 19)
 - A source the line named is taken as the corpse (`explicit-corpse`), whether or not the line said
   "corpse" (the `You looted X from Y and ...` forms make the word optional); `Reward Chest` is not.
 - A wiki assertion failure (`assertuserfailed`) stops sending for this launch only: the next
-  launch, or Test sign-in, signs in again. The credential stops (`eoz-login`, `eoz-email`,
-  `eoz-blocked`, `permissiondenied`, `eoz-disabled`, a failed login) last until Test sign-in.
+  launch, or Sign in again, signs in again. The credential stops (`eoz-login`, `eoz-email`,
+  `eoz-blocked`, `permissiondenied`, `eoz-disabled`, a failed login) last until Sign in again.
+- (2026-11-24) Remove clears the user name, password and switch, and keeps the record of what the
+  wiki took, so signing in again (even as another account) never resends it. The 50 newest refused
+  reports are listed; refused reports are never resent by this slice.
+- (2026-11-24) The status is asked every 5 s while the card is open; main reads the loot for it at
+  most once per 10 s, so an open card costs one loot read per 10 s.

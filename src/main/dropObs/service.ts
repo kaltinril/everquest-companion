@@ -3,7 +3,7 @@
 // only while the player's switch is on (docs/community/requirements/drop-db-submit.md).
 //
 // OFF BY DEFAULT. Nothing here touches the network until the player saves a Bot password and either
-// presses Test sign-in or turns the switch on. The drain wakes every 30 s and does nothing while the
+// presses Save and sign in or turns the switch on. The drain wakes every 30 s and does nothing while the
 // switch is off, sending is stopped, or a backoff is waiting (drain.ts).
 //
 // WHERE THE LOOT COMES FROM: `serveModuleSnapshot('loot')`, the same full read every loot window
@@ -18,9 +18,9 @@ import { serveModuleSnapshot } from '../dataServer/serveShim'
 import { getActiveCharacter } from '../session'
 import { listCharacters } from '../log/config'
 import { LOOT_MODULE } from '../../shared/lootFrame'
-import type { DropObsReply, DropObsStatus } from '../../shared/dropObs'
+import { KEPT_SHOWN, type DropObsKeptItem, type DropObsReply, type DropObsStatus } from '../../shared/dropObs'
 import { createObsClient, WikiRefusal, WikiUncertain } from './client'
-import { BATCH_SPACING_MS, drainOnce, newStatusCache, readyEvents, type DrainDeps } from './drain'
+import { BATCH_SPACING_MS, drainOnce, newStatusCache, readyEvents, type DrainDeps, type DrainOutcome } from './drain'
 import { obsEvents, type ObsEvent, type LootRowIn } from './events'
 import { loadState, saveState, type ObsState } from './state'
 
@@ -86,7 +86,7 @@ async function playerNames(): Promise<Set<string>> {
 }
 
 /** Every sendable event in the loot the engine serves, newest first; null when there is none to read. */
-async function currentEvents(): Promise<ObsEvent[] | null> {
+async function readEvents(): Promise<ObsEvent[] | null> {
   const ch = getActiveCharacter()
   if (ch === null) return null
   const snap = await serveModuleSnapshot(LOOT_MODULE)
@@ -95,7 +95,42 @@ async function currentEvents(): Promise<ObsEvent[] | null> {
   return obsEvents(rows, { server: ch.server, character: ch.name, players: await playerNames(), now: Date.now() })
 }
 
+/** The card asks for its status every few seconds while it is open; the loot is read once per window. */
+const EVENTS_TTL_MS = 10_000
+let eventsMemo: { at: number; events: ObsEvent[] | null } | null = null
+
+async function currentEvents(maxAgeMs = 0): Promise<ObsEvent[] | null> {
+  if (eventsMemo !== null && Date.now() - eventsMemo.at < maxAgeMs) return eventsMemo.events
+  const events = await readEvents()
+  eventsMemo = { at: Date.now(), events }
+  return events
+}
+
+/** The newest refused reports, newest first, for the card's list. */
+function keptItems(s: ObsState): DropObsKeptItem[] {
+  return Object.values(s.kept)
+    .map((k) => ({ item: k.item, npc: k.npc, observedAt: k.observedAt, code: k.code }))
+    .sort((a, b) => (a.observedAt < b.observedAt ? 1 : a.observedAt > b.observedAt ? -1 : 0))
+    .slice(0, KEPT_SHOWN)
+}
+
 const clientVersion = (): string => `everquest-companion/${app.getVersion()}`
+
+/** One step's outcome booked: the signed-in name a batch proved, and a line in the app's log. */
+function noteOutcome(s: ObsState, outcome: DrainOutcome, before: { delivered: number; kept: number }): void {
+  if (outcome === 'retry' || outcome === 'stopped') {
+    logInfo(`[drop observations] ${outcome}: ${s.lastError ?? '?'}`)
+    return
+  }
+  if (outcome !== 'sent' && outcome !== 'kept') return
+  // A batch the wiki answered proves the sign-in: the card shows who it is.
+  const who = client.account()?.name
+  if (who !== undefined && who !== s.signedInAs) {
+    s.signedInAs = who
+    save()
+  }
+  logInfo(`[drop observations] batch booked: ${String(s.delivered.length - before.delivered)} delivered, ${String(Object.keys(s.kept).length - before.kept)} kept for review`)
+}
 
 async function tick(): Promise<void> {
   const s = st()
@@ -105,12 +140,7 @@ async function tick(): Promise<void> {
     const events = s.inFlight === null ? await currentEvents() : []
     const deps: DrainDeps = { state: s, save, client, events: () => events, credentials, clientVersion: clientVersion(), now: Date.now, cache }
     const before = { delivered: s.delivered.length, kept: Object.keys(s.kept).length }
-    const outcome = await drainOnce(deps)
-    if (outcome === 'sent' || outcome === 'kept') {
-      logInfo(`[drop observations] batch booked: ${String(s.delivered.length - before.delivered)} delivered, ${String(Object.keys(s.kept).length - before.kept)} kept for review`)
-    } else if (outcome === 'retry' || outcome === 'stopped') {
-      logInfo(`[drop observations] ${outcome}: ${s.lastError ?? '?'}`)
-    }
+    noteOutcome(s, await drainOnce(deps), before)
   } finally {
     running = false
   }
@@ -125,7 +155,7 @@ export function startDropObsDrain(): void {
 
 export async function dropObsStatus(): Promise<DropObsStatus> {
   const s = st()
-  const events = await currentEvents()
+  const events = await currentEvents(EVENTS_TTL_MS)
   return {
     enabled: s.enabled,
     username: s.username,
@@ -138,7 +168,28 @@ export async function dropObsStatus(): Promise<DropObsStatus> {
     lastError: s.lastError,
     stopped: s.stopped?.message ?? null,
     nextAttemptAt: s.nextAttemptAt > Date.now() ? s.nextAttemptAt : 0,
-    lastSuccessAt: s.lastSuccessAt
+    lastSuccessAt: s.lastSuccessAt,
+    signedInAs: s.signedInAs,
+    keptItems: keptItems(s)
+  }
+}
+
+/** A failed sign-in, in words the player can act on. */
+function signInFailure(code: string): string {
+  switch (code) {
+    case 'eqc-login-failed':
+    case 'eoz-login':
+      return 'The wiki did not accept that user name and password. Copy both again from the Bot passwords page (the user name has an @ in it).'
+    case 'eoz-email':
+      return 'Your wiki account needs a confirmed email address first (wiki Preferences → Email).'
+    case 'eoz-blocked':
+      return 'This wiki account is blocked.'
+    case 'permissiondenied':
+      return 'This Bot password is missing the grant. On the Bot passwords page, tick "Submit attributed gameplay observations" and save.'
+    case 'eoz-disabled':
+      return 'The wiki is not taking loot reports right now. Try again later.'
+    default:
+      return code.startsWith('eqc-network') || code.startsWith('eqc-http') ? 'Could not reach the wiki. Check your internet connection and try again.' : `Sign-in failed (${code}).`
   }
 }
 
@@ -153,6 +204,8 @@ export async function saveDropObsAccount(username: string, password: string): Pr
   if (name === '') return reply(false, 'Enter the Bot password user name (it looks like Name@Label).')
   if (password !== '' && !(await safeStorage.isAsyncEncryptionAvailable())) return reply(false, 'This computer cannot encrypt a saved password, so it was not saved.')
   if (password === '' && s.passwordEnc === '') return reply(false, 'Enter the Bot password.')
+  // A changed sign-in has not worked yet: the card asks again before it shows a name.
+  if (name !== s.username || password !== '') s.signedInAs = ''
   s.username = name
   if (password !== '') s.passwordEnc = (await safeStorage.encryptStringAsync(password)).toString('base64')
   s.stopped = null
@@ -162,12 +215,36 @@ export async function saveDropObsAccount(username: string, password: string): Pr
   return reply(true, 'Saved.')
 }
 
+/** The switch. Turning it on with a sign-in that has never worked signs in first, and stays off if
+ *  that fails, so the player learns at once rather than from a stop thirty seconds later. */
 export async function setDropObsEnabled(enabled: boolean): Promise<DropObsReply> {
   const s = st()
+  if (enabled && (s.signedInAs === '' || s.stopped !== null)) {
+    const test = await testDropObs()
+    if (!test.ok) return test
+  }
   s.enabled = enabled
   save()
   if (enabled) setTimeout(() => void tick(), 1000)
-  return reply(true, enabled ? 'On. Your loot is sent in the background.' : 'Off. Nothing is sent.')
+  return reply(true, enabled ? 'On. Your loot is sent in the background, newest first.' : 'Off. Nothing is sent.')
+}
+
+/** Remove the saved sign-in and turn sending off. What the wiki already took stays booked, so
+ *  signing in again never sends it twice. */
+export async function forgetDropObsAccount(): Promise<DropObsReply> {
+  const s = st()
+  s.enabled = false
+  s.username = ''
+  s.passwordEnc = ''
+  s.signedInAs = ''
+  s.stopped = null
+  s.lastError = null
+  s.failures = 0
+  s.nextAttemptAt = 0
+  client.forget()
+  cache.status = null
+  save()
+  return reply(true, 'Sign-in removed. Nothing is sent.')
 }
 
 /** Sign in and ask the wiki's status: the account name and whether the drop database takes reports. */
@@ -185,12 +262,14 @@ export async function testDropObs(): Promise<DropObsReply> {
     s.failures = 0
     s.nextAttemptAt = 0
     s.lastError = null
+    s.signedInAs = account.name
     save()
     const ok = status.enabled && status.available
-    return await reply(ok, `Signed in as ${account.name}. Drop database: ${status.enabled ? 'enabled' : 'disabled'}, ${status.available ? 'available' : 'not available'}.`)
+    if (ok) return await reply(true, `Signed in as ${account.name}. The wiki is taking loot reports.`)
+    return await reply(false, `Signed in as ${account.name}, but the wiki is not taking loot reports right now. Try again later.`)
   } catch (e) {
     client.forget()
-    const code = e instanceof WikiRefusal || e instanceof WikiUncertain ? e.message : 'eqc-error'
-    return reply(false, `Sign-in test failed: ${code}`)
+    const code = e instanceof WikiRefusal || e instanceof WikiUncertain ? e.code : 'eqc-error'
+    return reply(false, signInFailure(code))
   }
 }

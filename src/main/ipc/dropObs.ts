@@ -6,7 +6,7 @@
 
 import { ipcMain } from 'electron'
 import { IPC } from '../../shared/ipc'
-import { dropObsStatus, saveDropObsAccount, setDropObsEnabled, startDropObsDrain, testDropObs } from '../dropObs/service'
+import { dropObsStatus, forgetDropObsAccount, saveDropObsAccount, setDropObsEnabled, startDropObsDrain, testDropObs } from '../dropObs/service'
 
 export function registerDropObsIpc(): void {
   ipcMain.handle(IPC.dropObsStatus, () => dropObsStatus())
@@ -15,5 +15,6 @@ export function registerDropObsIpc(): void {
   )
   ipcMain.handle(IPC.dropObsSetEnabled, (_e, enabled: unknown) => setDropObsEnabled(enabled === true))
   ipcMain.handle(IPC.dropObsTest, () => testDropObs())
+  ipcMain.handle(IPC.dropObsForget, () => forgetDropObsAccount())
   startDropObsDrain()
 }

@@ -22,7 +22,23 @@ export interface DropObsStatus {
   /** Epoch ms of the next try after a failure; 0 when none is waiting. */
   nextAttemptAt: number
   lastSuccessAt: number
+  /** The wiki account the saved sign-in last worked for; '' until one has. */
+  signedInAs: string
+  /** The newest reports the wiki did not take (at most KEPT_SHOWN), newest first, with its code. */
+  keptItems: DropObsKeptItem[]
 }
+
+export interface DropObsKeptItem {
+  item: string
+  npc: string
+  /** UTC ISO time the loot was taken. */
+  observedAt: string
+  /** `conflict`, or the wiki's rejection code. */
+  code: string
+}
+
+/** How many refused reports the card lists. */
+export const KEPT_SHOWN = 50
 
 export interface DropObsReply {
   ok: boolean

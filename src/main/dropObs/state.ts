@@ -35,8 +35,10 @@ export interface ObsState {
   failures: number
   lastError: string | null
   lastSuccessAt: number
-  /** Sending stopped until the player fixes it or presses Test sign-in. */
+  /** Sending stopped until the player fixes it or signs in again. */
   stopped: { code: string; message: string } | null
+  /** The wiki account the saved Bot password last signed in as; '' until a sign-in has worked. */
+  signedInAs: string
 }
 
 export function defaultState(): ObsState {
@@ -52,7 +54,8 @@ export function defaultState(): ObsState {
     failures: 0,
     lastError: null,
     lastSuccessAt: 0,
-    stopped: null
+    stopped: null,
+    signedInAs: ''
   }
 }
 
@@ -78,7 +81,8 @@ export function asState(raw: unknown): ObsState {
     failures: num(raw.failures, 0),
     lastError: typeof raw.lastError === 'string' ? raw.lastError : null,
     lastSuccessAt: num(raw.lastSuccessAt, 0),
-    stopped
+    stopped,
+    signedInAs: s(raw.signedInAs)
   }
 }
 

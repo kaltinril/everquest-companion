@@ -10,5 +10,7 @@ export const dropObsBridge = {
     ipcRenderer.invoke(IPC.dropObsSaveAccount, username, password),
   /** Only the player flips this, from the card. */
   setDropObsEnabled: (enabled: boolean): Promise<DropObsReply> => ipcRenderer.invoke(IPC.dropObsSetEnabled, enabled),
-  dropObsTest: (): Promise<DropObsReply> => ipcRenderer.invoke(IPC.dropObsTest)
+  dropObsTest: (): Promise<DropObsReply> => ipcRenderer.invoke(IPC.dropObsTest),
+  /** Remove the saved sign-in and turn sending off. */
+  dropObsForget: (): Promise<DropObsReply> => ipcRenderer.invoke(IPC.dropObsForget)
 }

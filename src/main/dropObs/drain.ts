@@ -7,7 +7,7 @@
 // wiki allows 120 batches an hour). After a rate-limit, capacity or network failure the next attempt
 // waits 1, 2, 4 ... minutes, capped at an hour (or the server's Retry-After, when longer). A refusal
 // that only the player can fix (not signed in, no confirmed email, blocked, no permission, the wiki's
-// storage turned off) stops sending and says why, until the player presses Test sign-in.
+// storage turned off) stops sending and says why, until the player presses Sign in again.
 //
 // THE RECEIPT (the spec): every ID sent appears exactly once across accepted, duplicates, conflicts
 // and rejected, for the same batch and account; otherwise nothing is booked and the batch is retried
@@ -27,16 +27,16 @@ const STATUS_TTL_MS = 15 * 60_000
 
 /** Refusals that stop sending until the player fixes them. */
 const STOP_CODES: Record<string, string> = {
-  'eoz-login': 'The wiki did not sign you in. Check the Bot password and press Test sign-in.',
+  'eoz-login': 'The wiki did not sign you in. Check the Bot password and press Sign in again.',
   'eoz-email': 'Your wiki account needs a confirmed email address before it can send loot.',
   'eoz-blocked': 'Your wiki account is blocked.',
-  permissiondenied: 'This Bot password is not allowed to send observations. Give it the observation-submission grant.',
-  'eoz-disabled': "The wiki has its drop database turned off for now. Press Test sign-in to check again.",
+  permissiondenied: 'This Bot password is missing the grant. On the wiki\'s Bot passwords page, tick "Submit attributed gameplay observations", save, and press Sign in again.',
+  'eoz-disabled': 'The wiki is not taking loot reports right now. Press Sign in again later to check.',
   'eqc-login-failed': 'Sign-in failed. Check the Bot password user name and password.',
   'eqc-no-password': 'No Bot password is saved.',
   // The spec: an assertion failure stops the pending operation; the player signs in again.
-  assertuserfailed: 'The wiki signed this session out. Press Test sign-in.',
-  assertnameduserfailed: 'The wiki session belongs to another account. Press Test sign-in.'
+  assertuserfailed: 'The wiki signed this session out. Press Sign in again.',
+  assertnameduserfailed: 'The wiki session belongs to another account. Press Sign in again.'
 }
 
 /** Codes that refuse the whole batch: its events are kept for review, not retried. */

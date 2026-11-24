@@ -246,7 +246,7 @@ test('THE STATE FILE round-trips, leaves no temp file, and a torn or foreign fil
   try {
     const file = join(dir, 'wiki-observations.json')
     assert.deepEqual(loadState(file), defaultState(), 'no file: the default')
-    const s: ObsState = { ...defaultState(), enabled: true, username: 'A@b', delivered: ['eqc-1234567890'], inFlight: { schemaVersion: 1, batchId: 'eqcb-1234567890', clientVersion: 'v', events: [] } }
+    const s: ObsState = { ...defaultState(), enabled: true, username: 'A@b', signedInAs: 'A', delivered: ['eqc-1234567890'], inFlight: { schemaVersion: 1, batchId: 'eqcb-1234567890', clientVersion: 'v', events: [] } }
     saveState(file, s)
     assert.deepEqual(loadState(file), s)
     assert.deepEqual(readdirSync(dir), ['wiki-observations.json'])
@@ -254,6 +254,10 @@ test('THE STATE FILE round-trips, leaves no temp file, and a torn or foreign fil
     assert.equal(loadState(file).enabled, false)
     writeFileSync(file, '{"version":2,"enabled":true}')
     assert.equal(loadState(file).enabled, false)
+    // A file written before the signed-in name existed: no name, so the card asks for a sign-in.
+    writeFileSync(file, '{"version":1,"enabled":true,"username":"A@b"}')
+    assert.equal(loadState(file).signedInAs, '')
+    assert.equal(loadState(file).enabled, true)
   } finally {
     rmSync(dir, { recursive: true, force: true })
   }
