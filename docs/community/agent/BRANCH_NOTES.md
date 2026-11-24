@@ -89,6 +89,23 @@ where one exists.
     Fishing Pole is out of era by the era join.
   - Not done: the plus-state does not scale it (no page states how a tier moves one); the compare
     card and `benefitMismatch` do not read it; no toolbar control; not looked at in the running app.
+- **Best in slot sheet** (2026-11-24, branch `bis-sheet`, NOT merged until the owner says;
+  `plans/2026-11-24-bis-sheet.md`, `requirements/bis-sheet.md`). P1 and P2 built; no UI yet.
+  - Files: `shared/planner/tierChips.ts` (chips, lanes, `bis1:` text format), `tierWeights.ts`
+    (units, `tierScore`, default board, presets), `bisSheet.ts` (candidates, readout),
+    `bisSearch.ts` (the exact choice). `roleWeights.ts` gained read-only exports only
+    (`focusWeightsOf`, `statLiveForClasses`, `hasteCredit`, the `RoleWeights` type).
+  - Score = lane weight x value / unit; unit = median positive stated value, measured from the rows
+    handed in. Never hard-code a unit.
+  - Laws: ratios only in the hands (1H, 2H) and RANGE (ranged), never ANY or other cells; a 1H ratio
+    in SECONDARY only for a dual-wield class (`DUAL_WIELD_CLASSES`); the class gate picks the
+    DEFAULT lane only and never scores; haste once per loadout in the sheet, `hasteCredit` per item.
+  - Lore: any flag starting "Lore" (spellings include `LORE EQUPPED`) = one cell in the whole sheet.
+  - `CHIP_KEYS` order IS the text format: append new chips, never insert.
+  - TRAP: branch and bound over the cells blew a 400k-node budget (ANY cells double-count lore
+    picks in the bound). The assignment (Hungarian) plus enumeration is exact and ~0.1 s.
+  - BEST column still reads `gearBisValue`; switching it waits on the owner (calibration numbers
+    in the plan, `tests/tierCalibration.test.mts`).
 
 ## Maps (was map-improvements)
 
