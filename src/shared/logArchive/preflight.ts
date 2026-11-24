@@ -62,10 +62,11 @@ export interface PreflightInput {
 }
 
 /** A restart finishes an archive the last run died in. One this run already failed to finish
- *  gets its reason instead: a restart may meet the same fault. */
+ *  gets its reason instead: a restart may meet the same fault, and then the launch recovery puts
+ *  the log back whole (rotate.ts `recoverRotation`). */
 function interruptedText(reason: string | null): string {
   if (reason === null) return 'An earlier archive was interrupted. Restart the app to finish it first.'
-  return `An earlier archive could not be finished: ${reason}. The app tries again each time it starts.`
+  return `An earlier archive could not be finished: ${reason}. Each time it starts, the app finishes it, or puts your log back whole.`
 }
 
 /** What this run or this log holds back, once the archive itself could go ahead. */

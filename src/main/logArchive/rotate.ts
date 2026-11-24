@@ -17,9 +17,22 @@
 // archive folder until a verified compressed copy exists. `recoverRotation` finishes an
 // interrupted run from wherever it stopped, at the next launch.
 //
+// AN ARCHIVE THAT CANNOT BE FINISHED IS UNDONE (owner, 2026-11-23: "if the archivable fails, we need
+// to recover for the user so they aren't screwed with no log data"). While the run that moved the
+// log goes on, nothing is missing: the engine keeps every line it read before the move. The next
+// launch is where the player would lose them, because the engine then reads only the fresh log and
+// an unsealed archive is not shown. So the launch recovery first tries to finish, as before; when it
+// cannot, it joins the moved file back in front of the live log under the log's own name (journal
+// step `returning`, joinLive.ts), before the engine reads anything. That one was chosen over the
+// others because the moved file is, byte for byte, what the log held at the move, whatever went
+// wrong after it (a refused compressed copy, a record that no longer matches, a missing record), so
+// moved + live is exactly the log the game would have had. Finishing needs the cause gone; pointing
+// the reader at the moved file needs the engine to read two files as one. A sealed archive is never
+// undone: its history is shown, and only the moved file's delete is left for the next start.
+//
 // The game may be running throughout: it opens the log by name for every line (ruling 0.5).
 
-import { appendFileSync, closeSync, existsSync, linkSync, openSync, readdirSync, readFileSync, readSync, renameSync, rmSync, statfsSync, statSync, truncateSync, writeFileSync } from 'node:fs'
+import { closeSync, existsSync, openSync, readdirSync, readFileSync, readSync, renameSync, rmSync, statfsSync, statSync, writeFileSync } from 'node:fs'
 import { createReadStream, createWriteStream } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { pipeline } from 'node:stream/promises'
@@ -29,12 +42,16 @@ import type { Segment, SegmentLog } from '../../shared/logArchive/segment'
 import type { BackupRequest, BackupResult } from './backup'
 import { archiveName } from './backup'
 import { logNameOf, type LedgerSource } from './factionLedgerFile'
+import { alreadyJoined, joinAndName, PART, piecesOf, waitingPieces, type Named, type RestoreIo } from './joinLive'
 import { readLogPrefix } from './logPrefix'
 import { resolveArchivePath } from './segmentStore'
 
+export type { RestoreIo } from './joinLive'
+
 export const JOURNAL = 'rotation-journal.json'
 
-export type JournalStep = 'moving' | 'moved'
+/** `returning`: the moved log is being joined back in front of the live one; never finish it then. */
+export type JournalStep = 'moving' | 'moved' | 'returning'
 
 export interface Journal {
   v: 1
@@ -54,6 +71,8 @@ export interface RotateDeps {
   factionLedger?: (dir: string, segmentId: string, source: LedgerSource) => Promise<void>
   /** Test seam: throw here to simulate a crash after the named step. */
   crashAfter?: (step: string) => void
+  /** Test seam: the disk steps of putting a moved log back (joinLive.ts). */
+  joinIo?: RestoreIo
 }
 
 export type RotateResult = { ok: true; segment: Segment } | { ok: false; reason: string; logTouched: boolean }
@@ -141,6 +160,11 @@ async function finishFromMoved(dir: string, j: Journal, deps: RotateDeps): Promi
 /** Archive the live log behind a captured segment. The caller has run the preflight. */
 export async function rotateLog(logPath: string, dir: string, captured: Segment, deps: RotateDeps): Promise<RotateResult> {
   const j: Journal = { v: 1, logPath, movedPath: join(dir, `${captured.id}.moving`), segmentId: captured.id, step: 'moving' }
+  // A rename replaces what is at the new name, and a moved file left there holds the player's lines.
+  if (existsSync(j.movedPath)) {
+    const reason = `an earlier archive left ${j.movedPath}, which holds lines from your log, so the log was not moved. Move that file somewhere safe, then try again. Nothing has changed.`
+    return { ok: false, reason, logTouched: false }
+  }
   // A log captured again at the same length has the same id as the history kept from it (Back up,
   // then Keep, then Archive with nothing played): a move that fails must leave that record as it was.
   const prior = deps.readSegment(dir, captured.id)
@@ -168,8 +192,9 @@ export async function rotateLog(logPath: string, dir: string, captured: Segment,
 }
 
 /**
- * Step 3.4: finish or clear an interrupted rotation. Run at launch before the engine attaches.
- * Returns what it did, or null when there was no journal.
+ * Step 3.4: finish or clear an interrupted rotation, or put the moved log back when it cannot be
+ * finished. Run at launch before the engine attaches. Returns what it did, or null when there was
+ * no journal.
  */
 export async function recoverRotation(dir: string, deps: RotateDeps): Promise<string | null> {
   const j = readJournal(dir)
@@ -178,20 +203,93 @@ export async function recoverRotation(dir: string, deps: RotateDeps): Promise<st
     clearJournal(dir)
     return 'an archive was interrupted before the log was moved; nothing had changed'
   }
+  // A put back under way is finished, never archived: the moved file may hold some of the live log.
+  // The journal is cleared before the moved file is removed, so a moved file gone in this step was
+  // taken outside the app, not joined.
+  if (j.step === 'returning') return existsSync(j.movedPath) ? putMovedBack(dir, j, null, deps) : gone(dir, j)
   try {
     const seg = await finishFromMoved(dir, { ...j, step: 'moved' }, deps)
     return `finished an interrupted archive: ${seg.id}`
   } catch (err) {
-    return `${NOT_FINISHED}${afterMove(err, j)}`
+    return undoOrSay(dir, j, err, deps)
   }
 }
 
 const NOT_FINISHED = 'an interrupted archive could not be finished: '
+const PUT_BACK = 'an interrupted archive could not be finished, so the log was put back whole: '
+const GONE = 'an interrupted archive was cleared: its old log is no longer at '
+const LAST_START = 'the last start began putting it back'
 
 /** Why the steps after the move stopped, always with where the old log is while it is there. */
 function afterMove(err: unknown, j: Journal): string {
   const why = (err as Error).message
   return why.includes(j.movedPath) || !existsSync(j.movedPath) ? why : `${why}; the old log is kept at ${j.movedPath}`
+}
+
+/** The cause alone, without the "kept at" the finishing steps add: once the log is back it is not. */
+function causeOf(err: unknown, j: Journal): string {
+  return (err as Error).message.replace(`; the old log is kept at ${j.movedPath}`, '').replace(`; it is kept at ${j.movedPath}`, '')
+}
+
+/** The finish failed: undo it when that is safe, otherwise say why. */
+async function undoOrSay(dir: string, j: Journal, err: unknown, deps: RotateDeps): Promise<string> {
+  // A sealed archive is shown on the tabs; only the moved file's delete is left. Never undone.
+  if (deps.readSegment(dir, j.segmentId)?.state === 'sealed') return `${NOT_FINISHED}${afterMove(err, j)}`
+  if (!existsSync(j.movedPath)) return gone(dir, j)
+  return putMovedBack(dir, j, causeOf(err, j), deps)
+}
+
+/** The moved file was moved or deleted outside the app. Nothing can be put back, and a journal
+ *  kept would block every archive for good. Lines a put back had set aside are named, never moved. */
+function gone(dir: string, j: Journal): string {
+  clearJournal(dir)
+  const aside = piecesOf(j.movedPath).map((p) => p.path)
+  const kept = aside.length > 0 ? `; lines set aside from your log are kept in ${aside.join(' and ')}` : ''
+  return `${GONE}${j.movedPath}, so nothing could be put back${kept}`
+}
+
+/** After a put back the record must not stand for a finished backup: a `backed-up` record whose
+ *  head the live log begins with reads as a log the player put back, which pauses the automatic
+ *  archive (eligible.ts `putBackInLive`). The compressed copy itself is kept. */
+function demoteRecord(dir: string, j: Journal, deps: RotateDeps): void {
+  try {
+    const seg = deps.readSegment(dir, j.segmentId)
+    if (seg?.state === 'backed-up') deps.writeSegment(dir, { ...seg, state: 'captured' })
+  } catch {
+    // The automatic archive then waits for Archive now; nothing is lost.
+  }
+}
+
+/** Join the moved file back in front of the live log, under the log's name. `why` is the reason
+ *  the archive could not be finished; null when a put back an earlier start began is continued. */
+async function putMovedBack(dir: string, j: Journal, why: string | null, deps: RotateDeps): Promise<string> {
+  try {
+    writeJournal(dir, { ...j, step: 'returning' })
+    if (!(await alreadyJoined(j.movedPath, j.logPath))) {
+      waitingPieces(j.movedPath, 0)
+      joinAndName(j.logPath, j.movedPath, j.movedPath, deps.joinIo ?? {})
+    }
+    demoteRecord(dir, j, deps)
+    // The journal goes first: a moved file that is gone in step `returning` was not joined.
+    clearJournal(dir)
+    try {
+      rmSync(j.movedPath, { force: true })
+    } catch {
+      // A spare copy of lines the log now holds; it costs disk space only.
+    }
+    return `${PUT_BACK}${why ?? LAST_START}`
+  } catch (err) {
+    try {
+      ensureFile(j.logPath)
+    } catch {
+      // The game makes it on its next line.
+    }
+    const held = [j.movedPath, ...piecesOf(j.movedPath).map((p) => p.path)].filter((p) => existsSync(p))
+    const safe = held.length > 0 ? `. Its lines are safe in ${held.join(' and ')}` : ''
+    const stop = (err as Error).message
+    const what = why === null ? `putting the log back stopped (${stop})` : `${why}; it could not be put back in front of your log either (${stop})`
+    return `${NOT_FINISHED}${what}${safe}`
+  }
 }
 
 /** Why the recovery could not finish, from what `recoverRotation` answered; null when it did, or
@@ -200,86 +298,25 @@ export function unfinishedReason(done: string | null): string | null {
   return done?.startsWith(NOT_FINISHED) === true ? done.slice(NOT_FINISHED.length) : null
 }
 
+/** What the card says when the recovery put the log back, or found nothing to put back; null
+ *  otherwise. Kept in memory until an archive succeeds (actions.ts `autoStopped`). */
+export function recoveredNote(done: string | null): string | null {
+  if (done?.startsWith(PUT_BACK) === true) {
+    return `An archive could not be finished (${done.slice(PUT_BACK.length)}), so the app put your log back whole. Nothing is missing.`
+  }
+  if (done?.startsWith(GONE) === true) {
+    const [where, kept = ''] = done.slice(GONE.length).split(', so nothing could be put back')
+    return `An archive could not be finished, and its old log is no longer at ${where} (moved or deleted outside the app), so nothing could be put back${kept}.`
+  }
+  return null
+}
+
 const RESTORING = '.restoring'
-const PART = '.part'
 
 /** The scratch files a put-back that stopped part-way left in `dir`. They hold log lines. */
 export function putBackLeftovers(dir: string): string[] {
   if (!existsSync(dir)) return []
   return readdirSync(dir).filter((f) => f.endsWith(RESTORING) || f.endsWith(PART))
-}
-
-/** Test seams: the two steps of a put-back that the disk can refuse. */
-export interface RestoreIo {
-  append?: (path: string, bytes: Buffer) => void
-  link?: (from: string, to: string) => void
-}
-
-/** A stretch of the live log set aside as `<id>.<at>.part`: `at` is how long the joined file was
- *  before the piece was added, so a half-added copy can be cut off and the piece added again.
- *  NaN for a name without it (an older version's `<id>.part`). */
-interface Piece {
-  path: string
-  at: number
-}
-
-function piecesOf(dir: string, id: string): Piece[] {
-  const mine = readdirSync(dir).filter((f) => f.startsWith(`${id}.`) && f.endsWith(PART))
-  return mine.map((f) => {
-    const at = f.slice(id.length + 1, -PART.length)
-    return { path: join(dir, f), at: /^\d+$/.test(at) ? Number(at) : NaN }
-  })
-}
-
-/** Two names of one file (a hard link). */
-function sameFile(a: string, b: string): boolean {
-  const fileOf = (path: string): string | null => {
-    const s = statSync(path, { bigint: true, throwIfNoEntry: false })
-    return s === undefined ? null : `${s.dev}:${s.ino}`
-  }
-  const x = fileOf(a)
-  return x !== null && x === fileOf(b)
-}
-
-/** Add a piece to the end of `joined`, first cutting off any half-added copy of it. */
-function addPiece(joined: string, p: Piece, io: RestoreIo): void {
-  truncateSync(joined, Math.min(p.at, statSync(joined).size))
-  ;(io.append ?? appendFileSync)(joined, readFileSync(p.path))
-  rmSync(p.path)
-}
-
-/** Move the live log aside and add its bytes to the end of `joined`. Nothing when there is none. */
-function absorbLive(logPath: string, joined: string, io: RestoreIo): void {
-  if (!existsSync(logPath)) return
-  const at = statSync(joined).size
-  const piece: Piece = { path: `${joined.slice(0, -RESTORING.length)}.${at}${PART}`, at }
-  // A rename replaces what is at the new name, and a piece there would be the only copy of its lines.
-  if (existsSync(piece.path)) throw new Error(`an earlier try left ${piece.path}`)
-  renameSync(logPath, piece.path)
-  try {
-    addPiece(joined, piece, io)
-  } catch (err) {
-    // Undo the round: cut the half-added copy off and give the log its name back. When either
-    // fails the piece keeps its name, which says where it belongs, and the next put-back adds it.
-    try {
-      truncateSync(joined, at)
-      if (linkIfFree(piece.path, logPath)) rmSync(piece.path)
-    } catch {
-      // The piece stays.
-    }
-    throw err
-  }
-}
-
-/** Link `from` to the name `to`; false when the name is taken (the game recreated it). */
-function linkIfFree(from: string, to: string, link: (from: string, to: string) => void = linkSync): boolean {
-  try {
-    link(from, to)
-    return true
-  } catch (err) {
-    if ((err as NodeJS.ErrnoException).code === 'EEXIST') return false
-    throw err
-  }
 }
 
 async function unpack(archive: string, to: string): Promise<string> {
@@ -324,105 +361,54 @@ async function archiveBase(archive: string | null, joined: string, source: { byt
   }
 }
 
-/** The drive would not give a file a second name, so a put-back cannot finish on it as it is. */
-class NoLink extends Error {}
-
-/**
- * Ask the drive for a second name of `joined` BEFORE any live line moves. exFAT and FAT32 have no
- * hard links: there the join could never be given the log's name, and every try would only move
- * more of the live log into it. The probe's `.partial` name is swept at launch (backup.ts).
- */
-function probeLink(joined: string, io: RestoreIo): void {
-  const probe = `${joined}.link.partial`
-  try {
-    rmSync(probe, { force: true })
-    ;(io.link ?? linkSync)(joined, probe)
-  } catch (err) {
-    throw new NoLink(`this drive would not link a file (${(err as Error).message}), so the log cannot be put back in one piece`)
-  }
-  try {
-    rmSync(probe)
-  } catch {
-    // A spare name for the joined file; the launch sweep takes it.
-  }
-}
-
-/** The pieces of `id` an earlier try set aside. Throws, naming the file, when this version cannot
- *  say where one belongs: a second piece, or a name without a length past the archive's. */
-function waitingPieces(dir: string, id: string, archiveBytes: number): Piece[] {
-  const waiting = piecesOf(dir, id)
-  const lost = waiting.length > 1 ? waiting[1] : waiting.find((p) => !(p.at >= archiveBytes))
-  if (lost === undefined) return waiting
-  throw new Error(`an earlier try left ${lost.path}, which holds lines from your log. Move it somewhere safe, then try again`)
-}
-
-/** Add what is waiting, then the live log, and give the result the live name. */
-function joinAndLink(logPath: string, joined: string, waiting: Piece[], io: RestoreIo): void {
-  for (const p of waiting) {
-    // A piece that is the live log's second name (the undo's link held, its delete did not) is in the log.
-    if (sameFile(p.path, logPath)) rmSync(p.path)
-    else addPiece(joined, p, io)
-  }
-  for (let round = 0; round < 50; round++) {
-    absorbLive(logPath, joined, io)
-    if (linkIfFree(joined, logPath, io.link)) {
-      // The log is whole under its own name from here, so nothing after the link is a failure.
-      try {
-        rmSync(joined)
-      } catch {
-        // A second name for the log is left; it costs nothing while the log is there.
-      }
-      return
-    }
-  }
-  throw new Error('the game kept recreating the log; try again in a quiet moment')
-}
-
 /** What a put-back that stopped has left, in the player's words. An unpacked copy holding nothing
- *  but the archive is removed, so the folder is as it was. Pressing again is advised only when it
- *  can finish, so never after `NoLink`. */
+ *  but the archive is removed, so the folder is as it was. */
 function stopped(err: Error, dir: string, seg: Segment, joined: string): string {
   const why = err.message
-  const held = [joined, ...piecesOf(dir, seg.id).map((p) => p.path)].filter((p) => existsSync(p))
+  const held = [joined, ...piecesOf(join(dir, seg.id)).map((p) => p.path)].filter((p) => existsSync(p))
   const onlyArchive = held.length === 1 && held[0] === joined && statSync(joined).size === seg.archiveSource?.bytes
   if (held.length === 0 || onlyArchive) {
     rmSync(joined, { force: true })
     return `${why}. Nothing has changed.`
   }
   const them = held.length > 1 ? 'them' : 'it'
-  const safe = `${why}. The lines since the archive are safe in ${held.join(' and ')}.`
-  if (err instanceof NoLink) return `${safe} Put back cannot finish until this drive links files. To use Archive now again, move ${them} somewhere safe first.`
-  return `${safe} Leave ${them} there and press Put back again to finish.`
+  return `${why}. The lines since the archive are safe in ${held.join(' and ')}. Leave ${them} there and press Put back again to finish.`
 }
 
 /**
  * Step 3.6: put an archived log back in front of the live one. The archive is unpacked and
- * verified, then joined with the live log the way ruling 0.5's test did by hand: move the live log
- * aside, add its bytes to the end, and link the result to the live name, which fails if the game
- * recreated the name meanwhile, in which case it goes round again. No line is removed or changed.
+ * verified, then joined with the live log (joinLive.ts): move the live log aside, add its bytes to
+ * the end, and give the result the live name, by a hard link, or on a drive without them by a
+ * copy that cannot replace a log the game made. No line is removed or changed.
  *
  * A TRY THAT STOPS IS FINISHED BY THE NEXT ONE. Whatever stops it (a full disk, a refused link, the
  * app killed), every line is then in the live log, in the joined file, or in a piece whose name
  * says where it belongs, and the reply names the files. The next try starts from them: it never
  * unpacks over the joined file and never renames over a piece.
  */
-export async function restoreLog(logPath: string, dir: string, seg: Segment, io: RestoreIo = {}): Promise<{ ok: boolean; reason: string }> {
+export async function restoreLog(logPath: string, dir: string, seg: Segment, io: RestoreIo = {}): Promise<{ ok: boolean; reason: string; how?: Named }> {
   if (seg.archivePath === null || seg.archiveSource === undefined) return { ok: false, reason: 'this history has no archive' }
   const joined = join(dir, `${seg.id}${RESTORING}`)
+  const stem = join(dir, seg.id)
   const source = seg.archiveSource
   let based = false
   try {
-    // A try that died right after the link: the log is whole and `joined` is its second name.
-    if (sameFile(joined, logPath)) {
+    // A try that died right after the name was given: the log is whole and holds all of `joined`.
+    if (await alreadyJoined(joined, logPath)) {
       rmSync(joined)
       return { ok: true, reason: 'restored' }
     }
-    const waiting = waitingPieces(dir, seg.id, source.bytes)
+    waitingPieces(stem, source.bytes)
     await archiveBase(resolveArchivePath(dir, seg), joined, source, logPath)
     based = true
-    probeLink(joined, io)
-    joinAndLink(logPath, joined, waiting, io)
-    return { ok: true, reason: 'restored' }
+    const how = joinAndName(logPath, joined, stem, io)
+    // The log is whole under its own name from here, so nothing after it is a failure.
+    try {
+      rmSync(joined)
+    } catch {
+      // A second name or a spare copy of the log is left; the next Put back finds it already joined.
+    }
+    return { ok: true, reason: 'restored', how }
   } catch (err) {
     const why = (err as Error).message
     if (!based) return { ok: false, reason: `${why}. Nothing has changed.` }
