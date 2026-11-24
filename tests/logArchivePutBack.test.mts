@@ -10,10 +10,11 @@
 import { after, test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
-import { appendFileSync, linkSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { appendFileSync, copyFileSync, linkSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { gzipSync } from 'node:zlib'
+import { sameFile } from '../src/main/logArchive/joinLive'
 import { putBackLeftovers, restoreLog } from '../src/main/logArchive/rotate'
 import { rotateBlockers } from '../src/shared/logArchive/preflight'
 import { SEGMENT_VERSION, type Segment } from '../src/shared/logArchive/segment'
@@ -82,10 +83,10 @@ test('put back: lines an earlier try had already joined are kept, and the second
 
 test('put back: a refused link keeps the newest lines, says where, and the second try finishes it', async () => {
   const f = archivedThenPlayed()
-  // The link to the log's name is refused, and so is the rename that stands in for it (a program
+  // The link to the log's name is refused, and so is the copy that stands in for it (a program
   // holding the joined file, say).
   const link = (from: string, to: string): void => (to === f.logPath ? refused('EPERM')() : linkSync(from, to))
-  const first = await restoreLog(f.logPath, f.dir, f.seg, { link, rename: refused('EPERM') })
+  const first = await restoreLog(f.logPath, f.dir, f.seg, { link, copy: refused('EPERM') })
   assert.equal(first.ok, false)
   assert.ok(first.reason.includes(f.joined), first.reason)
   assert.match(first.reason, /Put back again/)
@@ -100,19 +101,18 @@ test('put back: a refused link keeps the newest lines, says where, and the secon
 })
 
 // A drive without hard links (exFAT, FAT32) refuses every link (owner, 2026-11-23: "do the most
-// efficient for the scenario, if hard link fails, can we fall back to copy?"). The joined file is
-// the app's own and sits on the log's drive, so it is renamed to the log's name while that name is
-// free: no copy is needed. Only an archive folder on another drive from the log copies, to a
-// temporary name beside the log first, then renamed.
+// efficient for the scenario, if hard link fails, can we fall back to copy?"). The join is then
+// copied to the log's name, created exclusively, so a log the game made first is never replaced.
 
-for (const code of ['EPERM', 'ENOTSUP', 'EISDIR']) {
-  test(`put back: a drive that refuses hard links (${code}) gets the log back by renaming the join`, async () => {
+for (const code of ['EPERM', 'ENOTSUP', 'EISDIR', 'EXDEV']) {
+  test(`put back: a drive that refuses hard links (${code}) gets the log back by a copy`, async () => {
     const f = archivedThenPlayed()
     const back = await restoreLog(f.logPath, f.dir, f.seg, { link: refused(code) })
     assert.ok(back.ok, back.reason)
-    assert.equal(back.how, 'rename')
+    assert.equal(back.how, 'copy')
     assert.equal(readFileSync(f.logPath, 'utf8'), ARCHIVED + FRESH)
     assert.deepEqual(scratch(f.dir), [])
+    assert.deepEqual(scratch(join(f.dir, '..')), [], 'nothing is left beside the log')
     assert.deepEqual(putBackLeftovers(f.dir), [])
   })
 }
@@ -128,14 +128,20 @@ test('put back: lines an earlier try left on such a drive are joined and finishe
   assert.deepEqual(scratch(f.dir), [])
 })
 
-test('put back: an archive folder on another drive copies the join beside the log, then names it', async () => {
+test('put back: a log the game makes just before the copy is never written over; its lines are joined', async () => {
   const f = archivedThenPlayed()
-  const back = await restoreLog(f.logPath, f.dir, f.seg, { link: refused('EXDEV'), rename: refused('EXDEV') })
+  let game = true
+  // The game writes a line in the moment before the name is taken (seams for either way of naming).
+  const gameFirst = <A extends unknown[]>(real: (...a: A) => void) => (...a: A): void => {
+    if (game) writeFileSync(f.logPath, NEWER)
+    game = false
+    real(...a)
+  }
+  const io = { link: refused('ENOTSUP'), copy: gameFirst(copyFileSync), rename: gameFirst(renameSync) }
+  const back = await restoreLog(f.logPath, f.dir, f.seg, io)
   assert.ok(back.ok, back.reason)
-  assert.equal(back.how, 'copy')
-  assert.equal(readFileSync(f.logPath, 'utf8'), ARCHIVED + FRESH)
+  assert.equal(readFileSync(f.logPath, 'utf8'), ARCHIVED + FRESH + NEWER)
   assert.deepEqual(scratch(f.dir), [])
-  assert.deepEqual(scratch(join(f.dir, '..')), [], 'no half copy is left beside the log')
 })
 
 test('put back: a copy that stops half-way leaves no half log, keeps every line, and the next try finishes', async () => {
@@ -144,26 +150,55 @@ test('put back: a copy that stops half-way leaves no half log, keeps every line,
     writeFileSync(to, readFileSync(from).subarray(0, 10))
     refused('ENOSPC')()
   }
-  const first = await restoreLog(f.logPath, f.dir, f.seg, { link: refused('EXDEV'), rename: refused('EXDEV'), copy: halfCopy })
+  const first = await restoreLog(f.logPath, f.dir, f.seg, { link: refused('EXDEV'), copy: halfCopy })
   assert.equal(first.ok, false)
   assert.ok(first.reason.includes(f.joined), first.reason)
   assert.match(first.reason, /Put back again/)
   assert.equal(readFileSync(f.joined, 'utf8'), ARCHIVED + FRESH)
   assert.equal(readFileSync(f.logPath).length, 0, 'the log keeps its name, never a half copy')
-  assert.deepEqual(scratch(join(f.dir, '..')), [], 'the half copy is removed')
+  assert.deepEqual(scratch(f.dir).filter((x) => x !== `${f.seg.id}.restoring`), [], 'the half copy is not kept as a piece')
   appendFileSync(f.logPath, NEWER)
-  const second = await restoreLog(f.logPath, f.dir, f.seg, { link: refused('EXDEV'), rename: refused('EXDEV') })
+  const second = await restoreLog(f.logPath, f.dir, f.seg, { link: refused('EXDEV') })
   assert.ok(second.ok, second.reason)
   assert.equal(readFileSync(f.logPath, 'utf8'), ARCHIVED + FRESH + NEWER)
 })
 
+test('put back: a half copy a killed try left under the log’s name is not joined twice', async () => {
+  const f = archivedThenPlayed()
+  writeFileSync(f.joined, ARCHIVED + FRESH)
+  writeFileSync(f.logPath, (ARCHIVED + FRESH).slice(0, 30))
+  const back = await restoreLog(f.logPath, f.dir, f.seg, { link: refused('EXDEV') })
+  assert.ok(back.ok, back.reason)
+  assert.equal(readFileSync(f.logPath, 'utf8'), ARCHIVED + FRESH)
+})
+
 test('put back: a copy with no room for it is not started, and every line is kept', async () => {
   const f = archivedThenPlayed()
-  const back = await restoreLog(f.logPath, f.dir, f.seg, { link: refused('EXDEV'), rename: refused('EXDEV'), freeBytes: () => 5 })
+  const back = await restoreLog(f.logPath, f.dir, f.seg, { link: refused('EXDEV'), freeBytes: () => 5 })
   assert.equal(back.ok, false)
   assert.match(back.reason, /not enough free space/)
   assert.equal(readFileSync(f.joined, 'utf8'), ARCHIVED + FRESH)
   assert.deepEqual(scratch(join(f.dir, '..')), [])
+})
+
+test('put back: a piece the launch recovery left for another log does not block Put back', async () => {
+  const f = archivedThenPlayed()
+  // The recovery's pieces are `<id>.moving.<at>.part`; a capture of the same bytes shares the id.
+  const other = join(f.dir, `${f.seg.id}.moving.${BYTES}.part`)
+  writeFileSync(other, 'the recovery’s lines\r\n')
+  const back = await restoreLog(f.logPath, f.dir, f.seg)
+  assert.ok(back.ok, back.reason)
+  assert.equal(readFileSync(f.logPath, 'utf8'), ARCHIVED + FRESH)
+  assert.equal(readFileSync(other, 'utf8'), 'the recovery’s lines\r\n', 'left byte for byte')
+})
+
+test('put back: a volume that reports file id 0 for every file never has two files taken for one', () => {
+  const f = archivedThenPlayed()
+  writeFileSync(f.joined, ARCHIVED)
+  const zero = (): { dev: bigint; ino: bigint } => ({ dev: 7n, ino: 0n })
+  assert.equal(sameFile(f.joined, f.logPath, zero), false)
+  assert.equal(sameFile(f.joined, f.logPath, () => ({ dev: 0n, ino: 5n })), false)
+  assert.equal(sameFile(f.joined, f.logPath, () => ({ dev: 7n, ino: 5n })), true, 'a real id is trusted')
 })
 
 test('put back: a try that died after its copy was named is finished without joining the archive twice', async () => {

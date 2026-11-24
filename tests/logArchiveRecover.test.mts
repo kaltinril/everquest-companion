@@ -20,7 +20,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { backupLog } from '../src/main/logArchive/backup'
 import { readLogPrefix } from '../src/main/logArchive/logPrefix'
-import { JOURNAL, readJournal, recoverRotation, recoveredNote, unfinishedReason, type RotateDeps } from '../src/main/logArchive/rotate'
+import { JOURNAL, readJournal, recoverRotation, recoveredNote, rotateLog, unfinishedReason, type RotateDeps } from '../src/main/logArchive/rotate'
 import { listSegments, writeSegment } from '../src/main/logArchive/segmentStore'
 import { SEGMENT_VERSION, type Segment } from '../src/shared/logArchive/segment'
 
@@ -168,7 +168,7 @@ for (const code of ['EPERM', 'ENOTSUP', 'EISDIR']) {
 
 test('recover: a log folder on another drive from the archive folder gets the log back by a copy', async () => {
   const f = interrupted()
-  const io = { link: refused('EXDEV'), rename: refused('EXDEV') }
+  const io = { link: refused('EXDEV') }
   const done = await recoverRotation(f.dir, { ...refusedBackup, joinIo: io })
   assert.equal(readFileSync(f.logPath, 'utf8'), MOVED + FRESH)
   assert.deepEqual(strays(f.dir), [])
@@ -231,5 +231,41 @@ test('recover: a put back that died after its copy was named is finished without
   await recoverRotation(f.dir, deps())
   assert.equal(readFileSync(f.logPath, 'utf8'), MOVED + FRESH + NEWER)
   assert.equal(existsSync(f.movedPath), false)
+  assert.equal(readJournal(f.dir), null)
+})
+
+// ── after the review of 2026-11-23 ─────────────────────────────────────────────────────────────────
+
+test('recover: a moved file taken outside the app during a put back is not reported as put back', async () => {
+  const f = interrupted()
+  writeFileSync(join(f.dir, JOURNAL), JSON.stringify({ ...readJournal(f.dir), step: 'returning' }))
+  rmSync(f.movedPath)
+  const done = await recoverRotation(f.dir, deps())
+  const note = recoveredNote(done) ?? ''
+  assert.doesNotMatch(note, /put your log back whole|Nothing is missing/)
+  assert.match(note, /no longer at .+nothing could be put back/)
+  assert.equal(readJournal(f.dir), null)
+  assert.equal(readFileSync(f.logPath, 'utf8'), FRESH)
+})
+
+test('recover: a record left backed up is no longer a finished backup once the log is back', async () => {
+  const f = interrupted({ state: 'backed-up' })
+  // The compressed copy was written and recorded; sealing it failed, and so does the finish now.
+  await recoverRotation(f.dir, deps({ writeSegment: (dir, s) => (s.state === 'sealed' ? refused('EIO')() : writeSegment(dir, s)) }))
+  assert.equal(readFileSync(f.logPath, 'utf8'), MOVED + FRESH)
+  const seg = listSegments(f.dir).segments[0]
+  assert.equal(seg.state, 'captured', 'not offered to Keep, and not read as a log the player put back')
+})
+
+test('archive: a moved file left by an earlier archive is never written over', async () => {
+  const f = interrupted()
+  rmSync(join(f.dir, JOURNAL))
+  writeFileSync(f.logPath, MOVED)
+  const seg = listSegments(f.dir).segments[0]
+  const r = await rotateLog(f.logPath, f.dir, seg, deps())
+  assert.equal(r.ok, false)
+  assert.ok(!r.ok && !r.logTouched && r.reason.includes(f.movedPath) && /Nothing has changed/.test(r.reason), JSON.stringify(r))
+  assert.equal(readFileSync(f.movedPath, 'utf8'), MOVED, 'the earlier file is left byte for byte')
+  assert.equal(readFileSync(f.logPath, 'utf8'), MOVED, 'the log is not moved')
   assert.equal(readJournal(f.dir), null)
 })

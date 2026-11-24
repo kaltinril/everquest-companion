@@ -68,8 +68,14 @@ const deps = (over: Partial<RotateDeps> = {}): RotateDeps => ({
 
 const fullDisk = { append: (): never => { throw Object.assign(new Error('ENOSPC: no space left'), { code: 'ENOSPC' }) } }
 
+/** The game has written since the move, so there is a live log to add (an empty one is just dropped). */
+function played(dir: string): void {
+  writeFileSync(join(dir, '..', 'eqlog_Primitive_freeport.txt'), '[Mon Aug 03 09:00:00 2026] after the move\r\n')
+}
+
 test('recovery: an archive that cannot be finished or put back gives both reasons, and a later start puts it back', async () => {
   const f = interrupted()
+  played(f.dir)
   const failed = await recoverRotation(f.dir, deps({ backup: async () => ({ ok: false, reason: 'the disk refused the write' }), joinIo: fullDisk }))
   const why = unfinishedReason(failed)
   assert.ok(why !== null && why.includes('the disk refused the write') && why.includes('ENOSPC'), String(failed))
@@ -86,6 +92,7 @@ test('recovery: an archive that cannot be finished or put back gives both reason
 
 test('recovery: a reason that does not name the old log has its place added', async () => {
   const f = interrupted()
+  played(f.dir)
   const shorter = async (): Promise<never> => {
     throw new Error('the log is 5 bytes, shorter than the 9 captured')
   }

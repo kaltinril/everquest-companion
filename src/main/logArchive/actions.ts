@@ -416,8 +416,8 @@ export function restoreNow(id: string): Promise<LogArchiveReply> {
     if (newest?.id !== id) return reply(false, 'Only the newest archived log can be put back.')
     const r = await restoreLog(a.logPath, dir, newest)
     if (!r.ok) return reply(false, `Not put back: ${r.reason}`)
-    // A copy took longer and needed room for a second copy for a moment; worth a quiet word.
-    const copied = r.how === 'copy' ? ' (The archive folder is on another drive, so it was copied into place.)' : ''
+    // A copy takes longer and needs room for a second copy of the log; worth a quiet word.
+    const copied = r.how === 'copy' ? ' (This drive cannot link files, so it was copied into place.)' : ''
     writeSegment(dir, { ...newest, archivePath: resolveArchivePath(dir, newest) ?? newest.archivePath, state: 'backed-up' })
     // The engine is following a short log that just became a long one; only a fresh launch folds
     // it from the start. The card told the player the app restarts.

@@ -160,6 +160,11 @@ async function finishFromMoved(dir: string, j: Journal, deps: RotateDeps): Promi
 /** Archive the live log behind a captured segment. The caller has run the preflight. */
 export async function rotateLog(logPath: string, dir: string, captured: Segment, deps: RotateDeps): Promise<RotateResult> {
   const j: Journal = { v: 1, logPath, movedPath: join(dir, `${captured.id}.moving`), segmentId: captured.id, step: 'moving' }
+  // A rename replaces what is at the new name, and a moved file left there holds the player's lines.
+  if (existsSync(j.movedPath)) {
+    const reason = `an earlier archive left ${j.movedPath}, which holds lines from your log, so the log was not moved. Move that file somewhere safe, then try again. Nothing has changed.`
+    return { ok: false, reason, logTouched: false }
+  }
   // A log captured again at the same length has the same id as the history kept from it (Back up,
   // then Keep, then Archive with nothing played): a move that fails must leave that record as it was.
   const prior = deps.readSegment(dir, captured.id)
@@ -199,7 +204,9 @@ export async function recoverRotation(dir: string, deps: RotateDeps): Promise<st
     return 'an archive was interrupted before the log was moved; nothing had changed'
   }
   // A put back under way is finished, never archived: the moved file may hold some of the live log.
-  if (j.step === 'returning') return putMovedBack(dir, j, null, deps)
+  // The journal is cleared before the moved file is removed, so a moved file gone in this step was
+  // taken outside the app, not joined.
+  if (j.step === 'returning') return existsSync(j.movedPath) ? putMovedBack(dir, j, null, deps) : gone(dir, j)
   try {
     const seg = await finishFromMoved(dir, { ...j, step: 'moved' }, deps)
     return `finished an interrupted archive: ${seg.id}`
@@ -228,29 +235,48 @@ function causeOf(err: unknown, j: Journal): string {
 async function undoOrSay(dir: string, j: Journal, err: unknown, deps: RotateDeps): Promise<string> {
   // A sealed archive is shown on the tabs; only the moved file's delete is left. Never undone.
   if (deps.readSegment(dir, j.segmentId)?.state === 'sealed') return `${NOT_FINISHED}${afterMove(err, j)}`
-  if (!existsSync(j.movedPath)) {
-    // Moved or deleted outside the app. Nothing can be put back, and a journal kept would block
-    // every archive for good.
-    clearJournal(dir)
-    return `${GONE}${j.movedPath}, so nothing could be put back`
-  }
+  if (!existsSync(j.movedPath)) return gone(dir, j)
   return putMovedBack(dir, j, causeOf(err, j), deps)
+}
+
+/** The moved file was moved or deleted outside the app. Nothing can be put back, and a journal
+ *  kept would block every archive for good. Lines a put back had set aside are named, never moved. */
+function gone(dir: string, j: Journal): string {
+  clearJournal(dir)
+  const aside = piecesOf(j.movedPath).map((p) => p.path)
+  const kept = aside.length > 0 ? `; lines set aside from your log are kept in ${aside.join(' and ')}` : ''
+  return `${GONE}${j.movedPath}, so nothing could be put back${kept}`
+}
+
+/** After a put back the record must not stand for a finished backup: a `backed-up` record whose
+ *  head the live log begins with reads as a log the player put back, which pauses the automatic
+ *  archive (eligible.ts `putBackInLive`). The compressed copy itself is kept. */
+function demoteRecord(dir: string, j: Journal, deps: RotateDeps): void {
+  try {
+    const seg = deps.readSegment(dir, j.segmentId)
+    if (seg?.state === 'backed-up') deps.writeSegment(dir, { ...seg, state: 'captured' })
+  } catch {
+    // The automatic archive then waits for Archive now; nothing is lost.
+  }
 }
 
 /** Join the moved file back in front of the live log, under the log's name. `why` is the reason
  *  the archive could not be finished; null when a put back an earlier start began is continued. */
 async function putMovedBack(dir: string, j: Journal, why: string | null, deps: RotateDeps): Promise<string> {
   try {
-    if (existsSync(j.movedPath)) {
-      writeJournal(dir, { ...j, step: 'returning' })
-      if (await alreadyJoined(j.movedPath, j.logPath)) rmSync(j.movedPath)
-      else {
-        waitingPieces(j.movedPath, 0)
-        joinAndName(j.logPath, j.movedPath, j.movedPath, deps.joinIo ?? {})
-      }
+    writeJournal(dir, { ...j, step: 'returning' })
+    if (!(await alreadyJoined(j.movedPath, j.logPath))) {
+      waitingPieces(j.movedPath, 0)
+      joinAndName(j.logPath, j.movedPath, j.movedPath, deps.joinIo ?? {})
     }
-    // A moved file that is gone in step `returning` already has the log's name.
+    demoteRecord(dir, j, deps)
+    // The journal goes first: a moved file that is gone in step `returning` was not joined.
     clearJournal(dir)
+    try {
+      rmSync(j.movedPath, { force: true })
+    } catch {
+      // A spare copy of lines the log now holds; it costs disk space only.
+    }
     return `${PUT_BACK}${why ?? LAST_START}`
   } catch (err) {
     try {
@@ -279,8 +305,8 @@ export function recoveredNote(done: string | null): string | null {
     return `An archive could not be finished (${done.slice(PUT_BACK.length)}), so the app put your log back whole. Nothing is missing.`
   }
   if (done?.startsWith(GONE) === true) {
-    const rest = done.slice(GONE.length).replace(/, so nothing could be put back$/, '')
-    return `An archive could not be finished, and its old log is no longer at ${rest} (moved or deleted outside the app), so nothing could be put back.`
+    const [where, kept = ''] = done.slice(GONE.length).split(', so nothing could be put back')
+    return `An archive could not be finished, and its old log is no longer at ${where} (moved or deleted outside the app), so nothing could be put back${kept}.`
   }
   return null
 }
@@ -353,7 +379,7 @@ function stopped(err: Error, dir: string, seg: Segment, joined: string): string 
  * Step 3.6: put an archived log back in front of the live one. The archive is unpacked and
  * verified, then joined with the live log (joinLive.ts): move the live log aside, add its bytes to
  * the end, and give the result the live name, by a hard link, or on a drive without them by a
- * rename or a copy. No line is removed or changed.
+ * copy that cannot replace a log the game made. No line is removed or changed.
  *
  * A TRY THAT STOPS IS FINISHED BY THE NEXT ONE. Whatever stops it (a full disk, a refused link, the
  * app killed), every line is then in the live log, in the joined file, or in a piece whose name
@@ -376,6 +402,12 @@ export async function restoreLog(logPath: string, dir: string, seg: Segment, io:
     await archiveBase(resolveArchivePath(dir, seg), joined, source, logPath)
     based = true
     const how = joinAndName(logPath, joined, stem, io)
+    // The log is whole under its own name from here, so nothing after it is a failure.
+    try {
+      rmSync(joined)
+    } catch {
+      // A second name or a spare copy of the log is left; the next Put back finds it already joined.
+    }
     return { ok: true, reason: 'restored', how }
   } catch (err) {
     const why = (err as Error).message
