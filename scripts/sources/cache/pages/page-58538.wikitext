@@ -6,8 +6,8 @@
     <li>Pet Type: Wolf Spirit</li>
     <li>Pet Classes: [[Beastlord]] / [[Warrior]]</li>
     <li>Pet Level: 26</li>
-    <li>Hit Points: 1684 (+1/tick)</li>
-    <li>Mana: 500 (+6/tick)</li>
+    <li>Hit Points: 1602 (+1/tick)</li>
+    <li>Mana: 546 (+50/tick)</li>
     </ul>
   </div>
   <div style="flex: 1;">

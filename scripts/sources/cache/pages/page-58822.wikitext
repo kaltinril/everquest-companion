@@ -6,7 +6,7 @@
     <li>Pet Type: Animation</li>
     <li>Pet Classes: [[Paladin]] / [[Warrior]]</li>
     <li>Pet Level: 16</li>
-    <li>Hit Points: 502 (+1/tick)</li>
+    <li>Hit Points: 557 (+1/tick)</li>
     <li>Mana: 320 (+32/tick)</li>
     </ul>
   </div>
@@ -48,14 +48,13 @@
 !Bonus Damage
 !Dual Wield
 |-
-|?
-|?
+|10
+|30
 | +0
-| - 
+| 20% 
 |-
 |}
 == Abilities ==
-'''Needs to be Verified'''
 * [[Skill_Bash|Bash]]
 * [[Skill_Block|Block]]
 * [[Skill_Cleave|Cleave]]
@@ -68,8 +67,7 @@
 * [[Skill_Taunt|Taunt]]
 
 == Spell List ==
-'''Needs to be Verified'''
-* [[Desist|<span class='itemeff'>Desist</span>]]??
+* [[Desist|<span class='itemeff'>Desist</span>]]
 * [[Courage|<span class='itemeff'>Courage</span>]]
 * [[Furor|<span class='itemeff'>Furor</span>]]
 * [[Light Healing|<span class='itemeff'>Light Healing</span>]]??

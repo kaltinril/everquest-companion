@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-22T08:45:32.069Z",
+  "scrapedAt": "2026-11-24T08:33:28.325Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -35218,7 +35218,11 @@
         "-10",
         "+"
       ],
-      "image": "npc_a_krag_warrior.png"
+      "image": "npc_a_krag_warrior.png",
+      "commonDrops": [
+        "Bronze Battle Axe",
+        "Bronze Mace"
+      ]
     },
     {
       "page": "A krom zek spy",
@@ -38129,11 +38133,11 @@
         }
       ],
       "image": "npc_a_lizard_man_scout.png",
-      "otherNames": [
-        "A lizard man scout"
-      ],
       "relatedQuests": [
         "Greenblood Shadowknight Tunic"
+      ],
+      "otherNames": [
+        "A lizard man scout"
       ]
     },
     {
@@ -39380,7 +39384,7 @@
     },
     {
       "page": "A mimic",
-      "eraTag": "EpicQuests",
+      "eraTag": "Classic",
       "name": "a mimic",
       "level": "43-47",
       "zones": [
@@ -39395,10 +39399,6 @@
           "ew": 265
         }
       ],
-      "outOfEra": true,
-      "otherNames": [
-        "Mimic"
-      ],
       "factions": [
         "Minions of Underfoot"
       ],
@@ -39409,7 +39409,9 @@
       "relatedQuests": [
         "Shadow Knight Epic Quest"
       ],
-      "noImage": true
+      "otherNames": [
+        "Mimic"
+      ]
     },
     {
       "page": "A mimic (Clan RunnyEye)",
@@ -40654,7 +40656,10 @@
         "-2",
         "+"
       ],
-      "image": "npc_a_mutilated_attendant.png"
+      "image": "npc_a_mutilated_attendant.png",
+      "commonDrops": [
+        "Ruby"
+      ]
     },
     {
       "page": "A necro acolyte",
@@ -45349,7 +45354,10 @@
         "-2",
         "+"
       ],
-      "image": "npc_a_reanimated_scholar.png"
+      "image": "npc_a_reanimated_scholar.png",
+      "commonDrops": [
+        "Ruby"
+      ]
     },
     {
       "page": "A reanimated servant",
@@ -61833,7 +61841,10 @@
       "factionAmounts": [
         "-2"
       ],
-      "image": "npc_a_vivisected_centurion.png"
+      "image": "npc_a_vivisected_centurion.png",
+      "commonDrops": [
+        "Ruby"
+      ]
     },
     {
       "page": "A Voracious Brute",
@@ -123900,6 +123911,7 @@
       ],
       "drops": [
         "Rusty Weapons",
+        "Fippy's Paw",
         "Patch of Gnoll Fur",
         "Gnoll Fang",
         "High Quality Gnoll Fur"
@@ -216641,7 +216653,10 @@
           "ew": 103
         }
       ],
-      "image": "npc_renaldo_the_highway_bandit.png"
+      "image": "npc_renaldo_the_highway_bandit.png",
+      "commonDrops": [
+        "Fine Steel Spear"
+      ]
     },
     {
       "page": "Rendallen Ironforge",

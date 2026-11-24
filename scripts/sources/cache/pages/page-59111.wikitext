@@ -107,8 +107,8 @@ Applies to Charm, Fear, Lull/Pacify, Mez, Root, and Stun spells
 * +1/2 Spell Casting Level
 
 === Pets ===
-* -? Cast Time
-* -? Mana Cost
+* -3% Cast Time
+* -3% Mana Cost
 * Pet level increased +1 (max pet level = Character Level)
 ** Benefits per pet level:
 *** Increase base hit points

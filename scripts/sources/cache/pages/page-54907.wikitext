@@ -1,3 +1,32 @@
+== 11/22/2026 ==
+
+=== Drop observations are live! ===
+
+Hi everyone! We now have a [[Special:DropDatabase|Drop Database]], and the observations feed into the loot lists on mob pages. If you've been collecting drops in Eye of Zomm, those records finally have somewhere to go :)
+
+=== What changed? ===
+
+* '''[[Special:DropDatabase|Browse the Drop Database]].''' Search by zone, mob or item. Partial names work, so <code>flask</code> finds Water Flask. Expand an entry to see the individual observations, when they were recorded and submitted, quantities, and a character name if the contributor chose to share one. The database shows the full counts and percentages, even for small samples.
+* '''Grey percentages on mob pages.''' Observed items can appear in grey from their first report. A manually written percentage always takes priority. An automatic percentage only appears when there is no manual one and that particular item has at least 10 reports from the same mob, zone and instance. Matching manual entries keep their name and rarity notes. Motes are left out of the generated mob loot display.
+
+'''The grey % is an item's share of reported loot from that mob in the same zone and instance.''' Empty corpses and items nobody looted aren't fully represented in the logs, so this is not a per-kill drop chance. More observations should make the picture more useful, but please keep that distinction in mind.
+
+=== How do I contribute? ===
+
+'''Eye of Zomm:''' [https://github.com/Maergoth/EQL-EOZ/releases/latest Update to the latest version], then open '''Settings → Drop observations → Log in to wiki''' inside EoZ. Being signed in through your browser doesn't sign the app in, and your wiki account needs a confirmed email. Leave '''Collect and sync drop observations''' enabled and keep EoZ open and signed in while it uploads in the background, including previously saved observations. Uploads start after startup or login, and records are kept for retry if the wiki is unavailable. Existing opt-outs are respected.
+
+Character names are optional and off by default. To include yours with new observations, save and select the character currently detected by EoZ in '''Character Select''', then enable '''Include character name publicly with drop observations'''. The setting shows you which name will be shared. Names already queued can still be published after turning this off.
+
+'''Using another tool?''' Expand '''Share observations from another tool''' on the [[Special:DropDatabase|database page]]. The format, API endpoint and submission instructions are there, along with [[API Documentation|the full API documentation]]. You can adapt your recorded observations to that format and submit through your wiki account.
+
+=== Editing mob loot ===
+
+The wiki fills in observations automatically while you keep editing the mob's normal loot list. Just add one item per line or bullet: <code>Bone Chips</code> or <code><nowiki>[[Bone Chips]] (Common)</nowiki></code>. The manual entry takes the place of the matching generated entry. Any percentage you write yourself takes priority; otherwise, an observed percentage is filled in once that item reaches the 10-report minimum. Ordinary item links match by their destination, so a custom link label or notes after the link won't stop the match. Your wording and rarity notes are kept.
+
+We've also cleaned up old imported counts and percentage annotations on several mob pages. Item name, a manual or observed %, optional rarity. Much less nonsense to edit.
+
+Please try it out and report weird matches, missing drops or upload problems in [https://discord.com/channels/1435786469968183456/1521564179587268649 the wiki Discord]. Feedback is appreciated!
+
 == 11/14/2026 ==
 
 Hi everyone! We're trying optional ads as a way to support the wiki and buy more time for development '''without throwing money at it''', if you choose.
