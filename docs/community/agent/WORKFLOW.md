@@ -202,7 +202,12 @@ disagree, RULES.md wins; fix this file.
   `engine-absent`, `sky-achievements`, `sky-reward-inference` can flake under parallel load; run
   serially. `maps` also failed about one run in three alone until 2026-11-23: the zone chip names
   the map asked for, so a step waiting only on the chip clicked the previous map's label as it
-  vanished. After a zone change, wait on something the drawn map sets. The `feedback` and `telemetry` specs, the runner's skip list and the first-run notice
+  vanished. After a zone change, wait on something the drawn map sets. `character-switch-storm`
+  fails about 3 runs in 5 even alone ("ZERO module deltas reached the renderer ... 1 or 4 while
+  folding"), measured 2026-11-23 at the same rate on the pushed trunk and on the new batch: a flake
+  of the spec or a standing defect, not a regression; open. engined's `live_surfaces` "a melee round
+  leaves the modules ... silent" fails inside the full parallel `cargo test --workspace` and passes
+  alone (3 of 3, 2026-11-23). The `feedback` and `telemetry` specs, the runner's skip list and the first-run notice
   were removed 2026-11-20; the measurements below that name them are history.
   Measured 2026-10-18 (full run on main_community, then serial, then the same specs on test.26):
   58/68 green; the 10 reds were identical on test.26. By design on the TEST build: `feedback`,
