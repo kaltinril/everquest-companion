@@ -669,7 +669,7 @@ function hasteTerm(stats: GearStats, weights: RoleWeights, gate: LiveGate, owned
  * improved on what the page said (the "a stated penalty scores that penalty" clause above). What
  * owning haste cancels is the BENEFIT of more of it, never the cost of an item that takes it away.
  */
-function hasteCredit(stated: number, ownedHaste: number): number {
+export function hasteCredit(stated: number, ownedHaste: number): number {
   if (stated < 0) return stated
   return ownedHaste > 0 ? 0 : stated
 }

@@ -34,6 +34,7 @@ import { MacrosTab } from './features/macros/MacrosView'
 import PlannerView from './features/planner/PlannerView'
 import GearView from './features/gear/GearView'
 import VoidMoteView from './features/gear/VoidMoteView'
+import { BisTab } from './features/gear/BisView'
 // The gear area's third tab (JOS-324). A placeholder panel until JOS-326 fills it, and imported
 // plainly rather than lazily: it is a heading and two sentences, which is cheaper than the code
 // that would defer it.
@@ -165,6 +166,8 @@ function PlainView({
       {view === 'wishlist' && <WishlistView key={viewKey} onOpenLoot={routing.openLoot} onOpenMob={routing.openMob} onOpenMapZone={routing.openMapZone} />}
       {/* VOID MOTES (owner, 2026-11-19): a gear-area tab. Keyed like the rest: what is worn is one character's. */}
       {view === 'voidMotes' && <VoidMoteView key={viewKey} onOpenLoot={routing.openLoot} />}
+      <BisTab view={view} viewKey={viewKey} onOpenLoot={routing.openLoot} />
+
       {view === 'buffs' && <BuffsView key={viewKey} />}
       {/* SKILLS (fork #6). Its view check lives in its own file for the SpellDrill's reason. */}
       <SkillsTab view={view} viewKey={viewKey} />
