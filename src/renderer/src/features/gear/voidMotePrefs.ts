@@ -208,11 +208,32 @@ export function moteUnrankedText(hosts: readonly PlannerInventoryHost[]): string
   return `Not ranked: ${hosts.map(hostText).join(', ')} (not in the item data)`
 }
 
-/** `Indicolite Breastplate +9→+10 · Earring of Bashing +8→+10`: the week's motes, one item each. */
+/** `2 motes`, `1 mote`. */
+const motesText = (n: number): string => `${String(n)} ${n === 1 ? 'mote' : 'motes'}`
+
+/**
+ * `Indicolite Breastplate +9→+10 (1 mote) · Earring of Bashing +8→+10 (2 motes)`: the week's motes,
+ * one item each, with the count said in words (Malkil, 2026-11-23, read the table's bare number as
+ * the count; the line says it so nobody has to guess).
+ */
 export function motePlanText(plan: readonly MotePlanStep[]): string {
   return planByItem(plan)
-    .map((p) => `${p.name} +${String(p.from)}→+${String(p.from + p.motes)}`)
+    .map((p) => `${p.name} +${String(p.from)}→+${String(p.from + p.motes)} (${motesText(p.motes)})`)
     .join(' · ')
+}
+
+const ORDER_WORDS: Record<MoteOrder, string> = { recommended: 'recommended', gain: 'biggest gain', effort: 'most hours saved' }
+
+/**
+ * The line above the table: what a highlighted row and its number mean. The plan is the Recommended
+ * one under every sort (owner's default, 2026-11-23), so under another sort the line says so: the
+ * tester read "Biggest gain" keeping the highlights as a bug. `''` when nothing is highlighted.
+ */
+export function moteLegendText(order: MoteOrder, plan: readonly MotePlanStep[]): string {
+  if (plan.length === 0) return ''
+  const count = 'the number is how many motes that item gets'
+  if (order === 'recommended') return `Highlighted rows are where this week's motes go; ${count}. Sorting changes only the order.`
+  return `Sorted by ${ORDER_WORDS[order]}. The highlighted rows are still the Recommended plan for this week's motes; ${count}.`
 }
 
 /**

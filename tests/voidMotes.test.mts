@@ -366,7 +366,7 @@ test("THE OWNER'S PRACTICE: all three of the week's motes can land on one item, 
     ['Slime Blood of Cazic-Thule', 9]
   ])
   assert.equal(planMotesOn(plan, 'CHEST'), 3)
-  assert.equal(motePlanLine(plan), 'This week: Slime Blood of Cazic-Thule +7→+10')
+  assert.equal(motePlanLine(plan), 'This week: Slime Blood of Cazic-Thule +7→+10 (3 motes)')
 })
 
 test('motePlan: a finished item frees the next mote, and two can land on the second item', () => {
@@ -377,14 +377,14 @@ test('motePlan: a finished item frees the next mote, and two can land on the sec
     ['Bloodstar Pendant', 8],
     ['Bloodstar Pendant', 9]
   ])
-  assert.equal(motePlanLine(plan), 'This week: Slime Blood of Cazic-Thule +9→+10 · Bloodstar Pendant +8→+10')
+  assert.equal(motePlanLine(plan), 'This week: Slime Blood of Cazic-Thule +9→+10 (1 mote) · Bloodstar Pendant +8→+10 (2 motes)')
 })
 
 test("THE OWNER'S WORDS: \"I wouldn't use it on a crushbone belt\": a common piece below +7 never takes a mote, and the rest are held", () => {
   const { hosts, byKey } = worn([gear('Crushbone Belt', { stats: { AC: 300 } }), gear('Bloodstar Pendant')], [3, 9])
   const plan = motePlan(hosts, byKey, OPTS)
   assert.deepEqual(plan.map((s) => s.name), ['Bloodstar Pendant'], 'one mote finishes the pendant; the belt takes none')
-  assert.equal(motePlanLine(plan), 'This week: Bloodstar Pendant +9→+10 · hold 2')
+  assert.equal(motePlanLine(plan), 'This week: Bloodstar Pendant +9→+10 (1 mote) · hold 2')
   const none = worn([gear('Crushbone Belt')], [3])
   assert.deepEqual(motePlan(none.hosts, none.byKey, OPTS), [])
   assert.equal(motePlanLine([]), 'Nothing you wear is ready for a mote yet: hold them')

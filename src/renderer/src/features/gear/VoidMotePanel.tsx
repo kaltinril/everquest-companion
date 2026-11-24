@@ -44,6 +44,7 @@ import {
   sortMoteAdvice,
   type MoteAdvice,
   type MoteOrder,
+  type MotePlanStep,
   type MoteTarget
 } from '@shared/planner/voidMotes'
 import { segmented } from '../combat/segmented'
@@ -61,6 +62,7 @@ import {
   moteGateText,
   moteHoursText,
   moteHoursTitle,
+  moteLegendText,
   motePlanLine,
   moteSourceText,
   moteSourceTitle,
@@ -76,7 +78,7 @@ const HINT = 'Void-Touched Potential: three a week from raids, each skips a whol
 
 /** One clause per header (the tooltip diet). */
 const HEAD: readonly { label: string; hint: string; align?: 'right' }[] = [
-  { label: '#', hint: "How many of this week's motes it gets; a dash means not yet" },
+  { label: 'Motes', hint: "How many of this week's motes go on this item; a dash means not yet" },
   { label: 'Item', hint: "A worn item and its next tier, or where this week's motes take it" },
   { label: 'Slot', hint: 'Where your inventory dump says you wear it' },
   { label: 'Gain', hint: 'What the next tier adds for your target', align: 'right' },
@@ -229,6 +231,49 @@ function MoteRow({ advice, picks, target, onOpenLoot }: RowProps): JSX.Element {
   )
 }
 
+interface ListProps {
+  /** the rows, in the order picked */
+  list: readonly MoteAdvice[]
+  /** the week's plan: always the Recommended one, whatever the order */
+  plan: readonly MotePlanStep[]
+  motes: VoidMotePrefs
+  classes: readonly ClassAbbr[]
+  onOpenLoot?: (item: string) => void
+}
+
+/** The table, with the line that says what its highlights mean above it. */
+function MoteList({ list, plan, motes, classes, onOpenLoot }: ListProps): JSX.Element {
+  const legend = moteLegendText(motes.order, plan)
+  return (
+    <>
+      {/* What the highlight means, said under every sort (Malkil, 2026-11-23). */}
+      {legend !== '' && (
+        <Typography variant="caption" color="text.secondary" data-testid="gear-motes-legend" sx={{ px: 1, pb: 0.5, flexShrink: 0 }}>
+          {legend}
+        </Typography>
+      )}
+      <Box data-testid="gear-motes-list" sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto' }}>
+        <Table size="small" stickyHeader>
+          <TableHead>
+            <TableRow>
+              {HEAD.map((h) => (
+                <TableCell key={h.label} title={h.label === 'Gain' ? moteGainHint(motes.target, classes) : h.hint} align={h.align} sx={{ ...CELL, color: 'text.secondary' }}>
+                  {h.label}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {list.map((a) => (
+              <MoteRow key={a.cell} advice={a} picks={planMotesOn(plan, a.cell)} target={motes.target} onOpenLoot={onOpenLoot} />
+            ))}
+          </TableBody>
+        </Table>
+      </Box>
+    </>
+  )
+}
+
 export interface VoidMotePanelProps {
   /** what is worn, and the corpus by key — the hover card's own join */
   compare: GearCompareData
@@ -287,24 +332,7 @@ export default function VoidMotePanel({ compare, indexReady, indexRefused, class
           })}
         </Typography>
       ) : (
-        <Box data-testid="gear-motes-list" sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto' }}>
-          <Table size="small" stickyHeader>
-            <TableHead>
-              <TableRow>
-                {HEAD.map((h) => (
-                  <TableCell key={h.label} title={h.label === 'Gain' ? moteGainHint(motes.target, classes) : h.hint} align={h.align} sx={{ ...CELL, color: 'text.secondary' }}>
-                    {h.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {list.map((a) => (
-                <MoteRow key={a.cell} advice={a} picks={planMotesOn(plan, a.cell)} target={motes.target} onOpenLoot={onOpenLoot} />
-              ))}
-            </TableBody>
-          </Table>
-        </Box>
+        <MoteList list={list} plan={plan} motes={motes} classes={classes} onOpenLoot={onOpenLoot} />
       )}
       {/* A worn piece with no row in the item data is named, never dropped in silence. */}
       {unranked.length > 0 && (

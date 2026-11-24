@@ -10,7 +10,7 @@ import type { GearRow } from '../src/shared/planner/gear'
 import type { PlannerInventoryHost } from '../src/shared/planner/inventorySlots'
 import type { ItemSupply } from '../src/shared/planner/itemSupply'
 import { motePlan } from '../src/shared/planner/voidMotes'
-import { DEFAULT_MOTE_PREFS, MOTES_ON_HAND, motePlanLine, sanitizeMotePrefs } from '../src/renderer/src/features/gear/voidMotePrefs'
+import { DEFAULT_MOTE_PREFS, MOTES_ON_HAND, moteLegendText, motePlanLine, sanitizeMotePrefs } from '../src/renderer/src/features/gear/voidMotePrefs'
 
 /** A weekly raid boss's drop, as the build would price it: about 1 experience a week. */
 const RAID: ItemSupply = { kind: 'raid', from: 'Cazic Thule', perWeek: 1, roads: 1, chance: 0.125, kills: 1, hard: ['raid'] }
@@ -54,4 +54,27 @@ test('motes on hand: at 0 the line says there are none to spend, not that nothin
   const plan = motePlan(hosts, byKey, OPTS, 2)
   assert.equal(plan.length, 1, 'one mote finishes the shield; the +3 belt takes none')
   assert.ok(motePlanLine(plan, 2).endsWith('hold 1'), motePlanLine(plan, 2))
+})
+
+// ---- 2. what the highlight means, under every sort ----------------------------------------------
+
+test('the plan line names how many motes each item gets', () => {
+  const { hosts, byKey } = worn([gear('Shield of Rainbow Hues', RAID), gear('Slime Blood', RAID, { AC: 4 })], [8, 7])
+  const plan = motePlan(hosts, byKey, OPTS, 3)
+  assert.deepEqual(plan.map((s) => s.name), ['Shield of Rainbow Hues', 'Shield of Rainbow Hues', 'Slime Blood'])
+  assert.equal(motePlanLine(plan, 3), 'This week: Shield of Rainbow Hues +8→+10 (2 motes) · Slime Blood +7→+8 (1 mote)')
+})
+
+test("Malkil's report: under every sort the highlight is said to be where the motes go, the number how many, and the sort only the order", () => {
+  const { hosts, byKey } = worn([gear('Shield', RAID)], [8])
+  const plan = motePlan(hosts, byKey, OPTS, 2)
+  const recommended = moteLegendText('recommended', plan)
+  assert.equal(recommended, "Highlighted rows are where this week's motes go; the number is how many motes that item gets. Sorting changes only the order.")
+  for (const order of ['gain', 'effort'] as const) {
+    const text = moteLegendText(order, plan)
+    assert.ok(text.startsWith(`Sorted by ${order === 'gain' ? 'biggest gain' : 'most hours saved'}.`), text)
+    assert.ok(text.includes('still the Recommended plan'), text)
+    assert.ok(text.includes('the number is how many motes that item gets'), text)
+  }
+  assert.equal(moteLegendText('gain', []), '', 'nothing highlighted, nothing to explain')
 })
