@@ -18,7 +18,9 @@
 
 import { recordAppWikiCall, WIKI_UA, wikiKindOf } from './wikiUsage'
 
-const API = 'https://eqlwiki.com/api.php'
+/** The wiki's API endpoint: spelled here once; the drop-database client (dropObs/client.ts) reads it too. */
+export const WIKI_API = 'https://eqlwiki.com/api.php'
+const API = WIKI_API
 const REQUEST_SPACING_MS = 150 // polite inter-request delay (wiki)
 const REQUEST_TIMEOUT_MS = 8000
 const RETRY_AFTER_FALLBACK_MS = 60_000
