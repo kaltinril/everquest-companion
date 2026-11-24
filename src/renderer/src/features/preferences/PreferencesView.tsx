@@ -138,6 +138,7 @@ import PrefSectionBlock, { FILL_COLUMN_SX, FILL_ROOT_SX, FILL_ROW_SX, paneFills,
 // nothing renders until it lands. Read that file's header before touching any card's state.
 import { PrefsGate, usePrefsSeed } from './prefsHydration'
 import { LogArchiveSetting } from './LogArchiveSetting'
+import { DropObsSetting } from './DropObsSetting'
 import { normalizeQuery } from '../../lib/search'
 
 // ------------------------------------------------------------------- the view
@@ -296,6 +297,13 @@ function buildSections({ version, status, onWhatsNew }: SectionInputs): PrefSect
           label: 'Summarize and archive log',
           keywords: 'log archive rotate clear compress backup history size shrink large slow loading',
           content: <LogArchiveSetting />
+        },
+        // SEND LOOT TO THE WIKI'S DROP DATABASE (requirements/drop-db-submit.md). Off until the player turns it on.
+        {
+          id: 'drop-obs',
+          label: "Send loot to the wiki's drop database",
+          keywords: 'wiki drop database loot percent rate submit upload eqlwiki bot password sign in observations',
+          content: <DropObsSetting />
         }
       ]
     },

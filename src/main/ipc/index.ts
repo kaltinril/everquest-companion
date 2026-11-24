@@ -20,6 +20,7 @@ import { registerBuffTrustIpc } from './buffTrust'
 import { registerBazaarWatchIpc } from './bazaarWatch'
 import { registerResistIpc } from './resist'
 import { registerLogArchiveIpc } from './logArchive'
+import { registerDropObsIpc } from './dropObs'
 import { registerRespawnIpc } from './respawn'
 import { registerCharacterIpc } from './character'
 import { registerCharacterSheetIpc } from './characterSheet'
@@ -121,6 +122,7 @@ export function registerIpc(): void {
   registerBazaarWatchIpc()
   registerResistIpc()
   registerLogArchiveIpc()
+  registerDropObsIpc()
   registerUiScaleIpc()
   registerGapVerdictsIpc()
   registerGapsCharactersIpc()

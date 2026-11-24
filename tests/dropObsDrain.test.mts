@@ -71,7 +71,7 @@ function setup(events: ObsEvent[]): { deps: DrainDeps; state: ObsState; saves: s
     save: () => saves.push(JSON.stringify(state)),
     client,
     events: () => list,
-    credentials: () => ({ username: 'Kaltinril@companion', password: 's3cret-pass' }),
+    credentials: () => Promise.resolve({ username: 'Kaltinril@companion', password: 's3cret-pass' }),
     clientVersion: 'everquest-companion/0.1.0-test',
     now,
     cache: newStatusCache()

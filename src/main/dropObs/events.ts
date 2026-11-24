@@ -69,6 +69,7 @@ const sha = (text: string): string => createHash('sha256').update(text, 'utf8').
 
 /** Control characters out, runs of space folded: what the wiki normalizes to anyway. */
 function clean(text: string): string {
+  // eslint-disable-next-line no-control-regex -- control characters are exactly what is removed here.
   return text.replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim()
 }
 

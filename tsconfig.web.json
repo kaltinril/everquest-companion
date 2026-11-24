@@ -60,6 +60,8 @@
     "src/preload/alertFires.ts",
     // …and `logArchive.ts` (Keep log history, docs/plans/log-archive), likewise.
     "src/preload/logArchive.ts",
+    // …and `dropObs.ts` (Send loot to the wiki's drop database), likewise.
+    "src/preload/dropObs.ts",
     // …and `lootFrame.ts` (the loot ledger as what a window lacks), likewise.
     "src/preload/lootFrame.ts",
     // …and `gapsCharacters.ts` (the Gaps tab's All characters), likewise.

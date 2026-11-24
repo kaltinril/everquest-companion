@@ -1098,6 +1098,17 @@ export const IPC = {
   // Arg: segment id. Refold a segment an older build produced, and swap the new totals in (5.5).
   logArchiveRefresh: 'logArchive:refresh',
 
+  // ---- Send loot to the wiki's drop database (main/ipc/dropObs.ts; requirements/drop-db-submit.md) ----
+  // renderer -> main. Each returns DropObsReply (shared/dropObs.ts) except the status read, which
+  // returns DropObsStatus. Nothing is sent to the wiki while the switch is off.
+  dropObsStatus: 'dropObs:status',
+  // Args: (username: string, password: string). An empty password keeps the saved one.
+  dropObsSaveAccount: 'dropObs:saveAccount',
+  // Arg: boolean. The switch; only ever flipped by the player on the card.
+  dropObsSetEnabled: 'dropObs:setEnabled',
+  // Sign in and ask the wiki's status. No payload.
+  dropObsTest: 'dropObs:test',
+
   // ---- misc pushes ----
   onLine: 'log:line',
   onCharacter: 'log:character',

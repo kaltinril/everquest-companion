@@ -49,7 +49,7 @@ export interface DrainDeps {
   /** Every sendable event, newest first; null when the loot cannot be read right now. */
   events: () => ObsEvent[] | null
   /** The saved Bot password, decrypted; null when none. */
-  credentials: () => { username: string; password: string } | null
+  credentials: () => Promise<{ username: string; password: string } | null>
   clientVersion: string
   now: () => number
   /** The last status answer and when it came; owned by the caller, kept across steps. */
@@ -111,7 +111,7 @@ export function bookReceipt(state: ObsState, batch: ObservationBatch, reply: Sub
 
 async function signedInStatus(d: DrainDeps): Promise<StatusReply> {
   if (d.client.account() === null) {
-    const creds = d.credentials()
+    const creds = await d.credentials()
     if (creds === null) throw new WikiRefusal('eqc-no-password', 'no Bot password saved')
     await d.client.signIn(creds.username, creds.password)
     d.cache.status = null
