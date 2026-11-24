@@ -2,8 +2,9 @@
 // motes tab draws (VoidMoteView.tsx).
 //
 // One row per WORN item below +10: what the next tier gains the chosen target, the hours of play
-// it would otherwise cost, and where copies come from; above the list, where the week's three
-// motes go. The ranking and every number are `shared/planner/voidMotes.ts` (the supply estimate is
+// it would otherwise cost, and where copies come from; above the list, where the motes on hand go
+// and what a highlight means; beneath it, why. The ranking and every number are
+// `shared/planner/voidMotes.ts` (the supply estimate is
 // on each gear row, `itemSupply.ts`); the words are `voidMotePrefs.ts`; this file lays them out.
 //
 // It reads the same `plannerInventory` join the Gear tab's hover card does (`GearCompareData`), so
@@ -64,6 +65,7 @@ import {
   moteHoursTitle,
   moteLegendText,
   motePlanLine,
+  motePlanReasons,
   moteSourceText,
   moteSourceTitle,
   moteTargetLabel,
@@ -244,6 +246,7 @@ interface ListProps {
 /** The table, with the line that says what its highlights mean above it. */
 function MoteList({ list, plan, motes, classes, onOpenLoot }: ListProps): JSX.Element {
   const legend = moteLegendText(motes.order, plan)
+  const reasons = motePlanReasons(plan, motes.target, motes.onHand)
   return (
     <>
       {/* What the highlight means, said under every sort (Malkil, 2026-11-23). */}
@@ -270,6 +273,17 @@ function MoteList({ list, plan, motes, classes, onOpenLoot }: ListProps): JSX.El
           </TableBody>
         </Table>
       </Box>
+      {/* Why the motes go where they do, one line an item (Malkil, 2026-11-23): outside the scroller,
+          so it stays in sight under a long list. */}
+      {reasons.length > 0 && (
+        <Box data-testid="gear-motes-why" sx={{ px: 1, pt: 0.5, flexShrink: 0, borderTop: 1, borderColor: 'divider' }}>
+          {reasons.map((line) => (
+            <Typography key={line} variant="caption" color="text.secondary" component="p" data-testid="gear-motes-why-line" sx={{ m: 0 }}>
+              {line}
+            </Typography>
+          ))}
+        </Box>
+      )}
     </>
   )
 }

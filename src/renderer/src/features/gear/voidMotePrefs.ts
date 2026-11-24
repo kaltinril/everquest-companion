@@ -16,7 +16,8 @@ import {
   type MoteAdvice,
   type MoteOrder,
   type MotePlanStep,
-  type MoteTarget
+  type MoteTarget,
+  type MoteWhy
 } from '../../../../shared/planner/voidMotes'
 import { classDisplayName } from '../../../../shared/spellLevels'
 import { ROLE_LABEL } from '../plan/planBlurb'
@@ -234,6 +235,48 @@ export function moteLegendText(order: MoteOrder, plan: readonly MotePlanStep[]):
   const count = 'the number is how many motes that item gets'
   if (order === 'recommended') return `Highlighted rows are where this week's motes go; ${count}. Sorting changes only the order.`
   return `Sorted by ${ORDER_WORDS[order]}. The highlighted rows are still the Recommended plan for this week's motes; ${count}.`
+}
+
+/** `copies come from Terror and 3 others (Raid boss: weekly kill, 1 in 8)`: how copies are come by. */
+function copiesClause(supply: ItemSupply | undefined): string {
+  if (supply?.perWeek === undefined) return 'no page lists where copies come from'
+  if (supply.kind === 'crafted') return 'copies are crafted, at +0'
+  const others = supply.roads > 1 ? ` and ${String(supply.roads - 1)} ${supply.roads === 2 ? 'other' : 'others'}` : ''
+  return `copies come from ${supply.from ?? 'its source'}${others} (${moteSourceText(supply)})`
+}
+
+/**
+ * Why the first mote went on this item, from the ranking's own numbers: it led the ready rows on
+ * gain, on hours, on both, or on neither (then it is the best of the two multiplied, as the
+ * Recommended order is).
+ */
+function whyClause(why: MoteWhy, target: MoteTarget): string {
+  const label = moteTargetLabel(target)
+  const gain = moteGainText(why, target)
+  const hours = moteHoursText(why)
+  let text: string
+  if (why.ready <= 1) text = `the only item ready for one (${gain} ${label}, saves ${hours})`
+  else if (why.mostGain && why.mostHours) text = `the biggest gain for ${label} (${gain}) and the most hours saved (${hours})`
+  else if (why.mostGain) text = `the biggest gain for ${label} (${gain}), saving ${hours}`
+  else if (why.mostHours) text = `the most hours saved (${hours}), for ${gain} ${label}`
+  else text = `the best gain times hours saved (${gain} ${label} over ${hours})`
+  return why.gate === 'rare' ? `${text}, allowed below +${String(MOTE_RULES.minTier)} because copies barely exist` : text
+}
+
+/**
+ * The lines beneath the list (tester Malkil, 2026-11-23: "Perhaps it needs to describe its
+ * reasoning beneath the list"): one per planned item, then the motes held, if any. Built only from
+ * what the plan recorded (`MoteWhy`). No plan, no lines: the line above already says to hold them.
+ */
+export function motePlanReasons(plan: readonly MotePlanStep[], target: MoteTarget, motes: number = MOTE_RULES.perWeek): string[] {
+  if (plan.length === 0) return []
+  const lines = planByItem(plan).map((p) => {
+    const again = p.motes > 1 ? ', and still first when weighed again a tier up' : ''
+    return `${motesText(p.motes)} on ${p.name}, +${String(p.from)} to +${String(p.from + p.motes)}: ${whyClause(p.why, target)}${again}; ${copiesClause(p.why.supply)}.`
+  })
+  const held = motes - plan.length
+  if (held > 0) lines.push(`Hold ${String(held)}: nothing else you wear is ready for one yet.`)
+  return lines
 }
 
 /**
