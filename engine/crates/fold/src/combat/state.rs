@@ -667,8 +667,9 @@ impl EngineState {
             || self.pet_names.contains(t_key.as_ref())
             || (self.ally.bind_of(&t_key)).is_some_and(|b| admitted.contains(&b.charmer_key));
         let a_key = id_key_ref(attacker);
-        let friendly = a_key.is_empty()
-            || self.ally_friendly(&a_key)
+        // `friendly_person`, not `ally_friendly`: the ally caster set holds every player-shaped
+        // caster, and a proper-named mob that casts (Undertow, 2026-11-23) is still a mob.
+        let friendly = self.friendly_person(&a_key)
             || admitted.contains(a_key.as_ref())
             || self.ever_pet.contains(a_key.as_ref())
             || self.others.is_recorded(&a_key)
@@ -687,9 +688,9 @@ impl EngineState {
     /// fallback clock are unaffected.
     ///
     /// Conservative in both directions: it never engages anything (only already-engaged instances
-    /// are refreshed; the swings that do engage, a mob's at you or at one of ours, are routed to
-    /// `engage_hostile` and `engage_swing_at_ours`, and nothing here opens an encounter) and it never resolves or
-    /// creates a world instance, matching engaged ids by name prefix instead. Name-level matching
+    /// are refreshed; the swings that do engage, a mob's at you or at one of ours, go through
+    /// `engage_hostile` and `engage_swing_at_ours`, and nothing opens an encounter) and it never
+    /// resolves or creates a world instance, matching engaged ids by name prefix instead. Name-level matching
     /// refreshes every engaged twin sharing the name, because the log cannot tell twins apart on a
     /// miss line and a retired twin is "gone" via `is_retired` anyway.
     pub fn note_presence(&mut self, name: &str, ts: i64) {

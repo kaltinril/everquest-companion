@@ -99,6 +99,23 @@ fn a_mob_hitting_a_member_is_engaged() {
     assert_eq!(fights(&f).len(), 1, "{:?}", fights(&f));
 }
 
+/// A proper-named mob that casts is still a mob: its swing at Malkil engages it, though the ally
+/// model files every player-shaped caster as a friendly (Undertow, tonight at 22:10:18).
+#[test]
+fn a_proper_named_caster_hitting_a_member_is_engaged() {
+    let f = fold(&with_group(&[
+        "[Mon Nov 23 22:10:10 2026] You punch a shimmering sailfin for 100 points of damage.",
+        "[Mon Nov 23 22:10:12 2026] Undertow begins casting Immobilize.",
+        "[Mon Nov 23 22:10:13 2026] Undertow hits Malkil for 50 points of damage.",
+        "[Mon Nov 23 22:10:14 2026] You punch a shimmering sailfin for 100 points of damage.",
+        "[Mon Nov 23 22:10:14 2026] You have slain a shimmering sailfin!",
+        "[Mon Nov 23 22:10:17 2026] Undertow hits Malkil for 50 points of damage.",
+        "[Mon Nov 23 22:10:21 2026] You bash Undertow for 40 points of damage.",
+        "[Mon Nov 23 22:10:28 2026] Undertow has been slain by Malkil!",
+    ]));
+    assert_eq!(fights(&f).len(), 1, "{:?}", fights(&f));
+}
+
 /// A mob that only missed you is in the fight, as one whose swing landed always was.
 #[test]
 fn a_mob_that_only_missed_you_is_engaged() {
