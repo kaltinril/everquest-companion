@@ -115,9 +115,10 @@ interface ControlsProps {
 function MoteControls({ motes, setMotes, disabled }: ControlsProps): JSX.Element {
   return (
     <>
-      <Stack direction="row" spacing={0.75} alignItems="center" sx={{ flexShrink: 0 }}>
+      {/* "On hand", short: the row is the panel title's, and at 1280 px the picks must still share it. */}
+      <Stack direction="row" spacing={0.75} alignItems="center" title="How many void motes you have to spend now" sx={{ flexShrink: 0 }}>
         <Typography variant="caption" color="text.secondary" component="span">
-          Motes on hand
+          On hand
         </Typography>
         <ToggleButtonGroup
           size="small"
