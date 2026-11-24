@@ -28,6 +28,7 @@ import { readJsonChunked, receiveJsonChunks, type JsonChunkSink } from '../jsonC
 import type { SpellResistTable } from '../../shared/resistTypes'
 import type { ResistTableCacheTarget, ResistTableWorkerHead } from '../resistTableWorker'
 import { spellTableMemo, type SpellTableLoad } from './spellTableMemo'
+import { resolveSpellFiles, type SpellFiles } from './spellFiles'
 
 /**
  * Bump to invalidate every cached table in the field (a parser change, not a game patch).
@@ -79,9 +80,17 @@ import { spellTableMemo, type SpellTableLoad } from './spellTableMemo'
  */
 export const SPELL_RESIST_CACHE_VERSION = 10
 
-/** The client file, as it sits in the install this app resolved. */
-export function spellsUsPath(): string {
-  return join(effectiveEqRoot(), 'spells_us.txt')
+/**
+ * The client's spell files in the install this app resolved: `spells_us.txt`, or another
+ * `spells_<suffix>.txt` when that one is missing (spellFiles.ts has the rule, owner 2026-11-23).
+ */
+export function clientSpellFiles(): SpellFiles {
+  return resolveSpellFiles(effectiveEqRoot())
+}
+
+/** The client spell table, as it sits in the install this app resolved. See `clientSpellFiles`. */
+export function spellTablePath(): string {
+  return clientSpellFiles().table
 }
 
 function cachePath(): string {
@@ -175,7 +184,7 @@ async function load(path: string): Promise<SpellTableLoad<SpellResistTable>> {
 }
 
 // Loaded once per EverQuest folder, and again when that folder moves (spellTableMemo.ts).
-const memo = spellTableMemo(spellsUsPath, load)
+const memo = spellTableMemo(spellTablePath, load)
 
 /**
  * The table, loaded at most once per client file path. Null means the client file is unreadable — a

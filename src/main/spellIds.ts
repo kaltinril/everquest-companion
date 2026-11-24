@@ -1,10 +1,10 @@
 // spellIds.ts — the macro editor's spell lookup: the game's real spell ids by name and name by id,
-// from the player's own spells_us.txt, read when first asked and kept until the file changes. The
+// from the player's own spells_us.txt (or another language's table, resist/spellFiles.ts), read when first asked and kept until the file changes. The
 // 38 MB read is off-thread and the scan yields, so the thread tailing the log is not held up.
 
 import { readFile, stat } from 'node:fs/promises'
 import { type IndexedSpell, type SpellIdReply, readSpellIdAsk, readSpellRows, searchSpells } from '../shared/macros/spellIds'
-import { spellsUsPath } from './resist/spellTable'
+import { spellTablePath } from './resist/spellTable'
 
 const LINES_A_TURN = 2000
 
@@ -32,7 +32,7 @@ async function parse(path: string, stamp: string): Promise<Held> {
 
 /** The index for the file as it is now; one load at a time. */
 async function index(): Promise<Held> {
-  const path = spellsUsPath()
+  const path = spellTablePath()
   const info = await stat(path)
   const stamp = `${path}|${String(info.size)}|${String(info.mtimeMs)}`
   if (held?.stamp === stamp) return held
