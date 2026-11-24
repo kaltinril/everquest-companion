@@ -421,3 +421,31 @@ test("A ROW'S SERVED FIELDS TAKE THE NEWER SIDE: A MERCHANT MET IN AN ARCHIVED L
   const back = mergeGaps(live, archived) as Snap
   assert.deepEqual((back.rows[0] as Row & { itemsSold?: unknown }).itemsSold, [{ item: 'Ale' }, { item: 'Mead', copper: 52 }])
 })
+
+/** An item row's quest facts, as much of them as the turn-in test reads. */
+interface Facts {
+  turnedInTo?: { npc: string; n: number }[]
+  quests?: string[]
+  givenBy?: { npc: string }
+}
+
+test("ONE CHARACTER'S TURN-INS ADD UP ACROSS ITS ARCHIVE AND ITS LIVE LOG, EVERY LOADOUT TOGETHER (OWNER, 2026-11-23: \"CROSS LOAD-OUT ON THE SAME SERVER? YEAH IT ALL COUNTS\")", () => {
+  const plea = (count: number, questFacts: Facts): Row => ({ ...row('item', 'Plea to Freeport', count), questFacts }) as Row
+  const factsOf = (s: Snap): Facts | undefined => (s.rows[0] as Row & { questFacts?: Facts }).questFacts
+  // The archive holds the turn-ins made before it was cut, the live log the ones since: both count.
+  const archived = snap([plea(2, { turnedInTo: [{ npc: 'Sir Mollin', n: 2 }], quests: ['Old'], givenBy: { npc: 'Old Giver' } })])
+  const live = snap([plea(1, { turnedInTo: [{ npc: 'Sir Mollin', n: 1 }, { npc: 'Guard Alayle', n: 1 }], quests: ['New'] })])
+  assert.deepEqual(factsOf(mergeGaps(archived, live) as Snap), {
+    turnedInTo: [{ npc: 'Guard Alayle', n: 1 }, { npc: 'Sir Mollin', n: 3 }],
+    quests: ['New']
+  })
+  // A live row whose facts name no turn-in keeps the archive's: the newer side's silence is no undo.
+  const quiet = snap([plea(1, { quests: ['New'] })])
+  assert.deepEqual(factsOf(mergeGaps(archived, quiet) as Snap)?.turnedInTo, [{ npc: 'Sir Mollin', n: 2 }])
+  // One side's facts alone stand as they are.
+  assert.deepEqual(factsOf(mergeGaps(archived, snap([row('item', 'Plea to Freeport', 1)])) as Snap), factsOf(archived))
+  // Through the archive lookup too, oldest first.
+  const third = snap([plea(1, { turnedInTo: [{ npc: 'Sir Mollin', n: 4 }] })])
+  const folded = mergeModule('gaps', [archived, third], live).state as Snap
+  assert.deepEqual(factsOf(folded)?.turnedInTo, [{ npc: 'Guard Alayle', n: 1 }, { npc: 'Sir Mollin', n: 7 }])
+})

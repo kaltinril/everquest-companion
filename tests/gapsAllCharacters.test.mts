@@ -371,3 +371,16 @@ test('days back leaves out a Factions row and an Images row the log last met bef
   // Met again inside the window, the image row is back.
   assert.deepEqual(domainsOf([{ ...conOld, ts: NOW.getTime() - DAY }], true), ['image:a kobold'])
 })
+
+test('"Turned in to" is never summed across characters: each character shows its own (owner, 2026-11-23)', () => {
+  // The achievements are not cross character, so neither are the counts: an alt's turn-ins are not
+  // added to another character's, even where the attached character lacks the row.
+  const with_ = (r: GapRow, extra: Record<string, unknown>): GapRow => ({ ...r, ...extra }) as GapRow
+  const turnIn = (n: number): GapRow => with_(row('item', 'Plea to Freeport', n), { questFacts: { turnedInTo: [{ npc: 'Sir Mollin', n }] } })
+  const input = (label: string, rows: GapRow[]) => ({ label, gaps: gaps(rows), loot: [], kills: null })
+  const facts = (j: ReturnType<typeof joinCharacters>): unknown => (j.gaps?.rows.find((r) => r.name === 'Plea to Freeport') as unknown as { questFacts?: unknown }).questFacts
+  const mine = joinCharacters([input('Live', [turnIn(2)]), input('Alt', [turnIn(5)])], null)
+  assert.deepEqual(facts(mine), { turnedInTo: [{ npc: 'Sir Mollin', n: 2 }] })
+  const theirs = joinCharacters([input('Live', [row('item', 'Bat Wing', 1)]), input('Alt', [turnIn(5)]), input('Third', [turnIn(3)])], null)
+  assert.deepEqual(facts(theirs), { turnedInTo: [{ npc: 'Sir Mollin', n: 3 }] })
+})
