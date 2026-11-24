@@ -72,6 +72,8 @@
     "src/preload/planner.ts",
     // …and `achievements.ts` (the Achievements tab's one read), likewise.
     "src/preload/achievements.ts",
+    // …and `spellTableReport.ts` (the Spells tab's spell-file notice), likewise.
+    "src/preload/spellTableReport.ts",
     // …and `knowledge.ts` (the spell/item/mob lookups, JOS-293), likewise.
     "src/preload/knowledge.ts",
     // …and `overlaySnap.ts` (the overlay-snapping switch, JOS-217), likewise.

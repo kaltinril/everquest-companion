@@ -16,7 +16,8 @@
 // `spells_us.txt` case costs one existence check; only a folder without it is listed.
 
 import { existsSync, readdirSync } from 'node:fs'
-import { join } from 'node:path'
+import { basename, dirname, join } from 'node:path'
+import type { SpellTableReport } from '../../shared/spellTableNotice'
 
 /** The table every reader was written against. */
 export const US_SPELL_TABLE = 'spells_us.txt'
@@ -87,4 +88,13 @@ export function resolveSpellFiles(folder: string): SpellFiles {
     str: companion(folder, suffix, (s) => `spells_${s}_str.txt`),
     dbstr: companion(folder, suffix, (s) => `dbstr_${s}.txt`)
   }
+}
+
+/**
+ * Where the spell table stands, for the Spells tab's notice (`shared/spellTableNotice.ts`): the
+ * table memo's state and the path it looked at, split into the folder and the file's name.
+ */
+export function spellTableReport(state: SpellTableReport['state'], path: string): SpellTableReport {
+  const file = basename(path)
+  return { state, folder: dirname(path), file, fallback: file.toLowerCase() !== US_SPELL_TABLE }
 }

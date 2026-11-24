@@ -173,6 +173,9 @@ export const IPC = {
   spellsStackViews: 'spells:stackViews',
   // The macro editor's spell lookup: real ids from the player's spells_us.txt (src/main/spellIds.ts).
   spellIdLookup: 'spells:idLookup',
+  // renderer -> main: where the client's spell table stands (read, missing, unreadable, or another
+  // language's file), for the Spells tab's notice (shared/spellTableNotice.ts). No argument.
+  spellsTableReport: 'spells:tableReport',
 
   // ---- voice alerts / TTS (docs/plans/voice-alerts.md §3) ----
   // The 'system' engine tier needs NO channel at all: Chromium's own `speechSynthesis` lives in
