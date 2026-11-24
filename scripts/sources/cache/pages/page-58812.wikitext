@@ -6,7 +6,7 @@
     <li>Pet Type: Animation</li>
     <li>Pet Classes: [[Paladin]] / [[Warrior]]</li>
     <li>Pet Level: 1</li>
-    <li>Hit Points: 22 (+1/tick)</li>
+    <li>Hit Points: 28 (+1/tick)</li>
     <li>Mana: 100 (+4/tick)</li>
     </ul>
   </div>
@@ -48,8 +48,8 @@
 !Bonus Damage
 !Dual Wield
 |-
-|?
-|?
+|4
+|30
 | +0
 | - 
 |-
