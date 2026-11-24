@@ -18,7 +18,7 @@ import { recipeHelp, recipeItemSearch, recipelessItems } from '../gapRecipes'
 import { unknownItems, unknownSpells } from '../gapUnknownItems'
 import { itemTrades } from '../gapItemTrades'
 import { killFactionSamples } from '../gapKillFactionSamples'
-import { spellFactsFrom } from '../gapSpellFacts'
+import { spellFactsInFolder } from '../gapSpellFacts'
 import type { ClientSpellFacts } from '../../shared/gaps'
 import { effectiveEqRoot } from '../log/config'
 
@@ -57,15 +57,7 @@ export function gapVerdicts(domain: unknown, names: unknown): GapVerdicts {
 
 /** The install's spell files, read at rest when a spell page is asked for; none when they are missing. */
 function clientSpellFacts(names: readonly string[]): Record<string, ClientSpellFacts> {
-  try {
-    const root = effectiveEqRoot()
-    const us = readFileSync(join(root, 'spells_us.txt'), 'latin1')
-    const optional = (file: string): string => (existsSync(join(root, file)) ? readFileSync(join(root, file), 'latin1') : '')
-    // dbstr_us.txt: the descriptions (phase 4 of screenshot to wiki), read at rest like the others.
-    return spellFactsFrom(us, optional('spells_us_str.txt'), names, optional('dbstr_us.txt'))
-  } catch {
-    return {}
-  }
+  return spellFactsInFolder(effectiveEqRoot(), names)
 }
 
 export function registerGapVerdictsIpc(): void {

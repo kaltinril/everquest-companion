@@ -10,6 +10,9 @@
 import { type JSX, Suspense, lazy } from 'react'
 import { CircularProgress } from '@mui/material'
 import type { View } from './appViews'
+// The notice that stays up while the client's spell file is missing (owner, 2026-11-23). Small and
+// eager, outside the lazy views, so it is drawn above whichever of the three is open.
+import SpellTableNoticeFrame from './features/spells/SpellTableNotice'
 
 const LazySpellbook = lazy(() => import('./features/spells/SpellbookView'))
 const LazyUpgrades = lazy(() => import('./features/spells/SpellUpgradesView'))
@@ -39,8 +42,10 @@ export default function UnreleasedSpellsView({
           : null
   if (!Lazy) return null
   return (
-    <Suspense fallback={<CircularProgress size={20} />}>
-      <Lazy key={viewKey} />
-    </Suspense>
+    <SpellTableNoticeFrame>
+      <Suspense fallback={<CircularProgress size={20} />}>
+        <Lazy key={viewKey} />
+      </Suspense>
+    </SpellTableNoticeFrame>
   )
 }

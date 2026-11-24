@@ -7,7 +7,9 @@
 //
 // THE CLIENT'S TABLES ARE COPIED BESIDE IT when the caller names where they are. The engine looks
 // for `spells_us.txt` two folders up from the log, so a temp folder without them is an install
-// without a client.
+// without a client. Which files is `resolveSpellFiles`'s answer (another language's
+// `spells_<suffix>.txt` when `spells_us.txt` is missing, owner 2026-11-23); each is staged under its
+// `_us` name, so the staged install reads the same files the live one does.
 //
 // The temp folder is removed afterwards, whatever happened. Electron-free: the caller names the
 // binary, the tables and the defines.
@@ -19,9 +21,17 @@ import { createGunzip } from 'node:zlib'
 import { CAPTURED_MODULES } from '../../shared/logArchive/modules'
 import type { Segment } from '../../shared/logArchive/segment'
 import { foldWithSecondEngine, type SecondFold, type SecondFoldRequest } from './secondEngine'
+import { resolveSpellFiles } from '../resist/spellFiles'
 
-/** The client files the engine reads beside an install's `Logs` folder. */
-const TABLES = ['spells_us.txt', 'spells_us_str.txt', 'dbstr_us.txt']
+/** The client files the engine reads beside an install's `Logs` folder: each source, and the name it is staged as. */
+function tables(from: string): [source: string, staged: string][] {
+  const files = resolveSpellFiles(from)
+  return [
+    [files.table, 'spells_us.txt'],
+    [files.str, 'spells_us_str.txt'],
+    [files.dbstr, 'dbstr_us.txt']
+  ]
+}
 
 /** A full fold of a 250 MB log took 55 s; ten minutes is a hung engine, not a slow one. */
 const FOLD_TIMEOUT_MS = 10 * 60_000
@@ -71,9 +81,9 @@ async function gunzipPrefix(archive: string, dest: string, bytes: number): Promi
 function copyTables(from: string | null, root: string): number {
   if (from === null) return 0
   let n = 0
-  for (const t of TABLES) {
-    if (!existsSync(join(from, t))) continue
-    copyFileSync(join(from, t), join(root, t))
+  for (const [source, staged] of tables(from)) {
+    if (!existsSync(source)) continue
+    copyFileSync(source, join(root, staged))
     n++
   }
   return n

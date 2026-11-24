@@ -106,6 +106,21 @@ test('staging keeps exactly the lines the totals were taken from', async () => {
   assert.ok(existsSync(join(root, 'stage', 'spells_us.txt')))
 })
 
+test('staging copies another language\'s spell table when spells_us.txt is missing', async () => {
+  // Owner, 2026-11-23: with no spells_us.txt the app reads another spells_*.txt. The staged install
+  // carries it under the name the engine reads, with its own string table beside it.
+  const { root, archive } = archiveFixture()
+  const tables = join(root, 'eq')
+  mkdirSync(tables)
+  writeFileSync(join(tables, 'spells_de.txt'), 'de table')
+  writeFileSync(join(tables, 'dbstr_de.txt'), 'de strings')
+  const staged = await stageSegmentLog(segmentWith(archive), join(root, 'stage'), tables)
+  assert.ok('logPath' in staged)
+  assert.equal(staged.tables, 2)
+  assert.equal(readFileSync(join(root, 'stage', 'spells_us.txt'), 'utf8'), 'de table')
+  assert.equal(readFileSync(join(root, 'stage', 'dbstr_us.txt'), 'utf8'), 'de strings')
+})
+
 test('staging refuses an archive that does not hold the captured lines', async () => {
   const { root, archive } = archiveFixture()
   const wrong = segmentWith(archive, { log: { ...segmentWith(archive).log, sha256: sha('something else') } })

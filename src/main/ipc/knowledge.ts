@@ -26,7 +26,8 @@ import { spellItemIndex } from '../planner/indexCurrent'
 // Supernova at four targets, the launch after a cache-version bump forced the full re-parse).
 // `spellTable()` is the load promise itself; it settles once per run and every later await is
 // already-resolved, so the wait is paid exactly where the race was.
-import { spellTable } from '../resist/spellTable'
+import { spellTable, spellTableStatus } from '../resist/spellTable'
+import { spellTableReport } from '../resist/spellFiles'
 // The stacking rows, and what each one casts with itself - a join, so it lives where a test can
 // drive it (resist/stackSources.ts).
 import { stackViewsFor } from '../resist/stackSources'
@@ -200,6 +201,13 @@ export function registerKnowledgeIpc(): void {
     return table ? stackViewsFor(table, names) : {}
   })
   ipcMain.handle(IPC.spellIdLookup, (_e, ask: unknown) => spellIdLookup(ask))
+  // The Spells tab's notice: the table is awaited first, so the answer is a settled state rather
+  // than `loading`, and the path is the one the memo looked at (resist/spellFiles.ts picked it).
+  ipcMain.handle(IPC.spellsTableReport, async () => {
+    await spellTable()
+    const { state, path } = spellTableStatus()
+    return spellTableReport(state, path)
+  })
 
   // ---- item knowledge ("what's this lore/quest item for", Task #53) ----
   // The committed DB, the local quest sources and what a Copy lookup cached; never the wiki

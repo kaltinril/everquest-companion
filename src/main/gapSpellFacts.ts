@@ -13,9 +13,12 @@
 // matched the wiki word for word on 621 pages, the rest add editors' notes). 19,720 of 35,888 texts
 // hold placeholders the client fills; those wait for the spell window's screenshot (shared/spellWindow.ts).
 //
-// ELECTRON-FREE: the file read is the caller's; tests drive `spellFactsFrom` on strings.
+// ELECTRON-FREE: tests drive `spellFactsFrom` on strings, and `spellFactsInFolder` (the file read)
+// over a temp folder.
 
+import { existsSync, readFileSync } from 'node:fs'
 import type { ClientSpellFacts } from '../shared/gaps'
+import { resolveSpellFiles } from './resist/spellFiles'
 
 /** The sixteen class-level fields' classes, in the file's order (WAR CLR PAL RNG SHD DRU MNK BRD …). */
 const CLASSES = ['Warrior', 'Cleric', 'Paladin', 'Ranger', 'Shadow Knight', 'Druid', 'Monk', 'Bard', 'Rogue', 'Shaman', 'Necromancer', 'Wizard', 'Magician', 'Enchanter', 'Beastlord', 'Berserker']
@@ -102,4 +105,22 @@ export function spellFactsFrom(usText: string, strText: string, names: readonly 
     out[n] = { ...factsOf(f, msgs.get(f[0])), ...icon, ...(description ? { description } : {}) }
   }
   return out
+}
+
+/**
+ * The asked names' facts out of one EverQuest folder's files, read at rest; none when the folder has
+ * no spell table. Which files is `resolveSpellFiles`'s answer: `spells_us.txt`, or another
+ * language's `spells_<suffix>.txt` when that one is missing (owner, 2026-11-23), with the message
+ * and description files that go with it when they are there.
+ */
+export function spellFactsInFolder(folder: string, names: readonly string[]): Record<string, ClientSpellFacts> {
+  const files = resolveSpellFiles(folder)
+  if (!files.found) return {}
+  try {
+    const optional = (path: string): string => (existsSync(path) ? readFileSync(path, 'latin1') : '')
+    // dbstr: the descriptions (phase 4 of screenshot to wiki), read at rest like the others.
+    return spellFactsFrom(readFileSync(files.table, 'latin1'), optional(files.str), names, optional(files.dbstr))
+  } catch {
+    return {}
+  }
 }
