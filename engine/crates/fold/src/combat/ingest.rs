@@ -20,7 +20,7 @@ use crate::combat::aggregate::{DamageEvent, MissType, SourceRef};
 use crate::combat::ally::{AllyCastLine, AllyKind, AllyLeaderLine, AllyVerdict};
 use crate::combat::charm::CharmVerdict;
 use crate::combat::deathrecap;
-use crate::combat::encounter::{ZoneSessionClose, CC_HOLD_MS};
+use crate::combat::encounter::ZoneSessionClose;
 use crate::combat::lifecycle::{ensure_encounter, eval_closure, finalize_current};
 use crate::combat::procdetect::{
     castless_kind, is_castless_heal, lane_name_for, proc_eligible_damage, HealProcInput, ProcSide,
@@ -470,8 +470,7 @@ fn ingest_cc(st: &mut EngineState, ev: &Event) {
     ensure_encounter(st, ev.ts());
     let enc = st.current.as_mut().expect("just ensured");
     enc.engage(&inst.instance_id, ev.ts());
-    enc.cc_active_until
-        .insert(inst.instance_id, ev.ts() + CC_HOLD_MS);
+    enc.note_cc(inst.instance_id, ev.ts(), refresh, ev.str(Key::Verb));
     st.last_activity_ts = ev.ts();
     let tag = if refresh { "refresh" } else { "applied" };
     st.log_lazy(ev.ts(), "cc", "info", || {
@@ -496,6 +495,11 @@ fn ingest_death(st: &mut EngineState, ev: &Event) {
         st.log_lazy(ev.ts(), "charm", "dropped", || {
             format!("✕ {} died - {}'s pet is gone", gone.display, gone.charmer)
         });
+    }
+    // A held mob that died is held no longer. By name, like the hold: a twin's death ends it early,
+    // which is the old behaviour, never a longer hold.
+    if let Some(enc) = st.current.as_mut() {
+        enc.mez_on.remove(&key);
     }
     let killer_key = if ev.bool(Key::BySelf) {
         Some("you".to_string())

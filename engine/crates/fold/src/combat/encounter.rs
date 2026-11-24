@@ -11,7 +11,9 @@
 //! `PRESENCE_GONE_MS` is 4x `LINGER_MS` because real fights go quiet for many seconds at a time
 //! (miss streaks, cast phases, a stun), and a fled mob still closes at `FALLBACK_IDLE_MS`.
 //! `CC_HOLD_MS` exceeds `FALLBACK_IDLE_MS` so an actively refreshed mez holds a fight open; the hold
-//! vetoes only the death-close, never closure as such.
+//! vetoes only the death-close, never closure as such. An own mez still on a mob (`mez_on`, ended by
+//! its wear-off line, the mob's death or `MEZ_HOLD_MAX_MS`) vetoes both, the idle fallback too: the
+//! held mob is still in the fight and its wait counts (owner, 2026-11-23).
 //!
 //! `ZONE_HISTORY_CAP` is borrowed, not chosen: a session mark mints an entry here too, and the marks
 //! are bounded by `shared/sessionSegments.MAX_SESSION_MARKS`. Two rings at two depths would let the
@@ -137,6 +139,12 @@ pub struct Encounter {
     /// instanceId → epoch-ms until which this engaged instance is CC-held. A CC'd instance counts as
     /// alive, so a mez-and-wait keeps the encounter open regardless of damage gaps.
     pub cc_active_until: JsMap<i64>,
+    /// name key → epoch-ms bound of an own mez still on that mob: set by the application, ended by
+    /// the mez's wear-off line or a death of that name, and never past `MEZ_HOLD_MAX_MS`. While one
+    /// is on, neither the idle fallback nor the death-close ends the fight (owner, 2026-11-23: time
+    /// a mob spends held on mez still counts in the fight clock and the zone clock). Keyed by name,
+    /// not instance, because a held mob goes unseen long enough for staleness to re-spawn its id.
+    pub mez_on: JsMap<i64>,
     /// Display name of the most recent outgoing-damage target — the LIVE encounter name tracks
     /// whatever you are currently swinging at. On finalize the name switches to the largest target.
     pub last_out_target: Option<String>,
@@ -178,6 +186,7 @@ impl Encounter {
             active_ms: 0,
             prev_damage_ts: None,
             cc_active_until: JsMap::new(),
+            mez_on: JsMap::new(),
             last_out_target: None,
             summary: None,
             events: VecDeque::new(),
@@ -202,12 +211,35 @@ impl Encounter {
         self.engaged.insert(instance_id.to_string());
         self.engaged_seen.insert(instance_id.to_string(), ts);
     }
+
+    /// One own crowd-control line on `instance_id` at `ts`: the CC hold, and the held-mob mark that
+    /// a mez application sets and any CC wear-off (`refresh`) ends. A root (`ensnared`) holds no mob.
+    pub fn note_cc(&mut self, instance_id: String, ts: i64, refresh: bool, verb: Option<&str>) {
+        if let Some(key) = crate::combat::state::name_key_of(&instance_id) {
+            if refresh {
+                self.mez_on.remove(key);
+            } else if verb.is_some_and(|v| v != "ensnared") {
+                self.mez_on.insert(key.to_string(), ts + MEZ_HOLD_MAX_MS);
+            }
+        }
+        self.cc_active_until.insert(instance_id, ts + CC_HOLD_MS);
+    }
+
+    /// Is a mob of this fight still held on your mez at `now`? Never one that is now a pet of yours
+    /// (`pets`, the engine's pet-name set): a mezzed mob you charm is no longer a mob of the fight.
+    pub fn held_on_mez(&self, now: i64, pets: &HashSet<String>) -> bool {
+        (self.mez_on.iter()).any(|(key, &until)| until > now && !pets.contains(key))
+    }
 }
 
 pub const LINGER_MS: i64 = 5_000;
 pub const PRESENCE_GONE_MS: i64 = 20_000;
 pub const FALLBACK_IDLE_MS: i64 = 60_000;
 pub const CC_HOLD_MS: i64 = 120_000;
+/// The longest one own mez application holds a fight open with no wear-off line seen. Above the
+/// longest own mez measured, a Dazzle IV that ran 136 s (`tests/fixtures/w63-dazzle-break-vs-full.log`,
+/// 22:45:14 to 22:47:30); the wear-off line, not this bound, is what normally ends a hold.
+pub const MEZ_HOLD_MAX_MS: i64 = 180_000;
 /// Per-hit active-time cap AND the "in combat" freshness window.
 pub const ACTIVE_MS: i64 = 3_000;
 pub const ZONE_HISTORY_CAP: usize = 24;
