@@ -8,7 +8,10 @@
 //!
 //! The path is derived from the attach, never discovered: the app pushes a log at
 //! `<eqRoot>/Logs/eqlog_<Char>_<server>.txt`, so the table is `<eqRoot>/spells_us.txt`. A character
-//! switch that changes installs changes the table with it, and nothing on the wire says so.
+//! switch that changes installs changes the table with it, and nothing on the wire says so. When
+//! `spells_us.txt` is missing, another language's `spells_<suffix>.txt` in the same folder is read
+//! instead ([`crate::spell_files`], the app's own rule; owner, 2026-11-23). Which file is settled on
+//! first use, not at attach, so attach stays a path join and an empty cell.
 //!
 //! The file is allowed to be missing — a folder of logs with no EverQuest behind it is a real
 //! configuration, and it produces a card that says so rather than a refusal.
@@ -23,6 +26,7 @@
 //! rewrites `spells_us.txt` is followed by a game launch and a fresh engine. What it will not do is
 //! notice a patch mid-session, which costs a restart the player has already performed.
 
+use crate::spell_files::{resolve, SpellFiles};
 use fold::dbstr::{parse_spell_categories, CategoryNames};
 use fold::spells_us::{parse_spells_us, SpellInfo, SpellTable};
 use std::path::{Path, PathBuf};
@@ -34,10 +38,11 @@ use std::sync::OnceLock;
 /// makes a new one, so an install change is a new table rather than a stale one to be noticed.
 #[derive(Debug)]
 pub struct ClientSpells {
-    /// `<eqRoot>/spells_us.txt`, derived from the attach's log path.
-    path: PathBuf,
-    /// `<eqRoot>/dbstr_us.txt`, beside it. See [`ClientSpells::category_names`].
-    dbstr_path: PathBuf,
+    /// `<eqRoot>`, derived from the attach's log path.
+    root: PathBuf,
+    /// Which table and string table to read under `root` (`spells_us.txt` and `dbstr_us.txt`, or
+    /// another language's), settled once on first use. See [`crate::spell_files`].
+    files: OnceLock<SpellFiles>,
     /// The parsed table, or `None` when the file could not be read. Filled once.
     table: OnceLock<Option<SpellTable>>,
     /// The spell-category vocabulary, read from `dbstr_us.txt`. Filled once, independently of
@@ -67,8 +72,8 @@ impl ClientSpells {
     pub fn beside_log(log: &Path) -> Option<Self> {
         let root = log.parent()?.parent()?;
         Some(Self {
-            path: root.join("spells_us.txt"),
-            dbstr_path: root.join("dbstr_us.txt"),
+            root: root.to_path_buf(),
+            files: OnceLock::new(),
             table: OnceLock::new(),
             categories: OnceLock::new(),
         })
@@ -78,7 +83,12 @@ impl ClientSpells {
     /// "there is no spells_us.txt at …" can name the place it looked.
     #[must_use]
     pub fn path(&self) -> &Path {
-        &self.path
+        &self.files().table
+    }
+
+    /// The files under the install root, resolved on the first ask and kept.
+    fn files(&self) -> &SpellFiles {
+        self.files.get_or_init(|| resolve(&self.root))
     }
 
     /// The table, parsing it if nobody has yet. Blocks the calling thread on the first call.
@@ -86,7 +96,7 @@ impl ClientSpells {
     /// See the header for why that is a connection thread and never the ingest's, and for why the
     /// `None` is memoised alongside the `Some`.
     pub fn table(&self) -> Option<&SpellTable> {
-        self.table.get_or_init(|| read(&self.path)).as_ref()
+        self.table.get_or_init(|| read(self.path())).as_ref()
     }
 
     /// One spell, by the name the asker spells it. `None` for a name the table has no row for, and
@@ -112,7 +122,7 @@ impl ClientSpells {
     /// once per install, memoised including its failure.
     pub fn category_names(&self) -> &CategoryNames {
         self.categories.get_or_init(|| {
-            read_latin1(&self.dbstr_path)
+            read_latin1(&self.files().dbstr)
                 .map_or_else(CategoryNames::new, |text| parse_spell_categories(&text))
         })
     }
@@ -124,7 +134,7 @@ impl ClientSpells {
         if self.table().is_some() {
             return TableState::Ok;
         }
-        if self.path.exists() {
+        if self.path().exists() {
             TableState::Unloadable
         } else {
             TableState::Missing
@@ -186,6 +196,20 @@ mod tests {
         let spells = ClientSpells::beside_log(&log).expect("a derivable path");
         // `<eqRoot>/Logs/<log>` → `<eqRoot>/spells_us.txt`. Nothing on the wire says this.
         assert_eq!(spells.path(), dir.join("spells_us.txt"));
+    }
+
+    #[test]
+    fn another_language_table_is_read_when_spells_us_is_missing() {
+        // Owner, 2026-11-23: the app ships no spell file; with no `spells_us.txt` it reads another
+        // `spells_*.txt` from the same folder, and this process follows the same rule.
+        let dir = scratch("fallback");
+        let log = dir.join("Logs").join("eqlog_Primitive_freeport.txt");
+        let table = format!("{}\n", row("677", "Tashani", "1", ""));
+        std::fs::write(dir.join("spells_de.txt"), table).expect("the staged table");
+        let spells = ClientSpells::beside_log(&log).expect("a derivable path");
+        assert_eq!(spells.path(), dir.join("spells_de.txt"));
+        assert_eq!(spells.state(), TableState::Ok);
+        assert!(spells.spell("Tashani").is_some());
     }
 
     #[test]

@@ -43,6 +43,9 @@ mod logs;
 mod ops;
 mod search;
 mod spawn;
+/// Which spell files to read out of an install: `spells_us.txt`, or another language's table when
+/// it is missing. The app's `resist/spellFiles.ts` rule, kept the same.
+mod spell_files;
 /// Searching that table by type — the filter/sort/window behind the in-game Actions window's
 /// Category and Subcategory columns. `spells` owns the files; this owns the question.
 mod spell_search;
