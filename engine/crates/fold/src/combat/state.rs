@@ -608,16 +608,23 @@ impl EngineState {
     /// practice — the measured breaks are pets turning on the stranger who charmed them, and a
     /// stranger is invisible to the other four.
     pub fn ally_friendly(&self, name_key: &str) -> bool {
+        self.friendly_person(name_key) || self.ally.is_friendly(name_key)
+    }
+
+    /// The first four of `ally_friendly`'s sources and NOT the ally model's caster set: you, your
+    /// own live pets, the group roster, and anyone the heal stream proved a player. The caster set
+    /// takes every player-shaped name seen casting, and a proper-named mob casts too (`Undertow
+    /// begins casting Immobilize.`), so as a defender test it threw away every hit a group-mate the
+    /// roster had not learned landed on such a mob (owner, 2026-11-23: Malkil's damage on Undertow
+    /// was missing from the meter). That set stays where it belongs, on the charm-break proof.
+    pub fn friendly_person(&self, name_key: &str) -> bool {
         if name_key.is_empty() || name_key == "you" {
             return true;
         }
         if self.pet_names.contains(name_key) {
             return true;
         }
-        if self.is_known_player(name_key) || self.is_member(name_key) {
-            return true;
-        }
-        self.ally.is_friendly(name_key)
+        self.is_known_player(name_key) || self.is_member(name_key)
     }
 
     /// Learn the player's proper name as a FALLBACK only (an injected name wins): `You healed

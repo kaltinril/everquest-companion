@@ -933,8 +933,9 @@ fn records_other<'a>(
     }
     // The other half, asked of the DEFENDER. A recorded combatant swinging at you, at your pet, at a
     // group-mate, at anyone the heal stream proved a player, or at another recorded combatant is not
-    // a fight this meter models. Dropped rather than booked, and never filed as incoming.
-    if st.ally_friendly(&target_key) || st.others.is_recorded(&target_key) {
+    // a fight this meter models. Dropped rather than booked, and never filed as incoming. Not the
+    // ally model's caster set (`friendly_person`): a proper-named mob that casts is in it.
+    if st.friendly_person(&target_key) || st.others.is_recorded(&target_key) {
         return None;
     }
     Some(key)
