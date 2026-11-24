@@ -503,7 +503,7 @@ Special AAs require either an achievement to unlock or using the [[Reincarnation
 |-
 | Class Reincarnation: Iksar || +2 HP Gen +5 AC || +4 HP Gen +10 AC || +6 HP Gen +15 AC || This passive ability increases your hitpoint regeneration by 2 and your base armor class by 5. 
 |-
-| Class Reincarnation: Kerran || +2 END gen +10 Safe Fall ||  +2 END gen  +20 Safe Fall ||  +2 END gen  +30 Safe Fall || This passive ability will increase your endurance regeneration by 2 and grants an additional 10 points to your Safe Fall skill. 
+| Class Reincarnation: Kerran || +2 END gen +10 Safe Fall ||  +4 END gen  +20 Safe Fall ||  +6 END gen  +30 Safe Fall || This passive ability will increase your endurance regeneration by 2 and grants an additional 10 points to your Safe Fall skill. 
 |-
 | Class Reincarnation: Ogre || 10% || 20% || 30% || This passive ability increases your chance to resist any stun by 10%. 
 |-

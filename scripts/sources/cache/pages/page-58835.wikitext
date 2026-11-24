@@ -48,14 +48,13 @@
 !Bonus Damage
 !Dual Wield
 |-
-|?
-|?
-| +0
-| - 
+|21
+|28
+| +10
+| 65%
 |-
 |}
 == Abilities ==
-'''Needs to be Verified'''
 * [[Skill_Bash|Bash]]
 * [[Skill_Block|Block]]
 * [[Skill_Cleave|Cleave]]
@@ -68,12 +67,12 @@
 * [[Skill_Taunt|Taunt]]
 
 == Spell List ==
-'''Needs to be Verified'''
 * [[Daring|<span class='itemeff'>Daring</span>]]
-* [[Greater Healing|<span class='itemeff'>Greater Healing</span>]]??
-* [[Stun|<span class='itemeff'>Stun</span>]]??
+* [[Greater Healing|<span class='itemeff'>Greater Healing</span>]]
+* [[Root|<span class='itemeff'>Root</span>]]
+* [[Stun|<span class='itemeff'>Stun</span>]]
 * [[Symbol of Ryltan|<span class='itemeff'>Symbol of Ryltan</span>]]
-* [[Wrath|<span class='itemeff'>Wrath</span>]]??
+* [[Wrath|<span class='itemeff'>Wrath</span>]]
 
 == Focus Items ==
 * None

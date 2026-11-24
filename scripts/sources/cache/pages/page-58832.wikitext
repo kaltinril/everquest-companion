@@ -48,14 +48,13 @@
 !Bonus Damage
 !Dual Wield
 |-
-|?
-|?
+|16
+|30
 | +0
-| - 
+| 33%
 |-
 |}
 == Abilities ==
-'''Needs to be Verified'''
 * [[Skill_Bash|Bash]]
 * [[Skill_Block|Block]]
 * [[Skill_Cleave|Cleave]]
@@ -68,11 +67,11 @@
 * [[Skill_Taunt|Taunt]]
 
 == Spell List ==
-'''Needs to be Verified'''
 * [[Center|<span class='itemeff'>Center</span>]]
+* [[Furor|<span class='itemeff'>Furor</span>]]
 * [[Healing|<span class='itemeff'>Healing</span>]]??
-* [[Smite|<span class='itemeff'>Smite</span>]]??
-* [[Stun|<span class='itemeff'>Stun</span>]]??
+* [[Root|<span class='itemeff'>Root</span>]]
+* [[Stun|<span class='itemeff'>Stun</span>]]
 * [[Symbol of Transal|<span class='itemeff'>Symbol of Transal</span>]]
 
 == Focus Items ==
