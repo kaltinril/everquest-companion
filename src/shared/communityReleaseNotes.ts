@@ -28,6 +28,121 @@ export interface CommunityRelease {
 
 export const COMMUNITY_RELEASE_NOTES: readonly CommunityRelease[] = [
   {
+    "version": "0.1.55",
+    "date": "2026-11-23",
+    "title": "the Community Edition, group meters that count your group, and a clearer Void motes tab",
+    "groups": [
+      {
+        "heading": "Community Edition",
+        "items": [
+          {
+            "text": "This is EQ Legends Companion CE (Community Edition). Versions are plain numbers from here on (0.1.55), and the installer is named everquest-companion-ce-Setup. Your install updates itself as before and keeps all your settings."
+          }
+        ]
+      },
+      {
+        "heading": "Combat",
+        "items": [
+          {
+            "text": "Joining a group by accepting someone's invite now puts them in your group, so their damage shows under Group without them having to talk in party first."
+          },
+          {
+            "text": "A group-mate's hits on a named mob that casts spells (Undertow, for example) are counted. Before, they could vanish from the meter."
+          },
+          {
+            "text": "A pull is one fight: a mob attacking you, a group-mate or a pet is part of it even before anyone hits it, so switching targets no longer starts a new fight."
+          },
+          {
+            "text": "A mob held on your own mez keeps the fight open until the mez wears off."
+          },
+          {
+            "text": "The per-mob drill no longer calls group damage \"you + pet\", and the With its owner paste keeps each pet under its owner."
+          }
+        ]
+      },
+      {
+        "heading": "Void motes",
+        "items": [
+          {
+            "text": "An \"On hand\" picker: tell it you have 0, 1, 2 or 3 motes and the week's plan spends that many."
+          },
+          {
+            "text": "The Motes column and a line above the table say what the highlight means: the Recommended plan, under every sort."
+          },
+          {
+            "text": "One line under the list says why each planned mote goes where it does."
+          },
+          {
+            "text": "Hours count each dropper once, the five raid bosses' later kills in a week, and Slime Blood from the Plane of Fear minibosses after the week's first run."
+          }
+        ]
+      },
+      {
+        "heading": "Spells",
+        "items": [
+          {
+            "text": "If spells_us.txt is missing, the app looks for another language's spells file, and Spells shows a notice saying what is missing and where it looked."
+          }
+        ]
+      },
+      {
+        "heading": "Log archive",
+        "items": [
+          {
+            "text": "An archive that cannot finish puts your log back by itself at the next launch, so no log data is lost."
+          },
+          {
+            "text": "Put back works on drives without hard links (it copies instead)."
+          }
+        ]
+      },
+      {
+        "heading": "Small fixes",
+        "items": [
+          {
+            "text": "Loot: Group by item is remembered per character."
+          },
+          {
+            "text": "Bazaar: an item priced both before and after its name is listed with no price, and the line is shown, instead of taking the wrong price. A tier row's watch chip names what alerts on that tier."
+          },
+          {
+            "text": "Wiki Gaps: turn-in counts add up across a character's archived logs; a merchant only your other characters met keeps all its stock; the character you leave is saved on a switch and on quit."
+          },
+          {
+            "text": "Plane of Sky: a refused spare offer no longer costs the quest it completed."
+          },
+          {
+            "text": "Buffs: a card with time left no longer reads \"past estimate\", and a saved duration moves a crowd-control hold already running."
+          },
+          {
+            "text": "Maps: the tab notices map files that changed on disk."
+          },
+          {
+            "text": "Leveling: a Reincarnations panel shows each climb back to 50."
+          },
+          {
+            "text": "Tradeskills Home: full tiles for tradeskills not in your log, and the panel can be folded away."
+          },
+          {
+            "text": "Raid Targets: the tally no longer flashes 0 / 0 defeated."
+          },
+          {
+            "text": "Respawn timers: a kept typed number comes back after the shared-name switch."
+          }
+        ]
+      },
+      {
+        "heading": "Data",
+        "items": [
+          {
+            "text": "Wiki pages refreshed to today (50 pages changed)."
+          }
+        ]
+      }
+    ],
+    "knownIssues": "When you join a group, only the person whose invite you accepted is known at once; others already in it show under Group once they talk in party or you buff them. A group-mate's mez does not hold a fight open (the log does not say who cast it). The Void motes tab now skips Slime Blood of Cazic-Thule, because Fear's minibosses drop it so often on later runs; and it estimates a drop's chance from the size of the mob's loot list, because the wiki lists no drop rates. It does not count spells or progress already banked toward a tier, and it assumes copies are farmed at Refined. The archive recovery and the Put back copy have only been tested with simulated failures, not on a real failed archive or a FAT32/exFAT drive. On Wiki Gaps' All characters, a turn-in row your current character never did can show another character's count. The Repeatable chip marks only quests the wiki states plainly. Wiki Gaps can suggest a quest for an NPC the quest does not really start at. The game prints no line for some quest rewards, so those items cannot be tied to their quest. The Macros Send has not yet been tried in game: keep the copy it makes until you have logged in and seen your macros. A \"(guessed)\" pet owner can be wrong until /pet who leader settles it. The healing meters still divide by the whole fight's length. A buff's percent stats (haste, run speed) and regen are not raised with rank yet. A Copy page read is kept for half an hour. Joining another player's private instance is not told apart from the open world of that zone. Another player's spells never count toward a mob's resists. The con card does not list a mob's immunities yet (the mob page does). A mob or item added to the wiki after this build shows no wiki details until the next build (or a Copy click in Wiki Gaps). Capture finds the game window only when it is titled \"EverQuest Legends\" or \"EverQuest\". The screenshot reader reads English only. The installer is not code-signed, so Windows shows \"Windows protected your PC\" the first time (More info, then Run anyway). Builds before test.20 do not update themselves; install one by hand once."
+  },
+  {
     "version": "0.1.0-test.54",
     "date": "2026-11-21",
     "title": "repeatable faction quests, a recipe form on Wiki Gaps, and screen fixes",
