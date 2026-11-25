@@ -11,7 +11,7 @@ import { useCallback, useMemo, type JSX } from 'react'
 import { Box, Chip, MenuItem, Stack, TextField, Typography } from '@mui/material'
 import { CLASS_ABBRS, type ClassAbbr } from '@shared/classCombo'
 import { ITEM_UPGRADE_BASE } from '@shared/itemUpgrade'
-import { buildBisSheet, usableBy } from '@shared/planner/bisSheet'
+import { alignPairsToWorn, buildBisSheet, usableBy } from '@shared/planner/bisSheet'
 import type { GearRow } from '@shared/planner/gear'
 import { activeChips, type TierChip, type TierSetup } from '@shared/planner/tierChips'
 import { GUIDE_CREDIT, PRESET_LABEL, TIER_PRESETS, type TierPreset } from '@shared/planner/tierDefaults'
@@ -117,11 +117,12 @@ export default function BisView({ onOpenLoot }: BisViewProps = {}): JSX.Element 
   const setup = useMemo(() => activeSetup(prefs, classes.classes), [prefs, classes.classes])
   const owned = useMemo(() => ownedCopies(ownership.map), [ownership.map])
   const admit = useMemo(() => (prefs.era ? (r: GearRow) => !eraHidden(r) : () => true), [prefs.era, eraHidden])
-  const sheet = useMemo(
+  const worn = useWorn(compare)
+  const built = useMemo(
     () => buildBisSheet({ rows, setup, model, classes: classes.classes, admit, owned: prefs.owned ? owned : undefined }),
     [rows, setup, model, classes.classes, admit, owned, prefs.owned]
   )
-  const worn = useWorn(compare)
+  const sheet = useMemo(() => alignPairsToWorn(built, (cell) => worn.cells.get(cell)?.row?.key), [built, worn])
   const stated = useStated(rows, model, classes.classes, admit)
   const totals = useMemo(() => totalsRows(sheet.totals, loadoutTotals(worn.rows, model, setup.split), setup), [sheet, worn, model, setup])
   const lane = (chip: TierChip, tier: TierSetup['board'][TierChip]): void => setPrefs({ ...prefs, board: { ...setup.board, [chip]: tier } })

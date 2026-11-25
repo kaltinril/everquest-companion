@@ -240,6 +240,30 @@ function addTotals(totals: Partial<Record<TierChip, number>>, row: GearRow, opts
   }
 }
 
+/** The cells that come in twos: the same slot, so either holds the other's pick at the same score. */
+const PAIRS: readonly (readonly [PlanSlotId, PlanSlotId])[] = [['EAR', 'EAR2'], ['WRIST', 'WRIST2'], ['FINGER', 'FINGER2'], ['ANY1', 'ANY2']]
+
+/**
+ * LAY EACH PAIR ON THE SIDE THE PLAYER ALREADY WEARS IT (owner, 2026-11-24: *"i have earring of
+ * bashing, just on the other ear....."*, *"if an item is lore i can't equip 2...."*). The search
+ * puts a pair's two picks in either order, so an item worn in the second ear could be shown in the
+ * first, read as a second copy, with an amber border on both. Swapping the two cells (pick, its
+ * other-haste and runners-up together) changes no score and no total: only the side.
+ */
+export function alignPairsToWorn(sheet: BisSheet, wornKey: (cell: PlanSlotId) => string | undefined): BisSheet {
+  const cells = [...sheet.cells]
+  const hit = (c: BisCell | undefined, side: PlanSlotId): number => (c?.pick !== undefined && c.pick.row.key === wornKey(side) ? 1 : 0)
+  for (const [a, b] of PAIRS) {
+    const i = cells.findIndex((c) => c.cell === a)
+    const j = cells.findIndex((c) => c.cell === b)
+    if (i < 0 || j < 0 || hit(cells[j], a) + hit(cells[i], b) <= hit(cells[i], a) + hit(cells[j], b)) continue
+    const first = cells[i]
+    cells[i] = { ...cells[j], cell: a }
+    cells[j] = { ...first, cell: b }
+  }
+  return { ...sheet, cells }
+}
+
 /**
  * THE SHEET. Scores every admitted row once per cell, keeps the top `SEARCH_WIDTH` per cell for the
  * exact assignment, applies the caps pass when a cap is set, and reads the answer in `PLAN_SLOTS` order.
