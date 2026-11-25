@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-24T08:33:28.325Z",
+  "scrapedAt": "2026-11-25T05:15:32.799Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -60146,6 +60146,29 @@
         }
       ],
       "image": "npc_a_tomb_spiderling.png"
+    },
+    {
+      "page": "A tormented dead",
+      "eraTag": "Classic",
+      "name": "A tormented dead",
+      "level": "?",
+      "zones": [
+        "The Estate of Unrest"
+      ],
+      "loc": [
+        {
+          "ns": 49.69,
+          "ew": 1.69,
+          "z": 5.69
+        }
+      ],
+      "image": "?",
+      "commonDrops": [
+        "Zombie Skin",
+        "Grave Mold",
+        "Amanita Phalloide"
+      ],
+      "noImage": true
     },
     {
       "page": "A tormented tradesman",

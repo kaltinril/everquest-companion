@@ -19,7 +19,7 @@
     <ul>
     <li>Defensive Stats</li>
        <ul>
-       <li>Mitigation: 174</li>
+       <li>Mitigation: 183</li>
        <li>Evasion: 416</li>
        </ul>
     </ul>
@@ -32,11 +32,11 @@
      </ul>
   </div>
   <div style="flex: 1;">
-    <ul><li>Strength: 117</li>
-    <li>Stamina: 117</li>
+    <ul><li>Strength: 120</li>
+    <li>Stamina: 120</li>
     <li>Intelligence: 10</li>
     <li>Wisdom: 10</li>
-    <li>Agility: 117</li>
+    <li>Agility: 120</li>
     <li>Dexterity: 110</li>
     <li>Charisma: 8</li></ul>
   </div>
@@ -51,7 +51,7 @@
 |21
 |28
 | +14
-| ? 
+| 69% 
 |-
 |}
 == Abilities ==
