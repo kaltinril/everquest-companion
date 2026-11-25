@@ -184,6 +184,10 @@ export interface TotalsRow {
   worn: string
   cap: string
   capped: boolean
+  /** the target (the board's cap) as a number, for the Target column's input */
+  capValue?: number
+  /** the worn total has reached the target */
+  wornReached: boolean
 }
 
 function totalText(chip: TierChip, v: number | undefined): string {
@@ -194,7 +198,9 @@ function totalText(chip: TierChip, v: number | undefined): string {
 
 /** The totals table: the stats on the board that the loadout or the worn gear states, best lane first. */
 export function totalsRows(best: Partial<Record<TierChip, number>>, worn: Partial<Record<TierChip, number>>, setup: TierSetup): TotalsRow[] {
-  const chips = activeChips(setup.split).filter((c) => !isRatioChip(c) && setup.board[c] !== 'Off' && (best[c] !== undefined || worn[c] !== undefined))
+  const chips = activeChips(setup.split).filter(
+    (c) => !isRatioChip(c) && setup.board[c] !== 'Off' && (best[c] !== undefined || worn[c] !== undefined || setup.caps[c] !== undefined)
+  )
   const rank = (c: TierChip): number => RANKED_TIERS.indexOf(setup.board[c] as never)
   chips.sort((a, b) => rank(a) - rank(b))
   return chips.map((chip) => {
@@ -207,7 +213,9 @@ export function totalsRows(best: Partial<Record<TierChip, number>>, worn: Partia
       best: totalText(chip, best[chip]),
       worn: totalText(chip, worn[chip]),
       cap: cap === undefined ? '' : `${String(cap)}${capped ? ' capped' : ''}`,
-      capped
+      capped,
+      ...(cap === undefined ? {} : { capValue: cap }),
+      wornReached: cap !== undefined && (worn[chip] ?? 0) >= cap
     }
   })
 }

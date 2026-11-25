@@ -41,11 +41,18 @@ export interface BisPrefs {
   owned: boolean
   /** the saved tier list in force (its name), or null for a preset; both are picked in the one Start from menu */
   list: string | null
+  /** the totals table's Target column is open (off by default; owner: *"default off and if they click a button they can assign targets"*) */
+  targets: boolean
+  /** the attribute cap the "attributes at cap" fill uses: 510 published, raised by reincarnation AAs (no published numbers) */
+  statCap: number
 }
+
+/** Legends' published attribute cap (agent/MEASURED.md, "BiS sheet research"). */
+export const LEGENDS_STAT_CAP = 510
 
 export const DEFAULT_LEVEL = 60
 
-export const DEFAULT_BIS_PREFS: BisPrefs = { preset: 'classes', board: null, step: DEFAULT_STEP, split: false, caps: {}, level: DEFAULT_LEVEL, era: true, owned: false, list: null }
+export const DEFAULT_BIS_PREFS: BisPrefs = { preset: 'classes', board: null, step: DEFAULT_STEP, split: false, caps: {}, level: DEFAULT_LEVEL, era: true, owned: false, list: null, targets: false, statCap: LEGENDS_STAT_CAP }
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v)
 
@@ -88,9 +95,35 @@ export function sanitizeBisPrefs(raw: unknown): BisPrefs {
     level: typeof raw.level === 'number' ? clampLevel(raw.level) : DEFAULT_LEVEL,
     era: raw.era !== false,
     owned: raw.owned === true,
-    list: typeof raw.list === 'string' && raw.list.trim() !== '' ? raw.list : null
+    list: typeof raw.list === 'string' && raw.list.trim() !== '' ? raw.list : null,
+    targets: raw.targets === true,
+    statCap: typeof raw.statCap === 'number' && Number.isFinite(raw.statCap) && raw.statCap > 0 ? Math.round(raw.statCap) : LEGENDS_STAT_CAP
   }
 }
+
+/**
+ * Several targets at once (a target IS the board's cap: the stat counts only up to it across the
+ * loadout). `undefined` clears one. The board becomes the player's own, as a single cap does.
+ */
+export function withCaps(prefs: BisPrefs, setup: TierSetup, change: Partial<Record<TierChip, number | undefined>>): BisPrefs {
+  const touched = new Set(Object.keys(change))
+  const caps: Partial<Record<TierChip, number>> = Object.fromEntries(Object.entries(prefs.caps).filter(([k]) => !touched.has(k)))
+  for (const [chip, v] of Object.entries(change) as [TierChip, number | undefined][]) {
+    if (v !== undefined && Number.isFinite(v) && !isRatioChip(chip)) caps[chip] = v
+  }
+  return { ...prefs, caps, board: { ...setup.board } }
+}
+
+/** The tanking resist target (owner, 2026-11-24: *"resist gear should have a target of about 200 if you're going to be tanking"*). */
+export const TANK_RESIST_TARGET = 200
+
+/** Resists to the tanking target: the joined average, or each of the five when split. */
+export function tankResistTargets(split: boolean): Partial<Record<TierChip, number>> {
+  return split ? Object.fromEntries(SPLIT_RESISTS.map((c) => [c, TANK_RESIST_TARGET])) : { RESISTS: TANK_RESIST_TARGET }
+}
+
+/** The attributes the board shows as their own stats; STA lives inside HP and INT/WIS inside Mana, so they cannot take one. */
+export const CAPPED_ATTRIBUTES: readonly TierChip[] = ['STR', 'DEX', 'AGI', 'CHA']
 
 /** The board in force: the player's own, or the preset's default for the classes picked. */
 export function activeSetup(prefs: BisPrefs, classes: readonly ClassAbbr[]): TierSetup {

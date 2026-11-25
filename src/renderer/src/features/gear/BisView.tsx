@@ -24,7 +24,8 @@ import ChipMultiSelect from '../../components/ChipMultiSelect'
 import OutputKindLine from '../../components/OutputKindLine'
 import { useWishlist } from '../wishlist/useWishlist'
 import { wishFromGear } from '../wishlist/wishSearch'
-import BisCells, { BisTotals, type BisWishes, type WornCell } from './BisCells'
+import BisCells, { type BisWishes, type WornCell } from './BisCells'
+import BisTargets from './BisTargets'
 import BisStartFrom from './BisStartFrom'
 import { activeSetup, clampLevel, withCleared, withPasted, withSplit, type BisPrefs } from './bisPrefs'
 import { loadoutTotals, ownedCopies, totalsRows } from './bisText'
@@ -187,7 +188,7 @@ export default function BisView({ onOpenLoot }: BisViewProps = {}): JSX.Element 
           </Typography>
         </Stack>
       </Box>
-      <BisTotals rows={totals} plus={plus.full} />
+      <BisTargets rows={totals} plus={plus.full} prefs={prefs} setPrefs={setPrefs} setup={setup} />
     </Box>
   )
 }

@@ -28,6 +28,8 @@ export interface BisCompareProps {
   classes: readonly ClassAbbr[]
   /** the slider's tier both items are scored at */
   plus: number
+  /** the item's label: "Best:" for the slot's pick, "Next best:" when a runner-up is hovered */
+  label?: string
 }
 
 const TONE_COLOUR: Readonly<Record<Tone, string>> = { good: 'success.main', warn: 'warning.main', plain: 'text.secondary' }
@@ -88,18 +90,18 @@ function WornPart({ worn, score, same }: { worn: WornCell | undefined; score: nu
     <>
       <Line label="Worn:" name={wornName(worn)} score={score} />
       {worn.row === undefined && <Typography variant="caption" color="text.secondary">The item data does not know the worn item, so it cannot be scored.</Typography>}
-      {same && <Typography variant="caption" color="success.main">You already wear the best item for this slot.</Typography>}
+      {same && <Typography variant="caption" color="success.main">You already wear this item here.</Typography>}
     </>
   )
 }
 
-function CompareTable({ rows }: { rows: readonly CompareRow[] }): JSX.Element {
+function CompareTable({ rows, head }: { rows: readonly CompareRow[]; head: string }): JSX.Element {
   return (
     <Box component="table" sx={{ borderCollapse: 'collapse', '& td, & th': { fontSize: 12, py: 0.125, px: 0.75, textAlign: 'right' }, '& th': { color: 'text.secondary', fontWeight: 500 }, '& .stat': { textAlign: 'left' } }}>
       <thead>
         <tr>
           <th className="stat">Stat</th>
-          <th>Best</th>
+          <th>{head}</th>
           <th>Worn</th>
         </tr>
       </thead>
@@ -122,9 +124,9 @@ export default function BisCompare(props: BisCompareProps): JSX.Element {
   const m = compareModel(props)
   return (
     <Stack spacing={0.5} sx={{ p: 0.5, minWidth: 260, maxWidth: 380 }} data-testid="bis-compare">
-      {pick !== undefined && <Line label="Best:" name={pick.row.name} score={pick.score} />}
+      {pick !== undefined && <Line label={props.label ?? 'Best:'} name={pick.row.name} score={pick.score} />}
       <WornPart worn={worn} score={m.wornScore?.score} same={m.same} />
-      {m.rows.length > 0 && !m.same && <CompareTable rows={m.rows} />}
+      {m.rows.length > 0 && !m.same && <CompareTable rows={m.rows} head={(props.label ?? 'Best:').replace(/:$/, '')} />}
       {m.notes.map((n) => (
         <Typography key={n} variant="caption" color="text.secondary">{n}</Typography>
       ))}
