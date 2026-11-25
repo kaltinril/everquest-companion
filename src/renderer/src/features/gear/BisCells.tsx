@@ -6,8 +6,8 @@
 // the item window carry them); the card gained the item icon, a "+" that adds to the wish list, and
 // an amber border when the slot's best is not what is worn; a worn runner-up is highlighted.
 
-import { useState, type JSX, type MouseEvent } from 'react'
-import { Box, Chip, IconButton, Link, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material'
+import { useEffect, useState, type JSX, type MouseEvent } from 'react'
+import { Box, Chip, IconButton, Link, Stack, Tooltip, Typography, type Theme } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import CheckIcon from '@mui/icons-material/Check'
 import type { ClassAbbr } from '@shared/classCombo'
@@ -19,7 +19,7 @@ import { REVAMP_ERA_TAGS, weaponKindOf, type TierModel } from '@shared/planner/t
 import type { PlanSlotId } from '@shared/planner/types'
 import { ItemIcon } from '../../lib/ItemIcon'
 import BisCompare, { type WornCell } from './BisCompare'
-import { cellLabel, hasteNote, termText, type TotalsRow } from './bisText'
+import { cellLabel, hasteNote, termText } from './bisText'
 
 export type { WornCell } from './BisCompare'
 
@@ -111,15 +111,31 @@ function ItemLine({ row, props }: { row: GearRow; props: BisCellsProps }): JSX.E
   )
 }
 
-/** The next five; the one worn in this cell is highlighted (owner: *"it needs to indicate that row is worn"*). */
-function NextBest({ cell, worn, props }: { cell: BisCell; worn: WornCell | undefined; props: BisCellsProps }): JSX.Element {
+/** The hover's own surface: SOLID, not the theme's paper (the owner's screenshot showed the cards behind bleeding through). */
+const TIP_SLOT = { tooltip: { sx: { maxWidth: 400, bgcolor: (t: Theme) => (t.palette.mode === 'dark' ? '#15171d' : '#ffffff'), backgroundImage: 'none', opacity: 1, color: 'text.primary', border: 1, borderColor: 'divider', boxShadow: 8 } } }
+
+/**
+ * The next five; the one worn in this cell is highlighted (owner: *"it needs to indicate that row is
+ * worn"*). Each row has its own hover comparing IT with what is worn (owner: *"when i hover over a next
+ * best, can we compare that hovred next best item to what i'm wearing?"*); `onInner` tells the card to
+ * hold its own hover back meanwhile.
+ */
+function NextBest({ cell, worn, props, onInner }: { cell: BisCell; worn: WornCell | undefined; props: BisCellsProps; onInner: (on: boolean) => void }): JSX.Element {
   return (
-    <Stack sx={{ borderTop: 1, borderColor: 'divider', pt: 0.5 }} spacing={0.25} data-testid="bis-cell-next">
+    <Stack sx={{ borderTop: 1, borderColor: 'divider', pt: 0.5 }} spacing={0.25} data-testid="bis-cell-next" onMouseEnter={() => onInner(true)} onMouseLeave={() => onInner(false)}>
       <Typography variant="overline" color="text.secondary">Next best</Typography>
       {cell.runnersUp.length === 0 && <Typography variant="caption" color="text.secondary">None.</Typography>}
       {cell.runnersUp.map((r) => {
         const on = isWorn(r.row, worn)
         return (
+          <Tooltip
+            key={r.row.key}
+            placement="right-start"
+            enterDelay={250}
+            enterNextDelay={100}
+            title={<BisCompare cell={{ ...cell, pick: { ...r, reasons: [] } }} worn={worn} model={props.model} setup={props.setup} classes={props.classes} plus={props.plus} label="Next best:" />}
+            slotProps={TIP_SLOT}
+          >
           <Stack
             key={r.row.key}
             direction="row"
@@ -138,6 +154,7 @@ function NextBest({ cell, worn, props }: { cell: BisCell; worn: WornCell | undef
             <Typography variant="caption" color="text.secondary" sx={{ fontVariantNumeric: 'tabular-nums' }}>{r.score.toFixed(1)}</Typography>
             <WishButton row={r.row} wishes={props.wishes} />
           </Stack>
+          </Tooltip>
         )
       })}
     </Stack>
@@ -181,14 +198,22 @@ function Card({ cell, props, open, onToggle }: { cell: BisCell; props: BisCellsP
   const pickWorn = pick !== undefined && isWorn(pick.row, worn)
   // THE DIFFERENCE BORDER (owner: *"do some sort of border if there is a suggested difference for the slot"*).
   const differs = pick !== undefined && !pickWorn
+  const [tip, setTip] = useState(false)
+  const [inner, setInner] = useState(false)
+  // A list closed under the pointer never sends its mouse-leave; the card's hover must come back.
+  useEffect(() => {
+    if (!open) setInner(false)
+  }, [open])
   return (
     <Tooltip
       placement="right-start"
       enterDelay={350}
       enterNextDelay={200}
+      open={tip && !inner}
+      onOpen={() => setTip(true)}
+      onClose={() => setTip(false)}
       title={<BisCompare cell={cell} worn={worn} model={props.model} setup={props.setup} classes={props.classes} plus={props.plus} />}
-      // SOLID, NOT THE THEME'S PAPER: the owner's screenshot showed the cards behind bleeding through it.
-      slotProps={{ tooltip: { sx: { maxWidth: 400, bgcolor: (t) => (t.palette.mode === 'dark' ? '#15171d' : '#ffffff'), backgroundImage: 'none', opacity: 1, color: 'text.primary', border: 1, borderColor: 'divider', boxShadow: 8 } } }}
+      slotProps={TIP_SLOT}
     >
       <Box
         data-testid="bis-cell"
@@ -211,7 +236,7 @@ function Card({ cell, props, open, onToggle }: { cell: BisCell; props: BisCellsP
           {pick !== undefined && <Typography variant="caption" color="primary.main" sx={{ fontVariantNumeric: 'tabular-nums' }}>{pick.score.toFixed(1)}</Typography>}
         </Stack>
         <CardBody cell={cell} props={props} pickWorn={pickWorn} />
-        {open && <NextBest cell={cell} worn={worn} props={props} />}
+        {open && <NextBest cell={cell} worn={worn} props={props} onInner={setInner} />}
       </Box>
     </Tooltip>
   )
@@ -225,32 +250,5 @@ export default function BisCells(props: BisCellsProps): JSX.Element {
         <Card key={cell.cell} cell={cell} props={props} open={open === cell.cell} onToggle={() => setOpen(open === cell.cell ? null : cell.cell)} />
       ))}
     </Box>
-  )
-}
-
-export function BisTotals({ rows, plus }: { rows: readonly TotalsRow[]; plus: number }): JSX.Element {
-  return (
-    <Table size="small" data-testid="bis-totals">
-      <TableHead>
-        <TableRow>
-          <TableCell>Stat</TableCell>
-          <TableCell>Tier</TableCell>
-          <TableCell align="right">{`Best in slot (+${String(plus)})`}</TableCell>
-          <TableCell align="right">{`Worn (+${String(plus)})`}</TableCell>
-          <TableCell align="right">Cap</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {rows.map((r) => (
-          <TableRow key={r.chip}>
-            <TableCell>{r.label}</TableCell>
-            <TableCell>{r.tier === 'Off' ? 'Unassigned' : r.tier}</TableCell>
-            <TableCell align="right" sx={{ color: r.capped ? 'success.main' : undefined }}>{r.best}</TableCell>
-            <TableCell align="right" sx={{ color: 'text.secondary' }}>{r.worn}</TableCell>
-            <TableCell align="right">{r.cap}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
   )
 }

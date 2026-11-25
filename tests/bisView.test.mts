@@ -8,7 +8,7 @@ import type { GearRow } from '../src/shared/planner/gear'
 import { CHIP_KEYS, boardToText, uniformBoard, type TierChip } from '../src/shared/planner/tierChips'
 import { defaultBoard } from '../src/shared/planner/tierDefaults'
 import { conversionsFor, deriveChips, type TierModel } from '../src/shared/planner/tierWeights'
-import { DEFAULT_BIS_PREFS, activeSetup, clampLevel, sanitizeBisPrefs, matchesSaved, sanitizeSaved, withCleared, withLoadedBoard, withPasted, withSavedBoard, withSplit } from '../src/renderer/src/features/gear/bisPrefs'
+import { CAPPED_ATTRIBUTES, DEFAULT_BIS_PREFS, LEGENDS_STAT_CAP, activeSetup, tankResistTargets, withCaps, clampLevel, sanitizeBisPrefs, matchesSaved, sanitizeSaved, withCleared, withLoadedBoard, withPasted, withSavedBoard, withSplit } from '../src/renderer/src/features/gear/bisPrefs'
 import { budgetText, chipHint, chipValueText, compareRows, hasteNote, loadoutTotals, ownedCopies, sourceText, termText, totalsRows } from '../src/renderer/src/features/gear/bisText'
 import { sortValue } from '../src/renderer/src/features/gear/gearFilter'
 import type { GearOwnershipMap } from '../src/renderer/src/features/gear/gearOwnership'
@@ -157,4 +157,19 @@ test('the haste note says why haste counted less: it does not stack', () => {
   assert.equal(hasteNote(undefined, 0, 30), undefined)
   assert.match(hasteNote(30, 0, 36) ?? '', /does not count, another slot gives 36%/)
   assert.match(hasteNote(41, 5, 36) ?? '', /only 5% counts/)
+})
+test("targets are the board's caps: set several, clear one, tanking resists, the stat cap kept (owner)", () => {
+  const setup = activeSetup(DEFAULT_BIS_PREFS, ['WAR'])
+  const p = withCaps({ ...DEFAULT_BIS_PREFS, caps: { DEX: 300 } }, setup, { ...tankResistTargets(false), STR: 510, DEX: undefined, RATIO_1H: 2 })
+  assert.deepEqual(p.caps, { RESISTS: 200, STR: 510 }, 'DEX cleared, no target on a ratio')
+  assert.notEqual(p.board, null, "the board becomes the player's own, as a single cap does")
+  assert.deepEqual(Object.keys(tankResistTargets(true)).sort(), ['SV_COLD', 'SV_DISEASE', 'SV_FIRE', 'SV_MAGIC', 'SV_POISON'])
+  assert.ok(!CAPPED_ATTRIBUTES.includes('STA'), 'STA lives inside HP')
+  assert.equal(DEFAULT_BIS_PREFS.targets, false, 'off by default')
+  assert.equal(sanitizeBisPrefs({ targets: true, statCap: 540.4 }).statCap, 540)
+  assert.equal(sanitizeBisPrefs({ statCap: -3 }).statCap, LEGENDS_STAT_CAP)
+  const rows = totalsRows({ STR: 400 }, { STR: 520 }, { ...setup, caps: { STR: 510, RESISTS: 200 } })
+  const res = rows.find((r) => r.chip === 'RESISTS')
+  assert.equal(res?.capValue, 200, 'a target shows even when neither loadout states the stat')
+  assert.equal(rows.find((r) => r.chip === 'STR')?.wornReached, true)
 })
