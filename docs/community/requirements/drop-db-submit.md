@@ -46,3 +46,4 @@ Nothing here is removed or narrowed without the owner's word (RULES.md, rule 19)
   while it runs too (it stops only when nothing is waiting). Background and Send now sign in first
   when the saved sign-in has not worked yet; Only when I press Send itself sends nothing, so it
   does not.
+| 2026-11-24 | owner | Asked at the 0.1.56 release whether to ship it (an earlier row said not to merge yet; another session merged it at 15:10): "shit it all, off by default". | shipped in 0.1.56, off by default |
