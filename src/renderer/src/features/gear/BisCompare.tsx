@@ -26,6 +26,8 @@ export interface BisCompareProps {
   model: TierModel
   setup: TierSetup
   classes: readonly ClassAbbr[]
+  /** the slider's tier both items are scored at */
+  plus: number
 }
 
 const TONE_COLOUR: Readonly<Record<Tone, string>> = { good: 'success.main', warn: 'warning.main', plain: 'text.secondary' }
@@ -56,6 +58,12 @@ function compareModel({ cell, worn, model, setup, classes }: BisCompareProps): C
     wornRow === undefined || wornScore === undefined || same ? undefined : hasteNote(wornRow.stats.HASTE, wornScore.hasteCounted, cell.otherHaste)
   ].filter((n): n is string => n !== undefined)
   return { wornScore, same, rows, notes, budget: pick === undefined ? undefined : budgetText(itemBudget(pick.row, model)) }
+}
+
+/** Which tier the numbers are at, and the tier the worn copy really is when that differs. */
+function plusNote(plus: number, worn: WornCell | undefined): string {
+  const head = `Both at +${String(plus)} (the slider)`
+  return worn?.row !== undefined && (worn.tier ?? 0) !== plus ? `${head}; you wear yours at +${String(worn.tier ?? 0)}.` : `${head}.`
 }
 
 function wornName(worn: WornCell): string {
@@ -127,7 +135,7 @@ export default function BisCompare(props: BisCompareProps): JSX.Element {
         </Typography>
       )}
       {m.budget !== undefined && <Typography variant="caption" color={TONE_COLOUR[m.budget.tone]}>{m.budget.text}</Typography>}
-      {(worn?.tier ?? 0) > 0 && <Typography variant="caption" color="text.disabled">Both compared at +0.</Typography>}
+      <Typography variant="caption" color="text.disabled">{plusNote(props.plus, worn)}</Typography>
     </Stack>
   )
 }

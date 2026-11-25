@@ -3,16 +3,17 @@
 //
 // IT OWNS THE LAYOUT AND THE CHOICES. The scoring is shared/planner/tierWeights.ts, the defaults
 // tierDefaults.ts, the sheet bisSheet.ts; what is worn is the Gear tab's own join (`useGearCompare`,
-// read at base), the classes are the area's shared pick (`useGearClasses`, with the Gear tab's
+// scaled to the tab's upgrade slider like every candidate), the classes are the area's shared pick (`useGearClasses`, with the Gear tab's
 // "detected" chip), and the board is stored at `eq.gear.tiers`, where the Gear tab's BEST column
 // reads it too. Named boards are `eq.gear.tierLists`, picked in the Start from menu (BisStartFrom.tsx).
 
-import { useCallback, useMemo, type JSX } from 'react'
+import { useCallback, useDeferredValue, useMemo, type JSX } from 'react'
 import { Box, Chip, Stack, TextField, Typography } from '@mui/material'
 import { CLASS_ABBRS, type ClassAbbr } from '@shared/classCombo'
-import { ITEM_UPGRADE_BASE } from '@shared/itemUpgrade'
+import { ITEM_UPGRADE_BASE, type ItemUpgradeState } from '@shared/itemUpgrade'
 import { alignPairsToWorn, buildBisSheet, usableBy } from '@shared/planner/bisSheet'
 import type { GearRow } from '@shared/planner/gear'
+import { scaleGearRow } from '@shared/planner/gearScale'
 import { activeChips, type TierChip, type TierSetup } from '@shared/planner/tierChips'
 import { GUIDE_CREDIT } from '@shared/planner/tierDefaults'
 import type { TierModel } from '@shared/planner/tierWeights'
@@ -27,8 +28,10 @@ import BisCells, { BisTotals, type BisWishes, type WornCell } from './BisCells'
 import BisStartFrom from './BisStartFrom'
 import { activeSetup, clampLevel, withCleared, withPasted, withSplit, type BisPrefs } from './bisPrefs'
 import { loadoutTotals, ownedCopies, totalsRows } from './bisText'
-import { useEraHidden, useGearClasses, useGearCompare, useGearIndex, useGearOwnership, type GearClasses, type GearCompareData } from './gearData'
+import { useEraHidden, useGearClasses, useGearCompare, useGearIndex, useGearOwnership, useUpgradeState, type GearClasses, type GearCompareData } from './gearData'
+import { scaleAll } from './gearFilter'
 import TierBoard from './TierBoard'
+import UpgradeSlider from './UpgradeSlider'
 import { useBisPrefs, useTierModel } from './useBisData'
 
 export interface BisViewProps {
@@ -36,17 +39,19 @@ export interface BisViewProps {
 }
 
 /** What is worn in each cell (the dump's join), with the item data's row when it knows the item. */
-function useWorn(compare: GearCompareData): { cells: Map<PlanSlotId, WornCell>; rows: GearRow[] } {
+function useWorn(compare: GearCompareData, state: ItemUpgradeState): { cells: Map<PlanSlotId, WornCell>; rows: GearRow[] } {
   return useMemo(() => {
     const cells = new Map<PlanSlotId, WornCell>()
     const rows: GearRow[] = []
     for (const [cell, host] of compare.equipped) {
-      const row = compare.byKey.get(host.key)
+      const base = compare.byKey.get(host.key)
+      // At the slider's state, as the candidates are: like for like (the worn +N is still shown).
+      const row = base === undefined ? undefined : scaleGearRow(base, state)
       if (row !== undefined) rows.push(row)
       cells.set(cell, { name: host.name, tier: host.tier, row })
     }
     return { cells, rows }
-  }, [compare])
+  }, [compare, state])
 }
 
 /** The chips some item the player could wear states: the rest are drawn faded. */
@@ -102,26 +107,41 @@ function Controls({ prefs, setPrefs, classes, setup }: { prefs: BisPrefs; setPre
   )
 }
 
+/**
+ * THE SHEET AT THE SLIDER'S PLUS-STATE (owner, 2026-11-24: *"it's hard to compare when i have a +7 or
+ * +10 and it's showing a +0 ... a slider like on the other gear pages ... calculates them at the
+ * specific level i want ... apples to apples"*). Every candidate AND every worn item is scaled to the
+ * same state (`scaleAll`, the Gear table's own scaling), so the cards, the hover and the totals compare
+ * like with like. The model (units) stays measured at base, so the slider moves scores, not what S means.
+ */
+function useBisSheet(rows: readonly GearRow[], prefs: BisPrefs, { classes, model, state }: { classes: readonly ClassAbbr[]; model: TierModel; state: ItemUpgradeState }) {
+  const { eraHidden } = useEraHidden()
+  const ownership = useGearOwnership()
+  const compare = useGearCompare(rows, ITEM_UPGRADE_BASE)
+  const setup = useMemo(() => activeSetup(prefs, classes), [prefs, classes])
+  const owned = useMemo(() => ownedCopies(ownership.map), [ownership.map])
+  const admit = useMemo(() => (prefs.era ? (r: GearRow) => !eraHidden(r) : () => true), [prefs.era, eraHidden])
+  const scaled = useMemo(() => scaleAll(rows, state), [rows, state])
+  const worn = useWorn(compare, state)
+  const built = useMemo(
+    () => buildBisSheet({ rows: scaled, setup, model, classes, admit, owned: prefs.owned ? owned : undefined }),
+    [scaled, setup, model, classes, admit, owned, prefs.owned]
+  )
+  const sheet = useMemo(() => alignPairsToWorn(built, (cell) => worn.cells.get(cell)?.row?.key), [built, worn])
+  const totals = useMemo(() => totalsRows(sheet.totals, loadoutTotals(worn.rows, model, setup.split), setup), [sheet, worn, model, setup])
+  return { setup, owned, admit, worn, sheet, totals }
+}
+
 export default function BisView({ onOpenLoot }: BisViewProps = {}): JSX.Element {
   const { rows, ready, refused } = useGearIndex()
   const classes = useGearClasses()
   const [prefs, setPrefs] = useBisPrefs()
-  const { eraHidden } = useEraHidden()
-  const ownership = useGearOwnership()
-  const compare = useGearCompare(rows, ITEM_UPGRADE_BASE)
+  const upgrade = useUpgradeState()
+  const plus = useDeferredValue(upgrade.state)
   const model = useTierModel(rows, classes.classes, prefs.level)
   const wishes = useBisWishes()
-  const setup = useMemo(() => activeSetup(prefs, classes.classes), [prefs, classes.classes])
-  const owned = useMemo(() => ownedCopies(ownership.map), [ownership.map])
-  const admit = useMemo(() => (prefs.era ? (r: GearRow) => !eraHidden(r) : () => true), [prefs.era, eraHidden])
-  const worn = useWorn(compare)
-  const built = useMemo(
-    () => buildBisSheet({ rows, setup, model, classes: classes.classes, admit, owned: prefs.owned ? owned : undefined }),
-    [rows, setup, model, classes.classes, admit, owned, prefs.owned]
-  )
-  const sheet = useMemo(() => alignPairsToWorn(built, (cell) => worn.cells.get(cell)?.row?.key), [built, worn])
+  const { setup, owned, admit, worn, sheet, totals } = useBisSheet(rows, prefs, { classes: classes.classes, model, state: plus })
   const stated = useStated(rows, model, classes.classes, admit)
-  const totals = useMemo(() => totalsRows(sheet.totals, loadoutTotals(worn.rows, model, setup.split), setup), [sheet, worn, model, setup])
   const lane = (chip: TierChip, tier: TierSetup['board'][TierChip]): void => setPrefs({ ...prefs, board: { ...setup.board, [chip]: tier } })
   const cap = (chip: TierChip, value: number | undefined): void => {
     const caps: Partial<Record<TierChip, number>> = Object.fromEntries(Object.entries(prefs.caps).filter(([k]) => k !== chip))
@@ -136,6 +156,10 @@ export default function BisView({ onOpenLoot }: BisViewProps = {}): JSX.Element 
     <Box data-testid="bis-view" sx={{ display: 'flex', flexDirection: 'column', gap: 1, height: '100%', minHeight: 0, overflow: 'auto', pr: 0.5 }}>
       <OutputKindLine kind="inventory" quiet testId="bis-dump-line" />
       <Controls prefs={prefs} setPrefs={setPrefs} classes={classes} setup={setup} />
+      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+        <UpgradeSlider state={upgrade.state} onChange={upgrade.set} testId="bis" />
+        <Typography variant="caption" color="text.secondary">Every item, worn ones too, is scored at this tier, so the comparison is like for like.</Typography>
+      </Stack>
       <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 440px) minmax(0, 1fr)' }, alignItems: 'start' }}>
         <TierBoard
           setup={setup}
@@ -157,13 +181,13 @@ export default function BisView({ onOpenLoot }: BisViewProps = {}): JSX.Element 
           <Typography variant="caption" color="text.secondary" data-testid="bis-summary">
             {`${String(sheet.filled)} of ${String(sheet.cells.length)} slots filled · board total ${sheet.total.toFixed(1)} · ${String(activeChips(setup.split).filter((c) => setup.board[c] !== 'Off').length)} stats count`}
           </Typography>
-          <BisCells sheet={sheet} worn={worn.cells} model={model} setup={setup} classes={classes.classes} owned={owned} wishes={wishes} onOpenLoot={onOpenLoot} />
+          <BisCells sheet={sheet} worn={worn.cells} model={model} setup={setup} classes={classes.classes} owned={owned} wishes={wishes} plus={plus.full} onOpenLoot={onOpenLoot} />
           <Typography variant="caption" color="text.secondary">
             Hover a slot to compare its best item with what you wear and see where it drops; click it for the next five. An amber card means the best item is not what you wear. Haste does not stack: a slot is credited only for haste above what your other slots give. Weapon ratios count only in Primary, Secondary and Range, never in an Any slot. A Lore item is placed once; any other item may fill both rings, both ears, both wrists.
           </Typography>
         </Stack>
       </Box>
-      <BisTotals rows={totals} />
+      <BisTotals rows={totals} plus={plus.full} />
     </Box>
   )
 }

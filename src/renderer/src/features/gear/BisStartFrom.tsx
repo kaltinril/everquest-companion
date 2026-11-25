@@ -41,7 +41,7 @@ function SaveBox({ anchor, initial, onSave, onClose }: { anchor: HTMLElement; in
           />
           <Button size="small" variant="contained" disabled={name.trim() === ''} onClick={save} data-testid="bis-saved-save">Save</Button>
         </Stack>
-        <Typography variant="caption" color="text.secondary">Saves the tiers, the step, split resists and caps. The same name replaces the old one.</Typography>
+        <Typography variant="caption" color="text.secondary">A new name adds a list to the Start from menu; the same name replaces it. Saves the tiers, the step, split resists and caps.</Typography>
       </Stack>
     </Popover>
   )
@@ -85,10 +85,11 @@ export default function BisStartFrom({ prefs, setPrefs, setup }: BisStartFromPro
         {lists.length > 0 && <ListSubheader>My tier lists</ListSubheader>}
         {lists.map((s) => <MenuItem key={s.name} value={`${SAVED}${s.name}`} data-testid="bis-saved-item">{s.name}</MenuItem>)}
       </TextField>
-      <Tooltip title={current === undefined ? 'Save this tier list' : `Save the tier list (as "${current.name}" or a new name)`}>
-        <IconButton size="small" onClick={(e) => setAnchor(e.currentTarget)} data-testid="bis-saved-open" aria-label="Save this tier list">
-          <SaveIcon fontSize="small" />
-        </IconButton>
+      <Tooltip title="Name the tier list on the board and add it to the Start from menu. The same name replaces it.">
+        {/* A WORDED BUTTON, NOT A BARE ICON (owner: *"if i have no saved ones how do I add one i only see save?"*). */}
+        <Button size="small" variant="outlined" startIcon={<SaveIcon fontSize="small" />} onClick={(e) => setAnchor(e.currentTarget)} data-testid="bis-saved-open" sx={{ whiteSpace: 'nowrap' }}>
+          Save as…
+        </Button>
       </Tooltip>
       {current !== undefined && (
         <Tooltip title={`Delete "${current.name}"`}>
