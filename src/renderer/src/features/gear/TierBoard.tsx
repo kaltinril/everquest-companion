@@ -78,7 +78,6 @@ function BoardChip({ chip, setup, faded, onOpen }: { chip: TierChip; setup: Tier
         border: '1px solid #454b5b',
         borderStyle: faded ? 'dashed' : 'solid',
         opacity: faded ? 0.45 : 1,
-        textDecoration: off ? 'line-through' : 'none',
         '&:hover': { borderColor: 'primary.main' },
         '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.light' }
       }}
