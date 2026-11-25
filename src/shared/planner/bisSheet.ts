@@ -26,8 +26,8 @@ import type { GearRow } from './gear'
 import { improveUnderCaps, type CapCell, type CapRules } from './bisCaps'
 import { searchLoadout, type HasteRate, type SearchCandidate, type SearchCell } from './bisSearch'
 import { gearHandedness } from './roleWeights'
-import { activeChips, isRatioChip, tierWeight, type TierChip, type TierSetup } from './tierChips'
-import { round3, tierTerms, type TierModel, type TierTerm } from './tierWeights'
+import { RATIO_CHIPS, activeChips, isRatioChip, tierWeight, type TierChip, type TierSetup } from './tierChips'
+import { ratioCounts, round3, tierTerms, type TierModel, type TierTerm } from './tierWeights'
 import { PLAN_SLOTS, equipSlotOf, isAnyCell, type PlanSlotId } from './types'
 
 export interface BisOptions {
@@ -52,6 +52,8 @@ export interface BisPick {
   score: number
   /** the haste percent that counted in `score`: 0 when another cell already gives as much; negative = a penalty */
   hasteCounted: number
+  /** the weapon ratio it was ranked by first (`damageFirst`), when an S ratio counts in this cell */
+  damageFirst?: number
 }
 
 export interface BisCell {
@@ -103,8 +105,10 @@ function fitsCell(row: GearRow, cell: PlanSlotId): boolean {
 interface Scored extends SearchCandidate {
   row: GearRow
   terms: TierTerm[]
-  /** base + the item's own positive haste, as if alone: the order the cell lists it in */
+  /** its stats + its own positive haste, as if alone: the order the cell lists it in after `prio` */
   display: number
+  /** the damage-first ratio (`damageFirst`); `base` carries it times `DAMAGE_FIRST` for the search */
+  prio: number
 }
 
 function copiesOf(row: GearRow, owned: ReadonlyMap<string, number> | undefined): number {
@@ -146,7 +150,31 @@ export function cellScore(row: GearRow, cell: PlanSlotId, otherHaste: number, op
   return { score: round3(terms.reduce((sum, t) => sum + t.points, 0)), hasteCounted: counted, terms }
 }
 
-/** Every admitted row in one cell, scored and sorted best-first. */
+/**
+ * DAMAGE FIRST (owner, 2026-11-24: *"on weapons, the DAMAGE (ratio) should win out over stats and be
+ * higher rated"*; *"if the ratio they chose is in the S slot, treat it as priortized ABOVE other stats
+ * basically"*). His Wu's Fist of Mastery (ratio 0.73, no stats) lost Primary to Blood's Unity (0.55,
+ * +15 to every stat), because a ratio counts in one cell while stats add up.
+ *
+ * So in a cell where an S-lane ratio chip counts (the hands, RANGE for a bow; never ANY), the weapon's
+ * ratio, to two places, is ranked ABOVE everything else: the search sees it times `DAMAGE_FIRST`, a
+ * weight no item's stats can reach, and stats only break a tie. The weight is taken back out of the
+ * total and never shown: the cards show the ordinary score and say "damage first".
+ */
+export const DAMAGE_FIRST = 1_000_000
+
+/** The ratio an item is ranked by first in this cell (two places), or 0 when no S ratio chip counts there. */
+export function damageFirst(row: GearRow, cell: PlanSlotId, opts: Pick<BisOptions, 'setup' | 'model' | 'classes'>): number {
+  const values = opts.model.valuesOf(row)
+  let best = 0
+  for (const chip of RATIO_CHIPS) {
+    const v = values[chip]
+    if (opts.setup.board[chip] === 'S' && v !== undefined && v > best && ratioCounts(chip, cell, opts.classes)) best = v
+  }
+  return Math.round(best * 100) / 100
+}
+
+/** Every admitted row in one cell, scored and sorted best-first: damage first where it applies, then the score. */
 function scoreCell(cell: PlanSlotId, rows: readonly GearRow[], opts: BisOptions): Scored[] {
   const rate = hastePerPercent(opts)
   const ctx = { model: opts.model, setup: opts.setup, slot: cell, classes: opts.classes, skipHaste: true }
@@ -154,11 +182,12 @@ function scoreCell(cell: PlanSlotId, rows: readonly GearRow[], opts: BisOptions)
   for (const row of rows) {
     if (!fitsCell(row, cell)) continue
     const terms = tierTerms(row, ctx)
-    const base = round3(terms.reduce((sum, t) => sum + t.points, 0))
+    const stats = round3(terms.reduce((sum, t) => sum + t.points, 0))
     const haste = row.stats.HASTE ?? 0
-    out.push({ key: row.key, row, terms, base, haste, copies: copiesOf(row, opts.owned), twoHand: gearHandedness(row.skill) === '2h', display: round3(base + Math.max(0, haste) * rate) })
+    const prio = damageFirst(row, cell, opts)
+    out.push({ key: row.key, row, terms, base: stats + prio * DAMAGE_FIRST, prio, haste, copies: copiesOf(row, opts.owned), twoHand: gearHandedness(row.skill) === '2h', display: round3(stats + Math.max(0, haste) * rate) })
   }
-  return out.sort((a, b) => b.display - a.display || a.row.name.localeCompare(b.row.name))
+  return out.sort((a, b) => b.prio - a.prio || b.display - a.display || a.row.name.localeCompare(b.row.name))
 }
 
 /** The rows the sheet may use at all: the class picks, the caller's gates, owned-only. */
@@ -215,14 +244,15 @@ function readCell(cell: PlanSlotId, list: readonly Scored[], index: number, { ot
     .slice(0, RUNNER_POOL)
     .map((s) => {
       const c = cellScore(s.row, cell, otherHaste, opts)
-      return { row: s.row, score: c.score, hasteCounted: c.hasteCounted }
+      return { row: s.row, score: c.score, hasteCounted: c.hasteCounted, ...(s.prio > 0 ? { damageFirst: s.prio } : {}) }
     })
-    .sort((a, b) => b.score - a.score || a.row.name.localeCompare(b.row.name))
+    .sort((a, b) => (b.damageFirst ?? 0) - (a.damageFirst ?? 0) || b.score - a.score || a.row.name.localeCompare(b.row.name))
     .slice(0, RUNNERS_UP)
   if (picked === undefined) return { cell, runnersUp, otherHaste }
   const c = cellScore(picked.row, cell, otherHaste, opts)
   const reasons = c.terms.filter((t) => t.points > 0).slice(0, REASONS)
-  return { cell, pick: { row: picked.row, score: c.score, hasteCounted: c.hasteCounted, reasons }, runnersUp, otherHaste }
+  const pick = { row: picked.row, score: c.score, hasteCounted: c.hasteCounted, reasons, ...(picked.prio > 0 ? { damageFirst: picked.prio } : {}) }
+  return { cell, pick, runnersUp, otherHaste }
 }
 
 /** Per cell, the best positive haste among the picks in every OTHER cell. */
@@ -288,5 +318,7 @@ export function buildBisSheet(opts: BisOptions): BisSheet {
   const secondary = byCell.get('SECONDARY')
   if (secondary !== undefined && gearHandedness(byCell.get('PRIMARY')?.pick?.row.skill) === '2h') secondary.closedByTwoHander = true
   const cellsOut = PLAN_SLOTS.map((cell) => byCell.get(cell) ?? { cell, runnersUp: [], otherHaste: 0 })
-  return { cells: cellsOut, total: round3(total), totals, filled: cellsOut.filter((c) => c.pick !== undefined).length }
+  // The damage-first weight ranks; it is no part of what the loadout is worth.
+  const ranked = order.reduce((sum, _, i) => sum + (choice[i] >= 0 ? lists[i][choice[i]].prio : 0), 0)
+  return { cells: cellsOut, total: round3(total - ranked * DAMAGE_FIRST), totals, filled: cellsOut.filter((c) => c.pick !== undefined).length }
 }
