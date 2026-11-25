@@ -10,7 +10,7 @@ import { buildGearIndex } from '../src/main/planner/gearIndex'
 import { eraHides } from '../src/renderer/src/features/planner/plannerData'
 import type { ClassAbbr } from '../src/shared/classCombo'
 import type { GearRow } from '../src/shared/planner/gear'
-import { alignPairsToWorn, buildBisSheet, hasteCounted, isLoreRow, type BisOptions, type BisSheet } from '../src/shared/planner/bisSheet'
+import { DAMAGE_FIRST, alignPairsToWorn, buildBisSheet, hasteCounted, isLoreRow, type BisOptions, type BisSheet } from '../src/shared/planner/bisSheet'
 import { CHIP_KEYS, uniformBoard, type Tier, type TierChip, type TierSetup } from '../src/shared/planner/tierChips'
 import { defaultBoard } from '../src/shared/planner/tierDefaults'
 import { buildTierModel, conversionsFor, deriveChips, type TierModel } from '../src/shared/planner/tierWeights'
@@ -73,7 +73,8 @@ test('a two-hander closes the offhand, and is weighed against a one-hander plus 
   assert.equal(pickOf(axeWins, 'PRIMARY'), 'Greataxe')
   assert.equal(pickOf(axeWins, 'SECONDARY'), undefined)
   assert.equal(axeWins.cells.find((c) => c.cell === 'SECONDARY')?.closedByTwoHander, true)
-  const shieldWins = sheet([axe, sword, shield], setup({ RATIO_2H: 'S', RATIO_1H: 'S', AC: 'S' }), { classes: ['CLR'] })
+  assert.equal(pickOf(sheet([axe, sword, shield], setup({ RATIO_2H: 'S', RATIO_1H: 'S', AC: 'S' }), { classes: ['CLR'] }), 'PRIMARY'), 'Greataxe', 'ratios in S: damage first, the shield cannot buy it back')
+  const shieldWins = sheet([axe, sword, shield], setup({ RATIO_2H: 'A', RATIO_1H: 'A', AC: 'S' }), { classes: ['CLR'] })
   assert.equal(pickOf(shieldWins, 'PRIMARY'), 'Sword')
   assert.equal(pickOf(shieldWins, 'SECONDARY'), 'Tower Shield')
 })
@@ -132,6 +133,22 @@ test('a pair is laid on the side the player wears it: same scores, only the side
   assert.equal(laid.total, s.total)
   assert.deepEqual(laid.cells.map((c) => c.cell), s.cells.map((c) => c.cell), 'the cells keep their order')
   assert.equal(ear(alignPairsToWorn(s, (c) => (c === where ? 'bashing earring' : undefined)), where), 'Bashing Earring', 'already on its side: nothing moves')
+})
+
+test('damage first: with the 1H ratio in S, the best ratio wins the hands over a weapon full of stats (owner: Wu\'s Fist)', () => {
+  const wu = row("Wu's Fist", { slots: ['PRIMARY', 'SECONDARY'], skill: 'Hand to Hand', stats: { DMG: 16, DELAY: 22 } })
+  const blood = row("Blood's Unity", { slots: ['PRIMARY'], skill: '1H Slashing', stats: { DMG: 11, DELAY: 20, STR: 15, STA: 15, AGI: 15 } })
+  const lanes = { RATIO_1H: 'S' as const, STR: 'S' as const, AGI: 'S' as const }
+  const s = sheet([wu, blood], setup(lanes), { classes: ['MNK'] })
+  assert.equal(pickOf(s, 'PRIMARY'), "Wu's Fist")
+  assert.equal(pickOf(s, 'SECONDARY'), "Wu's Fist", 'a monk dual wields it')
+  const primary = s.cells.find((c) => c.cell === 'PRIMARY')
+  assert.equal(primary?.pick?.damageFirst, 0.73)
+  assert.ok(s.total < DAMAGE_FIRST, 'the ranking weight is not in the total')
+  assert.equal(primary?.runnersUp[0]?.row.name, "Blood's Unity", 'runners-up in damage order too')
+  const notS = sheet([wu, blood], setup({ ...lanes, RATIO_1H: 'A' }), { classes: ['MNK'] })
+  assert.equal(pickOf(notS, 'PRIMARY'), "Blood's Unity", 'below S the ratio is an ordinary stat again')
+  assert.equal(notS.cells.find((c) => c.cell === 'ANY1')?.pick?.damageFirst, undefined, 'never in an Any slot')
 })
 
 test('hasteCounted: the part above the other haste, both under the cap; a penalty in full', () => {

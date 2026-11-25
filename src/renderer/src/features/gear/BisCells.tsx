@@ -98,9 +98,14 @@ function ItemLine({ row, props }: { row: GearRow; props: BisCellsProps }): JSX.E
   return (
     <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0 }}>
       <ItemIcon name={row.name} />
-      <Link component="button" variant="body2" underline="hover" data-testid="bis-cell-item" onClick={(e: MouseEvent) => { e.stopPropagation(); props.onOpenLoot?.(row.name) }} sx={{ fontWeight: 600, textAlign: 'left', overflowWrap: 'anywhere', flex: 1, minWidth: 0 }}>
-        {row.name}
-      </Link>
+      {/* ONLY THE NAME IS THE LINK (owner: *"if i'm clikcing to the RIGHT of the text for the item name, don't make
+          that a hyperlink"*): the box takes the row's width, the link only its text, so a click beside the
+          name falls through to the card and opens the next five. */}
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Link component="button" variant="body2" underline="hover" data-testid="bis-cell-item" onClick={(e: MouseEvent) => { e.stopPropagation(); props.onOpenLoot?.(row.name) }} sx={{ fontWeight: 600, textAlign: 'left', overflowWrap: 'anywhere', maxWidth: '100%' }}>
+          {row.name}
+        </Link>
+      </Box>
       <WishButton row={row} wishes={props.wishes} />
     </Stack>
   )
@@ -129,6 +134,7 @@ function NextBest({ cell, worn, props }: { cell: BisCell; worn: WornCell | undef
               {r.row.name}
               {on && <Box component="span" sx={{ ml: 0.5, color: 'success.main', fontWeight: 700 }}>worn</Box>}
             </Typography>
+            {r.damageFirst !== undefined && <Typography variant="caption" color="info.main" sx={{ fontVariantNumeric: 'tabular-nums' }}>{`ratio ${r.damageFirst.toFixed(2)}`}</Typography>}
             <Typography variant="caption" color="text.secondary" sx={{ fontVariantNumeric: 'tabular-nums' }}>{r.score.toFixed(1)}</Typography>
             <WishButton row={r.row} wishes={props.wishes} />
           </Stack>
@@ -155,6 +161,11 @@ function CardBody({ cell, props, pickWorn }: { cell: BisCell; props: BisCellsPro
       <Tags cell={cell} owned={props.owned} worn={pickWorn} />
       <Typography variant="caption" color="text.secondary">{pick.reasons.map((t) => termText(pick.row, t)).join('  ·  ')}</Typography>
       {note !== undefined && <Typography variant="caption" color="text.disabled">{note}</Typography>}
+      {pick.damageFirst !== undefined && (
+        <Typography variant="caption" color="info.main" data-testid="bis-damage-first">
+          {`Damage first: ratio ${pick.damageFirst.toFixed(2)} (your weapon ratio is in S; stats only break a tie)`}
+        </Typography>
+      )}
     </>
   )
 }
