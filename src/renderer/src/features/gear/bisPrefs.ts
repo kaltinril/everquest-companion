@@ -15,6 +15,7 @@ import {
   TIER_STEPS,
   boardFromText,
   isRatioChip,
+  uniformBoard,
   type Tier,
   type TierBoard,
   type TierChip,
@@ -112,6 +113,68 @@ export function withPasted(prefs: BisPrefs, classes: readonly ClassAbbr[], text:
   if (parsed === undefined) return undefined
   const board = { ...activeSetup(prefs, classes).board, ...parsed.lanes }
   return { ...prefs, board, step: parsed.step, split: parsed.split, caps: parsed.caps }
+}
+
+/** Every stat in the Unassigned lane, caps cleared (owner, 2026-11-24: *"a clear tier button so all stats drop to the "unassigned" section"*). */
+export function withCleared(prefs: BisPrefs): BisPrefs {
+  return { ...prefs, board: uniformBoard('Off'), caps: {} }
+}
+
+// ---- saved tier lists (owner, 2026-11-24: *"should be able to save the users Teir list settings, let them NAME them too"*) ----
+
+export const SAVED_KEY = 'eq.gear.tierLists'
+
+/** A named board: what the board text carries (lanes, step, split, caps), resolved, never "follow the default". */
+export interface SavedBoard {
+  name: string
+  board: TierBoard
+  step: TierStep
+  split: boolean
+  caps: Partial<Record<TierChip, number>>
+}
+
+export const SAVED_NAME_MAX = 40
+
+export function sanitizeSaved(raw: unknown): SavedBoard[] {
+  if (!Array.isArray(raw)) return []
+  const out: SavedBoard[] = []
+  for (const r of raw) {
+    if (!isRecord(r) || typeof r.name !== 'string' || r.name.trim() === '') continue
+    const board = sanitizeBoard(r.board)
+    if (board === null) continue
+    out.push({ name: r.name.trim().slice(0, SAVED_NAME_MAX), board, step: TIER_STEPS.find((s) => s === r.step) ?? DEFAULT_STEP, split: r.split === true, caps: sanitizeCaps(r.caps) })
+  }
+  return out
+}
+
+/** Save the board in force under a name: same name (any case) is replaced, the list kept in name order. */
+export function withSavedBoard(list: readonly SavedBoard[], name: string, setup: TierSetup): SavedBoard[] {
+  const clean = name.trim().slice(0, SAVED_NAME_MAX)
+  if (clean === '') return [...list]
+  const entry: SavedBoard = { name: clean, board: { ...setup.board }, step: setup.step, split: setup.split, caps: { ...setup.caps } }
+  return [...list.filter((s) => s.name.toLowerCase() !== clean.toLowerCase()), entry].sort((a, b) => a.name.localeCompare(b.name))
+}
+
+/** A saved board put in force. */
+export function withLoadedBoard(prefs: BisPrefs, saved: SavedBoard): BisPrefs {
+  return { ...prefs, board: { ...saved.board }, step: saved.step, split: saved.split, caps: { ...saved.caps } }
+}
+
+export function readSavedBoards(): SavedBoard[] {
+  try {
+    const raw = localStorage.getItem(SAVED_KEY)
+    return sanitizeSaved(raw === null || raw === '' ? null : JSON.parse(raw))
+  } catch {
+    return []
+  }
+}
+
+export function writeSavedBoards(list: readonly SavedBoard[]): void {
+  try {
+    localStorage.setItem(SAVED_KEY, JSON.stringify(list))
+  } catch {
+    // Kept for this session only.
+  }
 }
 
 export function readBisPrefs(): BisPrefs {

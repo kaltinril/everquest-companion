@@ -89,13 +89,16 @@ where one exists.
     Fishing Pole is out of era by the era join.
   - Not done: the plus-state does not scale it (no page states how a tier moves one); the compare
     card and `benefitMismatch` do not read it; no toolbar control; not looked at in the running app.
-- **Best in slot tab** (Malkil and the owner, 2026-11-24; branch `bis-sheet`, NOT merged until the owner
-  says; plan `plans/2026-11-24-bis-sheet.md` "Version 2 design", asks `requirements/bis-sheet.md`).
+- **Best in slot tab** (Malkil and the owner, 2026-11-24; merged 2026-11-24, R1 fixes on `bis-r1`; plan `plans/2026-11-24-bis-sheet.md` "Version 2 design", asks `requirements/bis-sheet.md`).
   - Files: `shared/planner/tierChips.ts` (chips, lanes, step, board text `bis2:`), `tierWeights.ts`
     (conversions, derived chips, units, budgets, score), `tierDefaults.ts` (class-guide defaults),
     `bisSheet.ts` + `bisSearch.ts` (exact assignment) + `bisCaps.ts` (caps pass); renderer
     `features/gear/BisView.tsx` (the tab, `BisTab` mount), `TierBoard.tsx`, `BisCells.tsx`,
-    `bisPrefs.ts` (`eq.gear.tiers`), `bisText.ts`, `useBisData.ts`.
+    `bisPrefs.ts` (`eq.gear.tiers`, named lists `eq.gear.tierLists`), `bisText.ts`, `useBisData.ts`,
+    `BisCompare.tsx` (the slot hover), `BisSavedLists.tsx`.
+  - HASTE PER CARD (R1): the search counts the loadout's best haste once; every card, runner-up and the
+    hover's worn score is `bisSheet.cellScore`: haste only above `BisCell.otherHaste` (the best haste
+    of the picks in the other cells). The budget ranks nothing; it is shown only in the hover.
   - LAW: nothing on the board reads `roleWeights.ts` but `hasteCredit` and the weapon-kind helpers
     (owner: "without my old calculations"). INT/WIS live only inside MANA, STA only inside HP, by the
     game formulas (MEASURED.md, "BiS sheet research"). Resists are their average unless split.

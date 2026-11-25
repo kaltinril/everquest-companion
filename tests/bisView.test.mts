@@ -8,8 +8,8 @@ import type { GearRow } from '../src/shared/planner/gear'
 import { CHIP_KEYS, boardToText, uniformBoard, type TierChip } from '../src/shared/planner/tierChips'
 import { defaultBoard } from '../src/shared/planner/tierDefaults'
 import { conversionsFor, deriveChips, type TierModel } from '../src/shared/planner/tierWeights'
-import { DEFAULT_BIS_PREFS, activeSetup, clampLevel, sanitizeBisPrefs, withPasted, withSplit } from '../src/renderer/src/features/gear/bisPrefs'
-import { budgetText, chipHint, chipValueText, loadoutTotals, ownedCopies, sourceText, termText, totalsRows } from '../src/renderer/src/features/gear/bisText'
+import { DEFAULT_BIS_PREFS, activeSetup, clampLevel, sanitizeBisPrefs, sanitizeSaved, withCleared, withLoadedBoard, withPasted, withSavedBoard, withSplit } from '../src/renderer/src/features/gear/bisPrefs'
+import { budgetText, chipHint, chipValueText, compareRows, hasteNote, loadoutTotals, ownedCopies, sourceText, termText, totalsRows } from '../src/renderer/src/features/gear/bisText'
 import { sortValue } from '../src/renderer/src/features/gear/gearFilter'
 import type { GearOwnershipMap } from '../src/renderer/src/features/gear/gearOwnership'
 
@@ -75,7 +75,7 @@ test('words: values, reasons with STA/WIS/INT shown inside, hints, budget, sourc
   assert.match(chipHint('MANA', conversionsFor(['WAR'], 60), 60) ?? '', /No picked class/)
   assert.match(chipHint('HP', conversionsFor(['WAR'], 60), 60) ?? '', /1 STA is 6\.0 HP/)
   assert.match(chipHint('STR', conversionsFor([], 60), 60) ?? '', /nothing for a bow/)
-  assert.deepEqual(budgetText({ ratio: 1.4, band: 'lvl 51+', slot: 'HEAD' }), { text: 'Budget 140% of a typical lvl 51+ head', tone: 'good' })
+  assert.deepEqual(budgetText({ ratio: 1.4, band: 'lvl 51+', slot: 'HEAD' }), { text: 'Stat budget estimate: 140% of a typical lvl 51+ head (our own estimate; it does not change the ranking)', tone: 'good' })
   assert.equal(budgetText({ ratio: 0.5, band: 'Legends revamp', slot: 'FEET' })?.tone, 'warn')
   assert.equal(budgetText(undefined), undefined)
   assert.equal(sourceText({ dropZones: ['', 'Lower Guk'], dropMobs: ['', 'the froglok king'], dropLevels: ['', '47'] }), 'Lower Guk · the froglok king (lvl 47)')
@@ -114,4 +114,42 @@ test('the Gear tab BEST column reads the board when one is handed in, and the Ig
   assert.equal(sortValue(hasteHelm, 'BIS', { tier: { model: m, setup } }), 20)
   assert.equal(sortValue(hasteHelm, 'BIS', { tier: { model: m, setup }, ignoreHaste: true }), undefined, 'nothing left: blank, sorts last')
   assert.ok(sortValue(dexHelm, 'BIS', {}) !== undefined, 'without a board the old score still answers (the pure callers)')
+})
+
+test('Clear tiers drops every stat to Unassigned and clears the caps (owner R1)', () => {
+  const cleared = withCleared({ ...DEFAULT_BIS_PREFS, caps: { DEX: 300 } })
+  assert.ok(CHIP_KEYS.every((c) => cleared.board?.[c] === 'Off'))
+  assert.deepEqual(cleared.caps, {})
+})
+
+test('named tier lists: saved resolved, same name replaced, sorted, sanitized, loaded (owner R1)', () => {
+  const ranged = { board: defaultBoard('ranged', []), step: 2 as const, split: true, caps: { DEX: 300 } }
+  let list = withSavedBoard([], '  Malkil ranger ', ranged)
+  assert.equal(list[0].name, 'Malkil ranger')
+  list = withSavedBoard(list, 'Alt tank', { board: defaultBoard('tank', []), step: 4, split: false, caps: {} })
+  list = withSavedBoard(list, 'MALKIL RANGER', { ...ranged, step: 25 })
+  assert.deepEqual(list.map((s) => s.name), ['Alt tank', 'MALKIL RANGER'], 'same name in any case replaces')
+  assert.equal(withSavedBoard(list, '   ', ranged).length, 2, 'a blank name saves nothing')
+  const back = sanitizeSaved(JSON.parse(JSON.stringify(list)))
+  assert.deepEqual(back, list)
+  assert.deepEqual(sanitizeSaved([{ name: 'x', board: { AC: 'S' } }, 'junk', { board: list[0].board }]), [], 'partial boards and nameless entries are dropped')
+  const loaded = withLoadedBoard(DEFAULT_BIS_PREFS, list[1])
+  assert.equal(loaded.step, 25)
+  assert.equal(loaded.split, true)
+  assert.equal(loaded.board?.DEX, 'S')
+  assert.deepEqual(loaded.caps, { DEX: 300 })
+})
+
+test('the hover compare: board stats either item states, best lane first, ratios only where they swing', () => {
+  const setup = { board: { ...uniformBoard('Off'), DEX: 'S' as const, AC: 'C' as const, RATIO_1H: 'A' as const }, step: 4 as const, split: false, caps: {} }
+  const rows = compareRows({ DEX: 9, AC: 5, STR: 4, RATIO_1H: 0.4 }, { DEX: 9, AC: 8 }, setup, () => false)
+  assert.deepEqual(rows.map((r) => [r.chip, r.best, r.worn, r.ahead]), [['DEX', '+9', '+9', 'same'], ['AC', '+5', '+8', 'worn']], 'STR is Unassigned, the ratio does not swing here')
+  assert.equal(compareRows({ RATIO_1H: 0.4 }, {}, setup, () => true)[0].worn, '-')
+})
+
+test('the haste note says why haste counted less: it does not stack', () => {
+  assert.equal(hasteNote(36, 36, 21), undefined)
+  assert.equal(hasteNote(undefined, 0, 30), undefined)
+  assert.match(hasteNote(30, 0, 36) ?? '', /does not count, another slot gives 36%/)
+  assert.match(hasteNote(41, 5, 36) ?? '', /only 5% counts/)
 })

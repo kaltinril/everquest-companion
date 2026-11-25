@@ -3,10 +3,14 @@
 //
 // FROM CLASS GUIDES, NOT FROM THE OLD BEST FORMULA (owner, 2026-11-24: *"this is a experiment to find
 // the best in slot without my old calculations"*, *"use any online guides to help hone the
-// calculations"*). Each class's row is Almar's classic class guide (almarsguides.com, classic-PoR)
-// read into lanes, corrected by the Legends rules the guides predate: a bow's damage is DEX, and STR
-// does nothing for it (the Legends wiki's Archery test), so the ranger's ranged stats are DEX and the
-// ranged ratio. A row names only the stats the guide ranks; everything else lands in F.
+// calculations"*). Each class's row is OUR READING of Almar's classic class guides
+// (almarsguides.com/eq/endgame/classguides/classic-por/<class>/, checked 2026-11-24). The guides give
+// PROSE advice ("For tanking you'll want to get AC, Stamina and Agility", "Rangers will want to focus
+// on Strength, Dexterity and Wisdom"), never tiers, so the lanes are ours, and the app says so where
+// the preset is picked (`GUIDE_CREDIT`; owner: *"are we correctly accrediting the source?"*). They are
+// corrected by the Legends rules the guides predate: a bow's damage is DEX, and STR does nothing for
+// it (the Legends wiki's Archery test), so the ranger's ranged stats are DEX and the ranged ratio. A
+// row names only the stats the guide mentions; everything else lands in F.
 //
 // SEVERAL CLASSES (a Legends character carries up to three) take the BEST lane any of them gives a
 // stat. A stat no picked class can use is Off: mana with no caster, backstab without a rogue, CHA
@@ -49,8 +53,12 @@ export type TierPreset = 'classes' | 'tank' | 'melee' | 'ranged' | 'caster' | 'h
 
 export const TIER_PRESETS: readonly TierPreset[] = ['classes', 'tank', 'melee', 'ranged', 'caster', 'healer']
 
+/** The credit shown under the preset picker while "My classes" is in force. */
+export const GUIDE_CREDIT =
+  "Starting tiers for your classes are our reading of Almar's classic class guides (almarsguides.com). The guides give advice in prose, not tiers, so the tier placement is ours, adjusted for Legends rules (bows use DEX, not STR). Move any stat to change it."
+
 export const PRESET_LABEL: Readonly<Record<TierPreset, string>> = {
-  classes: 'My classes (class guides)',
+  classes: "My classes (from Almar's guides)",
   tank: 'Tank',
   melee: 'Melee damage',
   ranged: 'Ranged damage',

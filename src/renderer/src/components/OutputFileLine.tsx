@@ -320,7 +320,9 @@ export default function OutputFileLine({
             {why}
           </Typography>
         )}
-        <Box sx={{ flexGrow: 1, minWidth: 8 }} />
+        {/* THE CONTROLS SIT RIGHT AFTER THE COMMAND, the spacer after them (owner, 2026-11-24: the
+            "how" was *"WAY WAY WAY over to the right, on a large monitor it's not obvious that how
+            belongs to the instruction to run this command"*). Only the two stamps stay on the right. */}
         {/* THE MANUAL RE-READ (JOS-431), in the SAME chrome as the steps toggle beside it — one
             more quiet word on a row of quiet words, never a button with a card around it. It is
             first in the control group because it is the one a player arrives at this line looking
@@ -339,6 +341,7 @@ export default function OutputFileLine({
             testId={sub(testId, 'steps-toggle')}
           />
         )}
+        <Box sx={{ flexGrow: 1, minWidth: 8 }} />
         {/* The exact clock time is one hover away; the ambient text stays coarse (formatDate's
             own contract). This is the ONE place a tooltip is warranted here — it states the
             precise value of the number beside it, which is what makes the coarse one safe. */}
