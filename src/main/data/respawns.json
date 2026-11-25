@@ -1,6 +1,6 @@
 {
  "source": "eqlwiki.com — |respawn_time on every page in the committed mob catalog",
- "scrapedAt": "2026-11-24",
+ "scrapedAt": "2026-11-25",
  "rows": [
   {
    "key": "a alchemist`s acolyte",
@@ -551,6 +551,11 @@
    "page": "A Tier'Dal Spellbinder",
    "text": "2m 26s",
    "seconds": 146
+  },
+  {
+   "key": "a tormented dead",
+   "page": "A tormented dead",
+   "text": "?"
   },
   {
    "key": "a tortured revenant",

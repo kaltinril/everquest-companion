@@ -1,0 +1,1118 @@
+'''Haste is a game mechanic by which the attack rate of a weapon is increased.'''
+
+== Brief Overview ==
+
+Haste is an extremely important game mechanic for all melee classes in Everquest. There are various types of haste, and it is important to understand how they all work together to maximize your DPS (damage per second).
+
+Item Haste is only one type of haste and may not be affordable at the beginning of your adventure through Everquest but you should strive to obtain these pieces as you progress through the game.
+
+Haste increases the attack rate of a weapon and as a result will affect the dps rating of certain weapons differently depending on weapon delay and amount of haste stacked. Delay is measured in tenths of a second. For example, a weapon with a delay of 24 would swing every 2.4 seconds.
+
+'''Important Note''' Haste affects all weapons by the same percentage, however the increase in dps output varies depending on the starting delay of the equipped weapon. (I'll dig up a few dps charts later to help people visualize the difference but the increase in dps output is essentially an exponential curve upward as haste increases.)
+
+Basically there are accelerating gains in dps as more haste is stacked on, but higher delay weapons dps output accelerates faster than lower delay weapons dps output. Acceleration of dps output is not the same as dps output, so to make a determination of which weapon is best for a given situation you would have to take into account a variety of factors including the amount of haste you have, your atk rating, and the defense rating of what you are fighting.
+
+A comprehensive listing of all known haste items, spells, and songs is listed below.
+
+== Types of Haste ==
+There are a number of different ways to gain haste, and the way they interact with each other can be a bit complicated.
+
+# Permanent item haste: haste effect listed on an item you wear.
+# v1 Haste: Standard magical haste buffs - these are the haste effects gained from nearly all spells, bard songs, or click-able items.
+# v2 Haste: These buffs increase your haste and stack on top of v1 Haste buffs. However, this is not "overhaste" and will not allow you to exceed the haste cap. This haste is typically granted by the [[Melody of Ervaj|<span class='itemeff'>Melody of Ervaj</span>]] line of [[Bard]] songs. 
+# v3 Haste: These effects provide "overhaste" - These effects allow you to exceed the haste cap. Currently, the [[Magician|Magician's]] Frenzied Burnout is the only source of "overhaste" in Everquest Legends and as such it can only be applied to pets.
+# Quiver Haste: Quivers provide a special form of haste to bows. [[Skill_Archery#Quiver_Haste|Quiver Haste]] is believed to be applied before other forms of haste, so it is not subject to haste caps. However, this needs further testing or dev confirmation for EQ Legends.
+# Monk Haste: Monk's Unbound Alacrity [[Alternate_Advancement|AA]] grants up to 10% haste, and increases the haste cap by 10% as well. This could be viewed as a type of "overhaste" but its unclear how it will interact with overhaste spells or songs for player characters, should they be added in the future.
+
+== Haste Rules ==
+
+* For haste items, only the item with highest haste % counts. [per Embrwo, 07/04/26]
+* Haste effects of the same type will not stack, whereas haste effects of differing type will usually stack.
+* Haste is measured in Rate of Attack Increase, NOT Delay Decrease.
+* The FORMULA for determining Delay with Haste is:
+** New (Hasted) Delay = Delay/(1+Haste), where Haste is a decimal (21% == .21). FBSS Example: [Delay/(1+.21)]
+* The minimum weapon delay is 5 (needs confirmation).
+* Fractional hasted delay is NOT rounded. If a hasted delay is 17.02, then it takes 1.702 seconds to swing, it is not rounded down to 1.7 seconds or up to 1.8 seconds.
+
+===Haste Caps===
+{| class="eoTable3" style="width:40%;"
+! Level || Max total haste permitted
+!Notes
+|-
+| 1-30    || 55%
+|Static Cap
+|-
+| 31-50    || 75%
+|Gain 1% max per level after 30
+|-
+| 51-60    || 100%
+|Will need to test once available!
+|}
+
+= Haste Items and Buffs =
+
+== Permanent Haste Items ==
+
+<table class="eoTable2 sortable" style="width:100%;">
+  <tr> 
+    <th>Item</th>
+    <th>Haste</th>
+    <th>Slot</th>
+    <th>Other Stats</th>
+    <th>Zone</th>
+    <th>Mob/Quest</th>
+    <th>Notes</th>
+  </tr>
+  <tr> 
+    <td>{{:Sporali Gloves}}</td>
+    <td>9%</td>
+    <td>Hands</td>
+    <td>Wt: 1.0, ALL</td>
+    <td>[[Runnyeye]]</td>
+    <td>[[the Sporali Moldmaster]]</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>{{:Kitchen Toolbelt}}</td>
+    <td>10%</td>
+    <td>Waist</td>
+    <td>Wt: 0.1, ALL</td>
+    <td>[[Najena]]</td>
+    <td>[[The Tenderizer]]</td>
+    <td></td>
+  </tr>
+ <tr> 
+    <td>{{:Thick Leather Apron}}</td>
+    <td>15%</td>
+    <td>Waist</td>
+    <td>AC 8<br>
+     Wt: 1.0 [[Warrior|WAR]] [[Cleric|CLR]] [[Paladin|PAL]] [[Ranger|RNG]] [[Shadow Knight|SHD]] [[Druid|DRU]] [[Monk|MNK]] [[Bard|BRD]] [[Rogue|ROG]] [[Shaman|SHM]] [[Beastlord|BST]] [[Berserker|BER]]<br></td>
+    <td>[[The Estate of Unrest]]</td>
+    <td>[[an undead barkeep]]</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>{{:Swiftclaw Sash}}</td>
+    <td>15%</td>
+    <td>Waist</td>
+    <td>AC 2 AGI 2<br>
+     Wt: 0.1 ALL</td>
+    <td>[[Stonebrunt Mountains]]</td>
+    <td>Quest [[Heretic Heads]]</td>
+    <td>Quest Giver: [[Shazda Kaekwon]]</td>
+  </tr>
+  <tr> 
+    <td>{{:Wyvern Hide Boots}}</td>
+    <td>15%</td>
+    <td>Feet</td>
+    <td>AC 6 STA 5 AGI 5 DEX 5<br>
+     Wt: 1.0, ALL</td>
+    <td>[[Skyshrine]]</td>
+    <td>Cubes and Wyverns</td>
+    <td>Random drop from many lvl 45+ mobs </td>
+  </tr>
+  <tr> 
+    <td>{{:Belt of Concordance}}</td>
+    <td>16%</td>
+    <td>Waist</td>
+    <td>AC 6 STR 5 CHA 5 SV Poison 5<br>
+     Wt: 0.1 [[Bard|BRD]]</td>
+    <td>[[Plane of Sky]]</td>
+    <td>Various</td>
+    <td>Random drop from POS mobs</td>
+  </tr>
+  <tr> 
+    <td>{{:Belt of Iniquity}}</td>
+    <td>16%</td>
+    <td>Waist</td>
+    <td>AC 8 STR 5 INT 5 SV MAGIC 5<BR>
+     Wt: 0.1, [[Shadow Knight|SHD]]</td>
+    <td>[[Plane of Sky]]</td>
+    <td>Various</td>
+    <td>Random drop from POS mobs</td>
+  </tr>
+  <tr> 
+    <td>{{:Belt of the Pine}}</td>
+    <td>16%</td>
+    <td>Waist</td>
+    <td>AC 6 STR 5 WIS 5 SV DISEASE 5<br>
+     Wt: 0.1, [[Ranger|RNG]]</td>
+    <td>[[Plane of Sky]]</td>
+    <td>Various</td>
+    <td>Random drop from POS mobs</td>
+  </tr>
+  <tr> 
+    <td>{{:Belt of Virtue}}</td>
+    <td>16%</td>
+    <td>Waist</td>
+    <td>AC 8 STR 5 WIS 5 SV MAGIC 5<br>
+     Wt: 0.1, [[Paladin|PAL]]</td>
+    <td>[[Plane of Sky]]</td>
+    <td>Various</td>
+    <td>Random drop from POS mobs</td>
+  </tr>
+  <tr> 
+    <td>{{:Swirlspine Belt}}</td>
+    <td>16%</td>
+    <td>Waist</td>
+    <td>AC 4 <br>
+     Wt: 1.0 [[Warrior|WAR]] [[Paladin|PAL]] [[Ranger|RNG]] [[Shadow Knight|SHD]] [[Monk|MNK]] [[Bard|BRD]] [[Rogue|ROG]]</td>
+    <td>[[Kedge Keep]]</td>
+    <td>[[Swirlspine Guardian]]</td>
+    <td>Underwater zone</td>
+  </tr>
+  <tr> 
+    <td>{{:Hangman's Noose}}</td>
+    <td>17%</td>
+    <td>Head, Waist</td>
+    <td>AC 5<br>
+     Wt: 0.1 ALL</td>
+    <td>[[Trakanon's Teeth]]</td>
+    <td>[[Hangman]]</td>
+    <td>On a PH spawn cycle</td>
+  </tr>
+  <tr> 
+    <td>{{:Belt of Contention}}</td>
+    <td>21%</td>
+    <td>Waist</td>
+    <td>AC 10 STR 5 STA 5 SV FIRE 5<br>
+     Wt: 0.1 [[Warrior|WAR]]</td>
+    <td>[[Plane of Sky]]</td>
+    <td>Various</td>
+    <td>Random drop from POS mobs</td>
+  </tr>
+  <tr> 
+    <td>{{:Belt of Tranquility}}</td>
+    <td>21%</td>
+    <td>Waist</td>
+    <td>AC 4 STR 5 DEX 5 SV COLD 5<br>
+     Wt: 0.1 [[Monk|MNK]]</td>
+    <td>[[Plane of Sky]]</td>
+    <td>Various</td>
+    <td>Random drop from POS mobs</td>
+  </tr>
+  <tr> 
+    <td>{{:Belt of Transience}}</td>
+    <td>21%</td>
+    <td>Waist</td>
+    <td>AC 6 STR 5 DEX 5 SV POISON 10<br>
+     Wt: 0.1 [[Rogue|ROG]]</td>
+    <td>[[Plane of Sky]]</td>
+    <td>Various</td>
+    <td>Random drop from POS mobs</td>
+  </tr>
+  <tr> 
+    <td>{{:Flowing Black Silk Sash}}</td>
+    <td>21%</td>
+    <td>Waist</td>
+    <td>Wt: 0.1 ALL</td>
+    <td>[[Lower Guk]]</td>
+    <td>[[a frenzied ghoul]]</td>
+    <td>No placeholder</td>
+  </tr>
+  <tr> 
+    <td>{{:Silvery Belt of Contention}}</td>
+    <td>21%</td>
+    <td>Waist</td>
+    <td>AC 10 STA 4 WIS 5 INT 5<br>
+     Wt0.0 ALL</td>
+    <td>[[Kael Drakkal]]</td>>
+    <td>Protectors of Zek</td>
+    <td>Rare drop from many lvl 50+ mobs</td>
+  </tr>
+  <tr> 
+    <td>{{:Silver Chitin Hand Wraps}}</td>
+    <td>22%</td>
+    <td>Hands</td>
+    <td>AC 5 SV All 3<br>
+     Wt: 1.0 ALL</td>
+    <td>[[Velketor's Labyrinth]]</td>
+    <td>[[a Frenzied Velium Broodling]]</td>
+    <td>Nice easy camp for 45+</td>
+  </tr>
+  <tr> 
+    <td>{{:Sash of the Dragonborn}}</td>
+    <td>24%</td>
+    <td>Waist</td>
+    <td>AC 2<br>
+     Wt: 0.1 ALL</td>
+    <td>[[Howling Stones]]</td>
+    <td>[[a Crypt Spectre]]</td>
+    <td>Requires Keys to enter the wings where this drops</td>
+  </tr>
+  <tr> 
+    <td>{{:Honeycomb Belt}}</td>
+    <td>26%</td>
+    <td>Waist</td>
+    <td>6AC 2cha 6wis 75mana Wt2.0, [[Druid|DRU]] -ND</td>
+    <td>[[Plane of Sky]], Quest</td>
+    <td>[[Druid Plane of Sky Tests|Druid Test of the Bee]]</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>{{:Siblisian Berserker Cloak}}</td>
+    <td>26%</td>
+    <td>Back</td>
+    <td>AC 9 STR 9 STA 9 DEX 9 AGI 9 HP 50<br>
+     Wt: 0.1 ALL</td>
+    <td>[[Old Sebilis]]</td>
+    <td>[[Trakanon]]</td>
+    <td>Raid event, lvl 43+ named</td>
+  </tr>
+  <tr> 
+    <td>{{:Runebranded Girdle}}</td>
+    <td>27%</td>
+    <td>Waist</td>
+    <td>AC 7 STR 8 STA 8 DEX 8 HP 25 MANA 25<br>
+     Wt: 0.1 ALL</td>
+    <td>[[Old Sebilis]] / [[Kithicor Forest]]</td>
+    <td>Various froglok krup / [[Coercer Q'ioul]]</td>
+    <td>Old Sebilis with good group is easier</td>
+  </tr>
+  <tr> 
+    <td>{{:Runed Bolster Belt}}</td>
+    <td>31%</td>
+    <td>Waist</td>
+    <td>AC 5 STR 1 STA 10 DEX 10<br>
+     Wt: 0.1 ALL</td>
+    <td>[[Dreadlands]]/[[Emerald Jungle]]/[[Permafrost]]/[[Skyfire Mountains]]/[[Timorous Deep]]</td>
+    <td>[[Gorenaire]]/[[Severilous]]/[[Lady Vox]]/[[Talendor]]/[[Faydedar]]</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>{{:Girdle of Rapidity}}</td>
+    <td>31%</td>
+    <td>Waist</td>
+    <td>AC 6 CHA 7 INT 7 WIS 7 MANA 50<br>
+     Wt: 2.5 [[Cleric|CLR]] [[Druid|DRU]] [[Shaman|SHM]] [[Necromancer|NEC]] [[Wizard|WIZ]] [[Magician|MAG]] [[Enchanter|ENC]]</td>
+    <td>[[Chardok]]</td>
+    <td>[[Sarnak Collective Auditor]]</td>
+    <td>Bank Area, very rare (Chardok 2.0)</td>
+  </tr>
+  <tr> 
+    <td>{{:Sergeant's Leather Belt}}</td>
+    <td>32%</td>
+    <td>Waist</td>
+    <td>STA 9 HP 35 END 20<br>
+     Wt: 0.5 [[Warrior|WAR]] [[Cleric|CLR]] [[Paladin|PAL]] [[Ranger|RNG]] [[Shadow Knight|SHD]] [[Druid|DRU]] [[Monk|MNK]] [[Bard|BRD]] [[Rogue|ROG]] [[Shaman|SHM]] [[Beastlord|BST]] [[Berserker|BER]]</td>
+    <td>[[Nektropos Castle]]</td>
+    <td>[[Sergeant Tvyn]]</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>{{:Cloak of Piety}}</td>
+    <td>34%</td>
+    <td>Back</td>
+    <td>AC 12 STR 12 WIS 12 INT 12 SV MAGIC 10 SV FIRE 10<br>
+     Wt: 1.5 ALL</td>
+    <td>[[Old Sebilis]]</td>
+    <td>[[Trakanon]]</td>
+    <td>Raid Mob</td>
+  </tr>
+  <tr> 
+    <td>{{:Shroud of the Dar Brood}}</td>
+    <td>34%</td>
+    <td>Chest, Back</td>
+    <td>AC 14 STA 8 WIS 9 INT 9 SV MAGIC 10 SV COLD 10 SV FIRE 10 HP 20 MANA 50<br>
+     Wt: 1.0 ALL</td>
+    <td>[[Western Wastes]]</td>
+    <td>Quest [[Aid the Dar Brood]]</td>
+    <td>Quest Giver [[Harla Dar]]</td>
+  </tr>
+  <tr> 
+    <td>{{:Spiked Seahorse Hide Belt}}</td>
+    <td>34%</td>
+    <td>Waist</td>
+    <td>AC 10 STR 4 STA 4 AGI 4 DEX 4 WIS 4 INT 4 CHA 4 SV ALL 1 HP 25 MANA 2<br> 
+      Wt: 0.0 ALL</td>
+    <td>[[Siren's Grotto]]</td>
+    <td>[[Fellspine]]</td>
+    <td>Easy mob</td>
+  </tr>
+  <tr> 
+    <td>{{:Cloak of Flames}}</td>
+    <td>36%</td>
+    <td>Back</td>
+    <td>AC 10 AGI 9 DEX 9 SV FIRE 15 HP 50<br>
+     Wt: 0.1 ALL</td>
+    <td>[[Nagafen's Lair]]</td>
+    <td>[[Lord Nagafen]]</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>{{:Cloak of Crystalline Waters}}</td>
+    <td>36%</td>
+    <td>Back</td>
+    <td>AC 10 AGI 9 DEX 9 SV COLD 15 MANA 50<br>
+     Wt: 0.1 ALL</td>
+    <td>[[Cobalt Scar]]</td>
+    <td>[[Kelorek`Dar]]</td>
+    <td>Easy to get to raid mob</td>
+  </tr>
+  <tr> 
+    <td>{{:Cowl of Mortality}}</td>
+    <td>36%</td>
+    <td>Head</td>
+    <td>AC 16 STA 9 AGI 12 SV DISEASE 15 HP 50<br>
+     Wt: 0.1 ALL</td>
+    <td>[[Dragon Necropolis]]</td>
+    <td>[[Zlandicar]]</td>
+    <td>Raid Mob</td>
+  </tr>
+  <tr> 
+    <td>{{:Rakusha Cloak}}</td>
+    <td>36%</td>
+    <td>Back</td>
+    <td>AC 10 SV MAGIC 10 SV FIRE 10<br>
+     Wt: 0.1 [[Monk|MNK]]</td>
+    <td>[[Plane of Hate]]</td>
+    <td>[[Grandmaster R`Tal]]</td>
+    <td>Mini Boss</td>
+  </tr>
+  <tr>
+    <td>{{:Tolapumj's Robe}}</td>
+    <td>36%</td>
+    <td>Chest</td>
+    <td>AC 14 WIS 5 INT 10 MANA 50<br>
+     Wt: 3.5 [[Necromancer|NEC]] [[Wizard|WIZ]] [[Magician|MAG]] [[Enchanter|ENC]]</td>
+    <td>[[Old Sebilis]]</td>
+    <td>[[Tolapumj]]</td>
+    <td>Pure caster melee item</td>
+  </tr>
+  <tr class="grayout"> 
+    <td>{{:Sash of Infinite Blows}}</td>
+    <td>41%</td>
+    <td>Waist</td>
+    <td>AC 5<br>
+     Wt: 0.1, [[Monk|MNK]]</td>
+    <td>[[Plane of Fear]]</td>
+    <td>[[Dracoliche]]</td>
+    <td>(Fear 2.0) - Removed from game?</td>
+  </tr>
+  <tr> 
+    <td>{{:Cloak of the Fire Storm}}</td>
+    <td>40%</td>
+    <td>Back</td>
+    <td>AC 24 STR 15 STA 15 AGI 15 DEX 15 SV FIRE 35 HP 100<br>
+     Wt: 0.0 [[Warrior|WAR]] [[Paladin|PAL]] [[Shadow Knight|SHD]] [[Monk|MNK]] [[Bard|BRD]] [[Rogue|ROG]]</td>
+    <td>[[Temple of Veeshan]]</td>
+    <td>Quest [[Test of the Fire Storm]]</td>
+    <td>Quest Giver [[Telkorenar]]</td>
+  </tr>
+  <tr> 
+    <td>{{:Windraider's Belt}}</td>
+    <td>40%</td>
+    <td>Waist</td>
+    <td>AC 35 STR 10 SV ALL 7<br>
+     Wt: 0.5 ALL</td>
+    <td>[[Temple of Veeshan]]</td>
+    <td>[[Zlexak]]</td>
+    <td>Raid Event</td>
+  </tr>
+  <tr> 
+    <td>{{:Belt of the Destroyer}}</td>
+    <td>41%</td>
+    <td>Waist</td>
+    <td>25AC 10str 15wis 15int 15svF 75hp Wt0.5, All/All -ND</td>
+    <td>Temple of Veeshan - North,<br>
+      [[Dagarn the Destroyer]]</td>
+    <td>Raid Event</td>
+  </tr>
+  <tr> 
+    <td>{{:Belt of the Four Winds}}</td>
+    <td>41%</td>
+    <td>Waist</td>
+    <td>AC 5 STR 12 STA 12 AGI 6 DEX 6 SV MAGIC 5<br>
+     Wt: 2.0 [[Warrior|WAR]]</td>
+    <td>[[Plane of Sky]]</td>
+    <td>Quest [[Warrior Plane of Sky Tests|Warrior Test of Think]]t</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>{{:Brother Xave's Headband}}</td>
+    <td>41%</td>
+    <td>Head</td>
+    <td>AC 45 STR 15 STA 10 AGI 10 DEX 10 SV ALL 15 HP 75<br>
+     Wt:0.0 [[Monk|MNK]]</td>
+    <td>[[Temple of Veeshan]]</td>
+    <td>[[Vulak`Aerr]]</td>
+    <td>Raid Event</td>
+  </tr>
+  <tr> 
+    <td>{{:Feeliux's Cord of Velocity}}</td>
+    <td>41%</td>
+    <td>Waist</td>
+    <td>AC 30 STR 25 STA 20 AGI 25 DEX 25 HP 100<br>
+     Wt: 0.0 [[Warrior|WAR]] [[Paladin|PAL]] [[Ranger|RNG]] [[Shadow Knight|SHD]] [[Monk|MNK]] [[Bard|BRD]] [[Rogue|ROG]]</td>
+    <td>[[Temple of Veeshan]]</td>
+    <td> [[Vulak`Aerr]]</td>
+    <td>Raid Event</td>
+  </tr>
+  <tr> 
+    <td>{{:Gauntlets of Dragon Slaying}}</td>
+    <td>41%</td>
+    <td>Hands</td>
+    <td>AC 30 S STR 9 WIS 9 INT 9 SV ALL 9 HP 75 MANA 75<br>
+     Wt: 0.0 ALL</td>
+    <td>[[Kael Drakkal]] & [[Skyshrine]]</td>
+    <td>Quest [[Yelinak's Head]]</td>
+    <td>Quest Giver [[King Tormax]]</td>
+  </tr>
+  <tr> 
+    <td>{{:Girdle of Dark Power}}</td>
+    <td>41%</td>
+    <td>Waist</td>
+    <td>AC 30 STR 15 INT 15 SV ALL 5 HP 50 MANA 5<br>
+     Wt: 25.0, [[Bard|BRD]] [[Shadow Knight|SHD]] [[Rogue|ROG]]</td>
+    <td>[[Temple of Veeshan]]</td>
+    <td>[[Lady Nevederia]]</td>
+    <td>Raid Event</td>
+  </tr>
+  <tr> 
+    <td>{{:Girdle of Faith}}</td>
+    <td>41%</td>
+    <td>Waist</td>
+    <td>AC 10 STR 6 AGI 6 WIS 6<br>
+     Wt: 1.0 [[Paladin|PAL]]</td>
+    <td>[[Plane of Sky]]</td>
+    <td>Quest [[Paladin Plane of Sky Tests|Paladin Test of Spirit]]</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>{{:Golden Sash of Tranquility}}</td>
+    <td>41%</td>
+    <td>Waist</td>
+    <td>AC 5 STR 15 AGI 15 DEX 15<br>
+     Wt: 0.1 [[Monk|MNK]]</td>
+    <td>[[Plane of Sky]]</td>
+    <td>Quest [[Monk Plane of Sky Tests|Monk Test of Tranquility]]</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>{{:Grey Suede Boots}}</td>
+    <td>41%</td>
+    <td>Feet</td>
+    <td>AC 12 STR 8 AGI 8 SV COLD 10 SV POISON 10 HP 25<br>
+     Wt: 0.0 ALL</td>
+    <td>[[Veeshan's Peak]]</td>
+    <td>[[Hoshkar]]</td>
+    <td>Key required zone, Raid event</td>
+  </tr>
+  <tr> 
+    <td>{{:Pegasus-Hide Belt}}</td>
+    <td>41%</td>
+    <td>Waist</td>
+    <td>AC 8 STR 6 AGI 6 INT 6<br>
+     Wt: 1.0 [[Shadow Knight|SHD]]</td>
+    <td>[[Plane of Sky]]</td>
+    <td>Quest [[Shadow Knight Plane of Sky Tests|Shadow Knight Test of Slash]]</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>{{:Renard's Belt of Quickness}}</td>
+    <td>41%</td>
+    <td>Waist</td>
+    <td>AC 6 STR 5 AGI 12 DEX 12 CHA 5<br>
+     Wt: 1.0 [[Rogue|ROG]]</td>
+    <td>[[Plane of Sky]]</td>
+    <td>Quest [[Rogue Plane of Sky Tests|Rogue Test of Trickery]]</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>{{:Silver Bracelet of Speed}}</td>
+    <td>41%</td>
+    <td>Wrist</td>
+    <td>AC 38 STR 10 STA 10 WIS 10 INT 10 SV ALL 5 HP 100<br>
+     Wt: 0.0 ALL</td>
+    <td>[[Temple of Veeshan]]</td>
+    <td>Quest [[Test of the Platinum Tear]]</td>
+    <td>Raid Event</td>
+  </tr>
+  <tr> 
+    <td>{{:Yelinak's Talisman}}</td>
+    <td>41%</td>
+    <td>Neck</td>
+    <td>AC 8 STR 7 STA 7 AGI 7 DEX 7 WIS 7 INT 7 CHA 7 SV ALL 7 HP 40 MANA 4<br> 
+      Wt: 0.5 ALL</td>
+    <td>[[Skyshrine]]</td>
+    <td>[[Lord Yelinak]]</td>
+    <td>Related Quest [[Key to Sleeper's Tomb]]</td>
+  </tr>
+</table>
+
+== Triggered Haste Items (Buff Haste) ==
+
+
+<table class="eoTable2 sortable" style="width:100%;">
+  <tr> 
+    <th>Item</th>
+    <th>Haste</th>
+    <th>Other Stats</th>
+    <th>Zone</th>
+    <th>Mob</th>
+    <th>Notes</th>
+  </tr>
+  <tr> 
+    <td>{{:Eyepatch of Plunder}}</td>
+    <td>20%</td>
+    <td>AC 10 STR 10 DEX 10 SV ALL 6 HP 50 <b>Effect:</b> [[Captain Nalots Quickening]]<br>
+     Wt: 0.5 ALL</td>
+    <td>[[Iceclad Ocean]]</td>
+    <td>Quest [[The Lost Map]]</td>
+    <td>Quest Giver [[Ami]]</td>
+  </tr>
+  <tr> 
+    <td>{{:Vial of Tamed Mercury}}</td>
+    <td>20%</td>
+    <td>Potion <b>Effect:</b> Flurry (1 Charge)<br>
+     ALL</td>
+    <td>[[Alchemy]] (Trivial: 70)</td>>
+    <td>1 x [[Comfrey]] and 1 x [[Mercury</td>
+    <td>See also [[5 Dose Vial of Tamed Mercury]] and [[10 Dose Vial of Tamed Mercury]]</td>
+  </tr>
+  <tr>
+    <td>{{:Robe of the Whistling Fists}}</td>
+    <td>25%</td>
+    <td>AC 15 SV MAGIC 10 HP 50 <b>Effect:</b> [[Jonthan's Whistling Warsong]]<br>>
+     Wt: 0.5 [[Monk|MNK]]</td>
+    <td>[[Erudin]]</td>
+    <td>Quest [[Monk Epic Quest]]</td>
+    <td>Quest Giver [[Tomekeeper Danl]]</td>
+  </tr>
+  <tr> 
+    <td>{{:Sphinxian Circlet}}</td>
+    <td>35%</td>
+    <td>AC 4 STR 4 DEX 4 <b>Effect:</b> Haste (1 Charge)<br>
+     Wt: 1.0 [[Rogue|ROG]]</td>
+    <td>[[Plane of Sky]]</td>
+    <td>[[Sister of the Spire]]</td>
+    <td>Quest item used in [[Rogue Plane of Sky Tests|Rogue Test of Trickery]]</td>
+  </tr>
+  <tr>
+    <td>{{:Celestial Fists}}</td>
+    <td>40%</td>
+    <td>AC 15 STR 20 DEX 10 STA 10 AGI 10 HP 100 <b>Effect:</b> [[Celestial Tranquility]]<br>
+     Wt: 0.1 [[Monk|MNK]]</td>
+     <td>[[Erudin]]</td>
+    <td>Quest [[Monk Epic Quest]]</td>
+    <td>Quest Giver [[Tomekeeper Danl]]</td>
+  </tr>
+  <tr> 
+    <td>{{:Lute of the Howler}}</td>
+    <td>40%</td>
+    <td>String Resonance: 12 <b>Effect:</b> [[Illusion: Werewolf]]<br>  
+     Wt: 0.5 [[Bard|BRD]]</td>
+    <td>[[Velketor's Labyrinth]]</td>
+    <td>Khelker Icepaw</td>
+    <td>Cast 10 sec, Duration 36 mins</td>
+  </tr>
+  <tr> 
+    <td>{{:Adrenaline Tap}}</td>
+    <td>40%</td>
+    <td>Potion <b>Effect:</b> Flurry</b> (1 Charge)<br>
+     ALL</td>
+    <td>[[Alchemy]] (Trivial: 165)</td>
+    <td>1 x [[Comfrey]] and 1 x [[Dhea]]</td>
+    <td>See also [[5 Dose Adrenaline Tap]]  and [[10 Dose Adrenaline Tap]]</td>
+ </tr>
+  <tr> 
+    <td>{{:Clockwork Watchman Vambraces}}</td>
+    <td>40%</td>
+    <td>AC 11 <b>Effect:</b> [[Cog Boost]]<br>
+     Wt: 4.9 [[Warrior|WAR]] [[Cleric|CLR]]</td>
+    <td>[[Tinkering]] (Trivla: 227)</td>
+    <td>1 x [[Cogs]], 1 x [[Small Fine Plate Vambraces]], 1x [[Gnomish Bolts]], 1x [[Grease]], 1x [[Holgresh Fur]], 1x [[Mana Battery - Class Five]], 1 x [[Metal Fastening]], 1 x [[Metal Rod]], 1 x [[Metal Twine]], 1 x [[Sprockets]]</td>
+   <td>Part of [[Cultural Tradeskills: Gnome|gnome cultural tinkering]]</td>
+  </tr>
+  <tr> 
+    <td>{{:Dark Cloak of the Sky}}</td>
+    <td>50% (L49)</td>
+    <td>AC 6 STR 7 AGI 7 DEX 7 WIS 7 HP 55 <b>Effect:</b> [[Haste]]<br>
+     Wt: 5.0 [[Ranger|RNG]]</td>
+    <td>[[Plane of Sky]]</td>
+    <td>Quest [[Ranger Plane of Sky Tests|Ranger Test of Defense]]</td>
+    <td></td>
+  </tr>
+</table>
+
+== Weapon Haste (Permanent Haste) ==
+
+
+<table class="eoTable2 sortable" style="width:100%;">
+  <tr> 
+    <th>Item</th>
+    <th>Haste</th>
+    <th>Other Stats</th>
+    <th>Zone</th>
+    <th>Mob</th>
+    <th>Notes</th>
+  </tr>
+  <tr> 
+    <td>{{:Mithril Two-Handed Sword}}</td>
+    <td>31%</td>
+    <td>Primary 2H Slashing Dmg: 21 Atk Delay: 40 <b>Effect:</b> [[Haste]]<br>
+     WtL 8.5 [[Warrior|WAR]] [[Paladin|PAL]] [[Shadow Knight|SHD]]</td>
+    <td>[[Lower Guk]]</td>
+    <td>[[the froglok king]]</td>
+    <td>Related to [[Rogue Epic Quest]]</td>
+  </tr>
+  <tr> 
+    <td>{{:Monsoon, Sword of the Swiftwind}}</td>
+    <td>36%</td>
+    <td>Primary 2H Slash Dmg: 30 Atk Delay: 45 STR 10 STA 9<br>
+     Wt: 2.0 [[Warrior|WAR]]</td>
+    <td>[[Plane of Fear]]</td>
+    <td>[[Dracoliche]] [[Dread]] [[Fright]] [[Terror]]</td>
+    <td>Raid Event</td>
+  </tr>
+  <tr> 
+    <td>{{:Typhoon, Sword of the Tidalwave}}</td>
+    <td>36%</td>
+    <td>Primary 2H Slashing Dmg: 30 Atk Delay: 45 STR 10 WIS 4 SV Magic 5
+     Wt: 2.0 [[Warrior|WAR]]</td>
+    <td>[[Cobaltscar]]</td>
+    <td>[[Kelorek`Dar]]</td>
+    <td>Raid Event</td>
+  </tr>
+  <tr> 
+    <td>{{:Sunderfury}}</td>
+    <td>36%</td>
+    <td>Primary 2H Slashing Dmg: 25 Atk Delay: 36<br>
+     Wt: 7.5, [[Warrior|WAR]]</td>
+    <td>[[Plane of Hate]]</td>
+    <td>[[Grandmaster R`Tal]]</td>
+    <td>Raid Event</td>
+  </tr>
+  <tr> 
+    <td>{{:Velium Swiftblade}}</td>
+    <td>36%</td>
+    <td>Primary Secondary 1H Slashing Dmg: 5 Atk Delay: 24<br>
+     Wt: 0.1 [[Warrior|WAR]] [[Paladin|PAL]] [[Ranger|RNG]] [[Shadow Knight|SHD]] [[Bard|BRD]] [[Rogue|ROG]]</td>
+    <td>[[Kael Drakkel]]</td>
+    <td>Various mobs</td>
+    <td>Very Rare</td>
+  </tr>
+  <tr>
+    <td>{{:Ragebringer}}</td>
+    <td>40%</td>
+    <td>Primary Secondary Piercing Dmg: 15 Atk Delay: 25 <b>Effect:</b> [[Seething Fury]]<br>
+     STR 20 STA 10 AGI 10 HP 100 SV Disease 10 SV Magic 20 SV Poison 20 Wt: 2.5 [[Rogue|ROG]]</td>
+    <td>[[Qeynos Aqueducts]]</td>
+    <td>Quest [[Rogue Epic Quest]]</td>
+    <td>Quest Giver [[Malka Rale]]</td>
+  </tr>
+  <tr>
+    <td>{{:Swiftwind}}</td>
+    <td>40%</td>
+    <td>Secondary 1H Slashing Dmg: 13 Atk Delay: 21 <b>Effect:</b> [[Swift Spirit]]<br>
+     STR 15 DEX 5 STA 10 HP 50 SV FIRE 5 SV DISEASE 5 SV COLD 5 SV MAGIC 5 SV POISON 5Wt: 2.0 [[Ranger|RNG]]</td>
+    <td>[[Burning Woods]]</td>
+    <td>Quest [[Ranger Epic Quest]]</td>
+    <td>Quest Giver [[Telin Darkforest]]</td>
+  </tr>
+  <tr> 
+    <td>{{:Tolan's Longsword of the Glade}}</td>
+    <td>40%</td>
+    <td>Primary Secondary 1H Slashing Dmg: 15 Atk Delay: 21 <b>Effect:</b> [[Blessing of the Grove]]<br>
+     AC 15 STR 10 AGI 15 DEX 15 WIS 15 SV ALL 7 HP 100 Wt: 2.0 [[Ranger|RNG]]</td>
+    <td>[[Temple of Veeshan]]</td>
+    <TD>[[Vulak'Aerr]]</td>
+    <td>Raid event</td>
+  </tr>
+  <tr> 
+    <td>{{:Claw of Lightning}}</td>
+    <td>41%</td>
+    <td>Secondary 1H Slashing Dmg: 14 Atk Delay: 18 STR 8 AGI 8 DEX 8 SV MAGIC 10<br>
+     Wt: 0.0 [[Warrior|WAR]] [[Ranger|RNG]] [[Rogue|ROG]]</td>
+    <td>[[Temple of Veeshan]]</td>
+    <td>[[Eashen of the Sky]]</td>
+    <td>Raid event</td>
+  </tr>
+  <tr> 
+    <td>{{:Fist of Lightning}}</td>
+    <td>41%</td>
+    <td>Secondary 1H Blunt Dmg: 15 Atk Delay: 18 <b>Effect:</b> [[Haste]]<br>
+     STR 8 AGI 8 DEX 8 SV MAGIC 10 Wt: 0.0 [[Monk|MNK]]</td>
+    <td>[[Temple of Veeshan]]</td>
+    <td>[[Eashen of the Sky]]</td>
+    <td>Raid event</td>
+  </tr>
+  <tr> 
+    <td>{{:Rocksmasher}}</td>
+    <td>41%</td>
+    <td>Primary 2H Blunt Dmg: 47 Atk Delay: 41 AC 35 STA 25 HP 100
+     Wt: 0.0 [[Warrior|WAR]] [[Paladin|PAL]] [[Shadow Knight|SHD]]</td>
+    <td>[[Temple of Veeshan]]</td>
+    <td>[[Aaryonar]]</td>
+    <td>Raid event</td>
+  </tr>
+  <tr> 
+    <td>{{:Serrated Dragon Tooth}}</td>
+    <td>41%</td>
+    <td>Primary Secondary Range Piercing Dmg: 13 Atk Delay: 18 AC 30 STA 10 AGI 10 DEX 10 SV ALL 12<br> 
+      Wt: 0.0 [[Warrior|WAR]] [[Paladin|PAL]] [[Ranger|RNG]] [[Shadow Knight|SHD]] [[Monk|MNK]] [[Bard|BRD]] [[Rogue|ROG]]</td>
+    <td>[[Temple of Veeshan]]</td>
+    <td> Quest [[Test of the Tooth]]</td>
+    <td>Quest Giver [[Telkorenar]]</td>
+  </tr>
+</table>
+
+== Weapon Proc Haste (Buff Haste) ==
+
+
+<table class="eoTable2 sortable" style="width:100%;">
+  <tr> 
+    <th>Item</th>
+    <th>Haste</th>
+    <th>Other Stats</th>
+    <th>Zone</th>
+    <th>Mob</th>
+    <th>Notes</th>
+  </tr>
+  <tr> 
+    <td>{{:Ashenwood Short Spear}}</td>
+    <td>18%</td>
+    <td>Primary Piercing Dmg: 6 Atk Dekay: 22 <b>Effect:</b> [[Haste]]<br>
+     Wt: 5.0 [[Warrior|WAR]] [[Ranger|RNG]] [[Shadow Knight|SHD]] [[Bard|BRD]] [[Rogue|ROG]] [[Beastlord|BST]]</td>
+    <td>[[Najena]]</td>
+    <td>[[Drelzna]]</td>
+    <td>Level Required: 25</td>
+  </tr>
+  <tr> 
+    <td>{{:Earthen Blade}}</td>
+    <td>26%</td>
+    <td>Primary 2H Slashing Dmg: 26 Atk Delay: 50 <b>Effect:</b> [[Haste]]<br>
+     Wt: 8.5 [[Warrior|WAR]</td>
+    <td>[[The Hole]]</td>
+    <td>Various elementals</td>
+    <td>Level Required: 25</td>
+  </tr>
+  <tr> 
+    <td>{{:An Executioners Axe}}</td>
+    <td>31%</td>
+    <td>Primary 2H Slashing Dmg: 25 Atk Delay: 50 <b>Effect:</b> [[Haste]]<br>
+     Wt: 8.5, [[Warrior|WAR]]</td>
+    <td>[[Lower Guk]]</td>
+    <td>[[a ghoul executioner]]</td>
+    <td>Level Required: 30</td>
+  </tr>
+  <tr>
+    <td>{{:Singing Short Sword}}</td>
+    <td>55%</td>
+    <td>Primary Secondary 1H Slashing Dmg: 16 Atk Delay: 26 <b>Effect:</b> [[Dance of the Blade]]<br>
+     STR 15 DEX 10 STA 5 CHA 20 HP 100 SV ALL 10 Wt: 2.0, [[Bard|BRD]]</td>
+    <td>[[Dreadlands]]</td>
+    <td>Quest [[Bard Epic Quest]]</td>
+    <td>Level Required: 46</td>
+  </tr>
+  <tr> 
+    <td>{{:Nature's Melody}}</td>
+    <td>60%</td>
+    <td>Primary Secondary Piercing Dmg: 15 Atk Delay: 19 <b>Effect:</b> [[Song of the Deep Seas]]<br>
+     STR 10 STA 15 CHA 10 AGI 5 HP 100 SV FIRE 13 SV COLD 13 SV MAGIC 13 Wt: 1.0, [[Bard|BRD]]</td>
+    <td>[[Plane of Growth]]</td>
+    <td>[[Tunare]]</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>{{:Siren Song, Dagger of the Sea}}</td>
+    <td>60%</td>
+    <td>Primary Secondary Piercing Dmg:15 Atk Delay: 22 <b>Effect:</b> [][Song of the Deep Seas]]<br>
+    STR 10 CHA 7 HP 70 SV ALL 7 Wt: 4.5 [[Bard|BRD]]</td>
+    <td>[[Temple of Veeshan]]</td>
+    <td>[[Lord Koi'Doken]]</td>
+    <td></td>
+  </tr>
+</table>
+
+== Songs and Spells (Buff Haste) ==
+
+
+<table class="eoTable2 sortable" style="width:100%;">
+  <tr> 
+    <th>Haste</th>
+    <th>Level/Class</th>
+    <th>Spell/Song</th>
+    <th>Duration</th>
+    <th>Notes</th>
+  </tr>
+  <tr> 
+    <td>5%</td>
+    <td>[[Bard|BRD]]/50</td>
+    <td>[[Melody of Ervaj]]</td>
+    <td>18 seconds</td>
+    <td>Drops in: Velketor's Labyrinth </td>
+  </tr>
+  <tr> 
+    <td>10%</td>
+    <td>[[Bard|BRD]]/60</td>
+    <td>[[Composition of Ervaj]]</td>
+    <td>18 seconds</td>
+    <td>High Level Velious spell drop.</td>
+  </tr>
+  <tr> 
+    <td>10%</td>
+    <td>[[Bard|BRD]]/10</td>
+    <td>[[Anthem De Arms]]</td>
+    <td>18 seconds</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>11%</td>
+    <td>[[Magician|MAG]]/56</td>
+    <td>[[Muzzle of Mardu]]</td>
+    <td>Temporary Item</td>
+    <td>Works on Pets only. Kunark spell drops. Does not work on charmed or summoned animals, e.g. shaman wolf pets.</td>
+  </tr>
+  <tr> 
+    <td>20%</td>
+    <td>[[Bard|BRD]]/36</td>
+    <td>[[Vilia's Verses of Celerity]]</td>
+    <td>18 seconds</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>18%(L42) - 23%(L60)</td>
+    <td>[[Bard|BRD]]/42</td>
+    <td>[[McVaxius' Berserker Crescendo]]</td>
+    <td>18 seconds</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>21%(L57) - 22%(L60)</td>
+    <td>[[Bard|BRD]]/57</td>
+    <td>[[McVaxius' Rousing Rondo]]</td>
+    <td>18 seconds</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>16%(L7) - 25%(L40)</td>
+    <td>[[Bard|BRD]]/7</td>
+    <td>[[Jonthan's Whistling Warsong]]</td>
+    <td>18 seconds</td>
+    <td>Self Only</td>
+  </tr>
+  <tr> 
+    <td>22%(L29) - 28%(L52)</td>
+    <td>[[Enchanter|ENC]]/29</td>
+    <td>[[Augmentation]]</td>
+    <td>27 minutes</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>30%</td>
+    <td>[[Bard|BRD]]/50</td>
+    <td>[[Verses of Victory]]</td>
+    <td>18 seconds</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>28%(L16) - 30%(L20)</td>
+    <td>[[Shaman|SHM]]/29 [[Enchanter|ENC]]/16</td>
+    <td>[[Quickness]]</td>
+    <td>11 minutes</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>34%(L24) - 40%(L36)</td>
+    <td>[[Shaman|SHM]]/44 [[Enchanter|ENC]]/24</td>
+    <td>[[Alacrity]]</td>
+    <td>11 minutes</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>45%</td>
+    <td>[[Bard|BRD]]/54</td>
+    <td>[[Vilia's Chorus of Celerity]]</td>
+    <td>18 seconds</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>43%(L56) - 45%(L60)</td>
+    <td>[[Enchanter|ENC]]/56</td>
+    <td>[[Augment]]</td>
+    <td>36 minutes</td>
+    <td>Drops from Kunark mobs</td>
+  </tr>
+  <tr> 
+    <td>48%(L45) - 50%(L47)</td>
+    <td>[[Bard|BRD]]/45</td>
+    <td>[[Jonthan's Provocation]]</td>
+    <td>18 seconds</td>
+    <td>Self Only</td>
+  </tr>
+  <tr> 
+    <td>47%(L39) - 50%(L44)</td>
+    <td> <p>[[Shaman|SHM]]/56 [[Enchanter|ENC]]/39</p></td>
+    <td>[[Celerity]]</td>
+    <td>16 minutes</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>58%</td>
+    <td>[[Enchanter|ENC]]/60</td>
+    <td>[[Visions of Grandeur]]</td>
+    <td>42 minutes</td>
+    <td>Drops from Kunark mobs</td>
+  </tr>
+  <tr> 
+    <td>60%</td>
+    <td> <p>[[Enchanter|ENC]]/49</p></td>
+    <td>[[Swift Like The Wind]]</td>
+    <td>16 minutes</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>61%(L58) - 63%(L60)</td>
+    <td>[[Bard|BRD]]/58</td>
+    <td>[[Jonthan's Inspiration]]</td>
+    <td>18 seconds</td>
+    <td>Self Only</td>
+  </tr>
+  <tr> 
+    <td>64%</td>
+    <td>[[Enchanter|ENC]]/53</td>
+    <td>[[Aanya's Quickening]]</td>
+    <td>24 minutes</td>
+    <td></td>
+  </tr>
+  <tr> 
+    <td>66%</td>
+    <td>[[Enchanter|ENC]] Epic</td>
+    <td>[[Speed of the Shissar]]</td>
+    <td>30 minutes</td>
+    <td>[[Enchanter Epic Quest|Enchanter Epic]]</td>
+  </tr>
+  <tr> 
+    <td>70%</td>
+    <td>[[Enchanter|ENC]]/58</td>
+    <td>[[Wonderous Rapidity]]</td>
+    <td>19 minutes</td>
+    <td></td>
+  </tr>
+</table>
+
+== Calculation Examples ==
+
+'''Note:''' This table needs to be updated. The examples round the hasted delay up to the next tenth of a second based on an old haste formula, so they are slightly inaccurate.
+
+<table class="eoTable2 sortable">
+  <tr> 
+    <th>Weapon</th>
+    <th>Dmg/Dly</th>
+    <th>Haste Item(s)<br>
+      Name Percent</th>
+    <th>Calculations<br>
+      Delay/(1+Haste)</th>
+    <th>Hasted<br>
+      Dmg/Dly</th>
+    <th>Original Ratio</th>
+    <th>Hasted Ratio</th>
+    <th>Actual Improvement</th>
+  </tr>
+  <tr> 
+    <td>Wurmslayer</td>
+    <td width="14%">25/40</td>
+    <td width="27%">FBSS 21%</td>
+    <td>40/1.21 = 33.05</td>
+    <td width="15%">25/34</td>
+    <td> 0.63</td>
+    <td> 0.74</td>
+    <td> 17.6%</td>
+  </tr>
+  <tr> 
+    <td>Wurmslayer</td>
+    <td width="14%">25/40</td>
+    <td width="27%">Celerity 50%</td>
+    <td>40/1.50 = 26.66</td>
+    <td width="15%">25/27</td>
+    <td> 0.63</td>
+    <td> 0.93</td>
+    <td> 48.1%</td>
+  </tr>
+  <tr> 
+    <td>Wurmslayer</td>
+    <td width="14%">25/40</td>
+    <td width="27%">RBB 31% +      Celerity 50%</td>
+    <td>40/1.81 = 22.09</td>
+    <td width="15%">25/23</td>
+    <td> 0.63</td>
+    <td> 1.09</td>
+    <td> 73.9%</td>
+  </tr>
+  <tr> 
+    <td>Lamentation</td>
+    <td width="14%">9/19</td>
+    <td width="27%">FBSS 21%</td>
+    <td>19/1.21 = 15.70</td>
+    <td width="15%">9/16</td>
+    <td> 0.47</td>
+    <td> 0.56</td>
+    <td> 18.8%</td>
+  </tr>
+  <tr> 
+    <td>Lamentation</td>
+    <td width="14%">9/19</td>
+    <td width="27%">COF 36%</td>
+    <td>19/1.36 = 13.97</td>
+    <td width="15%">9/14</td>
+    <td> 0.47</td>
+    <td> 0.64</td>
+    <td> 35.7%</td>
+  </tr>
+  <tr> 
+    <td>Lamentation</td>
+    <td width="14%">9/19</td>
+    <td width="27%">COF 36% +      Celerity 50%</td>
+    <td>19/1.86 = 10.21</td>
+    <td width="15%">9/11</td>
+    <td> 0.47</td>
+    <td> 0.82</td>
+    <td> 72.7%</td>
+  </tr>
+  <tr> 
+    <td>Celestial Fists</td>
+    <td width="14%">9/16</td>
+    <td width="27%">FBSS 21%</td>
+    <td>16/1.21 = 13.22</td>
+    <td width="15%">9/14</td>
+    <td> 0.56</td>
+    <td> 0.64</td>
+    <td> 14.3%</td>
+  </tr>
+  <tr> 
+    <td>Celestial Fists</td>
+    <td width="14%">9/16</td>
+    <td width="27%">CT 40% + COF 36%</td>
+    <td>16/1.76 = 9.09</td>
+    <td width="15%">9/10</td>
+    <td> 0.56</td>
+    <td> 0.90</td>
+    <td> 60.0%</td>
+  </tr>
+</table>
+
+==99% VoG vs 100% Haste==
+There's a large debate about whether the 99% haste + 20 attack from VoG (while wearing 41% haste) is better or about the same as 100% haste with SoS. Below is a table of some datasets parsed to see if there is a significant DPS variance. If you provide data for this, make sure to rule out any extra variance via different gear, buffs, atk, etc. Ideally, people would test against different targets of varying AC and levels to try to figure out the best haste buff for each type of mob.
+
+{| class="eoTable3" style="width:40%;"
+! Level || Class || Weapon(s) || ATK || Haste || Mob || Total DMG || Time || DPS
+|-
+| 60 || Monk || [[Imbued Fighters Staff]] || 1206 || 41% + [[Visions of Grandeur|VoG]] || [[Bloodmaw]] || 42,367 || 374s || 113
+|-
+| 60 || Monk || [[Imbued Fighters Staff]] || 1206 || 41% + [[Visions of Grandeur|VoG]] || [[Bloodmaw]] || 42,241 || 378s || 111
+|-
+| 60 || Monk || [[Imbued Fighters Staff]] || 1186 || 41% + [[Wonderous Rapidity|WR]] || [[Bloodmaw]] || 42,284 || 372s || 113
+|-
+| 60 || Monk || [[Imbued Fighters Staff]] || 1186 || 41% + [[Wonderous Rapidity|WR]] || [[Bloodmaw]] || 42,202 || 375s || 112
+|}
+
+==Resources==
+*http://gaming.invisibill.net/eq/hastecalc.html
+*http://eq.magelo.com/haste_items.jspa
+*http://www.onlinegamecommands.com/everquest/everquesthaste.htm
+
+
+[[Category:Guides]]
+[[Category:Technical]]
+[[Category:Game Mechanics]]

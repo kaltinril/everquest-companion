@@ -2463,3 +2463,13 @@ File:Npc_a_mimic.png
 A_mimic
 Fippy's_Paw
 Fippy_Darkpaw
+Spirit_of_Yekan_Summon
+Spirit_of_Herikol_Summon
+Spirit_of_Khaliz_Summon
+Spirit_of_Kashek_Summon
+File:Spirit_of_kashek_summon.png
+Convoke_Shadow_Summon
+Restless_Bones_Summon
+Animate_Dead_Summon
+Haunting_Corpse_Summon
+Summon_Dead_Summon

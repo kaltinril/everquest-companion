@@ -257,7 +257,7 @@ The following information is still being collected and updated for Everquest Leg
 |4
 |38
 | +0
-|5%?
+|8%
 |-
 |style="text-align:center;"|'''8'''
 |[[Spirit of Sharik Summon|Spirit of Sharik]]
@@ -266,7 +266,7 @@ The following information is still being collected and updated for Everquest Leg
 |5
 |38
 | +1
-|14%?
+|14%
 |-
 |style="text-align:center;"|'''15'''
 |[[Spirit of Khaliz Summon|Spirit of Khaliz]]
@@ -275,7 +275,7 @@ The following information is still being collected and updated for Everquest Leg
 |9
 |30
 | +2
-|X?
+|19%
 |-
 | style="text-align:center;" |'''23'''
 |[[Spirit of Keshuval Summon|Spirit of Keshuval]]
@@ -284,7 +284,7 @@ The following information is still being collected and updated for Everquest Leg
 |12
 |30
 | +3
-|X?
+|25%
 |-
 | style="text-align:center;" |'''30'''
 |[[Spirit of Herikol Summon|Spirit of Herikol]]
@@ -293,7 +293,7 @@ The following information is still being collected and updated for Everquest Leg
 |14
 |30
 | +4
-|X?
+|31%
 |-
 | style="text-align:center;" |'''39'''
 |[[Spirit of Yekan Summon|Spirit of Yekan]]
@@ -302,7 +302,7 @@ The following information is still being collected and updated for Everquest Leg
 |17
 |28
 | +6
-|X?
+|47%
 |-
 | style="text-align:center;" |'''46'''
 |[[Spirit of Kashek Summon|Spirit of Kashek]]
@@ -311,7 +311,7 @@ The following information is still being collected and updated for Everquest Leg
 |21
 |28
 | +14
-|X?
+|69%
 |}
 ==== Reagents ====
 Beastlord pets do not have a reagent required to summon.
@@ -963,7 +963,7 @@ The greater focus items ({{:Staff of Elemental Mastery: Water}}, {{:Staff of Ele
 | 7
 | 30
 | +0
-| 8%?
+| 8%
 |-
 | style="text-align:center;"|'''8'''
 | [[Bone Walk Summon|Bone Walk]]
@@ -972,7 +972,7 @@ The greater focus items ({{:Staff of Elemental Mastery: Water}}, {{:Staff of Ele
 | 8
 | 30
 | +0
-| 13%?
+| 14%
 |-
 | style="text-align:center;"|'''12'''
 | [[Convoke Shadow Summon|Convoke Shadow]]
@@ -981,7 +981,7 @@ The greater focus items ({{:Staff of Elemental Mastery: Water}}, {{:Staff of Ele
 | 9
 | 30
 | +0
-| X%
+| 17%
 |-
 | style="text-align:center;"|'''16'''
 | [[Restless Bones Summon|Restless Bones]]
@@ -990,7 +990,7 @@ The greater focus items ({{:Staff of Elemental Mastery: Water}}, {{:Staff of Ele
 | 10
 | 30
 | +0
-| X%
+| 19%
 |-
 | style="text-align:center;"|'''20'''
 | [[Animate Dead Summon|Animate Dead]]
@@ -999,7 +999,7 @@ The greater focus items ({{:Staff of Elemental Mastery: Water}}, {{:Staff of Ele
 | 11
 | 30
 | +0
-| X%
+| 22%
 |-
 | style="text-align:center;"|'''24'''
 | [[Haunting Corpse Summon|Haunting Corpse]]
@@ -1008,7 +1008,7 @@ The greater focus items ({{:Staff of Elemental Mastery: Water}}, {{:Staff of Ele
 | 13
 | 30
 | +0
-| X%
+| 26%
 |-
 | style="text-align:center;"|'''29'''
 | [[Summon Dead Summon|Summon Dead]]
@@ -1017,7 +1017,7 @@ The greater focus items ({{:Staff of Elemental Mastery: Water}}, {{:Staff of Ele
 | 14
 | 30
 | +0
-| X%
+| 30%
 |-
 | style="text-align:center;"|'''34'''
 | [[Invoke Shadow Summon|Invoke Shadow]]
@@ -1026,7 +1026,7 @@ The greater focus items ({{:Staff of Elemental Mastery: Water}}, {{:Staff of Ele
 | 16
 | 29
 | +1
-| X%
+| 35%
 |-
 | style="text-align:center;"|'''39'''
 | [[Malignant Dead Summon|Malignant Dead]]
@@ -1035,7 +1035,7 @@ The greater focus items ({{:Staff of Elemental Mastery: Water}}, {{:Staff of Ele
 | 17
 | 29
 | +5
-| X%
+| 49%
 |-
 | style="text-align:center;"|'''44'''
 | [[Cackling Bones Summon|Cackling Bones]]
@@ -1044,7 +1044,7 @@ The greater focus items ({{:Staff of Elemental Mastery: Water}}, {{:Staff of Ele
 | 19
 | 28
 | +9
-| X%
+| 57%
 |-
 | style="text-align:center;"|'''49'''
 | [[Invoke Death Summon|Invoke Death]]
@@ -1053,7 +1053,7 @@ The greater focus items ({{:Staff of Elemental Mastery: Water}}, {{:Staff of Ele
 | 21
 | 28
 | +13
-| X%
+| 68%
 |}
 ==== Reagents ====
 Necromancer pets all require [[Bone Chips]] to summon.
@@ -1146,7 +1146,7 @@ These pets are identical to the [[Necromancer]] pets, Shadowknights just get the
 | 7
 | 30
 | +0
-| 8%?
+| 8%
 |-
 | style="text-align:center;"|'''15'''
 | [[Bone Walk Summon|Bone Walk]]
@@ -1155,7 +1155,7 @@ These pets are identical to the [[Necromancer]] pets, Shadowknights just get the
 | 8
 | 30
 | +0
-| 13%?
+| 14%
 |-
 | style="text-align:center;"|'''22'''
 | [[Convoke Shadow Summon|Convoke Shadow]]
@@ -1164,7 +1164,7 @@ These pets are identical to the [[Necromancer]] pets, Shadowknights just get the
 | 9
 | 30
 | +0
-| X%
+| 17%
 |-
 | style="text-align:center;"|'''30'''
 | [[Restless Bones Summon|Restless Bones]]
@@ -1173,7 +1173,7 @@ These pets are identical to the [[Necromancer]] pets, Shadowknights just get the
 | 10
 | 30
 | +0
-| X%
+| 19%
 |-
 | style="text-align:center;"|'''39'''
 | [[Animate Dead Summon|Animate Dead]]
@@ -1182,7 +1182,7 @@ These pets are identical to the [[Necromancer]] pets, Shadowknights just get the
 | 11
 | 30
 | +0
-| X%
+| 22%
 |-
 | style="text-align:center;"|'''49'''
 | [[Summon Dead Summon|Summon Dead]]
@@ -1191,7 +1191,7 @@ These pets are identical to the [[Necromancer]] pets, Shadowknights just get the
 | 14
 | 30
 | +0
-| X%
+| 30%
 |}
 ==== Reagents ====
 Just like Necromancer pets, Shadow Knight pets all require [[Bone Chips]] to summon.
@@ -1260,6 +1260,34 @@ Detail: pet will temporarily forget all prior commands and attempt to attack the
 
 Special Note: you may also use the alternative version of this command /pet kill
 PvP Note: unless Player versus Player is enabled, you cannot add a player or a player charmed NPC to a pet's Hate List.
+
+=== Command: /pet spellhold ===
+
+UI Button: spellhold
+
+Effect: Prevents the pet from casting spells. 
+
+Detail: Pet will refrain from casting any of their available spells. Persists between summons, so will also prevent pets from buffing themselves on summoning. Can be useful if you want your pet to focus ''only'' on melee for pure damage and jump directly into battle, but prevents the pet from casting any heals or lifetaps which may extend its life.
+
+=== Command: /pet hold ===
+
+Unlock: Companion's Discipline AA
+
+Effect: Causes the pet to hold its attacks. It ignores its Hate List and goes into Free mode, resuming its regular movement (either follow, guard, or sit).
+
+Detail: This command does not clear the pet's hate list, the pet will remain "held" until you give it an attack command at which time it will attempt to attack the target at the top of its hate list. After this, it will continue to attack other enemies on its hate list or new enemies added to its hate list. A pet's hate list is frozen while it is "held", which means it does not add anyone to its hate list even if attacked, but anyone on its list before being told to "hold" remains on the list.
+
+After telling your pet to hold, you can use /pet back off to ensure your pet's hate list is clear.
+
+=== Command: /pet ghold ===
+
+Unlock: Companion's Discipline AA
+
+Effect: This command is a toggle. Using "/pet ghold" will toggle between on/off, but "/pet ghold on" and "/pet ghold off" also work. When this state is toggled on, the pet will not attack anyone unless you explicitly tell them to.
+
+Detail: This command prevents any enemies from being added onto your pet's hate list, except if you explicitly tell them to attack. This gives complete control over who your pet will and will not attack. However, in chaotic fights against many enemies it can result in your pet standing around watching unless you tell your pet to attack each and every enemy.
+
+Telling your pet "/pet back off" clears the list of any targets you have given it and it goes back to not fighting anything.
 
 === Command: /pet kill name ===
 
@@ -1334,25 +1362,5 @@ Special Note: This command will target special pets that borrow the name of thei
 Effect: Clears your pet's command list
 
 Detail: This tells your pet to revert to a free state. If the pet is currently under /pet follow, or /pet guard me, it will revert to a /pet sit state. If it is chasing an NPC, and /pet as you were, followed by /pet back off is issued, the pet will continue off in its direction of travel. This command does not break /pet hold.
-
-=== Command: /pet hold ===
-
-Unlock: Companion's Discipline AA
-
-Effect: Causes the pet to hold its attacks. It ignores its Hate List and goes into Free mode, resuming its regular movement (either follow, guard, or sit).
-
-Detail: This command does not clear the pet's hate list, the pet will remain "held" until you give it an attack command at which time it will attempt to attack the target at the top of its hate list. After this, it will continue to attack other enemies on its hate list or new enemies added to its hate list. A pet's hate list is frozen while it is "held", which means it does not add anyone to its hate list even if attacked, but anyone on its list before being told to "hold" remains on the list.
-
-After telling your pet to hold, you can use /pet back off to ensure your pet's hate list is clear.
-
-=== Command: /pet ghold ===
-
-Unlock: Companion's Discipline AA
-
-Effect: This command is a toggle. Using "/pet ghold" will toggle between on/off, but "/pet ghold on" and "/pet ghold off" also work. When this state is toggled on, the pet will not attack anyone unless you explicitly tell them to.
-
-Detail: This command prevents any enemies from being added onto your pet's hate list, except if you explicitly tell them to attack. This gives complete control over who your pet will and will not attack. However, in chaotic fights against many enemies it can result in your pet standing around watching unless you tell your pet to attack each and every enemy.
-
-Telling your pet "/pet back off" clears the list of any targets you have given it and it goes back to not fighting anything.
 
 [[Category:Guides]]
