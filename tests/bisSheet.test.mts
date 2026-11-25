@@ -10,7 +10,7 @@ import { buildGearIndex } from '../src/main/planner/gearIndex'
 import { eraHides } from '../src/renderer/src/features/planner/plannerData'
 import type { ClassAbbr } from '../src/shared/classCombo'
 import type { GearRow } from '../src/shared/planner/gear'
-import { buildBisSheet, hasteCounted, isLoreRow, type BisOptions, type BisSheet } from '../src/shared/planner/bisSheet'
+import { alignPairsToWorn, buildBisSheet, hasteCounted, isLoreRow, type BisOptions, type BisSheet } from '../src/shared/planner/bisSheet'
 import { CHIP_KEYS, uniformBoard, type Tier, type TierChip, type TierSetup } from '../src/shared/planner/tierChips'
 import { defaultBoard } from '../src/shared/planner/tierDefaults'
 import { buildTierModel, conversionsFor, deriveChips, type TierModel } from '../src/shared/planner/tierWeights'
@@ -118,6 +118,20 @@ test("each card's score counts haste only above the other slots' best: haste doe
   assert.deepEqual([waistPick.hasteCounted, waistPick.score], [9, 64 * 9], 'the belt is credited only above the gloves: 30 - 21')
   assert.ok(!hands.pick.reasons.some((r) => r.chip === 'HASTE'), 'no haste in the why line')
   assert.deepEqual(hands.runnersUp.map((r) => [r.row.name, r.score]), [['Plain Gloves', 1]], 'runners-up scored the same way')
+})
+
+test('a pair is laid on the side the player wears it: same scores, only the side moves (owner: earring on the other ear)', () => {
+  const bigRing = row('Big Ring', { stats: { STR: 20 } })
+  const s = sheet([row('Bashing Earring', { slots: ['EAR'], flags: ['Lore Item'], stats: { STR: 9 } }), row('Checkmate', { slots: ['EAR'], flags: ['Lore Item'], stats: { STR: 5 } }), bigRing], setup({ STR: 'S' }))
+  const ear = (sh: BisSheet, c: PlanSlotId): string | undefined => sh.cells.find((x) => x.cell === c)?.pick?.row.name
+  const where: PlanSlotId = ear(s, 'EAR') === 'Bashing Earring' ? 'EAR' : 'EAR2'
+  const other: PlanSlotId = where === 'EAR' ? 'EAR2' : 'EAR'
+  const laid = alignPairsToWorn(s, (c) => (c === other ? 'bashing earring' : undefined))
+  assert.equal(ear(laid, other), 'Bashing Earring', 'moved to the ear it is worn in')
+  assert.equal(ear(laid, where), 'Checkmate')
+  assert.equal(laid.total, s.total)
+  assert.deepEqual(laid.cells.map((c) => c.cell), s.cells.map((c) => c.cell), 'the cells keep their order')
+  assert.equal(ear(alignPairsToWorn(s, (c) => (c === where ? 'bashing earring' : undefined)), where), 'Bashing Earring', 'already on its side: nothing moves')
 })
 
 test('hasteCounted: the part above the other haste, both under the cap; a penalty in full', () => {
