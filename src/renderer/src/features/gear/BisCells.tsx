@@ -37,6 +37,8 @@ export interface BisCellsProps {
   classes: readonly ClassAbbr[]
   owned: ReadonlyMap<string, number>
   wishes: BisWishes
+  /** the slider's tier: every item on the sheet, worn ones too, is scaled to it */
+  plus: number
   onOpenLoot?: (item: string) => void
 }
 
@@ -173,8 +175,9 @@ function Card({ cell, props, open, onToggle }: { cell: BisCell; props: BisCellsP
       placement="right-start"
       enterDelay={350}
       enterNextDelay={200}
-      title={<BisCompare cell={cell} worn={worn} model={props.model} setup={props.setup} classes={props.classes} />}
-      slotProps={{ tooltip: { sx: { maxWidth: 400, bgcolor: 'background.paper', color: 'text.primary', border: 1, borderColor: 'divider', boxShadow: 4 } } }}
+      title={<BisCompare cell={cell} worn={worn} model={props.model} setup={props.setup} classes={props.classes} plus={props.plus} />}
+      // SOLID, NOT THE THEME'S PAPER: the owner's screenshot showed the cards behind bleeding through it.
+      slotProps={{ tooltip: { sx: { maxWidth: 400, bgcolor: (t) => (t.palette.mode === 'dark' ? '#15171d' : '#ffffff'), backgroundImage: 'none', opacity: 1, color: 'text.primary', border: 1, borderColor: 'divider', boxShadow: 8 } } }}
     >
       <Box
         data-testid="bis-cell"
@@ -214,15 +217,15 @@ export default function BisCells(props: BisCellsProps): JSX.Element {
   )
 }
 
-export function BisTotals({ rows }: { rows: readonly TotalsRow[] }): JSX.Element {
+export function BisTotals({ rows, plus }: { rows: readonly TotalsRow[]; plus: number }): JSX.Element {
   return (
     <Table size="small" data-testid="bis-totals">
       <TableHead>
         <TableRow>
           <TableCell>Stat</TableCell>
           <TableCell>Tier</TableCell>
-          <TableCell align="right">Best in slot</TableCell>
-          <TableCell align="right">Worn (+0)</TableCell>
+          <TableCell align="right">{`Best in slot (+${String(plus)})`}</TableCell>
+          <TableCell align="right">{`Worn (+${String(plus)})`}</TableCell>
           <TableCell align="right">Cap</TableCell>
         </TableRow>
       </TableHead>
