@@ -28,6 +28,70 @@ export interface CommunityRelease {
 
 export const COMMUNITY_RELEASE_NOTES: readonly CommunityRelease[] = [
   {
+    "version": "0.1.56",
+    "date": "2026-11-24",
+    "title": "the Best in slot tab, and Send my loot to the wiki",
+    "intro": "Best in slot (new tab in the Gear area, between Gear and Recommended)",
+    "groups": [
+      {
+        "items": [
+          {
+            "text": "Rank the stats you care about on an S-to-F tier board (drag a stat, or click it), and the tab picks the best item for every slot of your character sheet from what your classes can wear. The Gear tab's BEST column scores by the same board."
+          },
+          {
+            "text": "Start from your classes (our reading of Almar's classic class guides, adjusted for Legends) or a role. Save your own boards by name (\"Save as...\") and pick them in the same Start from menu, or copy a board as text to share it."
+          },
+          {
+            "text": "With a weapon ratio in S, damage comes first in the hands and Range; stats only break a tie."
+          },
+          {
+            "text": "Haste does not stack: a slot is only credited for haste above what your other slots give."
+          },
+          {
+            "text": "A Lore item is placed once, and ear, wrist and ring pairs sit on the side you wear them."
+          },
+          {
+            "text": "An amber card means the best item is not what you wear. Hover a slot to compare it with what you wear and see where it drops; click it for the next five, each with its own hover. The + adds an item to your wish list."
+          },
+          {
+            "text": "The upgrade slider scores every item, worn ones too, at the same tier."
+          },
+          {
+            "text": "Set targets (off until you press it): stop counting a stat once the loadout reaches a number, with quick fills for resists at 200 (tanking) and attributes at your stat cap."
+          },
+          {
+            "text": "Owned only, Current era, the detected classes chip, and Clear tiers."
+          }
+        ]
+      },
+      {
+        "heading": "Send my loot to the wiki (Preferences, off by default)",
+        "items": [
+          {
+            "text": "Sends the loot you record to the wiki's drop database, as the wiki's own Eye of Zomm tool does, so wiki loot lists can show drop percentages. Sign in with a wiki bot password (the card walks you through it), then choose to send in the background or only when you press Send."
+          }
+        ]
+      },
+      {
+        "heading": "Small fixes",
+        "items": [
+          {
+            "text": "The /outputfile line's How and Refresh sit right next to the command."
+          }
+        ]
+      },
+      {
+        "heading": "Data",
+        "items": [
+          {
+            "text": "Wiki pages refreshed to today (21 pages changed)."
+          }
+        ]
+      }
+    ],
+    "knownIssues": "Best in slot is new and still an experiment: it does not weigh worn effects, procs or focus effects yet; the stat budget in its hover is our own estimate and does not change the ranking; reincarnation raises the stat cap by an amount the game does not publish, so type your own. Send my loot to the wiki has not been tried against the live wiki yet. When you join a group, only the person whose invite you accepted is known at once; others already in it show under Group once they talk in party or you buff them. A group-mate's mez does not hold a fight open (the log does not say who cast it). The Void motes tab skips Slime Blood of Cazic-Thule and estimates a drop's chance from the size of the mob's loot list, because the wiki lists no drop rates. The archive recovery and the Put back copy have only been tested with simulated failures. The Macros Send has not yet been tried in game: keep the copy it makes until you have logged in and seen your macros. A \"(guessed)\" pet owner can be wrong until /pet who leader settles it. The healing meters still divide by the whole fight's length. A mob or item added to the wiki after this build shows no wiki details until the next build (or a Copy click in Wiki Gaps). Capture finds the game window only when it is titled \"EverQuest Legends\" or \"EverQuest\". The screenshot reader reads English only. The installer is not code-signed, so Windows shows \"Windows protected your PC\" the first time (More info, then Run anyway). Builds before test.20 do not update themselves; install one by hand once."
+  },
+  {
     "version": "0.1.55",
     "date": "2026-11-23",
     "title": "the Community Edition, group meters that count your group, and a clearer Void motes tab",
