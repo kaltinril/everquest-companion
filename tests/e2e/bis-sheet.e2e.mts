@@ -6,7 +6,7 @@
  *
  *   1. the tab sits between Gear and Recommended and mounts the board and the sheet;
  *   2. the board draws the seven lanes and a chip per stat; clicking a chip opens its menu, and
- *      picking Off moves the chip to the Doesn't count lane and marks the board edited;
+ *      picking Unassigned moves the chip to the Unassigned (Off) lane and marks the board edited;
  *   3. the sheet fills (a card per cell, most with an item) and reads the staged
  *      `/outputfile inventory` dump's worn items;
  *   4. the choice survives a relaunch on the same profile (`eq.gear.tiers`), and Reset brings the
@@ -27,7 +27,7 @@ const TAB = '[data-testid="tab-bis"]'
 const VIEW = '[data-testid="bis-view"]'
 const CELL = '[data-testid="bis-cell"]'
 const CELL_ITEM = '[data-testid="bis-cell-item"]'
-const WORN = '[data-testid="bis-cell-worn"]'
+const WORN = '[data-testid="bis-cell"][data-worn]'
 const CHIP_AGI = '[data-testid="bis-chip-AGI"]'
 const OFF_LANE = '[data-testid="bis-lane-Off"]'
 const EDITED = '[data-testid="bis-edited"]'
@@ -60,7 +60,7 @@ async function stepFirstRun(page: Page): Promise<void> {
   await page.click(CHIP_AGI, { timeout: 15_000 })
   check('a chip opens its menu', await until(async () => (await countOf(page, '[data-testid="bis-chip-menu"]')) === 1, 10_000))
   await page.click('[data-testid="bis-menu-Off"]', { timeout: 15_000 })
-  check('Off moves the chip to the Doesn\'t count lane', await until(async () => (await countOf(page, `${OFF_LANE} ${CHIP_AGI}`)) === 1, 10_000))
+  check('Unassigned moves the chip to the Unassigned lane', await until(async () => (await countOf(page, `${OFF_LANE} ${CHIP_AGI}`)) === 1, 10_000))
   check('…and the board reads edited', (await countOf(page, EDITED)) === 1)
 }
 

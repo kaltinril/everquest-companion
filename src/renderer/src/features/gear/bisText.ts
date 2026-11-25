@@ -61,7 +61,7 @@ export function chipHint(chip: TierChip, conv: Conversions, level: number): stri
   if (chip === 'DEX') return 'Bow damage (archery uses DEX in place of STR), proc rate, ranger archery crits.'
   if (chip === 'AGI') return 'Avoidance up to 200; below 75 it costs AC.'
   if (chip === 'RESISTS') return 'The average of fire, cold, magic, disease and poison. About 6 points is 1% resist.'
-  if (chip === 'HASTE') return 'Only your highest worn haste counts, so the loadout counts it once.'
+  if (chip === 'HASTE') return 'Haste does not stack: only your highest worn haste counts. A slot is credited only for haste above what your other slots already give.'
   if (isRatioChip(chip)) return 'Never counted in an Any slot.'
   return undefined
 }
@@ -73,11 +73,67 @@ export function unitText(chip: TierChip, unit: number): string {
 
 export type Tone = 'good' | 'warn' | 'plain'
 
+/**
+ * THE BUDGET IS OUR OWN ESTIMATE AND RANKS NOTHING (owner, 2026-11-24: *"Don't use this weird
+ * calculation you invented, you can show it but don't use it"*). No public formula exists
+ * (agent/MEASURED.md); it is the item's stats in units against the median item of its slot and
+ * drop level, shown in the hover only, and the words say so.
+ */
 export function budgetText(b: ItemBudget | undefined): { text: string; tone: Tone } | undefined {
   if (b === undefined) return undefined
   const pct = Math.round(b.ratio * 100)
   const tone: Tone = pct >= 130 ? 'good' : pct < 80 ? 'warn' : 'plain'
-  return { text: `Budget ${String(pct)}% of a typical ${b.band} ${b.slot.toLowerCase()}`, tone }
+  return { text: `Stat budget estimate: ${String(pct)}% of a typical ${b.band} ${b.slot.toLowerCase()} (our own estimate; it does not change the ranking)`, tone }
+}
+
+/** Why an item's haste counted less than it states: only the highest worn haste counts. Undefined when it all counted. */
+export function hasteNote(stated: number | undefined, counted: number, otherHaste: number): string | undefined {
+  if (stated === undefined || stated <= 0 || counted >= stated) return undefined
+  const head = `Haste ${String(Math.round(stated))}%`
+  if (otherHaste <= 0) return `${head}: ${String(Math.round(counted))}% counts (the haste cap)`
+  return counted > 0
+    ? `${head}: only ${String(Math.round(counted))}% counts, another slot gives ${String(Math.round(otherHaste))}% (haste does not stack)`
+    : `${head}: does not count, another slot gives ${String(Math.round(otherHaste))}% (haste does not stack)`
+}
+
+/** One line of the hover's compare: a stat, the best item's value, the worn item's, and who is ahead. */
+export interface CompareRow {
+  chip: TierChip
+  label: string
+  best: string
+  worn: string
+  /** which side holds more of it */
+  ahead: 'best' | 'worn' | 'same'
+}
+
+/**
+ * The stats on the board (not Unassigned) that either item states, best lane first. Haste reads the
+ * percent each would COUNT in this loadout; ratios are left to `ratioShown`, the caller's
+ * does-it-swing-here verdict.
+ */
+export function compareRows(
+  best: Partial<Record<TierChip, number>>,
+  worn: Partial<Record<TierChip, number>>,
+  setup: TierSetup,
+  ratioShown: (chip: TierChip) => boolean
+): CompareRow[] {
+  const chips = activeChips(setup.split).filter(
+    (c) => setup.board[c] !== 'Off' && (best[c] !== undefined || worn[c] !== undefined) && (!isRatioChip(c) || ratioShown(c))
+  )
+  const rank = (c: TierChip): number => RANKED_TIERS.indexOf(setup.board[c] as never)
+  chips.sort((a, b) => rank(a) - rank(b))
+  return chips.map((chip) => {
+    const b = best[chip] ?? 0
+    const w = worn[chip] ?? 0
+    const eps = isRatioChip(chip) ? 0.005 : 0.05
+    return {
+      chip,
+      label: shortLabel(chip),
+      best: best[chip] === undefined ? '-' : chipValueText(chip, b),
+      worn: worn[chip] === undefined ? '-' : chipValueText(chip, w),
+      ahead: Math.abs(b - w) < eps ? 'same' : b > w ? 'best' : 'worn'
+    }
+  })
 }
 
 export function cellLabel(cell: PlanSlotId): string {

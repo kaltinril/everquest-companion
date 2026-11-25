@@ -3,27 +3,31 @@
 //
 // IT OWNS THE LAYOUT AND THE CHOICES. The scoring is shared/planner/tierWeights.ts, the defaults
 // tierDefaults.ts, the sheet bisSheet.ts; what is worn is the Gear tab's own join (`useGearCompare`,
-// read at base), the classes are the area's shared pick (`useGearClasses`), and the board is stored
-// at `eq.gear.tiers`, where the Gear tab's BEST column reads it too.
+// read at base), the classes are the area's shared pick (`useGearClasses`, with the Gear tab's
+// "detected" chip), and the board is stored at `eq.gear.tiers`, where the Gear tab's BEST column
+// reads it too. Named boards are `eq.gear.tierLists` (BisSavedLists.tsx).
 
-import { useMemo, type JSX } from 'react'
+import { useCallback, useMemo, type JSX } from 'react'
 import { Box, Chip, MenuItem, Stack, TextField, Typography } from '@mui/material'
 import { CLASS_ABBRS, type ClassAbbr } from '@shared/classCombo'
 import { ITEM_UPGRADE_BASE } from '@shared/itemUpgrade'
 import { buildBisSheet, usableBy } from '@shared/planner/bisSheet'
 import type { GearRow } from '@shared/planner/gear'
 import { activeChips, type TierChip, type TierSetup } from '@shared/planner/tierChips'
-import { PRESET_LABEL, TIER_PRESETS, type TierPreset } from '@shared/planner/tierDefaults'
-import { tierScore, type TierModel } from '@shared/planner/tierWeights'
+import { GUIDE_CREDIT, PRESET_LABEL, TIER_PRESETS, type TierPreset } from '@shared/planner/tierDefaults'
+import type { TierModel } from '@shared/planner/tierWeights'
 import type { PlanSlotId } from '@shared/planner/types'
 import { classDisplayName } from '@shared/spellLevels'
 import type { View } from '../../appViews'
 import ChipMultiSelect from '../../components/ChipMultiSelect'
 import OutputKindLine from '../../components/OutputKindLine'
-import BisCells, { BisTotals, type WornCell } from './BisCells'
-import { activeSetup, clampLevel, withPasted, withSplit, type BisPrefs } from './bisPrefs'
+import { useWishlist } from '../wishlist/useWishlist'
+import { wishFromGear } from '../wishlist/wishSearch'
+import BisCells, { BisTotals, type BisWishes, type WornCell } from './BisCells'
+import BisSavedLists from './BisSavedLists'
+import { activeSetup, clampLevel, withCleared, withLoadedBoard, withPasted, withSplit, type BisPrefs } from './bisPrefs'
 import { loadoutTotals, ownedCopies, totalsRows } from './bisText'
-import { useEraHidden, useGearClasses, useGearCompare, useGearIndex, useGearOwnership, type GearCompareData } from './gearData'
+import { useEraHidden, useGearClasses, useGearCompare, useGearIndex, useGearOwnership, type GearClasses, type GearCompareData } from './gearData'
 import TierBoard from './TierBoard'
 import { useBisPrefs, useTierModel } from './useBisData'
 
@@ -31,18 +35,18 @@ export interface BisViewProps {
   onOpenLoot?: (item: string) => void
 }
 
-/** What is worn in each cell (the dump's join), scored on the board at +0. */
-function useWorn(compare: GearCompareData, model: TierModel, setup: TierSetup, classes: readonly ClassAbbr[]): { cells: Map<PlanSlotId, WornCell>; rows: GearRow[] } {
+/** What is worn in each cell (the dump's join), with the item data's row when it knows the item. */
+function useWorn(compare: GearCompareData): { cells: Map<PlanSlotId, WornCell>; rows: GearRow[] } {
   return useMemo(() => {
     const cells = new Map<PlanSlotId, WornCell>()
     const rows: GearRow[] = []
     for (const [cell, host] of compare.equipped) {
       const row = compare.byKey.get(host.key)
       if (row !== undefined) rows.push(row)
-      cells.set(cell, { name: host.name, tier: host.tier, score: row === undefined ? undefined : tierScore(row, { model, setup, slot: cell, classes }) })
+      cells.set(cell, { name: host.name, tier: host.tier, row })
     }
     return { cells, rows }
-  }, [compare, model, setup, classes])
+  }, [compare])
 }
 
 /** The chips some item the player could wear states: the rest are drawn faded. */
@@ -57,18 +61,46 @@ function useStated(rows: readonly GearRow[], model: TierModel, classes: readonly
   }, [rows, model, classes, admit])
 }
 
-function Controls({ prefs, setPrefs, classes, onClasses }: { prefs: BisPrefs; setPrefs: (p: BisPrefs) => void; classes: ClassAbbr[]; onClasses: (c: ClassAbbr[]) => void }): JSX.Element {
+/** The wish list's door, the Gear table's way (`useGearWishes` in GearView.tsx). */
+function useBisWishes(): BisWishes {
+  const wishlist = useWishlist()
+  const entries = wishlist.list.entries
+  const wished = useMemo(() => new Set(entries.map((e) => e.itemKey)), [entries])
+  const { add, remove } = wishlist
+  const onToggle = useCallback((row: GearRow, wasWished: boolean) => (wasWished ? remove(row.key) : add(wishFromGear(row, Date.now()))), [add, remove])
+  return { wished, onToggle: wishlist.ready ? onToggle : undefined }
+}
+
+function Controls({ prefs, setPrefs, classes }: { prefs: BisPrefs; setPrefs: (p: BisPrefs) => void; classes: GearClasses }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap data-testid="bis-controls">
-      <ChipMultiSelect options={CLASS_ABBRS} value={classes} onChange={onClasses} label="Classes" placeholder="every class" optionLabel={classDisplayName} minWidth={190} testId="bis-classes" />
-      <TextField select size="small" label="Start from" value={prefs.preset} onChange={(e) => setPrefs({ ...prefs, preset: e.target.value as TierPreset, board: null, caps: {} })} sx={{ minWidth: 200 }} slotProps={{ htmlInput: { 'data-testid': 'bis-preset' } }}>
-        {TIER_PRESETS.map((p) => <MenuItem key={p} value={p}>{PRESET_LABEL[p]}</MenuItem>)}
-      </TextField>
-      <Chip size="small" variant="outlined" label="Reset board" data-testid="bis-reset" onClick={() => setPrefs({ ...prefs, board: null, caps: {} })} />
-      {prefs.board !== null && <Chip size="small" color="warning" variant="outlined" label="edited" data-testid="bis-edited" />}
-      <TextField size="small" type="number" label="Level" value={prefs.level} onChange={(e) => setPrefs({ ...prefs, level: clampLevel(Number(e.target.value)) })} sx={{ width: 90 }} slotProps={{ htmlInput: { min: 1, max: 70, 'data-testid': 'bis-level' } }} />
-      <Chip size="small" label="Current era" data-testid="bis-era" color={prefs.era ? 'primary' : 'default'} variant={prefs.era ? 'filled' : 'outlined'} onClick={() => setPrefs({ ...prefs, era: !prefs.era })} />
-      <Chip size="small" label="Owned only" data-testid="bis-owned" color={prefs.owned ? 'primary' : 'default'} variant={prefs.owned ? 'filled' : 'outlined'} onClick={() => setPrefs({ ...prefs, owned: !prefs.owned })} />
+    <Stack spacing={0.5}>
+      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap data-testid="bis-controls">
+        <ChipMultiSelect options={CLASS_ABBRS} value={classes.classes} onChange={classes.set} label="Classes" placeholder="every class" optionLabel={classDisplayName} minWidth={190} testId="bis-classes" />
+        {classes.offer !== null && (
+          <Chip
+            size="small"
+            color="warning"
+            variant="outlined"
+            label={`detected: ${classes.offer.map(classDisplayName).join(', ')}`}
+            data-testid="bis-class-offer"
+            title="What the app currently infers you are running. Click to rank for it."
+            onClick={classes.adopt}
+          />
+        )}
+        <TextField select size="small" label="Start from" value={prefs.preset} onChange={(e) => setPrefs({ ...prefs, preset: e.target.value as TierPreset, board: null, caps: {} })} sx={{ minWidth: 200 }} slotProps={{ htmlInput: { 'data-testid': 'bis-preset' } }}>
+          {TIER_PRESETS.map((p) => <MenuItem key={p} value={p}>{PRESET_LABEL[p]}</MenuItem>)}
+        </TextField>
+        <Chip size="small" variant="outlined" label="Reset board" data-testid="bis-reset" onClick={() => setPrefs({ ...prefs, board: null, caps: {} })} />
+        {prefs.board !== null && <Chip size="small" color="warning" variant="outlined" label="edited" data-testid="bis-edited" />}
+        <TextField size="small" type="number" label="Level" value={prefs.level} onChange={(e) => setPrefs({ ...prefs, level: clampLevel(Number(e.target.value)) })} sx={{ width: 90 }} slotProps={{ htmlInput: { min: 1, max: 70, 'data-testid': 'bis-level' } }} />
+        <Chip size="small" label="Current era" data-testid="bis-era" color={prefs.era ? 'primary' : 'default'} variant={prefs.era ? 'filled' : 'outlined'} onClick={() => setPrefs({ ...prefs, era: !prefs.era })} />
+        <Chip size="small" label="Owned only" data-testid="bis-owned" color={prefs.owned ? 'primary' : 'default'} variant={prefs.owned ? 'filled' : 'outlined'} onClick={() => setPrefs({ ...prefs, owned: !prefs.owned })} />
+      </Stack>
+      {prefs.preset === 'classes' && (
+        <Typography variant="caption" color="text.secondary" data-testid="bis-credit">
+          {GUIDE_CREDIT}
+        </Typography>
+      )}
     </Stack>
   )
 }
@@ -81,6 +113,7 @@ export default function BisView({ onOpenLoot }: BisViewProps = {}): JSX.Element 
   const ownership = useGearOwnership()
   const compare = useGearCompare(rows, ITEM_UPGRADE_BASE)
   const model = useTierModel(rows, classes.classes, prefs.level)
+  const wishes = useBisWishes()
   const setup = useMemo(() => activeSetup(prefs, classes.classes), [prefs, classes.classes])
   const owned = useMemo(() => ownedCopies(ownership.map), [ownership.map])
   const admit = useMemo(() => (prefs.era ? (r: GearRow) => !eraHidden(r) : () => true), [prefs.era, eraHidden])
@@ -88,7 +121,7 @@ export default function BisView({ onOpenLoot }: BisViewProps = {}): JSX.Element 
     () => buildBisSheet({ rows, setup, model, classes: classes.classes, admit, owned: prefs.owned ? owned : undefined }),
     [rows, setup, model, classes.classes, admit, owned, prefs.owned]
   )
-  const worn = useWorn(compare, model, setup, classes.classes)
+  const worn = useWorn(compare)
   const stated = useStated(rows, model, classes.classes, admit)
   const totals = useMemo(() => totalsRows(sheet.totals, loadoutTotals(worn.rows, model, setup.split), setup), [sheet, worn, model, setup])
   const lane = (chip: TierChip, tier: TierSetup['board'][TierChip]): void => setPrefs({ ...prefs, board: { ...setup.board, [chip]: tier } })
@@ -104,30 +137,34 @@ export default function BisView({ onOpenLoot }: BisViewProps = {}): JSX.Element 
   return (
     <Box data-testid="bis-view" sx={{ display: 'flex', flexDirection: 'column', gap: 1, height: '100%', minHeight: 0, overflow: 'auto', pr: 0.5 }}>
       <OutputKindLine kind="inventory" quiet testId="bis-dump-line" />
-      <Controls prefs={prefs} setPrefs={setPrefs} classes={classes.classes} onClasses={classes.set} />
+      <Controls prefs={prefs} setPrefs={setPrefs} classes={classes} />
       <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 440px) minmax(0, 1fr)' }, alignItems: 'start' }}>
-        <TierBoard
-          setup={setup}
-          model={model}
-          level={prefs.level}
-          stated={stated}
-          onLane={lane}
-          onCap={cap}
-          onStep={(step) => setPrefs({ ...prefs, step })}
-          onSplit={() => setPrefs(withSplit(prefs))}
-          onLoad={(text) => {
-            const next = withPasted(prefs, classes.classes, text)
-            if (next !== undefined) setPrefs(next)
-            return next !== undefined
-          }}
-        />
+        <Stack spacing={1.5}>
+          <TierBoard
+            setup={setup}
+            model={model}
+            level={prefs.level}
+            stated={stated}
+            onLane={lane}
+            onCap={cap}
+            onStep={(step) => setPrefs({ ...prefs, step })}
+            onSplit={() => setPrefs(withSplit(prefs))}
+            onClear={() => setPrefs(withCleared(prefs))}
+            onLoad={(text) => {
+              const next = withPasted(prefs, classes.classes, text)
+              if (next !== undefined) setPrefs(next)
+              return next !== undefined
+            }}
+          />
+          <BisSavedLists setup={setup} onLoad={(saved) => setPrefs(withLoadedBoard(prefs, saved))} />
+        </Stack>
         <Stack spacing={1} sx={{ minWidth: 0 }}>
           <Typography variant="caption" color="text.secondary" data-testid="bis-summary">
             {`${String(sheet.filled)} of ${String(sheet.cells.length)} slots filled · board total ${sheet.total.toFixed(1)} · ${String(activeChips(setup.split).filter((c) => setup.board[c] !== 'Off').length)} stats count`}
           </Typography>
-          <BisCells sheet={sheet} worn={worn.cells} model={model} owned={owned} onOpenLoot={onOpenLoot} />
+          <BisCells sheet={sheet} worn={worn.cells} model={model} setup={setup} classes={classes.classes} owned={owned} wishes={wishes} onOpenLoot={onOpenLoot} />
           <Typography variant="caption" color="text.secondary">
-            Click a slot for the next five. Weapon ratios count only in Primary, Secondary and Range, never in an Any slot. A Lore item is placed once; any other item may fill both rings, both ears, both wrists. Haste counts once for the whole loadout. Budget compares an item&apos;s total stats, on your classes, with the typical item of its slot and drop level.
+            Hover a slot to compare its best item with what you wear and see where it drops; click it for the next five. An amber border means the best item is not what you wear. Haste does not stack: a slot is credited only for haste above what your other slots give. Weapon ratios count only in Primary, Secondary and Range, never in an Any slot. A Lore item is placed once; any other item may fill both rings, both ears, both wrists.
           </Typography>
         </Stack>
       </Box>

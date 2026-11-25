@@ -44,15 +44,23 @@ export interface BisOptions {
 
 export interface BisPick {
   row: GearRow
-  /** the item's points in this cell, its own haste counted as if it were the only haste worn */
+  /**
+   * the item's points in this cell, with haste counted only ABOVE the best haste the rest of the
+   * loadout already gives (owner, 2026-11-24: *"you cant' stack HASTE items ... you just get the
+   * highest haste amongst all the items with haste"*)
+   */
   score: number
+  /** the haste percent that counted in `score`: 0 when another cell already gives as much; negative = a penalty */
+  hasteCounted: number
 }
 
 export interface BisCell {
   cell: PlanSlotId
   pick?: BisPick & { reasons: TierTerm[] }
-  /** the next best in this cell, picked or not elsewhere */
+  /** the next best in this cell, picked or not elsewhere, scored against the same other-haste */
   runnersUp: BisPick[]
+  /** the best haste percent the picks in the OTHER cells give (0 when none) */
+  otherHaste: number
   /** SECONDARY left empty because a two-hander sits in PRIMARY */
   closedByTwoHander?: true
 }
@@ -104,9 +112,38 @@ function copiesOf(row: GearRow, owned: ReadonlyMap<string, number> | undefined):
   return owned === undefined ? cap : Math.min(cap, owned.get(row.key) ?? 0)
 }
 
-function hastePerPercent(opts: BisOptions): number {
+function hastePerPercent(opts: Pick<BisOptions, 'setup' | 'model'>): number {
   if (!activeChips(opts.setup.split).includes('HASTE')) return 0
   return tierWeight(opts.setup.board.HASTE, opts.setup.step) / opts.model.units.HASTE
+}
+
+/**
+ * The haste percent an item adds when `other` is already worn: worn haste does not stack, only the
+ * highest counts, so it is the part above `other` (each side under the HASTE cap). A penalty
+ * (negative haste) always counts in full.
+ */
+export function hasteCounted(haste: number, other: number, cap: number | undefined): number {
+  if (haste <= 0) return haste
+  const under = (h: number): number => (cap === undefined ? h : Math.min(h, cap))
+  return Math.max(0, under(haste) - under(Math.max(0, other)))
+}
+
+/** An item's score in one cell beside a loadout whose other cells give `otherHaste`. */
+export interface CellScore {
+  score: number
+  hasteCounted: number
+  /** the terms, HASTE as counted, best first */
+  terms: TierTerm[]
+}
+
+/** What each card, each runner-up and the worn compare read, so the three can never disagree. */
+export function cellScore(row: GearRow, cell: PlanSlotId, otherHaste: number, opts: Pick<BisOptions, 'setup' | 'model' | 'classes'>): CellScore {
+  const terms = tierTerms(row, { model: opts.model, setup: opts.setup, slot: cell, classes: opts.classes, skipHaste: true })
+  const counted = hasteCounted(row.stats.HASTE ?? 0, otherHaste, opts.setup.caps.HASTE)
+  const rate = hastePerPercent(opts)
+  if (counted !== 0 && rate !== 0) terms.push({ chip: 'HASTE', value: counted, points: counted * rate })
+  terms.sort((a, b) => b.points - a.points)
+  return { score: round3(terms.reduce((sum, t) => sum + t.points, 0)), hasteCounted: counted, terms }
 }
 
 /** Every admitted row in one cell, scored and sorted best-first. */
@@ -168,15 +205,29 @@ function solveWithCaps(lists: readonly Scored[][], start: readonly number[], rul
   return { choice: choice.map((j, i) => (j < 0 ? -1 : lists[i].indexOf(pools[i][j]))), total }
 }
 
-function readCell(cell: PlanSlotId, list: readonly Scored[], index: number, opts: BisOptions): BisCell {
+/** How far down a cell's list the runners-up are re-scored against the loadout's haste before the top five are kept. */
+const RUNNER_POOL = 40
+
+function readCell(cell: PlanSlotId, list: readonly Scored[], index: number, { otherHaste, opts }: { otherHaste: number; opts: BisOptions }): BisCell {
   const picked = index >= 0 ? list[index] : undefined
-  const runnersUp = list.filter((s) => s !== picked).slice(0, RUNNERS_UP).map((s) => ({ row: s.row, score: s.display }))
-  if (picked === undefined) return { cell, runnersUp }
-  const reasons = tierTerms(picked.row, { model: opts.model, setup: opts.setup, slot: cell, classes: opts.classes })
-    .filter((t) => t.points > 0)
-    .sort((a, b) => b.points - a.points)
-    .slice(0, REASONS)
-  return { cell, pick: { row: picked.row, score: picked.display, reasons }, runnersUp }
+  const runnersUp = list
+    .filter((s) => s !== picked)
+    .slice(0, RUNNER_POOL)
+    .map((s) => {
+      const c = cellScore(s.row, cell, otherHaste, opts)
+      return { row: s.row, score: c.score, hasteCounted: c.hasteCounted }
+    })
+    .sort((a, b) => b.score - a.score || a.row.name.localeCompare(b.row.name))
+    .slice(0, RUNNERS_UP)
+  if (picked === undefined) return { cell, runnersUp, otherHaste }
+  const c = cellScore(picked.row, cell, otherHaste, opts)
+  const reasons = c.terms.filter((t) => t.points > 0).slice(0, REASONS)
+  return { cell, pick: { row: picked.row, score: c.score, hasteCounted: c.hasteCounted, reasons }, runnersUp, otherHaste }
+}
+
+/** Per cell, the best positive haste among the picks in every OTHER cell. */
+function othersHaste(picks: readonly (Scored | undefined)[]): number[] {
+  return picks.map((_, i) => picks.reduce((best, p, j) => (j === i || p === undefined ? best : Math.max(best, p.haste)), 0))
 }
 
 /** What one picked item gives, added into the loadout's totals. */
@@ -204,13 +255,14 @@ export function buildBisSheet(opts: BisOptions): BisSheet {
   const { choice, total } = rules === undefined ? exact : solveWithCaps(lists, exact.choice, rules)
   const byCell = new Map<PlanSlotId, BisCell>()
   const totals: Partial<Record<TierChip, number>> = {}
+  const other = othersHaste(order.map((_, i) => (choice[i] >= 0 ? lists[i][choice[i]] : undefined)))
   order.forEach((cell, i) => {
-    const read = readCell(cell, lists[i], choice[i], opts)
+    const read = readCell(cell, lists[i], choice[i], { otherHaste: other[i], opts })
     if (read.pick !== undefined) addTotals(totals, read.pick.row, opts)
     byCell.set(cell, read)
   })
   const secondary = byCell.get('SECONDARY')
   if (secondary !== undefined && gearHandedness(byCell.get('PRIMARY')?.pick?.row.skill) === '2h') secondary.closedByTwoHander = true
-  const cellsOut = PLAN_SLOTS.map((cell) => byCell.get(cell) ?? { cell, runnersUp: [] })
+  const cellsOut = PLAN_SLOTS.map((cell) => byCell.get(cell) ?? { cell, runnersUp: [], otherHaste: 0 })
   return { cells: cellsOut, total: round3(total), totals, filled: cellsOut.filter((c) => c.pick !== undefined).length }
 }

@@ -10,7 +10,7 @@ import { buildGearIndex } from '../src/main/planner/gearIndex'
 import { eraHides } from '../src/renderer/src/features/planner/plannerData'
 import type { ClassAbbr } from '../src/shared/classCombo'
 import type { GearRow } from '../src/shared/planner/gear'
-import { buildBisSheet, isLoreRow, type BisOptions, type BisSheet } from '../src/shared/planner/bisSheet'
+import { buildBisSheet, hasteCounted, isLoreRow, type BisOptions, type BisSheet } from '../src/shared/planner/bisSheet'
 import { CHIP_KEYS, uniformBoard, type Tier, type TierChip, type TierSetup } from '../src/shared/planner/tierChips'
 import { defaultBoard } from '../src/shared/planner/tierDefaults'
 import { buildTierModel, conversionsFor, deriveChips, type TierModel } from '../src/shared/planner/tierWeights'
@@ -103,6 +103,27 @@ test('haste is counted once per loadout: a second haste item is worth only its o
   assert.equal(pickOf(s, 'BACK'), 'Plated Cloak')
   assert.equal(s.total, 64 * 30 + 3 * 5, 'the belt once; the plated cloak in BACK and both ANY cells')
   assert.equal(s.totals.HASTE, 30)
+})
+
+test("each card's score counts haste only above the other slots' best: haste does not stack (owner R1)", () => {
+  const belt = row('Haste Belt', { slots: ['WAIST'], stats: { HASTE: 30 } })
+  const gloves = row('Haste Gloves', { slots: ['HANDS'], stats: { HASTE: 21, AC: 2 } })
+  const plainGloves = row('Plain Gloves', { slots: ['HANDS'], stats: { AC: 1 } })
+  const s = sheet([belt, gloves, plainGloves], setup({ HASTE: 'S', AC: 'C' }))
+  const hands = s.cells.find((c) => c.cell === 'HANDS')
+  const waistPick = s.cells.find((c) => c.cell === 'WAIST')?.pick
+  assert.ok(hands?.pick !== undefined && waistPick !== undefined)
+  assert.equal(hands.pick.row.name, 'Haste Gloves', 'its AC still makes it the best gloves')
+  assert.deepEqual([hands.pick.hasteCounted, hands.pick.score, hands.otherHaste], [0, 2, 30], 'the belt already gives more haste: its AC alone (C is 1 a point here)')
+  assert.deepEqual([waistPick.hasteCounted, waistPick.score], [9, 64 * 9], 'the belt is credited only above the gloves: 30 - 21')
+  assert.ok(!hands.pick.reasons.some((r) => r.chip === 'HASTE'), 'no haste in the why line')
+  assert.deepEqual(hands.runnersUp.map((r) => [r.row.name, r.score]), [['Plain Gloves', 1]], 'runners-up scored the same way')
+})
+
+test('hasteCounted: the part above the other haste, both under the cap; a penalty in full', () => {
+  assert.equal(hasteCounted(30, 36, undefined), 0)
+  assert.equal(hasteCounted(41, 36, 40), 4, 'both sides under the cap')
+  assert.equal(hasteCounted(-5, 36, undefined), -5, 'a penalty always counts')
 })
 
 test('a cap stops a stat counting above it, and the loadout fills with other stats instead (owner)', () => {

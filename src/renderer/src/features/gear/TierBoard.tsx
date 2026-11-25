@@ -1,7 +1,8 @@
 // gear/TierBoard.tsx — THE S-TO-F BOARD (Malkil, 2026-11-24: *"assigning each stat a tier using a
 // drag-and-drop S, A, B, C, D, F system"*; owner: the reference image *"should be saved and be the one
 // actually used"*). Six lanes in the image's colours, the Off lane under them (the owner's *"cross a
-// stat off"*), chips dragged between lanes with the browser's own drag and drop (as
+// stat off"*; named Unassigned since the owner's 2026-11-24 R1 pass), chips dragged
+// between lanes with the browser's own drag and drop (as
 // features/macros/ButtonGrid.tsx), or clicked for a menu, so nothing is drag-only.
 
 import { useState, type DragEvent, type JSX } from 'react'
@@ -32,6 +33,8 @@ export interface TierBoardProps {
   onCap: (chip: TierChip, cap: number | undefined) => void
   onStep: (step: TierStep) => void
   onSplit: () => void
+  /** every stat to Unassigned */
+  onClear: () => void
   /** a pasted board; false when the text is not one */
   onLoad: (text: string) => boolean
 }
@@ -40,7 +43,7 @@ const FAMILY_BG = { weapon: '#3a2f22', resist: '#22313a', pool: '#2b2540', plain
 const DRAG_TYPE = 'text/plain'
 
 function laneTitle(t: Tier): string {
-  return t === 'Off' ? "Doesn't count" : t
+  return t === 'Off' ? 'Unassigned' : t
 }
 
 function BoardChip({ chip, setup, faded, onOpen }: { chip: TierChip; setup: TierSetup; faded: boolean; onOpen: (el: HTMLElement, chip: TierChip) => void }): JSX.Element {
@@ -94,7 +97,7 @@ function Lane({ tier, props, onOpen }: { tier: Tier; props: TierBoardProps; onOp
   return (
     <Box data-testid={`bis-lane-${tier}`} sx={{ display: 'grid', gridTemplateColumns: '64px 1fr', minHeight: 52 }}>
       <Box sx={{ bgcolor: LANE_COLOUR[tier], color: tier === 'Off' ? '#e7e3d8' : LANE_INK, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', lineHeight: 1.1 }}>
-        <Typography sx={{ fontSize: tier === 'Off' ? 12 : 22, fontWeight: tier === 'Off' ? 700 : 500, color: 'inherit' }}>{laneTitle(tier)}</Typography>
+        <Typography sx={{ fontSize: tier === 'Off' ? 11 : 22, fontWeight: tier === 'Off' ? 700 : 500, color: 'inherit' }}>{laneTitle(tier)}</Typography>
         {tier !== 'Off' && <Typography sx={{ fontSize: 10, fontWeight: 700, opacity: 0.75, color: 'inherit' }}>x{Number(weight.toPrecision(3))}</Typography>}
       </Box>
       <Box
@@ -129,7 +132,7 @@ function ChipMenu({ chip, anchor, props, onClose }: { chip: TierChip; anchor: HT
   }
   return (
     <Popover open anchorEl={anchor} onClose={onClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
-      <Stack spacing={1} sx={{ p: 1.5, width: 280 }} data-testid="bis-chip-menu">
+      <Stack spacing={1} sx={{ p: 1.5, width: 360 }} data-testid="bis-chip-menu">
         <Typography variant="subtitle2">{chipLabel(chip)}</Typography>
         <Stack direction="row" spacing={0.5}>
           {TIERS.map((t) => (
@@ -143,7 +146,7 @@ function ChipMenu({ chip, anchor, props, onClose }: { chip: TierChip; anchor: HT
               }}
               sx={{ minWidth: 0, flex: 1, bgcolor: LANE_COLOUR[t], color: t === 'Off' ? '#e7e3d8' : LANE_INK, fontWeight: 700, outline: props.setup.board[chip] === t ? '2px solid #fff' : 'none', '&:hover': { bgcolor: LANE_COLOUR[t], opacity: 0.85 } }}
             >
-              {t}
+              {laneTitle(t)}
             </Button>
           ))}
         </Stack>
@@ -213,9 +216,12 @@ export default function TierBoard(props: TierBoardProps): JSX.Element {
         <ToggleButton size="small" value="split" selected={setup.split} onChange={props.onSplit} data-testid="bis-split" sx={{ py: 0.25 }}>
           Split resists
         </ToggleButton>
+        <Button size="small" variant="outlined" color="warning" onClick={props.onClear} data-testid="bis-clear" sx={{ py: 0.25 }}>
+          Clear tiers
+        </Button>
       </Stack>
       <Typography variant="caption" color="text.secondary">
-        Doesn&apos;t count is the cross-off: a stat you have maxed or no longer need. Click a stat for its menu: its tier, what it does, and a cap (it then counts only up to that total across the loadout; Legends caps attributes at 510).
+        Unassigned stats do not count: drop a stat there when you have maxed it or no longer need it. Clear tiers drops every stat there. Click a stat for its menu: its tier, what it does, and a cap (it then counts only up to that total across the loadout; Legends caps attributes at 510).
       </Typography>
       <BoardText setup={setup} onLoad={props.onLoad} />
       {menu !== null && <ChipMenu chip={menu.chip} anchor={menu.anchor} props={props} onClose={() => setMenu(null)} />}
