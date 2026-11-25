@@ -157,8 +157,9 @@ function CardBody({ cell, props, pickWorn }: { cell: BisCell; props: BisCellsPro
   )
 }
 
-function cardBorder(open: boolean, differs: boolean): { border: number; borderColor: string; p: string | number } {
-  return { border: differs ? 2 : 1, borderColor: open ? 'primary.main' : differs ? 'warning.main' : 'divider', p: differs ? '7px' : 1 }
+/** A slot with a suggested change is tinted as well as bordered, so the suggestions stand out in a row of cards (owner: *"can we change the background slightly too not just the border? this way the recomendations POP"*). */
+function cardBorder(open: boolean, differs: boolean): { border: number; borderColor: string; p: string | number; bgcolor: string } {
+  return { border: differs ? 2 : 1, borderColor: open ? 'primary.main' : differs ? 'warning.main' : 'divider', p: differs ? '7px' : 1, bgcolor: differs ? 'rgba(255, 167, 38, 0.13)' : 'background.paper' }
 }
 
 function Card({ cell, props, open, onToggle }: { cell: BisCell; props: BisCellsProps; open: boolean; onToggle: () => void }): JSX.Element {
@@ -182,7 +183,6 @@ function Card({ cell, props, open, onToggle }: { cell: BisCell; props: BisCellsP
         data-worn={worn === undefined ? undefined : 'true'}
         onClick={onToggle}
         sx={{
-          bgcolor: 'background.paper',
           ...cardBorder(open, differs),
           borderRadius: 1,
           display: 'flex',
