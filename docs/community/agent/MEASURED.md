@@ -227,6 +227,47 @@ Re-read from the cached page (`scripts/sources/cache/pages/page-57054.wikitext`)
   one is firing.
 - Slotting a low-level class lowers the DISPLAYED level and everything scaled from it.
 
+### BiS sheet research (2026-11-24): SOURCED, not measured by us
+
+Read from public sources for the Best in slot sheet (`plans/2026-11-24-bis-sheet.md`, Version 2).
+Code: TAKP/EQMacEmu (github.com/EQMacEmu/Server: zone/client_mods.cpp, attack.cpp, mob.cpp,
+client.cpp, special_attacks.cpp, common/ruletypes.h) and EQEmu (github.com/EQEmu/Server,
+zone/client_mods.cpp). Guides: almarsguides.com/eq/endgame/classguides/classic-por/<class>/. Legends
+wiki pages read through `scripts/wiki-call.mts` (ledger): Statistics, Game_Mechanics, Skill_Archery.
+wiki.project1999.com refused the fetch (403).
+
+- HP = L*F/10 + L*F/10*STA'/300; STA' = 255 + (STA-255)/2 above 255. F at 60: WAR 300 (steps up
+  from 220), PAL/SHD 260 (from 210), BER as PAL/SHD (EQEmu), RNG 200, MNK/BRD/ROG/BST 180,
+  CLR/DRU/SHM 150, NEC/WIZ/MAG/ENC 120. HP per STA = L*F/3000. The Legends Game_Mechanics page
+  gives the same factors at 50 and 60.
+- Mana from WIS (CLR DRU SHM PAL RNG BST) or INT (NEC WIZ MAG ENC SHD BRD): S' = S, or 200 +
+  (S-200)/2 above 200, plus 1.5*(S'-100) above 100; Mana = S'*15L/200 + 15L. Per point at 60: 4.5
+  below 100, 11.25 from 100 to 200 (Legends wiki observed 11.27), 5.6 above 200. Hybrids get none
+  before level 9. Multiclass rule: unpublished (eqlegendstools says INT and/or WIS by class mix).
+- STR: melee offense, skill + ATK + (2*STR-150)/3 at STR 75+; raises the average hit, not the max.
+  No effect on archery in Legends: eqlwiki Skill_Archery test, STR 199 to 299 gave no gain (the P99
+  wiki says otherwise for P99).
+- DEX: archery offense in place of STR. Legends test: DEX 139 to 338 took the average bow hit 118
+  to 153 and DPS 34 to 45 (+32%). Proc chance (0.000417 + 0.0000114*DEX) * delay, DEX capped at
+  255 for it. Warrior crit +DEX/90; ranger archery crit +DEX/34.
+- AGI: AC loss below about 38; avoidance -25..0 below 40, +6..+53 from 75 to 200, none above 200;
+  mitigation +AGI/20 above 70.
+- AC: item AC x4/3 except NEC/WIZ/MAG/ENC; anti-twink cap 6L+25 below 50; mitigation softcap 350 to
+  50, then (Velious) WAR 430, PAL/SHD/CLR/BRD 403, RNG/SHM 375, others 350. Legends wiki: "caps
+  are changed in EQL" (unverified).
+- ATK: worn cap 250. Haste: worn haste does not add, the highest counts; item haste capped 10% at
+  level 25 and under; total cap level+25 (1-50), 85 (51-59), 100 (60+).
+- Regen caps: worn mana regen 15, HP regen 30 (60 and under).
+- Caps: classic 255 per stat; Legends 510 (515 for Magician) per eqlwiki Statistics and
+  eqlegendstools; reincarnation raises the softcap +10, excess counts 20%. Resists cap 500.
+- Resists: about 6 points per 1% (eqlwiki, from EQEmu; unverified for Legends); 5%/95% floor and
+  ceiling.
+- Item stat budget: no public point-cost formula (Verant, SOE or EQEmu). Our own fit over the
+  corpus (2026-11-24): items of one drop level and slot vary about 4x in total stats; one attribute
+  is worth about 3 mana and 3 to 6 points of one resist; AC follows armour type, not budget.
+- eqlegendstools.com/char-sheet/ is a Legends BiS planner with per-stat weights 0-100; it
+  publishes no weights.
+
 ## Progression and world
 
 - **A respawn estimate is death-to-death, so it carries the fight** (2026-10-11, owner: timers 1 to

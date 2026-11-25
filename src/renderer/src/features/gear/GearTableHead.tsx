@@ -14,6 +14,8 @@ import type { GearSort, GearSortKey } from './gearFilter'
 
 /** One clause (the tooltip diet): the two gestures, and nothing about where they are stored. */
 const RESIZE_HINT = 'Drag to resize, double-click to fit'
+/** BEST reads the Best in slot tab's board (plans/2026-11-24-bis-sheet.md). */
+const BEST_TITLE = 'Scored by your tier list (Best in slot tab)'
 
 /** Every header's rendered width, read off the DOM — the seed both gestures start from. */
 function seedWidths(headRow: HTMLElement): GearColumnWidths {
@@ -361,7 +363,7 @@ export const GearHead = memo(function GearHead({
           </>
         )}
         {columns.map((c) => (
-          <SortHeader key={c.key} column={c} sort={sort} width={w(c.key, numericColumnWidth(layout, c.key))} align="right" onSort={onSort} onWidths={onWidths} />
+          <SortHeader key={c.key} column={c} sort={sort} width={w(c.key, numericColumnWidth(layout, c.key))} align="right" title={c.key === 'BIS' ? BEST_TITLE : undefined} onSort={onSort} onWidths={onWidths} />
         ))}
         {/* The one column that is not a number and not sortable: it reports a live file, and the
             header carries the two things a reader has to know about it — that a `+N` is its own

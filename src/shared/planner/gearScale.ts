@@ -32,6 +32,8 @@ import {
 } from '../itemUpgrade'
 import type { ClassAbbr } from '../classCombo'
 import { damageRatio } from '../itemStats'
+import type { TierSetup } from './tierChips'
+import type { TierModel } from './tierWeights'
 import { GEAR_STAT_KEYS, type GearRow, type GearStatKey, type GearStats } from './gear'
 // A CYCLE, ON PURPOSE AND SAFE: roleWeights.ts reads `gearRatio`/`gearEffectiveHp` from this file
 // and this file reads `roleValue` from it. Neither touches the other's bindings while a module is
@@ -185,6 +187,12 @@ export interface GearDerivedOpts {
   ignoreHaste?: boolean
   ownedHaste?: number
   classes?: readonly ClassAbbr[]
+  /**
+   * THE PLAYER'S OWN TIER BOARD (Best in slot tab, plans/2026-11-24-bis-sheet.md; owner: the feature
+   * *"will also correct/tie in to our existing BEST stat"*). When present, BEST is the board's score
+   * (`gearFilter.sortValue`); `gearBisValue` below is then not read.
+   */
+  tier?: { model: TierModel; setup: TierSetup }
 }
 
 /** The role model's context for these knobs — the chip is an infinite owned haste, see above. */

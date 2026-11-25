@@ -1,0 +1,157 @@
+// The Best in slot sheet (src/shared/planner/bisSheet.ts, bisSearch.ts, bisCaps.ts;
+// plans/2026-11-24-bis-sheet.md, "The sheet" and "Version 2 design"). The plan's named cases on
+// synthetic rows, then the committed corpus: timing, the lore rule, and Malkil's own ranger board.
+
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
+import itemsJson from '../src/main/data/items.json'
+import type { ItemDbFile } from '../src/main/itemsDb'
+import { buildGearIndex } from '../src/main/planner/gearIndex'
+import { eraHides } from '../src/renderer/src/features/planner/plannerData'
+import type { ClassAbbr } from '../src/shared/classCombo'
+import type { GearRow } from '../src/shared/planner/gear'
+import { buildBisSheet, isLoreRow, type BisOptions, type BisSheet } from '../src/shared/planner/bisSheet'
+import { CHIP_KEYS, uniformBoard, type Tier, type TierChip, type TierSetup } from '../src/shared/planner/tierChips'
+import { defaultBoard } from '../src/shared/planner/tierDefaults'
+import { buildTierModel, conversionsFor, deriveChips, type TierModel } from '../src/shared/planner/tierWeights'
+import type { PlanSlotId } from '../src/shared/planner/types'
+
+function row(name: string, over: Partial<GearRow> = {}): GearRow {
+  return { key: name.toLowerCase(), name, searchKey: name.toLowerCase(), slots: ['FINGER'], classes: [], races: ['ALL'], flags: [], quest: false, playerCrafted: false, stats: {}, effects: [], ...over }
+}
+
+function setup(lanes: Partial<Record<TierChip, Tier>>, over: Partial<TierSetup> = {}): TierSetup {
+  return { board: { ...uniformBoard('Off'), ...lanes }, step: 4, split: false, caps: {}, ...over }
+}
+
+/** Units of 1, so points read as lane weight x value (S 64, C 1). */
+function flatModel(classes: readonly ClassAbbr[] = []): TierModel {
+  const conv = conversionsFor(classes, 60)
+  return { conv, units: Object.fromEntries(CHIP_KEYS.map((c) => [c, 1])) as Record<TierChip, number>, typicalBudget: new Map(), valuesOf: (it) => deriveChips(it, conv) }
+}
+
+function pickOf(sheet: BisSheet, cell: PlanSlotId): string | undefined {
+  return sheet.cells.find((c) => c.cell === cell)?.pick?.row.name
+}
+
+function sheet(rows: GearRow[], s: TierSetup, extra: Partial<BisOptions> = {}): BisSheet {
+  const classes = extra.classes ?? []
+  return buildBisSheet({ rows, setup: s, model: flatModel(classes), classes, ...extra })
+}
+
+const RINGS: PlanSlotId[] = ['FINGER', 'FINGER2', 'ANY1', 'ANY2']
+
+test('two plain rings fill both fingers', () => {
+  const s = sheet([row('Plain Ring', { stats: { STR: 10 } }), row('Lesser Ring', { stats: { STR: 2 } })], setup({ STR: 'S' }))
+  assert.equal(pickOf(s, 'FINGER'), 'Plain Ring')
+  assert.equal(pickOf(s, 'FINGER2'), 'Plain Ring')
+})
+
+test('a Lore Equipped ring is placed once across the sheet, ANY cells included (Malkil)', () => {
+  const lore = row('Lore Ring', { flags: ['Magic Item', 'Lore Equipped'], stats: { STR: 20 } })
+  const s = sheet([lore, row('Plain Ring', { stats: { STR: 5 } })], setup({ STR: 'S' }))
+  assert.equal(RINGS.filter((c) => pickOf(s, c) === 'Lore Ring').length, 1)
+  assert.equal(RINGS.filter((c) => pickOf(s, c) === 'Plain Ring').length, 3)
+  assert.ok(isLoreRow(row('x', { flags: ['LORE EQUPPED'] })), "the wiki's misspelling is lore too")
+  assert.ok(!isLoreRow(row('x', { flags: ['No Trade'] })))
+})
+
+test('a weapon in an ANY cell scores no ratio, whatever the ratio lane (Malkil)', () => {
+  const sword = row('Big Sword', { slots: ['PRIMARY'], skill: '1H Slashing', stats: { DMG: 40, DELAY: 20, STR: 1 } })
+  const swordOnly = sheet([sword], setup({ RATIO_1H: 'S', STR: 'C' }))
+  assert.equal(pickOf(swordOnly, 'PRIMARY'), 'Big Sword')
+  const any = swordOnly.cells.find((c) => c.cell === 'ANY1')?.pick
+  assert.equal(any?.score, 1, 'in ANY the sword is its STR alone')
+  assert.ok(!(any?.reasons ?? []).some((r) => r.chip === 'RATIO_1H'))
+})
+
+test('a two-hander closes the offhand, and is weighed against a one-hander plus the offhand', () => {
+  const axe = row('Greataxe', { slots: ['PRIMARY'], skill: '2H Slashing', stats: { DMG: 60, DELAY: 40 } })
+  const sword = row('Sword', { slots: ['PRIMARY', 'SECONDARY'], skill: '1H Slashing', stats: { DMG: 10, DELAY: 20 } })
+  const shield = row('Tower Shield', { slots: ['SECONDARY'], stats: { AC: 4 } })
+  const axeWins = sheet([axe, sword, shield], setup({ RATIO_2H: 'S', RATIO_1H: 'S', AC: 'F' }), { classes: ['CLR'] })
+  assert.equal(pickOf(axeWins, 'PRIMARY'), 'Greataxe')
+  assert.equal(pickOf(axeWins, 'SECONDARY'), undefined)
+  assert.equal(axeWins.cells.find((c) => c.cell === 'SECONDARY')?.closedByTwoHander, true)
+  const shieldWins = sheet([axe, sword, shield], setup({ RATIO_2H: 'S', RATIO_1H: 'S', AC: 'S' }), { classes: ['CLR'] })
+  assert.equal(pickOf(shieldWins, 'PRIMARY'), 'Sword')
+  assert.equal(pickOf(shieldWins, 'SECONDARY'), 'Tower Shield')
+})
+
+test('the class picks limit the sheet; an item stating no classes is kept', () => {
+  const cleric = row('Cleric Ring', { classes: ['CLR'], stats: { STR: 30 } })
+  const unknown = row('Odd Ring', { classes: [], stats: { STR: 10 } })
+  const s = sheet([cleric, unknown, row('Warrior Ring', { classes: ['WAR'], stats: { STR: 5 } })], setup({ STR: 'S' }), { classes: ['WAR', 'MNK'] })
+  assert.ok(!s.cells.some((c) => c.pick?.row.name === 'Cleric Ring' || c.runnersUp.some((r) => r.row.name === 'Cleric Ring')))
+  assert.equal(pickOf(s, 'FINGER'), 'Odd Ring')
+})
+
+test("INT counts only for INT classes: a warrior's INT ring earns nothing, a wizard's does", () => {
+  const rows = [row('Int Ring', { stats: { INT: 15 } }), row('Str Ring', { stats: { STR: 3 } })]
+  const lanes = setup({ MANA: 'S', STR: 'C' })
+  assert.equal(pickOf(sheet(rows, lanes, { classes: ['WAR'] }), 'FINGER'), 'Str Ring')
+  assert.equal(pickOf(sheet(rows, lanes, { classes: ['WIZ'] }), 'FINGER'), 'Int Ring')
+  assert.equal(defaultBoard('classes', ['WAR']).MANA, 'Off', "and the warrior's board starts mana Off")
+})
+
+test('haste is counted once per loadout: a second haste item is worth only its other stats', () => {
+  const belt = row('Haste Belt', { slots: ['WAIST'], stats: { HASTE: 30 } })
+  const hasteCloak = row('Haste Cloak', { slots: ['BACK'], stats: { HASTE: 30, AC: 1 } })
+  const acCloak = row('Plated Cloak', { slots: ['BACK'], stats: { AC: 5 } })
+  const s = sheet([belt, hasteCloak, acCloak], setup({ HASTE: 'S', AC: 'C' }))
+  assert.equal(pickOf(s, 'WAIST'), 'Haste Belt')
+  assert.equal(pickOf(s, 'BACK'), 'Plated Cloak')
+  assert.equal(s.total, 64 * 30 + 3 * 5, 'the belt once; the plated cloak in BACK and both ANY cells')
+  assert.equal(s.totals.HASTE, 30)
+})
+
+test('a cap stops a stat counting above it, and the loadout fills with other stats instead (owner)', () => {
+  const dex = row('Dex Ring', { stats: { DEX: 10 } })
+  const ac = row('Plated Ring', { stats: { AC: 10 } })
+  const free = sheet([dex, ac], setup({ DEX: 'S', AC: 'C' }))
+  assert.equal(RINGS.filter((c) => pickOf(free, c) === 'Dex Ring').length, 4)
+  const capped = sheet([dex, ac], setup({ DEX: 'S', AC: 'C' }, { caps: { DEX: 10 } }))
+  assert.equal(RINGS.filter((c) => pickOf(capped, c) === 'Dex Ring').length, 1)
+  assert.equal(RINGS.filter((c) => pickOf(capped, c) === 'Plated Ring').length, 3)
+  assert.equal(capped.totals.DEX, 10)
+  assert.equal(capped.total, 64 * 10 + 3 * 10)
+})
+
+test('owned-only: an item fills no more cells than copies owned', () => {
+  const s = sheet([row('Plain Ring', { stats: { STR: 10 } }), row('Other Ring', { stats: { STR: 1 } })], setup({ STR: 'S' }), {
+    owned: new Map([['plain ring', 1], ['other ring', 4]])
+  })
+  assert.equal(RINGS.filter((c) => pickOf(s, c) === 'Plain Ring').length, 1)
+  assert.equal(RINGS.filter((c) => pickOf(s, c) === 'Other Ring').length, 3)
+})
+
+test("the caller's gate (era) is honoured", () => {
+  const s = sheet([row('Old Ring', { eraTag: 'Kunark', stats: { STR: 20 } }), row('Ring', { stats: { STR: 1 } })], setup({ STR: 'S' }), { admit: (r) => r.eraTag !== 'Kunark' })
+  assert.equal(pickOf(s, 'FINGER'), 'Ring')
+})
+
+const corpus = buildGearIndex(itemsJson as unknown as ItemDbFile).rows
+const inEra = corpus.filter((r) => !eraHides(r as never, true))
+
+test("Malkil's ranger board puts a DEX helm on HEAD, not the Wizard cap (his first report)", () => {
+  const classes: ClassAbbr[] = ['RNG', 'MAG', 'WIZ']
+  const board = { ...uniformBoard('Off'), DEX: 'S', ATTACK: 'S', HASTE: 'S', RATIO_RANGED: 'S', AGI: 'B', HP_REGEN: 'B', AC: 'C', HP: 'C', MANA: 'C', MANA_REGEN: 'C', END_REGEN: 'C', RESISTS: 'C', SV_VOID: 'C', DMG_BONUS: 'F' } as const
+  const model = buildTierModel(inEra, classes, 60)
+  const s = buildBisSheet({ rows: inEra, setup: { board, step: 4, split: false, caps: {} }, model, classes })
+  assert.equal(pickOf(s, 'HEAD'), 'Executioners Hood')
+})
+
+test('over the corpus: every cell read, no lore item twice, and fast', () => {
+  for (const classes of [[], ['WAR', 'MNK', 'SHM'], ['RNG']] as ClassAbbr[][]) {
+    const model = buildTierModel(inEra, classes, 60)
+    const t0 = performance.now()
+    const s = buildBisSheet({ rows: inEra, setup: { board: defaultBoard('classes', classes), step: 4, split: false, caps: { HP: 2000 } }, model, classes })
+    const ms = performance.now() - t0
+    console.log(`sheet, classes [${classes.join(' ')}]: ${ms.toFixed(0)} ms, total ${String(s.total)}`)
+    assert.equal(s.cells.length, 23)
+    assert.ok(s.cells.filter((c) => c.pick !== undefined).length >= 20, 'nearly every cell has an item')
+    assert.ok(ms < 4000, `${ms.toFixed(0)} ms`)
+    const lorePicks = s.cells.flatMap((c) => (c.pick !== undefined && isLoreRow(c.pick.row) ? [c.pick.row.key] : []))
+    assert.equal(new Set(lorePicks).size, lorePicks.length, 'no lore item twice')
+  }
+})
