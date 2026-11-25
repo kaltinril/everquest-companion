@@ -8,7 +8,7 @@ import type { GearRow } from '../src/shared/planner/gear'
 import { CHIP_KEYS, boardToText, uniformBoard, type TierChip } from '../src/shared/planner/tierChips'
 import { defaultBoard } from '../src/shared/planner/tierDefaults'
 import { conversionsFor, deriveChips, type TierModel } from '../src/shared/planner/tierWeights'
-import { DEFAULT_BIS_PREFS, activeSetup, clampLevel, sanitizeBisPrefs, sanitizeSaved, withCleared, withLoadedBoard, withPasted, withSavedBoard, withSplit } from '../src/renderer/src/features/gear/bisPrefs'
+import { DEFAULT_BIS_PREFS, activeSetup, clampLevel, sanitizeBisPrefs, matchesSaved, sanitizeSaved, withCleared, withLoadedBoard, withPasted, withSavedBoard, withSplit } from '../src/renderer/src/features/gear/bisPrefs'
 import { budgetText, chipHint, chipValueText, compareRows, hasteNote, loadoutTotals, ownedCopies, sourceText, termText, totalsRows } from '../src/renderer/src/features/gear/bisText'
 import { sortValue } from '../src/renderer/src/features/gear/gearFilter'
 import type { GearOwnershipMap } from '../src/renderer/src/features/gear/gearOwnership'
@@ -138,6 +138,11 @@ test('named tier lists: saved resolved, same name replaced, sorted, sanitized, l
   assert.equal(loaded.split, true)
   assert.equal(loaded.board?.DEX, 'S')
   assert.deepEqual(loaded.caps, { DEX: 300 })
+  assert.equal(loaded.list, 'MALKIL RANGER', 'the Start from menu shows the list in force')
+  assert.ok(matchesSaved(list[1], activeSetup(loaded, [])), 'untouched: not edited')
+  assert.ok(!matchesSaved(list[1], { ...activeSetup(loaded, []), caps: {} }), 'a cap removed: edited')
+  assert.equal(sanitizeBisPrefs({ list: 'Alt tank' }).list, 'Alt tank')
+  assert.equal(sanitizeBisPrefs({ list: 3 }).list, null)
 })
 
 test('the hover compare: board stats either item states, best lane first, ratios only where they swing', () => {

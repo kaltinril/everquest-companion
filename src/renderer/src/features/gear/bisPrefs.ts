@@ -39,11 +39,13 @@ export interface BisPrefs {
   era: boolean
   /** best from what this character owns, not best overall */
   owned: boolean
+  /** the saved tier list in force (its name), or null for a preset; both are picked in the one Start from menu */
+  list: string | null
 }
 
 export const DEFAULT_LEVEL = 60
 
-export const DEFAULT_BIS_PREFS: BisPrefs = { preset: 'classes', board: null, step: DEFAULT_STEP, split: false, caps: {}, level: DEFAULT_LEVEL, era: true, owned: false }
+export const DEFAULT_BIS_PREFS: BisPrefs = { preset: 'classes', board: null, step: DEFAULT_STEP, split: false, caps: {}, level: DEFAULT_LEVEL, era: true, owned: false, list: null }
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v)
 
@@ -85,7 +87,8 @@ export function sanitizeBisPrefs(raw: unknown): BisPrefs {
     caps: sanitizeCaps(raw.caps),
     level: typeof raw.level === 'number' ? clampLevel(raw.level) : DEFAULT_LEVEL,
     era: raw.era !== false,
-    owned: raw.owned === true
+    owned: raw.owned === true,
+    list: typeof raw.list === 'string' && raw.list.trim() !== '' ? raw.list : null
   }
 }
 
@@ -157,7 +160,12 @@ export function withSavedBoard(list: readonly SavedBoard[], name: string, setup:
 
 /** A saved board put in force. */
 export function withLoadedBoard(prefs: BisPrefs, saved: SavedBoard): BisPrefs {
-  return { ...prefs, board: { ...saved.board }, step: saved.step, split: saved.split, caps: { ...saved.caps } }
+  return { ...prefs, board: { ...saved.board }, step: saved.step, split: saved.split, caps: { ...saved.caps }, list: saved.name }
+}
+
+/** Is the board in force still the saved one, lane for lane, with its step, split and caps? */
+export function matchesSaved(saved: SavedBoard, setup: TierSetup): boolean {
+  return saved.step === setup.step && saved.split === setup.split && CHIP_KEYS.every((c) => saved.board[c] === setup.board[c] && saved.caps[c] === setup.caps[c])
 }
 
 export function readSavedBoards(): SavedBoard[] {

@@ -5,16 +5,16 @@
 // tierDefaults.ts, the sheet bisSheet.ts; what is worn is the Gear tab's own join (`useGearCompare`,
 // read at base), the classes are the area's shared pick (`useGearClasses`, with the Gear tab's
 // "detected" chip), and the board is stored at `eq.gear.tiers`, where the Gear tab's BEST column
-// reads it too. Named boards are `eq.gear.tierLists` (BisSavedLists.tsx).
+// reads it too. Named boards are `eq.gear.tierLists`, picked in the Start from menu (BisStartFrom.tsx).
 
 import { useCallback, useMemo, type JSX } from 'react'
-import { Box, Chip, MenuItem, Stack, TextField, Typography } from '@mui/material'
+import { Box, Chip, Stack, TextField, Typography } from '@mui/material'
 import { CLASS_ABBRS, type ClassAbbr } from '@shared/classCombo'
 import { ITEM_UPGRADE_BASE } from '@shared/itemUpgrade'
 import { alignPairsToWorn, buildBisSheet, usableBy } from '@shared/planner/bisSheet'
 import type { GearRow } from '@shared/planner/gear'
 import { activeChips, type TierChip, type TierSetup } from '@shared/planner/tierChips'
-import { GUIDE_CREDIT, PRESET_LABEL, TIER_PRESETS, type TierPreset } from '@shared/planner/tierDefaults'
+import { GUIDE_CREDIT } from '@shared/planner/tierDefaults'
 import type { TierModel } from '@shared/planner/tierWeights'
 import type { PlanSlotId } from '@shared/planner/types'
 import { classDisplayName } from '@shared/spellLevels'
@@ -24,8 +24,8 @@ import OutputKindLine from '../../components/OutputKindLine'
 import { useWishlist } from '../wishlist/useWishlist'
 import { wishFromGear } from '../wishlist/wishSearch'
 import BisCells, { BisTotals, type BisWishes, type WornCell } from './BisCells'
-import BisSavedLists from './BisSavedLists'
-import { activeSetup, clampLevel, withCleared, withLoadedBoard, withPasted, withSplit, type BisPrefs } from './bisPrefs'
+import BisStartFrom from './BisStartFrom'
+import { activeSetup, clampLevel, withCleared, withPasted, withSplit, type BisPrefs } from './bisPrefs'
 import { loadoutTotals, ownedCopies, totalsRows } from './bisText'
 import { useEraHidden, useGearClasses, useGearCompare, useGearIndex, useGearOwnership, type GearClasses, type GearCompareData } from './gearData'
 import TierBoard from './TierBoard'
@@ -71,7 +71,7 @@ function useBisWishes(): BisWishes {
   return { wished, onToggle: wishlist.ready ? onToggle : undefined }
 }
 
-function Controls({ prefs, setPrefs, classes }: { prefs: BisPrefs; setPrefs: (p: BisPrefs) => void; classes: GearClasses }): JSX.Element {
+function Controls({ prefs, setPrefs, classes, setup }: { prefs: BisPrefs; setPrefs: (p: BisPrefs) => void; classes: GearClasses; setup: TierSetup }): JSX.Element {
   return (
     <Stack spacing={0.5}>
       <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap data-testid="bis-controls">
@@ -87,16 +87,13 @@ function Controls({ prefs, setPrefs, classes }: { prefs: BisPrefs; setPrefs: (p:
             onClick={classes.adopt}
           />
         )}
-        <TextField select size="small" label="Start from" value={prefs.preset} onChange={(e) => setPrefs({ ...prefs, preset: e.target.value as TierPreset, board: null, caps: {} })} sx={{ minWidth: 200 }} slotProps={{ htmlInput: { 'data-testid': 'bis-preset' } }}>
-          {TIER_PRESETS.map((p) => <MenuItem key={p} value={p}>{PRESET_LABEL[p]}</MenuItem>)}
-        </TextField>
-        <Chip size="small" variant="outlined" label="Reset board" data-testid="bis-reset" onClick={() => setPrefs({ ...prefs, board: null, caps: {} })} />
-        {prefs.board !== null && <Chip size="small" color="warning" variant="outlined" label="edited" data-testid="bis-edited" />}
+        <BisStartFrom prefs={prefs} setPrefs={setPrefs} setup={setup} />
+        <Chip size="small" variant="outlined" label="Reset board" title="Back to the preset's starting tiers" data-testid="bis-reset" onClick={() => setPrefs({ ...prefs, board: null, caps: {}, list: null })} />
         <TextField size="small" type="number" label="Level" value={prefs.level} onChange={(e) => setPrefs({ ...prefs, level: clampLevel(Number(e.target.value)) })} sx={{ width: 90 }} slotProps={{ htmlInput: { min: 1, max: 70, 'data-testid': 'bis-level' } }} />
         <Chip size="small" label="Current era" data-testid="bis-era" color={prefs.era ? 'primary' : 'default'} variant={prefs.era ? 'filled' : 'outlined'} onClick={() => setPrefs({ ...prefs, era: !prefs.era })} />
         <Chip size="small" label="Owned only" data-testid="bis-owned" color={prefs.owned ? 'primary' : 'default'} variant={prefs.owned ? 'filled' : 'outlined'} onClick={() => setPrefs({ ...prefs, owned: !prefs.owned })} />
       </Stack>
-      {prefs.preset === 'classes' && (
+      {prefs.preset === 'classes' && prefs.list === null && (
         <Typography variant="caption" color="text.secondary" data-testid="bis-credit">
           {GUIDE_CREDIT}
         </Typography>
@@ -138,34 +135,31 @@ export default function BisView({ onOpenLoot }: BisViewProps = {}): JSX.Element 
   return (
     <Box data-testid="bis-view" sx={{ display: 'flex', flexDirection: 'column', gap: 1, height: '100%', minHeight: 0, overflow: 'auto', pr: 0.5 }}>
       <OutputKindLine kind="inventory" quiet testId="bis-dump-line" />
-      <Controls prefs={prefs} setPrefs={setPrefs} classes={classes} />
+      <Controls prefs={prefs} setPrefs={setPrefs} classes={classes} setup={setup} />
       <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 440px) minmax(0, 1fr)' }, alignItems: 'start' }}>
-        <Stack spacing={1.5}>
-          <TierBoard
-            setup={setup}
-            model={model}
-            level={prefs.level}
-            stated={stated}
-            onLane={lane}
-            onCap={cap}
-            onStep={(step) => setPrefs({ ...prefs, step })}
-            onSplit={() => setPrefs(withSplit(prefs))}
-            onClear={() => setPrefs(withCleared(prefs))}
-            onLoad={(text) => {
-              const next = withPasted(prefs, classes.classes, text)
-              if (next !== undefined) setPrefs(next)
-              return next !== undefined
-            }}
-          />
-          <BisSavedLists setup={setup} onLoad={(saved) => setPrefs(withLoadedBoard(prefs, saved))} />
-        </Stack>
+        <TierBoard
+          setup={setup}
+          model={model}
+          level={prefs.level}
+          stated={stated}
+          onLane={lane}
+          onCap={cap}
+          onStep={(step) => setPrefs({ ...prefs, step })}
+          onSplit={() => setPrefs(withSplit(prefs))}
+          onClear={() => setPrefs(withCleared(prefs))}
+          onLoad={(text) => {
+            const next = withPasted(prefs, classes.classes, text)
+            if (next !== undefined) setPrefs(next)
+            return next !== undefined
+          }}
+        />
         <Stack spacing={1} sx={{ minWidth: 0 }}>
           <Typography variant="caption" color="text.secondary" data-testid="bis-summary">
             {`${String(sheet.filled)} of ${String(sheet.cells.length)} slots filled · board total ${sheet.total.toFixed(1)} · ${String(activeChips(setup.split).filter((c) => setup.board[c] !== 'Off').length)} stats count`}
           </Typography>
           <BisCells sheet={sheet} worn={worn.cells} model={model} setup={setup} classes={classes.classes} owned={owned} wishes={wishes} onOpenLoot={onOpenLoot} />
           <Typography variant="caption" color="text.secondary">
-            Hover a slot to compare its best item with what you wear and see where it drops; click it for the next five. An amber border means the best item is not what you wear. Haste does not stack: a slot is credited only for haste above what your other slots give. Weapon ratios count only in Primary, Secondary and Range, never in an Any slot. A Lore item is placed once; any other item may fill both rings, both ears, both wrists.
+            Hover a slot to compare its best item with what you wear and see where it drops; click it for the next five. An amber card means the best item is not what you wear. Haste does not stack: a slot is credited only for haste above what your other slots give. Weapon ratios count only in Primary, Secondary and Range, never in an Any slot. A Lore item is placed once; any other item may fill both rings, both ears, both wrists.
           </Typography>
         </Stack>
       </Box>
