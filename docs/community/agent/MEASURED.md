@@ -402,8 +402,64 @@ Sources beside `plans/2026-11-25-aa-window/`: seven AA-window screenshots and th
     after a rank-3 purchase at 15:42 (cost 6).
   - Point Blank Fire is in the combo's Archetype list (Monk; Daybreak 2026-09-22: Rangers, Rogues,
     Monks, Berserkers).
-- What it would take for other combos: the same `/alt list` after a loadout swap (the list follows
-  the combo in force).
+- **The list follows the combo in force and includes AAs not owned** (16:02 to 16:07, WAR + MNK +
+  each other class in turn, the owner saying the class after each run; raw lines
+  `plans/2026-11-25-aa-window/alt-list-runs-by-class-2026-11-25.txt`). `/alt list` is the short form.
+  Every wiki Class table matches the game's per class except the two removed steeds and the
+  Unbound(ed) Strikethrough name; `Strike As One` is #2261, cost 6, game text "grants the Beastlord a
+  chance on hit to increase their Warder's chance to flurry by 30% for 12 seconds". Costs differ only
+  on Rampage (5 then 4) and Pottery Mastery (rank 4 at 20).
+- **Archetype AAs by class** (the wiki's Archetype table names no classes). In every run, so from
+  WAR or MNK (a WAR-out and a MNK-out run would split them): Point Blank Fire, Finishing Blow,
+  Improved Bash, Ambidexterity, Double Riposte, Physical Enhancement, Acrobatics, Rampage,
+  Intimidation, Burst of Power. Added by the third class:
+  - SHM: Healing Adept, Healing Gift, Spell Casting Mastery, Mastery of the Past, Spell Casting
+    Deftness, Mass Group Buff, Quick Damage, Spell Casting Reinforcement, Mental Clarity, Destructive
+    Fury, Pet Affinity, Fury of Magic, Master of All, Healing Boon, Critical Affliction, Destructive
+    Cascade, Persistent Casting, Companion's Discipline, Mnemonic Retention.
+  - SHD: Mastery of the Past, Spell Casting Deftness, Quick Damage, Spell Casting Reinforcement,
+    Mental Clarity, Destructive Fury, Pet Affinity, Fury of Magic, Critical Affliction, Destructive
+    Cascade, Persistent Casting, Companion's Discipline, Mnemonic Retention.
+  - WIZ: Spell Casting Mastery, Spell Casting Subtlety, Mastery of the Past, Spell Casting Deftness,
+    Exodus, Quick Damage, Spell Casting Reinforcement, Mental Clarity, Destructive Fury, Fury of
+    Magic, Master of All, Persistent Casting, Companion's Discipline, Mnemonic Retention.
+  - NEC: Spell Casting Mastery, Spell Casting Subtlety, Mastery of the Past, Spell Casting Deftness,
+    Mass Group Buff, Innate Invis to Undead, Quick Damage, Mend Companion, Spell Casting
+    Reinforcement, Mental Clarity, Destructive Fury, Pet Affinity, Fury of Magic, Master of All,
+    Critical Affliction, Destructive Cascade, Persistent Casting, Companion's Discipline, Mnemonic
+    Retention.
+  - PAL: Healing Adept, Healing Gift, Mastery of the Past, Spell Casting Deftness, Mass Group Buff,
+    Quick Damage, Spell Casting Reinforcement, Mental Clarity, Destructive Fury, Fury of Magic,
+    Healing Boon, Persistent Casting, Mnemonic Retention.
+  - RNG: Healing Adept, Healing Gift, Mastery of the Past, Spell Casting Deftness, Mass Group Buff,
+    Quick Damage, Innate Camouflage, Spell Casting Reinforcement, Mental Clarity, Destructive Fury,
+    Fury of Magic, Critical Affliction, Destructive Cascade, Persistent Casting, Mnemonic Retention.
+  - ROG: Thief's Intuition. BER: nothing beyond the ten.
+  - DRU: Healing Adept, Healing Gift, Spell Casting Mastery, Mastery of the Past, Spell Casting
+    Deftness, Mass Group Buff, Exodus, Quick Damage, Innate Camouflage, Spell Casting Reinforcement,
+    Mental Clarity, Destructive Fury, Pet Affinity, Fury of Magic, Master of All, Healing Boon,
+    Critical Affliction, Destructive Cascade, Persistent Casting, Companion's Discipline, Mnemonic
+    Retention.
+  - ENC: Spell Casting Mastery, Spell Casting Subtlety, Mastery of the Past, Spell Casting Deftness,
+    Mass Group Buff, Quick Damage, Spell Casting Reinforcement, Mental Clarity, Destructive Fury, Pet
+    Affinity, Fury of Magic, Master of All, Critical Affliction, Destructive Cascade, Persistent
+    Casting, Companion's Discipline, Mnemonic Retention.
+  - MAG: Spell Casting Mastery, Spell Casting Subtlety, Mastery of the Past, Spell Casting Deftness,
+    Mass Group Buff, Quick Damage, Mend Companion, Spell Casting Reinforcement, Mental Clarity,
+    Destructive Fury, Pet Affinity, Fury of Magic, Master of All, Persistent Casting, Companion's
+    Discipline, Mnemonic Retention.
+  - BRD: Mastery of the Past, Spell Casting Deftness, Quick Damage, Mental Clarity, Destructive Fury,
+    Fury of Magic, Thief's Intuition, Critical Affliction, Destructive Cascade, Persistent Casting,
+    Companion's Discipline, Mnemonic Retention.
+  - BST: Healing Adept, Healing Gift, Mastery of the Past, Spell Casting Deftness, Mass Group Buff,
+    Quick Damage, Mend Companion, Spell Casting Reinforcement, Mental Clarity, Destructive Fury, Pet
+    Affinity, Fury of Magic, Critical Affliction, Destructive Cascade, Persistent Casting,
+    Companion's Discipline, Mnemonic Retention.
+  - CLR: Healing Adept, Healing Gift, Spell Casting Mastery, Mastery of the Past, Spell Casting
+    Deftness, Mass Group Buff, Innate Invis to Undead, Quick Damage, Spell Casting Reinforcement,
+    Mental Clarity, Destructive Fury, Fury of Magic, Master of All, Healing Boon, Critical
+    Affliction, Persistent Casting, Mnemonic Retention.
+  Every Archetype row on the wiki appeared in at least one run.
 
 ## /outputfile dumps
 
