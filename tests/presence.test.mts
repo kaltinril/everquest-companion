@@ -222,6 +222,8 @@ test("this app's own windows never look like EverQuest", () => {
     'Fight Overlay',
     'Zone Overlay',
     'Event Log Overlay',
+    'Cursor Overlay',
+    // The cursor overlay's title before the 2026-11-26 rename.
     'Cursor Ring'
   ]) {
     assert.equal(isEqWindow({ exePath: 'C:\\app\\companion.exe', title }, EQ_ROOT), false, title)

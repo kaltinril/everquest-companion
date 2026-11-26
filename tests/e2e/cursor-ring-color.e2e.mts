@@ -105,7 +105,7 @@ async function openCursorRing(page: Page): Promise<void> {
 
 /** The card as a fresh install shows it: a picker, on white, drawing a white ring. */
 async function stepDefaultIsUnchanged(page: Page): Promise<void> {
-  check('Preferences has a Cursor ring section', (await countOf(page, PANE)) === 1)
+  check('Preferences has a Cursor overlay section', (await countOf(page, PANE)) === 1)
   check('…with a colour picker in it', (await countOf(page, COLOR)) === 1)
   const type = await page.evaluate((sel) => {
     const el = document.querySelector(sel)

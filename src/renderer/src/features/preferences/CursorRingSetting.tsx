@@ -1,4 +1,6 @@
-// CursorRingSetting — Preferences → Cursor ring.
+// CursorRingSetting — Preferences → Cursor overlay (called "Cursor ring" on screen until the owner's
+// 2026-11-26 rename; the file, the `cursorRing` store key and every data-testid keep the old name,
+// because existing installs and tests depend on them).
 //
 // A thick circle that follows the mouse, drawn ONLY over the EverQuest window (owner request:
 // "I lose my mouse on EQ screens"). Off by default; the toggle is the only thing that makes it
@@ -254,11 +256,11 @@ export function CursorRingSetting(): JSX.Element {
               onChange={(e) => update({ enabled: e.target.checked })}
             />
           }
-          label={<Typography variant="body2">Show a ring around your mouse cursor</Typography>}
+          label={<Typography variant="body2">Show a cursor overlay</Typography>}
         />
         <Typography variant="caption" color="text.secondary">
           {prefs.enabled
-            ? 'A ring follows your pointer so you can find it on a busy screen. Your real cursor is untouched - the ring never gets in the way of a click.'
+            ? 'A mark follows your pointer so you can find it on a busy screen. Your real cursor is untouched - the overlay never gets in the way of a click.'
             : 'Off. Nothing is drawn and nothing is tracked.'}
         </Typography>
       </Stack>
@@ -276,7 +278,7 @@ export function CursorRingSetting(): JSX.Element {
       </Stack>
 
       <Typography variant="caption" color="text.secondary">
-        The ring only appears over EverQuest, while the game is the window you’re in.
+        The overlay only appears over EverQuest, while the game is the window you’re in.
       </Typography>
     </Stack>
   )
@@ -294,14 +296,14 @@ export function CursorRingSetting(): JSX.Element {
 export function cursorRingSection(): PrefSection {
   return {
     id: 'cursor',
-    label: 'Cursor ring',
+    label: 'Cursor overlay',
     icon: <AdjustIcon fontSize="small" />,
     items: [
       {
         id: 'cursor-ring',
-        label: 'Cursor ring',
+        label: 'Cursor overlay',
         keywords:
-          'cursor mouse pointer ring circle halo highlight find lost locate ultimate size thickness white color colour picker shape oval square rounded diamond dot target bullseye double offset position shift move nudge x y demo',
+          'cursor overlay mouse pointer ring circle halo highlight find lost locate ultimate size thickness white color colour picker shape oval square rounded diamond dot target bullseye double offset position shift move nudge x y demo',
         content: <CursorRingSetting />
       }
     ]
