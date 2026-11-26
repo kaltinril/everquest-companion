@@ -460,6 +460,16 @@ Sources beside `plans/2026-11-25-aa-window/`: seven AA-window screenshots and th
     Mental Clarity, Destructive Fury, Fury of Magic, Master of All, Healing Boon, Critical
     Affliction, Persistent Casting, Mnemonic Retention.
   Every Archetype row on the wiki appeared in at least one run.
+- **The window's rank panels** (`aa-special-*.png`): Current Rank and Next Rank show the text plus
+  "Requirements: Level: 1, No previous ability requirements". `/alt list` prints neither the
+  requirements nor, for an activated rank, its passive half or its refresh. Rank 3 of a class
+  reincarnation: "Ability Activation ID: <id> - Refresh Time: 0:02:00 - Ability Timer(s): 90", the
+  activated text, then "As a passive effect, ..." at the rank-3 value (Warrior #26000 melee damage
+  -6%, Monk #26024 dodge +6%, Shaman #26036 beneficial non-heal mana cost -9%). So the shared
+  timer is number 90 with a 2-minute refresh; the wiki's Special header says "HK Share CoolDown on
+  90sec timer". Rank values match the wiki's columns (Warrior 2/4/6, Monk 2/4/6, Shaman 3/6/9,
+  Half Elf stat caps and resists +3/+6, Iksar HP regen 2/4 and AC 5/10). Completionist's text
+  matches the wiki word for word.
 
 ## /outputfile dumps
 
