@@ -16,6 +16,7 @@ import {
 } from '@mui/material'
 import UndoIcon from '@mui/icons-material/Undo'
 import type { AaClassGroup, AaRanked } from '@shared/aaRanks'
+import { aaMarks, aaMarkTip, type AaField } from '@shared/aaOfficial'
 import { Tooltip } from '../../lib/Tooltip'
 
 const CELL_SX = { py: 0.5, px: 1, fontSize: 12, verticalAlign: 'top' } as const
@@ -32,11 +33,41 @@ const CLEAR_TIP = 'Forget your pick and use the rank your log shows instead.'
 const COST_TIP = 'Points each rank costs, as the wiki lists them.'
 const VALUES_TIP = 'What each rank gives, as the wiki lists it.'
 const UNLISTED_TEXT = "From your log, not on the wiki's AA page."
+const REMOVED_LOG_TIP = 'Removed by Daybreak, but your log shows this rank bought.'
 
 export type SetPick = (key: string, rank: number | null) => void
 
+/** A quiet mark on a field the game corrected (shared/aaOfficial.ts), its source on hover. */
+function Mark({ r, fields }: { r: AaRanked; fields: readonly AaField[] }): JSX.Element | null {
+  const marks = fields.flatMap((f) => aaMarks(r.row, f))
+  if (marks.length === 0) return null
+  return (
+    <Tooltip title={aaMarkTip(marks)}>
+      <Box component="sup" sx={{ color: 'info.main', ml: 0.25, cursor: 'help', fontWeight: 400 }} data-testid="aa-mark">
+        *
+      </Box>
+    </Tooltip>
+  )
+}
+
+/** A removed AA: no picker, the date it went, and the log's rank when the log shows one. */
+function RemovedRank({ r }: { r: AaRanked }): JSX.Element {
+  return (
+    <Stack direction="row" alignItems="center" spacing={0.5} data-testid="aa-removed">
+      <Typography variant="caption" color="text.secondary">{`Removed ${r.row.removed ?? ''}`}</Typography>
+      <Mark r={r} fields={['removed']} />
+      {r.logRank !== null && r.logRank > 0 && (
+        <Tooltip title={REMOVED_LOG_TIP}>
+          <Typography variant="caption" color="text.secondary">{`rank ${String(r.logRank)} from log`}</Typography>
+        </Tooltip>
+      )}
+    </Stack>
+  )
+}
+
 /** The rank picker, the "from log" mark, and the way back to the log's rank. */
 function RankControl({ r, setPick }: { r: AaRanked; setPick: SetPick }): JSX.Element {
+  if (r.row.removed !== undefined) return <RemovedRank r={r} />
   return (
     <Stack direction="row" alignItems="center" spacing={0.5}>
       <Select
@@ -55,6 +86,7 @@ function RankControl({ r, setPick }: { r: AaRanked; setPick: SetPick }): JSX.Ele
           </MenuItem>
         ))}
       </Select>
+      <Mark r={r} fields={['ranks']} />
       {r.source === 'log' && (
         <Tooltip title={FROM_LOG_TIP}>
           <Typography variant="caption" color="text.secondary" data-testid="aa-from-log">
@@ -82,7 +114,15 @@ function RankControl({ r, setPick }: { r: AaRanked; setPick: SetPick }): JSX.Ele
 
 /** The name shown: the log's where it has one, with the wiki's on hover. */
 function NameCell({ r }: { r: AaRanked }): JSX.Element {
-  const name = <TableCell sx={{ ...CELL_SX, fontWeight: 600, whiteSpace: 'nowrap' }}>{r.key}</TableCell>
+  const gone = r.row.removed === undefined ? {} : { textDecoration: 'line-through', color: 'text.secondary' }
+  const name = (
+    <TableCell sx={{ ...CELL_SX, fontWeight: 600, whiteSpace: 'nowrap' }}>
+      <Box component="span" sx={gone}>
+        {r.key}
+      </Box>
+      <Mark r={r} fields={['row', 'name']} />
+    </TableCell>
+  )
   if (r.wikiName === null) return name
   return (
     <Tooltip title={`The wiki calls this ${r.wikiName}.`} cursor="inherit">
@@ -104,6 +144,7 @@ function TextCell({ r }: { r: AaRanked }): JSX.Element {
       <Tooltip title={r.row.hk === undefined ? r.row.text : `${r.row.text} Hotkey: ${r.row.hk}`} cursor="inherit">
         <Box sx={TEXT_SX}>{r.row.text}</Box>
       </Tooltip>
+      <Mark r={r} fields={['text']} />
     </TableCell>
   )
 }
@@ -112,7 +153,10 @@ function AaRowLine({ r, setPick, special }: { r: AaRanked; setPick: SetPick; spe
   return (
     <TableRow hover data-testid="aa-row">
       <NameCell r={r} />
-      <TableCell sx={{ ...CELL_SX, whiteSpace: 'nowrap' }}>{special ? (r.row.values ?? []).join(' / ') : r.row.cost}</TableCell>
+      <TableCell sx={{ ...CELL_SX, whiteSpace: 'nowrap' }}>
+        {special ? (r.row.values ?? []).join(' / ') : r.row.cost}
+        <Mark r={r} fields={['cost']} />
+      </TableCell>
       <TextCell r={r} />
       <TableCell sx={CELL_SX}>
         <RankControl r={r} setPick={setPick} />

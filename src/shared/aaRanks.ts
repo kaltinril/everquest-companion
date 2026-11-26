@@ -8,10 +8,14 @@
 //
 // NAMES (shared/aaLogMatch.ts). A log name matches a row without case or apostrophes (`Warriors
 // Endurance` is `Warrior's Endurance`), else the one row a couple of edits away. The name shown is
-// the log's: `Race Reincarnation: Human` for the wiki's `Class Reincarnation: Human`, `Unbound
-// Strikethrough` for `Unbounded Strikethrough`. A log AA no row is gets a General row of its own.
+// the log's: `Race Reincarnation: Human` for the wiki's `Class Reincarnation: Human` (in a table
+// without aaOfficial.ts's renames). A log AA no row is gets a General row of its own.
+//
+// THE TABLE is the wiki's with the game's corrections over it (shared/aaOfficial.ts `AA_ROWS`): a
+// removed AA keeps its row and any log rank, but takes no pick and costs no points.
 
-import { AA_TABLE, type AaSection, type AaTableRow } from './aaTable.generated'
+import type { AaSection, AaTableRow } from './aaTable.generated'
+import { AA_ROWS, type AaRow } from './aaOfficial'
 import { aaFold, aaLogAas, aaLogMatch, type LogAa } from './aaLogMatch'
 import type { AASpendLike } from './aa'
 import type { ClassAbbr } from './classCombo'
@@ -22,7 +26,7 @@ export { aaFold } from './aaLogMatch'
 export type AaRankSource = 'pick' | 'log' | 'none'
 
 export interface AaRanked {
-  row: AaTableRow
+  row: AaRow
   /** The name shown and the key a pick is stored under: the log's own form where it has one. */
   key: string
   rank: number
@@ -46,10 +50,10 @@ export type AaPicksByCharacter = Readonly<Record<string, AaPicks>>
 /** Where the picks are kept (renderer localStorage). */
 export const AA_PICKS_KEY = 'eq.aa.ranks'
 
-/** The race of a Special `Class Reincarnation: <race>` row, or null for any other row. */
+/** The race of a Special race row (the wiki's `Class Reincarnation: <race>`, the game's `Race Reincarnation`), else null. */
 export function aaRaceOf(row: AaTableRow): string | null {
-  const m = row.section === 'special' ? /^Class Reincarnation:\s*(.+)$/.exec(row.name) : null
-  return m !== null && classAbbrForDisplayName(m[1]) === undefined ? m[1] : null
+  const m = row.section === 'special' ? /^(Class|Race) Reincarnation:\s*(.+)$/.exec(row.name) : null
+  return m !== null && (m[1] === 'Race' || classAbbrForDisplayName(m[2]) === undefined) ? m[2] : null
 }
 
 /** The name a row is shown and stored under. */
@@ -61,13 +65,14 @@ export function aaKey(row: AaTableRow): string {
 const clamp = (n: number, max: number): number => Math.max(0, Math.min(max, Math.floor(n)))
 
 /** One row's rank for a character, from its log AA (null when the log names none). */
-export function rankAa(row: AaTableRow, log: LogAa | null, picks: AaPicks, unlisted = false): AaRanked {
+export function rankAa(row: AaRow, log: LogAa | null, picks: AaPicks, unlisted = false): AaRanked {
   const key = log !== null && (log.near === true || unlisted) ? log.name : aaKey(row)
   const logRank = log === null ? null : log.rank
   const max = Math.max(row.ranks, logRank ?? 0)
   const base = { row, key, max, logRank, wikiName: unlisted || key === row.name ? null : row.name, unlisted }
   const pick = picks[key]
-  if (pick !== undefined) return { ...base, rank: clamp(pick, max), source: 'pick' }
+  // A removed AA takes no pick: only what the log shows (THE LOG WINS) is held.
+  if (pick !== undefined && row.removed === undefined) return { ...base, rank: clamp(pick, max), source: 'pick' }
   if (logRank !== null && logRank > 0) return { ...base, rank: logRank, source: 'log' }
   return { ...base, rank: 0, source: 'none' }
 }
@@ -85,7 +90,7 @@ export function rankAas(
   spends: readonly AASpendLike[],
   picks: AaPicks,
   races: readonly (string | null)[] = [],
-  table: readonly AaTableRow[] = AA_TABLE
+  table: readonly AaRow[] = AA_ROWS
 ): AaRanked[] {
   const { byRow, unplaced } = aaLogMatch(aaLogAas(spends, races), table, aaKey)
   return [
@@ -100,7 +105,7 @@ export function aaRankOf(ranked: readonly AaRanked[], key: string): number {
 }
 
 /** Log names no table row answers to: what the tab cannot place. */
-export function aaUnplaced(spends: readonly AASpendLike[], table: readonly AaTableRow[] = AA_TABLE): string[] {
+export function aaUnplaced(spends: readonly AASpendLike[], table: readonly AaTableRow[] = AA_ROWS): string[] {
   return aaLogMatch(aaLogAas(spends), table, aaKey)
     .unplaced.map((aa) => aa.name)
     .sort((a, b) => a.localeCompare(b))
@@ -125,7 +130,8 @@ export function aaPointsSpent(ranked: readonly AaRanked[]): AaPoints {
   const out = { points: 0, unknown: 0 }
   const seen = new Set<string>()
   for (const r of ranked) {
-    if (seen.has(r.key) || r.row.section === 'special' || r.rank === 0) continue
+    // A removed AA's points were refunded (aaOfficial.ts).
+    if (seen.has(r.key) || r.row.section === 'special' || r.rank === 0 || r.row.removed !== undefined) continue
     seen.add(r.key)
     const priced = aaRankCosts(r.row)
     // A rank past the wiki's count (the log's) has no price.

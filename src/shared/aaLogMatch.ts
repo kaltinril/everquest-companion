@@ -3,7 +3,8 @@
 //
 // A log name matches a row whose folded name (or a race row's log form) is the same. Else it takes
 // the one row, not matched already, within NEAR_EDITS edits of it (`Unbound Strikethrough` is the
-// wiki's `Unbounded Strikethrough`); a tie is no match. A name with neither is `unplaced`.
+// wiki's `Unbounded Strikethrough`, before aaOfficial.ts renamed that row); a tie is no match. A name
+// with neither is `unplaced`.
 
 import type { AaTableRow } from './aaTable.generated'
 import { aaLedger } from './aaLedger'

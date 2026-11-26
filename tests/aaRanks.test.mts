@@ -167,7 +167,7 @@ test('on the committed table every race row has the log spelling and Human and H
   assert.ok(AA_TABLE.filter((r) => aaKey(r).startsWith('Race Reincarnation:')).length >= 16, 'the 16 race rows of the 2026-11-25 cache')
 })
 
-test('on the committed table the log name Unbound Strikethrough is the Ranger row', () => {
-  const r = rankAas([spend('Unbound Strikethrough')], {}).find((x) => x.wikiName === 'Unbounded Strikethrough')
-  assert.deepEqual([r?.key, r?.row.class, r?.rank, r?.unlisted], ['Unbound Strikethrough', 'Ranger', 1, false])
+test('on the committed table the log name Unbound Strikethrough is the Ranger row (renamed by aaOfficial.ts, no near match)', () => {
+  const r = rankAas([spend('Unbound Strikethrough')], {}).find((x) => x.key === 'Unbound Strikethrough')
+  assert.deepEqual([r?.row.class, r?.rank, r?.unlisted, r?.wikiName], ['Ranger', 1, false, null])
 })
