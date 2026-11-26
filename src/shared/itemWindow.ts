@@ -92,6 +92,9 @@ const LABELS: readonly (readonly [string, string, Kind])[] = [
   ['Skill', 'Skill', 'weapon'], ['Range', 'Range', 'weapon'], ['Ratio', 'Ratio', 'weapon'], ['Dmg Bon', 'Dmg Bon', 'weapon'],
   ['Weight', 'WT', 'wt'], ['Size', 'Size', 'size'], ['Value', 'Value', 'value'], ['Charges', 'Charges', 'line'],
   ['Rec Level', 'Recommended level', 'line'], ['Req Level', 'Required level', 'line'],
+  // A mote or fragment of potential (window seen 2026-11-26, Fragment of Grand Potential): the item
+  // experience it adds, the highest tier it works on, the spell experience. Written as the window prints them.
+  ['Item Upgrade', 'Item Upgrade', 'line'], ['Item Max Tier', 'Item Max Tier', 'line'], ['Spell Upgrade', 'Spell Upgrade', 'line'],
   // A container: the pages write `Weight Reduction: 0%` and `Capacity: 6 Size Capacity: SMALL` (205 pages).
   ['Capacity', 'Capacity', 'bag'], ['Size Cap', 'Size Capacity', 'bag'], ['Size Capacity', 'Size Capacity', 'bag'], ['Weight Reduction', 'Weight Reduction', 'bag'],
   ['Focus Effect', 'Focus', 'effect'], ['Click Effect', 'Click', 'effect'], ['Worn Effect', 'Worn', 'effect'],
@@ -111,8 +114,11 @@ const labelOf = (hit: string): readonly [string, string, Kind] | undefined => {
   return LABELS.find(([l]) => l.replace(/\s+/g, '').toLowerCase() === key)
 }
 
-/** A line about the window, not the item: tabs, upgrade widgets, exaltation slots, placement. */
-const NOT_ITEM = /\b(Exaltation|O\w{0,2}amentation|Unmodified|Modified|Merge|Place\s*Item|Tier\s*\d+|Tier|upgraded|placeable in|Description|Container\W+(?:OPEN|CLOSED))\b/i
+/**
+ * A line about the window, not the item: tabs, upgrade widgets, exaltation slots, placement.
+ * `Tier` is the upgrade bar's label; a mote's `Item Max Tier: 8` is the item's own.
+ */
+const NOT_ITEM = /\b(Exaltation|O\w{0,2}amentation|Unmodified|Modified|Merge|Place\s*Item|(?<!Max\s{0,3})Tier\s*\d+|(?<!Max\s{0,3})Tier|upgraded|placeable in|Description|Container\W+(?:OPEN|CLOSED))\b/i
 
 // ---- small readers ------------------------------------------------------------------------------
 

@@ -464,3 +464,16 @@ test("THE ICON READ AS A LONGER TOKEN IS DROPPED WHEN THE TITLE BAR NAMES THE RE
   // No title read: nothing confirms the rest, so nothing is dropped.
   assert.equal(readItemWindow(window('- [ll [=', 'wee, Token of Reincamation')).name, 'wee, Token of Reincamation')
 })
+
+test("A MOTE'S UPGRADE NUMBERS ARE KEPT: Item Upgrade, Item Max Tier, Spell Upgrade (owner, 2026-11-26: Fragment of Grand Potential)", () => {
+  const r = readItemWindow([
+    'Fragment of Grand Potential', 'No Trade', 'Class: ALL', 'Race: ALL',
+    'Item Upgrade: 22', 'Item Max Tier: 8', 'Spell Upgrade: 256', 'Size: TINY', 'Unmodified'
+  ])
+  assert.deepEqual(r.statsblock.split('\n').filter(Boolean), [
+    'No Trade<br>', 'Item Upgrade: 22<br>', 'Item Max Tier: 8<br>', 'Spell Upgrade: 256<br>', 'Size: TINY<br>', 'Class: ALL<br>', 'Race: ALL<br>'
+  ])
+  assert.deepEqual(r.unread, [])
+  // The upgrade bar's own label is still not the item's.
+  assert.ok(!readItemWindow(['Test Blade', 'Magic', 'Class: WAR', 'Race: ALL', 'Merge | Tier: 10/10', 'Size: MEDIUM']).statsblock.includes('Tier'))
+})
