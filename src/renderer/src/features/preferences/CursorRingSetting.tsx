@@ -38,6 +38,7 @@ import {
 } from '@shared/presencePrefs'
 import { CursorRingDemo } from './CursorRingDemo'
 import { CrosshairRow } from './CursorCrosshairSetting'
+import { TrailRow } from './CursorTrailSetting'
 
 /**
  * SEEDED from the pane's hydration snapshot, written back on every change; main's reply is
@@ -305,6 +306,8 @@ export function CursorRingSetting(): JSX.Element {
 
       <CrosshairRow prefs={prefs} onChange={update} />
 
+      <TrailRow prefs={prefs} onChange={update} />
+
       <Typography variant="caption" color="text.secondary">
         The overlay only appears over EverQuest, while the game is the window you’re in.
       </Typography>
@@ -331,7 +334,7 @@ export function cursorRingSection(): PrefSection {
         id: 'cursor-ring',
         label: 'Cursor overlay',
         keywords:
-          'cursor overlay mouse pointer ring circle halo highlight find lost locate ultimate size thickness white color colour picker shape oval square rounded diamond dot target bullseye double offset position shift move nudge x y demo crosshair cross hair lines vertical horizontal weight aim',
+          'cursor overlay mouse pointer ring circle halo highlight find lost locate ultimate size thickness white color colour picker shape oval square rounded diamond dot target bullseye double offset position shift move nudge x y demo crosshair cross hair lines vertical horizontal weight aim trail particle particles sparkle sparkles effect length fade',
         content: <CursorRingSetting />
       }
     ]

@@ -452,7 +452,9 @@ test('the shipped defaults are the zero-cost posture', () => {
     showShape: true,
     crosshairEnabled: false,
     crosshairColorHex: '#ffffff',
-    crosshairWeightPx: 2
+    crosshairWeightPx: 2,
+    trail: 'off',
+    trailLength: 5
   })
   assert.deepEqual(DEFAULT_OVERLAY_AUTO_HIDE, { hideWhenNotRunning: true, hideWhenUnfocused: false })
 })
@@ -483,7 +485,9 @@ test('ring prefs are clamped, rounded, and never silently re-intended', () => {
     showShape: true,
     crosshairEnabled: false,
     crosshairColorHex: '#ffffff',
-    crosshairWeightPx: 2
+    crosshairWeightPx: 2,
+    trail: 'off',
+    trailLength: 5
   })
   assert.equal(normalizeCursorRing({ sizePx: 5 }).sizePx, 20, 'below the floor clamps up')
   assert.equal(normalizeCursorRing({ sizePx: 5000 }).sizePx, 200, 'above the cap clamps down')

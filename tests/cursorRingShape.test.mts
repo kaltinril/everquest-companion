@@ -160,6 +160,6 @@ test('ONLY A KNOWN SHAPE SURVIVES the normalizer', () => {
   }
   // A bad shape never costs the player the rest of their settings.
   const v = normalizeCursorRing({ enabled: true, sizePx: 90, thicknessPx: 6, colorHex: '#00ff00', shape: 'star' })
-  assert.deepEqual(v, { enabled: true, sizePx: 90, thicknessPx: 6, colorHex: '#00ff00', shape: 'circle', offsetXPx: 0, offsetYPx: 0, showShape: true, crosshairEnabled: false, crosshairColorHex: '#ffffff', crosshairWeightPx: 2 })
+  assert.deepEqual(v, { enabled: true, sizePx: 90, thicknessPx: 6, colorHex: '#00ff00', shape: 'circle', offsetXPx: 0, offsetYPx: 0, showShape: true, crosshairEnabled: false, crosshairColorHex: '#ffffff', crosshairWeightPx: 2, trail: 'off', trailLength: 5 })
   assert.equal(normalizeCursorRing({ shape: 'diamond' }).shape, 'diamond')
 })

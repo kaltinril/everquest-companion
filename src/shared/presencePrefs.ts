@@ -184,7 +184,32 @@ export interface CursorRingPrefs {
   crosshairColorHex: string
   /** The lines' weight, whole CSS px, 1 to 8. */
   crosshairWeightPx: number
+  /**
+   * TRAIL / PARTICLES behind the pointer (owner, 2026-11-26: "trail/particle affects"), drawn in
+   * the shape's colour on one canvas (`shared/cursorTrail.ts` holds the maths). OFF by default:
+   * off means no canvas work at all.
+   */
+  trail: CursorTrailMode
+  /** How long the trail is (how long each point lives, and for sparkles how many), 1 to 10. */
+  trailLength: number
 }
+
+/** `off` draws nothing; `trail` is a fading line behind the pointer; `sparkles` sheds little
+ *  falling specks. */
+export type CursorTrailMode = 'off' | 'trail' | 'sparkles'
+
+/** Every trail mode, in the order Preferences lists them. The normalizer accepts nothing else. */
+export const CURSOR_TRAIL_MODES: readonly CursorTrailMode[] = ['off', 'trail', 'sparkles']
+
+/** A known trail mode, or `off`: a store file, a share import or a newer build may carry anything. */
+export function normalizeTrailMode(value: unknown): CursorTrailMode {
+  return CURSOR_TRAIL_MODES.find((m) => m === value) ?? 'off'
+}
+
+/** Trail length bounds: a unitless 1 to 10 the trail maths turns into a lifetime and a count. */
+export const MIN_TRAIL_LENGTH = 1
+export const MAX_TRAIL_LENGTH = 10
+export const DEFAULT_TRAIL_LENGTH = 5
 
 /**
  * The ring's outline. All of them are drawn with CSS on the two prebuilt divs in cursor.html (the
@@ -317,7 +342,9 @@ export const DEFAULT_CURSOR_RING: CursorRingPrefs = {
   showShape: true,
   crosshairEnabled: false,
   crosshairColorHex: DEFAULT_RING_COLOR,
-  crosshairWeightPx: DEFAULT_CROSSHAIR_WEIGHT_PX
+  crosshairWeightPx: DEFAULT_CROSSHAIR_WEIGHT_PX,
+  trail: 'off',
+  trailLength: DEFAULT_TRAIL_LENGTH
 }
 
 export const DEFAULT_OVERLAY_AUTO_HIDE: OverlayAutoHidePrefs = {
@@ -369,7 +396,9 @@ export function normalizeCursorRing(value: unknown): CursorRingPrefs {
       MIN_CROSSHAIR_WEIGHT_PX,
       MAX_CROSSHAIR_WEIGHT_PX,
       DEFAULT_CROSSHAIR_WEIGHT_PX
-    )
+    ),
+    trail: normalizeTrailMode(v.trail),
+    trailLength: clampPx(v.trailLength, MIN_TRAIL_LENGTH, MAX_TRAIL_LENGTH, DEFAULT_TRAIL_LENGTH)
   }
 }
 

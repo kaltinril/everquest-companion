@@ -4,13 +4,14 @@
 // It lives in `src/renderer/src/overlay/` beside the meters but shares NOTHING with them: no
 // React, no MUI, no theme, no shared component. The meters are a UI; this is one <div> that
 // moves. Pulling in a framework to move a div would add a reconciler to the hottest path in the
-// app for no expressible benefit — so this file is plain DOM. The one thing it shares is the pure
+// app for no expressible benefit — so this file is plain DOM (the trail's canvas painter, its one
+// sibling, is plain DOM too). The one thing it shares is the pure
 // arithmetic (`shared/cursorRingShape.ts`, `shared/cursorCrosshair.ts`), which the Preferences
 // sample reads too.
 //
 // ============================ THE PERFORMANCE CONTRACT ============================
-// The owner's requirement was "it can't feel like it's lagging". Three rules make that true,
-// and every one of them is visible in the ~15 lines of real code below:
+// The owner's requirement was "it can't feel like it's lagging". Five rules make that true
+// (the first three were the whole ring; 4 and 5 came with the overlay's crosshair and trail):
 //
 //   1. THE REAL CURSOR IS NEVER TOUCHED. Windows draws the system pointer; this window is
 //      click-through and `cursor: none`. Only the halo follows, so even if a frame is dropped
@@ -34,6 +35,13 @@
 //      per config. On a move only their `transform` changes, translateX on the column, translateY
 //      on the row, in the SAME frame as the ring. Off, the paint skips them on one boolean. With
 //      the shape switched off, the paint skips the ring the same way.
+//   5. THE TRAIL IS THE ONE CANVAS, AND IT PAYS ONLY WHILE IT IS ON AND MOVING (2026-11-26).
+//      Rule 3's "no canvas, no timer" still holds for the shape and the crosshair, and for the
+//      whole window while the trail is Off: the canvas is hidden, never given a context, and a
+//      sample costs one early return (cursorTrailCanvas.ts). With a trail picked, a sample spawns
+//      points (capped, oldest dropped, so a fast mouse cannot build a backlog) and asks for frames;
+//      the rAF loop clears only what it last drew and STOPS ITSELF once everything has faded, so a
+//      still mouse costs nothing. A PARKED point spawns nothing and clears the trail.
 
 import { ringStrokeColor } from '@shared/presencePrefs'
 import type { CursorPoint, CursorRingPrefs } from '@shared/presencePrefs'
@@ -47,6 +55,7 @@ import {
 } from '@shared/cursorRingShape'
 import type { RingGeometry, RingOffset } from '@shared/cursorRingShape'
 import { crosshairLineStyles, crosshairOf, crosshairTransforms } from '@shared/cursorCrosshair'
+import { createTrailPainter } from './cursorTrailCanvas'
 
 /** The bridge `preload/cursor.ts` installs. Narrow on purpose — this window can receive its
  *  config and a stream of points, and can do nothing else. */
@@ -71,6 +80,9 @@ const ring = mustGet('ring')
 const inner = mustGet('ring-inner')
 const crossV = mustGet('cross-v')
 const crossH = mustGet('cross-h')
+const trailCanvas = mustGet('trail')
+if (!(trailCanvas instanceof HTMLCanvasElement)) throw new Error('cursorRing: #trail is not a canvas')
+const trail = createTrailPainter(trailCanvas)
 
 /** The chosen shape as a box (size, stroke, corners, turn, inner mark). Recomputed only when a
  *  setting changes, so the hot path is two subtractions and a string. Until the config arrives
@@ -104,6 +116,7 @@ function applyConfig(cfg: CursorRingPrefs): void {
   shapeOn = shapeShown(cfg)
   ring.style.display = shapeOn ? 'block' : 'none'
   applyCrosshair(cfg)
+  trail.configure(cfg)
   // The colour is a STYLE assignment, so only a `#rrggbb` may reach it — `ringStrokeColor` takes
   // the value through the same normalizer main stored it through, and answers with an rgba()
   // built from three numbers. Nothing a store file could carry becomes a CSS declaration here.
@@ -156,6 +169,9 @@ function schedulePaint(): void {
 function onPoint(p: CursorPoint): void {
   latest = p
   schedulePaint()
+  // Every sample, not the coalesced one: the trail is the path, and each point is a vertex of it.
+  // Off, this is one early return.
+  trail.point(p)
 }
 
 const bridge = window.eqCursor

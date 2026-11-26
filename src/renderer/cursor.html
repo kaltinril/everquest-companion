@@ -8,7 +8,8 @@
       ring until 2026-11-26, and the file names keep that). A transparent, click-through,
       always-on-top window sized to the EverQuest window. What moves: a white circle (or the shape
       the player picked) that follows the pointer, with one child for the shapes that have an
-      inner mark, and, only when the player turns it on, the two crosshair lines.
+      inner mark, and, only when the player turns them on, the two crosshair lines and the trail
+      canvas.
 
       CSP: the same deny-by-default policy as index.html / overlay.html, minus everything this
       page cannot use. It loads no images, no fonts, and speaks to nothing — the only relaxation
@@ -124,9 +125,26 @@
         height: 2px;
         transform: translate3d(0, -9999px, 0);
       }
+
+      /*
+        THE TRAIL CANVAS (owner, 2026-11-26: "trail/particle affects"). Hidden, and never given a
+        2D context, until the player picks a trail; cursorTrailCanvas.ts then sizes its backing
+        store to the window times devicePixelRatio and runs an animation loop only while something
+        is still fading. Drawn under the crosshair and the ring.
+      */
+      #trail {
+        display: none;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+      }
     </style>
   </head>
   <body>
+    <canvas id="trail"></canvas>
     <div id="cross-v" class="cross"></div>
     <div id="cross-h" class="cross"></div>
     <div id="ring"><div id="ring-inner"></div></div>
