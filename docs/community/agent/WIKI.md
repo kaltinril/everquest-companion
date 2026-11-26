@@ -77,6 +77,13 @@ A page is a mob page only if its OWN text opens the template (indirect transclus
 
 - **Era banner** first: `{{Classic Era}}` (also Kunark, Velious, Luclin, revamps, Epics). `{{Sky
   Era}}` was retired 2026-09. The banner decides a page's era (`mobs.json eraTag`).
+- **Does Not Exist banner**: `{{:Does Not Exist}}` above an item's template (a transclusion of the
+  main-namespace page, as `{{:Item}}` is) says no player can have the item; the Oakwynd page pairs it
+  with "Obtained during a GM event." and `|gmitem`. 28 cached item pages, 2026-11-25 (27
+  `{{:Does Not Exist}}`, 1 `{{: Does Not Exist}}`). Not `{{DNE}}` ("non-Legends content",
+  `shared/pageNotices.ts`). The parser reads it (`itemPageCategories.itemPageMarkers`, also
+  `{{Does Not Exist}}`, any case, comments skipped) into `items.json doesNotExist: true`;
+  `itemsResearch.isUnobtainable` turns it into `GearRow.unobtainable`.
 - **Level** as a range is written unspaced, `11-13` (983 pages) more often than `11 - 13` (281).
 - **Location**: `|location = (y, x)`, the same order as the game's `/loc`; some pages write
   `100% @ (-1128, -2923)`.
