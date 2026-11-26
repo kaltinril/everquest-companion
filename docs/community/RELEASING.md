@@ -29,8 +29,8 @@ what makes it safe to hand to strangers:
 - **It is not code-signed.** Windows SmartScreen says "Windows protected your PC" on first run;
   the player clicks **More info**, then **Run anyway**. The release notes say so.
 
-The app's licence (FSL-1.1-MIT) permits this: redistribution for any purpose other than a
-competing commercial product.
+The licences permit this (see LICENSING.md): the fork's own work is MIT, and the original code's
+FSL-1.1-MIT allows redistribution for any purpose other than a competing commercial product.
 
 ## The name changed; the ids did not
 
@@ -158,7 +158,8 @@ unpromoted. Deleting a release is the owner's call.
   (US$9.99/month, individuals in the US and Canada): `scripts/azure-sign.cjs` signs whenever the
   six `AZURE_*` variables are set, and `win.signtoolOptions.publisherName` must then be the
   certificate's name exactly. Free signing services (SignPath Foundation) require an OSI licence,
-  which FSL is not. A new certificate still meets SmartScreen warnings until it builds reputation.
+  which the original code's FSL is not (until it converts in 2028). A new certificate still meets
+  SmartScreen warnings until it builds reputation.
 - **Auto-update: on since test.20**, without signing. What it took: the generic `publish` block
   above, `publisherName` dropped from the TEST build (with it every unsigned update is rejected),
   the `TEST_BUILD` early-out in `src/main/updater.ts` removed, and the publish script uploading

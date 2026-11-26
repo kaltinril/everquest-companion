@@ -33,8 +33,9 @@ the ask to build it into a row's details. Rules first:
 - **No tokens, no cloud.** Everything runs on the player's machine. Honest note: Tesseract 4+ and
   Windows OCR use small local neural models; they are deterministic, offline and free. Only glyph
   templates (option C below) are strictly model-free.
-- **Licence.** The repo is FSL-1.1-MIT. Dependencies are MIT, Apache-2.0, BSD or ISC from the
-  public npm registry only (RULES.md rule 7 applies to each one).
+- **Licence.** The fork's own work is MIT, the original code FSL-1.1-MIT (LICENSING.md).
+  Dependencies are MIT, Apache-2.0, BSD or ISC from the public npm registry only (RULES.md rule 7
+  applies to each one).
 - **No game art shipped.** Icons are Daybreak's. The icon index is built at runtime from the
   player's own install (the same footing as reading `spells_us.txt`, owner 2026-10-19 for spell
   pages) and cached in userData. Nothing derived from the game's files is committed. Needs the

@@ -3,7 +3,7 @@
 [![Latest release](https://img.shields.io/github/v/release/kaltinril/everquest-companion?include_prereleases&label=release&color=d4a017)](https://github.com/kaltinril/everquest-companion/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/kaltinril/everquest-companion/total?color=2ea44f)](https://github.com/kaltinril/everquest-companion/releases)
 ![Windows 10 and 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078d4)
-[![License: FSL-1.1-MIT](https://img.shields.io/badge/license-FSL--1.1--MIT-lightgrey)](LICENSE)
+[![License: MIT and FSL-1.1-MIT](https://img.shields.io/badge/license-MIT%20%2B%20FSL--1.1--MIT-lightgrey)](LICENSING.md)
 [![Open issues](https://img.shields.io/github/issues/kaltinril/everquest-companion)](https://github.com/kaltinril/everquest-companion/issues)
 
 A Windows desktop companion for **EverQuest Legends**. It reads the log file the game already
@@ -209,8 +209,10 @@ taken in. Read these in order:
 
 ## License
 
-FSL-1.1-MIT (Functional Source License, converting to MIT after two years): see
-[`LICENSE`](LICENSE). Copyright (c) 2026 Josh Moyers.
+The fork's own work is MIT: see [`LICENSE-MIT`](LICENSE-MIT). The original code by Josh Moyers
+stays under his FSL-1.1-MIT (Functional Source License, converting to MIT two years after each
+version, about August-September 2028): see [`LICENSE`](LICENSE), Copyright (c) 2026 Josh Moyers.
+[`LICENSING.md`](LICENSING.md) explains which code is under which, and how to tell.
 
 ## Thanks
 
