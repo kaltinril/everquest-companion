@@ -5,8 +5,9 @@
 // read through useAaRanks. A rank the player picks is kept for this character only.
 
 import { type JSX, useMemo, useState } from 'react'
-import { Box, FormControlLabel, Stack, Switch, Tab, Tabs, Typography } from '@mui/material'
-import { resolvedClasses } from '@shared/classCombo'
+import { Box, FormControlLabel, Stack, Switch, Tab, Tabs, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
+import { resolvedClasses, type ClassAbbr } from '@shared/classCombo'
+import { archetypeRows } from '@shared/aaArchetypeClasses'
 import { aaClassGroups, aaGroupRows, aaPointsSpent, aaSectionRows, aaUnplaced, type AaRanked } from '@shared/aaRanks'
 import type { AaSection } from '@shared/aaTable.generated'
 import { statCapOf } from '@shared/reincarnationCap'
@@ -33,6 +34,9 @@ const ALL_CLASSES_TIP = 'Show the AAs of every class, not only the classes you p
 const NO_CLASSES = 'Your classes are not known yet, so every class is shown.'
 const CAP_TIP = 'Your base stat cap after reincarnations and the Human and Half Elf AAs.'
 const UNPLACED_TIP = 'Your log bought these, but no wiki AA row has the same name.'
+const MINE_TIP = "Which classes have each Archetype AA, from the game's /alternateadv list, 2026-11-25."
+const MAY_APPLY = 'May apply: WAR or MNK has these, and maybe other classes too.'
+const MAY_APPLY_TIP = 'Every list run had WAR and MNK, so these are not split yet.'
 
 function Points({ rows }: { rows: AaRanked[] }): JSX.Element {
   const { points, unknown } = aaPointsSpent(rows)
@@ -55,10 +59,44 @@ function StatCapLine({ ranked, reincarnations }: { ranked: AaRanked[]; reincarna
   )
 }
 
+/** The character's classes, when the class combo is known; none before. */
+function useMyClasses(): ClassAbbr[] {
+  const current = useComboSnap().current
+  return useMemo(() => (current === null ? [] : resolvedClasses(current)), [current])
+}
+
+/** The Archetype tab: the AAs the character's classes have, or all (game list, 2026-11-25). */
+function ArchetypeTab({ ranked, setPick }: { ranked: AaRanked[]; setPick: SetPick }): JSX.Element {
+  const mine = useMyClasses()
+  const [all, setAll] = useState(false)
+  const rows = useMemo(() => aaSectionRows(ranked, 'archetype'), [ranked])
+  const shown = useMemo(() => (all || mine.length === 0 ? { mine: rows, mayApply: [] } : archetypeRows(rows, mine)), [rows, mine, all])
+  return (
+    <>
+      <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
+        <Points rows={[...shown.mine, ...shown.mayApply]} />
+        {mine.length > 0 ? (
+          <Tooltip title={MINE_TIP}>
+            <ToggleButtonGroup exclusive size="small" value={all ? 'all' : 'mine'} onChange={(_e, v: string | null) => {
+              if (v !== null) setAll(v === 'all')
+            }} data-testid="aa-archetype-filter">
+              <ToggleButton value="mine" sx={{ textTransform: 'none', py: 0.25 }}>My classes</ToggleButton>
+              <ToggleButton value="all" sx={{ textTransform: 'none', py: 0.25 }}>All</ToggleButton>
+            </ToggleButtonGroup>
+          </Tooltip>
+        ) : (
+          <Typography variant="caption" color="text.secondary">
+            {NO_CLASSES}
+          </Typography>
+        )}
+      </Stack>
+      <AaTable rows={shown.mine} setPick={setPick} tail={{ note: MAY_APPLY, tip: MAY_APPLY_TIP, rows: shown.mayApply }} />
+    </>
+  )
+}
+
 function ClassTab({ ranked, setPick }: { ranked: AaRanked[]; setPick: SetPick }): JSX.Element {
-  const combo = useComboSnap()
-  const current = combo.current
-  const mine = useMemo(() => (current === null ? [] : resolvedClasses(current)), [current])
+  const mine = useMyClasses()
   const [all, setAll] = useState(false)
   const groups = useMemo(() => aaClassGroups(ranked, mine, all || mine.length === 0), [ranked, mine, all])
   return (
@@ -153,6 +191,8 @@ function AaView(): JSX.Element {
         <Box sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto', overscrollBehavior: 'contain' }}>
           {tab === 'class' ? (
             <ClassTab ranked={ranked} setPick={setPick} />
+          ) : tab === 'archetype' ? (
+            <ArchetypeTab ranked={ranked} setPick={setPick} />
           ) : (
             <SectionTab section={tab} ranked={ranked} reincarnations={reincarnations} setPick={setPick} />
           )}

@@ -38,6 +38,8 @@ export interface AaFix {
   wikitext: string
   /** A placeholder name the game lists (`Race Reincarnation: Race 18`). */
   placeholder?: true
+  /** Not a row: a table's header line (the Special AAs' hotkey column). */
+  header?: true
 }
 
 interface Acc {
@@ -49,6 +51,8 @@ interface Acc {
   dates: string[]
   log?: AaAbilityRow
   placeholder?: true
+  /** A header entry's line, in place of a row's. */
+  line?: string
 }
 
 const plural = (n: number, word: string): string => `${String(n)} ${word}${n === 1 ? '' : 's'}`
@@ -82,7 +86,7 @@ export function aaRowWikitext(row: AaRow, isNew: boolean): string {
 }
 
 const said = (row: AaTableRow, field: AaField): string =>
-  ({ row: 'no row', name: row.name, ranks: plural(row.ranks, 'rank'), cost: `cost ${row.cost}`, text: 'a Description without it', removed: 'the AA as current' })[field]
+  ({ row: 'no row', name: row.name, ranks: plural(row.ranks, 'rank'), cost: `cost ${row.cost}`, text: 'a Description without it', hk: 'a hotkey cell without it', removed: 'the AA as current', header: 'the header' })[field]
 
 /** What the corrected row should say of one field. */
 function should(row: AaRow, field: AaField, c?: AaCorrection): string {
@@ -91,6 +95,7 @@ function should(row: AaRow, field: AaField, c?: AaCorrection): string {
   if (field === 'ranks') return plural(row.ranks, 'rank')
   if (field === 'cost') return `cost ${row.cost}`
   if (field === 'text') return `the Description adds "${c?.append ?? ''}"`
+  if (field === 'hk') return `the hotkey cell adds "${c?.hkNote ?? ''}"`
   return 'the AA marked removed'
 }
 
@@ -151,6 +156,16 @@ class Builder {
   }
 
   correct(c: AaCorrection): void {
+    // A tab-only note: the Special header's row says it once for every class row.
+    if (c.tabOnly === true) return
+    if (c.header !== undefined) {
+      this.headerRow(c, c.header)
+      return
+    }
+    if (c.confirms === true) {
+      this.confirm(c)
+      return
+    }
     if (c.add !== undefined) {
       if (correctionTarget(this.table, c) !== undefined) return
       const acc = this.newAcc(c.add, c.add.section)
@@ -160,17 +175,25 @@ class Builder {
     }
     const target = correctionTarget(this.table, c)
     if (target === undefined) return
-    // A second source for a row another entry corrects: its evidence on every issue the row has.
-    if (c.confirms === true) {
-      const acc = this.accs.get(rowKey(target))
-      if (acc !== undefined) for (const i of acc.issues) note(acc, i, sourceEvidence(c))
-      return
-    }
     if (correctionAgrees(target, c)) return
     const acc = this.accOf(target)
     const before = acc.fixed.marks?.length ?? 0
     acc.fixed = withCorrection(acc.fixed, c)
     for (const m of (acc.fixed.marks ?? []).slice(before)) note(acc, issueOf(acc, m.field, said(target, m.field), should(acc.fixed, m.field, c)), sourceEvidence(c))
+  }
+
+  /** A table header line the game states otherwise: one row, its Copy the line itself. */
+  headerRow(c: AaCorrection, h: { says: string; should: string; line: string }): void {
+    const acc = this.newAcc({ section: 'special', name: c.name, ranks: 0, cost: '', text: '' }, 'special')
+    acc.line = h.line
+    note(acc, issueOf(acc, 'header', h.says, h.should), sourceEvidence(c))
+  }
+
+  /** A second source for a row another entry corrects or adds: its evidence on every issue the row has. */
+  confirm(c: AaCorrection): void {
+    const target = correctionTarget(this.table, c)
+    const acc = this.accs.get(target === undefined ? `new|${aaFold(c.name)}` : rowKey(target))
+    if (acc !== undefined) for (const i of acc.issues) note(acc, i, sourceEvidence(c))
   }
 
   /** A log AA on a page row: its name and rank against the page's, after the corrections. */
@@ -222,8 +245,9 @@ function gapRowOf(acc: Acc): GapRow {
     ...(acc.fixed.class === undefined ? {} : { class: acc.fixed.class }),
     wikiName: acc.page?.name ?? null,
     issues: acc.issues,
-    wikitext: aaRowWikitext(acc.fixed, acc.page === undefined),
-    ...(acc.placeholder === true ? { placeholder: true as const } : {})
+    wikitext: acc.line ?? aaRowWikitext(acc.fixed, acc.page === undefined),
+    ...(acc.placeholder === true ? { placeholder: true as const } : {}),
+    ...(acc.line === undefined ? {} : { header: true as const })
   }
   const count = acc.log === undefined ? acc.issues.reduce((n, i) => n + i.evidence.length, 0) : acc.log.ranks.reduce((n, r) => n + r.buys, 0)
   return { domain: 'aa', name: acc.fixed.name, kinds: [...acc.kinds], count, first: when[0] ?? '', last: when[when.length - 1] ?? '', details: { samples: lines }, page: AA_PAGE, aaFix: fix }
@@ -254,7 +278,8 @@ export function aaFixText(row: Pick<GapRow, 'aaFix' | 'name'>): string {
 
 /** The chip's words: which table and row, and what it should say. */
 export function aaFixWhy(fix: AaFix): string {
-  const where = fix.wikiName === null ? `The ${aaTableName(fix.section, fix.class)} table lacks it` : `${aaTableName(fix.section, fix.class)}, row ${fix.wikiName}`
+  const table = aaTableName(fix.section, fix.class)
+  const where = fix.header === true ? `The ${table} table header` : fix.wikiName === null ? `The ${table} table lacks it` : `${table}, row ${fix.wikiName}`
   const what = fix.issues.map((i) => `${i.should} (page: ${i.says})`).join('; ')
   return `${where}: ${what}.${fix.placeholder === true ? ' The game lists a placeholder name: check before adding it.' : ''}`
 }

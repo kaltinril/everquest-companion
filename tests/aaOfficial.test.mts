@@ -27,7 +27,7 @@ test('the generated table is untouched: the wiki cache still says what it said',
 test('Strike As One: a new Beastlord row, cost 6, in the class table in name order', () => {
   const r = row('Strike As One', 'Beastlord')
   assert.deepEqual([r.section, r.ranks, r.cost, fields(r)], ['class', 1, '6', ['row']])
-  assert.match(r.text, /Warder a 30% increased flurry chance for 12 seconds\. Requirements: Level 35\.$/)
+  assert.equal(r.text, "This passive ability grants the Beastlord a chance on hit to increase their Warder's chance to flurry by 30% for 12 seconds. Requirements: Level 35.")
   const beast = AA_ROWS.filter((x) => x.class === 'Beastlord').map((x) => x.name)
   assert.deepEqual(beast.slice(-3), ['Playing Possum', 'Strike As One', 'Unbound Ferocity'])
 })
@@ -107,4 +107,11 @@ test('each correction names its source and date; each tooltip is one sentence of
     const words = c.tip.split(/\s+/).length
     assert.ok(words >= 7 && words <= 15, `${c.name}: ${String(words)} words`)
   }
+})
+
+test("class reincarnation rows: the game's hotkey note (refresh 2:00, shared timer 90); race rows none", () => {
+  const war = row('Class Reincarnation: Warrior')
+  assert.equal(war.hk, 'Thrash: 4 primary-hand combat rounds on everything within 40 ft. Refresh 2:00, shared timer 90; rank 3 keeps its passive.')
+  assert.deepEqual(fields(war), ['hk'])
+  assert.equal(row('Race Reincarnation: Half Elf').hk?.includes('2:00') ?? false, false)
 })

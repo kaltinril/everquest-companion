@@ -32,6 +32,7 @@ test('with no log, each correction the page lacks is a row; one row per AA, name
   assert.equal(new Set(NO_LOG.map((r) => r.name)).size, NO_LOG.length, 'one row per name (Done marks and rows key on it)')
   assert.ok(NO_LOG.every((r) => r.domain === 'aa' && r.page === AA_PAGE))
   assert.deepEqual(fieldsOf(ROWS.get('Strike As One')), ['row'])
+  assert.equal(ROWS.get('Strike As One')?.aaFix?.issues[0].evidence.length, 2, "the game's list, then Daybreak's 08-25 notes")
   assert.deepEqual(fieldsOf(ROWS.get('Rampage')), ['ranks', 'text', 'cost'])
   assert.deepEqual(fieldsOf(ROWS.get('Unbound Strikethrough')), ['name'])
   assert.deepEqual(fieldsOf(ROWS.get('Quick Buff')), ['text', 'text', 'text', 'text'])
@@ -72,7 +73,7 @@ test("a row's dates and kinds are its sources'; a second source joins the same i
 
 test("Copy gives the row in the page's own layout; the chip opens the AA page's editor", () => {
   const strike = ROWS.get('Strike As One') as GapRow
-  assert.match(wikiPageText(strike, [], {}), /^\|-\n\| Strike As One \|\| 1 \|\| 6 \|\| This passive AA gives the Beastlord .* Requirements: Level 35\.\n$/)
+  assert.match(wikiPageText(strike, [], {}), /^\|-\n\| Strike As One \|\| 1 \|\| 6 \|\| This passive ability grants the Beastlord .* Requirements: Level 35\.\n$/)
   const rampage = ROWS.get('Rampage') as GapRow
   assert.match(wikiPageText(rampage, [], {}), /^\| Rampage \|\| 2 \|\| 5\/4 \|\| Ability Activation ID: 109 .*Rank 2: Level 40, Warriors and Berserkers\. Requirements: Level 30\.\n$/)
   const drakkin = ROWS.get('Race Reincarnation: Drakkin') as GapRow
@@ -116,4 +117,13 @@ test('the log joins a correction of the same AA as more evidence, never a second
   assert.ok(by.get('Rampage')?.kinds.includes('trained'))
   assert.ok(by.get('Unbound Strikethrough')?.aaFix?.issues[0].evidence.some((e) => e.startsWith('Your log: Unbound Strikethrough')))
   assert.ok(by.get('Strike As One')?.aaFix?.issues[0].evidence.some((e) => e.startsWith('Your log: Strike As One rank 1')))
+})
+
+test("the Special AAs header is one row (timer 90, refresh 2 minutes); the class rows' notes add none", () => {
+  const head = ROWS.get('Special AAs header') as GapRow
+  assert.deepEqual(head.aaFix?.issues.map((i) => [i.field, i.says]), [['header', 'HK Share CoolDown on 90sec timer']])
+  assert.match(head.aaFix?.issues[0].should ?? '', /share ability timer 90; each refreshes in 2 minutes \(seen on Warrior, Monk, Shaman\)/)
+  assert.equal(wikiPageText(head, [], {}), '! Name !! Ranks I !! Rank II !! Rank III !! Description !! HK (shared ability timer 90, refresh 2:00)\n')
+  assert.match(gapActions(head, 'unchecked')[0].why, /^The Special AAs table header: /)
+  assert.equal(ROWS.get('Class Reincarnation: Warrior'), undefined)
 })

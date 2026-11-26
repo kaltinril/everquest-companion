@@ -144,7 +144,7 @@ function TextCell({ r }: { r: AaRanked }): JSX.Element {
       <Tooltip title={r.row.hk === undefined ? r.row.text : `${r.row.text} Hotkey: ${r.row.hk}`} cursor="inherit">
         <Box sx={TEXT_SX}>{r.row.text}</Box>
       </Tooltip>
-      <Mark r={r} fields={['text']} />
+      <Mark r={r} fields={['text', 'hk']} />
     </TableCell>
   )
 }
@@ -182,13 +182,32 @@ function Head({ special }: { special: boolean }): JSX.Element {
   )
 }
 
-/** One section's rows as a table. */
-export function AaTable({ rows, setPick, special = false }: { rows: AaRanked[]; setPick: SetPick; special?: boolean }): JSX.Element {
+/** Rows under a quiet heading of their own: the Archetype AAs that may apply. */
+export interface AaTail {
+  note: string
+  tip: string
+  rows: AaRanked[]
+}
+
+/** One section's rows as a table, and a tail group under its note when given. */
+export function AaTable({ rows, setPick, special = false, tail }: { rows: AaRanked[]; setPick: SetPick; special?: boolean; tail?: AaTail }): JSX.Element {
   return (
     <Table size="small" stickyHeader data-testid="aa-table">
       <Head special={special} />
       <TableBody>
         {rows.map((r) => (
+          <AaRowLine key={r.key} r={r} setPick={setPick} special={special} />
+        ))}
+        {tail !== undefined && tail.rows.length > 0 && (
+          <TableRow data-testid="aa-may-apply">
+            <TableCell colSpan={4} sx={{ ...CELL_SX, color: 'text.secondary', fontStyle: 'italic', bgcolor: 'action.hover' }}>
+              <Tooltip title={tail.tip}>
+                <span>{tail.note}</span>
+              </Tooltip>
+            </TableCell>
+          </TableRow>
+        )}
+        {tail?.rows.map((r) => (
           <AaRowLine key={r.key} r={r} setPick={setPick} special={special} />
         ))}
       </TableBody>
