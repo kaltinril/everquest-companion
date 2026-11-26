@@ -3,7 +3,11 @@
 //
 // The four lists join, older first. The AA ledger's unspent total is the value to watch: it is
 // read off every gain and every purchase, so a merge that dropped one would show it.
+//
+// The latest `/alt list` run is the newer one's (by its stamp, as either side may lack it); the
+// activations join by name, the earliest first sighting and the latest last one.
 
+import type { AaActivation, AaListRun } from '../aaList'
 import type { LevelingSnap } from '../types'
 
 const LISTS = ['levels', 'aaGains', 'aaSpends', 'aaPotions'] as const
@@ -11,6 +15,20 @@ const LISTS = ['levels', 'aaGains', 'aaSpends', 'aaPotions'] as const
 function isLevelingSnap(x: unknown): x is LevelingSnap {
   if (x === null || typeof x !== 'object') return false
   return LISTS.every((k) => Array.isArray((x as Record<string, unknown>)[k]))
+}
+
+function newerRun(a: AaListRun | null | undefined, b: AaListRun | null | undefined): AaListRun | null {
+  if (a === null || a === undefined) return b ?? null
+  return b === null || b === undefined || a.ts > b.ts ? a : b
+}
+
+function joinActivations(older: readonly AaActivation[], newer: readonly AaActivation[]): AaActivation[] {
+  const byName = new Map<string, AaActivation>()
+  for (const a of [...older, ...newer]) {
+    const had = byName.get(a.name)
+    byName.set(a.name, had === undefined ? a : { name: a.name, first: Math.min(had.first, a.first), last: Math.max(had.last, a.last) })
+  }
+  return [...byName.values()]
 }
 
 /** `older` then `newer`, or null when either is not a leveling snapshot. */
@@ -21,6 +39,11 @@ export function mergeLeveling(older: unknown, newer: unknown): LevelingSnap | nu
     levels: [...older.levels, ...newer.levels],
     aaGains: [...older.aaGains, ...newer.aaGains],
     aaSpends: [...older.aaSpends, ...newer.aaSpends],
-    aaPotions: [...older.aaPotions, ...newer.aaPotions]
+    aaPotions: [...older.aaPotions, ...newer.aaPotions],
+    // Only when a side has them: two segments from before the fields merge to one without them.
+    ...(older.aaList === undefined && newer.aaList === undefined ? {} : { aaList: newerRun(older.aaList, newer.aaList) }),
+    ...(older.aaActivations === undefined && newer.aaActivations === undefined
+      ? {}
+      : { aaActivations: joinActivations(older.aaActivations ?? [], newer.aaActivations ?? []) })
   }
 }

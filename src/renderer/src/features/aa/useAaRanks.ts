@@ -1,7 +1,8 @@
 // aa/useAaRanks.ts — the current character's AA ranks (shared/aaRanks.ts) and the stat cap they set
 // (shared/reincarnationCap.ts), for the Alt. Advancement tab and the Best in slot sheet.
 //
-// The log side is the `leveling` snapshot's purchase lines; the player's picks are kept per
+// The log side is the `leveling` snapshot's purchase lines, its latest `/alt list` run and the AAs
+// seen activated (the order of proof is shared/aaRanks.ts's); the player's picks are kept per
 // character name under `AA_PICKS_KEY` in localStorage, one store for every caller in the window.
 // Free ranks the game grants (shared/aaGranted.ts) read the log's last stated level and the class combo.
 
@@ -10,7 +11,7 @@ import type { CharacterSnap } from '@shared/characterTypes'
 import type { LevelingSnap } from '@shared/types'
 import {
   AA_PICKS_KEY,
-  rankAas,
+  rankAasFrom,
   sanitizeAaPicks,
   withAaPick,
   type AaPicks,
@@ -89,6 +90,8 @@ export interface AaRanksState {
   ranked: AaRanked[]
   /** The ranks before free ranks are laid on, for another combo's grants. */
   ungranted: AaRanked[]
+  /** When the latest `/alt list` run was printed; null before one. */
+  listTs: number | null
   /** When each reincarnation the log shows happened, newest first. */
   reincarnations: number[]
   /** Set this character's rank in the row stored under `key`, or `null` to go back to the log. */
@@ -109,7 +112,12 @@ export function useAaRanks(planned: readonly ClassAbbr[] | null = null): AaRanks
   const spends = snap?.aaSpends
   const levels = snap?.levels
   const found = useMemo(() => reincarnationsOf(levels ?? [], spends ?? []), [levels, spends])
-  const ungranted = useMemo(() => rankAas(spends ?? [], picks, found.map((r) => r.race)), [spends, picks, found])
+  const list = snap?.aaList ?? null
+  const activations = snap?.aaActivations
+  const ungranted = useMemo(
+    () => rankAasFrom({ spends: spends ?? [], races: found.map((r) => r.race), list, activations: activations ?? [] }, picks),
+    [spends, picks, found, list, activations]
+  )
   const ranked = useMemo(() => withGranted(ungranted, { level, classes }), [ungranted, level, classes])
   const reincarnations = useMemo(() => found.map((r) => r.ts), [found])
   const setPick = useCallback(
@@ -118,7 +126,7 @@ export function useAaRanks(planned: readonly ClassAbbr[] | null = null): AaRanks
     },
     [character]
   )
-  return { character, level, detected, served: snap !== null, ranked, ungranted, reincarnations, setPick }
+  return { character, level, detected, served: snap !== null, ranked, ungranted, listTs: list?.ts ?? null, reincarnations, setPick }
 }
 
 /** The current character's base stat cap: hard with no reincarnation, soft (and raised) after one. */

@@ -7,11 +7,14 @@
 
 import type { LevelingDelta, LevelingSnap } from '@shared/types'
 
-export const EMPTY_LEVELING: LevelingSnap = { levels: [], aaGains: [], aaSpends: [], aaPotions: [] }
+export const EMPTY_LEVELING: LevelingSnap = { levels: [], aaGains: [], aaSpends: [], aaPotions: [], aaList: null, aaActivations: [] }
 
 export const applyLevelingDelta = (s: LevelingSnap, d: LevelingDelta): LevelingSnap => ({
   levels: [...s.levels, ...d.levels],
   aaGains: [...s.aaGains, ...d.aaGains],
   aaSpends: [...s.aaSpends, ...d.aaSpends],
-  aaPotions: [...s.aaPotions, ...d.aaPotions]
+  aaPotions: [...s.aaPotions, ...d.aaPotions],
+  // Not lists to append: a delta that carries them carries their whole new value.
+  aaList: d.aaList === undefined ? s.aaList : d.aaList,
+  aaActivations: d.aaActivations ?? s.aaActivations
 })

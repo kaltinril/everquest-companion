@@ -2,9 +2,14 @@
 // tab (owner, 2026-11-25; docs/community/requirements/alt-advancement.md) and the Best in slot
 // sheet's soft cap. Pure: the committed table, the log's purchase lines and the player's picks in.
 //
-// WHERE A RANK COMES FROM, in order: the player's own pick for this character; else the highest rank
-// the log's purchase lines state (`aaLedger`); else 0. A free rank the game grants is laid over
-// these by shared/aaGranted.ts `withGranted` (the log writes no line for it). THE LOG WINS OVER THE WIKI (owner,
+// WHERE A RANK COMES FROM (owner, 2026-11-25, the order of proof): the first source that says
+// something wins. 1. the latest `/alt list` run (shared/aaList.ts; it reads a rank only for a row with
+// more than one), except that a purchase line logged AFTER the run raises it (a list can be stale
+// until a loadout swap or zone, MEASURED.md); 2. the player activating it (`You activate X.`: at
+// least rank 1); 3. the player's own pick for this character; 4. the highest rank the log's purchase
+// lines state (`aaLedger`), and a free rank the game grants, laid over by shared/aaGranted.ts
+// `withGranted` (the log writes no line for it). A one-rank row the list printed with none of 2-4 is
+// `unknown`: the list prints it the same owned or not, so it is never guessed and never sold. THE LOG WINS OVER THE WIKI (owner,
 // 2026-11-25): a row's top rank is the larger of the wiki's rank count and the log's rank.
 //
 // NAMES (shared/aaLogMatch.ts). A log name matches a row without case or apostrophes (`Warriors
@@ -19,13 +24,14 @@ import type { AaSection, AaTableRow } from './aaTable.generated'
 import { AA_ROWS, type AaRow } from './aaOfficial'
 import { aaFold, aaLogAas, aaLogMatch, type LogAa } from './aaLogMatch'
 import type { AASpendLike } from './aa'
+import { aaActivatedRows, aaListRead, type AaActivation, type AaListRun } from './aaList'
 import type { ClassAbbr } from './classCombo'
 import { classAbbrForDisplayName } from './spellLevels'
 
 export { aaFold } from './aaLogMatch'
 
 /** `granted`: a free rank the game gives without a purchase line (shared/aaGranted.ts). */
-export type AaRankSource = 'pick' | 'log' | 'granted' | 'none'
+export type AaRankSource = 'list' | 'activated' | 'pick' | 'log' | 'granted' | 'none'
 
 export interface AaRanked {
   row: AaRow
@@ -41,6 +47,28 @@ export interface AaRanked {
   wikiName: string | null
   /** A log AA the wiki's AA page does not list. */
   unlisted: boolean
+  /** A one-rank AA the list printed and nothing else in the log settles: held or not, unknown. */
+  unknown?: true
+}
+
+/** What the log says of one row besides its purchase lines (shared/aaList.ts). */
+export interface AaEvidence {
+  /** The rank the latest `/alt list` run shows. */
+  list?: number
+  /** The run printed the row (read or not). */
+  printed?: boolean
+  /** The highest rank a purchase line logged after the run states. */
+  after?: number
+  /** The log shows the player activating it. */
+  activated?: boolean
+}
+
+/** Everything the log gives the ranks: purchases, reincarnations, the latest list run, activations. */
+export interface AaLogInput {
+  spends: readonly AASpendLike[]
+  races?: readonly (string | null)[]
+  list?: AaListRun | null
+  activations?: readonly AaActivation[]
 }
 
 /** One character's picks, by row key. */
@@ -66,22 +94,52 @@ export function aaKey(row: AaTableRow): string {
 
 const clamp = (n: number, max: number): number => Math.max(0, Math.min(max, Math.floor(n)))
 
-/** One row's rank for a character, from its log AA (null when the log names none). */
-export function rankAa(row: AaRow, log: LogAa | null, picks: AaPicks, unlisted = false): AaRanked {
+type Held = Pick<AaRanked, 'rank' | 'source'> & { unknown?: true }
+
+/** Below the list: activation (at least 1), else the pick, else the purchase lines. */
+function heldBelowList(pick: number | undefined, logRank: number | null, ev: AaEvidence, max: number): Held {
+  const lower: Held | null = pick !== undefined ? { rank: clamp(pick, max), source: 'pick' } : logRank !== null && logRank > 0 ? { rank: logRank, source: 'log' } : null
+  if (ev.activated === true) return lower !== null && lower.rank >= 1 ? lower : { rank: 1, source: 'activated' }
+  if (lower !== null) return lower
+  return ev.printed === true ? { rank: 0, source: 'none', unknown: true } : { rank: 0, source: 'none' }
+}
+
+/** One row's rank for a character, from its log AA (null when the log names none) and the other evidence. */
+export function rankAa(row: AaRow, log: LogAa | null, picks: AaPicks, { unlisted = false, ev = {} }: { unlisted?: boolean; ev?: AaEvidence } = {}): AaRanked {
   const key = log !== null && (log.near === true || unlisted) ? log.name : aaKey(row)
   const logRank = log === null ? null : log.rank
   const max = Math.max(row.ranks, logRank ?? 0)
   const base = { row, key, max, logRank, wikiName: unlisted || key === row.name ? null : row.name, unlisted }
-  const pick = picks[key]
+  if (ev.list !== undefined) {
+    const after = ev.after ?? 0
+    return { ...base, ...(after > ev.list ? { rank: after, source: 'log' as const } : { rank: ev.list, source: 'list' as const }) }
+  }
   // A removed AA takes no pick: only what the log shows (THE LOG WINS) is held.
-  if (pick !== undefined && row.removed === undefined) return { ...base, rank: clamp(pick, max), source: 'pick' }
-  if (logRank !== null && logRank > 0) return { ...base, rank: logRank, source: 'log' }
-  return { ...base, rank: 0, source: 'none' }
+  const pick = row.removed === undefined ? picks[key] : undefined
+  return { ...base, ...heldBelowList(pick, logRank, ev, max) }
 }
 
 /** A General row for a log AA the wiki's page does not list. */
 function unlistedRow(aa: LogAa): AaTableRow {
   return { section: 'general', name: aa.name, ranks: aa.rank, cost: '', text: '' }
+}
+
+/** Each row's list rank, purchases after the run, and activation, by folded row name. */
+function evidenceOf(input: AaLogInput, table: readonly AaRow[]): (row: AaTableRow) => AaEvidence {
+  const run = input.list ?? null
+  const read = run === null ? null : aaListRead(run, table, aaKey)
+  const later = run === null ? null : aaLogMatch(aaLogAas(input.spends.filter((x) => x.ts > run.ts)), table, aaKey).byRow
+  const acted = aaActivatedRows(input.activations ?? [], table, aaKey)
+  return (row) => {
+    const f = aaFold(row.name)
+    const list = read?.ranks.get(f)
+    return {
+      ...(list === undefined ? {} : { list }),
+      ...(read?.printed.has(f) === true ? { printed: true } : {}),
+      ...(later?.get(f) === undefined ? {} : { after: later.get(f)?.rank }),
+      ...(acted.has(f) ? { activated: true } : {})
+    }
+  }
 }
 
 /**
@@ -94,10 +152,16 @@ export function rankAas(
   races: readonly (string | null)[] = [],
   table: readonly AaRow[] = AA_ROWS
 ): AaRanked[] {
-  const { byRow, unplaced } = aaLogMatch(aaLogAas(spends, races), table, aaKey)
+  return rankAasFrom({ spends, races }, picks, table)
+}
+
+/** `rankAas` with every kind of evidence the log holds (the list run, activations). */
+export function rankAasFrom(input: AaLogInput, picks: AaPicks, table: readonly AaRow[] = AA_ROWS): AaRanked[] {
+  const { byRow, unplaced } = aaLogMatch(aaLogAas(input.spends, input.races ?? []), table, aaKey)
+  const ev = evidenceOf(input, table)
   return [
-    ...table.map((row) => rankAa(row, byRow.get(aaFold(row.name)) ?? null, picks)),
-    ...unplaced.map((aa) => rankAa(unlistedRow(aa), aa, picks, true))
+    ...table.map((row) => rankAa(row, byRow.get(aaFold(row.name)) ?? null, picks, { ev: ev(row) })),
+    ...unplaced.map((aa) => rankAa(unlistedRow(aa), aa, picks, { unlisted: true }))
   ]
 }
 

@@ -28,7 +28,7 @@ export interface AaBoardRow {
   max: number
   effect: AaEffect
   cost: AaRowCost | null
-  /** Usable, bought with points, not removed, below its top rank. */
+  /** Usable, bought with points, not removed, below its top rank, and not `unknown`. */
   buyable: boolean
   /** The character's own combo lacks the row, but the log bought ranks in it: another loadout's. */
   elsewhere: boolean
@@ -72,7 +72,8 @@ export function aaBoard(ranked: readonly AaRanked[], combo: AaCombo): AaBoardRow
     const usable = fit === 'mine'
     const max = aaComboMax(r, combo.classes)
     const cost = aaRowCost(r.row, r.rank, max)
-    const buyable = usable && cost !== null && r.rank < max
+    // A rank the log cannot settle (aaRanks.ts `unknown`) is never sold to the player.
+    const buyable = usable && cost !== null && r.rank < max && r.unknown !== true
     const elsewhere = combo.own && fit === 'other' && (r.logRank ?? 0) > 0
     return { r, fit, usable, max, effect: aaEffect(r.row), cost, buyable, elsewhere }
   })
@@ -158,9 +159,9 @@ export interface AaTabCount {
   matches: number | null
 }
 
-/** A sub-tab's count: maxed of usable, their points, and the search's matches. */
+/** A sub-tab's count: maxed of usable (a row the log cannot settle left out), their points, and the search's matches. */
 export function aaTabCount(board: readonly AaBoardRow[], section: AaSection, scope: AaScope, query: string): AaTabCount {
-  const mine = board.filter((b) => b.r.row.section === section && b.usable)
+  const mine = board.filter((b) => b.r.row.section === section && b.usable && b.r.unknown !== true)
   const matches = query.trim() === '' ? null : board.filter((b) => b.r.row.section === section && (b.usable || scope === 'all') && aaMatches(b, query)).length
   return { maxed: mine.filter((b) => b.r.rank >= b.max).length, of: mine.length, points: aaCostSum(mine.map((b) => b.cost)), matches }
 }
@@ -171,6 +172,11 @@ export interface AaLeft {
   /** Points to the top rank of every buyable row. */
   points: number
   unknown: boolean
+}
+
+/** Usable rows the log cannot settle (a one-rank AA `/alt list` prints the same owned or not). */
+export function aaCantTell(board: readonly AaBoardRow[]): AaBoardRow[] {
+  return board.filter((b) => b.usable && b.r.unknown === true && b.r.row.removed === undefined)
 }
 
 /** What the combo has left to buy. */

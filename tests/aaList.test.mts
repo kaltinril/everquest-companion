@@ -1,0 +1,174 @@
+// What `/alt list` and `You activate X.` say of the AAs held (src/shared/aaList.ts), and the order of
+// proof they take in the ranks (src/shared/aaRanks.ts; owner, 2026-11-25): list, activation, pick,
+// then purchase lines and grants; a purchase logged after the list raises it. The fixtures are the
+// owner's own lines (docs/community/plans/2026-11-25-aa-window/): a maxed WAR/SHM/MNK, and a fresh
+// level-1 ENC/WAR owning nothing.
+
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
+import { aaBlockRank, aaListRead, aaRowListRank, type AaActivation, type AaListBlock, type AaListRun } from '../src/shared/aaList'
+import { aaKey, rankAasFrom, type AaLogInput, type AaPicks, type AaRanked } from '../src/shared/aaRanks'
+import { withGranted } from '../src/shared/aaGranted'
+import { aaBoard, aaCantTell, aaLeft } from '../src/shared/aaBoard'
+import { aaRecommend } from '../src/shared/aaRecommend'
+import { AA_ROWS } from '../src/shared/aaOfficial'
+import { mergeLeveling } from '../src/shared/logArchive/mergeLeveling'
+import type { ClassAbbr } from '../src/shared/classCombo'
+import type { AASpendEvent, LevelingSnap } from '../src/shared/types'
+
+const T = Date.parse('2026-11-25T16:02:11')
+
+/** The blocks of a list as the engine's fold joins them (one run: the fixtures hold one each). */
+function runOf(file: string, ts = T): AaListRun {
+  const blocks: AaListBlock[] = []
+  for (const raw of readFileSync(new URL(`./fixtures/aaList/${file}`, import.meta.url), 'utf8').split(/\r?\n/)) {
+    const line = raw.replace(/^\[[^\]]+\] /, '')
+    const head = /^Ability #(\d+): (.+)$/.exec(line)
+    const last = blocks.at(-1)
+    if (head !== null) blocks.push({ id: Number(head[1]), name: head[2].trim(), description: '', cost: null })
+    else if (line.startsWith('Description: ') && last !== undefined) last.description = line.slice('Description: '.length).trim()
+    else if (line.startsWith('Cost per Level: ') && last !== undefined) last.cost = Number(line.slice('Cost per Level: '.length))
+  }
+  return { ts, blocks }
+}
+
+const OWNER = runOf('owner-maxed-war-shm-mnk.txt')
+const FRESH = runOf('fresh-enc-war.txt')
+const WSM: ClassAbbr[] = ['WAR', 'SHM', 'MNK']
+
+const ranks = (input: Partial<AaLogInput>, picks: AaPicks = {}, classes: ClassAbbr[] = WSM): AaRanked[] =>
+  withGranted(rankAasFrom({ spends: [], ...input }, picks), { level: 50, classes })
+const row = (ranked: readonly AaRanked[], key: string): AaRanked => {
+  const r = ranked.find((x) => x.key === key)
+  assert.ok(r !== undefined, key)
+  return r
+}
+const act = (name: string, ts = T + 1): AaActivation => ({ name, first: ts, last: ts })
+const spend = (ability: string, rank: number, ts: number, cost = 1): AASpendEvent => ({ ts, ability: `${ability} ${String(rank)}`, cost, rank })
+
+test('the fixtures are the real runs: 118 blocks maxed, Combat Fury in both', () => {
+  assert.equal(OWNER.blocks.length, 118)
+  assert.ok(FRESH.blocks.some((b) => b.name === 'Combat Fury'))
+})
+
+test('a block reads its rank off the text, and off the cost when the text cannot', () => {
+  const fury = AA_ROWS.find((r) => r.name === 'Combat Fury')
+  assert.ok(fury !== undefined)
+  assert.equal(aaBlockRank(fury, { id: 40, name: 'Combat Fury', description: 'with all skills by 5%.', cost: 4 }), 4)
+  assert.equal(aaBlockRank(fury, { id: 40, name: 'Combat Fury', description: 'with all skills by 1%.', cost: 1 }), 1)
+  assert.equal(aaBlockRank(fury, { id: 40, name: 'Combat Fury', description: 'no number', cost: 3 }), 3)
+  // One block of rank 1 is unowned; a current-and-next pair is the current rank.
+  const bane = AA_ROWS.find((r) => r.name === 'Banestrike')
+  assert.ok(bane !== undefined)
+  const b = (pct: number): AaListBlock => ({ id: 15073, name: 'Banestrike', description: `abilities by ${String(pct)}%.`, cost: 0 })
+  assert.equal(aaRowListRank(bane, [b(2)]), 0)
+  assert.equal(aaRowListRank(bane, [b(2), b(4)]), 1)
+  assert.equal(aaRowListRank(bane, [b(10)]), 4)
+})
+
+test("OWNER'S MAXED LIST: Combat Fury 4/4 from the list; Quick Buff and Improved Bash can't be told", () => {
+  const ranked = ranks({ list: OWNER })
+  assert.deepEqual([row(ranked, 'Combat Fury').rank, row(ranked, 'Combat Fury').source], [4, 'list'])
+  for (const one of ['Quick Buff', 'Improved Bash']) {
+    assert.equal(row(ranked, one).unknown, true, one)
+    assert.equal(row(ranked, one).rank, 0, one)
+  }
+  assert.equal(row(ranked, 'Banestrike').rank, 1)
+})
+
+test("A STALE LIST says nothing of the row it printed three times: the purchase line settles it", () => {
+  // The owner's list was taken two minutes after buying Pottery Mastery 3 (15:42), before any zone or
+  // swap: Pottery printed rank 2, rank 3 and an unsold "rank 4".
+  const alone = ranks({ list: OWNER })
+  assert.equal(row(alone, 'Pottery Mastery').unknown, true)
+  const bought = [1, 2, 3].map((k) => spend('Pottery Mastery', k, T - 120_000 + k))
+  const ranked = ranks({ list: OWNER, spends: bought })
+  assert.deepEqual([row(ranked, 'Pottery Mastery').rank, row(ranked, 'Pottery Mastery').source], [3, 'log'])
+})
+
+test("OWNER'S MAXED LIST: nothing is left to buy and nothing is recommended", () => {
+  const board = aaBoard(ranks({ list: OWNER }), { classes: WSM, own: true })
+  const recs = aaRecommend(board, 20)
+  assert.deepEqual(recs.items.map((i) => `${i.b.r.key} ${String(i.b.r.rank)}/${String(i.b.max)}`), [])
+  assert.equal(aaLeft(board).count, 0)
+  const unsure = aaCantTell(board).map((b) => b.r.key)
+  assert.ok(unsure.includes('Quick Buff') && unsure.includes('Improved Bash'), unsure.join(', '))
+})
+
+test('FRESH CHARACTER: the list says Combat Fury 0, and it is for sale', () => {
+  const ranked = ranks({ list: FRESH }, {}, ['ENC', 'WAR'])
+  assert.deepEqual([row(ranked, 'Combat Fury').rank, row(ranked, 'Combat Fury').source], [0, 'list'])
+  const board = aaBoard(ranked, { classes: ['ENC', 'WAR'], own: true })
+  assert.ok(aaRecommend(board, 20).items.some((i) => i.b.r.key === 'Combat Fury'))
+})
+
+test('ACTIVATION: "You activate Quick Buff." holds it; "You activate Skull Bash." changes nothing', () => {
+  const ranked = ranks({ list: OWNER, activations: [act('Quick Buff'), act('Skull Bash')] })
+  const qb = row(ranked, 'Quick Buff')
+  assert.deepEqual([qb.rank, qb.source, qb.unknown], [1, 'activated', undefined])
+  assert.equal(row(ranked, 'Improved Bash').unknown, true)
+  const without = ranks({ list: OWNER, activations: [act('Skull Bash')] })
+  assert.deepEqual(
+    without.map((r) => [r.key, r.rank, r.source]),
+    ranks({ list: OWNER }).map((r) => [r.key, r.rank, r.source])
+  )
+})
+
+test('RUNG 1, the list, beats a pick and every purchase logged before it', () => {
+  const before = [1, 2, 3, 4].map((k) => spend('Combat Fury', k, T - 1000 + k))
+  const ranked = ranks({ list: FRESH, spends: before }, { 'Combat Fury': 3 }, ['ENC', 'WAR'])
+  assert.deepEqual([row(ranked, 'Combat Fury').rank, row(ranked, 'Combat Fury').source], [0, 'list'])
+})
+
+test('THE STALE-LIST EXCEPTION: a purchase logged after the list raises the rank above it', () => {
+  const after = [spend('Combat Fury', 1, T + 60_000), spend('Combat Fury', 2, T + 61_000)]
+  const ranked = ranks({ list: FRESH, spends: after }, {}, ['ENC', 'WAR'])
+  assert.deepEqual([row(ranked, 'Combat Fury').rank, row(ranked, 'Combat Fury').source], [2, 'log'])
+})
+
+test('RUNG 2, an activation, beats a pick of 0 (a pick above it still counts on a multi-rank row)', () => {
+  const zero = ranks({ activations: [act('Quick Buff')] }, { 'Quick Buff': 0 })
+  assert.deepEqual([row(zero, 'Quick Buff').rank, row(zero, 'Quick Buff').source], [1, 'activated'])
+})
+
+test('RUNG 3, the pick, beats purchase lines when neither list nor activation says anything', () => {
+  const spends = [1, 2].map((k) => spend('Combat Fury', k, T + k))
+  const ranked = ranks({ spends }, { 'Combat Fury': 4 })
+  assert.deepEqual([row(ranked, 'Combat Fury').rank, row(ranked, 'Combat Fury').source], [4, 'pick'])
+  // "I have it" on a row the list cannot read is a pick, and it settles the row.
+  const had = ranks({ list: OWNER }, { 'Improved Bash': 1 })
+  assert.deepEqual([row(had, 'Improved Bash').rank, row(had, 'Improved Bash').source, row(had, 'Improved Bash').unknown], [1, 'pick', undefined])
+})
+
+test('RUNG 4, purchase lines, with no list read at all: today behaviour, nothing marked unknown', () => {
+  const spends = [1, 2].map((k) => spend('Combat Fury', k, T + k))
+  const ranked = ranks({ spends })
+  assert.deepEqual([row(ranked, 'Combat Fury').rank, row(ranked, 'Combat Fury').source], [2, 'log'])
+  assert.equal(row(ranked, 'Quick Buff').unknown, undefined)
+  const board = aaBoard(ranked, { classes: WSM, own: true })
+  assert.ok(aaRecommend(board, 20).items.some((i) => i.b.r.key === 'Quick Buff'))
+})
+
+test('the list maps its names onto the rows: apostrophes and race rows', () => {
+  const read = aaListRead(OWNER, AA_ROWS, aaKey)
+  // The game writes `Warriors Endurance`, the wiki `Warrior's Endurance`; the race lines `Race Reincarnation: Iksar`.
+  assert.ok(read.printed.has('warriors endurance'))
+  assert.ok([...read.printed].some((f) => f.endsWith('reincarnation: iksar')))
+  assert.equal(read.ts, T)
+})
+
+test('mergeLeveling: the newer list run wins, activations join by name', () => {
+  const base: LevelingSnap = { levels: [], aaGains: [], aaSpends: [], aaPotions: [] }
+  const older: LevelingSnap = { ...base, aaList: { ts: 5, blocks: [] }, aaActivations: [{ name: 'Quick Buff', first: 1, last: 4 }] }
+  const newer: LevelingSnap = { ...base, aaList: null, aaActivations: [{ name: 'Quick Buff', first: 8, last: 9 }, act('Rampage', 7)] }
+  const m = mergeLeveling(older, newer)
+  assert.ok(m !== null)
+  assert.equal(m.aaList?.ts, 5)
+  assert.deepEqual(m.aaActivations, [{ name: 'Quick Buff', first: 1, last: 9 }, { name: 'Rampage', first: 7, last: 7 }])
+  const later = mergeLeveling(older, { ...base, aaList: { ts: 9, blocks: [] } })
+  assert.equal(later?.aaList?.ts, 9)
+  // A segment written before the fields reads as one without them.
+  assert.equal(mergeLeveling(base, base)?.aaActivations, undefined)
+  assert.equal(mergeLeveling(base, older)?.aaList?.ts, 5)
+})
