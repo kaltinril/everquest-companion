@@ -294,7 +294,9 @@ function NavGroupSection({
         </Box>
       </ListItemButton>
       <Collapse in={open}>
-        <List component="div" disablePadding>
+        {/* Indented 4px under the heading (owner, 2026-11-26); Overview and Preferences, which
+            sit under no heading, are not. */}
+        <List component="div" disablePadding sx={{ pl: '4px' }}>
           {group.rows.map((row) => (
             <NavRowButton key={row.view} row={row} view={view} onSelect={onSelect} />
           ))}
