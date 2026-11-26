@@ -159,6 +159,13 @@ export interface CursorRingPrefs {
    * shape fits the same `sizePx` footprint; `shared/cursorRingShape.ts` turns one into a box.
    */
   shape: RingShape
+  /**
+   * Where the shape sits relative to the pointer's hot spot, in CSS px (owner, 2026-11-26: "can we
+   * also control the offset, X/Y"). Positive X moves it right, positive Y moves it down. 0/0 by
+   * default, which centres it on the pointer as it always was.
+   */
+  offsetXPx: number
+  offsetYPx: number
 }
 
 /**
@@ -185,6 +192,10 @@ export const RING_SHAPES: readonly RingShape[] = [
   'dot',
   'target'
 ]
+
+/** Offset bounds, each axis. Past 60px the shape stops reading as the pointer's own mark. */
+export const MIN_RING_OFFSET_PX = -60
+export const MAX_RING_OFFSET_PX = 60
 
 /** The shape the ring has always had. */
 export const DEFAULT_RING_SHAPE: RingShape = 'circle'
@@ -277,7 +288,9 @@ export const DEFAULT_CURSOR_RING: CursorRingPrefs = {
   sizePx: DEFAULT_RING_SIZE_PX,
   thicknessPx: DEFAULT_RING_THICKNESS_PX,
   colorHex: DEFAULT_RING_COLOR,
-  shape: DEFAULT_RING_SHAPE
+  shape: DEFAULT_RING_SHAPE,
+  offsetXPx: 0,
+  offsetYPx: 0
 }
 
 export const DEFAULT_OVERLAY_AUTO_HIDE: OverlayAutoHidePrefs = {
@@ -318,7 +331,9 @@ export function normalizeCursorRing(value: unknown): CursorRingPrefs {
     sizePx,
     thicknessPx: Math.max(MIN_RING_THICKNESS_PX, Math.min(thickness, Math.floor(sizePx / 2))),
     colorHex: normalizeRingColor(v.colorHex),
-    shape: normalizeRingShape(v.shape)
+    shape: normalizeRingShape(v.shape),
+    offsetXPx: clampPx(v.offsetXPx, MIN_RING_OFFSET_PX, MAX_RING_OFFSET_PX, 0),
+    offsetYPx: clampPx(v.offsetYPx, MIN_RING_OFFSET_PX, MAX_RING_OFFSET_PX, 0)
   }
 }
 

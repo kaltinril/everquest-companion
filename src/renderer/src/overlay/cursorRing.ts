@@ -30,8 +30,8 @@
 
 import { ringStrokeColor } from '@shared/presencePrefs'
 import type { CursorPoint, CursorRingPrefs } from '@shared/presencePrefs'
-import { innerMarkStyle, ringBoxStyle, ringGeometry, ringTransform } from '@shared/cursorRingShape'
-import type { RingGeometry } from '@shared/cursorRingShape'
+import { innerMarkStyle, ringBoxStyle, ringGeometry, ringOffset, ringTransform } from '@shared/cursorRingShape'
+import type { RingGeometry, RingOffset } from '@shared/cursorRingShape'
 
 /** The bridge `preload/cursor.ts` installs. Narrow on purpose — this window can receive its
  *  config and a stream of points, and can do nothing else. */
@@ -57,9 +57,12 @@ const inner: HTMLElement = innerEl
  *  setting changes, so the hot path is two subtractions and a string. Until the config arrives
  *  it is the default circle, the same box cursor.html's static rule draws. */
 let geometry: RingGeometry = ringGeometry({ sizePx: 0, thicknessPx: 1 })
+/** The player's X/Y offset from the pointer; set with the geometry, read on every paint. */
+let offset: RingOffset = { x: 0, y: 0 }
 
 function applyConfig(cfg: CursorRingPrefs): void {
   geometry = ringGeometry(cfg)
+  offset = ringOffset(cfg)
   // The colour is a STYLE assignment, so only a `#rrggbb` may reach it — `ringStrokeColor` takes
   // the value through the same normalizer main stored it through, and answers with an rgba()
   // built from three numbers. Nothing a store file could carry becomes a CSS declaration here.
@@ -92,7 +95,7 @@ function paint(): void {
   // Translate only (plus the diamond's fixed turn). Rounding to whole pixels keeps the ring off
   // half-pixel boundaries, where the compositor would resample the border and make a crisp 4px
   // stroke look soft. For the circle this is the very string the ring has always been given.
-  ring.style.transform = ringTransform(geometry, latest)
+  ring.style.transform = ringTransform(geometry, latest, offset)
 }
 
 /** Ask for at most ONE frame. Calling this ten times between two frames costs nine boolean

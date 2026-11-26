@@ -3526,6 +3526,13 @@ what a later change must know. Each fix has a unit test that failed before it.
   mark on `#ring-inner`, a child of `#ring` styled once per config, so the ring's transform carries
   it. The diamond's `rotate(45deg)` is appended to the same transform string, after the translate.
   No timer, no canvas, no layout on a move.
+- **Offset:** `offsetXPx` / `offsetYPx`, whole px clamped to +-60 (`MIN/MAX_RING_OFFSET_PX`), default
+  0/0 (centred, as before), no schema bump. `ringTransform(g, p, offset)` adds it before the half
+  box comes off; `ringOffset(prefs)` reads a config without one as 0/0. +-60 keeps a parked ring
+  (-9999) off screen. Pinned in `tests/cursorRingOffset.test.mts`.
+- **Preferences sample:** `CursorRingDemo.tsx`, a box holding a drawn arrow pointer whose tip is the
+  hot spot, with the shape at the offset; keeps `data-testid="pref-cursor-ring-preview"` on the
+  shape (the colour e2e reads its border colour). Grows with size + offset so nothing clips.
 - **Queued (owner, 2026-11-26: shapes first):** icon upload (would add `'image'` to `RingShape`; the
   window then draws a picture; cursor.html's CSP has `img-src 'none'` today), NxN drawing grid,
   crosshair (full-window lines, own colour and weight), trail / particles.

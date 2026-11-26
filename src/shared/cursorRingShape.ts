@@ -127,13 +127,29 @@ export function ringGeometry(
   }
 }
 
+/** The player's X/Y offset of the shape from the pointer, CSS px. */
+export interface RingOffset {
+  x: number
+  y: number
+}
+
+const NO_OFFSET: RingOffset = { x: 0, y: 0 }
+
+/** The offset carried by the prefs; a config without one (an older main) is centred. */
+export function ringOffset(prefs: { offsetXPx?: unknown; offsetYPx?: unknown }): RingOffset {
+  const n = (v: unknown): number => (typeof v === 'number' && Number.isFinite(v) ? Math.round(v) : 0)
+  return { x: n(prefs.offsetXPx), y: n(prefs.offsetYPx) }
+}
+
 /**
- * The ring's transform for one pointer sample: centre the box on the point, whole pixels, then
- * turn it. THE HOT PATH: two subtractions, two roundings, one string. For every shape but the
- * diamond it is exactly the string the ring has always used.
+ * The ring's transform for one pointer sample: centre the box on the point plus the player's
+ * offset, whole pixels, then turn it. THE HOT PATH: a few additions, two roundings, one string.
+ * At offset 0/0, for every shape but the diamond it is exactly the string the ring always used.
  */
-export function ringTransform(g: RingGeometry, p: CursorPoint): string {
-  const t = `translate3d(${Math.round(p.x - g.widthPx / 2)}px, ${Math.round(p.y - g.heightPx / 2)}px, 0)`
+export function ringTransform(g: RingGeometry, p: CursorPoint, offset: RingOffset = NO_OFFSET): string {
+  const x = Math.round(p.x + offset.x - g.widthPx / 2)
+  const y = Math.round(p.y + offset.y - g.heightPx / 2)
+  const t = `translate3d(${x}px, ${y}px, 0)`
   return g.rotateDeg === 0 ? t : `${t} rotate(${g.rotateDeg}deg)`
 }
 
