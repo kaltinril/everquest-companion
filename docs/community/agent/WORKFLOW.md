@@ -333,6 +333,13 @@ disagree, RULES.md wins; fix this file.
   is we don't want to have our users confused what is wrong."). A screen that is stuck, empty or
   stale says why in plain words and, where the app can know it, what to try. A silent wait and a
   wrong reason are both defects. Recovering by itself is welcome, and comes second to saying so.
+- **Where the log and the wiki disagree, the app trusts the log** (owner, 2026-11-25: "we should
+  trust log data over wiki data since the wiki depends on manual free contributions from community,
+  and daybreak who makes eql is constantly updating/changing/enhancing EQL"). A rank, name, value or
+  count the log states wins over the wiki's: never cap, rename or hide what the log shows to fit a
+  wiki page (the AA tab: Rampage at rank 2 where the wiki lists 1; the log's `Unbound Strikethrough`
+  shown under its own name, matched to the wiki's `Unbounded Strikethrough`). The difference is
+  still reported to the owner as a wiki fix (the ruling below on wiki-data complaints).
 - **Scraping is wiki-only; the log is the truth** (owner, 2026-10-10). The game's own files may
   be parsed once, at dev time, to find wiki errors; nothing shipped or scraped depends on them.
   DATA_REFRESH.md, "The ETL".
