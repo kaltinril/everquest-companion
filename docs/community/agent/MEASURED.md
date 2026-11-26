@@ -363,6 +363,48 @@ wiki.project1999.com refused the fetch (403).
 - **Log rotation:** the game opens the log by path per write. Moving the live log while EQ runs
   works; the game creates a fresh file on the next line.
 
+## Alternate advancement: the game window and `/alternateadv list` (2026-11-25, owner's WAR/SHM/MNK)
+
+Sources beside `plans/2026-11-25-aa-window/`: seven AA-window screenshots and the list's log text.
+
+- **`/outputfile` has no AA kind.** The game's usage line: achievements, faction, guild, guildbank,
+  guildhall, inventory, missingspells, raid, realestate, recipes [argument], spellbook. The
+  `alternateadv` kind in `shared/outputs/kinds.ts` was the original author's unverified guess.
+- **`/alternateadv list` (`/alt list`) prints to the log**: every AA the class combo can see, one
+  block each, all lines in one second (118 blocks, 354 lines on the owner's log):
+  `Ability #<id>: <name>`, `Description: <the rank's text>`, `Cost per Level: <n>`. No rank number.
+  An ability not yet maxed prints a block per rank shown (current and next: Banestrike 1/4 prints
+  its 2% and 4% texts; Class Reincarnation: Warrior 2/3 prints rank 2 and the activated rank 3); an
+  unowned one prints rank 1; a maxed one prints one block. The `#id` is stable per ability.
+- **The window** (General, Archetype, Class, Special tabs; Title, Cur/Max, Cost, Timer columns):
+  Archetype and Class list only what the class combo can take. Cost is blank once maxed, 0 on
+  Special rows. The owner: AA Points 20, Assigned 810, Total Spent 810.
+- **WAR/SHM/MNK facts**: all 32 General AAs maxed. Archetype for this combo (29 seen, all maxed):
+  Point Blank Fire, Healing Adept, Healing Gift, Spell Casting Mastery, Mastery of the Past, Spell
+  Casting Deftness, Finishing Blow, Mass Group Buff, Quick Damage, Improved Bash, Ambidexterity,
+  Double Riposte, Spell Casting Reinforcement 4, Mental Clarity 4, Physical Enhancement, Acrobatics,
+  Destructive Fury, Pet Affinity, Rampage 2/2, Fury of Magic 4, Master of All, Healing Boon,
+  Critical Affliction, Destructive Cascade, Persistent Casting 6, Intimidation, Companion's
+  Discipline, Burst of Power, Mnemonic Retention 6. Class (13, all maxed): Warriors Endurance,
+  Unbound Cascade, Unbound Wrath, Cannibalization, Improved Mend, Purify Body, Rapid Feign, Area
+  Taunt, War Cry, Dragon Force, Innate Fighters Tenacity, Unbound Alacrity, Heroic Leap. Special:
+  Banestrike 1/4; Class Reincarnation: Warrior, Monk, Shaman 2/3; Race Reincarnation: Half Elf 1/3
+  and Iksar 1/3 (two reincarnations, one into each race); every other row 0/3.
+- **Where the game differs from the wiki's AA page** (the game wins, WORKFLOW.md ruling):
+  - Race lines are named `Race Reincarnation: <race>` in the game; the wiki writes `Class
+    Reincarnation: <race>`.
+  - The game has `Race Reincarnation: Drakkin` (#26145) and a placeholder `Race Reincarnation:
+    Race 18` (#26151); the wiki has neither.
+  - Rampage 2/2 shows cost 4 (the wiki: 1 rank, cost 5); Daybreak's 2026-10-22 notes added rank 2.
+  - Pottery Mastery prints a fourth rank, cost 20: "reduces the chance of failing Pottery recipes
+    by 50% and allows you to increase your skill past its Specialization cap by 5 points by
+    learning more recipes" (the wiki: 3 ranks, 2/4/6; the window, a minute earlier, 3/3). Seen
+    after a rank-3 purchase at 15:42 (cost 6).
+  - Point Blank Fire is in the combo's Archetype list (Monk; Daybreak 2026-09-22: Rangers, Rogues,
+    Monks, Berserkers).
+- What it would take for other combos: the same `/alt list` after a loadout swap (the list follows
+  the combo in force).
+
 ## /outputfile dumps
 
 - **Inventory:** the bank is always in it. Hoard and Personal Depot appear only after that window
