@@ -96,7 +96,7 @@ Requirement row: `requirements/scrape-delta-tool.md` 2026-10-18. Not started.
 
 ## Re-runnable checks (scripts in the session scratchpad; recreate if gone)
 
-- Log evidence: scan archive (`%APPDATA%/everquest-companion-dev/log-archive/*.log.gz`) + live log
+- Log evidence: scan archive (`<EQ>/Logs/companion-archive/*.log.gz`; the `%APPDATA%` folder is stale since 2026-10-07) + live log
   for looted items (`You have looted a X from Y's corpse` / `You looted a X from Y's corpse`),
   mobs (slain / has been slain by / con lines / loot sources), zones (`You have entered X.`),
   spells (`begins casting` — only the player's own casts count for spell era).

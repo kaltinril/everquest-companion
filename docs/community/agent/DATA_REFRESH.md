@@ -451,7 +451,8 @@ The app's Gaps tab merges the archived months with the live log, and an archive'
 version that recorded it read them (refreshed automatically once per update since 2026-10-18). An
 audit of the live log alone misses them: on 2026-10-18 it said the pet rows were gone while the
 test.19 archive still served 140 of them. The archive lives where the app's Preferences card says
-(here `<EQ>/Logs/companion-archive`), not only `%APPDATA%/everquest-companion-dev/log-archive`.
+(`<EQ>/Logs/companion-archive`). `%APPDATA%/everquest-companion-dev/log-archive` is the stale
+pre-2026-10-07 folder.
 
 The whole Gaps list for a log, offline: concatenate the archived `.log.gz` and the live log into one
 file named `eqlog_<Name>_<server>.all.txt` (the harness wants a slice-shaped name), then from a

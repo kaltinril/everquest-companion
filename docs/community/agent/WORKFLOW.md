@@ -33,7 +33,11 @@ disagree, RULES.md wins; fix this file.
 - **Engine rebuild after merging engine changes:** `npm run build:engine` in the main clone. The
   dev app resolves `engine/target/release`, and runs a COPY at
   `%APPDATA%/everquest-companion-dev/engine-run/engined.exe`, so an open app never blocks a rebuild.
-- **The user's game log** is `<EQ install>/Logs/eqlog_<Character>_<server>.txt`. The install path
+- **The user's game log** is `<EQ install>/Logs/eqlog_<Character>_<server>.txt`. Its archived months are
+  `<EQ install>/Logs/companion-archive/*.log.gz` (since 2026-10-07; `logArchiveDir()`); a live log can
+  start weeks back after an archive, so read both. `%APPDATA%/everquest-companion-*/log-archive` is the
+  folder from before that move: stale, read by nothing (2026-11-25: searching it alone made the
+  owner's history look cut at Oct 6). The install path
   is recorded in `%APPDATA%/everquest-companion-dev/everquest-companion-progress.json`; read it
   there instead of scanning drives (a drive-wide `find` times out).
 - **No prettier.** The repo has no prettier config; `npx prettier --write` reflows whole files to
