@@ -12,15 +12,22 @@
       canvas.
 
       CSP: the same deny-by-default policy as index.html / overlay.html, minus everything this
-      page cannot use. It loads no images, no fonts, and speaks to nothing — the only relaxation
-      is `style-src 'unsafe-inline'` for the <style> block below.
+      page cannot use. It loads no fonts and speaks to nothing; the relaxations are
+      `style-src 'unsafe-inline'` for the <style> block below and `img-src data:` for the player's
+      own picture.
         script-src 'self'   no inline/eval.
         connect-src 'self'  no fetch of its own; 'self' covers dev HMR's WebSocket.
-        img-src / font-src / object-src / frame-src / child-src / base-uri / form-action  'none'.
+        img-src data:       ONLY inline data URLs (2026-11-26, the 'image' shape: an uploaded icon
+                            or a grid drawing, stored as a small PNG data URL). Never http(s):, so
+                            a picture can never phone home or leak that the overlay is on; never
+                            file:, so it can never read the disk; no blob:, nothing here makes one.
+                            What reaches #ring-img's src has also passed the strict PNG validator
+                            (shared/cursorPicture.ts normalizePictureDataUrl).
+        font-src / object-src / frame-src / child-src / base-uri / form-action  'none'.
     -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'none'; font-src 'none'; connect-src 'self'; object-src 'none'; frame-src 'none'; child-src 'none'; base-uri 'none'; form-action 'none'"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src data:; font-src 'none'; connect-src 'self'; object-src 'none'; frame-src 'none'; child-src 'none'; base-uri 'none'; form-action 'none'"
     />
     <title>Cursor Overlay</title>
     <style>
@@ -98,6 +105,24 @@
       }
 
       /*
+        THE PICTURE of the `image` shape (2026-11-26): the player's uploaded icon or grid drawing.
+        A CHILD of the ring like the inner mark, so the ring's transform carries it; cursorRing.ts
+        sets its src (a validated PNG data URL) and its image-rendering once per config, never on a
+        move. With a picture the ring draws no border and no shadows (`.picture`), so only the
+        picture shows, contained in the size footprint.
+      */
+      #ring.picture {
+        box-shadow: none;
+      }
+      #ring-img {
+        display: none;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        pointer-events: none;
+      }
+
+      /*
         THE CROSSHAIR (owner, 2026-11-26): one full-height column and one full-width row through
         the pointer. Hidden until the player turns it on; cursorRing.ts then sets their weight and
         colour once per config, and a move changes only their transforms (translateX on the
@@ -147,7 +172,7 @@
     <canvas id="trail"></canvas>
     <div id="cross-v" class="cross"></div>
     <div id="cross-h" class="cross"></div>
-    <div id="ring"><div id="ring-inner"></div></div>
+    <div id="ring"><div id="ring-inner"></div><img id="ring-img" alt="" /></div>
     <script type="module" src="/src/overlay/cursorRing.ts"></script>
   </body>
 </html>

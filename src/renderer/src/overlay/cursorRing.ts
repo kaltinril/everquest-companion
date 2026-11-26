@@ -10,8 +10,9 @@
 // sample reads too.
 //
 // ============================ THE PERFORMANCE CONTRACT ============================
-// The owner's requirement was "it can't feel like it's lagging". Five rules make that true
-// (the first three were the whole ring; 4 and 5 came with the overlay's crosshair and trail):
+// The owner's requirement was "it can't feel like it's lagging". Six rules make that true
+// (the first three were the whole ring; 4 and 5 came with the overlay's crosshair and trail, 6
+// with the player's own picture):
 //
 //   1. THE REAL CURSOR IS NEVER TOUCHED. Windows draws the system pointer; this window is
 //      click-through and `cursor: none`. Only the halo follows, so even if a frame is dropped
@@ -42,6 +43,11 @@
 //      points (capped, oldest dropped, so a fast mouse cannot build a backlog) and asks for frames;
 //      the rAF loop clears only what it last drew and STOPS ITSELF once everything has faded, so a
 //      still mouse costs nothing. A PARKED point spawns nothing and clears the trail.
+//   6. THE PICTURE IS SET ONCE PER CONFIG (2026-11-26, the 'image' shape). The player's icon or
+//      drawing is a prebuilt <img> INSIDE the ring, so the ring's transform carries it like the
+//      inner mark. Its src (a small, validated PNG data URL) is assigned only when the picture
+//      itself changes, so a slider drag does not even re-decode it; a move still changes only the
+//      ring's transform. No canvas, no timer, no per-move work for it at all.
 
 import { ringStrokeColor } from '@shared/presencePrefs'
 import type { CursorPoint, CursorRingPrefs } from '@shared/presencePrefs'
@@ -50,9 +56,11 @@ import {
   ringBoxStyle,
   ringGeometry,
   ringOffset,
+  ringPicture,
   ringTransform,
   shapeShown
 } from '@shared/cursorRingShape'
+import { pictureRendering } from '@shared/cursorPicture'
 import type { RingGeometry, RingOffset } from '@shared/cursorRingShape'
 import { crosshairLineStyles, crosshairOf, crosshairTransforms } from '@shared/cursorCrosshair'
 import { createTrailPainter } from './cursorTrailCanvas'
@@ -78,6 +86,9 @@ function mustGet(id: string): HTMLElement {
 
 const ring = mustGet('ring')
 const inner = mustGet('ring-inner')
+const picEl = mustGet('ring-img')
+if (!(picEl instanceof HTMLImageElement)) throw new Error('cursorRing: #ring-img is not an img')
+const pic: HTMLImageElement = picEl
 const crossV = mustGet('cross-v')
 const crossH = mustGet('cross-h')
 const trailCanvas = mustGet('trail')
@@ -95,6 +106,28 @@ let shapeOn = true
 /** The crosshair's switch and weight; read on every paint, set with the config. */
 let crossOn = false
 let crossWeight = 1
+
+/** The picture #ring-img holds now, '' for none: a new src only when this changes. */
+let shownPicture = ''
+
+/**
+ * Show the player's picture in the ring, or hide it. Once per config, never on a move. The src is
+ * ONLY ever `ringPicture`'s answer, which is a string that passed the strict PNG data-URL validator
+ * (cursorPicture.ts), assigned as a property: never markup, never a CSS url() built here.
+ */
+function applyPicture(picture: string | null): void {
+  ring.classList.toggle('picture', picture !== null)
+  pic.style.display = picture === null ? 'none' : 'block'
+  const want = picture ?? ''
+  if (want === shownPicture) return
+  shownPicture = want
+  if (picture === null) {
+    pic.removeAttribute('src')
+    return
+  }
+  pic.style.imageRendering = pictureRendering(picture)
+  pic.src = picture
+}
 
 /** Show or hide the crosshair and style its two lines. Once per config, never on a move. */
 function applyCrosshair(cfg: CursorRingPrefs): void {
@@ -122,6 +155,7 @@ function applyConfig(cfg: CursorRingPrefs): void {
   // built from three numbers. Nothing a store file could carry becomes a CSS declaration here.
   const stroke = ringStrokeColor(cfg.colorHex)
   Object.assign(ring.style, ringBoxStyle(geometry, stroke))
+  applyPicture(ringPicture(cfg))
   // The inner mark (centre dot, the target's inner ring) is a child of the ring, so the ring's
   // transform carries it: it is styled here, once, and never touched on a move.
   if (geometry.inner) {
