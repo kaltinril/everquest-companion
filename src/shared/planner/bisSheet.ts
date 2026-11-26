@@ -40,6 +40,12 @@ export interface BisOptions {
   admit?: (row: GearRow) => boolean
   /** owned-only mode: item key -> copies owned (bags, bank, worn). Absent = best overall */
   owned?: ReadonlyMap<string, number>
+  /**
+   * what the character holds (bags, bank, worn), read in BOTH modes for one thing only: a row no
+   * player can obtain stays a candidate when the character holds it, capped to the copies held
+   * (owner, 2026-11-25: *"If the character ACTUALLY OWNS an item, sure it should be considered"*)
+   */
+  held?: ReadonlyMap<string, number>
 }
 
 export interface BisPick {
@@ -185,7 +191,7 @@ function scoreCell(cell: PlanSlotId, rows: readonly GearRow[], opts: BisOptions)
     const stats = round3(terms.reduce((sum, t) => sum + t.points, 0))
     const haste = row.stats.HASTE ?? 0
     const prio = damageFirst(row, cell, opts)
-    out.push({ key: row.key, row, terms, base: stats + prio * DAMAGE_FIRST, prio, haste, copies: copiesOf(row, opts.owned), twoHand: gearHandedness(row.skill) === '2h', display: round3(stats + Math.max(0, haste) * rate) })
+    out.push({ key: row.key, row, terms, base: stats + prio * DAMAGE_FIRST, prio, haste, copies: copiesOf(row, opts.owned ?? (isObtainable(row) ? undefined : opts.held)), twoHand: gearHandedness(row.skill) === '2h', display: round3(stats + Math.max(0, haste) * rate) })
   }
   return out.sort((a, b) => b.prio - a.prio || b.display - a.display || a.row.name.localeCompare(b.row.name))
 }
@@ -194,13 +200,14 @@ function scoreCell(cell: PlanSlotId, rows: readonly GearRow[], opts: BisOptions)
  * THE ROW GATE: may the sheet use this row at all? The class picks, the caller's gates (Current era),
  * owned-only, and never a row no player can obtain (`GearRow.unobtainable`; owner, 2026-11-25: *"we
  * simply need to just ignore items that are impossible to get before we even start our
- * calculation"*), except in owned-only mode a copy the character owns: owning it proves it can be
- * had. Exported so the tab's other walk over the rows (`BisView.useStated`) asks the same question.
+ * calculation"*), except a copy the character holds, in either mode: holding it proves it can be had
+ * (owner, 2026-11-25). Exported so the tab's other walk over the rows (`BisView.useStated`) asks the
+ * same question.
  */
-export function bisAdmits(row: GearRow, gate: Pick<BisOptions, 'classes' | 'admit' | 'owned'>): boolean {
-  const held = gate.owned === undefined ? undefined : (gate.owned.get(row.key) ?? 0) > 0
-  if (held === false) return false
-  return (held === true || isObtainable(row)) && usableBy(row, gate.classes) && (gate.admit === undefined || gate.admit(row))
+export function bisAdmits(row: GearRow, gate: Pick<BisOptions, 'classes' | 'admit' | 'owned' | 'held'>): boolean {
+  if (gate.owned !== undefined && (gate.owned.get(row.key) ?? 0) <= 0) return false
+  const holds = ((gate.owned ?? gate.held)?.get(row.key) ?? 0) > 0
+  return (holds || isObtainable(row)) && usableBy(row, gate.classes) && (gate.admit === undefined || gate.admit(row))
 }
 
 /** The rows the sheet may use at all, dropped before any scoring. */

@@ -56,15 +56,15 @@ function useWorn(compare: GearCompareData, state: ItemUpgradeState): { cells: Ma
 }
 
 /** The chips some item the player could wear states (the sheet's own row gate, `bisAdmits`): the rest are drawn faded. */
-function useStated(rows: readonly GearRow[], model: TierModel, classes: readonly ClassAbbr[], admit: (r: GearRow) => boolean): Set<TierChip> {
+function useStated(rows: readonly GearRow[], model: TierModel, classes: readonly ClassAbbr[], gate: { admit: (r: GearRow) => boolean; held: ReadonlyMap<string, number> }): Set<TierChip> {
   return useMemo(() => {
     const out = new Set<TierChip>()
     for (const row of rows) {
-      if (!bisAdmits(row, { classes, admit })) continue
+      if (!bisAdmits(row, { classes, admit: gate.admit, held: gate.held })) continue
       for (const [chip, v] of Object.entries(model.valuesOf(row))) if (v !== 0) out.add(chip as TierChip)
     }
     return out
-  }, [rows, model, classes, admit])
+  }, [rows, model, classes, gate.admit, gate.held])
 }
 
 /** The wish list's door, the Gear table's way (`useGearWishes` in GearView.tsx). */
@@ -125,7 +125,7 @@ function useBisSheet(rows: readonly GearRow[], prefs: BisPrefs, { classes, model
   const scaled = useMemo(() => scaleAll(rows, state), [rows, state])
   const worn = useWorn(compare, state)
   const built = useMemo(
-    () => buildBisSheet({ rows: scaled, setup, model, classes, admit, owned: prefs.owned ? owned : undefined }),
+    () => buildBisSheet({ rows: scaled, setup, model, classes, admit, owned: prefs.owned ? owned : undefined, held: owned }),
     [scaled, setup, model, classes, admit, owned, prefs.owned]
   )
   const sheet = useMemo(() => alignPairsToWorn(built, (cell) => worn.cells.get(cell)?.row?.key), [built, worn])
@@ -142,7 +142,7 @@ export default function BisView({ onOpenLoot }: BisViewProps = {}): JSX.Element 
   const model = useTierModel(rows, classes.classes, prefs.level)
   const wishes = useBisWishes()
   const { setup, owned, admit, worn, sheet, totals } = useBisSheet(rows, prefs, { classes: classes.classes, model, state: plus })
-  const stated = useStated(rows, model, classes.classes, admit)
+  const stated = useStated(rows, model, classes.classes, { admit, held: owned })
   const lane = (chip: TierChip, tier: TierSetup['board'][TierChip]): void => setPrefs({ ...prefs, board: { ...setup.board, [chip]: tier } })
   const cap = (chip: TierChip, value: number | undefined): void => {
     const caps: Partial<Record<TierChip, number>> = Object.fromEntries(Object.entries(prefs.caps).filter(([k]) => k !== chip))

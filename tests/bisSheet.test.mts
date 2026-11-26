@@ -228,8 +228,16 @@ test('owned-only keeps an unobtainable item the character owns: owning it proves
   assert.equal(bisAdmits(OAKWYND, { classes: ['RNG'], owned: new Map([['oakwynd', 1]]) }), true)
   const notOwned = sheet([OAKWYND, WAR_BOW], setup({ RATIO_RANGED: 'S' }), { classes: ['RNG'], owned: new Map([['war bow', 1]]) })
   assert.equal(pickOf(notOwned, 'RANGE'), 'War Bow')
-  // Best overall ignores ownership altogether, as it always has: the row stays out.
-  assert.equal(bisAdmits(OAKWYND, { classes: ['RNG'] }), false)
+  assert.equal(bisAdmits(OAKWYND, { classes: ['RNG'] }), false, 'held by nobody: out')
+})
+
+test('best overall keeps an unobtainable item the character holds, one cell per copy held (owner, 2026-11-25)', () => {
+  const held = sheet([OAKWYND, WAR_BOW], setup({ RATIO_RANGED: 'S' }), { classes: ['RNG'], held: new Map([['oakwynd', 1]]) })
+  assert.equal(pickOf(held, 'RANGE'), 'Oakwynd')
+  assert.equal(bisAdmits(OAKWYND, { classes: ['RNG'], held: new Map([['oakwynd', 1]]) }), true)
+  assert.equal(bisAdmits(OAKWYND, { classes: ['RNG'], held: new Map([['war bow', 1]]) }), false)
+  // a held map never gates an obtainable row: best overall still offers what the character lacks
+  assert.equal(bisAdmits(WAR_BOW, { classes: ['RNG'], held: new Map() }), true)
 })
 
 test('over the corpus: the ranger sheet never offers Oakwynd (the 2026-11-25 report)', () => {

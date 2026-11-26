@@ -127,7 +127,7 @@ where one exists.
     One seam: a new signal goes there. Readers: `effectIndex.excludedDonor`, and `gearIndex.pageRow`
     -> `GearRow.unobtainable` (optional, no version bump).
     - Gated (`gear.isObtainable`): `bisSheet.bisAdmits` drops the row before scoring, except a copy
-      the character owns in owned-only mode; `BisView.useStated` asks `bisAdmits`;
+      the character holds, in either mode (`BisOptions.held`, capped to copies held); `BisView.useStated` asks `bisAdmits`;
       `progressionPlan.candidatePool` (the Plan route) skips it.
     - Left: the Gear tab lists the row and its BEST column scores it (a lookup, not a pick); the tier
       model's units still measure over it (a median over thousands of rows); Void motes, socket
