@@ -79,10 +79,9 @@
 //             drawing them asks nobody for anything). Lives in ./ThanksSetting.tsx, descriptor
 //             and all. Last in the rail on purpose — see the table.
 
-import { type JSX, useCallback, useDeferredValue, useMemo, useState } from 'react'
+import { Fragment, type JSX, useCallback, useDeferredValue, useMemo, useState } from 'react'
 import { Box, List, ListItemButton, ListItemText, TextField, Typography } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
-import SportsEsportsIcon from '@mui/icons-material/SportsEsports'
 import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt'
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
 import IosShareIcon from '@mui/icons-material/IosShare'
@@ -92,7 +91,8 @@ import { ExportSettingsSetting, ImportSettingsSetting } from '../profiles/Profil
 import { ClassComboSetting } from '../profiles/ClassComboPanel'
 import { UpdateSetting, VersionSetting, useUpdateStatus } from './UpdateSetting'
 import type { UpdateStatus } from '@shared/types'
-import { EqFolderSetting } from './EqFolderSetting'
+import { dropObsSection, gameSection, logArchiveSection } from './GameSections'
+import { RAIL_GROUP_STARTS } from './prefsRailGroups'
 // Combat: whose damage the meters show (JOS-115) + where the pet's sits. Its own file with its own
 // descriptor, same ceiling and same answer as PerfSetting and GraphicsSetting.
 import { combatSection } from './CombatSection'
@@ -137,8 +137,6 @@ import PrefSectionBlock, { FILL_COLUMN_SX, FILL_ROOT_SX, FILL_ROW_SX, paneFills,
 // THE HYDRATION GATE (JOS-340) — one batched read of everything this pane paints from main, and
 // nothing renders until it lands. Read that file's header before touching any card's state.
 import { PrefsGate, usePrefsSeed } from './prefsHydration'
-import { LogArchiveSetting } from './LogArchiveSetting'
-import { DropObsSetting } from './DropObsSetting'
 import { normalizeQuery } from '../../lib/search'
 
 // ------------------------------------------------------------------- the view
@@ -280,45 +278,23 @@ interface SectionInputs {
 /** The whole settings table, in render order. Rebuilt only when its inputs change. */
 function buildSections({ version, status, onWhatsNew }: SectionInputs): PrefSection[] {
   return [
-    {
-      id: 'game',
-      label: 'Game',
-      icon: <SportsEsportsIcon fontSize="small" />,
-      items: [
-        {
-          id: 'eq-folder',
-          label: 'EverQuest install folder',
-          keywords: 'path directory logs eqlog character detect override install location',
-          content: <EqFolderSetting />
-        },
-        // SUMMARIZE AND ARCHIVE LOG (docs/plans/log-archive). Off until the player turns it on (step 6.3).
-        {
-          id: 'log-archive',
-          label: 'Summarize and archive log',
-          keywords: 'log archive rotate clear compress backup history size shrink large slow loading',
-          content: <LogArchiveSetting />
-        },
-        // SEND MY LOOT TO THE WIKI: the drop database (requirements/drop-db-submit.md). Off until the player turns it on.
-        {
-          id: 'drop-obs',
-          label: 'Send my loot to the wiki',
-          keywords: 'wiki drop database drop list loot reports percent rate chance submit upload share eqlwiki bot password sign in observations',
-          content: <DropObsSetting />
-        }
-      ]
-    },
-    // SECOND IN THE RAIL, ahead of everything about the game (JOS-123). A person who opens
-    // Preferences because they can barely read the app has to find this one, and the rail is
-    // itself drawn at the size they are complaining about.
+    // GROUPED (owner, 2026-11-26): the rail draws a heading above the first section of each
+    // group (./prefsRailGroups.ts), so this list is in group order. GAME: the install folder,
+    // then the log archive and loot sending as sections of their own (./GameSections.tsx).
+    gameSection(),
+    logArchiveSection(),
+    dropObsSection(),
+    // DISPLAY. Appearance leads it, the first row under the game group (JOS-123): a person who
+    // opens Preferences because they can barely read the app has to find this one.
     appearanceSection(),
-    combatSection(),
-    overlaysSection(),
-    // Right after the overlays, because the promise this switch makes is about them: closing the
-    // window keeps them running (JOS-139).
     windowSection(),
     graphicsSection(),
-    buffTrustSection(),
     cursorRingSection(),
+    // OVERLAYS & ALERTS. Window used to sit right after Overlays because the close-to-tray switch
+    // is a promise about them (JOS-139); its own label still says so.
+    overlaysSection(),
+    combatSection(),
+    buffTrustSection(),
     voiceSection(),
     // NO SOUND SECTION HERE, and that is a ruling rather than an omission (JOS-443, owner:
     // "remove the sound section from preferences - redundant" and then, on the whole idea, "we
@@ -451,24 +427,49 @@ function SectionRail({
     // whole page scroll — the exact thing the whats-new pane's "the LIST scrolls, never the
     // page" contract forbids. minHeight: 0 is what lets a flex child shrink below its content.
     <List dense disablePadding sx={{ width: RAIL_WIDTH, flexShrink: 0, minHeight: 0, overflowY: 'auto' }}>
-      {sections.map((s) => {
+      {sections.map((s, i) => {
         const dim = unmatched.has(s.id)
+        const group = RAIL_GROUP_STARTS[s.id]
         return (
-          <ListItemButton
-            key={s.id}
-            dense
-            data-testid={`prefs-rail-${s.id}`}
-            selected={active === s.id}
-            aria-disabled={dim}
-            onClick={() => onPick(s.id)}
-            sx={{ borderRadius: 1, gap: 1, opacity: dim ? 0.38 : 1 }}
-          >
-            <Box sx={{ display: 'flex', color: 'text.secondary' }}>{s.icon}</Box>
-            <ListItemText slotProps={{ primary: { variant: 'body2' } }} primary={s.label} />
-          </ListItemButton>
+          <Fragment key={s.id}>
+            {group && <RailHeading label={group} first={i === 0} />}
+            <ListItemButton
+              dense
+              data-testid={`prefs-rail-${s.id}`}
+              selected={active === s.id}
+              aria-disabled={dim}
+              onClick={() => onPick(s.id)}
+              sx={{ borderRadius: 1, gap: 1, opacity: dim ? 0.38 : 1 }}
+            >
+              <Box sx={{ display: 'flex', color: 'text.secondary' }}>{s.icon}</Box>
+              <ListItemText slotProps={{ primary: { variant: 'body2' } }} primary={s.label} />
+            </ListItemButton>
+          </Fragment>
         )
       })}
     </List>
+  )
+}
+
+/** A group heading in the rail, in the main nav's style (STATS/DATA, RESEARCH, CONFIG). */
+function RailHeading({ label, first }: { label: string; first: boolean }): JSX.Element {
+  return (
+    <Typography
+      variant="caption"
+      component="div"
+      data-testid={`prefs-rail-group-${label.toLowerCase().replace(/[^a-z]+/g, '-')}`}
+      sx={{
+        px: 2,
+        pt: first ? 0.5 : 1.5,
+        pb: 0.5,
+        color: 'text.secondary',
+        fontWeight: 600,
+        letterSpacing: '0.06em',
+        textTransform: 'uppercase'
+      }}
+    >
+      {label}
+    </Typography>
   )
 }
 

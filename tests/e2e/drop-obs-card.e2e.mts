@@ -37,8 +37,8 @@ interface CardText {
 async function openCard(page: Page): Promise<void> {
   await page.waitForSelector('[data-testid="nav-overview"]', { timeout: 60_000 })
   await page.click('[data-testid="nav-preferences"]', { timeout: 60_000 })
-  await page.waitForSelector('[data-testid="prefs-rail-game"]', { timeout: 20_000 })
-  await page.click('[data-testid="prefs-rail-game"]')
+  await page.waitForSelector('[data-testid="prefs-rail-drop-obs"]', { timeout: 20_000 })
+  await page.click('[data-testid="prefs-rail-drop-obs"]')
   await page.waitForSelector('[data-testid="drop-obs-status"]', { timeout: 20_000 })
 }
 
