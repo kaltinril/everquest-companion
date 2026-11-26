@@ -80,6 +80,14 @@ function valuesFromDef(def: AaEffectDef, ranks: number): string[] | null {
   return each.map((t) => (t === '?' || /[a-z]/i.test(t) ? t : `${t}${unit}`))
 }
 
+/** What the text says a row requires (after its last "Requirements:"), or null. */
+export function aaRequirementText(text: string): string | null {
+  const at = text.lastIndexOf('Requirements:')
+  if (at < 0) return null
+  const req = text.slice(at + 'Requirements:'.length).trim().replace(/\.$/, '')
+  return req === '' ? null : req
+}
+
 /** The first words of the text, for an AA the table does not know. */
 export function aaFallbackLabel(row: AaTableRow): string {
   const body = aaEffectBody(row.text)

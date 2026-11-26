@@ -1,147 +1,44 @@
 // aa/AaView.tsx — the Alt. Advancement tab (owner, 2026-11-25; docs/community/requirements/
-// alt-advancement.md): the wiki's four AA tables, each row with the rank the character holds.
+// alt-advancement.md), redesigned from mockup v4: one header line, the class combo, three cards, then
+// Summary / General / Archetype / Class / Special with a search across them.
 //
-// The table is shared/aaTable.generated.ts; which rank each row shows and why is shared/aaRanks.ts,
-// read through useAaRanks. A rank the player picks is kept for this character only.
+// The table is shared/aaOfficial.ts `AA_ROWS`; ranks are shared/aaRanks.ts through useAaRanks (log,
+// grants, the player's picks); the combo's view of them is shared/aaBoard.ts through useAaBoard.
 
-import { type JSX, useMemo, useState } from 'react'
-import { Box, FormControlLabel, Stack, Switch, Tab, Tabs, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
-import { resolvedClasses, type ClassAbbr } from '@shared/classCombo'
-import { archetypeRows } from '@shared/aaArchetypeClasses'
-import { aaClassGroups, aaGroupRows, aaPointsSpent, aaSectionRows, aaUnplaced, type AaRanked } from '@shared/aaRanks'
+import { type JSX, useCallback, useMemo, useState } from 'react'
+import { Box, Chip, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
+import SearchIcon from '@mui/icons-material/Search'
+import CloseIcon from '@mui/icons-material/Close'
+import { aaLeft, aaPlanDelta, aaSearchCount, aaSearchGroups, aaTabCount, aaTabGroups, type AaBoardRow, type AaScope } from '@shared/aaBoard'
+import { aaCostSumText } from '@shared/aaCost'
+import { aaRecommend, type AaRecs } from '@shared/aaRecommend'
+import { aaUnplaced } from '@shared/aaRanks'
 import type { AaSection } from '@shared/aaTable.generated'
-import { statCapOf } from '@shared/reincarnationCap'
+import { CLASS_ABBRS, type ClassAbbr } from '@shared/classCombo'
+import { classDisplayName } from '@shared/spellLevels'
 import type { LevelingSnap } from '@shared/types'
 import type { View } from '../../appViews'
+import ChipMultiSelect from '../../components/ChipMultiSelect'
 import { LogReadInline } from '../../components/LogReadInline'
+import type { TradeskillFocus } from '../../lib/tradeskillLink'
 import { useModule } from '../../lib/useModule'
 import { Tooltip } from '../../lib/Tooltip'
-import { useComboSnap } from '../profiles/ClassComboData'
-import { AaClassTable, AaTable, type SetPick } from './AaRows'
-import { useAaRanks } from './useAaRanks'
+import { PaceCard, PointsCard, SpendCard } from './AaCards'
+import { AaList } from './AaList'
+import { AaSummary } from './AaSummary'
+import { AaNavContext, aaRowId, type AaNav } from './aaNav'
+import { useAaBoard, type AaBoardState } from './useAaBoard'
 
-const TABS: readonly { id: AaSection; label: string }[] = [
+type AaTabId = 'summary' | AaSection
+
+const SECTIONS: readonly { id: AaSection; label: string }[] = [
   { id: 'general', label: 'General' },
   { id: 'archetype', label: 'Archetype' },
   { id: 'class', label: 'Class' },
   { id: 'special', label: 'Special' }
 ]
 
-const CAPTION = 'Ranks come from your log, free ones from your level; pick a rank where the log missed one.'
-const POINTS_TIP = 'Points the shown ranks cost, at the wiki prices for each rank.'
-const UNKNOWN_TIP = 'The wiki gives no price for some ranks, so they add nothing here.'
-const ALL_CLASSES_TIP = 'Show the AAs of every class, not only the classes you play.'
-const NO_CLASSES = 'Your classes are not known yet, so every class is shown.'
-const CAP_TIP = 'Your base stat cap after reincarnations and the Human and Half Elf AAs.'
 const UNPLACED_TIP = 'Your log bought these, but no wiki AA row has the same name.'
-const MINE_TIP = "Which classes have each Archetype AA, from the game's /alternateadv list, 2026-11-25."
-const MAY_APPLY = 'May apply: melee AAs not yet checked for your classes.'
-const MAY_APPLY_TIP = 'Your classes were only listed beside Warrior and Monk, so these are unconfirmed.'
-
-function Points({ rows }: { rows: AaRanked[] }): JSX.Element {
-  const { points, unknown } = aaPointsSpent(rows)
-  return (
-    <Tooltip title={unknown > 0 ? UNKNOWN_TIP : POINTS_TIP}>
-      <Typography variant="body2" data-testid="aa-points">
-        {`Points spent: ${String(points)}${unknown > 0 ? '+' : ''}`}
-      </Typography>
-    </Tooltip>
-  )
-}
-
-function StatCapLine({ ranked, reincarnations }: { ranked: AaRanked[]; reincarnations: number[] }): JSX.Element {
-  const cap = statCapOf(ranked, reincarnations)
-  const kind = cap.over > 0 ? `soft, ${String(cap.reincarnations)} reincarnation${cap.reincarnations === 1 ? '' : 's'}` : 'hard'
-  return (
-    <Tooltip title={CAP_TIP}>
-      <Typography variant="body2" data-testid="aa-stat-cap">{`Base stat cap: ${String(cap.value)} (${kind})`}</Typography>
-    </Tooltip>
-  )
-}
-
-/** The character's classes, when the class combo is known; none before. */
-function useMyClasses(): ClassAbbr[] {
-  const current = useComboSnap().current
-  return useMemo(() => (current === null ? [] : resolvedClasses(current)), [current])
-}
-
-/** The Archetype tab: the AAs the character's classes have, or all (game list, 2026-11-25). */
-function ArchetypeTab({ ranked, setPick }: { ranked: AaRanked[]; setPick: SetPick }): JSX.Element {
-  const mine = useMyClasses()
-  const [all, setAll] = useState(false)
-  const rows = useMemo(() => aaSectionRows(ranked, 'archetype'), [ranked])
-  const shown = useMemo(() => (all || mine.length === 0 ? { mine: rows, mayApply: [] } : archetypeRows(rows, mine)), [rows, mine, all])
-  return (
-    <>
-      <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
-        <Points rows={[...shown.mine, ...shown.mayApply]} />
-        {mine.length > 0 ? (
-          <Tooltip title={MINE_TIP}>
-            <ToggleButtonGroup exclusive size="small" value={all ? 'all' : 'mine'} onChange={(_e, v: string | null) => {
-              if (v !== null) setAll(v === 'all')
-            }} data-testid="aa-archetype-filter">
-              <ToggleButton value="mine" sx={{ textTransform: 'none', py: 0.25 }}>My classes</ToggleButton>
-              <ToggleButton value="all" sx={{ textTransform: 'none', py: 0.25 }}>All</ToggleButton>
-            </ToggleButtonGroup>
-          </Tooltip>
-        ) : (
-          <Typography variant="caption" color="text.secondary">
-            {NO_CLASSES}
-          </Typography>
-        )}
-      </Stack>
-      <AaTable rows={shown.mine} setPick={setPick} tail={{ note: MAY_APPLY, tip: MAY_APPLY_TIP, rows: shown.mayApply }} />
-    </>
-  )
-}
-
-function ClassTab({ ranked, setPick }: { ranked: AaRanked[]; setPick: SetPick }): JSX.Element {
-  const mine = useMyClasses()
-  const [all, setAll] = useState(false)
-  const groups = useMemo(() => aaClassGroups(ranked, mine, all || mine.length === 0), [ranked, mine, all])
-  return (
-    <>
-      <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
-        <Points rows={aaGroupRows(groups)} />
-        {mine.length > 0 ? (
-          <Tooltip title={ALL_CLASSES_TIP}>
-            <FormControlLabel
-              control={
-                <Switch
-                  size="small"
-                  checked={all}
-                  onChange={(_e, on) => {
-                    setAll(on)
-                  }}
-                  data-testid="aa-all-classes"
-                />
-              }
-              label="All classes"
-            />
-          </Tooltip>
-        ) : (
-          <Typography variant="caption" color="text.secondary">
-            {NO_CLASSES}
-          </Typography>
-        )}
-      </Stack>
-      <AaClassTable groups={groups} setPick={setPick} />
-    </>
-  )
-}
-
-function SectionTab(p: { section: AaSection; ranked: AaRanked[]; reincarnations: number[]; setPick: SetPick }): JSX.Element {
-  const rows = useMemo(() => aaSectionRows(p.ranked, p.section), [p.ranked, p.section])
-  const special = p.section === 'special'
-  return (
-    <>
-      <Box sx={{ mb: 1 }}>
-        {special ? <StatCapLine ranked={p.ranked} reincarnations={p.reincarnations} /> : <Points rows={rows} />}
-      </Box>
-      <AaTable rows={rows} setPick={p.setPick} special={special} />
-    </>
-  )
-}
 
 /** Log names no row answers to, so the player is not left wondering where a purchase went. */
 function Unplaced(): JSX.Element | null {
@@ -158,51 +55,190 @@ function Unplaced(): JSX.Element | null {
   )
 }
 
-function AaView(): JSX.Element {
-  const { character, served, ranked, reincarnations, setPick } = useAaRanks()
-  const [tab, setTab] = useState<AaSection>('general')
-  const ready = served && character !== null
+/** "Drywrought · WAR/SHM/MNK · 50 · everything your classes can buy is maxed · 20 points banked". */
+function headerLine(s: AaBoardState): string {
+  const who = [s.character ?? '', s.detected.join('/'), s.level === null ? '' : String(s.level)].filter((w) => w !== '').join(' · ')
+  const left = aaLeft(s.ownBoard)
+  const banked = s.unspent === null ? '' : ` · ${String(s.unspent)} points banked`
+  if (left.count === 0) return `${who} · everything your classes can buy is maxed${banked}`
+  const unspent = s.unspent === null ? '' : ` · ${String(s.unspent)} unspent`
+  return `${who} · ${String(left.count)} AA${left.count === 1 ? '' : 's'} left to buy, ${String(left.points)}${left.unknown ? '+' : ''} pts${unspent}`
+}
+
+/** The header: the page's name and one line about the character. The unspent warning (aa-points-warn) sits beside it. */
+function AaHeader({ s }: { s: AaBoardState }): JSX.Element {
   return (
-    <Box data-testid="aa-view" sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 2, minHeight: 0 }}>
+    <Stack spacing={0.25} sx={{ mb: 1 }} data-testid="aa-header">
       <Typography variant="h6">Alternate Advancement</Typography>
-      <Typography variant="caption" color="text.secondary">
-        {CAPTION}
+      <Typography variant="body2" color="text.secondary" data-testid="aa-header-line">
+        {headerLine(s)}
       </Typography>
-      {ready && <Unplaced />}
-      <Tabs
-        value={tab}
-        onChange={(_e, v: AaSection) => {
-          setTab(v)
-        }}
-        sx={{ minHeight: 36, mb: 1 }}
-      >
-        {TABS.map((t) => (
-          <Tab key={t.id} value={t.id} label={t.label} sx={{ minHeight: 36 }} data-testid={`aa-tab-${t.id}`} />
+      <Unplaced />
+    </Stack>
+  )
+}
+
+function planningLine(s: AaBoardState): string {
+  const d = aaPlanDelta(s.board, s.ownBoard)
+  const drops = d.drops > 0 ? `; ${String(d.drops)} of your AAs drop out` : ''
+  return `Planning ${s.classes.join('/')}: ${String(d.points)}${d.unknown ? '+' : ''} points to max what this combo adds (${String(d.adds)} AAs)${drops}.`
+}
+
+function ClassBar({ s, scope, setScope }: { s: AaBoardState; scope: AaScope; setScope: (v: AaScope) => void }): JSX.Element {
+  const { pick } = s
+  return (
+    <Stack spacing={0.5} sx={{ mb: 1.5 }}>
+      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+        <ChipMultiSelect<ClassAbbr> options={CLASS_ABBRS} value={pick.classes} onChange={pick.set} label="Classes" placeholder="your classes" max={3} optionLabel={classDisplayName} minWidth={260} testId="aa-classes" />
+        {pick.offer !== null && (
+          <Chip size="small" color="success" variant="outlined" label={`back to detected · ${pick.offer.join('/')}`} onClick={pick.adopt} data-testid="aa-class-offer" />
+        )}
+        <ToggleButtonGroup exclusive size="small" value={scope} onChange={(_e, v: AaScope | null) => v !== null && setScope(v)} data-testid="aa-scope">
+          <ToggleButton value="usable" sx={{ textTransform: 'none', py: 0.25 }}>
+            Usable by these classes
+          </ToggleButton>
+          <ToggleButton value="all" sx={{ textTransform: 'none', py: 0.25 }}>
+            All AAs
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Stack>
+      {s.planning && (
+        <Typography variant="caption" color="warning.main" data-testid="aa-planning">
+          {planningLine(s)}
+        </Typography>
+      )}
+      {s.classes.length === 0 && (
+        <Typography variant="caption" color="text.secondary">
+          Your classes are not known yet: pick them to see your Archetype and Class AAs.
+        </Typography>
+      )}
+    </Stack>
+  )
+}
+
+function SearchBox({ query, setQuery }: { query: string; setQuery: (q: string) => void }): JSX.Element {
+  return (
+    <TextField
+      size="small"
+      value={query}
+      onChange={(e) => setQuery(e.target.value)}
+      placeholder="Search every tab"
+      sx={{ ml: 'auto', width: 240 }}
+      slotProps={{
+        input: {
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon fontSize="small" />
+            </InputAdornment>
+          ),
+          endAdornment:
+            query === '' ? undefined : (
+              <IconButton size="small" onClick={() => setQuery('')} aria-label="Clear the search">
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            ),
+          inputProps: { 'data-testid': 'aa-search' }
+        }
+      }}
+    />
+  )
+}
+
+function TabRow({ s, tab, setTab, scope, query, setQuery }: { s: AaBoardState; tab: AaTabId; setTab: (t: AaTabId) => void; scope: AaScope; query: string; setQuery: (q: string) => void }): JSX.Element {
+  const searching = query.trim() !== ''
+  const label = (id: AaSection, name: string): string => {
+    const c = aaTabCount(s.board, id, scope, query)
+    if (c.matches !== null) return `${name} ${String(c.matches)}`
+    return id === 'special' ? name : `${name} ${String(c.maxed)}/${String(c.of)}`
+  }
+  const total = searching ? aaSearchCount(s.board, scope, query) : null
+  return (
+    <Stack direction="row" alignItems="center" spacing={1} sx={{ borderBottom: 1, borderColor: 'divider', mb: 1 }}>
+      <Tabs value={tab} onChange={(_e, v: AaTabId) => setTab(v)} sx={{ minHeight: 36 }} variant="scrollable" scrollButtons={false}>
+        <Tab value="summary" label={total === null ? 'Summary' : `Summary ${String(total)}`} sx={{ minHeight: 36 }} data-testid="aa-tab-summary" />
+        {SECTIONS.map((t) => (
+          <Tab key={t.id} value={t.id} label={label(t.id, t.label)} sx={{ minHeight: 36 }} data-testid={`aa-tab-${t.id}`} />
         ))}
       </Tabs>
-      {!ready && (
-        <LogReadInline module="leveling" served={served} sx={{ py: 4, textAlign: 'center' }}>
-          <Typography variant="body2" color="text.secondary" data-testid="aa-empty" sx={{ py: 4, textAlign: 'center' }}>
-            No character yet. Ranks show once your log names the character you play.
-          </Typography>
-        </LogReadInline>
+      <SearchBox query={query} setQuery={setQuery} />
+    </Stack>
+  )
+}
+
+/** One sub-tab's count line and list. */
+function SectionTab({ s, section, scope, query }: { s: AaBoardState; section: AaSection; scope: AaScope; query: string }): JSX.Element {
+  const groups = useMemo(() => aaTabGroups(s.board, section, s.classes, { scope, query }), [s.board, section, s.classes, scope, query])
+  const c = aaTabCount(s.board, section, scope, query)
+  const name = SECTIONS.find((x) => x.id === section)?.label ?? ''
+  return (
+    <>
+      {section !== 'special' && (
+        <Typography variant="caption" color="text.secondary" component="div" sx={{ px: 1, mb: 0.5 }} data-testid="aa-tab-line">
+          {`${name} ${String(c.maxed)}/${String(c.of)} · ${aaCostSumText(c.points)}`}
+        </Typography>
       )}
-      {ready && (
-        <Box sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto', overscrollBehavior: 'contain' }}>
-          {tab === 'class' ? (
-            <ClassTab ranked={ranked} setPick={setPick} />
-          ) : tab === 'archetype' ? (
-            <ArchetypeTab ranked={ranked} setPick={setPick} />
-          ) : (
-            <SectionTab section={tab} ranked={ranked} reincarnations={reincarnations} setPick={setPick} />
-          )}
-        </Box>
-      )}
-    </Box>
+      <AaList groups={groups} classes={s.classes} setPick={s.setPick} empty={query.trim() === '' ? 'Nothing here for these classes.' : 'Nothing matches.'} />
+    </>
+  )
+}
+
+function Body({ s, recs, tab, setTab, scope, query }: { s: AaBoardState; recs: AaRecs; tab: AaTabId; setTab: (t: AaTabId) => void; scope: AaScope; query: string }): JSX.Element {
+  if (tab !== 'summary') return <SectionTab s={s} section={tab} scope={scope} query={query} />
+  if (query.trim() !== '') {
+    return <AaList groups={aaSearchGroups(s.board, scope, query)} classes={s.classes} setPick={s.setPick} showClass empty="Nothing matches." />
+  }
+  return <AaSummary board={s.board} base={s.planning ? s.ownBoard : null} recs={recs} unspent={s.unspent} classes={s.classes} onSpecial={() => setTab('special')} />
+}
+
+export interface AaLinksProps {
+  onGo: (v: View) => void
+  onOpenTradeskill: (f: TradeskillFocus) => void
+}
+
+function AaView({ onGo, onOpenTradeskill }: AaLinksProps): JSX.Element {
+  const s = useAaBoard()
+  const [tab, setTab] = useState<AaTabId>('summary')
+  const [scope, setScope] = useState<AaScope>('usable')
+  const [query, setQuery] = useState('')
+  const [open, setOpen] = useState<string | null>(null)
+  const toggle = useCallback((id: string) => setOpen((o) => (o === id ? null : id)), [])
+  const jump = useCallback((b: AaBoardRow) => {
+    setQuery('')
+    setTab(b.r.row.section)
+    setOpen(aaRowId(b))
+  }, [])
+  const nav = useMemo<AaNav>(() => ({ go: onGo, openTradeskill: onOpenTradeskill, open, toggle, jump }), [onGo, onOpenTradeskill, open, toggle, jump])
+  const recs = useMemo(() => aaRecommend(s.board, s.unspent ?? 0), [s.board, s.unspent])
+  const ready = s.served && s.character !== null
+  return (
+    <AaNavContext.Provider value={nav}>
+      <Box data-testid="aa-view" sx={{ height: '100%', overflow: 'auto', overscrollBehavior: 'contain', p: 2, minHeight: 0 }}>
+        {!ready && (
+          <LogReadInline module="leveling" served={s.served} sx={{ py: 4, textAlign: 'center' }}>
+            <Typography variant="body2" color="text.secondary" data-testid="aa-empty" sx={{ py: 4, textAlign: 'center' }}>
+              No character yet. Ranks show once your log names the character you play.
+            </Typography>
+          </LogReadInline>
+        )}
+        {ready && (
+          <>
+            <AaHeader s={s} />
+            <ClassBar s={s} scope={scope} setScope={setScope} />
+            <Stack direction="row" spacing={1.5} sx={{ mb: 1.5 }} flexWrap="wrap" useFlexGap>
+              <PointsCard unspent={s.unspent} ownBoard={s.ownBoard} planning={s.planning} />
+              <PaceCard />
+              <SpendCard recs={recs} unspent={s.unspent} />
+            </Stack>
+            <TabRow s={s} tab={tab} setTab={setTab} scope={scope} query={query} setQuery={setQuery} />
+            <Body s={s} recs={recs} tab={tab} setTab={setTab} scope={scope} query={query} />
+          </>
+        )}
+      </Box>
+    </AaNavContext.Provider>
   )
 }
 
 /** The Alt. Advancement tab: nothing on any other view. The check lives here, as the Skills tab's does. */
-export function AaTab({ view, viewKey }: { view: View; viewKey: string }): JSX.Element | null {
-  return view === 'aa' ? <AaView key={viewKey} /> : null
+export function AaTab({ view, viewKey, ...links }: { view: View; viewKey: string } & AaLinksProps): JSX.Element | null {
+  return view === 'aa' ? <AaView key={viewKey} {...links} /> : null
 }

@@ -18,7 +18,7 @@ import {
   type AaRanked
 } from '@shared/aaRanks'
 import { withGranted } from '@shared/aaGranted'
-import { resolvedClasses } from '@shared/classCombo'
+import { resolvedClasses, type ClassAbbr } from '@shared/classCombo'
 import { reincarnations as reincarnationsOf } from '@shared/reincarnationClimbs'
 import { statCapOf, type StatCap } from '@shared/reincarnationCap'
 import { useModule } from '../../lib/useModule'
@@ -80,32 +80,37 @@ function write(next: AaPicksByCharacter): void {
 export interface AaRanksState {
   /** The current character's name; null before the log names one. */
   character: string | null
+  /** The level the log last stated; null before one. */
+  level: number | null
+  /** The classes the log shows (the combo); empty before one is known. */
+  detected: ClassAbbr[]
   /** False until the `leveling` snapshot is served. */
   served: boolean
   ranked: AaRanked[]
+  /** The ranks before free ranks are laid on, for another combo's grants. */
+  ungranted: AaRanked[]
   /** When each reincarnation the log shows happened, newest first. */
   reincarnations: number[]
   /** Set this character's rank in the row stored under `key`, or `null` to go back to the log. */
   setPick: (key: string, rank: number | null) => void
 }
 
-/** The current character's rank in every row of the AA table. */
-export function useAaRanks(): AaRanksState {
+/** The current character's rank in every row of the AA table; free ranks for `planned` classes when given. */
+export function useAaRanks(planned: readonly ClassAbbr[] | null = null): AaRanksState {
   const snap = useModule<LevelingSnap>('leveling')
   const charSnap = useModule<CharacterSnap>('character')
   const character = charSnap?.character?.name ?? null
   const level = charSnap?.level?.level ?? null
   const combo = useComboSnap().current
-  const classes = useMemo(() => (combo === null ? [] : resolvedClasses(combo)), [combo])
+  const detected = useMemo(() => (combo === null ? [] : resolvedClasses(combo)), [combo])
+  const classes = planned ?? detected
   const all = useSyncExternalStore(subscribe, snapshot, () => cache.value)
   const picks = character === null ? NO_PICKS : (all[character] ?? NO_PICKS)
   const spends = snap?.aaSpends
   const levels = snap?.levels
   const found = useMemo(() => reincarnationsOf(levels ?? [], spends ?? []), [levels, spends])
-  const ranked = useMemo(
-    () => withGranted(rankAas(spends ?? [], picks, found.map((r) => r.race)), { level, classes }),
-    [spends, picks, found, level, classes]
-  )
+  const ungranted = useMemo(() => rankAas(spends ?? [], picks, found.map((r) => r.race)), [spends, picks, found])
+  const ranked = useMemo(() => withGranted(ungranted, { level, classes }), [ungranted, level, classes])
   const reincarnations = useMemo(() => found.map((r) => r.ts), [found])
   const setPick = useCallback(
     (key: string, rank: number | null) => {
@@ -113,7 +118,7 @@ export function useAaRanks(): AaRanksState {
     },
     [character]
   )
-  return { character, served: snap !== null, ranked, reincarnations, setPick }
+  return { character, level, detected, served: snap !== null, ranked, ungranted, reincarnations, setPick }
 }
 
 /** The current character's base stat cap: hard with no reincarnation, soft (and raised) after one. */

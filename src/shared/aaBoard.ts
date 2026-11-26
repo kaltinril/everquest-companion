@@ -11,7 +11,7 @@
 import { AA_GROUPS, type AaGroup } from './aaEffectTable'
 import { aaEffect, type AaEffect } from './aaEffects'
 import { aaCostSum, aaRowCost, type AaCostSum, type AaRowCost } from './aaCost'
-import { archetypeFit, type ArchetypeFit } from './aaArchetypeClasses'
+import { ARCHETYPE_BY_CLASS, IN_EVERY_RUN, archetypeFit, type ArchetypeFit } from './aaArchetypeClasses'
 import type { AaRanked } from './aaRanks'
 import type { AaSection } from './aaTable.generated'
 import type { ClassAbbr } from './classCombo'
@@ -117,7 +117,7 @@ function classGroups(rows: readonly AaBoardRow[], classes: readonly ClassAbbr[],
 }
 
 /** One sub-tab's list: the combo's rows, then (Archetype) the ones that may apply, then with `all` the rest. */
-export function aaTabGroups(board: readonly AaBoardRow[], section: Exclude<AaSection, 'special'>, classes: readonly ClassAbbr[], view: { scope: AaScope; query: string }): AaListGroup[] {
+export function aaTabGroups(board: readonly AaBoardRow[], section: AaSection, classes: readonly ClassAbbr[], view: { scope: AaScope; query: string }): AaListGroup[] {
   const rows = board.filter((b) => b.r.row.section === section && aaMatches(b, view.query))
   if (section === 'class') return classGroups(rows, classes, view.scope).filter((g) => g.rows.length > 0)
   const groups: AaListGroup[] = [
@@ -139,6 +139,11 @@ const SECTIONS: readonly { id: AaSection; label: string }[] = [
 export function aaSearchGroups(board: readonly AaBoardRow[], scope: AaScope, query: string): AaListGroup[] {
   const shown = board.filter((b) => (b.usable || scope === 'all') && aaMatches(b, query))
   return SECTIONS.map((s) => ({ title: s.label, kind: 'mine' as const, rows: shown.filter((b) => b.r.row.section === s.id) })).filter((g) => g.rows.length > 0)
+}
+
+/** How many rows a search across every tab finds. */
+export function aaSearchCount(board: readonly AaBoardRow[], scope: AaScope, query: string): number {
+  return aaSearchGroups(board, scope, query).reduce((n, g) => n + g.rows.length, 0)
 }
 
 export interface AaTabCount {
@@ -193,4 +198,23 @@ export function aaPlanDelta(planned: readonly AaBoardRow[], own: readonly AaBoar
 /** The groups in "what it does" order, each with its rows; empty groups left out. */
 export function aaByGroup<T>(items: readonly T[], groupOf: (t: T) => AaGroup): { group: AaGroup; label: string; items: T[] }[] {
   return AA_GROUPS.map((g) => ({ group: g.id, label: g.label, items: items.filter((t) => groupOf(t) === g.id) })).filter((g) => g.items.length > 0)
+}
+
+/** Whether two class lists hold the same classes. */
+export function aaSameClasses(a: readonly ClassAbbr[], b: readonly ClassAbbr[]): boolean {
+  return a.length === b.length && a.every((c) => b.includes(c))
+}
+
+/** Points the usable rows' held ranks cost, at the corrected prices. */
+export function aaSpent(board: readonly AaBoardRow[]): AaCostSum {
+  return aaCostSum(board.filter((b) => b.usable).map((b) => b.cost))
+}
+
+/** Which of the classes bring a row: "Every class has it.", "From your Warrior and Monk.", "A Monk AA."; null for General and Special. */
+export function aaBroughtBy(r: AaRanked, classes: readonly ClassAbbr[]): string | null {
+  if (r.row.section === 'class') return r.row.class === undefined ? null : `A ${r.row.class} AA.`
+  if (r.row.section !== 'archetype') return null
+  if (IN_EVERY_RUN.includes(r.row.name)) return 'Every class has it.'
+  const who = classes.filter((c) => ARCHETYPE_BY_CLASS[c].includes(r.row.name)).map(classDisplayName)
+  return who.length === 0 ? null : `From your ${who.join(' and ')}.`
 }
