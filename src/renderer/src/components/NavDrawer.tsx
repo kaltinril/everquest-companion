@@ -40,7 +40,16 @@ import AutoStoriesIcon from '@mui/icons-material/AutoStories'
 import UpdateChip from './UpdateChip'
 import AaNavBadge from '../features/aa/AaNavBadge'
 import { useNavMenu } from './useNavMenu'
-import { navPx } from '@shared/navMenu'
+import {
+  GROUP_HEADING_SX,
+  GROUP_HEADING_TEXT_SX,
+  NAV_GROUP_INDENT,
+  NAV_ICON_SX,
+  NAV_ROW_SX,
+  NAV_TEXT_SX,
+  NAV_WIDTH,
+  navVars
+} from './navSx'
 import { useBoolPref } from '../features/combat/useCombatPrefs'
 import { NEW_ISSUE_URL } from '@shared/issueLink'
 import type { PrefsRouting } from '../appRouting'
@@ -54,7 +63,7 @@ import {
   type View
 } from '../appViews'
 
-export const DRAWER_WIDTH = 220
+export const DRAWER_WIDTH = NAV_WIDTH
 
 /** A row is a view + an icon. The LABEL is not a field: it comes from `VIEW_LABELS`, the one
  *  place a tab is named, because a drill's Back button now says those names too (navOrigin.ts). */
@@ -209,20 +218,6 @@ const GROUPS: NavGroup[] = [
   }
 ]
 
-/** Compact and quiet: a heading is orientation for the rows under it, never a destination. */
-const GROUP_HEADING_SX = { minHeight: 28, mt: 0.5, py: 0, pr: 1 } as const
-const GROUP_HEADING_TEXT_SX = { fontSize: 11, letterSpacing: 1, textTransform: 'uppercase' } as const
-
-/** A destination row's metrics (fork #10): the `--nav-*` variables NavDrawer sets on the paper. */
-const NAV_ROW_SX = { minHeight: 'var(--nav-row)', py: 0 } as const
-const NAV_ICON_SX = {
-  minWidth: 'var(--nav-icon-col)',
-  '& .MuiSvgIcon-root': { fontSize: 'var(--nav-icon)' }
-} as const
-const NAV_TEXT_SX = {
-  my: 0,
-  '& .MuiListItemText-primary': { fontSize: 'var(--nav-text)', lineHeight: 1.3 }
-} as const
 
 /** The fold's key. '1'/'0' via `useBoolPref`; absent means OPEN, the state a new user starts in. */
 const groupOpenKey = (id: string): string => `eq.nav.open.${id}`
@@ -296,7 +291,7 @@ function NavGroupSection({
       <Collapse in={open}>
         {/* Indented 4px under the heading (owner, 2026-11-26); Overview and Preferences, which
             sit under no heading, are not. */}
-        <List component="div" disablePadding sx={{ pl: '4px' }}>
+        <List component="div" disablePadding sx={{ pl: NAV_GROUP_INDENT }}>
           {group.rows.map((row) => (
             <NavRowButton key={row.view} row={row} view={view} onSelect={onSelect} />
           ))}
@@ -341,10 +336,7 @@ export default function NavDrawer({
           position: 'relative',
           height: '100%',
           borderTop: 'none',
-          '--nav-row': navPx(menu.rowPx),
-          '--nav-text': navPx(menu.textPx),
-          '--nav-icon': navPx(menu.iconPx),
-          '--nav-icon-col': navPx(menu.iconCol)
+          ...navVars(menu)
         }
       }}
     >

@@ -172,13 +172,16 @@ test('the card is two of the page’s steppers, walking the shared ladders', () 
 })
 
 test('the drawer sizes its rows from variables on the paper, and the headings stay fixed', () => {
+  // The styles live in navSx.ts since the Preferences rail shares them (2026-11-26).
   const drawer = src('../src/renderer/src/components/NavDrawer.tsx')
+  const sx = src('../src/renderer/src/components/navSx.ts')
   for (const name of ['--nav-row', '--nav-text', '--nav-icon', '--nav-icon-col']) {
-    assert.ok(drawer.includes(`'${name}': navPx(`), `${name} is set on the drawer paper`)
+    assert.ok(sx.includes(`'${name}': navPx(`), `${name} is set by navVars`)
   }
+  assert.match(drawer, /\.\.\.navVars\(menu\)/)
   // minHeight, never height: a row grows before it clips.
-  assert.match(drawer, /const NAV_ROW_SX = \{ minHeight: 'var\(--nav-row\)', py: 0 \}/)
-  assert.match(drawer, /const GROUP_HEADING_SX = \{ minHeight: 28, mt: 0\.5, py: 0, pr: 1 \}/)
+  assert.match(sx, /const NAV_ROW_SX = \{ minHeight: 'var\(--nav-row\)', py: 0 \}/)
+  assert.match(sx, /const GROUP_HEADING_SX = \{ minHeight: 28, mt: 0\.5, py: 0, pr: 1 \}/)
 })
 
 test('the row height stepper’s accessible names are whole sentences', () => {

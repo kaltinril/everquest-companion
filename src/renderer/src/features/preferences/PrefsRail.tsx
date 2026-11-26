@@ -9,34 +9,27 @@
 // `selected`, so the rail still agrees with the pane.
 
 import type { JSX } from 'react'
-import { Box, Collapse, List, ListItemButton, ListItemText, Typography } from '@mui/material'
+import { Box, Collapse, List, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import type { PrefSection } from './PreferencesView'
-import { RAIL_GROUP_STARTS } from './prefsRailGroups'
+import { type RailGroup, railGroups } from './prefsRailGroups'
 import { useBoolPref } from '../combat/useCombatPrefs'
+import { useNavMenu } from '../../components/useNavMenu'
+import {
+  GROUP_HEADING_SX,
+  GROUP_HEADING_TEXT_SX,
+  NAV_GROUP_INDENT,
+  NAV_ICON_SX,
+  NAV_ROW_SX,
+  NAV_TEXT_SX,
+  NAV_WIDTH,
+  navVars
+} from '../../components/navSx'
 
-const RAIL_WIDTH = 168
-
-interface RailGroup {
-  /** The heading, or null for sections listed before the first heading. */
-  heading: string | null
-  /** The fold's key part: the id of the group's first section. */
-  id: string
-  sections: PrefSection[]
-}
-
-/** The sections cut into groups at each id `RAIL_GROUP_STARTS` names. Order is kept. */
-export function railGroups(sections: PrefSection[]): RailGroup[] {
-  const out: RailGroup[] = []
-  for (const s of sections) {
-    const heading = RAIL_GROUP_STARTS[s.id]
-    const last = out[out.length - 1]
-    if (heading !== undefined || !last) out.push({ heading: heading ?? null, id: s.id, sections: [s] })
-    else last.sections.push(s)
-  }
-  return out
-}
+// THE SAME SIZES AS THE MAIN NAV (owner, 2026-11-26): its width, and the row, text and icon sizes
+// the player sets for the left menu (./navSx.ts reads them as CSS variables on the rail's root).
+const RAIL_WIDTH = NAV_WIDTH
 
 /** The fold's key. '1'/'0' via `useBoolPref`; absent means OPEN. */
 const foldKey = (id: string): string => `eq.prefs.open.${id}`
@@ -51,16 +44,14 @@ function RailRow({ s, active, unmatched, onPick }: RowProps & { s: PrefSection }
   const dim = unmatched.has(s.id)
   return (
     <ListItemButton
-      dense
       data-testid={`prefs-rail-${s.id}`}
       selected={active === s.id}
       aria-disabled={dim}
       onClick={() => onPick(s.id)}
-      // Indented 4px under its group heading (owner, 2026-11-26).
-      sx={{ borderRadius: 1, gap: 1, ml: '4px', opacity: dim ? 0.38 : 1 }}
+      sx={{ ...NAV_ROW_SX, opacity: dim ? 0.38 : 1 }}
     >
-      <Box sx={{ display: 'flex', color: 'text.secondary' }}>{s.icon}</Box>
-      <ListItemText slotProps={{ primary: { variant: 'body2' } }} primary={s.label} />
+      <ListItemIcon sx={NAV_ICON_SX}>{s.icon}</ListItemIcon>
+      <ListItemText primary={s.label} sx={NAV_TEXT_SX} />
     </ListItemButton>
   )
 }
@@ -78,12 +69,9 @@ function RailGroupBlock({ group, ...row }: RowProps & { group: RailGroup }): JSX
         aria-expanded={open}
         selected={!open && holdsActive}
         onClick={() => setOpen(!open)}
-        sx={{ minHeight: 28, mt: 0.5, py: 0, pr: 1, borderRadius: 1 }}
+        sx={GROUP_HEADING_SX}
       >
-        <Typography
-          color="text.secondary"
-          sx={{ fontSize: 11, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase' }}
-        >
+        <Typography color="text.secondary" sx={GROUP_HEADING_TEXT_SX}>
           {group.heading}
         </Typography>
         <Box sx={{ ml: 'auto', display: 'flex', color: 'text.secondary' }}>
@@ -91,7 +79,7 @@ function RailGroupBlock({ group, ...row }: RowProps & { group: RailGroup }): JSX
         </Box>
       </ListItemButton>
       <Collapse in={open}>
-        <List component="div" dense disablePadding>
+        <List component="div" disablePadding sx={{ pl: NAV_GROUP_INDENT }}>
           {rows}
         </List>
       </Collapse>
@@ -111,11 +99,15 @@ export function SectionRail({
   sections,
   ...row
 }: RowProps & { sections: PrefSection[] }): JSX.Element {
+  const menu = useNavMenu()
   return (
     // The rail scrolls WITHIN the split rather than growing the page: a rail that stretches the
     // document makes the whole page scroll — the exact thing the whats-new pane's "the LIST
     // scrolls, never the page" contract forbids. minHeight: 0 lets a flex child shrink.
-    <List dense disablePadding sx={{ width: RAIL_WIDTH, flexShrink: 0, minHeight: 0, overflowY: 'auto' }}>
+    <List
+      disablePadding
+      sx={{ width: RAIL_WIDTH, flexShrink: 0, minHeight: 0, overflowY: 'auto', ...navVars(menu) }}
+    >
       {railGroups(sections).map((g) => (
         <RailGroupBlock key={g.id} group={g} {...row} />
       ))}
