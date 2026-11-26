@@ -84,5 +84,3 @@ scripts/sources/cache/eoz/
 scripts/sandbox/results/*
 !scripts/sandbox/results/.gitkeep
 
-# Per-machine scratch for the Linear CLI (scripts/linear.mts reads .triage/linear.env).
-.triage/
