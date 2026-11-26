@@ -6,14 +6,17 @@
 // 2026-11-24: *"respect Lore Equipped when determining if multiple of a single item can be
 // equipped"*), and in owned-only mode an item fills at most as many cells as copies owned. (2) A
 // two-hander in PRIMARY closes SECONDARY. (3) Worn haste does not stack, so the loadout is paid for
-// its single best haste once, not once per item.
+// its single best haste once, not once per item. (4) A bow in RANGE puts the cell's arrow in AMMO
+// (owner, 2026-11-25: *"If a bow is equipped in the ranged slot an arrow should be equipped in the
+// ammo slot"*).
 //
 // HOW, AND WHY NOT BRANCH AND BOUND: (1) alone is an ASSIGNMENT problem — cells on one side, item
 // copies on the other, each cell takes one copy or stays empty — and the Hungarian method solves it
 // exactly in polynomial time. Branch and bound was tried first and ran out a 400k-node budget on the
 // corpus: the ANY cells' best rows are every other cell's lore picks, so every shallow bound counted
-// them twice and pruned nothing. (2) and (3) are taken by ENUMERATION around the assignment: with or
-// without a two-hander, and which placed item supplies the loadout's haste (or none). Forcing that
+// them twice and pruned nothing. (2), (3) and (4) are taken by ENUMERATION around the assignment: with
+// or without a two-hander, with or without a bow (AMMO then holds only its arrow), and which placed
+// item supplies the loadout's haste (or none). Forcing that
 // item and ignoring every other positive haste gives a value at or below the true one for every
 // loadout, equal to it when the forced item is the loadout's best haste, so the maximum over the
 // enumeration is exact.
@@ -31,6 +34,8 @@ export interface SearchCandidate {
   copies: number
   /** a two-hander: placed in PRIMARY, it closes SECONDARY */
   twoHand: boolean
+  /** a bow: placed in RANGE, it puts the arrow in AMMO */
+  bow?: boolean
 }
 
 export interface SearchCell {
@@ -38,12 +43,17 @@ export interface SearchCell {
   candidates: readonly SearchCandidate[]
   isPrimary: boolean
   isSecondary: boolean
+  isRange?: boolean
+  /** AMMO's arrow: the cell's only option while RANGE holds a bow */
+  arrow?: SearchCandidate
 }
 
 export interface SearchResult {
-  /** per cell, the index into its candidates, or -1 for empty */
+  /** per cell, the index into its candidates, or -1 for empty; with `bow`, AMMO's index is into `[arrow]` */
   choice: number[]
   total: number
+  /** the bow variant won: RANGE holds a bow (or nothing), AMMO its arrow (or nothing) */
+  bow: boolean
 }
 
 /** Points one haste percent is worth on the board (lane weight / unit); 0 when HASTE is Off. */
@@ -182,14 +192,26 @@ function assign(cells: readonly (readonly Option[])[], left: ReadonlyMap<string,
 
 // ---- the enumeration -----------------------------------------------------------------------------
 
-/** The cells' lists for one two-hander variant: PRIMARY without two-handers, or only them and SECONDARY shut. */
-function variant(cells: readonly SearchCell[], twoHand: boolean): Option[][] {
+/**
+ * The cells' lists for one variant. Two-hander: PRIMARY without two-handers, or only them and SECONDARY
+ * shut. Bow: RANGE without bows, or only bows and AMMO holding only its arrow.
+ */
+function variant(cells: readonly SearchCell[], twoHand: boolean, bow: boolean): Option[][] {
   return cells.map((cell) => {
     const all = cell.candidates.map((cand, index) => ({ index, cand }))
     if (cell.isPrimary) return all.filter((o) => o.cand.twoHand === twoHand)
+    if (cell.isRange === true) return all.filter((o) => (o.cand.bow === true) === bow)
+    if (bow && cell.arrow !== undefined) return [{ index: 0, cand: cell.arrow }]
     return twoHand && cell.isSecondary ? [] : all
   })
 }
+
+/** Does the variant leave the cell its rule is about anything to hold? (No two-hander, no bow: skip it.) */
+function holds(cells: readonly SearchCell[], lists: readonly (readonly Option[])[], which: (c: SearchCell) => boolean): boolean {
+  return cells.some((c, i) => which(c) && lists[i].length > 0)
+}
+
+const VARIANTS: readonly (readonly [boolean, boolean])[] = [[false, false], [false, true], [true, false], [true, true]]
 
 function hasteChoices(lists: readonly (readonly Option[])[], rate: HasteRate): (Forced | null)[] {
   const out: (Forced | null)[] = [null]
@@ -200,7 +222,7 @@ function hasteChoices(lists: readonly (readonly Option[])[], rate: HasteRate): (
   return out
 }
 
-function solve(lists: readonly (readonly Option[])[], forced: Forced | null, rate: HasteRate): SearchResult {
+function solve(lists: readonly (readonly Option[])[], forced: Forced | null, rate: HasteRate): Omit<SearchResult, 'bow'> {
   const left = new Map<string, number>()
   for (const list of lists) for (const o of list) left.set(o.cand.key, o.cand.copies)
   let total = 0
@@ -217,13 +239,13 @@ function solve(lists: readonly (readonly Option[])[], forced: Forced | null, rat
 
 /** The best loadout over the cells: exact, see the file header. */
 export function searchLoadout(cells: readonly SearchCell[], rate: HasteRate): SearchResult {
-  let best: SearchResult = { choice: cells.map(() => -1), total: 0 }
-  for (const twoHand of [false, true]) {
-    const lists = variant(cells, twoHand)
-    if (twoHand && !cells.some((c, i) => c.isPrimary && lists[i].length > 0)) continue
+  let best: SearchResult = { choice: cells.map(() => -1), total: 0, bow: false }
+  for (const [twoHand, bow] of VARIANTS) {
+    const lists = variant(cells, twoHand, bow)
+    if ((twoHand && !holds(cells, lists, (c) => c.isPrimary)) || (bow && !holds(cells, lists, (c) => c.isRange === true))) continue
     for (const forced of hasteChoices(lists, rate)) {
       const result = solve(lists, forced, rate)
-      if (result.total > best.total + 1e-9) best = result
+      if (result.total > best.total + 1e-9) best = { ...result, bow }
     }
   }
   return best

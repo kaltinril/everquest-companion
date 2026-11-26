@@ -213,6 +213,8 @@ export interface GearRow {
   skill?: string
   /** `Range:` verbatim when it is NOT a single number ("50 / 75 / 100", 30 arrow pages) */
   rangeText?: string
+  /** elemental damage stated (`Fire DMG: 4`; fire, cold, poison, magic, disease added up), unscaled; absent when none */
+  elementalDmg?: number
   /** THE BASE numeric vector — the whole point of the row (see `gearScale.ts`) */
   stats: GearStats
   /** every effect line the page states, socketed or not */

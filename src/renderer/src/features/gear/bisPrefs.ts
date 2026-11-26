@@ -22,6 +22,7 @@ import {
   type TierSetup,
   type TierStep
 } from '../../../../shared/planner/tierChips'
+import { ATTRIBUTE_HARD_CAP, maxCharacterLevel } from '../../../../shared/planner/statCaps'
 import { TIER_PRESETS, defaultBoard, type TierPreset } from '../../../../shared/planner/tierDefaults'
 
 export const BIS_KEY = 'eq.gear.tiers'
@@ -45,14 +46,16 @@ export interface BisPrefs {
   targets: boolean
   /** the attribute cap the "attributes at cap" fill uses: 510 published, raised by reincarnation AAs (no published numbers) */
   statCap: number
+  /** the spell haste percent the character reliably has; item haste counts only up to the cap less this */
+  spellHaste: number
 }
 
-/** Legends' published attribute cap (agent/MEASURED.md, "BiS sheet research"). */
-export const LEGENDS_STAT_CAP = 510
+/** Legends' published attribute cap (agent/MEASURED.md, "BiS sheet research"; eqlwiki's Statistics page). */
+export const LEGENDS_STAT_CAP = ATTRIBUTE_HARD_CAP
 
-export const DEFAULT_LEVEL = 60
+export const DEFAULT_LEVEL = 50
 
-export const DEFAULT_BIS_PREFS: BisPrefs = { preset: 'classes', board: null, step: DEFAULT_STEP, split: false, caps: {}, level: DEFAULT_LEVEL, era: true, owned: false, list: null, targets: false, statCap: LEGENDS_STAT_CAP }
+export const DEFAULT_BIS_PREFS: BisPrefs = { preset: 'classes', board: null, step: DEFAULT_STEP, split: false, caps: {}, level: DEFAULT_LEVEL, era: true, owned: false, list: null, targets: false, statCap: LEGENDS_STAT_CAP, spellHaste: 0 }
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v)
 
@@ -77,8 +80,14 @@ function sanitizeCaps(raw: unknown): Partial<Record<TierChip, number>> {
   return caps
 }
 
-export function clampLevel(n: number): number {
-  return Number.isFinite(n) ? Math.min(70, Math.max(1, Math.round(n))) : DEFAULT_LEVEL
+/** 1 to the level cap on `now` (50, 55 from Rulers of Kunark); a stored level above it comes down. */
+export function clampLevel(n: number, now: Date = new Date()): number {
+  return Number.isFinite(n) ? Math.min(maxCharacterLevel(now), Math.max(1, Math.round(n))) : DEFAULT_LEVEL
+}
+
+/** A spell haste percent, 0 to 100, whole; anything odd is 0. */
+export function clampSpellHaste(n: number): number {
+  return Number.isFinite(n) ? Math.min(100, Math.max(0, Math.round(n))) : 0
 }
 
 /** Whatever the store held, as a usable choice: every field checked, anything odd its default. */
@@ -97,7 +106,8 @@ export function sanitizeBisPrefs(raw: unknown): BisPrefs {
     owned: raw.owned === true,
     list: typeof raw.list === 'string' && raw.list.trim() !== '' ? raw.list : null,
     targets: raw.targets === true,
-    statCap: typeof raw.statCap === 'number' && Number.isFinite(raw.statCap) && raw.statCap > 0 ? Math.round(raw.statCap) : LEGENDS_STAT_CAP
+    statCap: typeof raw.statCap === 'number' && Number.isFinite(raw.statCap) && raw.statCap > 0 ? Math.round(raw.statCap) : LEGENDS_STAT_CAP,
+    spellHaste: typeof raw.spellHaste === 'number' ? clampSpellHaste(raw.spellHaste) : 0
   }
 }
 

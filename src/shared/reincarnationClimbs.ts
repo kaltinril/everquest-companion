@@ -172,24 +172,45 @@ function toClimb(g: Group, dings: readonly LevelEvent[], until: number, snap: Pr
   }
 }
 
+interface Found {
+  g: Group
+  dings: LevelEvent[]
+  until: number
+}
+
 /**
- * One row per reincarnation, newest first; empty for a character with none.
+ * The groups that really were reincarnations, newest first, each with its climb's dings.
  *
  * Walked newest to oldest so each climb is bounded by the next group that really was a
  * reincarnation: a re-log rejected by rule 2 does not cut the climb it fell inside.
  */
-export function reincarnationClimbs({ levels, spends, snap }: ReincarnationInput): ReincarnationClimb[] {
+function found(levels: readonly LevelEvent[], spends: readonly AASpendEvent[]): Found[] {
   const candidates = advancing(groupLines(spends))
   if (candidates.length === 0) return []
   const dated = [...levels].sort((a, b) => a.ts - b.ts)
-  const out: ReincarnationClimb[] = []
+  const out: Found[] = []
   let until = Infinity
   for (let i = candidates.length - 1; i >= 0; i--) {
     const g = candidates[i]
     const dings = climbDings(dated, g.ts, until)
     if (dings.length > 0 && !dings.some((d) => d.level <= RESET_DING_MAX)) continue
-    out.push(toClimb(g, dings, until, snap))
+    out.push({ g, dings, until })
     until = g.ts
   }
   return out
+}
+
+/** One row per reincarnation, newest first; empty for a character with none. */
+export function reincarnationClimbs({ levels, spends, snap }: ReincarnationInput): ReincarnationClimb[] {
+  return found(levels, spends).map(({ g, dings, until }) => toClimb(g, dings, until, snap))
+}
+
+export interface Reincarnation {
+  ts: number
+  race: string | null
+}
+
+/** Each reincarnation's time and race, newest first: the same rows, without the play time (no progression snapshot). */
+export function reincarnations(levels: readonly LevelEvent[], spends: readonly AASpendEvent[]): Reincarnation[] {
+  return found(levels, spends).map(({ g }) => ({ ts: g.ts, race: g.lines.find((l) => l.kind === 'Race')?.name ?? null }))
 }
