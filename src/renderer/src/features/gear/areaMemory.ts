@@ -141,6 +141,12 @@ export const AREA_FORM_TIER = {
    * silently re-filter the other. The SHAPE is shared (`useFollowingClasses`) - the state is not.
    */
   'eq.spells.classes': 'restart',
+  // ---- the Alt. Advancement tab ----
+  /**
+   * The class combo the tab is PLANNING for, or absent while it follows detection. Session-scoped:
+   * a plan is a look at another combo, so a restart comes back to the classes the log shows.
+   */
+  'eq.aa.classes': 'session',
   // ---- the Wish list tab ----
   'eq.wishlist.search': 'session',
   // ---- the Character tab ----

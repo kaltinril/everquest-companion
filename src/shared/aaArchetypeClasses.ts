@@ -55,6 +55,8 @@ const UNSPLIT = new Set(WAR_OR_MNK_UNSPLIT.map(fold))
 const EVERYONE = new Set(IN_EVERY_RUN.map(fold))
 const BY_CLASS = new Map(Object.entries(ARCHETYPE_BY_CLASS).map(([c, names]) => [c, new Set(names.map(fold))]))
 const MEASURED = new Set([...UNSPLIT, ...EVERYONE, ...[...BY_CLASS.values()].flatMap((s) => [...s])])
+/** Daybreak's 2026-09-22 notes name every class Point Blank Fire is for (RNG, ROG, MNK, BER): never 'may apply'. */
+const SETTLED_BY_NOTES = new Set([fold('Point Blank Fire')])
 
 /** Whether these classes have an Archetype AA, as the runs measured it. */
 export function archetypeFit(name: string, classes: readonly ClassAbbr[]): ArchetypeFit {
@@ -63,7 +65,7 @@ export function archetypeFit(name: string, classes: readonly ClassAbbr[]): Arche
   if (!MEASURED.has(f)) return 'mayApply'
   if (classes.some((c) => BY_CLASS.get(c)?.has(f) === true)) return 'mine'
   // One of the nine: a class seen only beside WAR and MNK may have it too.
-  return UNSPLIT.has(f) && classes.some((c) => c !== 'WAR' && c !== 'MNK' && !MEASURED_ALONE.has(c)) ? 'mayApply' : 'other'
+  return UNSPLIT.has(f) && !SETTLED_BY_NOTES.has(f) && classes.some((c) => c !== 'WAR' && c !== 'MNK' && !MEASURED_ALONE.has(c)) ? 'mayApply' : 'other'
 }
 
 /** The rows the Archetype tab shows: the classes' own, then the ones that may apply. A rank held always shows. */

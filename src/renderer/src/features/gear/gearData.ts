@@ -500,7 +500,7 @@ export function useGearClasses(): GearClasses {
  * questions must not answer each other: narrowing the gear table to your Warrior should not also
  * hide every Shaman spell in the Spellbook.
  */
-export function useFollowingClasses(key: 'eq.gear.classes' | 'eq.spells.classes'): GearClasses {
+export function useFollowingClasses(key: 'eq.gear.classes' | 'eq.spells.classes' | 'eq.aa.classes'): GearClasses {
   const combo = useComboSnap()
   const current = combo.current
   // An unresolved slot contributes nothing, so a half-known combo yields the classes it does know

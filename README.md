@@ -55,7 +55,7 @@ Everything is per-character: switch characters and the app re-reads that log.
 - **Leveling:** XP and AA progress per character, with history, and the best spells of each type
   at your level.
 - **Skills:** every skill your log has seen go up, at its newest level.
-- **Alt. Advancement:** the wiki's AA tables, with the ranks your character holds.
+- **Alt. Advancement:** what your AAs give you, what is left to buy and what it costs, for your classes or any combination; your stat cap and reincarnation lines; a warning before the 50-point cap.
 
 **Looking things up**
 

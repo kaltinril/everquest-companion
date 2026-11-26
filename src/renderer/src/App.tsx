@@ -172,7 +172,7 @@ function PlainView({
       {view === 'buffs' && <BuffsView key={viewKey} />}
       {/* SKILLS (fork #6). Its view check lives in its own file for the SpellDrill's reason. */}
       <SkillsTab view={view} viewKey={viewKey} />
-      <AaTab view={view} viewKey={viewKey} />
+      <AaTab view={view} viewKey={viewKey} onGo={routing.selectView} onOpenTradeskill={routing.openTradeskills} />
       {/* TRADESKILLS (fork #6). Its view check lives in its own file, as the Skills tab's does. */}
       <TradeskillsTab view={view} viewKey={viewKey} routing={routing} />
       {/* MACROS (fork #11). Its view check lives in its own file; not keyed by character. */}

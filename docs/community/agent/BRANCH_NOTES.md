@@ -218,6 +218,26 @@ where one exists.
   cannot read grants nothing. WAR/SHM/MNK 50: Gather Party, Origin, Full Potential, Intimidation, Point
   Blank Fire, Heroic Leap, Innate Fighters Tenacity, Unbound Wrath/Cascade/Alacrity 3/3. Not measured:
   whether Lay on Hands (10/10 at 6) and Hunter's Attack Power (26/26 at 8) are granted gradually.
+- REDESIGN (2026-11-25, mockup v4): `features/aa/{AaView,AaCards,AaSummary,AaList,AaRowDetail,AaSpecial,AaUnspentLine}.tsx`,
+  `useAaBoard.ts`, `aaNav.ts`; `shared/{aaEffectTable,aaEffects,aaCost,aaBoard,aaRecommend,aaStats,aaLinks,aaSpecial}.ts`.
+  `AaRows.tsx` is gone. Effect labels are hand-written (`aaEffectTable.ts`), numbers from the row text or
+  Special cells; a list whose length is not the rank count shows the label only; never "none".
+  Planned combo key `eq.aa.classes` (session tier, `useFollowingClasses`). Usable = General and Special,
+  Archetype by `archetypeFit`, Class by class; a held rank counts only for your own classes; unusable
+  rows never count. `CLASS_TOPS` in `aaBoard.ts` (Steadfast Will 8/7/6, Rampage 2 for WAR/BER). Point
+  Blank Fire is never "may apply" (Daybreak's notes). Pace = `useTimeslice(aaGainTs)` + `rangeStats` +
+  `aaPace` (choosing a scope changes the app-wide slice). Wiki Gaps link writes `eq.gaps.domain` = aa.
+  Costs: `aaCost.ts` (free ranks 0, an unstated price makes "N+"). The game's "spent" total is not in
+  the log: the Points card shows spent at the wiki's prices. Not built: the list toolbar (All / Can
+  still buy / Activated, Group by), the pace sparkline, clickable pips, starting a timer from an AA.
+- UNSPENT WARNING (aa-points-warn): unspent = `aa.ts unspentAaPoints` (newest "You now have M" less
+  purchases after it; null with no gain line). `aaPointsWarn.ts`: `AA_POINT_CAP` 50 (also
+  `AA_BANK_CAP`), warn at 45. Signal `aaPointsUnspent` (tokens points, cap); seeded alert
+  `aa-points-unspent` OFF (stamp `alertAaPointsSeed`). N in localStorage `eq.aa.unspentAlertAt` (1-50),
+  edited by the Points card's "Alert at" (the framework has no per-alert number). Fired renderer-side
+  (`AaPointsWatcher` in AppCelebrations) once per upward crossing; the first count and the first after a
+  character switch are a baseline. Nav badge `AaNavBadge.tsx`: amber "!" 45-49, red at 50. The game's
+  cap line is not parsed (engine change); reaching 50 covers it. At 50 the game also stops experience.
 - Labels: the nav says "Alt. Adv." (`VIEW_LABELS`), the page "Alternate Advancement". The description
   has no hover (it is shown in full); a hotkey row's hover holds the hotkey text only.
 ## Maps (was map-improvements)

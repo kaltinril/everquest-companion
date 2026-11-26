@@ -109,9 +109,10 @@ test('the restart split is a table, and every key in it is on one of exactly two
   const keys = Object.keys(AREA_FORM_TIER) as AreaFormKey[]
   // Eleven fields arrived with JOS-329; the progression planner's two picks (`eq.plan.role`,
   // `eq.plan.reach`) made thirteen, its survivability dial makes fourteen, and the Spellbook's own
-  // class trio (`eq.spells.classes`, 2026-09-10) makes fifteen. The number is here so a key added
+  // class trio (`eq.spells.classes`, 2026-09-10) makes fifteen, the Alt. Advancement tab's planned combo
+  // (`eq.aa.classes`, 2026-11-25) sixteen. The number is here so a key added
   // without a row in `READERS` below fails TWICE — once on the count, once on the coverage sweep.
-  assert.equal(keys.length, 15, 'fifteen fields are stored — update this test when a sixteenth is')
+  assert.equal(keys.length, 16, 'sixteen fields are stored — update this test when a seventeenth is')
   for (const key of keys) {
     const tier = tierOf(key)
     assert.ok(tier === 'restart' || tier === 'session', `${key} is on an unknown tier ${tier}`)
@@ -192,6 +193,7 @@ const READERS: Reader[] = [
   // One sanitizer, two keys: the stored shape - a per-character map of pinned trios - is identical
   // and only the surface differs. `useFollowingClasses` takes the key as its parameter.
   { key: 'eq.spells.classes', read: sanitizeGearClassPins, fallback: null },
+  { key: 'eq.aa.classes', read: sanitizeGearClassPins, fallback: null },
   { key: 'eq.gear.upgrade', read: sanitizeUpgrade, fallback: ITEM_UPGRADE_BASE },
   { key: 'eq.gear.search', read: sanitizeSearch, fallback: '', legal: anyString },
   { key: 'eq.planner.filters', read: (r) => sanitizeBrowseForm(r, BROWSE_FALLBACK), fallback: BROWSE_FALLBACK },
