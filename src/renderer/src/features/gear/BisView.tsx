@@ -11,9 +11,10 @@ import { useCallback, useDeferredValue, useMemo, type JSX } from 'react'
 import { Box, Chip, Stack, TextField, Typography } from '@mui/material'
 import { CLASS_ABBRS, type ClassAbbr } from '@shared/classCombo'
 import { ITEM_UPGRADE_BASE, type ItemUpgradeState } from '@shared/itemUpgrade'
-import { alignPairsToWorn, buildBisSheet, usableBy } from '@shared/planner/bisSheet'
+import { alignPairsToWorn, buildBisSheet, defaultChipCaps, itemHasteCap, usableBy } from '@shared/planner/bisSheet'
 import type { GearRow } from '@shared/planner/gear'
 import { scaleGearRow } from '@shared/planner/gearScale'
+import { itemHasteRoom, maxCharacterLevel } from '@shared/planner/statCaps'
 import { activeChips, type TierChip, type TierSetup } from '@shared/planner/tierChips'
 import { GUIDE_CREDIT } from '@shared/planner/tierDefaults'
 import type { TierModel } from '@shared/planner/tierWeights'
@@ -27,7 +28,7 @@ import { wishFromGear } from '../wishlist/wishSearch'
 import BisCells, { type BisWishes, type WornCell } from './BisCells'
 import BisTargets from './BisTargets'
 import BisStartFrom from './BisStartFrom'
-import { activeSetup, clampLevel, withCleared, withPasted, withSplit, type BisPrefs } from './bisPrefs'
+import { activeSetup, clampLevel, clampSpellHaste, withCleared, withPasted, withSplit, type BisPrefs } from './bisPrefs'
 import { loadoutTotals, ownedCopies, totalsRows } from './bisText'
 import { useEraHidden, useGearClasses, useGearCompare, useGearIndex, useGearOwnership, useUpgradeState, type GearClasses, type GearCompareData } from './gearData'
 import { scaleAll } from './gearFilter'
@@ -95,7 +96,17 @@ function Controls({ prefs, setPrefs, classes, setup }: { prefs: BisPrefs; setPre
         )}
         <BisStartFrom prefs={prefs} setPrefs={setPrefs} setup={setup} />
         <Chip size="small" variant="outlined" label="Reset board" title="Back to the preset's starting tiers" data-testid="bis-reset" onClick={() => setPrefs({ ...prefs, board: null, caps: {}, list: null })} />
-        <TextField size="small" type="number" label="Level" value={prefs.level} onChange={(e) => setPrefs({ ...prefs, level: clampLevel(Number(e.target.value)) })} sx={{ width: 90 }} slotProps={{ htmlInput: { min: 1, max: 70, 'data-testid': 'bis-level' } }} />
+        <TextField size="small" type="number" label="Level" value={prefs.level} onChange={(e) => setPrefs({ ...prefs, level: clampLevel(Number(e.target.value)) })} sx={{ width: 90 }} slotProps={{ htmlInput: { min: 1, max: maxCharacterLevel(), 'data-testid': 'bis-level' } }} />
+        <TextField
+          size="small"
+          type="number"
+          label="Spell haste %"
+          title="Haste your spells or buffs reliably give; item haste counts up to the cap."
+          value={prefs.spellHaste}
+          onChange={(e) => setPrefs({ ...prefs, spellHaste: clampSpellHaste(Number(e.target.value)) })}
+          sx={{ width: 120 }}
+          slotProps={{ htmlInput: { min: 0, max: 100, 'data-testid': 'bis-spell-haste' } }}
+        />
         <Chip size="small" label="Current era" data-testid="bis-era" color={prefs.era ? 'primary' : 'default'} variant={prefs.era ? 'filled' : 'outlined'} onClick={() => setPrefs({ ...prefs, era: !prefs.era })} />
         <Chip size="small" label="Owned only" data-testid="bis-owned" color={prefs.owned ? 'primary' : 'default'} variant={prefs.owned ? 'filled' : 'outlined'} onClick={() => setPrefs({ ...prefs, owned: !prefs.owned })} />
       </Stack>
@@ -124,13 +135,14 @@ function useBisSheet(rows: readonly GearRow[], prefs: BisPrefs, { classes, model
   const admit = useMemo(() => (prefs.era ? (r: GearRow) => !eraHidden(r) : () => true), [prefs.era, eraHidden])
   const scaled = useMemo(() => scaleAll(rows, state), [rows, state])
   const worn = useWorn(compare, state)
+  const hasteRoom = itemHasteRoom(prefs.level, prefs.spellHaste)
   const built = useMemo(
-    () => buildBisSheet({ rows: scaled, setup, model, classes, admit, owned: prefs.owned ? owned : undefined }),
-    [scaled, setup, model, classes, admit, owned, prefs.owned]
+    () => buildBisSheet({ rows: scaled, setup, model, classes, admit, owned: prefs.owned ? owned : undefined, hasteRoom }),
+    [scaled, setup, model, classes, admit, owned, prefs.owned, hasteRoom]
   )
   const sheet = useMemo(() => alignPairsToWorn(built, (cell) => worn.cells.get(cell)?.row?.key), [built, worn])
-  const totals = useMemo(() => totalsRows(sheet.totals, loadoutTotals(worn.rows, model, setup.split), setup), [sheet, worn, model, setup])
-  return { setup, owned, admit, worn, sheet, totals }
+  const totals = useMemo(() => totalsRows(sheet.totals, loadoutTotals(worn.rows, model, setup.split, itemHasteCap({ setup, hasteRoom })), setup, defaultChipCaps()), [sheet, worn, model, setup, hasteRoom])
+  return { setup, owned, admit, worn, sheet, totals, hasteRoom }
 }
 
 export default function BisView({ onOpenLoot }: BisViewProps = {}): JSX.Element {
@@ -141,7 +153,7 @@ export default function BisView({ onOpenLoot }: BisViewProps = {}): JSX.Element 
   const plus = useDeferredValue(upgrade.state)
   const model = useTierModel(rows, classes.classes, prefs.level)
   const wishes = useBisWishes()
-  const { setup, owned, admit, worn, sheet, totals } = useBisSheet(rows, prefs, { classes: classes.classes, model, state: plus })
+  const { setup, owned, admit, worn, sheet, totals, hasteRoom } = useBisSheet(rows, prefs, { classes: classes.classes, model, state: plus })
   const stated = useStated(rows, model, classes.classes, admit)
   const lane = (chip: TierChip, tier: TierSetup['board'][TierChip]): void => setPrefs({ ...prefs, board: { ...setup.board, [chip]: tier } })
   const cap = (chip: TierChip, value: number | undefined): void => {
@@ -182,7 +194,7 @@ export default function BisView({ onOpenLoot }: BisViewProps = {}): JSX.Element 
           <Typography variant="caption" color="text.secondary" data-testid="bis-summary">
             {`${String(sheet.filled)} of ${String(sheet.cells.length)} slots filled · board total ${sheet.total.toFixed(1)} · ${String(activeChips(setup.split).filter((c) => setup.board[c] !== 'Off').length)} stats count`}
           </Typography>
-          <BisCells sheet={sheet} worn={worn.cells} model={model} setup={setup} classes={classes.classes} owned={owned} wishes={wishes} plus={plus.full} onOpenLoot={onOpenLoot} />
+          <BisCells sheet={sheet} worn={worn.cells} model={model} setup={setup} classes={classes.classes} owned={owned} wishes={wishes} plus={plus.full} hasteRoom={hasteRoom} onOpenLoot={onOpenLoot} />
           <Typography variant="caption" color="text.secondary">
             Hover a slot to compare its best item with what you wear and see where it drops; click it for the next five. An amber card means the best item is not what you wear. Haste does not stack: a slot is credited only for haste above what your other slots give. Weapon ratios count only in Primary, Secondary and Range, never in an Any slot. A Lore item is placed once; any other item may fill both rings, both ears, both wrists.
           </Typography>

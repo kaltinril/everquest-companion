@@ -19,7 +19,7 @@ import { REVAMP_ERA_TAGS, weaponKindOf, type TierModel } from '@shared/planner/t
 import type { PlanSlotId } from '@shared/planner/types'
 import { ItemIcon } from '../../lib/ItemIcon'
 import BisCompare, { type WornCell } from './BisCompare'
-import { cellLabel, hasteNote, termText } from './bisText'
+import { arrowText, cellLabel, hasteNote, termText } from './bisText'
 
 export type { WornCell } from './BisCompare'
 
@@ -39,6 +39,8 @@ export interface BisCellsProps {
   wishes: BisWishes
   /** the slider's tier: every item on the sheet, worn ones too, is scaled to it */
   plus: number
+  /** item haste that can still count (`itemHasteRoom`), for the hover's worn score */
+  hasteRoom?: number
   onOpenLoot?: (item: string) => void
 }
 
@@ -133,7 +135,7 @@ function NextBest({ cell, worn, props, onInner }: { cell: BisCell; worn: WornCel
             placement="right-start"
             enterDelay={250}
             enterNextDelay={100}
-            title={<BisCompare cell={{ ...cell, pick: { ...r, reasons: [] } }} worn={worn} model={props.model} setup={props.setup} classes={props.classes} plus={props.plus} label="Next best:" />}
+            title={<BisCompare cell={{ ...cell, pick: { ...r, reasons: [] } }} worn={worn} model={props.model} setup={props.setup} classes={props.classes} plus={props.plus} hasteRoom={props.hasteRoom} label="Next best:" />}
             slotProps={TIP_SLOT}
           >
           <Stack
@@ -178,6 +180,11 @@ function CardBody({ cell, props, pickWorn }: { cell: BisCell; props: BisCellsPro
       <Tags cell={cell} owned={props.owned} worn={pickWorn} />
       <Typography variant="caption" color="text.secondary">{pick.reasons.map((t) => termText(pick.row, t)).join('  ·  ')}</Typography>
       {note !== undefined && <Typography variant="caption" color="text.disabled">{note}</Typography>}
+      {cell.arrowForBow === true && (
+        <Typography variant="caption" color="info.main" data-testid="bis-arrow-for-bow">
+          {arrowText(pick.row)}
+        </Typography>
+      )}
       {pick.damageFirst !== undefined && (
         <Typography variant="caption" color="info.main" data-testid="bis-damage-first">
           {`Damage first: ratio ${pick.damageFirst.toFixed(2)} (your weapon ratio is in S; stats only break a tie)`}
@@ -212,7 +219,7 @@ function Card({ cell, props, open, onToggle }: { cell: BisCell; props: BisCellsP
       open={tip && !inner}
       onOpen={() => setTip(true)}
       onClose={() => setTip(false)}
-      title={<BisCompare cell={cell} worn={worn} model={props.model} setup={props.setup} classes={props.classes} plus={props.plus} />}
+      title={<BisCompare cell={cell} worn={worn} model={props.model} setup={props.setup} classes={props.classes} plus={props.plus} hasteRoom={props.hasteRoom} />}
       slotProps={TIP_SLOT}
     >
       <Box

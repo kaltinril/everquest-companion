@@ -20,7 +20,7 @@ import {
   type TierSetup,
   type TierStep
 } from '@shared/planner/tierChips'
-import type { TierModel } from '@shared/planner/tierWeights'
+import { chipUnit, type TierModel } from '@shared/planner/tierWeights'
 import { LANE_COLOUR, LANE_INK, LANE_TRAY, chipFamily, chipHint, unitText } from './bisText'
 
 export interface TierBoardProps {
@@ -150,7 +150,7 @@ function ChipMenu({ chip, anchor, props, onClose }: { chip: TierChip; anchor: HT
           ))}
         </Stack>
         {hint !== undefined && <Typography variant="caption" color="text.secondary">{hint}</Typography>}
-        <Typography variant="caption" color="text.secondary">{unitText(chip, props.model.units[chip])}</Typography>
+        <Typography variant="caption" color="text.secondary">{unitText(chip, chipUnit(props.model.units, chip))}</Typography>
         {!isRatioChip(chip) && (
           <Stack direction="row" spacing={1} alignItems="center">
             <TextField
@@ -220,7 +220,7 @@ export default function TierBoard(props: TierBoardProps): JSX.Element {
         </Button>
       </Stack>
       <Typography variant="caption" color="text.secondary">
-        Unassigned stats do not count: drop a stat there when you have maxed it or no longer need it. Clear tiers drops every stat there. Click a stat for its menu: its tier, what it does, and a cap (it then counts only up to that total across the loadout; Legends caps attributes at 510).
+        Unassigned stats do not count: drop a stat there when you have maxed it or no longer need it. Clear tiers drops every stat there. Click a stat for its menu: its tier, what it does, and a cap (it then counts only up to that total across the loadout; attributes stop at 510 by default).
       </Typography>
       <BoardText setup={setup} onLoad={props.onLoad} />
       {menu !== null && <ChipMenu chip={menu.chip} anchor={menu.anchor} props={props} onClose={() => setMenu(null)} />}

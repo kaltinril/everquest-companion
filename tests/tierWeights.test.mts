@@ -20,6 +20,7 @@ import { defaultBoard, TIER_PRESETS } from '../src/shared/planner/tierDefaults'
 import {
   MIN_ENDGAME_SAMPLES,
   buildTierModel,
+  chipUnit,
   conversionsFor,
   deriveChips,
   itemBudget,
@@ -115,6 +116,21 @@ test('score = lane weight x value / unit; a penalty scores; Off scores nothing; 
 function endgame(name: string, stats: GearRow['stats'], dl = '55'): TierItem {
   return { stats, dropLevels: [dl], slots: ['HEAD'], ...({ name } as object) }
 }
+
+test('split resists in one lane score exactly what the one Resists chip scores (owner, 2026-11-25)', () => {
+  const rows: TierItem[] = []
+  for (let i = 0; i < MIN_ENDGAME_SAMPLES; i++) rows.push(endgame(`e${i}`, { SV_FIRE: 8, SV_ALL: 2 }), endgame(`m${i}`, { SV_MAGIC: 15 }))
+  const model = buildTierModel(rows, [], 60)
+  assert.notEqual(model.units.SV_FIRE, model.units.RESISTS, 'the measured units differ, so the fifth rides on the Resists unit')
+  const item = { stats: { SV_FIRE: 12, SV_COLD: 12, SV_MAGIC: 12, SV_DISEASE: 12, SV_POISON: 12 } }
+  const joined = tierScore(item, { model, setup: setup({ RESISTS: 'A' }) })
+  const split = tierScore(item, { model, setup: setup({ SV_FIRE: 'A', SV_COLD: 'A', SV_MAGIC: 'A', SV_DISEASE: 'A', SV_POISON: 'A' }, { split: true }) })
+  assert.ok(joined > 0)
+  assert.equal(split, joined)
+  const fireOnly = { stats: { SV_FIRE: 20 } }
+  assert.equal(tierScore(fireOnly, { model, setup: setup({ SV_FIRE: 'A' }, { split: true }) }), tierScore(fireOnly, { model, setup: setup({ RESISTS: 'A' }) }), 'one resist too')
+  assert.equal(chipUnit(model.units, 'SV_COLD'), model.units.RESISTS * 5)
+})
 
 test('units: the median over endgame rows, every row when endgame rows are too few', () => {
   const rows: TierItem[] = []

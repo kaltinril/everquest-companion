@@ -141,6 +141,8 @@ export interface GearStatReading {
   stats: GearStats
   /** `Range:` verbatim when it was not a single number */
   rangeText?: string
+  /** the elemental damage lines added up (`elementalDmgOf`) */
+  elementalDmg?: number
   /** values read by `statInteger` */
   integers: number
   /** values read as a whole-value percent */
@@ -200,10 +202,25 @@ function foldStructural(block: ItemStatBlock, out: GearStatReading): void {
   else s.RANGE = range
 }
 
+/** Elemental damage lines; BANE hits one body type, so it is not elemental. */
+const ELEMENTAL_DMG_KEYS: ReadonlySet<string> = new Set(['FIRE_DMG', 'COLD_DMG', 'POISON_DMG', 'MAGIC_DMG', 'DISEASE_DMG'])
+
+/** The elemental damage a block states (`Fire DMG: 4`), added up; undefined when it states none. */
+export function elementalDmgOf(block: ItemStatBlock): number | undefined {
+  let total: number | undefined
+  for (const row of block.stats) {
+    const n = ELEMENTAL_DMG_KEYS.has(normalizeStatKey(row.key)) ? statInteger(row.value) : null
+    if (n !== null) total = (total ?? 0) + n
+  }
+  return total
+}
+
 export function readGearStats(block: ItemStatBlock): GearStatReading {
   const out: GearStatReading = { stats: {}, integers: 0, percents: 0, unindexed: {}, unreadable: {} }
   foldStatRows([...block.stats, ...block.saves], out)
   foldStructural(block, out)
+  const elemental = elementalDmgOf(block)
+  if (elemental !== undefined) out.elementalDmg = elemental
   return out
 }
 
@@ -319,6 +336,7 @@ function optionalFields(
     ...era,
     ...(k.stats?.skill === undefined ? {} : { skill: k.stats.skill }),
     ...(read?.rangeText === undefined ? {} : { rangeText: read.rangeText }),
+    ...(read?.elementalDmg === undefined ? {} : { elementalDmg: read.elementalDmg }),
     ...(voidSynth ? { voidSynth: true as const } : {}),
     // Copied per row (donors do the same) so a consumer never needs a second index to answer
     // "where does this drop".

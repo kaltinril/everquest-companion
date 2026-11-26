@@ -10,6 +10,7 @@ import { defaultBoard } from '../src/shared/planner/tierDefaults'
 import { conversionsFor, deriveChips, type TierModel } from '../src/shared/planner/tierWeights'
 import { CAPPED_ATTRIBUTES, DEFAULT_BIS_PREFS, LEGENDS_STAT_CAP, activeSetup, tankResistTargets, withCaps, clampLevel, sanitizeBisPrefs, matchesSaved, sanitizeSaved, withCleared, withLoadedBoard, withPasted, withSavedBoard, withSplit } from '../src/renderer/src/features/gear/bisPrefs'
 import { budgetText, chipHint, chipValueText, compareRows, hasteNote, loadoutTotals, ownedCopies, sourceText, termText, totalsRows } from '../src/renderer/src/features/gear/bisText'
+import { maxCharacterLevel } from '../src/shared/planner/statCaps'
 import { sortValue } from '../src/renderer/src/features/gear/gearFilter'
 import type { GearOwnershipMap } from '../src/renderer/src/features/gear/gearOwnership'
 
@@ -29,13 +30,18 @@ test('stored prefs: anything odd reads as its default; a board must name every c
   assert.equal(p.preset, 'ranged')
   assert.equal(p.step, 25)
   assert.equal(p.split, true)
-  assert.equal(p.level, 70, 'clamped')
+  assert.equal(p.level, maxCharacterLevel(), 'clamped to the level cap')
   assert.deepEqual(p.caps, { DEX: 510 }, 'no cap on a ratio, none that is not a number')
   assert.equal(p.board, null, 'a partial board is not a board')
   assert.equal(p.era, false)
   assert.equal(p.owned, true)
   assert.equal(sanitizeBisPrefs({ step: 3 }).step, 4)
-  assert.equal(clampLevel(Number.NaN), 60)
+  assert.equal(clampLevel(Number.NaN), 50)
+  assert.equal(DEFAULT_BIS_PREFS.level, 50, 'characters are level 50 at most (owner, 2026-11-25)')
+  assert.equal(clampLevel(60, new Date(2026, 11, 7, 23, 59)), 50, 'a stored 60 comes down to 50 before Kunark')
+  assert.equal(clampLevel(60, new Date(2026, 11, 8)), 55, 'and to 55 from its local launch day')
+  assert.equal(clampLevel(53, new Date(2026, 11, 8)), 53)
+  assert.equal(sanitizeBisPrefs({ level: 60 }).level, maxCharacterLevel(), 'clamped on load')
 })
 
 test('the board in force follows the classes until the player edits it', () => {
@@ -103,6 +109,17 @@ test('totals: summed, haste the best one, the best lane first, a reached cap mar
   assert.equal(out[0].cap, '12 capped')
   assert.equal(out[0].worn, '3')
   assert.equal(out[2].worn, '-')
+  assert.equal(loadoutTotals(rows, m, false, 25).HASTE, 25, 'item haste down to the room left under the cap')
+})
+
+test('spell haste: 0 by default, stored whole between 0 and 100 (owner, 2026-11-25)', () => {
+  assert.equal(DEFAULT_BIS_PREFS.spellHaste, 0)
+  assert.equal(sanitizeBisPrefs({ spellHaste: 30.4 }).spellHaste, 30)
+  assert.equal(sanitizeBisPrefs({ spellHaste: -5 }).spellHaste, 0)
+  assert.equal(sanitizeBisPrefs({ spellHaste: 140 }).spellHaste, 100)
+  assert.equal(sanitizeBisPrefs({ spellHaste: 'x' }).spellHaste, 0)
+  const back = sanitizeBisPrefs(JSON.parse(JSON.stringify({ ...DEFAULT_BIS_PREFS, spellHaste: 45 })))
+  assert.equal(back.spellHaste, 45, 'round-trips through the store')
 })
 
 test('the Gear tab BEST column reads the board when one is handed in, and the Ignore haste chip still drops haste', () => {
@@ -172,4 +189,9 @@ test("targets are the board's caps: set several, clear one, tanking resists, the
   const res = rows.find((r) => r.chip === 'RESISTS')
   assert.equal(res?.capValue, 200, 'a target shows even when neither loadout states the stat')
   assert.equal(rows.find((r) => r.chip === 'STR')?.wornReached, true)
+  const byDefault = totalsRows({ STR: 600 }, { STR: 200 }, { ...setup, board: { ...setup.board, STR: 'A' } }, { STR: 510 })
+  const strRow = byDefault.find((r) => r.chip === 'STR')
+  assert.deepEqual([strRow?.cap, strRow?.capValue, strRow?.capDefault], ['510 capped', undefined, 510], 'the default cap shows with no target set')
+  const own = totalsRows({ STR: 600 }, {}, { ...setup, board: { ...setup.board, STR: 'A' }, caps: { STR: 700 } }, { STR: 510 })
+  assert.equal(own.find((r) => r.chip === 'STR')?.cap, '700', 'a target wins over the default')
 })
