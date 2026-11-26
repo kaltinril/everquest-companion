@@ -473,7 +473,8 @@ Sources beside `plans/2026-11-25-aa-window/`: seven AA-window screenshots and th
 - **The stale list's third block is far from the other two** (owner's 15:44 list): Pottery Mastery's
   rank-2 and rank-3 blocks are back to back, the unsold "rank 4" block about seventy blocks later. So a
   repeated `#id` inside one run is not a new run; every measured run opens on `#1` Innate Eminence.
-- **Other ownership evidence in the owner's live log** (2026-11-25, 35 MB, read-only scan; not parsed):
+- **Other ownership evidence in the owner's live log** (2026-11-25, 35 MB, read-only scan; parsed into
+  the leveling snapshot's used set since then, BRANCH_NOTES.md "Alt. Advancement"):
   `You can use the ability <AA> again in N minute(s) N seconds.` (Heroic Leap 20,320, Rampage 887);
   `You begin casting <AA> <roman>.` names the rank (`Rampage II`, `Heroic Leap I`, `Cannibalization I`,
   `Area Taunt I`, `Dragon Force I`); `... (Finishing Blow)` after your own melee hit; `You disable Point

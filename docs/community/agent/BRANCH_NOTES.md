@@ -193,8 +193,12 @@ where one exists.
   above counting `SOFT_CAP_OVER` 0.2. A reincarnation before the log began is not counted.
 - ORDER OF PROOF (owner, 2026-11-25; `shared/aaRanks.ts` `rankAasFrom`): the first source that says
   something wins. 1. the latest `/alt list` run (`shared/aaList.ts`), except a purchase line logged
-  AFTER the run raises it (stale list); purchases before it are superseded (respecs exist:
-  `tests/fixtures/aa-mnemonic-respec.log`). 2. `You activate X.` for a table name: at least rank 1.
+  after the run OR after the last zone-in before it raises it (`aaBeatsList`; a list is stale until a
+  zone after a purchase); purchases before that zone-in are superseded (respecs exist:
+  `tests/fixtures/aa-mnemonic-respec.log`). No zone-in seen before the run (`zoneBefore` null, e.g. the
+  zone was in an older archive segment): every purchase counts. Loadout swaps are not detected.
+  2. the player's own use lines for a table name: the rank a cast's numeral names, else at least 1
+  (a numeral above the wiki's count raises the top rank).
   3. the pick. 4. purchase lines (`aaLedger`), then grants (`withGranted` never moves a list or pick
   rank). A one-rank row the list printed with none of 2-4 is `unknown`: not buyable, out of
   `aaLeft` and the tab counts, listed in the "Can't tell from the log" card ("I have it" = pick).
@@ -203,7 +207,11 @@ where one exists.
 - `/alt list` DATA FLOW: engine `eqlog/src/parse/aa_list.rs` (kind `aaList`: header `value`+`ability`,
   `text`, `cost`; first in the cascade) → `fold/src/modules/leveling_aa.rs` (latest run; a new run on
   a >2 s gap or the run's first id again, not on other repeats: a stale list repeats an id far apart;
-  activations name/first/last, a repeat moves `last` without announcing) → `LevelingSnap.aaList`,
+  `zoneBefore` = the last `zone` event before the run; the used set name/first/last/rank, fed by
+  `aaActivate`, `castBegin` (rank via `names::spell_rank`), `aaOwned` (reuse timer, `You disable X.`,
+  `Your X combat ability is interrupted.`; classifier last in the cascade) and the player's own
+  melee `damage` with `(Finishing Blow)` (raw-tail gate); only a new name or a higher rank announces;
+  every cast name is kept, the app filters by the table) → `LevelingSnap.aaList`,
   `.aaActivations` (optional: absent from older segments) → `mergeLeveling` (newer run by stamp,
   activations joined by name, fields only when a side has them). Reading a rank: each slash group of
   the row text with one value a rank (`1/2/3/5%`) against the block's numbers, else the cost; one
