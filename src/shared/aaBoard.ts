@@ -3,10 +3,11 @@
 // "someone may want to look at other class combinations"; "what if i want to look at aa's i can't
 // use, just to see what they are??"). Pure.
 //
-// USABLE: General and Special always; an Archetype AA by `archetypeFit`; a Class AA by its class. For
-// the character's own (detected) classes a held rank always counts (THE LOG WINS, WORKFLOW.md); for
-// another combo the ranks carry over only where that combo can use the AA. A row the combo cannot use
-// is kept, flagged, and left out of every total and recommendation.
+// USABLE: General and Special always; an Archetype AA by `archetypeFit`; a Class AA by its class. The
+// game gives only the combo in force its Archetype and Class AAs (MEASURED.md, "Alternate
+// advancement"), so a log rank on a row these classes lack was bought under another loadout: kept
+// (THE LOG WINS for what was bought), flagged `elsewhere`, and like every row the combo cannot use
+// left out of every total and recommendation. Only with no classes known does a held rank count.
 
 import { AA_GROUPS, type AaGroup } from './aaEffectTable'
 import { aaEffect, type AaEffect } from './aaEffects'
@@ -29,11 +30,13 @@ export interface AaBoardRow {
   cost: AaRowCost | null
   /** Usable, bought with points, not removed, below its top rank. */
   buyable: boolean
+  /** The character's own combo lacks the row, but the log bought ranks in it: another loadout's. */
+  elsewhere: boolean
 }
 
 export interface AaCombo {
   classes: readonly ClassAbbr[]
-  /** The classes are the character's own, so a held rank always counts. */
+  /** The classes are the character's own (detected), not a planned combo. */
   own: boolean
 }
 
@@ -47,8 +50,8 @@ const CLASS_TOPS: Readonly<Record<string, { by: readonly [readonly ClassAbbr[], 
 export function aaFit(r: AaRanked, combo: AaCombo): AaFit {
   const { section } = r.row
   if (section === 'general' || section === 'special') return 'mine'
-  if (combo.own && r.rank > 0) return 'mine'
-  if (combo.classes.length === 0) return 'mayApply'
+  // No classes known: nothing tells another loadout's rank from this one's, so the log's counts.
+  if (combo.classes.length === 0) return combo.own && r.rank > 0 ? 'mine' : 'mayApply'
   if (section === 'archetype') return archetypeFit(r.row.name, combo.classes)
   const abbr = classAbbrForDisplayName(r.row.class ?? '')
   return abbr !== undefined && combo.classes.includes(abbr) ? 'mine' : 'other'
@@ -70,7 +73,8 @@ export function aaBoard(ranked: readonly AaRanked[], combo: AaCombo): AaBoardRow
     const max = aaComboMax(r, combo.classes)
     const cost = aaRowCost(r.row, r.rank, max)
     const buyable = usable && cost !== null && r.rank < max
-    return { r, fit, usable, max, effect: aaEffect(r.row), cost, buyable }
+    const elsewhere = combo.own && fit === 'other' && (r.logRank ?? 0) > 0
+    return { r, fit, usable, max, effect: aaEffect(r.row), cost, buyable, elsewhere }
   })
 }
 
@@ -105,7 +109,7 @@ function classGroups(rows: readonly AaBoardRow[], classes: readonly ClassAbbr[],
   for (const b of rows) byClass.set(b.r.row.class ?? '', [...(byClass.get(b.r.row.class ?? '') ?? []), b])
   const own = classes.map(classDisplayName).filter((c) => byClass.has(c))
   const out: AaListGroup[] = own.map((c) => ({ title: c, kind: 'mine' as const, rows: byClass.get(c) ?? [] }))
-  // A held row of a class outside the combo (the log's) still shows under its class.
+  // A usable row of a class outside the combo (held, with no classes known) shows under its class.
   for (const [cls, list] of byClass) {
     if (own.includes(cls)) continue
     const held = list.filter((b) => b.usable)

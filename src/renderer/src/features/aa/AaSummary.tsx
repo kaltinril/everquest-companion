@@ -5,7 +5,7 @@ import { type JSX, useMemo, useState } from 'react'
 import { Box, LinearProgress, Link, Paper, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import { aaByGroup, type AaBoardRow } from '@shared/aaBoard'
 import { AA_BANK_CAP, aaNotForPoints, aaRecFit, type AaRecItem, type AaRecs } from '@shared/aaRecommend'
-import { aaSigned, aaStatRiseIsGood, aaStatTotals, type AaStatLine } from '@shared/aaStats'
+import { aaSigned, aaStatTotals, type AaStatLine } from '@shared/aaStats'
 import type { ClassAbbr } from '@shared/classCombo'
 import { useAaNav } from './aaNav'
 
@@ -13,7 +13,6 @@ const LINK_SX = { cursor: 'pointer', color: 'success.main', '&:hover': { textDec
 
 function StatLine({ line, board }: { line: AaStatLine; board: readonly AaBoardRow[] }): JSX.Element {
   const nav = useAaNav()
-  const good = line.diff > 0 === aaStatRiseIsGood(line.stat)
   return (
     <Box sx={{ py: 0.5, borderBottom: 1, borderColor: 'divider', breakInside: 'avoid' }} data-testid="aa-stat">
       <Stack direction="row" alignItems="baseline" spacing={1}>
@@ -23,11 +22,6 @@ function StatLine({ line, board }: { line: AaStatLine; board: readonly AaBoardRo
         <Typography variant="body2" sx={{ fontWeight: 600 }}>
           {line.total === 0 && line.seeText ? 'see text' : aaSigned(line.total, line.unit)}
         </Typography>
-        {line.diff !== 0 && (
-          <Typography variant="caption" color={good ? 'success.main' : 'error.main'}>
-            {aaSigned(line.diff, line.unit)}
-          </Typography>
-        )}
       </Stack>
       <Typography variant="caption" color="text.secondary" component="div">
         {line.from.map((f) => {
@@ -38,11 +32,6 @@ function StatLine({ line, board }: { line: AaStatLine; board: readonly AaBoardRo
             </Box>
           )
         })}
-        {line.gone.map((g) => (
-          <Box key={g} component="span" sx={{ mr: 1.25, textDecoration: 'line-through', color: 'text.disabled' }}>
-            {g}
-          </Box>
-        ))}
         {line.stat === 'Stat cap' && (
           <Link component="button" variant="caption" onClick={() => nav.go('bis')} color="success.main">
             Best in slot
@@ -142,8 +131,8 @@ function Recommendations({ recs, board, unspent, classes, onSpecial }: { recs: A
 
 export interface AaSummaryProps {
   board: AaBoardRow[]
-  /** The detected combo's board while planning another, for the change; null otherwise. */
-  base: AaBoardRow[] | null
+  /** Another combo than the detected one is in force. */
+  planning: boolean
   recs: AaRecs
   unspent: number | null
   classes: readonly ClassAbbr[]
@@ -151,7 +140,7 @@ export interface AaSummaryProps {
 }
 
 export function AaSummary(p: AaSummaryProps): JSX.Element {
-  const groups = useMemo(() => aaStatTotals(p.board, p.base ?? undefined), [p.board, p.base])
+  const groups = useMemo(() => aaStatTotals(p.board), [p.board])
   return (
     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 1fr) 340px' }, gap: 2 }} data-testid="aa-summary">
       <Box sx={{ minWidth: 0 }}>
@@ -159,7 +148,7 @@ export function AaSummary(p: AaSummaryProps): JSX.Element {
           What your AAs give you
         </Typography>
         <Typography variant="caption" color="text.secondary" component="div" sx={{ mb: 1 }}>
-          {p.base === null ? 'Totals from your ranks. Click an AA to open its row.' : 'Green and red: the change against your own classes.'}
+          {`Totals from your ranks${p.planning ? `, for ${p.classes.join('/')}` : ''}. Click an AA to open its row.`}
         </Typography>
         <Box sx={{ columnCount: { xs: 1, md: 2, xl: 3 }, columnGap: 3 }}>
           {groups.map((g) => (

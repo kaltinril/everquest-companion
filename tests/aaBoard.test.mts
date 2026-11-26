@@ -10,6 +10,7 @@ import { aaNotForPoints, aaRecFit, aaRecommend } from '../src/shared/aaRecommend
 import { aaSigned, aaStatTotals } from '../src/shared/aaStats'
 import { aaActivation, aaLinks } from '../src/shared/aaLinks'
 import type { ClassAbbr } from '../src/shared/classCombo'
+import type { AASpendEvent } from '../src/shared/types'
 
 const OWN: ClassAbbr[] = ['WAR', 'SHM', 'MNK']
 const own: AaCombo = { classes: OWN, own: true }
@@ -134,14 +135,57 @@ test('WHAT YOUR AAS GIVE YOU: totals from held usable ranks, race and class line
   assert.equal(groups[0].group, 'Attributes')
 })
 
-test('WHAT YOUR AAS GIVE YOU: another combo shows the change; an unusable AA drops out of the total', () => {
+test('WHAT YOUR AAS GIVE YOU: another combo shows only what its AAs add, no change against your own', () => {
   const picks = maxedPicks()
-  const base = aaBoard(ranked(picks), own)
   const planned = aaBoard(ranked(picks, ['WAR', 'CLR', 'WIZ']), { classes: ['WAR', 'CLR', 'WIZ'], own: false })
-  const haste = aaStatTotals(planned, base).flatMap((g) => g.lines).find((l) => l.stat === 'Haste')
-  assert.equal(haste?.total, 0)
-  assert.equal(haste?.diff, -10)
-  assert.deepEqual(haste?.gone, ['Unbound Alacrity'])
+  const lines = aaStatTotals(planned).flatMap((g) => g.lines)
+  assert.equal(lines.find((l) => l.stat === 'Haste'), undefined, 'a Monk AA adds nothing to WAR/CLR/WIZ')
+  assert.ok(lines.every((l) => !('diff' in l) && !('gone' in l)))
+  assert.equal(lines.find((l) => l.stat === 'Mana cost')?.total, -10, 'a reduction keeps its minus')
+})
+
+const T = Date.parse('2026-11-12T18:00:00')
+const spend = (ability: string, rank: number): AASpendEvent =>
+  rank === 1 ? { ts: T, ability, cost: 1 } : { ts: T + rank, ability: `${ability} ${String(rank)}`, cost: 1, rank }
+const climb = (ability: string, top: number): AASpendEvent[] => Array.from({ length: top }, (_, i) => spend(ability, i + 1))
+/** The owner's own purchases, then ones from loadouts played before (a Ranger's, a Paladin's, a Bard's, a Berserker's). */
+const MINE = [...climb('Combat Fury', 3), ...climb('Unbound Alacrity', 3)]
+const BEFORE = [...climb("Hunter's Attack Power", 13), ...climb('Lay on Hands', 8), ...climb('Unbound Versatility', 1), ...climb('Unbound Fury', 2)]
+const FOREIGN = ["Hunter's Attack Power", 'Lay on Hands', 'Unbound Versatility', 'Unbound Fury']
+const logBoard = (spends: AASpendEvent[], combo: AaCombo = own): AaBoardRow[] => aaBoard(withGranted(rankAas(spends, {}), { level: 50, classes: combo.classes }), combo)
+
+test("ANOTHER LOADOUT'S AAS: kept, marked, shown only with All, and out of every count, stat and recommendation", () => {
+  const board = logBoard([...MINE, ...BEFORE])
+  const clean = logBoard(MINE)
+  for (const key of FOREIGN) {
+    const b = find(board, key)
+    assert.equal(b.usable, false, key)
+    assert.equal(b.elsewhere, true, key)
+  }
+  assert.equal(find(board, "Hunter's Attack Power").r.rank, 13, 'the log wins for what was bought')
+  assert.deepEqual(aaTabCount(board, 'class', 'usable', ''), aaTabCount(clean, 'class', 'usable', ''))
+  assert.deepEqual(aaLeft(board), aaLeft(clean))
+  assert.deepEqual(aaRecommend(board, 20).items.map((i) => i.b.r.key), aaRecommend(clean, 20).items.map((i) => i.b.r.key))
+  assert.deepEqual(aaStatTotals(board), aaStatTotals(clean))
+  assert.ok(aaStatTotals(board).flatMap((g) => g.lines).every((l) => l.from.every((f) => !FOREIGN.includes(f.key))))
+  const usable = aaTabGroups(board, 'class', OWN, { scope: 'usable', query: '' })
+  assert.deepEqual(usable.map((g) => g.title), ['Warrior', 'Shaman', 'Monk'])
+  const ranger = aaTabGroups(board, 'class', OWN, { scope: 'all', query: '' }).find((g) => g.title === 'Ranger · not for WAR/SHM/MNK')
+  assert.equal(ranger?.kind, 'other')
+  assert.ok(ranger?.rows.some((b) => b.r.key === "Hunter's Attack Power" && b.elsewhere))
+  assert.equal(aaSearchGroups(board, 'usable', 'lay on hands').length, 0)
+  assert.equal(aaSearchGroups(board, 'all', 'lay on hands')[0].rows[0].elsewhere, true)
+  // The owner's own rows are unchanged.
+  assert.deepEqual([find(board, 'Unbound Alacrity').r.rank, find(board, 'Unbound Alacrity').usable], [3, true])
+  assert.deepEqual([find(board, 'Combat Fury').r.rank, find(board, 'Combat Fury').elsewhere], [3, false])
+})
+
+test("ANOTHER LOADOUT'S AAS: a planned combo that has them counts them, unmarked; with no classes known the log's ranks count", () => {
+  const planned = logBoard([...MINE, ...BEFORE], { classes: ['RNG', 'PAL', 'BRD'], own: false })
+  assert.deepEqual([find(planned, "Hunter's Attack Power").usable, find(planned, "Hunter's Attack Power").elsewhere], [true, false])
+  assert.equal(find(planned, 'Unbound Fury').elsewhere, false, 'planning marks nothing as another loadout')
+  const unknown = logBoard([...MINE, ...BEFORE], { classes: [], own: true })
+  assert.equal(find(unknown, 'Lay on Hands').usable, true)
 })
 
 test('LINKS: masteries to their workbench, stat AAs to Best in slot, activated AAs to Timers, corrections to Wiki Gaps', () => {

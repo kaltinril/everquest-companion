@@ -21,6 +21,23 @@ const SOURCE_TIP = {
   granted: 'Free AA: the game grants it once you reach its level.',
   none: ''
 } as const
+const ELSEWHERE_TIP = 'Your log bought this under another class combo; these classes do not get it.'
+
+/** The quiet note after an unusable row's name: another loadout's rank, "may apply", or "not for". */
+function NotForNote({ b, classes }: { b: AaBoardRow; classes: readonly ClassAbbr[] }): JSX.Element | null {
+  if (b.usable) return null
+  const sx = { ml: 0.75, color: 'text.disabled', fontWeight: 400 }
+  if (b.elsewhere) {
+    return (
+      <Tooltip title={ELSEWHERE_TIP}>
+        <Box component="small" sx={sx} data-testid="aa-elsewhere">
+          from another loadout
+        </Box>
+      </Tooltip>
+    )
+  }
+  return <Box component="small" sx={sx}>{b.fit === 'mayApply' ? 'may apply' : aaNotFor(classes)}</Box>
+}
 
 function Pips({ b }: { b: AaBoardRow }): JSX.Element {
   const on = b.usable ? b.r.rank : 0
@@ -42,7 +59,9 @@ function Pips({ b }: { b: AaBoardRow }): JSX.Element {
 
 function RankCell({ b }: { b: AaBoardRow }): JSX.Element {
   if (!b.usable || b.r.row.removed !== undefined) {
-    return <Typography variant="caption" color="text.disabled">{b.r.row.removed !== undefined ? 'removed' : '-'}</Typography>
+    // Another loadout's rank stays in sight, dimmed: the log bought it.
+    const text = b.r.row.removed !== undefined ? 'removed' : b.elsewhere ? `${String(b.r.rank)}/${String(b.max)}` : '-'
+    return <Typography variant="caption" color="text.disabled">{text}</Typography>
   }
   const word = SOURCE_WORD[b.r.source]
   return (
@@ -119,7 +138,7 @@ function AaLine({ b, classes, setPick, showClass }: { b: AaBoardRow; classes: re
           {b.r.key}
           <Mark b={b} fields={['row', 'name', 'text', 'hk', 'removed']} />
           {showClass && b.r.row.class !== undefined && <Box component="small" sx={{ ml: 0.75, color: 'text.disabled' }}>{b.r.row.class}</Box>}
-          {!b.usable && <Box component="small" sx={{ ml: 0.75, color: 'text.disabled', fontWeight: 400 }}>{b.fit === 'mayApply' ? 'may apply' : aaNotFor(classes)}</Box>}
+          <NotForNote b={b} classes={classes} />
         </Typography>
         <Pips b={b} />
         <RankCell b={b} />

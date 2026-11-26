@@ -32,6 +32,7 @@ export function Mark({ b, fields }: { b: AaBoardRow; fields: readonly AaField[] 
 /** Where the rank comes from, in one line. */
 function sourceLine(b: AaBoardRow, classes: readonly ClassAbbr[]): string {
   if (b.r.row.removed !== undefined) return `Removed ${b.r.row.removed}${b.r.logRank !== null && b.r.logRank > 0 ? `; your log shows rank ${String(b.r.logRank)}` : ''}.`
+  if (b.elsewhere) return `Your log shows rank ${String(b.r.logRank ?? b.r.rank)}, bought under another loadout; not counted for ${classes.join('/')}.`
   if (b.fit === 'mayApply') return 'May apply: measured only beside Warrior and Monk.'
   if (b.fit === 'other') return `Shown to read: ${aaNotFor(classes)}.`
   if (b.r.unlisted) return "From your log; not on the wiki's AA page."

@@ -103,10 +103,6 @@ export interface AaStatLine {
   /** An AA feeds it whose value this cannot read. */
   seeText: boolean
   from: AaStatFrom[]
-  /** The change against another combo's board (planning); 0 without one. */
-  diff: number
-  /** The AAs the other board counted that this one does not. */
-  gone: string[]
 }
 
 export interface AaStatGroup {
@@ -121,7 +117,7 @@ export function aaStatName(key: string): string {
 
 const round = (n: number): number => Math.round(n * 100) / 100
 
-function statLine(d: AaStatDef, byKey: ReadonlyMap<string, AaBoardRow>): Omit<AaStatLine, 'diff' | 'gone'> {
+function statLine(d: AaStatDef, byKey: ReadonlyMap<string, AaBoardRow>): AaStatLine {
   const from: AaStatFrom[] = []
   for (const [key, sign = 1, which = 0] of d.parts) {
     const b = byKey.get(key)
@@ -140,17 +136,13 @@ const keyed = (board: readonly AaBoardRow[]): Map<string, AaBoardRow> => {
   return out
 }
 
-/** The stat lines with something feeding them, in groups; with `base`, each line's change against it. */
-export function aaStatTotals(board: readonly AaBoardRow[], base?: readonly AaBoardRow[], defs: readonly AaStatDef[] = AA_STAT_DEFS): AaStatGroup[] {
+/** The stat lines with something feeding them, in groups: only what the board's usable AAs add. */
+export function aaStatTotals(board: readonly AaBoardRow[], defs: readonly AaStatDef[] = AA_STAT_DEFS): AaStatGroup[] {
   const now = keyed(board)
-  const was = base === undefined ? null : keyed(base)
   const groups: AaStatGroup[] = []
   for (const d of defs) {
-    const cur = statLine(d, now)
-    const old = was === null ? null : statLine(d, was)
-    if (cur.from.length === 0 && (old === null || old.from.length === 0)) continue
-    const gone = old === null ? [] : old.from.filter((f) => !cur.from.some((c) => c.key === f.key)).map((f) => f.name)
-    const line: AaStatLine = { ...cur, diff: old === null ? 0 : round(cur.total - old.total), gone }
+    const line = statLine(d, now)
+    if (line.from.length === 0) continue
     const group = groups.find((g) => g.group === d.group)
     if (group === undefined) groups.push({ group: d.group, lines: [line] })
     else group.lines.push(line)
@@ -161,9 +153,4 @@ export function aaStatTotals(board: readonly AaBoardRow[], base?: readonly AaBoa
 /** A signed amount with its unit: "+10", "-9%". */
 export function aaSigned(n: number, unit: string): string {
   return `${n > 0 ? '+' : n < 0 ? '-' : ''}${String(Math.abs(round(n)))}${unit}`
-}
-
-/** Whether a rise in the stat is good for the player (damage taken, costs and weight are better lower). */
-export function aaStatRiseIsGood(stat: string): boolean {
-  return !/taken|cost|weight|delay|cast time/i.test(stat)
 }

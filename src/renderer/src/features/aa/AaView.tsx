@@ -189,7 +189,7 @@ function Body({ s, recs, tab, setTab, scope, query }: { s: AaBoardState; recs: A
   if (query.trim() !== '') {
     return <AaList groups={aaSearchGroups(s.board, scope, query)} classes={s.classes} setPick={s.setPick} showClass empty="Nothing matches." />
   }
-  return <AaSummary board={s.board} base={s.planning ? s.ownBoard : null} recs={recs} unspent={s.unspent} classes={s.classes} onSpecial={() => setTab('special')} />
+  return <AaSummary board={s.board} planning={s.planning} recs={recs} unspent={s.unspent} classes={s.classes} onSpecial={() => setTab('special')} />
 }
 
 export interface AaLinksProps {
