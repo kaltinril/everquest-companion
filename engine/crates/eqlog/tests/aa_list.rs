@@ -51,3 +51,47 @@ fn a_name_with_a_colon_keeps_it_and_a_malformed_header_is_not_claimed() {
     assert_ne!(parsed("Ability #x: Nope")["kind"], "aaList");
     assert_ne!(parsed("Cost per Level: lots")["kind"], "aaList");
 }
+
+#[test]
+fn the_players_own_proof_lines_parse_to_aa_owned_with_the_name() {
+    for (line, name) in [
+        (
+            "You can use the ability Heroic Leap again in 2 minute(s) 3 seconds.",
+            "Heroic Leap",
+        ),
+        (
+            "You can use the ability Rampage again in 0 minute(s) 41 seconds.",
+            "Rampage",
+        ),
+        ("You disable Point Blank Fire.", "Point Blank Fire"),
+        (
+            "Your Quick Buff combat ability is interrupted.",
+            "Quick Buff",
+        ),
+    ] {
+        let v = parsed(line);
+        assert_eq!(v["kind"], "aaOwned", "{line}");
+        assert_eq!(v["name"], name, "{line}");
+    }
+    // A spell interrupt stays what it was.
+    assert_eq!(
+        parsed("Your Origin spell is interrupted.")["kind"],
+        "castInterrupted"
+    );
+}
+
+#[test]
+fn a_ranked_cast_and_a_finishing_blow_reach_the_fold_as_they_always_did() {
+    let c = parsed("You begin casting Rampage II.");
+    assert_eq!(c["kind"], "castBegin");
+    assert_eq!(c["spell"], "Rampage II");
+    let d = parsed("You punch a rock golem for 120 points of damage. (Finishing Blow)");
+    assert_eq!(d["kind"], "damage");
+    assert_eq!(d["attacker"], "You");
+    assert_eq!(d["dtype"], "melee");
+    assert!(d["modifiers"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|m| m == "Finishing Blow"));
+}

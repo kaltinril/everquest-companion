@@ -258,7 +258,8 @@ impl Parser {
             || casts::classify_poison_proc(&self.casts, c, out)
             || casts::classify_db_buff(db, c, out)
             || who::classify_item_activate(&self.who, c, out)
-            || casts::classify_spell_emote(&self.casts, c, out);
+            || casts::classify_spell_emote(&self.casts, c, out)
+            || aa_list::classify_aa_owned(c, out);
         if !claimed {
             out.begin(Kind::Unknown);
             out.envelope(c.seq, c.ts, c.raw);

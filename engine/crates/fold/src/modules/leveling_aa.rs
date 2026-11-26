@@ -10,10 +10,18 @@
 //! seventy blocks later, a third (owner's 15:44 list, MEASURED.md). A new run replaces the old whole.
 //! Reading a rank out of a block is the app's (`src/shared/aaList.ts`), which holds the AA table.
 //!
-//! ACTIVATIONS. `You activate <name>.` (`aaActivate`) for every name, AA or not (`Skull Bash` is a
-//! skill): the app keeps only names its AA table has. First and last stamp per name.
+//! The run also records the last zone-in before it (`zoneBefore`): a list is stale until a zone or a
+//! loadout swap after a purchase (MEASURED.md), so the app lets a purchase with no zone-in between
+//! it and the run beat the run.
+//!
+//! USED: what the player's own lines show them using, every name, AA or not (the app keeps only
+//! names its AA table has; `Skull Bash` is a skill): `You activate X.` (`aaActivate`); `You begin
+//! casting X II.` (`castBegin`, rank from the numeral); `You can use the ability X again in ...`,
+//! `You disable X.`, `Your X combat ability is interrupted.` (`aaOwned`); and `(Finishing Blow)` on
+//! the player's own melee hit. First and last stamp per name, and the highest rank a line named.
 
-use crate::event::{Event, Key};
+use crate::event::{Event, Key, Kind};
+use eqlog::names::{spell_rank, strip_rank_tail};
 use serde::Serialize;
 
 /// Lines of one run further apart than this belong to two runs (one run prints in about 1 s).
@@ -28,10 +36,13 @@ pub struct AaListBlock {
 }
 
 #[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AaListRun {
     /// The first header's stamp.
     ts: i64,
     blocks: Vec<AaListBlock>,
+    /// The last zone-in before the run; null when the log showed none.
+    zone_before: Option<i64>,
     /// The run's last line, for the gap test. Not published.
     #[serde(skip)]
     last_ts: i64,
@@ -48,8 +59,9 @@ impl AaListRun {
     }
 }
 
-/// Folds one `aaList` line into the latest run. Returns whether the published run changed.
-pub fn fold_list_line(run: &mut Option<AaListRun>, ev: &Event) -> bool {
+/// Folds one `aaList` line into the latest run (`zone`: the last zone-in so far). Returns whether the
+/// published run changed.
+pub fn fold_list_line(run: &mut Option<AaListRun>, ev: &Event, zone: Option<i64>) -> bool {
     let ts = ev.ts();
     if let Some(id) = ev.int(Key::Value) {
         let name = ev.str(Key::Ability).unwrap_or_default().to_string();
@@ -68,6 +80,7 @@ pub fn fold_list_line(run: &mut Option<AaListRun>, ev: &Event) -> bool {
                 *run = Some(AaListRun {
                     ts,
                     blocks: vec![block],
+                    zone_before: zone,
                     last_ts: ts,
                 })
             }
@@ -103,23 +116,55 @@ pub struct AaActivation {
     name: String,
     first: i64,
     last: i64,
+    /// The highest rank a line named (`Rampage II`); absent when none did.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    rank: Option<i64>,
 }
 
-/// Folds one `aaActivate` line. Returns true only for a name not seen before: a repeat moves `last`
-/// without announcing, so a Quick Buff every ten minutes does not refetch the whole history.
-pub fn fold_activation(seen: &mut Vec<AaActivation>, ev: &Event) -> bool {
-    let Some(name) = ev.str(Key::Name).filter(|n| !n.is_empty()) else {
+const FINISHING_BLOW: &str = "Finishing Blow";
+
+/// The name (and rank) a line shows the player using, or None. A damage line counts only when it is
+/// the player's own melee hit carrying `(Finishing Blow)`: the raw tail is the cheap gate, as this is
+/// asked of every hit.
+fn used(ev: &Event) -> Option<(String, Option<i64>)> {
+    match ev.kind_of() {
+        Kind::AaActivate | Kind::AaOwned => Some((ev.str(Key::Name)?.to_string(), None)),
+        Kind::CastBegin => {
+            let spell = ev.str(Key::Spell)?;
+            let rank = spell_rank(spell);
+            let name = strip_rank_tail(spell.trim()).trim().to_string();
+            Some((name, (rank > 0).then_some(rank)))
+        }
+        Kind::Damage if ev.raw().ends_with("Finishing Blow)") => {
+            let own = ev.str(Key::Attacker) == Some("You") && ev.str(Key::Dtype) == Some("melee");
+            let fb = ev.arr_str(Key::Modifiers).contains(&FINISHING_BLOW);
+            (own && fb).then(|| (FINISHING_BLOW.to_string(), None))
+        }
+        _ => None,
+    }
+}
+
+/// Folds one line that may show the player using something. Returns true only for a name not seen
+/// before or a higher rank: a repeat moves `last` without announcing, so Heroic Leap's reuse line
+/// (20,000 in the owner's log) never refetches the whole history.
+pub fn fold_used(seen: &mut Vec<AaActivation>, ev: &Event) -> bool {
+    let Some((name, rank)) = used(ev).filter(|(n, _)| !n.is_empty()) else {
         return false;
     };
     let ts = ev.ts();
     if let Some(a) = seen.iter_mut().find(|a| a.name == name) {
         a.last = a.last.max(ts);
-        return false;
+        let higher = rank > a.rank;
+        if higher {
+            a.rank = rank;
+        }
+        return higher;
     }
     seen.push(AaActivation {
-        name: name.to_string(),
+        name,
         first: ts,
         last: ts,
+        rank,
     });
     true
 }
@@ -151,9 +196,9 @@ mod tests {
     }
 
     fn block(run: &mut Option<AaListRun>, ts: i64, id: i64, name: &str, t: &str, c: i64) {
-        assert!(fold_list_line(run, &header(ts, id, name)));
-        assert!(fold_list_line(run, &text(ts, t)));
-        assert!(fold_list_line(run, &cost(ts, c)));
+        assert!(fold_list_line(run, &header(ts, id, name), None));
+        assert!(fold_list_line(run, &text(ts, t), None));
+        assert!(fold_list_line(run, &cost(ts, c), None));
     }
 
     #[test]
@@ -209,10 +254,10 @@ mod tests {
     #[test]
     fn a_stray_description_or_cost_line_changes_nothing() {
         let mut run = None;
-        assert!(!fold_list_line(&mut run, &text(1000, "lone")));
+        assert!(!fold_list_line(&mut run, &text(1000, "lone"), None));
         block(&mut run, 1000, 40, "Combat Fury", "by 5%.", 4);
-        assert!(!fold_list_line(&mut run, &text(9000, "late")));
-        assert!(!fold_list_line(&mut run, &cost(1000, 9)));
+        assert!(!fold_list_line(&mut run, &text(9000, "late"), None));
+        assert!(!fold_list_line(&mut run, &cost(1000, 9), None));
         assert_eq!(run.unwrap().blocks[0].cost, Some(4));
     }
 
@@ -224,10 +269,68 @@ mod tests {
                 r#"{{"kind":"aaActivate","seq":1,"ts":{ts},"raw":"a","name":"{n}"}}"#
             ))
         };
-        assert!(fold_activation(&mut seen, &act(1000, "Quick Buff")));
-        assert!(!fold_activation(&mut seen, &act(9000, "Quick Buff")));
-        assert!(fold_activation(&mut seen, &act(9500, "Skull Bash")));
+        assert!(fold_used(&mut seen, &act(1000, "Quick Buff")));
+        assert!(!fold_used(&mut seen, &act(9000, "Quick Buff")));
+        assert!(fold_used(&mut seen, &act(9500, "Skull Bash")));
         assert_eq!((seen[0].first, seen[0].last), (1000, 9000));
         assert_eq!(seen.len(), 2);
+    }
+
+    #[test]
+    fn a_run_records_the_last_zone_in_before_it() {
+        let mut run = None;
+        assert!(fold_list_line(
+            &mut run,
+            &header(5000, 1, "Innate Eminence"),
+            Some(1200)
+        ));
+        assert_eq!(run.unwrap().zone_before, Some(1200));
+    }
+
+    #[test]
+    fn a_cast_names_its_rank_and_a_higher_one_announces_again() {
+        let mut seen = Vec::new();
+        let cast = |ts: i64, spell: &str| {
+            ev(&format!(
+                r#"{{"kind":"castBegin","seq":1,"ts":{ts},"raw":"c","spell":"{spell}"}}"#
+            ))
+        };
+        assert!(fold_used(&mut seen, &cast(1000, "Rampage I")));
+        assert!(!fold_used(&mut seen, &cast(2000, "Rampage I")));
+        assert!(fold_used(&mut seen, &cast(3000, "Rampage II")));
+        assert!(!fold_used(&mut seen, &cast(4000, "Rampage I")));
+        assert_eq!(
+            (seen[0].name.as_str(), seen[0].rank, seen[0].last),
+            ("Rampage", Some(2), 4000)
+        );
+        assert!(fold_used(&mut seen, &cast(5000, "Origin")));
+        assert_eq!(seen[1].rank, None);
+    }
+
+    #[test]
+    fn the_reuse_line_counts_and_twenty_thousand_of_it_announce_once() {
+        let mut seen = Vec::new();
+        let reuse = |ts: i64| {
+            ev(&format!(
+                r#"{{"kind":"aaOwned","seq":1,"ts":{ts},"raw":"r","name":"Heroic Leap"}}"#
+            ))
+        };
+        let announced = (0..20_000)
+            .filter(|i| fold_used(&mut seen, &reuse(*i)))
+            .count();
+        assert_eq!((announced, seen.len()), (1, 1));
+    }
+
+    #[test]
+    fn finishing_blow_counts_only_on_the_players_own_melee_hit() {
+        let mut seen = Vec::new();
+        let hit = |attacker: &str| {
+            ev(&format!(
+                r#"{{"kind":"damage","seq":1,"ts":1,"raw":"{attacker} punch a rock golem for 9 points of damage. (Finishing Blow)","attacker":"{attacker}","target":"a rock golem","amount":9,"dtype":"melee","modifiers":["Finishing Blow"]}}"#
+            ))
+        };
+        assert!(!fold_used(&mut seen, &hit("Malkil")));
+        assert!(fold_used(&mut seen, &hit("You")));
+        assert_eq!(seen[0].name, "Finishing Blow");
     }
 }

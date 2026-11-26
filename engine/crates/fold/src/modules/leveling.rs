@@ -7,7 +7,7 @@
 //! The potion is deliberately not persisted: the quaff is a log line, so a relaunch replays it and
 //! re-derives the charge state exactly.
 
-use super::leveling_aa::{fold_activation, fold_list_line, AaActivation, AaListRun};
+use super::leveling_aa::{fold_list_line, fold_used, AaActivation, AaListRun};
 use crate::event::{Event, Kind};
 use crate::EqModule;
 use serde::Serialize;
@@ -50,6 +50,8 @@ pub struct LevelingModule {
     aa_potions: Vec<AaPotionRow>,
     aa_list: Option<AaListRun>,
     aa_activations: Vec<AaActivation>,
+    /// The last zone-in, for the next list run's `zoneBefore`. Not published.
+    last_zone: Option<i64>,
     seq: i64,
     /// The announce cursor — see [`crate::announce`]. Moved only by an arm that changed what this
     /// module publishes (`on_event`); every other log line leaves it untouched.
@@ -74,6 +76,7 @@ impl EqModule for LevelingModule {
         self.aa_potions.clear();
         self.aa_list = None;
         self.aa_activations.clear();
+        self.last_zone = None;
         self.seq = 0;
         self.announce.reset();
     }
@@ -122,8 +125,14 @@ impl EqModule for LevelingModule {
                 self.aa_potions.push(AaPotionRow { ts: ev.ts() });
                 true
             }
-            Kind::AaList => fold_list_line(&mut self.aa_list, ev),
-            Kind::AaActivate => fold_activation(&mut self.aa_activations, ev),
+            Kind::AaList => fold_list_line(&mut self.aa_list, ev, self.last_zone),
+            Kind::AaActivate | Kind::AaOwned | Kind::CastBegin | Kind::Damage => {
+                fold_used(&mut self.aa_activations, ev)
+            }
+            Kind::Zone => {
+                self.last_zone = Some(ev.ts());
+                false
+            }
             _ => false,
         };
         if published {

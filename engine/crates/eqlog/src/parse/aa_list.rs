@@ -52,3 +52,32 @@ pub fn classify_aa_list(c: &Ctx, out: &mut Ev) -> bool {
     out.i(Key::Cost, cost);
     true
 }
+
+const REUSE: &str = "You can use the ability ";
+const REUSE_TAIL: &str = " again in ";
+const DISABLE: &str = "You disable ";
+const COMBAT_INTERRUPT: (&str, &str) = ("Your ", " combat ability is interrupted.");
+
+/// The player's own lines that name an ability they hold, as `aaOwned` with `name`: the reuse timer
+/// (`You can use the ability Heroic Leap again in 2 minute(s) 3 seconds.`), a toggle switched off
+/// (`You disable Point Blank Fire.`) and an interrupted combat ability (`Your Quick Buff combat
+/// ability is interrupted.`). Any name: the app keeps the ones its AA table has. Offered last in the
+/// cascade, so a line another classifier claims is never taken from it.
+pub fn classify_aa_owned(c: &Ctx, out: &mut Ev) -> bool {
+    let text = c.text;
+    let name = if let Some(rest) = text.strip_prefix(REUSE) {
+        rest.find(REUSE_TAIL).map(|at| &rest[..at])
+    } else if let Some(rest) = text.strip_prefix(DISABLE) {
+        rest.strip_suffix('.')
+    } else {
+        text.strip_prefix(COMBAT_INTERRUPT.0)
+            .and_then(|rest| rest.strip_suffix(COMBAT_INTERRUPT.1))
+    };
+    let Some(name) = name.map(js_trim).filter(|n| !n.is_empty()) else {
+        return false;
+    };
+    out.begin(Kind::AaOwned);
+    out.envelope(c.seq, c.ts, c.raw);
+    out.s(Key::Name, name);
+    true
+}
