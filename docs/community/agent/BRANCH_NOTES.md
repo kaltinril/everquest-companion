@@ -33,8 +33,9 @@ where one exists.
   is at the 100-line function ceiling; `gear.e2e.mts` is near 400 lines.
 - Zone filter: `GearFilters.zones` holds map stems; 174 corpus spellings resolve to 121 zones via
   `zoneShortNameFromCatalog`.
-- Open: arrows are unvalued (DMG with no delay); a suspect row (Coldain Crossbow) tops
-  the RANGE slot; zone options do not respect Current era; clicking a Zone cell does not filter.
+- Open: zone options do not respect Current era; clicking a Zone cell does not filter.
+- Closed 2026-11-25: Coldain Crossbow "topping RANGE" was measured over the whole corpus with no era
+  filter; its `{{Velious Era}}` banner hides it under Current era, and it is `Temporary` (below).
 - Closed 2026-11-25: Oakwynd (GM-event bow, Does Not Exist banner) is `GearRow.unobtainable`, see
   "Unobtainable items" under the Best in slot tab below.
 - **Void motes tab** (2026-11-18, a tab since 2026-11-19; `shared/planner/voidMotes.ts`,
@@ -132,6 +133,17 @@ where one exists.
     - Left: the Gear tab lists the row and its BEST column scores it (a lookup, not a pick); the tier
       model's units still measure over it (a median over thousands of rows); Void motes, socket
       advice, `planOwned` read only what the character holds; the wish list is the player's own.
+  - Temporary items (owner, 2026-11-25, Summoned: Coldstone in Ammo: "Like i'm going to go randomly
+    hail a magician ... every time i play?"): `gear.isTemporary` = the `Temporary` flag or a
+    `Summoned:` name. `bisAdmits` drops it ALWAYS, held or not (gone at the next camp); the Plan route
+    skips it. 101 slotted rows: 77 summoned, 24 NPC drops (Shadowed weapons, Coldain Crossbow).
+  - Era on the sheet (owner, 2026-11-25: "dont' we already compute what to show in classic vs not in
+    the gear tab ... why are we reinventing the wheel"): the sheet's Current era is the RECOMMENDERS'
+    gate, `plannerData.eraUnconfirmed` (anything but a positive in-era from `donorEra`, the Recommended
+    tab's `eraLegal` rule), via `gearData.useEraHidden().eraUnconfirmed`. The lists keep `eraHides`
+    (Unknown Era shown). Trigger: Dwarven Plate Boots (Enchanted Imbued), a cultural piece no page
+    dates, filled Feet. A held copy passes the era gate (`bisAdmits`; an owned item is owned). The
+    tier model still measures over `!eraHidden` rows.
   - Not done: P5 (effects chips, a "My tier list" focus on Recommended and Void motes, per-character
     boards); the upgrade slider on the sheet; the Lore Group rule; not looked at in the running app.
   - 2026-11-25 batch (owner's asks, `requirements/bis-sheet.md`; merged, not seen on screen by the owner):
