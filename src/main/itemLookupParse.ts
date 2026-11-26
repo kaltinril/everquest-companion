@@ -177,7 +177,7 @@ import { itemBaseName, parseStatsBlock, wikiDefaultBackstab, type ItemStatBlock 
 import { namesEra } from '../shared/planner/era'
 import { stripFormatChars } from '../shared/wikiTitle'
 import { isUnfilledItemBlueprint } from './itemBlueprint'
-import { itemPageCategories } from './itemPageCategories'
+import { itemPageMarkers } from './itemPageCategories'
 
 /** Strip a trailing ` +N` upgrade suffix. Applied before lookup + as the cache key. ONE
  *  definition of the rule for every main-side caller — see shared/itemStats.itemBaseName. */
@@ -951,7 +951,7 @@ export function parseItemWikitext(
   | 'eraTag'
   | 'foraged'
   | 'foragedNote'
-  | 'foragedCategory' | 'ingredientCategory'
+  | 'foragedCategory' | 'ingredientCategory' | 'doesNotExist'
 > {
   if (isUnfilledItemBlueprint(wikitext)) return { lore: false, quest: false, questUses: [], dropsFrom: [] }
   const statsBlock = templateField(wikitext, 'statsblock') ?? undefined
@@ -986,7 +986,7 @@ export function parseItemWikitext(
     eraTag: pageEraTag(wikitext),
     ...tradeskillFields(recipeParse, craftParse),
     ...foragedFields(wikitext),
-    ...itemPageCategories(wikitext),
+    ...itemPageMarkers(wikitext),
     statsBlock: statsBlock
       ? statsBlock.replace(/<br\s*\/?>/gi, '\n').replace(/[ \t]{2,}/g, ' ').trim()
       : undefined

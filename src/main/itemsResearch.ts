@@ -27,7 +27,9 @@
 // excluded item stays in item lookup and stays a searchable host, because "you cannot pull an
 // effect off this" is not "this item does not exist". `instrument` has NO consumer yet: V11's
 // grouping axis is what will read it, and the table is filed ahead of it so commissioning that
-// axis stays a UI decision rather than a data one.
+// axis stays a UI decision rather than a data one. Since 2026-11-25 the GM flags also feed
+// `isUnobtainable()` below, beside the page's own `{{:Does Not Exist}}` banner: the gear index marks
+// those rows `unobtainable`, and the Best in slot sheet and the Plan route leave them out.
 //
 // THE FOUR TABLES THE FILE CARRIES TODAY (JOS-25 + JOS-64 + JOS-67, the non-gated halves of
 // planner-v2 §4):
@@ -159,6 +161,20 @@ export const ITEMS_RESEARCH = itemsResearchJson as ItemResearchFile
  */
 export function isUnfarmable(research: ItemResearch | undefined): boolean {
   return research?.gmEvent === true || research?.gmOnly === true
+}
+
+/**
+ * Can NO player obtain this item? The one verdict over every signal that says so (owner, 2026-11-25:
+ * "we simply need to just ignore items that are impossible to get before we even start our
+ * calculation"): the page's own `{{:Does Not Exist}}` banner (`doesNotExist`, scraped), or the
+ * curated GM provenance (`isUnfarmable`). A future signal is added here and nowhere else.
+ *
+ * Read by the donor index (`effectIndex.excludedDonor`) and the gear index (`GearRow.unobtainable`,
+ * which the Best in slot sheet and the Plan route gate on). The item stays in item lookup and in the
+ * Gear tab: looking one up is still valid.
+ */
+export function isUnobtainable(k: Pick<ResearchedKnowledge, 'doesNotExist' | 'research'>): boolean {
+  return k.doesNotExist === true || isUnfarmable(k.research)
 }
 
 /**

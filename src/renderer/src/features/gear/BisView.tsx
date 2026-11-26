@@ -11,7 +11,7 @@ import { useCallback, useDeferredValue, useMemo, type JSX } from 'react'
 import { Box, Chip, Stack, TextField, Typography } from '@mui/material'
 import { CLASS_ABBRS, type ClassAbbr } from '@shared/classCombo'
 import { ITEM_UPGRADE_BASE, type ItemUpgradeState } from '@shared/itemUpgrade'
-import { alignPairsToWorn, buildBisSheet, defaultChipCaps, itemHasteCap, usableBy } from '@shared/planner/bisSheet'
+import { alignPairsToWorn, bisAdmits, buildBisSheet, defaultChipCaps, itemHasteCap } from '@shared/planner/bisSheet'
 import type { GearRow } from '@shared/planner/gear'
 import { scaleGearRow } from '@shared/planner/gearScale'
 import { attributeCaps, itemHasteRoom, maxCharacterLevel, type StatCaps } from '@shared/planner/statCaps'
@@ -57,16 +57,16 @@ function useWorn(compare: GearCompareData, state: ItemUpgradeState): { cells: Ma
   }, [compare, state])
 }
 
-/** The chips some item the player could wear states: the rest are drawn faded. */
-function useStated(rows: readonly GearRow[], model: TierModel, classes: readonly ClassAbbr[], admit: (r: GearRow) => boolean): Set<TierChip> {
+/** The chips some item the player could wear states (the sheet's own row gate, `bisAdmits`): the rest are drawn faded. */
+function useStated(rows: readonly GearRow[], model: TierModel, classes: readonly ClassAbbr[], gate: { admit: (r: GearRow) => boolean; held: ReadonlyMap<string, number> }): Set<TierChip> {
   return useMemo(() => {
     const out = new Set<TierChip>()
     for (const row of rows) {
-      if (!usableBy(row, classes) || !admit(row)) continue
+      if (!bisAdmits(row, { classes, admit: gate.admit, held: gate.held })) continue
       for (const [chip, v] of Object.entries(model.valuesOf(row))) if (v !== 0) out.add(chip as TierChip)
     }
     return out
-  }, [rows, model, classes, admit])
+  }, [rows, model, classes, gate.admit, gate.held])
 }
 
 /** The wish list's door, the Gear table's way (`useGearWishes` in GearView.tsx). */
@@ -138,7 +138,7 @@ function useBisSheet(rows: readonly GearRow[], prefs: BisPrefs, { classes, model
   const worn = useWorn(compare, state)
   const hasteRoom = itemHasteRoom(prefs.level, prefs.spellHaste)
   const built = useMemo(
-    () => buildBisSheet({ rows: scaled, setup, model, classes, admit, owned: prefs.owned ? owned : undefined, hasteRoom, statCaps }),
+    () => buildBisSheet({ rows: scaled, setup, model, classes, admit, owned: prefs.owned ? owned : undefined, held: owned, hasteRoom, statCaps }),
     [scaled, setup, model, classes, admit, owned, prefs.owned, hasteRoom, statCaps]
   )
   const sheet = useMemo(() => alignPairsToWorn(built, (cell) => worn.cells.get(cell)?.row?.key), [built, worn])
@@ -158,7 +158,7 @@ export default function BisView({ onOpenLoot }: BisViewProps = {}): JSX.Element 
   const statCap = useReincarnationCap()
   const statCaps = useMemo(() => attributeCaps(statCap), [statCap])
   const { setup, owned, admit, worn, sheet, totals, hasteRoom } = useBisSheet(rows, prefs, { classes: classes.classes, model, state: plus, statCaps })
-  const stated = useStated(rows, model, classes.classes, admit)
+  const stated = useStated(rows, model, classes.classes, { admit, held: owned })
   const lane = (chip: TierChip, tier: TierSetup['board'][TierChip]): void => setPrefs({ ...prefs, board: { ...setup.board, [chip]: tier } })
   const cap = (chip: TierChip, value: number | undefined): void => {
     const caps: Partial<Record<TierChip, number>> = Object.fromEntries(Object.entries(prefs.caps).filter(([k]) => k !== chip))

@@ -33,8 +33,10 @@ where one exists.
   is at the 100-line function ceiling; `gear.e2e.mts` is near 400 lines.
 - Zone filter: `GearFilters.zones` holds map stems; 174 corpus spellings resolve to 121 zones via
   `zoneShortNameFromCatalog`.
-- Open: arrows are unvalued (DMG with no delay); two suspect rows (Oakwynd, Coldain Crossbow) top
+- Open: arrows are unvalued (DMG with no delay); a suspect row (Coldain Crossbow) tops
   the RANGE slot; zone options do not respect Current era; clicking a Zone cell does not filter.
+- Closed 2026-11-25: Oakwynd (GM-event bow, Does Not Exist banner) is `GearRow.unobtainable`, see
+  "Unobtainable items" under the Best in slot tab below.
 - **Void motes tab** (2026-11-18, a tab since 2026-11-19; `shared/planner/voidMotes.ts`,
   `gear/VoidMoteView.tsx` hosting `VoidMotePanel.tsx`, view id `voidMotes`, stored at
   `eq.gear.motes`). A void mote is Void-Touched Potential: +1 full tier on
@@ -119,6 +121,17 @@ where one exists.
     too), one cell in the whole sheet; `CHIP_KEYS` order IS the text format: append, never insert.
   - TRAP: branch and bound over the cells blew a 400k-node budget (ANY cells double-count lore picks
     in the bound). The assignment (Hungarian) plus enumeration is exact and fast.
+  - Unobtainable items (owner, 2026-11-25: "we simply need to just ignore items that are impossible
+    to get before we even start our calculation"): main `itemsResearch.isUnobtainable` = the page's
+    `{{:Does Not Exist}}` banner (`items.json doesNotExist`) or `isUnfarmable` (GM event / GM only).
+    One seam: a new signal goes there. Readers: `effectIndex.excludedDonor`, and `gearIndex.pageRow`
+    -> `GearRow.unobtainable` (optional, no version bump).
+    - Gated (`gear.isObtainable`): `bisSheet.bisAdmits` drops the row before scoring, except a copy
+      the character holds, in either mode (`BisOptions.held`, capped to copies held); `BisView.useStated` asks `bisAdmits`;
+      `progressionPlan.candidatePool` (the Plan route) skips it.
+    - Left: the Gear tab lists the row and its BEST column scores it (a lookup, not a pick); the tier
+      model's units still measure over it (a median over thousands of rows); Void motes, socket
+      advice, `planOwned` read only what the character holds; the wish list is the player's own.
   - Not done: P5 (effects chips, a "My tier list" focus on Recommended and Void motes, per-character
     boards); the upgrade slider on the sheet; the Lore Group rule; not looked at in the running app.
   - 2026-11-25 batch (owner's asks, `requirements/bis-sheet.md`; merged, not seen on screen by the owner):

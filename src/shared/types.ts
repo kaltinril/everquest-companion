@@ -724,6 +724,12 @@ export interface ItemKnowledge {
   foragedCategory?: boolean
   /** the page files itself under `[[Category:Tradeskill Ingredient]]` */
   ingredientCategory?: boolean
+  /**
+   * the page carries the `{{:Does Not Exist}}` banner: it says no player can have the item
+   * (`itemPageCategories.itemPageMarkers`). Absent when the page carries no banner (law 1).
+   * `itemsResearch.isUnobtainable` is the verdict that reads it.
+   */
+  doesNotExist?: true
   /** whether this result was served from cache (vs a fresh network lookup) */
   cached: boolean
   /** true when the wiki lookup was attempted but found no page (negative result) */

@@ -64,7 +64,7 @@
 //
 // TWO KINDS OF ITEM ARE DROPPED FROM THE DONOR INDEX AND ONLY FROM IT (V9, docs/plans/planner-v2
 // .md): the mage-conjured `Summoned:` family and whatever the curated layer flags `summoned` or
-// calls unfarmable (`gmEvent` / `gmOnly`). They stay in the ITEM index — a summoned item is a perfectly real thing to look up,
+// calls unobtainable (`gmEvent` / `gmOnly`, or the page's `{{:Does Not Exist}}` banner). They stay in the ITEM index — a summoned item is a perfectly real thing to look up,
 // and "you cannot pull an effect off this" is not "this does not exist". See `excludedDonor`.
 
 import { itemKey, type ItemDbEntry, type ItemDbFile } from '../itemsDb'
@@ -76,7 +76,7 @@ import { renamedItems } from '../../shared/itemRenames'
 import spellsJson from '../data/spells.json'
 import {
   ITEMS_RESEARCH,
-  isUnfarmable,
+  isUnobtainable,
   knowledgeWithResearch,
   type ItemResearchFile,
   type ResearchedKnowledge
@@ -251,10 +251,11 @@ const SUMMONED_PREFIX = /^summoned:/i
  * Can anything on this item be donated at all?
  *
  * TWO WITNESSES, no heuristics between them: the name prefix above, and the curated layer
- * (`itemsResearch.ts`) — its `summoned` flag, plus `isUnfarmable()`, which is that file's own
+ * (`itemsResearch.ts`) — its `summoned` flag, plus `isUnobtainable()`, which is that file's own
  * verdict over its GM-provenance flags (`gmEvent`, and since JOS-64 `gmOnly`; the owner ruled the
- * two mean the same thing to a planner). Neither witness is a guess about an item's stats, and the
- * GM half is asked as ONE question so a flag added there can never be forgotten here.
+ * two mean the same thing to a planner) and, since 2026-11-25, the page's `{{:Does Not Exist}}`
+ * banner (a nonexistent item cannot donate). Neither witness is a guess about an item's stats, and
+ * that half is asked as ONE question so a signal added there can never be forgotten here.
  *
  * R7 — summoned items cannot donate — is OWNER-OBSERVED and unverified in any published source:
  * integrator research 2026-08-05 found the eqlwiki Exaltations page, the 7/14 patch notes and the
@@ -263,9 +264,9 @@ const SUMMONED_PREFIX = /^summoned:/i
  * wrongly listing them puts unfarmable rows in a farm plan and costs the browser its trust. The
  * decisive test is in-game and takes 30 seconds (attempt a merge of two identical summoned items).
  */
-function excludedDonor(name: string, research: ResearchedKnowledge['research']): boolean {
-  if (SUMMONED_PREFIX.test(name)) return true
-  return research?.summoned === true || isUnfarmable(research)
+function excludedDonor(k: ResearchedKnowledge): boolean {
+  if (SUMMONED_PREFIX.test(k.name)) return true
+  return k.research?.summoned === true || isUnobtainable(k)
 }
 
 /**
@@ -331,7 +332,7 @@ function pageContext(
       // cannot be trusted with this line). The browser marks what the character cannot use by it.
       deities: deityList(entry.statsBlock),
       canonical: itemKey(entry.page) === key,
-      excluded: excludedDonor(k.name, k.research)
+      excluded: excludedDonor(k)
     },
     effects: k.stats?.effects ?? [],
     unknown: slot.unknown

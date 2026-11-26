@@ -22,7 +22,7 @@
 // PURE, relative value imports (the shared/planner house rule) so the node test runner loads it.
 
 import type { ClassAbbr } from '../classCombo'
-import type { GearRow } from './gear'
+import { isObtainable, type GearRow } from './gear'
 import { arrowRank, isArrow, isBow } from './bisArrows'
 import { improveUnderCaps, type CapCell, type CapRules, type FoldedCap } from './bisCaps'
 import { searchLoadout, type SearchCandidate, type SearchCell } from './bisSearch'
@@ -42,6 +42,12 @@ export interface BisOptions {
   admit?: (row: GearRow) => boolean
   /** owned-only mode: item key -> copies owned (bags, bank, worn). Absent = best overall */
   owned?: ReadonlyMap<string, number>
+  /**
+   * what the character holds (bags, bank, worn), read in BOTH modes for one thing only: a row no
+   * player can obtain stays a candidate when the character holds it, capped to the copies held
+   * (owner, 2026-11-25: *"If the character ACTUALLY OWNS an item, sure it should be considered"*)
+   */
+  held?: ReadonlyMap<string, number>
   /** item haste that can still count: the level's haste cap less the spell haste (`itemHasteRoom`); absent = no limit */
   hasteRoom?: number
   /** the attribute caps; absent = eqlwiki's hard cap, 510 (`HARD_STAT_CAPS`). A cap the player sets on a chip wins */
@@ -208,7 +214,7 @@ function scoreCell(cell: PlanSlotId, rows: readonly GearRow[], opts: BisOptions)
     const stats = round3(terms.reduce((sum, t) => sum + t.points, 0))
     const haste = underCap(row.stats.HASTE ?? 0, cap)
     const prio = damageFirst(row, cell, opts)
-    out.push({ key: row.key, row, terms, base: stats + prio * DAMAGE_FIRST, prio, haste, copies: copiesOf(row, opts.owned), twoHand: gearHandedness(row.skill) === '2h', bow: isBow(row), attrs: row.stats, display: round3(stats + Math.max(0, haste) * rate) })
+    out.push({ key: row.key, row, terms, base: stats + prio * DAMAGE_FIRST, prio, haste, copies: copiesOf(row, opts.owned ?? (isObtainable(row) ? undefined : opts.held)), twoHand: gearHandedness(row.skill) === '2h', bow: isBow(row), attrs: row.stats, display: round3(stats + Math.max(0, haste) * rate) })
   }
   return out.sort((a, b) => b.prio - a.prio || b.display - a.display || a.row.name.localeCompare(b.row.name))
 }
@@ -218,11 +224,23 @@ function arrowList(list: readonly Scored[]): Scored[] {
   return list.filter((s) => isArrow(s.row)).sort((a, b) => arrowRank(b.row) - arrowRank(a.row) || b.display - a.display || a.row.name.localeCompare(b.row.name))
 }
 
-/** The rows the sheet may use at all: the class picks, the caller's gates, owned-only. */
+/**
+ * THE ROW GATE: may the sheet use this row at all? The class picks, the caller's gates (Current era),
+ * owned-only, and never a row no player can obtain (`GearRow.unobtainable`; owner, 2026-11-25: *"we
+ * simply need to just ignore items that are impossible to get before we even start our
+ * calculation"*), except a copy the character holds, in either mode: holding it proves it can be had
+ * (owner, 2026-11-25). Exported so the tab's other walk over the rows (`BisView.useStated`) asks the
+ * same question.
+ */
+export function bisAdmits(row: GearRow, gate: Pick<BisOptions, 'classes' | 'admit' | 'owned' | 'held'>): boolean {
+  if (gate.owned !== undefined && (gate.owned.get(row.key) ?? 0) <= 0) return false
+  const holds = ((gate.owned ?? gate.held)?.get(row.key) ?? 0) > 0
+  return (holds || isObtainable(row)) && usableBy(row, gate.classes) && (gate.admit === undefined || gate.admit(row))
+}
+
+/** The rows the sheet may use at all, dropped before any scoring. */
 function admitted(opts: BisOptions): GearRow[] {
-  return opts.rows.filter(
-    (row) => usableBy(row, opts.classes) && (opts.admit === undefined || opts.admit(row)) && (opts.owned === undefined || (opts.owned.get(row.key) ?? 0) > 0)
-  )
+  return opts.rows.filter((row) => bisAdmits(row, opts))
 }
 
 /** PRIMARY before SECONDARY, so the two-hander rule sees the hand first; ANY cells last. */

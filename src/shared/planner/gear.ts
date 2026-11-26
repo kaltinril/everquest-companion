@@ -274,6 +274,22 @@ export interface GearRow {
    * moves one.
    */
   skillMods?: SkillMod[]
+  /**
+   * NO PLAYER CAN OBTAIN IT (owner, 2026-11-25: "we simply need to just ignore items that are
+   * impossible to get before we even start our calculation"): main's `itemsResearch.isUnobtainable`
+   * (the page's `{{:Does Not Exist}}` banner, or a GM event / GM only item), answered once at build.
+   * Present only when true. The Gear tab still lists the row (looking one up is valid); whatever
+   * RECOMMENDS an item asks `isObtainable` below.
+   */
+  unobtainable?: true
+}
+
+/**
+ * May this row be recommended to a player who does not own it? The one question the recommenders
+ * (the Best in slot sheet, the Plan route) ask of `unobtainable`.
+ */
+export function isObtainable(row: Pick<GearRow, 'unobtainable'>): boolean {
+  return row.unobtainable !== true
 }
 
 // ---- the served payload ---------------------------------------------------------------------
