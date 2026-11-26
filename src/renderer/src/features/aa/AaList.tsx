@@ -14,8 +14,10 @@ import { AaRowDetail, Mark, type SetPick } from './AaRowDetail'
 /** Name · pips · rank · effect · points · next: the pips column is fixed so every row lines up. */
 const GRID = 'minmax(130px, 1.3fr) 112px 84px minmax(120px, 2fr) 92px 72px'
 const MAX_PIPS = 10
-const SOURCE_WORD = { pick: 'you', log: 'log', granted: 'granted', none: '' } as const
+const SOURCE_WORD = { list: 'alt list', activated: 'used', pick: 'you', log: 'log', granted: 'granted', none: '' } as const
 const SOURCE_TIP = {
+  list: 'Read from your latest /alt list.',
+  activated: 'Your log shows you activating it.',
   pick: 'You set this rank; open the row to go back to the log.',
   log: "Your log's purchase lines show this rank.",
   granted: 'Free AA: the game grants it once you reach its level.',
@@ -62,6 +64,16 @@ function RankCell({ b }: { b: AaBoardRow }): JSX.Element {
     // Another loadout's rank stays in sight, dimmed: the log bought it.
     const text = b.r.row.removed !== undefined ? 'removed' : b.elsewhere ? `${String(b.r.rank)}/${String(b.max)}` : '-'
     return <Typography variant="caption" color="text.disabled">{text}</Typography>
+  }
+  if (b.r.unknown === true) {
+    return (
+      <Typography variant="caption" color="text.secondary" noWrap data-testid="aa-source-unknown">
+        {`?/${String(b.max)}`}
+        <Box component="span" sx={{ ml: 0.75, color: 'text.disabled' }}>
+          can&apos;t tell
+        </Box>
+      </Typography>
+    )
   }
   const word = SOURCE_WORD[b.r.source]
   return (

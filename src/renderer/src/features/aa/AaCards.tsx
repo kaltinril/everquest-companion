@@ -1,13 +1,14 @@
-// aa/AaCards.tsx — the Alt. Advancement tab's top row: Points, Pace and Spend your points.
+// aa/AaCards.tsx — the Alt. Advancement tab's top row: Points, Pace, Spend your points, and the AAs
+// the log cannot settle (a one-rank AA `/alt list` prints the same owned or not).
 //
 // Pace is the Leveling tab's own AA pace (shared/aaPace.ts, worded by leveling/aaPaceRows.ts) over the
 // app-wide slice (features/timeslice): Session, Zone + Session, Zone, All. A slice the log cannot
 // define yet is shown disabled with its reason, never filled with a number.
 
 import { type JSX, type ReactNode, useMemo } from 'react'
-import { Box, Chip, LinearProgress, Paper, Stack, Typography } from '@mui/material'
+import { Box, Button, Chip, LinearProgress, Paper, Stack, Typography } from '@mui/material'
 import { aaPace } from '@shared/aaPace'
-import { aaSpent, type AaBoardRow } from '@shared/aaBoard'
+import { aaCantTell, aaSpent, type AaBoardRow } from '@shared/aaBoard'
 import { AA_BANK_CAP, type AaRecs } from '@shared/aaRecommend'
 import { AaUnspentLine } from './AaUnspentLine'
 import { rangeStats } from '@shared/progressionStats'
@@ -175,6 +176,27 @@ export function SpendCard({ recs, unspent }: { recs: AaRecs; unspent: number | n
           </Typography>
         </>
       )}
+    </Card>
+  )
+}
+
+/** The usable AAs the log cannot settle, each with a one-click "I have it" (the player's pick). */
+export function CantTellCard({ board, setPick }: { board: readonly AaBoardRow[]; setPick: (key: string, rank: number | null) => void }): JSX.Element | null {
+  const nav = useAaNav()
+  const rows = aaCantTell(board)
+  if (rows.length === 0) return null
+  return (
+    <Card title="Can't tell from the log" testId="aa-cant-tell">
+      {rows.map((b) => (
+        <Stack key={b.r.key} direction="row" spacing={1} alignItems="baseline">
+          <Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} noWrap onClick={() => nav.jump(b)}>
+            {b.r.key}
+          </Typography>
+          <Button size="small" sx={{ ml: 'auto', textTransform: 'none', py: 0, minWidth: 0 }} onClick={() => setPick(b.r.key, b.max)} data-testid="aa-have-it">
+            I have it
+          </Button>
+        </Stack>
+      ))}
     </Card>
   )
 }

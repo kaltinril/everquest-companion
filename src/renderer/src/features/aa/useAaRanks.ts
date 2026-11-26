@@ -98,6 +98,24 @@ export interface AaRanksState {
   setPick: (key: string, rank: number | null) => void
 }
 
+const NO_SPENDS: LevelingSnap['aaSpends'] = []
+const NO_LEVELS: LevelingSnap['levels'] = []
+const NO_ACTIVATIONS: NonNullable<LevelingSnap['aaActivations']> = []
+
+/** The ranks the log and the picks give, before free ranks: purchases, reincarnations, the list, activations. */
+function useLogRanks(snap: LevelingSnap | null, picks: AaPicks): { found: ReturnType<typeof reincarnationsOf>; ungranted: AaRanked[]; list: LevelingSnap['aaList'] } {
+  const spends = snap?.aaSpends ?? NO_SPENDS
+  const levels = snap?.levels ?? NO_LEVELS
+  const list = snap?.aaList ?? null
+  const activations = snap?.aaActivations ?? NO_ACTIVATIONS
+  const found = useMemo(() => reincarnationsOf(levels, spends), [levels, spends])
+  const ungranted = useMemo(
+    () => rankAasFrom({ spends, races: found.map((r) => r.race), list, activations }, picks),
+    [spends, picks, found, list, activations]
+  )
+  return { found, ungranted, list }
+}
+
 /** The current character's rank in every row of the AA table; free ranks for `planned` classes when given. */
 export function useAaRanks(planned: readonly ClassAbbr[] | null = null): AaRanksState {
   const snap = useModule<LevelingSnap>('leveling')
@@ -109,15 +127,7 @@ export function useAaRanks(planned: readonly ClassAbbr[] | null = null): AaRanks
   const classes = planned ?? detected
   const all = useSyncExternalStore(subscribe, snapshot, () => cache.value)
   const picks = character === null ? NO_PICKS : (all[character] ?? NO_PICKS)
-  const spends = snap?.aaSpends
-  const levels = snap?.levels
-  const found = useMemo(() => reincarnationsOf(levels ?? [], spends ?? []), [levels, spends])
-  const list = snap?.aaList ?? null
-  const activations = snap?.aaActivations
-  const ungranted = useMemo(
-    () => rankAasFrom({ spends: spends ?? [], races: found.map((r) => r.race), list, activations: activations ?? [] }, picks),
-    [spends, picks, found, list, activations]
-  )
+  const { found, ungranted, list } = useLogRanks(snap, picks)
   const ranked = useMemo(() => withGranted(ungranted, { level, classes }), [ungranted, level, classes])
   const reincarnations = useMemo(() => found.map((r) => r.ts), [found])
   const setPick = useCallback(

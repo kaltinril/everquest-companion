@@ -104,19 +104,30 @@ function heldBelowList(pick: number | undefined, logRank: number | null, ev: AaE
   return ev.printed === true ? { rank: 0, source: 'none', unknown: true } : { rank: 0, source: 'none' }
 }
 
+/** The list's rank, raised by a purchase logged after it (the list can be stale); null when it says nothing. */
+function heldByList(ev: AaEvidence): Held | null {
+  if (ev.list === undefined) return null
+  const after = ev.after ?? 0
+  return after > ev.list ? { rank: after, source: 'log' } : { rank: ev.list, source: 'list' }
+}
+
+export interface RankAaOptions {
+  /** A log AA the wiki's page does not list. */
+  unlisted?: boolean
+  ev?: AaEvidence
+}
+
 /** One row's rank for a character, from its log AA (null when the log names none) and the other evidence. */
-export function rankAa(row: AaRow, log: LogAa | null, picks: AaPicks, { unlisted = false, ev = {} }: { unlisted?: boolean; ev?: AaEvidence } = {}): AaRanked {
+export function rankAa(row: AaRow, log: LogAa | null, picks: AaPicks, opts: RankAaOptions = {}): AaRanked {
+  const unlisted = opts.unlisted === true
   const key = log !== null && (log.near === true || unlisted) ? log.name : aaKey(row)
-  const logRank = log === null ? null : log.rank
+  const logRank = log?.rank ?? null
   const max = Math.max(row.ranks, logRank ?? 0)
   const base = { row, key, max, logRank, wikiName: unlisted || key === row.name ? null : row.name, unlisted }
-  if (ev.list !== undefined) {
-    const after = ev.after ?? 0
-    return { ...base, ...(after > ev.list ? { rank: after, source: 'log' as const } : { rank: ev.list, source: 'list' as const }) }
-  }
+  const ev = opts.ev ?? {}
   // A removed AA takes no pick: only what the log shows (THE LOG WINS) is held.
   const pick = row.removed === undefined ? picks[key] : undefined
-  return { ...base, ...heldBelowList(pick, logRank, ev, max) }
+  return { ...base, ...(heldByList(ev) ?? heldBelowList(pick, logRank, ev, max)) }
 }
 
 /** A General row for a log AA the wiki's page does not list. */

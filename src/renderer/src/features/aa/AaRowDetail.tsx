@@ -36,13 +36,29 @@ function sourceLine(b: AaBoardRow, classes: readonly ClassAbbr[]): string {
   if (b.fit === 'mayApply') return 'May apply: measured only beside Warrior and Monk.'
   if (b.fit === 'other') return `Shown to read: ${aaNotFor(classes)}.`
   if (b.r.unlisted) return "From your log; not on the wiki's AA page."
-  const said = { pick: 'Rank set by you.', log: "Rank from your log's purchase lines.", granted: 'Free at your level, so counted as held.', none: 'Not held.' }
+  if (b.r.unknown === true) return "Can't tell from the log: /alt list prints a one-rank AA the same whether you have it or not. Set it below."
+  const said = {
+    list: 'Rank read from your latest /alt list.',
+    activated: 'Held: your log shows you activating it.',
+    pick: 'Rank set by you.',
+    log: "Rank from your log's purchase lines.",
+    granted: 'Free at your level, so counted as held.',
+    none: 'Not held.'
+  }
   return said[b.r.source]
+}
+
+/** What settles the rank when the log does and a pick would not count (the order of proof, aaRanks.ts). */
+function settledBy(b: AaBoardRow): string | null {
+  if (b.r.source === 'list') return 'from /alt list'
+  if (b.r.source === 'activated' && b.r.max <= 1) return 'seen activated'
+  return null
 }
 
 /** The rank picker and the way back to the log's rank (pick and clear, as the tab always had). */
 function RankPicker({ b, setPick }: { b: AaBoardRow; setPick: SetPick }): JSX.Element | null {
   if (b.r.row.removed !== undefined) return null
+  const settled = settledBy(b)
   return (
     <Stack direction="row" spacing={1} alignItems="center">
       <Typography variant="caption" color="text.secondary">
@@ -51,6 +67,7 @@ function RankPicker({ b, setPick }: { b: AaBoardRow; setPick: SetPick }): JSX.El
       <Select
         size="small"
         value={b.r.rank}
+        disabled={settled !== null}
         onChange={(e) => {
           setPick(b.r.key, e.target.value)
         }}
@@ -64,6 +81,11 @@ function RankPicker({ b, setPick }: { b: AaBoardRow; setPick: SetPick }): JSX.El
           </MenuItem>
         ))}
       </Select>
+      {settled !== null && (
+        <Typography variant="caption" color="text.disabled" data-testid="aa-rank-settled">
+          {settled}
+        </Typography>
+      )}
       {b.r.source === 'pick' && (
         <Button size="small" onClick={() => setPick(b.r.key, null)} sx={{ textTransform: 'none' }} data-testid="aa-clear-pick">
           Back to the log&apos;s rank
