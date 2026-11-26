@@ -28,6 +28,68 @@ export interface CommunityRelease {
 
 export const COMMUNITY_RELEASE_NOTES: readonly CommunityRelease[] = [
   {
+    "version": "0.1.57",
+    "date": "2026-11-25",
+    "title": "the Alt. Adv. tab, and Best in slot fixes",
+    "groups": [
+      {
+        "heading": "Alt. Adv. (new tab under Stats/Data)",
+        "items": [
+          {
+            "text": "Every AA from the wiki's Alternate Advancement page in General, Archetype, Class and Special, with the ranks your log shows you bought. Free AAs count once you reach their level. Where your log missed one (bought before you started logging), open the row and set the rank."
+          },
+          {
+            "text": "Summary: what your AAs give you, stat by stat, and what is left to buy with its cost. Each AA shows its total cost, not just its ranks."
+          },
+          {
+            "text": "Pick any 1 to 3 classes to plan another combo; \"All AAs\" shows the ones your classes cannot use. Search finds an AA on every tab."
+          },
+          {
+            "text": "Special shows your stat cap: 510, raised by each reincarnation and the Human and Half Elf reincarnation AAs."
+          },
+          {
+            "text": "The game wins over the wiki: ranks and names come from your log, and corrections from the game and Daybreak's patch notes are applied (Strike As One, Rampage rank 2, the removed steeds and more). Wiki Gaps has a new AAs tab listing each difference, ready to paste into the wiki."
+          },
+          {
+            "text": "At 45 unspent AA points the side panel shows a \"!\" (red at 50, where the game stops your experience). An \"Unspent AA points\" alert can warn you at a number you pick (off by default)."
+          }
+        ]
+      },
+      {
+        "heading": "Best in slot",
+        "items": [
+          {
+            "text": "A bow in Range puts the best arrow in Ammo (damage first, then elemental damage)."
+          },
+          {
+            "text": "Split resists no longer count five times as much as Resists."
+          },
+          {
+            "text": "Level defaults to 50 (55 from Rulers of Kunark, December 8)."
+          },
+          {
+            "text": "A Spell haste % field: item haste only counts up to your haste cap."
+          },
+          {
+            "text": "Attributes stop counting at their cap by default (510), raised by your reincarnations."
+          },
+          {
+            "text": "Items no player can get (GM-event items like Oakwynd), Temporary and Summoned items, and items with no class are never recommended. Current era only shows items known to be in the era."
+          }
+        ]
+      },
+      {
+        "heading": "Data",
+        "items": [
+          {
+            "text": "Wiki pages refreshed to today (3 pages changed)."
+          }
+        ]
+      }
+    ],
+    "knownIssues": "The Alt. Adv. tab cannot tell from the log whether you hold a single-rank AA you bought before you started logging; set it once by hand. Its point totals use the wiki's costs, which can differ from the game's AA window. Best in slot does not weigh worn effects, procs or focus effects yet. Send my loot to the wiki has not been tried against the live wiki yet. When you join a group, only the person whose invite you accepted is known at once; others already in it show under Group once they talk in party or you buff them. A group-mate's mez does not hold a fight open (the log does not say who cast it). The Void motes tab skips Slime Blood of Cazic-Thule and estimates a drop's chance from the size of the mob's loot list. The archive recovery and the Put back copy have only been tested with simulated failures. The Macros Send has not yet been tried in game: keep the copy it makes until you have logged in and seen your macros. A \"(guessed)\" pet owner can be wrong until /pet who leader settles it. The healing meters still divide by the whole fight's length. A mob or item added to the wiki after this build shows no wiki details until the next build (or a Copy click in Wiki Gaps). Capture finds the game window only when it is titled \"EverQuest Legends\" or \"EverQuest\". The screenshot reader reads English only. The installer is not code-signed, so Windows shows \"Windows protected your PC\" the first time (More info, then Run anyway). Builds before test.20 do not update themselves; install one by hand once."
+  },
+  {
     "version": "0.1.56",
     "date": "2026-11-24",
     "title": "the Best in slot tab, and Send my loot to the wiki",
