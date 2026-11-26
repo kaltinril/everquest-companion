@@ -229,6 +229,7 @@ function arrowList(list: readonly Scored[]): Scored[] {
  * simply need to just ignore items that are impossible to get before we even start our
  * calculation"*):
  *   - a `Temporary` or `Summoned:` item, always, held or not: it is gone at the next camp (`isTemporary`);
+ *   - a `Class: NONE` item, always (`GearRow.noClass`): no player wears it (a pet-illusion form);
  *   - owned-only mode: a row the character does not hold;
  *   - a class the picks do not include (`usableBy`);
  *   - a row no player can obtain (`GearRow.unobtainable`), and a row the caller's gates refuse
@@ -238,7 +239,7 @@ function arrowList(list: readonly Scored[]): Scored[] {
  * Exported so the tab's other walk over the rows (`BisView.useStated`) asks the same question.
  */
 export function bisAdmits(row: GearRow, gate: Pick<BisOptions, 'classes' | 'admit' | 'owned' | 'held'>): boolean {
-  if (isTemporary(row)) return false
+  if (isTemporary(row) || row.noClass === true) return false
   if (gate.owned !== undefined && (gate.owned.get(row.key) ?? 0) <= 0) return false
   if (!usableBy(row, gate.classes)) return false
   const holds = ((gate.owned ?? gate.held)?.get(row.key) ?? 0) > 0

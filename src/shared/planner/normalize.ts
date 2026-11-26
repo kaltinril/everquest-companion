@@ -102,6 +102,17 @@ function readClassTokens(raw: string[]): ClassTokens {
 }
 
 /**
+ * Does the `Class:` line say NO class (`Class: NONE`, nothing listed)? Not the same as an unstated
+ * list, which `normalizeClasses` also returns as `[]`. Measured 2026-11-25: 292 pages, 7 with a slot,
+ * among them the pet-illusion forms an item converts to (Amulet of Necropotence -> Collar of
+ * Necropotence, Guise of the Deceiver -> Guise of the Deceived; MEASURED.md): no player wears them.
+ */
+export function statesNoClass(classes?: string[]): boolean {
+  const t = readClassTokens(classes ?? [])
+  return t.none && !t.all && t.listed.length === 0
+}
+
+/**
  * The `Class:` list → the classes that can actually use the item.
  *
  * `ALL` → all 16. `ALL except NEC WIZ MAG ENC` (455 pages) → the complement. `NONE` → `[]`.

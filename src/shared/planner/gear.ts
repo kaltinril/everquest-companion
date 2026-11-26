@@ -282,6 +282,11 @@ export interface GearRow {
    * RECOMMENDS an item asks `isObtainable` below.
    */
   unobtainable?: true
+  /**
+   * the page says `Class: NONE`: no player class wears it (`normalize.statesNoClass`), unlike an
+   * unstated list, which `classes: []` also holds. Present only when true. Never recommended.
+   */
+  noClass?: true
 }
 
 /**
@@ -304,9 +309,9 @@ export function isTemporary(row: Pick<GearRow, 'flags' | 'name'>): boolean {
   return /^summoned:/i.test(row.name) || row.flags.some((f) => /^\s*temporary\s*$/i.test(f))
 }
 
-/** Obtainable and not temporary: the Plan route's one question to a row it does not own. */
-export function isRecommendable(row: Pick<GearRow, 'unobtainable' | 'flags' | 'name'>): boolean {
-  return isObtainable(row) && !isTemporary(row)
+/** Obtainable, not temporary, and some class wears it: the Plan route's one question to a row it does not own. */
+export function isRecommendable(row: Pick<GearRow, 'unobtainable' | 'flags' | 'name' | 'noClass'>): boolean {
+  return isObtainable(row) && !isTemporary(row) && row.noClass !== true
 }
 
 // ---- the served payload ---------------------------------------------------------------------

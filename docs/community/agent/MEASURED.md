@@ -479,6 +479,19 @@ Sources beside `plans/2026-11-25-aa-window/`: seven AA-window screenshots and th
   Half Elf stat caps and resists +3/+6, Iksar HP regen 2/4 and AC 5/10). Completionist's text
   matches the wiki word for word.
 
+## Converted items (pet illusions)
+
+- An item window can show "Converts to <item>" (owner's screenshot, 2026-11-25: Amulet of
+  Necropotence +4 -> Collar of Necropotence). The converted form is a pet illusion: it appears in
+  the Pet tab's Pet Illusion list (Guise of the Deceived, the Petamorph Wands). Its wiki page states
+  `Class: NONE`, `Race: NONE`, no stats, sometimes `Pet Illusion: <race>`; no player wears it.
+  Pairs: Amulet of Necropotence -> Collar of Necropotence, Guise of the Deceiver -> Guise of the Deceived.
+- An item kept in Storage > Activated Items unconverted is not in the Pet Illusion list (Drywrought's
+  Amulet of Necropotence +4). Activated rows are not counted as held (`HELD_KEYRING_CATEGORIES`).
+- Not known: whether a converted item can be turned back into the wearable form.
+- The game window shows Amulet of Necropotence +4 as `Class: ALL`; the wiki page says
+  `Class: ENC MAG NEC WIZ`. Unresolved; a wiki fix candidate.
+
 ## /outputfile dumps
 
 - **Inventory:** the bank is always in it. Hoard and Personal Depot appear only after that window
