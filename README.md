@@ -1,15 +1,33 @@
 # EQ Legends Companion: Community Edition
 
+[![Latest release](https://img.shields.io/github/v/release/kaltinril/everquest-companion?include_prereleases&label=release&color=d4a017)](https://github.com/kaltinril/everquest-companion/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/kaltinril/everquest-companion/total?color=2ea44f)](https://github.com/kaltinril/everquest-companion/releases)
+![Windows 10 and 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078d4)
+[![License: FSL-1.1-MIT](https://img.shields.io/badge/license-FSL--1.1--MIT-lightgrey)](LICENSE)
+[![Open issues](https://img.shields.io/github/issues/kaltinril/everquest-companion)](https://github.com/kaltinril/everquest-companion/issues)
+
 A Windows desktop companion for **EverQuest Legends**. It reads the log file the game already
 writes and turns it into live, useful views: a DPS meter, floating overlays, quest, loot and gear
-tracking, maps, alerts.
+tracking, trade-chat prices, tradeskills, maps and alerts.
+
+**[Download the latest release](https://github.com/kaltinril/everquest-companion/releases/latest)** ·
+[What it does](#what-it-does) · [A look around](#a-look-around) ·
+[First run](#download-and-first-run) ·
+[Report a problem](https://github.com/kaltinril/everquest-companion/issues)
+
+![The Combat tab: a Nagafen's Lair fight with the group's damage meter, procs per minute and the combat log](docs/screenshots/combat.png)
 
 **It only reads files the game writes.** Your log, and a few files in your EverQuest folder, such
-as the `/outputfile` lists, your UI settings and the spell data. Nothing is injected into
-EverQuest, no memory is read, and nothing is automated or played for you. It changes no game file,
-with one exception that is off until you turn it on: **Summarize and archive log** moves a full log
-file into a `companion-archive` folder inside the game's Logs folder, so a fresh one starts. If you
-turned off logging, the app simply has nothing to show.
+as the `/outputfile` lists, your UI settings, your macros and the spell data. Nothing is injected
+into EverQuest, no memory is read, and nothing is automated or played for you. It changes no game
+file unless you ask it to, in one of two ways:
+
+- **Summarize and archive log** (off until you turn it on) moves a full log file into a
+  `companion-archive` folder inside the game's Logs folder, so a fresh one starts.
+- **Macros:** when you send a macro set to a character, the app writes it into that character's
+  game file. It makes a copy of the file first, and refuses while EverQuest is running.
+
+If you turned off logging, the app simply has nothing to show.
 
 This project began as a fork of [**EQ Legends Companion**](https://github.com/jmoyers/everquest-companion)
 by **Josh Moyers**. He built the app and its engine, and the credit for that is his. He is no
@@ -24,24 +42,34 @@ Everything is per-character: switch characters and the app re-reads that log.
 
 - **Overview:** the at-a-glance page the app opens on.
 - **Combat:** a live DPS meter with per-fight and per-zone numbers, fight history, a drill-down
-  into each attack and spell, and a timeline of the pull. Healing has its own meters.
+  into each attack and spell, procs per minute, and a timeline of the pull. Healing has its own
+  meters.
 - **Loot:** a running history of what you looted, and what each item is for: which quests use
   it, what it turns in for, which recipes consume it.
-- **Bazaar:** what trade chat asks and offers, with a watchlist that alerts.
+- **Bazaar:** what trade chat asks and offers, per item: price by day and by time of day, a
+  predicted price, who is buying or selling, and a watchlist that alerts.
 - **Wiki Gaps:** the names your log mentions that the wiki data has no record of, with a Copy
   button that drafts the wiki page.
 - **Buffs:** remaining time on your buffs and debuffs, learned from the log, and which of your
   spells did not take hold and what blocked them.
-- **Leveling:** XP and AA progress per character, with history.
+- **Leveling:** XP and AA progress per character, with history, and the best spells of each type
+  at your level.
+- **Skills:** every skill your log has seen go up, at its newest level.
+- **Alt. Advancement:** the wiki's AA tables, with the ranks your character holds.
 
 **Looking things up**
 
 - **Mobs:** look up a mob and what it drops.
 - **Gear** (beta): drop sources, worth scores and the +0 to +10 upgrade slider. Its other tabs:
-  **Recommended** (a level route with the gear to aim for), **Exaltations** (the socket board
-  optimizer), **Void motes** (where the week's three are best spent), **Character** and
-  **Wish list**.
+  **Best in slot** (rank the stats you care about from S to F and it fills every slot with the
+  best item, from what you own or from the whole game), **Recommended** (a level route with the
+  gear to aim for), **Exaltations** (the socket board optimizer), **Void motes** (where the week's
+  three are best spent), **Character** and **Wish list**.
 - **Maps:** clickable zone links, mob pins, travel routes, ports, and where to level.
+- **Tradeskills:** one card per tradeskill with your level from the log and the next recipe to
+  raise it, a workbench with the wiki's recipe book, what foraging has found, and a search over
+  every craftable item. It builds on the wiki's recipes and two guides written by players (see
+  [Thanks](#thanks)).
 - **Raid Targets:** which named and raid mobs you have killed and when.
 - **Achievements:** your open achievements, with a Slayer planner that ranks the zones to work in.
 - **Unlocks:** the races, classes and deities you have not unlocked yet, and what each still needs.
@@ -51,10 +79,12 @@ Everything is per-character: switch characters and the app re-reads that log.
   stacking.
 - **Factions:** your standings, read from the game's `/outputfile faction`.
 
-**Alerts and timers**
+**Alerts, macros and timers**
 
 - **Alerts:** play a sound, speak a line or show a banner when something happens: a charm break,
   a buff fading, a raid target dying, or any log line you write a rule for.
+- **Macros:** your own macro library, kept in sets, beside what each character's game file holds.
+  Send a set to a character when you are ready (see above).
 - **Timers:** respawn clocks started by your own kills.
 
 **Overlays**
@@ -70,6 +100,21 @@ Lock one and it becomes click-through. The same menu resets every overlay's posi
 - **Summarize and archive log** (in **Preferences**, off until you turn it on): once your log
   passes 100 MB the app moves it into a `companion-archive` folder inside the game's Logs folder
   and keeps your history showing, and the game carries on in a fresh, small log file.
+
+## A look around
+
+<table>
+  <tr>
+    <td width="50%" valign="top"><a href="docs/screenshots/bazaar.png"><img src="docs/screenshots/bazaar.png" alt="The Bazaar tab: Mithril Champion Arrows with the asking price, a predicted price, price by day and by time of day, and who has been buying"></a><br><b>Bazaar.</b> Trade-chat prices per item, by day and by time of day, a predicted price, and who is buying or selling.</td>
+    <td width="50%" valign="top"><a href="docs/screenshots/leveling.png"><img src="docs/screenshots/leveling.png" alt="The Leveling tab: AA points earned, spent and unspent, AA pace, level over time, the best spells at level 50, and the AA abilities held"></a><br><b>Leveling.</b> Level and AA pace, the AA ranks you hold, and your best spells at your level.</td>
+  </tr>
+  <tr>
+    <td colspan="2"><a href="docs/screenshots/best-in-slot.png"><img src="docs/screenshots/best-in-slot.png" alt="The Gear tab's Best in slot board: stats ranked from S to F on the left, and the best item for each of 23 slots on the right, marked worn or owned"></a><br><b>Gear, Best in slot.</b> Rank the stats you care about from S to F; it picks the best item for every slot and marks what you already wear or own.</td>
+  </tr>
+  <tr>
+    <td colspan="2"><a href="docs/screenshots/tradeskills.png"><img src="docs/screenshots/tradeskills.png" alt="The Tradeskills tab: where you left off, a search over every craftable item, and one card per tradeskill with its level and next recipe"></a><br><b>Tradeskills.</b> Pick up where you left off: your level in each tradeskill, the next recipe to raise it, and what foraging has found.</td>
+  </tr>
+</table>
 
 ## Download and first run
 
@@ -135,6 +180,10 @@ project. What it does ask the network for:
 - **The EverQuest Legends wiki:** only when you click **Copy** on a row of the Wiki Gaps tab, to
   read the page that row is about. Everything else the app shows comes from data and pictures
   shipped inside it.
+- **Your loot, sent to the wiki's drop database:** only if you turn on **Send my loot to the
+  wiki** (**Preferences**, under **Game**; off until you do). It sends the loot your log records,
+  so the wiki can work out drop rates, and signs in with a wiki bot password you make for it,
+  never your main password. Your character's name is not sent.
 - **Sound and voice files:** the first voice pack on first launch; the list of packs, and any
   sound you preview, when you open **Sound packs…**; and any sound pack or spoken-alert voice you
   choose to install. These come from GitHub (and, for the spoken-alert voice, a Microsoft runtime

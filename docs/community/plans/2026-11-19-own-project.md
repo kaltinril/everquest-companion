@@ -58,6 +58,19 @@ Left alone on purpose, for Part 4: `SECURITY.md`, `TELEMETRY.md`, `AGENTS.md`, e
 `electron-builder.yml`. Not yet looked at by a person: `fork-workflow.svg` parses as XML but was
 never rendered; open it once.
 
+README refresh, 2026-11-25 (owner: "spice up the readme a bit and clean it up ... add these
+screenshots"):
+
+- Badges (shields.io), a hero shot and an "A look around" gallery. The owner's screenshots live in
+  `docs/screenshots/` (combat, bazaar, leveling, best-in-slot, tradeskills); retake one when its
+  screen changes a lot.
+- Added the tabs it was missing: Skills, Alt. Advancement, Tradeskills, Macros, Gear's Best in slot.
+- Two facts fixed: Macros' send writes a character's game file (`src/main/macros/gameFileSend.ts`:
+  a copy first, refused while the game runs), so the "changes no game file" line now names two
+  opt-in writes; Privacy now lists "Send my loot to the wiki" (`src/main/dropObs/`, off by default).
+- Keep it true: a new tab, a new write into the game folder, or a new network call gets its line in
+  the README in the same change.
+
 ## Part 2: the rename from TEST to Community Edition (Level A built 2026-11-23, first release not cut)
 
 Owner, 2026-11-19: "We should also probably start naming our builds as Everquest Legends Companion
