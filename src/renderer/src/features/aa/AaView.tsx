@@ -80,9 +80,9 @@ function AaHeader({ s }: { s: AaBoardState }): JSX.Element {
 }
 
 function planningLine(s: AaBoardState): string {
+  // Only what the combo adds: no "drop out" count (owner, 2026-11-25: no negatives on this tab).
   const d = aaPlanDelta(s.board, s.ownBoard)
-  const drops = d.drops > 0 ? `; ${String(d.drops)} of your AAs drop out` : ''
-  return `Planning ${s.classes.join('/')}: ${String(d.points)}${d.unknown ? '+' : ''} points to max what this combo adds (${String(d.adds)} AAs)${drops}.`
+  return `Planning ${s.classes.join('/')}: ${String(d.points)}${d.unknown ? '+' : ''} points to max what this combo adds (${String(d.adds)} AAs).`
 }
 
 function ClassBar({ s, scope, setScope }: { s: AaBoardState; scope: AaScope; setScope: (v: AaScope) => void }): JSX.Element {

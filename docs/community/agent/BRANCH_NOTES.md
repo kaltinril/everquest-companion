@@ -230,6 +230,13 @@ where one exists.
   Costs: `aaCost.ts` (free ranks 0, an unstated price makes "N+"). The game's "spent" total is not in
   the log: the Points card shows spent at the wiki's prices. Not built: the list toolbar (All / Can
   still buy / Activated, Group by), the pace sparkline, clickable pips, starting a timer from an AA.
+- OWN COMBO ONLY (2026-11-25, seen in the app on the owner's log): a Class row counts only for a shown
+  class, an Archetype row only when `archetypeFit` is 'mine' ('mayApply' is shown, not counted, even if
+  held). The log holds purchases from earlier loadouts; the game gives only the combo in force its
+  Archetype and Class AAs. `AaBoardRow.elsewhere` = own combo, not for these classes, log rank > 0: kept,
+  shown only under All AAs, marked "from another loadout", out of every count. With no classes known,
+  a held rank still counts (nothing tells loadouts apart). SUMMARY ADDS ONLY: `aaStatTotals(board,
+  defs?)`, no diff column, colours or struck-through AAs; the planning line has no "drop out" count.
 - UNSPENT WARNING (aa-points-warn): unspent = `aa.ts unspentAaPoints` (newest "You now have M" less
   purchases after it; null with no gain line). `aaPointsWarn.ts`: `AA_POINT_CAP` 50 (also
   `AA_BANK_CAP`), warn at 45. Signal `aaPointsUnspent` (tokens points, cap); seeded alert
