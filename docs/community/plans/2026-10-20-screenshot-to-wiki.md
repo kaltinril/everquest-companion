@@ -425,3 +425,16 @@ screenshots are being gathered)
   and the larger UI scale (the Mummy windows) gets nothing from it. Wire it (`readText` through
   `mergeFont`, as `readItemShot.ts windowLines`) the day a spell window's page field is misread by
   OCR or a spell has no description in the install.
+
+## Mote and fragment windows (2026-11-26)
+
+- The game now prints three lines on a mote or fragment of potential, above Size: `Item Upgrade: 22`,
+  `Item Max Tier: 8`, `Spell Upgrade: 256` (Fragment of Grand Potential, owner's capture).
+- `itemWindow.ts` keeps them as `line` labels, written as the window prints them; before, `Tier` in
+  NOT_ITEM dropped the Max Tier line and the two Upgrade lines were unread. `Tier` alone (the upgrade
+  bar) is still dropped.
+- No wiki page had these lines on 2026-11-26 (the 17 fragment and mote pages in `items.json` stop at
+  No Trade, Size, Class, Race): the layout is the window's, not a wiki convention. Open for the owner.
+- The numbers disagree with the mote table in `plans/2026-11-19-void-mote-ranking.md` (Grand 8
+  points, works to +7; the fragment says 22 and tier 8). A fragment may not be a mote; check a mote's
+  window before changing that table.
