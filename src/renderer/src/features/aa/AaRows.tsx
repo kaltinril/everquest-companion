@@ -31,6 +31,7 @@ const FROM_LOG_TIP = 'Your log shows this rank bought; pick another to set it yo
 const CLEAR_TIP = 'Forget your pick and use the rank your log shows instead.'
 const COST_TIP = 'Points each rank costs, as the wiki lists them.'
 const VALUES_TIP = 'What each rank gives, as the wiki lists it.'
+const UNLISTED_TEXT = "From your log, not on the wiki's AA page."
 
 export type SetPick = (key: string, rank: number | null) => void
 
@@ -48,9 +49,9 @@ function RankControl({ r, setPick }: { r: AaRanked; setPick: SetPick }): JSX.Ele
         inputProps={{ 'aria-label': `${r.key} rank` }}
         data-testid="aa-rank"
       >
-        {Array.from({ length: r.row.ranks + 1 }, (_, n) => (
+        {Array.from({ length: r.max + 1 }, (_, n) => (
           <MenuItem key={n} value={n} sx={{ fontSize: 12 }}>
-            {`${String(n)} / ${String(r.row.ranks)}`}
+            {`${String(n)} / ${String(r.max)}`}
           </MenuItem>
         ))}
       </Select>
@@ -79,16 +80,40 @@ function RankControl({ r, setPick }: { r: AaRanked; setPick: SetPick }): JSX.Ele
   )
 }
 
+/** The name shown: the log's where it has one, with the wiki's on hover. */
+function NameCell({ r }: { r: AaRanked }): JSX.Element {
+  const name = <TableCell sx={{ ...CELL_SX, fontWeight: 600, whiteSpace: 'nowrap' }}>{r.key}</TableCell>
+  if (r.wikiName === null) return name
+  return (
+    <Tooltip title={`The wiki calls this ${r.wikiName}.`} cursor="inherit">
+      {name}
+    </Tooltip>
+  )
+}
+
+function TextCell({ r }: { r: AaRanked }): JSX.Element {
+  if (r.unlisted) {
+    return (
+      <TableCell sx={{ ...CELL_SX, color: 'text.secondary', fontStyle: 'italic' }} data-testid="aa-unlisted">
+        {UNLISTED_TEXT}
+      </TableCell>
+    )
+  }
+  return (
+    <TableCell sx={CELL_SX}>
+      <Tooltip title={r.row.hk === undefined ? r.row.text : `${r.row.text} Hotkey: ${r.row.hk}`} cursor="inherit">
+        <Box sx={TEXT_SX}>{r.row.text}</Box>
+      </Tooltip>
+    </TableCell>
+  )
+}
+
 function AaRowLine({ r, setPick, special }: { r: AaRanked; setPick: SetPick; special: boolean }): JSX.Element {
   return (
     <TableRow hover data-testid="aa-row">
-      <TableCell sx={{ ...CELL_SX, fontWeight: 600, whiteSpace: 'nowrap' }}>{r.key}</TableCell>
+      <NameCell r={r} />
       <TableCell sx={{ ...CELL_SX, whiteSpace: 'nowrap' }}>{special ? (r.row.values ?? []).join(' / ') : r.row.cost}</TableCell>
-      <TableCell sx={CELL_SX}>
-        <Tooltip title={r.row.hk === undefined ? r.row.text : `${r.row.text} Hotkey: ${r.row.hk}`} cursor="inherit">
-          <Box sx={TEXT_SX}>{r.row.text}</Box>
-        </Tooltip>
-      </TableCell>
+      <TextCell r={r} />
       <TableCell sx={CELL_SX}>
         <RankControl r={r} setPick={setPick} />
       </TableCell>

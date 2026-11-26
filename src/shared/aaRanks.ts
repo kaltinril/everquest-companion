@@ -3,28 +3,38 @@
 // sheet's soft cap. Pure: the committed table, the log's purchase lines and the player's picks in.
 //
 // WHERE A RANK COMES FROM, in order: the player's own pick for this character; else the highest rank
-// the log's purchase lines state (`aaLedger`); else 0. The wiki's rank count caps both.
+// the log's purchase lines state (`aaLedger`); else 0. THE LOG WINS OVER THE WIKI (owner,
+// 2026-11-25): a row's top rank is the larger of the wiki's rank count and the log's rank.
 //
-// NAMES. A log name is matched to a row case-insensitively and without apostrophes: the log writes
-// `Warriors Endurance` where the wiki writes `Warrior's Endurance`. The Special table writes a race's
-// row `Class Reincarnation: Human`; the log says `Race Reincarnation: Human`, which is the name shown.
+// NAMES (shared/aaLogMatch.ts). A log name matches a row without case or apostrophes (`Warriors
+// Endurance` is `Warrior's Endurance`), else the one row a couple of edits away. The name shown is
+// the log's: `Race Reincarnation: Human` for the wiki's `Class Reincarnation: Human`, `Unbound
+// Strikethrough` for `Unbounded Strikethrough`. A log AA no row is gets a General row of its own.
 
 import { AA_TABLE, type AaSection, type AaTableRow } from './aaTable.generated'
-import { aaLedger } from './aaLedger'
+import { aaFold, aaLogAas, aaLogMatch, type LogAa } from './aaLogMatch'
 import type { AASpendLike } from './aa'
 import type { ClassAbbr } from './classCombo'
 import { classAbbrForDisplayName } from './spellLevels'
+
+export { aaFold } from './aaLogMatch'
 
 export type AaRankSource = 'pick' | 'log' | 'none'
 
 export interface AaRanked {
   row: AaTableRow
-  /** The name shown and the key a pick is stored under: the log's own form for a race row. */
+  /** The name shown and the key a pick is stored under: the log's own form where it has one. */
   key: string
   rank: number
+  /** The top rank: the wiki's rank count, or the log's rank when higher. */
+  max: number
   source: AaRankSource
-  /** The log's rank, capped; null when the log names no purchase of it. */
+  /** The log's rank; null when the log names no purchase of it. */
   logRank: number | null
+  /** The wiki's name when the one shown differs from it. */
+  wikiName: string | null
+  /** A log AA the wiki's AA page does not list. */
+  unlisted: boolean
 }
 
 /** One character's picks, by row key. */
@@ -35,11 +45,6 @@ export type AaPicksByCharacter = Readonly<Record<string, AaPicks>>
 
 /** Where the picks are kept (renderer localStorage). */
 export const AA_PICKS_KEY = 'eq.aa.ranks'
-
-/** A name folded for matching: case, apostrophes and runs of spaces do not count. */
-export function aaFold(name: string): string {
-  return name.toLowerCase().replace(/['’]/g, '').replace(/\s+/g, ' ').trim()
-}
 
 /** The race of a Special `Class Reincarnation: <race>` row, or null for any other row. */
 export function aaRaceOf(row: AaTableRow): string | null {
@@ -53,49 +58,40 @@ export function aaKey(row: AaTableRow): string {
   return race === null ? row.name : `Race Reincarnation: ${race}`
 }
 
-/**
- * The highest rank the log states per ability, by folded name. A race line states no rank (`Race
- * Reincarnation: Half Elf` every time), so a race's rank is also the number of reincarnations into
- * it (`races`: one entry per reincarnation, shared/reincarnationClimbs.ts).
- */
-export function aaLogRanks(spends: readonly AASpendLike[], races: readonly (string | null)[] = []): Map<string, number> {
-  const out = new Map(aaLedger(spends).map((r) => [aaFold(r.name), r.topRank]))
-  for (const race of races) {
-    if (race === null) continue
-    const key = aaFold(`Race Reincarnation: ${race}`)
-    const n = races.filter((r) => r === race).length
-    out.set(key, Math.max(out.get(key) ?? 0, n))
-  }
-  return out
-}
-
-/** The log's rank for a row: a race row answers to either spelling. */
-function logRankOf(row: AaTableRow, key: string, logRanks: ReadonlyMap<string, number>): number | null {
-  return logRanks.get(aaFold(key)) ?? logRanks.get(aaFold(row.name)) ?? null
-}
-
 const clamp = (n: number, max: number): number => Math.max(0, Math.min(max, Math.floor(n)))
 
-/** One row's rank for a character. */
-export function rankAa(row: AaTableRow, logRanks: ReadonlyMap<string, number>, picks: AaPicks): AaRanked {
-  const key = aaKey(row)
-  const logged = logRankOf(row, key, logRanks)
-  const logRank = logged === null ? null : clamp(logged, row.ranks)
+/** One row's rank for a character, from its log AA (null when the log names none). */
+export function rankAa(row: AaTableRow, log: LogAa | null, picks: AaPicks, unlisted = false): AaRanked {
+  const key = log !== null && (log.near === true || unlisted) ? log.name : aaKey(row)
+  const logRank = log === null ? null : log.rank
+  const max = Math.max(row.ranks, logRank ?? 0)
+  const base = { row, key, max, logRank, wikiName: unlisted || key === row.name ? null : row.name, unlisted }
   const pick = picks[key]
-  if (pick !== undefined) return { row, key, rank: clamp(pick, row.ranks), source: 'pick', logRank }
-  if (logRank !== null && logRank > 0) return { row, key, rank: logRank, source: 'log', logRank }
-  return { row, key, rank: 0, source: 'none', logRank }
+  if (pick !== undefined) return { ...base, rank: clamp(pick, max), source: 'pick' }
+  if (logRank !== null && logRank > 0) return { ...base, rank: logRank, source: 'log' }
+  return { ...base, rank: 0, source: 'none' }
 }
 
-/** Every row of the table, ranked, in the table's order. `races`: see `aaLogRanks`. */
+/** A General row for a log AA the wiki's page does not list. */
+function unlistedRow(aa: LogAa): AaTableRow {
+  return { section: 'general', name: aa.name, ranks: aa.rank, cost: '', text: '' }
+}
+
+/**
+ * Every row of the table, ranked, in the table's order, then a General row per log AA no row is.
+ * `races`: one entry per reincarnation (shared/aaLogMatch.ts `aaLogAas`).
+ */
 export function rankAas(
   spends: readonly AASpendLike[],
   picks: AaPicks,
   races: readonly (string | null)[] = [],
   table: readonly AaTableRow[] = AA_TABLE
 ): AaRanked[] {
-  const logRanks = aaLogRanks(spends, races)
-  return table.map((row) => rankAa(row, logRanks, picks))
+  const { byRow, unplaced } = aaLogMatch(aaLogAas(spends, races), table, aaKey)
+  return [
+    ...table.map((row) => rankAa(row, byRow.get(aaFold(row.name)) ?? null, picks)),
+    ...unplaced.map((aa) => rankAa(unlistedRow(aa), aa, picks, true))
+  ]
 }
 
 /** The rank held in the row stored under `key`; 0 when no row has it. */
@@ -105,10 +101,8 @@ export function aaRankOf(ranked: readonly AaRanked[], key: string): number {
 
 /** Log names no table row answers to: what the tab cannot place. */
 export function aaUnplaced(spends: readonly AASpendLike[], table: readonly AaTableRow[] = AA_TABLE): string[] {
-  const known = new Set(table.flatMap((row) => [aaFold(row.name), aaFold(aaKey(row))]))
-  return aaLedger(spends)
-    .map((r) => r.name)
-    .filter((name) => !known.has(aaFold(name)))
+  return aaLogMatch(aaLogAas(spends), table, aaKey)
+    .unplaced.map((aa) => aa.name)
     .sort((a, b) => a.localeCompare(b))
 }
 
@@ -133,7 +127,9 @@ export function aaPointsSpent(ranked: readonly AaRanked[]): AaPoints {
   for (const r of ranked) {
     if (seen.has(r.key) || r.row.section === 'special' || r.rank === 0) continue
     seen.add(r.key)
-    const costs = aaRankCosts(r.row).slice(0, r.rank)
+    const priced = aaRankCosts(r.row)
+    // A rank past the wiki's count (the log's) has no price.
+    const costs = Array.from({ length: r.rank }, (_, i) => priced[i] ?? null)
     if (costs.some((c) => c === null)) out.unknown++
     out.points += costs.reduce<number>((s, c) => s + (c ?? 0), 0)
   }
