@@ -152,7 +152,8 @@ function evidenceOf(input: AaLogInput, table: readonly AaRow[]): (row: AaTableRo
     const used = acted.get(f)
     return {
       ...(list === undefined ? {} : { list }),
-      ...(read?.printed.has(f) === true ? { printed: true } : {}),
+      // A Special row is never sold for points and every reincarnation writes its own line: no line is rank 0.
+      ...(read?.printed.has(f) === true && row.section !== 'special' ? { printed: true } : {}),
       ...(later?.get(f) === undefined ? {} : { after: later.get(f)?.rank }),
       ...(used === undefined ? {} : { activated: used })
     }

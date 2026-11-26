@@ -77,6 +77,13 @@ test("OWNER'S MAXED LIST: Combat Fury 4/4 from the list; Quick Buff and Improved
   assert.equal(row(ranked, 'Banestrike').rank, 1)
 })
 
+test("A SPECIAL ROW the list printed but cannot read is not sold for points: rank 0, never can't-tell", () => {
+  const run: AaListRun = { ts: T, blocks: [{ id: 26124, name: 'Race Reincarnation: Troll', description: 'This passive ability increases your hitpoint regeneration by 3.', cost: 0 }] }
+  const troll = ranks({ list: run }).find((r) => r.row.section === 'special' && /Troll/.test(r.key))
+  assert.ok(troll !== undefined)
+  assert.deepEqual([troll.rank, troll.unknown], [0, undefined])
+})
+
 test("A STALE LIST says nothing of the row it printed three times: the purchase line settles it", () => {
   // The owner's list was taken two minutes after buying Pottery Mastery 3 (15:42), before any zone or
   // swap: Pottery printed rank 2, rank 3 and an unsold "rank 4".
