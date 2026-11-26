@@ -13,6 +13,7 @@ import { AA_GROUPS, type AaGroup } from './aaEffectTable'
 import { aaEffect, type AaEffect } from './aaEffects'
 import { aaCostSum, aaRowCost, type AaCostSum, type AaRowCost } from './aaCost'
 import { ARCHETYPE_BY_CLASS, IN_EVERY_RUN, archetypeFit, type ArchetypeFit } from './aaArchetypeClasses'
+import { aaRequirements } from './aaGranted'
 import type { AaRanked } from './aaRanks'
 import type { AaSection } from './aaTable.generated'
 import type { ClassAbbr } from './classCombo'
@@ -90,6 +91,32 @@ export function aaMatches(b: AaBoardRow, query: string): boolean {
 
 export type AaScope = 'usable' | 'all'
 
+/** The level a row's first rank asks for, as the wiki's text states it; null when that text cannot be read. */
+export function aaStartLevel(b: AaBoardRow): number | null {
+  const req = aaRequirements(b.r.row)
+  return req === null ? null : req.levels[0]
+}
+
+/**
+ * Whether a row is in reach by `maxLevel` (null: no level filter). The level is the wiki's, and the wiki
+ * can be wrong (owner, 2026-11-26: fix the wiki when a row is found wrong); a requirement the text does
+ * not state clearly stays in, so the filter never hides a row it cannot rule out.
+ */
+export function aaWithinLevel(b: AaBoardRow, maxLevel: number | null): boolean {
+  if (maxLevel === null) return true
+  const level = aaStartLevel(b)
+  return level === null || level <= maxLevel
+}
+
+/** What a list shows: the scope, the search and the level filter. */
+export interface AaFilter {
+  scope: AaScope
+  query: string
+  maxLevel?: number | null
+}
+
+const shown = (b: AaBoardRow, query: string, maxLevel: number | null | undefined): boolean => aaMatches(b, query) && aaWithinLevel(b, maxLevel ?? null)
+
 export interface AaListGroup {
   /** Null for a list with one group. */
   title: string | null
@@ -121,8 +148,8 @@ function classGroups(rows: readonly AaBoardRow[], classes: readonly ClassAbbr[],
 }
 
 /** One sub-tab's list: the combo's rows, then (Archetype) the ones that may apply, then with `all` the rest. */
-export function aaTabGroups(board: readonly AaBoardRow[], section: AaSection, classes: readonly ClassAbbr[], view: { scope: AaScope; query: string }): AaListGroup[] {
-  const rows = board.filter((b) => b.r.row.section === section && aaMatches(b, view.query))
+export function aaTabGroups(board: readonly AaBoardRow[], section: AaSection, classes: readonly ClassAbbr[], view: AaFilter): AaListGroup[] {
+  const rows = board.filter((b) => b.r.row.section === section && shown(b, view.query, view.maxLevel))
   if (section === 'class') return classGroups(rows, classes, view.scope).filter((g) => g.rows.length > 0)
   const groups: AaListGroup[] = [
     { title: null, kind: 'mine', rows: rows.filter((b) => b.usable) },
@@ -140,14 +167,14 @@ const SECTIONS: readonly { id: AaSection; label: string }[] = [
 ]
 
 /** A search across every tab: the matching rows the scope shows, one group a section. */
-export function aaSearchGroups(board: readonly AaBoardRow[], scope: AaScope, query: string): AaListGroup[] {
-  const shown = board.filter((b) => (b.usable || scope === 'all') && aaMatches(b, query))
-  return SECTIONS.map((s) => ({ title: s.label, kind: 'mine' as const, rows: shown.filter((b) => b.r.row.section === s.id) })).filter((g) => g.rows.length > 0)
+export function aaSearchGroups(board: readonly AaBoardRow[], scope: AaScope, query: string, maxLevel: number | null = null): AaListGroup[] {
+  const rows = board.filter((b) => (b.usable || scope === 'all') && shown(b, query, maxLevel))
+  return SECTIONS.map((s) => ({ title: s.label, kind: 'mine' as const, rows: rows.filter((b) => b.r.row.section === s.id) })).filter((g) => g.rows.length > 0)
 }
 
 /** How many rows a search across every tab finds. */
-export function aaSearchCount(board: readonly AaBoardRow[], scope: AaScope, query: string): number {
-  return aaSearchGroups(board, scope, query).reduce((n, g) => n + g.rows.length, 0)
+export function aaSearchCount(board: readonly AaBoardRow[], scope: AaScope, query: string, maxLevel: number | null = null): number {
+  return aaSearchGroups(board, scope, query, maxLevel).reduce((n, g) => n + g.rows.length, 0)
 }
 
 export interface AaTabCount {
@@ -158,10 +185,10 @@ export interface AaTabCount {
   matches: number | null
 }
 
-/** A sub-tab's count: maxed of usable, their points, and the search's matches. */
-export function aaTabCount(board: readonly AaBoardRow[], section: AaSection, scope: AaScope, query: string): AaTabCount {
-  const mine = board.filter((b) => b.r.row.section === section && b.usable)
-  const matches = query.trim() === '' ? null : board.filter((b) => b.r.row.section === section && (b.usable || scope === 'all') && aaMatches(b, query)).length
+/** A sub-tab's count: maxed of usable (within the level filter), their points, and the search's matches. */
+export function aaTabCount(board: readonly AaBoardRow[], section: AaSection, { scope, query, maxLevel = null }: AaFilter): AaTabCount {
+  const mine = board.filter((b) => b.r.row.section === section && b.usable && aaWithinLevel(b, maxLevel))
+  const matches = query.trim() === '' ? null : board.filter((b) => b.r.row.section === section && (b.usable || scope === 'all') && shown(b, query, maxLevel)).length
   return { maxed: mine.filter((b) => b.r.rank >= b.max).length, of: mine.length, points: aaCostSum(mine.map((b) => b.cost)), matches }
 }
 

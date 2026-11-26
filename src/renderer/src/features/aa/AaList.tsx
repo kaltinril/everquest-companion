@@ -3,7 +3,7 @@
 
 import { type JSX, Fragment, useEffect, useRef } from 'react'
 import { Box, Typography } from '@mui/material'
-import { aaNotFor, type AaBoardRow, type AaListGroup } from '@shared/aaBoard'
+import { aaNotFor, aaStartLevel, type AaBoardRow, type AaListGroup } from '@shared/aaBoard'
 import { aaCostText } from '@shared/aaCost'
 import { aaEffectLine } from '@shared/aaEffects'
 import type { ClassAbbr } from '@shared/classCombo'
@@ -22,6 +22,19 @@ const SOURCE_TIP = {
   none: ''
 } as const
 const ELSEWHERE_TIP = 'Your log bought this under another class combo; these classes do not get it.'
+const LEVEL_TIP = 'The level the wiki gives for rank 1. The wiki can be wrong: fix it there when the game says otherwise.'
+
+/** "L3" after the name while the level filter is on; "L?" when the wiki's text does not state it clearly. */
+function LevelTag({ b }: { b: AaBoardRow }): JSX.Element {
+  const level = aaStartLevel(b)
+  return (
+    <Tooltip title={LEVEL_TIP}>
+      <Box component="small" sx={{ ml: 0.75, color: 'text.disabled', fontWeight: 400 }} data-testid="aa-level">
+        {level === null ? 'L?' : `L${String(level)}`}
+      </Box>
+    </Tooltip>
+  )
+}
 
 /** The quiet note after an unusable row's name: another loadout's rank, "may apply", or "not for". */
 function NotForNote({ b, classes }: { b: AaBoardRow; classes: readonly ClassAbbr[] }): JSX.Element | null {
@@ -110,7 +123,7 @@ function PointsCells({ b }: { b: AaBoardRow }): JSX.Element {
   )
 }
 
-function AaLine({ b, classes, setPick, showClass }: { b: AaBoardRow; classes: readonly ClassAbbr[]; setPick: SetPick; showClass: boolean }): JSX.Element {
+function AaLine({ b, classes, setPick, showClass, showLevel }: { b: AaBoardRow; classes: readonly ClassAbbr[]; setPick: SetPick; showClass: boolean; showLevel: boolean }): JSX.Element {
   const nav = useAaNav()
   const id = aaRowId(b)
   const open = nav.open === id
@@ -137,6 +150,7 @@ function AaLine({ b, classes, setPick, showClass }: { b: AaBoardRow; classes: re
         <Typography variant="body2" noWrap sx={{ fontWeight: 500, ...dim, ...(b.r.row.removed === undefined ? {} : { textDecoration: 'line-through' }) }}>
           {b.r.key}
           <Mark b={b} fields={['row', 'name', 'text', 'hk', 'removed']} />
+          {showLevel && <LevelTag b={b} />}
           {showClass && b.r.row.class !== undefined && <Box component="small" sx={{ ml: 0.75, color: 'text.disabled' }}>{b.r.row.class}</Box>}
           <NotForNote b={b} classes={classes} />
         </Typography>
@@ -151,7 +165,7 @@ function AaLine({ b, classes, setPick, showClass }: { b: AaBoardRow; classes: re
 }
 
 /** The groups of one list, each under its quiet heading. */
-export function AaList({ groups, classes, setPick, showClass = false, empty }: { groups: AaListGroup[]; classes: readonly ClassAbbr[]; setPick: SetPick; showClass?: boolean; empty: string }): JSX.Element {
+export function AaList({ groups, classes, setPick, showClass = false, showLevel = false, empty }: { groups: AaListGroup[]; classes: readonly ClassAbbr[]; setPick: SetPick; showClass?: boolean; showLevel?: boolean; empty: string }): JSX.Element {
   if (groups.length === 0) {
     return (
       <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>
@@ -169,7 +183,7 @@ export function AaList({ groups, classes, setPick, showClass = false, empty }: {
             </Typography>
           )}
           {g.rows.map((b) => (
-            <AaLine key={aaRowId(b)} b={b} classes={classes} setPick={setPick} showClass={showClass} />
+            <AaLine key={aaRowId(b)} b={b} classes={classes} setPick={setPick} showClass={showClass} showLevel={showLevel} />
           ))}
         </Fragment>
       ))}

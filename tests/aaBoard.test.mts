@@ -5,7 +5,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { withGranted } from '../src/shared/aaGranted'
 import { rankAas, type AaPicks, type AaRanked } from '../src/shared/aaRanks'
-import { aaBoard, aaComboMax, aaFit, aaLeft, aaPlanDelta, aaSearchGroups, aaTabCount, aaTabGroups, type AaBoardRow, type AaCombo } from '../src/shared/aaBoard'
+import { aaBoard, aaComboMax, aaFit, aaLeft, aaPlanDelta, aaSearchGroups, aaStartLevel, aaTabCount, aaTabGroups, aaWithinLevel, type AaBoardRow, type AaCombo } from '../src/shared/aaBoard'
 import { aaNotForPoints, aaRecFit, aaRecommend } from '../src/shared/aaRecommend'
 import { aaSigned, aaStatTotals } from '../src/shared/aaStats'
 import { aaActivation, aaLinks } from '../src/shared/aaLinks'
@@ -94,11 +94,11 @@ test('RECOMMENDATIONS: cheapest next rank first; the plan says how far the point
 
 test('TAB COUNTS: maxed of usable and their points; a search counts its matches', () => {
   const board = aaBoard(ranked({ ...maxedPicks(), 'Innate Regeneration': 3 }), own)
-  const general = aaTabCount(board, 'general', 'usable', '')
+  const general = aaTabCount(board, 'general', { scope: 'usable', query: '' })
   assert.equal(general.of - general.maxed, 1)
   assert.equal(general.points.total - general.points.spent, 15)
-  assert.equal(aaTabCount(board, 'archetype', 'usable', 'crit').matches, 5)
-  assert.ok((aaTabCount(board, 'archetype', 'all', 'crit').matches ?? 0) >= 5)
+  assert.equal(aaTabCount(board, 'archetype', { scope: 'usable', query: 'crit' }).matches, 5)
+  assert.ok((aaTabCount(board, 'archetype', { scope: 'all', query: 'crit' }).matches ?? 0) >= 5)
 })
 
 test('LISTS: Archetype splits mine and, with All, the rest; Class groups by class; search spans every tab', () => {
@@ -116,6 +116,28 @@ test('LISTS: Archetype splits mine and, with All, the rest; Class groups by clas
   assert.deepEqual(search.map((g) => [g.title, g.rows.map((b) => b.r.key)]), [['General', ['Crafting Mastery', 'Pottery Mastery']]])
   assert.equal(aaSearchGroups(board, 'usable', 'evac').length, 0, 'Exodus is not usable')
   assert.equal(aaSearchGroups(board, 'all', 'group evac')[0].rows[0].r.key, 'Exodus', 'the effect label is searched')
+})
+
+test('LEVEL FILTER: rank 1 by the wiki; a row whose level the text does not state clearly stays in', () => {
+  const board = aaBoard(ranked(), own)
+  assert.equal(aaStartLevel(find(board, 'Full Potential')), 50)
+  assert.equal(aaStartLevel(find(board, 'Widened Perception')), 25)
+  assert.equal(aaStartLevel(find(board, 'Mana Burn')), 45, 'not the 3 of "Mental Clarity at Level 3"')
+  assert.equal(aaWithinLevel(find(board, 'Full Potential'), 10), false)
+  assert.equal(aaWithinLevel(find(board, 'Full Potential'), null), true, 'no filter')
+  const unread = board.find((b) => aaStartLevel(b) === null)
+  if (unread !== undefined) assert.equal(aaWithinLevel(unread, 1), true)
+  const general = aaTabGroups(board, 'general', OWN, { scope: 'usable', query: '', maxLevel: 10 }).flatMap((g) => g.rows.map((b) => b.r.key))
+  assert.ok(general.includes('Packrat'))
+  assert.ok(!general.includes('Full Potential') && !general.includes('Widened Perception'))
+  const others = aaTabGroups(board, 'class', OWN, { scope: 'all', query: '', maxLevel: 9 })
+  assert.ok(!others.some((g) => g.rows.some((b) => b.r.key === 'Mana Burn')))
+  assert.ok(others.some((g) => g.title === 'Bard · not for WAR/SHM/MNK' && g.rows.some((b) => b.r.key === 'Scribble Notes')))
+  const unfiltered = aaTabCount(board, 'general', { scope: 'usable', query: '' })
+  const filtered = aaTabCount(board, 'general', { scope: 'usable', query: '', maxLevel: 10 })
+  assert.equal(unfiltered.of - filtered.of, 2, 'Full Potential and Widened Perception drop out')
+  assert.equal(aaSearchGroups(board, 'usable', 'loadout', 10).length, 0)
+  assert.equal(aaSearchGroups(board, 'usable', 'loadout', 25).length, 1)
 })
 
 test('WHAT YOUR AAS GIVE YOU: totals from held usable ranks, race and class lines included', () => {
@@ -163,7 +185,7 @@ test("ANOTHER LOADOUT'S AAS: kept, marked, shown only with All, and out of every
     assert.equal(b.elsewhere, true, key)
   }
   assert.equal(find(board, "Hunter's Attack Power").r.rank, 13, 'the log wins for what was bought')
-  assert.deepEqual(aaTabCount(board, 'class', 'usable', ''), aaTabCount(clean, 'class', 'usable', ''))
+  assert.deepEqual(aaTabCount(board, 'class', { scope: 'usable', query: '' }), aaTabCount(clean, 'class', { scope: 'usable', query: '' }))
   assert.deepEqual(aaLeft(board), aaLeft(clean))
   assert.deepEqual(aaRecommend(board, 20).items.map((i) => i.b.r.key), aaRecommend(clean, 20).items.map((i) => i.b.r.key))
   assert.deepEqual(aaStatTotals(board), aaStatTotals(clean))

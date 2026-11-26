@@ -85,7 +85,38 @@ function planningLine(s: AaBoardState): string {
   return `Planning ${s.classes.join('/')}: ${String(d.points)}${d.unknown ? '+' : ''} points to max what this combo adds (${String(d.adds)} AAs).`
 }
 
-function ClassBar({ s, scope, setScope }: { s: AaBoardState; scope: AaScope; setScope: (v: AaScope) => void }): JSX.Element {
+const LEVEL_FILTER_TIP = 'Only AAs whose rank 1 asks for this level or lower, by the wiki. The wiki can be wrong: when the game says otherwise, fix the wiki.'
+
+/** "Up to level [ ]": a level, or empty for no filter. */
+function LevelBox({ maxLevel, setMaxLevel }: { maxLevel: number | null; setMaxLevel: (n: number | null) => void }): JSX.Element {
+  return (
+    <Tooltip title={LEVEL_FILTER_TIP}>
+      <TextField
+        size="small"
+        label="Up to level"
+        value={maxLevel === null ? '' : String(maxLevel)}
+        onChange={(e) => {
+          const digits = e.target.value.replace(/\D/g, '').slice(0, 3)
+          setMaxLevel(digits === '' ? null : Math.max(1, Number(digits)))
+        }}
+        sx={{ width: 120 }}
+        slotProps={{
+          input: {
+            endAdornment:
+              maxLevel === null ? undefined : (
+                <IconButton size="small" onClick={() => setMaxLevel(null)} aria-label="Clear the level filter">
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              ),
+            inputProps: { inputMode: 'numeric', 'data-testid': 'aa-level-filter' }
+          }
+        }}
+      />
+    </Tooltip>
+  )
+}
+
+function ClassBar({ s, scope, setScope, maxLevel, setMaxLevel }: { s: AaBoardState; scope: AaScope; setScope: (v: AaScope) => void; maxLevel: number | null; setMaxLevel: (n: number | null) => void }): JSX.Element {
   const { pick } = s
   return (
     <Stack spacing={0.5} sx={{ mb: 1.5 }}>
@@ -102,6 +133,7 @@ function ClassBar({ s, scope, setScope }: { s: AaBoardState; scope: AaScope; set
             All AAs
           </ToggleButton>
         </ToggleButtonGroup>
+        <LevelBox maxLevel={maxLevel} setMaxLevel={setMaxLevel} />
       </Stack>
       {s.planning && (
         <Typography variant="caption" color="warning.main" data-testid="aa-planning">
@@ -145,14 +177,14 @@ function SearchBox({ query, setQuery }: { query: string; setQuery: (q: string) =
   )
 }
 
-function TabRow({ s, tab, setTab, scope, query, setQuery }: { s: AaBoardState; tab: AaTabId; setTab: (t: AaTabId) => void; scope: AaScope; query: string; setQuery: (q: string) => void }): JSX.Element {
+function TabRow({ s, tab, setTab, scope, query, setQuery, maxLevel }: { s: AaBoardState; tab: AaTabId; setTab: (t: AaTabId) => void; scope: AaScope; query: string; setQuery: (q: string) => void; maxLevel: number | null }): JSX.Element {
   const searching = query.trim() !== ''
   const label = (id: AaSection, name: string): string => {
-    const c = aaTabCount(s.board, id, scope, query)
+    const c = aaTabCount(s.board, id, { scope, query, maxLevel })
     if (c.matches !== null) return `${name} ${String(c.matches)}`
     return id === 'special' ? name : `${name} ${String(c.maxed)}/${String(c.of)}`
   }
-  const total = searching ? aaSearchCount(s.board, scope, query) : null
+  const total = searching ? aaSearchCount(s.board, scope, query, maxLevel) : null
   return (
     <Stack direction="row" alignItems="center" spacing={1} sx={{ borderBottom: 1, borderColor: 'divider', mb: 1 }}>
       <Tabs value={tab} onChange={(_e, v: AaTabId) => setTab(v)} sx={{ minHeight: 36 }} variant="scrollable" scrollButtons={false}>
@@ -167,27 +199,29 @@ function TabRow({ s, tab, setTab, scope, query, setQuery }: { s: AaBoardState; t
 }
 
 /** One sub-tab's count line and list. */
-function SectionTab({ s, section, scope, query }: { s: AaBoardState; section: AaSection; scope: AaScope; query: string }): JSX.Element {
-  const groups = useMemo(() => aaTabGroups(s.board, section, s.classes, { scope, query }), [s.board, section, s.classes, scope, query])
-  const c = aaTabCount(s.board, section, scope, query)
+function SectionTab({ s, section, scope, query, maxLevel }: { s: AaBoardState; section: AaSection; scope: AaScope; query: string; maxLevel: number | null }): JSX.Element {
+  const groups = useMemo(() => aaTabGroups(s.board, section, s.classes, { scope, query, maxLevel }), [s.board, section, s.classes, scope, query, maxLevel])
+  const c = aaTabCount(s.board, section, { scope, query, maxLevel })
+  const filtered = maxLevel !== null
   const name = SECTIONS.find((x) => x.id === section)?.label ?? ''
   return (
     <>
       {section !== 'special' && (
         <Typography variant="caption" color="text.secondary" component="div" sx={{ px: 1, mb: 0.5 }} data-testid="aa-tab-line">
-          {`${name} ${String(c.maxed)}/${String(c.of)} · ${aaCostSumText(c.points)}`}
+          {`${name} ${String(c.maxed)}/${String(c.of)} · ${aaCostSumText(c.points)}${filtered ? ` · up to level ${String(maxLevel)}, by the wiki` : ''}`}
         </Typography>
       )}
-      <AaList groups={groups} classes={s.classes} setPick={s.setPick} empty={query.trim() === '' ? 'Nothing here for these classes.' : 'Nothing matches.'} />
+      <AaList groups={groups} classes={s.classes} setPick={s.setPick} showLevel={filtered} empty={query.trim() === '' && !filtered ? 'Nothing here for these classes.' : 'Nothing matches.'} />
     </>
   )
 }
 
-function Body({ s, recs, tab, setTab, scope, query }: { s: AaBoardState; recs: AaRecs; tab: AaTabId; setTab: (t: AaTabId) => void; scope: AaScope; query: string }): JSX.Element {
+function Body({ s, recs, tab, setTab, scope, query, maxLevel }: { s: AaBoardState; recs: AaRecs; tab: AaTabId; setTab: (t: AaTabId) => void; scope: AaScope; query: string; maxLevel: number | null }): JSX.Element {
+  // Special rows come from reincarnating and achievements, not a level: the level filter leaves them be.
   if (tab === 'special') return <AaSpecial board={s.board} ranked={s.ranked} reincarnations={s.reincarnations} classes={s.classes} setPick={s.setPick} query={query} />
-  if (tab !== 'summary') return <SectionTab s={s} section={tab} scope={scope} query={query} />
+  if (tab !== 'summary') return <SectionTab s={s} section={tab} scope={scope} query={query} maxLevel={maxLevel} />
   if (query.trim() !== '') {
-    return <AaList groups={aaSearchGroups(s.board, scope, query)} classes={s.classes} setPick={s.setPick} showClass empty="Nothing matches." />
+    return <AaList groups={aaSearchGroups(s.board, scope, query, maxLevel)} classes={s.classes} setPick={s.setPick} showClass showLevel={maxLevel !== null} empty="Nothing matches." />
   }
   return <AaSummary board={s.board} planning={s.planning} recs={recs} unspent={s.unspent} classes={s.classes} onSpecial={() => setTab('special')} />
 }
@@ -202,6 +236,7 @@ function AaView({ onGo, onOpenTradeskill }: AaLinksProps): JSX.Element {
   const [tab, setTab] = useState<AaTabId>('summary')
   const [scope, setScope] = useState<AaScope>('usable')
   const [query, setQuery] = useState('')
+  const [maxLevel, setMaxLevel] = useState<number | null>(null)
   const [open, setOpen] = useState<string | null>(null)
   const toggle = useCallback((id: string) => setOpen((o) => (o === id ? null : id)), [])
   const jump = useCallback((b: AaBoardRow) => {
@@ -225,14 +260,14 @@ function AaView({ onGo, onOpenTradeskill }: AaLinksProps): JSX.Element {
         {ready && (
           <>
             <AaHeader s={s} />
-            <ClassBar s={s} scope={scope} setScope={setScope} />
+            <ClassBar s={s} scope={scope} setScope={setScope} maxLevel={maxLevel} setMaxLevel={setMaxLevel} />
             <Stack direction="row" spacing={1.5} sx={{ mb: 1.5 }} flexWrap="wrap" useFlexGap>
               <PointsCard unspent={s.unspent} ownBoard={s.ownBoard} planning={s.planning} />
               <PaceCard />
               <SpendCard recs={recs} unspent={s.unspent} />
             </Stack>
-            <TabRow s={s} tab={tab} setTab={setTab} scope={scope} query={query} setQuery={setQuery} />
-            <Body s={s} recs={recs} tab={tab} setTab={setTab} scope={scope} query={query} />
+            <TabRow s={s} tab={tab} setTab={setTab} scope={scope} query={query} setQuery={setQuery} maxLevel={maxLevel} />
+            <Body s={s} recs={recs} tab={tab} setTab={setTab} scope={scope} query={query} maxLevel={maxLevel} />
           </>
         )}
       </Box>
