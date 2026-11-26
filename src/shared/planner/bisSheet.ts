@@ -27,7 +27,7 @@ import { improveUnderCaps, type CapCell, type CapRules } from './bisCaps'
 import { searchLoadout, type HasteRate, type SearchCandidate, type SearchCell } from './bisSearch'
 import { gearHandedness } from './roleWeights'
 import { RATIO_CHIPS, activeChips, isRatioChip, tierWeight, type TierChip, type TierSetup } from './tierChips'
-import { ratioCounts, round3, tierTerms, type TierModel, type TierTerm } from './tierWeights'
+import { chipUnit, ratioCounts, round3, tierTerms, type TierModel, type TierTerm } from './tierWeights'
 import { PLAN_SLOTS, equipSlotOf, isAnyCell, type PlanSlotId } from './types'
 import { isUnobtainable } from './unobtainable'
 
@@ -214,7 +214,7 @@ function capRules(opts: BisOptions): CapRules | undefined {
     const cap = setup.caps[chip]
     if (cap === undefined || isRatioChip(chip) || setup.board[chip] === 'Off') continue
     if (chip !== 'HASTE') caps.set(chip, cap)
-    perValue.set(chip, tierWeight(setup.board[chip], setup.step) / model.units[chip])
+    perValue.set(chip, tierWeight(setup.board[chip], setup.step) / chipUnit(model.units, chip))
   }
   if (perValue.size === 0) return undefined
   return { caps, perValue, hastePerPercent: hastePerPercent(opts), hasteCap: setup.caps.HASTE }

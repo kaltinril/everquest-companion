@@ -2,7 +2,7 @@
 // them without a window (plans/2026-11-24-bis-sheet.md "Version 2 design"; mockup v2 is the reference).
 
 import type { GearRow } from '../../../../shared/planner/gear'
-import { chipGroup, chipLabel, isRatioChip, activeChips, RANKED_TIERS, type TierChip, type TierSetup } from '../../../../shared/planner/tierChips'
+import { chipGroup, chipLabel, isRatioChip, isSplitResist, activeChips, RANKED_TIERS, type TierChip, type TierSetup } from '../../../../shared/planner/tierChips'
 import type { Conversions, ItemBudget, TierModel, TierTerm } from '../../../../shared/planner/tierWeights'
 import { planSlotLabel, type PlanSlotId } from '../../../../shared/planner/types'
 import type { GearOwnershipMap } from './gearOwnership'
@@ -68,6 +68,7 @@ export function chipHint(chip: TierChip, conv: Conversions, level: number): stri
 
 /** "A good endgame item carries +6; that much counts as 1 x the lane." */
 export function unitText(chip: TierChip, unit: number): string {
+  if (isSplitResist(chip)) return `Each resist counts a fifth of Resists: ${chipValueText(chip, Number(unit.toPrecision(3)))} counts as 1 x the lane.`
   return `A good endgame item carries ${chipValueText(chip, Number(unit.toPrecision(3)))}; that much counts as 1 x the lane.`
 }
 

@@ -20,7 +20,7 @@ import {
   type TierSetup,
   type TierStep
 } from '@shared/planner/tierChips'
-import type { TierModel } from '@shared/planner/tierWeights'
+import { chipUnit, type TierModel } from '@shared/planner/tierWeights'
 import { LANE_COLOUR, LANE_INK, LANE_TRAY, chipFamily, chipHint, unitText } from './bisText'
 
 export interface TierBoardProps {
@@ -150,7 +150,7 @@ function ChipMenu({ chip, anchor, props, onClose }: { chip: TierChip; anchor: HT
           ))}
         </Stack>
         {hint !== undefined && <Typography variant="caption" color="text.secondary">{hint}</Typography>}
-        <Typography variant="caption" color="text.secondary">{unitText(chip, props.model.units[chip])}</Typography>
+        <Typography variant="caption" color="text.secondary">{unitText(chip, chipUnit(props.model.units, chip))}</Typography>
         {!isRatioChip(chip) && (
           <Stack direction="row" spacing={1} alignItems="center">
             <TextField
