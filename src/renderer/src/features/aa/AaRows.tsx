@@ -29,7 +29,8 @@ const TEXT_SX = {
 } as const
 
 const FROM_LOG_TIP = 'Your log shows this rank bought; pick another to set it yourself.'
-const CLEAR_TIP = 'Forget your pick and use the rank your log shows instead.'
+const GRANTED_TIP = 'Free AA: the game grants it once you reach its level.'
+const CLEAR_TIP ='Forget your pick and use the rank your log shows instead.'
 const COST_TIP = 'Points each rank costs, as the wiki lists them.'
 const VALUES_TIP = 'What each rank gives, as the wiki lists it.'
 const UNLISTED_TEXT = "From your log, not on the wiki's AA page."
@@ -91,6 +92,13 @@ function RankControl({ r, setPick }: { r: AaRanked; setPick: SetPick }): JSX.Ele
         <Tooltip title={FROM_LOG_TIP}>
           <Typography variant="caption" color="text.secondary" data-testid="aa-from-log">
             from log
+          </Typography>
+        </Tooltip>
+      )}
+      {r.source === 'granted' && (
+        <Tooltip title={GRANTED_TIP}>
+          <Typography variant="caption" color="text.secondary" data-testid="aa-granted">
+            granted
           </Typography>
         </Tooltip>
       )}

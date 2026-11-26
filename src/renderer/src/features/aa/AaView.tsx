@@ -27,7 +27,7 @@ const TABS: readonly { id: AaSection; label: string }[] = [
   { id: 'special', label: 'Special' }
 ]
 
-const CAPTION = 'Ranks come from your log; pick a rank where the log missed one.'
+const CAPTION = 'Ranks come from your log, free ones from your level; pick a rank where the log missed one.'
 const POINTS_TIP = 'Points the shown ranks cost, at the wiki prices for each rank.'
 const UNKNOWN_TIP = 'The wiki gives no price for some ranks, so they add nothing here.'
 const ALL_CLASSES_TIP = 'Show the AAs of every class, not only the classes you play.'

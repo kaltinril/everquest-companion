@@ -3,7 +3,8 @@
 // sheet's soft cap. Pure: the committed table, the log's purchase lines and the player's picks in.
 //
 // WHERE A RANK COMES FROM, in order: the player's own pick for this character; else the highest rank
-// the log's purchase lines state (`aaLedger`); else 0. THE LOG WINS OVER THE WIKI (owner,
+// the log's purchase lines state (`aaLedger`); else 0. A free rank the game grants is laid over
+// these by shared/aaGranted.ts `withGranted` (the log writes no line for it). THE LOG WINS OVER THE WIKI (owner,
 // 2026-11-25): a row's top rank is the larger of the wiki's rank count and the log's rank.
 //
 // NAMES (shared/aaLogMatch.ts). A log name matches a row without case or apostrophes (`Warriors
@@ -23,7 +24,8 @@ import { classAbbrForDisplayName } from './spellLevels'
 
 export { aaFold } from './aaLogMatch'
 
-export type AaRankSource = 'pick' | 'log' | 'none'
+/** `granted`: a free rank the game gives without a purchase line (shared/aaGranted.ts). */
+export type AaRankSource = 'pick' | 'log' | 'granted' | 'none'
 
 export interface AaRanked {
   row: AaRow
