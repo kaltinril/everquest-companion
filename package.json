@@ -60,7 +60,6 @@
     "tesseract.js": "7.0.0"
   },
   "devDependencies": {
-    "@aws-sdk/credential-providers": "^3.1130.0",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@eslint/js": "^10.0.1",
