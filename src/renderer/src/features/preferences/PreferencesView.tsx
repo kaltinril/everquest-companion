@@ -439,7 +439,8 @@ function SectionRail({
               selected={active === s.id}
               aria-disabled={dim}
               onClick={() => onPick(s.id)}
-              sx={{ borderRadius: 1, gap: 1, opacity: dim ? 0.38 : 1 }}
+              // Indented 4px under its group heading (owner, 2026-11-26).
+              sx={{ borderRadius: 1, gap: 1, ml: '4px', opacity: dim ? 0.38 : 1 }}
             >
               <Box sx={{ display: 'flex', color: 'text.secondary' }}>{s.icon}</Box>
               <ListItemText slotProps={{ primary: { variant: 'body2' } }} primary={s.label} />
