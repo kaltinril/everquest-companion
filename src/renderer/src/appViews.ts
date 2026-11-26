@@ -21,6 +21,8 @@ export type View =
   | 'leveling'
   // SKILLS (fork #6, 2026-11-19): every skill the log has seen go up, at its newest level.
   | 'skills'
+  // ALT. ADVANCEMENT (owner, 2026-11-25): the wiki's AA tables with the ranks the character holds.
+  | 'aa'
   // TRADESKILLS (fork #6, 2026-11-20): one tile per tradeskill and a workbench with its wiki recipe
   // book. One view: Home or a workbench is the tab's own remembered state.
   | 'tradeskills'
@@ -114,6 +116,7 @@ export const VIEW_LABELS: Record<View, string> = {
   alerts: 'Alerts',
   leveling: 'Leveling',
   skills: 'Skills',
+  aa: 'Alt. Advancement',
   tradeskills: 'Tradeskills',
   macros: 'Macros',
   loot: 'Loot',
@@ -173,6 +176,7 @@ const KNOWN_VIEWS: View[] = [
   'alerts',
   'leveling',
   'skills',
+  'aa',
   'tradeskills',
   'macros',
   'loot',

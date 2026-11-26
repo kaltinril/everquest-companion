@@ -21,6 +21,7 @@ import StorefrontIcon from '@mui/icons-material/Storefront'
 import FindInPageIcon from '@mui/icons-material/FindInPage'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import HandymanIcon from '@mui/icons-material/Handyman'
+import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium'
 import ConstructionIcon from '@mui/icons-material/Construction'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech'
@@ -148,7 +149,9 @@ const GROUPS: NavGroup[] = [
       { view: 'buffs', icon: <AutoFixHighIcon /> },
       { view: 'leveling', icon: <TrendingUpIcon /> },
       // SKILLS sits under Leveling: the other thing your log watches go up.
-      { view: 'skills', icon: <HandymanIcon /> }
+      { view: 'skills', icon: <HandymanIcon /> },
+      // ALT. ADVANCEMENT sits under Skills: the AA ranks the log has seen bought.
+      { view: 'aa', icon: <WorkspacePremiumIcon /> }
     ]
   },
 {
