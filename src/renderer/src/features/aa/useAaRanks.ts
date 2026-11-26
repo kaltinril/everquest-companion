@@ -3,6 +3,7 @@
 //
 // The log side is the `leveling` snapshot's purchase lines; the player's picks are kept per
 // character name under `AA_PICKS_KEY` in localStorage, one store for every caller in the window.
+// Free ranks the game grants (shared/aaGranted.ts) read the log's last stated level and the class combo.
 
 import { useCallback, useMemo, useSyncExternalStore } from 'react'
 import type { CharacterSnap } from '@shared/characterTypes'
@@ -16,9 +17,12 @@ import {
   type AaPicksByCharacter,
   type AaRanked
 } from '@shared/aaRanks'
+import { withGranted } from '@shared/aaGranted'
+import { resolvedClasses } from '@shared/classCombo'
 import { reincarnations as reincarnationsOf } from '@shared/reincarnationClimbs'
 import { statCapOf, type StatCap } from '@shared/reincarnationCap'
 import { useModule } from '../../lib/useModule'
+import { useComboSnap } from '../profiles/ClassComboData'
 
 const listeners = new Set<() => void>()
 const NO_PICKS: AaPicks = {}
@@ -88,13 +92,20 @@ export interface AaRanksState {
 /** The current character's rank in every row of the AA table. */
 export function useAaRanks(): AaRanksState {
   const snap = useModule<LevelingSnap>('leveling')
-  const character = useModule<CharacterSnap>('character')?.character?.name ?? null
+  const charSnap = useModule<CharacterSnap>('character')
+  const character = charSnap?.character?.name ?? null
+  const level = charSnap?.level?.level ?? null
+  const combo = useComboSnap().current
+  const classes = useMemo(() => (combo === null ? [] : resolvedClasses(combo)), [combo])
   const all = useSyncExternalStore(subscribe, snapshot, () => cache.value)
   const picks = character === null ? NO_PICKS : (all[character] ?? NO_PICKS)
   const spends = snap?.aaSpends
   const levels = snap?.levels
   const found = useMemo(() => reincarnationsOf(levels ?? [], spends ?? []), [levels, spends])
-  const ranked = useMemo(() => rankAas(spends ?? [], picks, found.map((r) => r.race)), [spends, picks, found])
+  const ranked = useMemo(
+    () => withGranted(rankAas(spends ?? [], picks, found.map((r) => r.race)), { level, classes }),
+    [spends, picks, found, level, classes]
+  )
   const reincarnations = useMemo(() => found.map((r) => r.ts), [found])
   const setPick = useCallback(
     (key: string, rank: number | null) => {
