@@ -127,7 +127,9 @@ test('the colour rides the existing ring blob, defaulted field by field like eve
     crosshairColorHex: '#ffffff',
     crosshairWeightPx: 2,
     trail: 'off',
-    trailLength: 5
+    trailLength: 5,
+    imageDataUrl: '',
+    drawing: { n: 16, cells: new Array(256).fill('') }
   })
   assert.deepEqual(normalizeCursorRing({ enabled: true, sizePx: 60, thicknessPx: 5, colorHex: '#00E5FF' }), {
     enabled: true,
@@ -142,7 +144,9 @@ test('the colour rides the existing ring blob, defaulted field by field like eve
     crosshairColorHex: '#ffffff',
     crosshairWeightPx: 2,
     trail: 'off',
-    trailLength: 5
+    trailLength: 5,
+    imageDataUrl: '',
+    drawing: { n: 16, cells: new Array(256).fill('') }
   })
   // A bad colour never costs the user the rest of their settings.
   assert.equal(normalizeCursorRing({ sizePx: 120, colorHex: 'chartreuse' }).sizePx, 120)

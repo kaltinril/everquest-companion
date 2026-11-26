@@ -38,7 +38,7 @@ const fixture = (name: string): StoreData => JSON.parse(readFileSync(join(FIXTUR
 // The shape switch, the crosshair and the trail joined the same way (2026-11-26, the cursor
 // overlay): missing reads as shape shown, crosshair off, trail off (tests/cursorCrosshair.test.mts,
 // tests/cursorTrail.test.mts).
-const RING_DEFAULT = { enabled: false, sizePx: 44, thicknessPx: 4, colorHex: '#ffffff', shape: 'circle', offsetXPx: 0, offsetYPx: 0, showShape: true, crosshairEnabled: false, crosshairColorHex: '#ffffff', crosshairWeightPx: 2, trail: 'off', trailLength: 5 }
+const RING_DEFAULT = { enabled: false, sizePx: 44, thicknessPx: 4, colorHex: '#ffffff', shape: 'circle', offsetXPx: 0, offsetYPx: 0, showShape: true, crosshairEnabled: false, crosshairColorHex: '#ffffff', crosshairWeightPx: 2, trail: 'off', trailLength: 5, imageDataUrl: '', drawing: { n: 16, cells: new Array(256).fill('') } }
 const AUTOHIDE_DEFAULT = { hideWhenNotRunning: true, hideWhenUnfocused: false }
 
 /** `store-v4-presence.json` — a fully-populated voice-era store (v0.2.0): characters, alerts
@@ -112,7 +112,9 @@ test('an EXISTING cursor-ring blob is repaired field by field, never replaced wh
     crosshairColorHex: '#ffffff',
     crosshairWeightPx: 2,
     trail: 'off',
-    trailLength: 5
+    trailLength: 5,
+    imageDataUrl: '',
+    drawing: { n: 16, cells: new Array(256).fill('') }
   })
 
   // A stroke wider than the radius is a filled dot, not a ring. A colour the user DID choose
@@ -134,7 +136,9 @@ test('an EXISTING cursor-ring blob is repaired field by field, never replaced wh
     crosshairColorHex: '#ffffff',
     crosshairWeightPx: 2,
     trail: 'off',
-    trailLength: 5
+    trailLength: 5,
+    imageDataUrl: '',
+    drawing: { n: 16, cells: new Array(256).fill('') }
   })
 
   for (const junk of [null, 42, 'nonsense', [], { nested: true }]) {

@@ -14,6 +14,9 @@
 // leave any value in any key (storeMigrations.ts's downgrade contract), so `normalize*` takes
 // `unknown` and always answers with a complete, in-range blob.
 
+// The picture's validator lives in its own pure module (no runtime imports of its own, so no cycle).
+import { normalizePictureDataUrl } from './cursorPicture'
+
 /**
  * A screen rectangle in DIP (device-independent pixels) — the coordinate space Electron's
  * `screen.getCursorScreenPoint()` and `BrowserWindow.getBounds()` both speak, and the space a
@@ -192,6 +195,47 @@ export interface CursorRingPrefs {
   trail: CursorTrailMode
   /** How long the trail is (how long each point lives, and for sparkles how many), 1 to 10. */
   trailLength: number
+  /**
+   * The player's own picture, drawn when `shape` is `'image'` (owner, 2026-11-26: "user can upload
+   * an icon ... a simple quick NxN grid they can draw on"). A small PNG data URL, from the upload
+   * (downsized in Preferences) or the drawing grid (one pixel per cell): one picture, two ways to
+   * make it. '' (the default) is no picture, and `'image'` with none draws the circle. Only
+   * `shared/cursorPicture.ts normalizePictureDataUrl` decides what may be stored here.
+   */
+  imageDataUrl: string
+  /** The drawing grid itself, kept so Edit reopens the last drawing. Not read by the overlay. */
+  drawing: CursorDrawing
+}
+
+/**
+ * The drawing grid (owner, 2026-11-26: "a simple quick NxN grid they can draw on like paint"):
+ * `n` x `n` cells, row by row, each '' (empty) or a `#rrggbb` through `normalizeRingColor`.
+ */
+export interface CursorDrawing {
+  n: number
+  cells: string[]
+}
+
+/** The grid sizes the editor offers; the normalizer accepts nothing else. */
+export const DRAWING_SIZES: readonly number[] = [8, 12, 16, 24, 32]
+export const DEFAULT_DRAWING_SIZE = 16
+
+/** A blank `n` x `n` grid. */
+export function emptyDrawing(n: number = DEFAULT_DRAWING_SIZE): CursorDrawing {
+  return { n, cells: new Array<string>(n * n).fill('') }
+}
+
+/**
+ * The drawing, defaulted: `n` one of DRAWING_SIZES (else 16), exactly n*n cells (padded with '',
+ * trimmed past the end), every cell '' or a lower-case `#rrggbb`; anything else in a cell is ''.
+ */
+export function normalizeDrawing(value: unknown): CursorDrawing {
+  const v = isPlainObject(value) ? value : {}
+  const n = DRAWING_SIZES.find((s) => s === v.n) ?? DEFAULT_DRAWING_SIZE
+  const given = Array.isArray(v.cells) ? (v.cells as unknown[]) : []
+  const cells = new Array<string>(n * n)
+  for (let i = 0; i < cells.length; i++) cells[i] = normalizeRingColor(given[i], '')
+  return { n, cells }
 }
 
 /** `off` draws nothing; `trail` is a fading line behind the pointer; `sparkles` sheds little
@@ -220,10 +264,18 @@ export const DEFAULT_TRAIL_LENGTH = 5
  *   diamond  a square turned 45 degrees.   dot      the ring with a filled centre dot.
  *   target   a ring inside a ring.
  *
- * ROOM FOR MORE: a later 'image' (an uploaded icon) joins this union; the ring window then draws
- * the picture instead of the outline. Nothing here has to change shape for that.
+ *   image    the player's own picture (`imageDataUrl`: an uploaded icon or a grid drawing),
+ *            drawn at the size footprint instead of an outline; with no picture, the circle.
  */
-export type RingShape = 'circle' | 'oval' | 'square' | 'rounded' | 'diamond' | 'dot' | 'target'
+export type RingShape =
+  | 'circle'
+  | 'oval'
+  | 'square'
+  | 'rounded'
+  | 'diamond'
+  | 'dot'
+  | 'target'
+  | 'image'
 
 /** Every shape, in the order Preferences lists them. The normalizer accepts these and nothing else. */
 export const RING_SHAPES: readonly RingShape[] = [
@@ -233,7 +285,8 @@ export const RING_SHAPES: readonly RingShape[] = [
   'rounded',
   'diamond',
   'dot',
-  'target'
+  'target',
+  'image'
 ]
 
 /** Offset bounds, each axis. Past 60px the shape stops reading as the pointer's own mark. */
@@ -344,7 +397,9 @@ export const DEFAULT_CURSOR_RING: CursorRingPrefs = {
   crosshairColorHex: DEFAULT_RING_COLOR,
   crosshairWeightPx: DEFAULT_CROSSHAIR_WEIGHT_PX,
   trail: 'off',
-  trailLength: DEFAULT_TRAIL_LENGTH
+  trailLength: DEFAULT_TRAIL_LENGTH,
+  imageDataUrl: '',
+  drawing: emptyDrawing()
 }
 
 export const DEFAULT_OVERLAY_AUTO_HIDE: OverlayAutoHidePrefs = {
@@ -398,7 +453,9 @@ export function normalizeCursorRing(value: unknown): CursorRingPrefs {
       DEFAULT_CROSSHAIR_WEIGHT_PX
     ),
     trail: normalizeTrailMode(v.trail),
-    trailLength: clampPx(v.trailLength, MIN_TRAIL_LENGTH, MAX_TRAIL_LENGTH, DEFAULT_TRAIL_LENGTH)
+    trailLength: clampPx(v.trailLength, MIN_TRAIL_LENGTH, MAX_TRAIL_LENGTH, DEFAULT_TRAIL_LENGTH),
+    imageDataUrl: normalizePictureDataUrl(v.imageDataUrl),
+    drawing: normalizeDrawing(v.drawing)
   }
 }
 

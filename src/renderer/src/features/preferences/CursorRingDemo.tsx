@@ -14,11 +14,23 @@
 // The crosshair (2026-11-26) is drawn here too, through the same seams (`crosshairOf`,
 // `crosshairLineStyles`): two lines through the arrow's tip, clipped to the box the way the game
 // window clips them. They ignore the offset, as in the game.
+//
+// The player's picture (the 'image' shape, 2026-11-26) is drawn here through `ringPicture` and
+// `pictureRendering`, the overlay window's own seams: an <img> filling the shape's box, contained,
+// with no outline or shadow, and the arrow on top.
 
 import type { JSX } from 'react'
 import type { CursorRingPrefs } from '@shared/presencePrefs'
 import { ringStrokeColor } from '@shared/presencePrefs'
-import { innerMarkStyle, ringBoxStyle, ringGeometry, ringOffset, shapeShown } from '@shared/cursorRingShape'
+import {
+  innerMarkStyle,
+  ringBoxStyle,
+  ringGeometry,
+  ringOffset,
+  ringPicture,
+  shapeShown
+} from '@shared/cursorRingShape'
+import { pictureRendering } from '@shared/cursorPicture'
 import { crosshairLineOffset, crosshairLineStyles, crosshairOf } from '@shared/cursorCrosshair'
 
 /** cursor.html's three readability shadows, and the inner mark's two contours. */
@@ -76,6 +88,7 @@ export function CursorRingDemo({ prefs }: { prefs: CursorRingPrefs }): JSX.Eleme
   const stroke = ringStrokeColor(prefs.colorHex)
   const g = ringGeometry(prefs)
   const off = ringOffset(prefs)
+  const picture = ringPicture(prefs)
   // Big enough to hold the footprint at its offset on every side, so the box is centred on the
   // pointer and the shape never clips.
   const reach = Math.max(Math.abs(off.x), Math.abs(off.y)) + prefs.sizePx / 2 + DEMO_PAD_PX
@@ -106,10 +119,24 @@ export function CursorRingDemo({ prefs }: { prefs: CursorRingPrefs }): JSX.Eleme
           top: Math.round(centre + off.y - g.heightPx / 2),
           boxSizing: 'border-box',
           borderStyle: 'solid',
-          boxShadow: RING_SHADOW,
+          boxShadow: picture === null ? RING_SHADOW : 'none',
           transform: g.rotateDeg === 0 ? undefined : `rotate(${g.rotateDeg}deg)`
         }}
       >
+        {picture !== null && (
+          <img
+            src={picture}
+            alt=""
+            data-testid="pref-cursor-picture-preview"
+            style={{
+              display: 'block',
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              imageRendering: pictureRendering(picture)
+            }}
+          />
+        )}
         {g.inner && (
           <div
             style={{
