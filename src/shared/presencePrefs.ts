@@ -153,6 +153,46 @@ export interface CursorRingPrefs {
    * moves nobody's ring. `ringStrokeColor()` is the ONE place it becomes a CSS value.
    */
   colorHex: string
+  /**
+   * The outline the stroke draws (owner, 2026-11-26: "the cursor thing is very plain"). CIRCLE by
+   * default, which is the ring every player has had, so an upgrade moves nobody's ring. Every
+   * shape fits the same `sizePx` footprint; `shared/cursorRingShape.ts` turns one into a box.
+   */
+  shape: RingShape
+}
+
+/**
+ * The ring's outline. All of them are drawn with CSS on the two prebuilt divs in cursor.html (the
+ * ring and its inner mark), so a cursor move still changes only a `transform`.
+ *
+ *   circle   the original ring.            oval     the circle squashed to 60% height.
+ *   square   sharp corners.                rounded  a square with rounded corners.
+ *   diamond  a square turned 45 degrees.   dot      the ring with a filled centre dot.
+ *   target   a ring inside a ring.
+ *
+ * ROOM FOR MORE: a later 'image' (an uploaded icon) joins this union; the ring window then draws
+ * the picture instead of the outline. Nothing here has to change shape for that.
+ */
+export type RingShape = 'circle' | 'oval' | 'square' | 'rounded' | 'diamond' | 'dot' | 'target'
+
+/** Every shape, in the order Preferences lists them. The normalizer accepts these and nothing else. */
+export const RING_SHAPES: readonly RingShape[] = [
+  'circle',
+  'oval',
+  'square',
+  'rounded',
+  'diamond',
+  'dot',
+  'target'
+]
+
+/** The shape the ring has always had. */
+export const DEFAULT_RING_SHAPE: RingShape = 'circle'
+
+/** A known shape name, or the circle. A store file, a share import or a newer build may carry
+ *  any string here; an unknown one draws the ring the player had before shapes existed. */
+export function normalizeRingShape(value: unknown): RingShape {
+  return RING_SHAPES.find((s) => s === value) ?? DEFAULT_RING_SHAPE
 }
 
 /**
@@ -236,7 +276,8 @@ export const DEFAULT_CURSOR_RING: CursorRingPrefs = {
   enabled: false,
   sizePx: DEFAULT_RING_SIZE_PX,
   thicknessPx: DEFAULT_RING_THICKNESS_PX,
-  colorHex: DEFAULT_RING_COLOR
+  colorHex: DEFAULT_RING_COLOR,
+  shape: DEFAULT_RING_SHAPE
 }
 
 export const DEFAULT_OVERLAY_AUTO_HIDE: OverlayAutoHidePrefs = {
@@ -276,7 +317,8 @@ export function normalizeCursorRing(value: unknown): CursorRingPrefs {
     enabled: bool(v.enabled, DEFAULT_CURSOR_RING.enabled),
     sizePx,
     thicknessPx: Math.max(MIN_RING_THICKNESS_PX, Math.min(thickness, Math.floor(sizePx / 2))),
-    colorHex: normalizeRingColor(v.colorHex)
+    colorHex: normalizeRingColor(v.colorHex),
+    shape: normalizeRingShape(v.shape)
   }
 }
 

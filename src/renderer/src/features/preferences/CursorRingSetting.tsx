@@ -2,8 +2,9 @@
 //
 // A thick circle that follows the mouse, drawn ONLY over the EverQuest window (owner request:
 // "I lose my mouse on EQ screens"). Off by default; the toggle is the only thing that makes it
-// exist. It is white until the player picks another colour (JOS-125), and the default is the
-// old colour exactly, so nobody's ring changes by upgrading.
+// exist. It is white until the player picks another colour (JOS-125), and a circle until the
+// player picks another shape (owner, 2026-11-26); both defaults are the old ring exactly, so
+// nobody's ring changes by upgrading.
 //
 // THE NOTE ABOUT SCOPE IS NOT DECORATION. "Only over EverQuest" is the single most surprising
 // thing about this feature — a user who turns it on while reading Preferences sees nothing
@@ -17,7 +18,7 @@
 // ONE BORDER: PreferencesView wraps each item in an outlined Paper, so this renders bare Stacks.
 
 import { type JSX, useCallback, useState } from 'react'
-import { FormControlLabel, Slider, Stack, Switch, Typography } from '@mui/material'
+import { FormControlLabel, MenuItem, Select, Slider, Stack, Switch, Typography } from '@mui/material'
 import AdjustIcon from '@mui/icons-material/Adjust'
 import type { PrefSection } from './PreferencesView'
 import { recordPref, usePrefsSeed } from './prefsHydration'
@@ -27,8 +28,12 @@ import {
   MAX_RING_THICKNESS_PX,
   MIN_RING_SIZE_PX,
   MIN_RING_THICKNESS_PX,
+  RING_SHAPES,
+  type RingShape,
+  normalizeRingShape,
   ringStrokeColor
 } from '@shared/presencePrefs'
+import { innerMarkStyle, ringBoxStyle, ringGeometry } from '@shared/cursorRingShape'
 
 /**
  * SEEDED from the pane's hydration snapshot, written back on every change; main's reply is
@@ -68,24 +73,96 @@ function useCursorRing(): [CursorRingPrefs, (patch: Partial<CursorRingPrefs>) =>
  * the ticket was about, is fixed at the window that draws it.
  */
 function RingPreview({ prefs }: { prefs: CursorRingPrefs }): JSX.Element {
+  // The SAME seams the ring window paints with — `ringStrokeColor` for the colour, `ringGeometry`
+  // for the shape — so what this sample shows is what the game gets, not a second opinion.
+  const stroke = ringStrokeColor(prefs.colorHex)
+  const g = ringGeometry(prefs)
   return (
+    // A box the size of the footprint, so picking the oval or the diamond does not shift the row.
     <div
-      data-testid="pref-cursor-ring-preview"
       style={{
         width: prefs.sizePx,
         height: prefs.sizePx,
-        boxSizing: 'border-box',
-        borderRadius: '50%',
-        borderStyle: 'solid',
-        borderWidth: prefs.thicknessPx,
-        // The SAME seam the ring window paints with, so what this sample shows is what the game
-        // gets — not a second opinion about how a hex becomes a stroke.
-        borderColor: ringStrokeColor(prefs.colorHex),
-        boxShadow:
-          '0 0 0 1px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(0,0,0,0.6), 0 0 14px 4px rgba(0,0,0,0.28)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         flexShrink: 0
       }}
-    />
+    >
+      <div
+        data-testid="pref-cursor-ring-preview"
+        data-shape={prefs.shape}
+        style={{
+          ...ringBoxStyle(g, stroke),
+          position: 'relative',
+          boxSizing: 'border-box',
+          borderStyle: 'solid',
+          boxShadow: RING_SHADOW,
+          transform: g.rotateDeg === 0 ? undefined : `rotate(${g.rotateDeg}deg)`,
+          flexShrink: 0
+        }}
+      >
+        {g.inner && (
+          <div
+            style={{
+              ...innerMarkStyle(g.inner, stroke),
+              position: 'absolute',
+              boxSizing: 'border-box',
+              borderRadius: '50%',
+              borderStyle: 'solid',
+              boxShadow: INNER_SHADOW
+            }}
+          />
+        )}
+      </div>
+    </div>
+  )
+}
+
+/** cursor.html's three readability shadows, and the inner mark's two contours. */
+const RING_SHADOW =
+  '0 0 0 1px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(0,0,0,0.6), 0 0 14px 4px rgba(0,0,0,0.28)'
+const INNER_SHADOW = '0 0 0 1px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(0,0,0,0.6)'
+
+/** What each shape is called in the picker, in `RING_SHAPES` order. */
+const SHAPE_LABELS: Record<RingShape, string> = {
+  circle: 'Circle',
+  oval: 'Oval',
+  square: 'Square',
+  rounded: 'Rounded square',
+  diamond: 'Diamond',
+  dot: 'Ring with a centre dot',
+  target: 'Target (double ring)'
+}
+
+/** The shape picker (owner, 2026-11-26). A plain select: seven names read better as words than
+ *  as a row of tiny icons, and main re-checks the value (an unknown one draws the circle). */
+function RingShapePicker({
+  prefs,
+  onChange
+}: {
+  prefs: CursorRingPrefs
+  onChange: (patch: Partial<CursorRingPrefs>) => void
+}): JSX.Element {
+  return (
+    <Stack sx={{ minWidth: 180 }}>
+      <Typography variant="caption" color="text.secondary">
+        Shape
+      </Typography>
+      <Select
+        size="small"
+        data-testid="pref-cursor-ring-shape"
+        value={prefs.shape}
+        onChange={(e) => onChange({ shape: normalizeRingShape(e.target.value) })}
+        sx={{ width: 200 }}
+      >
+        {RING_SHAPES.map((shape) => (
+          <MenuItem key={shape} value={shape}>
+            {SHAPE_LABELS[shape]}
+          </MenuItem>
+        ))}
+      </Select>
+    </Stack>
   )
 }
 
@@ -203,6 +280,7 @@ export function CursorRingSetting(): JSX.Element {
 
       <Stack direction="row" spacing={3} alignItems="center" flexWrap="wrap" useFlexGap>
         <RingSliders prefs={prefs} onChange={update} />
+        <RingShapePicker prefs={prefs} onChange={update} />
         <RingColor prefs={prefs} onChange={update} />
         <RingPreview prefs={prefs} />
       </Stack>
@@ -233,7 +311,7 @@ export function cursorRingSection(): PrefSection {
         id: 'cursor-ring',
         label: 'Cursor ring',
         keywords:
-          'cursor mouse pointer ring circle halo highlight find lost locate ultimate size thickness white color colour picker',
+          'cursor mouse pointer ring circle halo highlight find lost locate ultimate size thickness white color colour picker shape oval square rounded diamond dot target bullseye double',
         content: <CursorRingSetting />
       }
     ]

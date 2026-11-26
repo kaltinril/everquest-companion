@@ -3,7 +3,8 @@
 // It lives in `src/renderer/src/overlay/` beside the meters but shares NOTHING with them: no
 // React, no MUI, no theme, no shared component. The meters are a UI; this is one <div> that
 // moves. Pulling in a framework to move a div would add a reconciler to the hottest path in the
-// app for no expressible benefit — so this file is plain DOM, and it is the whole module.
+// app for no expressible benefit — so this file is plain DOM. The one thing it shares is the pure
+// shape arithmetic (`shared/cursorRingShape.ts`), which the Preferences sample reads too.
 //
 // ============================ THE PERFORMANCE CONTRACT ============================
 // The owner's requirement was "it can't feel like it's lagging". Three rules make that true,
@@ -19,14 +20,18 @@
 //      between two frames, nine are overwritten and cost a single assignment each. Queueing
 //      them would be exactly the "feels laggy" failure — a ring replaying where the mouse USED
 //      to be.
-//   3. COMPOSITOR-ONLY PAINTING. The ring element is created once, sized once (and again only
-//      when the user changes the setting), and thereafter only its `transform` changes. That is
-//      a GPU layer translation: no canvas, no repaint, no layout, no style recalc that touches
-//      anything else. There is no timer in this file at all — no rAF is scheduled while the
+//   3. COMPOSITOR-ONLY PAINTING. The ring element (and its inner mark, a child that rides along)
+//      is created once, sized once (and again only when the user changes a setting, the SHAPE
+//      included), and thereafter only the ring's `transform` changes. That is a GPU layer
+//      translation: no canvas, no repaint, no layout, no style recalc that touches anything
+//      else. The diamond's 45-degree turn is part of the same transform string, so it costs
+//      nothing more. There is no timer in this file at all — no rAF is scheduled while the
 //      mouse is still, because main sends nothing while the point is unchanged.
 
 import { ringStrokeColor } from '@shared/presencePrefs'
 import type { CursorPoint, CursorRingPrefs } from '@shared/presencePrefs'
+import { innerMarkStyle, ringBoxStyle, ringGeometry, ringTransform } from '@shared/cursorRingShape'
+import type { RingGeometry } from '@shared/cursorRingShape'
 
 /** The bridge `preload/cursor.ts` installs. Narrow on purpose — this window can receive its
  *  config and a stream of points, and can do nothing else. */
@@ -41,24 +46,33 @@ declare global {
 }
 
 const ringEl = document.getElementById('ring')
-// cursor.html always carries #ring; fail loudly rather than silently tracking nothing.
-if (!ringEl) throw new Error('cursorRing: #ring element missing from cursor.html')
+const innerEl = document.getElementById('ring-inner')
+// cursor.html always carries both; fail loudly rather than silently tracking nothing.
+if (!ringEl || !innerEl) throw new Error('cursorRing: #ring or #ring-inner missing from cursor.html')
 // Re-bound with a non-null declared type: TS resets narrowing inside the closures below.
 const ring: HTMLElement = ringEl
+const inner: HTMLElement = innerEl
 
-/** Half the diameter — the offset that centres the ring on the pointer. Recomputed only when
- *  the size setting changes, so the hot path is two subtractions. */
-let radius = 0
+/** The chosen shape as a box (size, stroke, corners, turn, inner mark). Recomputed only when a
+ *  setting changes, so the hot path is two subtractions and a string. Until the config arrives
+ *  it is the default circle, the same box cursor.html's static rule draws. */
+let geometry: RingGeometry = ringGeometry({ sizePx: 0, thicknessPx: 1 })
 
 function applyConfig(cfg: CursorRingPrefs): void {
-  radius = cfg.sizePx / 2
-  ring.style.width = `${cfg.sizePx}px`
-  ring.style.height = `${cfg.sizePx}px`
-  ring.style.borderWidth = `${cfg.thicknessPx}px`
+  geometry = ringGeometry(cfg)
   // The colour is a STYLE assignment, so only a `#rrggbb` may reach it — `ringStrokeColor` takes
   // the value through the same normalizer main stored it through, and answers with an rgba()
   // built from three numbers. Nothing a store file could carry becomes a CSS declaration here.
-  ring.style.borderColor = ringStrokeColor(cfg.colorHex)
+  const stroke = ringStrokeColor(cfg.colorHex)
+  Object.assign(ring.style, ringBoxStyle(geometry, stroke))
+  // The inner mark (centre dot, the target's inner ring) is a child of the ring, so the ring's
+  // transform carries it: it is styled here, once, and never touched on a move.
+  if (geometry.inner) {
+    Object.assign(inner.style, innerMarkStyle(geometry.inner, stroke))
+    inner.style.display = 'block'
+  } else {
+    inner.style.display = 'none'
+  }
   // Re-centre on the last known point. Without this a size change while the mouse is STILL
   // would leave the ring off-centre by the radius delta until the pointer next moved — and a
   // Preferences slider is exactly the moment the pointer is somewhere else entirely.
@@ -75,9 +89,10 @@ let queued = false
 function paint(): void {
   queued = false
   if (!latest) return
-  // Translate only. Rounding to whole pixels keeps the ring off half-pixel boundaries, where
-  // the compositor would resample the border and make a crisp 4px stroke look soft.
-  ring.style.transform = `translate3d(${Math.round(latest.x - radius)}px, ${Math.round(latest.y - radius)}px, 0)`
+  // Translate only (plus the diamond's fixed turn). Rounding to whole pixels keeps the ring off
+  // half-pixel boundaries, where the compositor would resample the border and make a crisp 4px
+  // stroke look soft. For the circle this is the very string the ring has always been given.
+  ring.style.transform = ringTransform(geometry, latest)
 }
 
 /** Ask for at most ONE frame. Calling this ten times between two frames costs nine boolean

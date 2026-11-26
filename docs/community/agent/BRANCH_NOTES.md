@@ -3507,3 +3507,25 @@ what a later change must know. Each fix has a unit test that failed before it.
 - **Combat copy.** Under "With its owner" the level-1 paste follows `petGroupPrintLines` (master,
   pets, `Together`). The per-mob drill reads "all sources combined": its events are everything but
   `enemy`, so a group's damage is in it.
+
+## Cursor ring: shapes (2026-11-26, requirements/cursor-ring.md)
+
+- **Field:** `CursorRingPrefs.shape` (`RingShape`: `circle` | `oval` | `square` | `rounded` |
+  `diamond` | `dot` | `target`), default `circle`. Rides the `cursorRing` blob with no schema bump,
+  like `colorHex`: `normalizeRingShape` takes `unknown`, and an unknown or missing name draws the
+  circle (store file, renderer, share import, a config sent without one).
+- **Geometry:** `shared/cursorRingShape.ts` `ringGeometry` (box, stroke, radius, turn, inner mark)
+  and `ringTransform`. The ring window and the Preferences sample both read it; never a second copy.
+  Every shape fits the `sizePx` footprint: oval = full width, 60% height; diamond = side
+  size/sqrt(2) turned 45 degrees. The drawn stroke is capped at half the shorter side; the stored
+  thickness is not touched.
+- **Default pinned:** the circle's geometry and transform string are the old ring's exactly
+  (`tests/cursorRingShape.test.mts`); `cursorRingZoom.test.mts` now pins the centring line in the
+  shape module.
+- **Performance contract, extended:** still one moving element. `dot` and `target` draw their inner
+  mark on `#ring-inner`, a child of `#ring` styled once per config, so the ring's transform carries
+  it. The diamond's `rotate(45deg)` is appended to the same transform string, after the translate.
+  No timer, no canvas, no layout on a move.
+- **Queued (owner, 2026-11-26: shapes first):** icon upload (would add `'image'` to `RingShape`; the
+  window then draws a picture; cursor.html's CSP has `img-src 'none'` today), NxN drawing grid,
+  crosshair (full-window lines, own colour and weight), trail / particles.
