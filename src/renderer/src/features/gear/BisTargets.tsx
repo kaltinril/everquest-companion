@@ -7,13 +7,13 @@
 // loadout at" and this column edit the same number. Off by default: the column and its fill buttons
 // show only after "Set targets".
 //
-// THE ATTRIBUTE CAP: Legends publishes 510 (agent/MEASURED.md); reincarnation AAs raise it ("a permanent
-// increase to your stat caps", Rulers of Kunark page) but no page states by how much, so the player
-// types their own and the fill uses it.
+// THE ATTRIBUTE CAP: 510 hard, or the soft cap the log's reincarnations and the Alt. Advancement ranks give
+// (shared/reincarnationCap.ts, owner 2026-11-25). "Your stat cap" starts there; a number the player types wins.
 
 import { useEffect, useState, type JSX } from 'react'
 import { Button, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import type { TierChip, TierSetup } from '@shared/planner/tierChips'
+import { statCapCaption, type StatCap } from '@shared/reincarnationCap'
 import { CAPPED_ATTRIBUTES, LEGENDS_STAT_CAP, tankResistTargets, withCaps, type BisPrefs } from './bisPrefs'
 import type { TotalsRow } from './bisText'
 
@@ -24,6 +24,8 @@ export interface BisTargetsProps {
   prefs: BisPrefs
   setPrefs: (p: BisPrefs) => void
   setup: TierSetup
+  /** the attribute cap in force: hard 510 or the reincarnation soft cap */
+  statCap: StatCap
 }
 
 /** One target box: typed freely, committed on Enter or leaving the box; empty clears it. */
@@ -48,10 +50,14 @@ function TargetInput({ row, onSet }: { row: TotalsRow; onSet: (chip: TierChip, v
   )
 }
 
-function Toolbar({ prefs, setPrefs, setup }: Omit<BisTargetsProps, 'rows' | 'plus'>): JSX.Element {
-  const [cap, setCap] = useState(String(prefs.statCap))
+function Toolbar({ prefs, setPrefs, setup, statCap: inForce }: Omit<BisTargetsProps, 'rows' | 'plus'>): JSX.Element {
+  const typed = prefs.statCap !== LEGENDS_STAT_CAP ? prefs.statCap : inForce.value
+  const [cap, setCap] = useState(String(typed))
+  useEffect(() => setCap(String(typed)), [typed])
   const set = (change: Partial<Record<TierChip, number | undefined>>): void => setPrefs(withCaps(prefs, setup, change))
-  const statCap = Number(cap) > 0 ? Math.round(Number(cap)) : LEGENDS_STAT_CAP
+  const statCap = Number(cap) > 0 ? Math.round(Number(cap)) : inForce.value
+  // Only a number the player changed is kept, so the cap follows the next reincarnation by itself.
+  const kept = statCap === inForce.value ? LEGENDS_STAT_CAP : statCap
   return (
     <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap data-testid="bis-targets-bar">
       <Button size="small" variant={prefs.targets ? 'contained' : 'outlined'} onClick={() => setPrefs({ ...prefs, targets: !prefs.targets })} data-testid="bis-targets-toggle">
@@ -67,18 +73,18 @@ function Toolbar({ prefs, setPrefs, setup }: Omit<BisTargetsProps, 'rows' | 'plu
             label="Your stat cap"
             value={cap}
             onChange={(e) => setCap(e.target.value)}
-            onBlur={() => setPrefs({ ...prefs, statCap })}
+            onBlur={() => setPrefs({ ...prefs, statCap: kept })}
             slotProps={{ htmlInput: { inputMode: 'numeric', 'data-testid': 'bis-stat-cap' } }}
             sx={{ width: 120 }}
           />
-          <Button size="small" variant="outlined" onClick={() => setPrefs({ ...withCaps(prefs, setup, Object.fromEntries(CAPPED_ATTRIBUTES.map((c) => [c, statCap]))), statCap })} data-testid="bis-targets-attrs">
+          <Button size="small" variant="outlined" onClick={() => setPrefs({ ...withCaps(prefs, setup, Object.fromEntries(CAPPED_ATTRIBUTES.map((c) => [c, statCap]))), statCap: kept })} data-testid="bis-targets-attrs">
             Attributes to the cap
           </Button>
           <Button size="small" color="warning" onClick={() => set(Object.fromEntries(Object.keys(prefs.caps).map((c) => [c, undefined])))} data-testid="bis-targets-clear">
             Clear targets
           </Button>
           <Typography variant="caption" color="text.secondary" sx={{ flexBasis: '100%' }}>
-            A target stops a stat counting once the loadout reaches it, so the sheet spends the remaining slots on your other stats. Attributes stop counting at 510 by default (the hard cap on eqlwiki's Statistics page), STA inside HP and INT/WIS inside Mana too; a target you set wins. Reincarnation AAs raise the cap (no published amount), so type your own.
+            A target stops a stat counting once the loadout reaches it, so the sheet spends the remaining slots on your other stats. Attributes stop counting at {statCapCaption(inForce)}, STA inside HP and INT/WIS inside Mana too; a target you set wins.
           </Typography>
         </>
       )}
@@ -86,11 +92,11 @@ function Toolbar({ prefs, setPrefs, setup }: Omit<BisTargetsProps, 'rows' | 'plu
   )
 }
 
-export default function BisTargets({ rows, plus, prefs, setPrefs, setup }: BisTargetsProps): JSX.Element {
+export default function BisTargets({ rows, plus, prefs, setPrefs, setup, statCap }: BisTargetsProps): JSX.Element {
   const onSet = (chip: TierChip, v: number | undefined): void => setPrefs(withCaps(prefs, setup, { [chip]: v }))
   return (
     <Stack spacing={1}>
-      <Toolbar prefs={prefs} setPrefs={setPrefs} setup={setup} />
+      <Toolbar prefs={prefs} setPrefs={setPrefs} setup={setup} statCap={statCap} />
       <Table size="small" data-testid="bis-totals">
         <TableHead>
           <TableRow>

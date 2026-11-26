@@ -14,7 +14,7 @@ import { ITEM_UPGRADE_BASE, type ItemUpgradeState } from '@shared/itemUpgrade'
 import { alignPairsToWorn, buildBisSheet, defaultChipCaps, itemHasteCap, usableBy } from '@shared/planner/bisSheet'
 import type { GearRow } from '@shared/planner/gear'
 import { scaleGearRow } from '@shared/planner/gearScale'
-import { itemHasteRoom, maxCharacterLevel } from '@shared/planner/statCaps'
+import { attributeCaps, itemHasteRoom, maxCharacterLevel, type StatCaps } from '@shared/planner/statCaps'
 import { activeChips, type TierChip, type TierSetup } from '@shared/planner/tierChips'
 import { GUIDE_CREDIT } from '@shared/planner/tierDefaults'
 import type { TierModel } from '@shared/planner/tierWeights'
@@ -27,6 +27,7 @@ import { useWishlist } from '../wishlist/useWishlist'
 import { wishFromGear } from '../wishlist/wishSearch'
 import BisCells, { type BisWishes, type WornCell } from './BisCells'
 import BisTargets from './BisTargets'
+import { useReincarnationCap } from '../aa/useAaRanks'
 import BisStartFrom from './BisStartFrom'
 import { activeSetup, clampLevel, clampSpellHaste, withCleared, withPasted, withSplit, type BisPrefs } from './bisPrefs'
 import { loadoutTotals, ownedCopies, totalsRows } from './bisText'
@@ -126,7 +127,7 @@ function Controls({ prefs, setPrefs, classes, setup }: { prefs: BisPrefs; setPre
  * same state (`scaleAll`, the Gear table's own scaling), so the cards, the hover and the totals compare
  * like with like. The model (units) stays measured at base, so the slider moves scores, not what S means.
  */
-function useBisSheet(rows: readonly GearRow[], prefs: BisPrefs, { classes, model, state }: { classes: readonly ClassAbbr[]; model: TierModel; state: ItemUpgradeState }) {
+function useBisSheet(rows: readonly GearRow[], prefs: BisPrefs, { classes, model, state, statCaps }: { classes: readonly ClassAbbr[]; model: TierModel; state: ItemUpgradeState; statCaps: StatCaps }) {
   const { eraHidden } = useEraHidden()
   const ownership = useGearOwnership()
   const compare = useGearCompare(rows, ITEM_UPGRADE_BASE)
@@ -137,11 +138,11 @@ function useBisSheet(rows: readonly GearRow[], prefs: BisPrefs, { classes, model
   const worn = useWorn(compare, state)
   const hasteRoom = itemHasteRoom(prefs.level, prefs.spellHaste)
   const built = useMemo(
-    () => buildBisSheet({ rows: scaled, setup, model, classes, admit, owned: prefs.owned ? owned : undefined, hasteRoom }),
-    [scaled, setup, model, classes, admit, owned, prefs.owned, hasteRoom]
+    () => buildBisSheet({ rows: scaled, setup, model, classes, admit, owned: prefs.owned ? owned : undefined, hasteRoom, statCaps }),
+    [scaled, setup, model, classes, admit, owned, prefs.owned, hasteRoom, statCaps]
   )
   const sheet = useMemo(() => alignPairsToWorn(built, (cell) => worn.cells.get(cell)?.row?.key), [built, worn])
-  const totals = useMemo(() => totalsRows(sheet.totals, loadoutTotals(worn.rows, model, setup.split, itemHasteCap({ setup, hasteRoom })), setup, defaultChipCaps()), [sheet, worn, model, setup, hasteRoom])
+  const totals = useMemo(() => totalsRows(sheet.totals, loadoutTotals(worn.rows, model, setup.split, itemHasteCap({ setup, hasteRoom })), setup, defaultChipCaps(statCaps)), [sheet, worn, model, setup, hasteRoom, statCaps])
   return { setup, owned, admit, worn, sheet, totals, hasteRoom }
 }
 
@@ -153,7 +154,10 @@ export default function BisView({ onOpenLoot }: BisViewProps = {}): JSX.Element 
   const plus = useDeferredValue(upgrade.state)
   const model = useTierModel(rows, classes.classes, prefs.level)
   const wishes = useBisWishes()
-  const { setup, owned, admit, worn, sheet, totals, hasteRoom } = useBisSheet(rows, prefs, { classes: classes.classes, model, state: plus })
+  // The attribute cap: hard 510, or the soft cap the log's reincarnations and the AA ranks give (owner, 2026-11-25).
+  const statCap = useReincarnationCap()
+  const statCaps = useMemo(() => attributeCaps(statCap), [statCap])
+  const { setup, owned, admit, worn, sheet, totals, hasteRoom } = useBisSheet(rows, prefs, { classes: classes.classes, model, state: plus, statCaps })
   const stated = useStated(rows, model, classes.classes, admit)
   const lane = (chip: TierChip, tier: TierSetup['board'][TierChip]): void => setPrefs({ ...prefs, board: { ...setup.board, [chip]: tier } })
   const cap = (chip: TierChip, value: number | undefined): void => {
@@ -200,7 +204,7 @@ export default function BisView({ onOpenLoot }: BisViewProps = {}): JSX.Element 
           </Typography>
         </Stack>
       </Box>
-      <BisTargets rows={totals} plus={plus.full} prefs={prefs} setPrefs={setPrefs} setup={setup} />
+      <BisTargets rows={totals} plus={plus.full} prefs={prefs} setPrefs={setPrefs} setup={setup} statCap={statCap} />
     </Box>
   )
 }

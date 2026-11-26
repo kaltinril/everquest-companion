@@ -10,9 +10,11 @@ import {
   RULERS_OF_KUNARK,
   SOFT_CAP_OVER,
   reincarnationStatCap,
+  statCapCaption,
   statCapOf
 } from '../src/shared/reincarnationCap'
 import { rankAas } from '../src/shared/aaRanks'
+import { ATTRIBUTES, KUNARK_LAUNCH, attributeCaps, countedAmount } from '../src/shared/planner/statCaps'
 import { reincarnations } from '../src/shared/reincarnationClimbs'
 import type { AASpendEvent, LevelEvent } from '../src/shared/types'
 
@@ -73,4 +75,23 @@ test('the reincarnations come from the log with their race', () => {
   ])
   const ranked = rankAas([], {}, found.map((r) => r.race))
   assert.equal(statCapOf(ranked, found.map((r) => r.ts)).value, 510 + 11 + 10 + 5 + 3)
+})
+
+test('one Rulers of Kunark date and one 510 serve the sheet and the AA tab', () => {
+  assert.equal(RULERS_OF_KUNARK, KUNARK_LAUNCH.getTime())
+})
+
+test('the Best in slot sheet gets the soft cap on all seven attributes', () => {
+  const cap = reincarnationStatCap({ reincarnationTimes: [BEFORE], humanRanks: 1, halfElfRanks: 0 })
+  const caps = attributeCaps(cap)
+  for (const a of ATTRIBUTES) assert.deepEqual(caps[a], { value: 525, over: 0.2 })
+  // 535 STR across the loadout: 525 in full, the 10 above at a fifth.
+  assert.equal(countedAmount(535, caps.STR), 527)
+})
+
+test('the sheet says where its cap came from', () => {
+  const hard = statCapCaption(reincarnationStatCap({ reincarnationTimes: [], humanRanks: 0, halfElfRanks: 0 }))
+  assert.match(hard, /^510 by default \(the hard cap/)
+  const soft = statCapCaption(reincarnationStatCap({ reincarnationTimes: [BEFORE, AFTER], humanRanks: 0, halfElfRanks: 0 }))
+  assert.match(soft, /^531 by default, a soft cap from your 2 reincarnations/)
 })

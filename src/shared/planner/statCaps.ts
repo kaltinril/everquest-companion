@@ -54,3 +54,8 @@ export function hasteCapAt(level: number): number {
 export function itemHasteRoom(level: number, spellHaste: number): number {
   return Math.max(0, hasteCapAt(level) - Math.max(0, spellHaste))
 }
+
+/** Every attribute at one cap: the reincarnation soft cap (shared/reincarnationCap.ts), or the hard default. */
+export function attributeCaps(cap: StatCap): StatCaps {
+  return Object.fromEntries(ATTRIBUTES.map((a) => [a, { value: cap.value, over: cap.over }]))
+}
