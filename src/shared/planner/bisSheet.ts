@@ -29,6 +29,7 @@ import { gearHandedness } from './roleWeights'
 import { RATIO_CHIPS, activeChips, isRatioChip, tierWeight, type TierChip, type TierSetup } from './tierChips'
 import { ratioCounts, round3, tierTerms, type TierModel, type TierTerm } from './tierWeights'
 import { PLAN_SLOTS, equipSlotOf, isAnyCell, type PlanSlotId } from './types'
+import { isUnobtainable } from './unobtainable'
 
 export interface BisOptions {
   rows: readonly GearRow[]
@@ -190,10 +191,11 @@ function scoreCell(cell: PlanSlotId, rows: readonly GearRow[], opts: BisOptions)
   return out.sort((a, b) => b.prio - a.prio || b.display - a.display || a.row.name.localeCompare(b.row.name))
 }
 
-/** The rows the sheet may use at all: the class picks, the caller's gates, owned-only. */
+/** The rows the sheet may use at all: obtainable, the class picks, the caller's gates, owned-only. */
 function admitted(opts: BisOptions): GearRow[] {
   return opts.rows.filter(
-    (row) => usableBy(row, opts.classes) && (opts.admit === undefined || opts.admit(row)) && (opts.owned === undefined || (opts.owned.get(row.key) ?? 0) > 0)
+    (row) =>
+      !isUnobtainable(row) && usableBy(row, opts.classes) && (opts.admit === undefined || opts.admit(row)) && (opts.owned === undefined || (opts.owned.get(row.key) ?? 0) > 0)
   )
 }
 
