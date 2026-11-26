@@ -13,7 +13,8 @@ icon (it can either be auto downsized if it's not a lot of code bloat, or, requi
 icon) 2. a simple quick NxN grid they can draw on like paint 3. a cross hair like thing, 1 vertical
 line across the entire screen at the mouse posiiton, and 1 horizontal at the mouse position (they
 can control line color and weight) 4. trail/particle affects". Then, the same day: "ok can we just
-add more shapes for now".
+add more shapes for now". Then: "can we also control the offset, X/Y, with a demo showing the icon
+and mouse ?"
 
 | Date | Asked by | The ask | Status |
 | --- | --- | --- | --- |
@@ -22,3 +23,4 @@ add more shapes for now".
 | 2026-11-26 | owner | A simple NxN grid the player can draw on, like Paint, to make their own cursor mark. | queued (owner, 2026-11-26: shapes first) |
 | 2026-11-26 | owner | A crosshair: one vertical line across the whole screen at the pointer and one horizontal line, with the line colour and weight the player's to choose. | queued (owner, 2026-11-26: shapes first) |
 | 2026-11-26 | owner | Trail / particle effects behind the pointer. | queued (owner, 2026-11-26: shapes first) |
+| 2026-11-26 | owner | Control the X/Y offset of the mark from the pointer, with a demo showing the mark and the mouse. | built (Preferences > Cursor ring > Offset X / Offset Y, -60 to +60 px, 0/0 default; the sample draws a mouse arrow with its tip on the pointer spot and the shape at the offset) |

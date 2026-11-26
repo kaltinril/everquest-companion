@@ -24,16 +24,17 @@ import type { PrefSection } from './PreferencesView'
 import { recordPref, usePrefsSeed } from './prefsHydration'
 import {
   type CursorRingPrefs,
+  MAX_RING_OFFSET_PX,
   MAX_RING_SIZE_PX,
   MAX_RING_THICKNESS_PX,
+  MIN_RING_OFFSET_PX,
   MIN_RING_SIZE_PX,
   MIN_RING_THICKNESS_PX,
   RING_SHAPES,
   type RingShape,
-  normalizeRingShape,
-  ringStrokeColor
+  normalizeRingShape
 } from '@shared/presencePrefs'
-import { innerMarkStyle, ringBoxStyle, ringGeometry } from '@shared/cursorRingShape'
+import { CursorRingDemo } from './CursorRingDemo'
 
 /**
  * SEEDED from the pane's hydration snapshot, written back on every change; main's reply is
@@ -59,70 +60,6 @@ function useCursorRing(): [CursorRingPrefs, (patch: Partial<CursorRingPrefs>) =>
 
   return [prefs, update]
 }
-
-/**
- * A small live sample of the ring, so the sliders describe something you can see without
- * alt-tabbing into the game. Same three shadows as the real thing (cursor.html).
- *
- * IT IS A SAMPLE, NOT A RULER, and one divergence is worth stating rather than rediscovering
- * (JOS-154). This card is drawn in the MAIN window, which carries the app's text size
- * (`uiScale`), while the ring window is pinned at zoom 1 so its CSS pixels stay DIPs — so at 125%
- * this circle is 25% wider on screen than the halo the game gets. Left alone on purpose: a
- * preview that shrank while the labels beside it grew would read as broken, and the number the
- * player is actually choosing is on the slider's own label. The ring's POSITION, which is what
- * the ticket was about, is fixed at the window that draws it.
- */
-function RingPreview({ prefs }: { prefs: CursorRingPrefs }): JSX.Element {
-  // The SAME seams the ring window paints with — `ringStrokeColor` for the colour, `ringGeometry`
-  // for the shape — so what this sample shows is what the game gets, not a second opinion.
-  const stroke = ringStrokeColor(prefs.colorHex)
-  const g = ringGeometry(prefs)
-  return (
-    // A box the size of the footprint, so picking the oval or the diamond does not shift the row.
-    <div
-      style={{
-        width: prefs.sizePx,
-        height: prefs.sizePx,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0
-      }}
-    >
-      <div
-        data-testid="pref-cursor-ring-preview"
-        data-shape={prefs.shape}
-        style={{
-          ...ringBoxStyle(g, stroke),
-          position: 'relative',
-          boxSizing: 'border-box',
-          borderStyle: 'solid',
-          boxShadow: RING_SHADOW,
-          transform: g.rotateDeg === 0 ? undefined : `rotate(${g.rotateDeg}deg)`,
-          flexShrink: 0
-        }}
-      >
-        {g.inner && (
-          <div
-            style={{
-              ...innerMarkStyle(g.inner, stroke),
-              position: 'absolute',
-              boxSizing: 'border-box',
-              borderRadius: '50%',
-              borderStyle: 'solid',
-              boxShadow: INNER_SHADOW
-            }}
-          />
-        )}
-      </div>
-    </div>
-  )
-}
-
-/** cursor.html's three readability shadows, and the inner mark's two contours. */
-const RING_SHADOW =
-  '0 0 0 1px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(0,0,0,0.6), 0 0 14px 4px rgba(0,0,0,0.28)'
-const INNER_SHADOW = '0 0 0 1px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(0,0,0,0.6)'
 
 /** What each shape is called in the picker, in `RING_SHAPES` order. */
 const SHAPE_LABELS: Record<RingShape, string> = {
@@ -211,6 +148,54 @@ function RingSliders({
   )
 }
 
+/** One offset axis. Whole px, clamped in main; 0 is centred on the pointer. */
+function OffsetSlider({
+  axis,
+  value,
+  onChange
+}: {
+  axis: 'X' | 'Y'
+  value: number
+  onChange: (v: number) => void
+}): JSX.Element {
+  return (
+    <Stack sx={{ minWidth: 180 }}>
+      <Typography variant="caption" color="text.secondary">
+        Offset {axis} ({value > 0 ? `+${value}` : value}px{axis === 'X' ? ', + is right' : ', + is down'})
+      </Typography>
+      <Slider
+        size="small"
+        data-testid={`pref-cursor-ring-offset-${axis.toLowerCase()}`}
+        min={MIN_RING_OFFSET_PX}
+        max={MAX_RING_OFFSET_PX}
+        step={1}
+        value={value}
+        marks={[{ value: 0 }]}
+        onChange={(_e, v) => onChange(v)}
+        onDoubleClick={() => onChange(0)}
+        sx={{ width: 160 }}
+      />
+    </Stack>
+  )
+}
+
+/** Where the shape sits relative to the pointer (owner, 2026-11-26). Double-click a slider to
+ *  put it back on the pointer. */
+function RingOffsets({
+  prefs,
+  onChange
+}: {
+  prefs: CursorRingPrefs
+  onChange: (patch: Partial<CursorRingPrefs>) => void
+}): JSX.Element {
+  return (
+    <Stack direction="row" spacing={3} alignItems="center" flexWrap="wrap" useFlexGap>
+      <OffsetSlider axis="X" value={prefs.offsetXPx} onChange={(v) => onChange({ offsetXPx: v })} />
+      <OffsetSlider axis="Y" value={prefs.offsetYPx} onChange={(v) => onChange({ offsetYPx: v })} />
+    </Stack>
+  )
+}
+
 /** The one id the caption's `htmlFor` and the colour input share. */
 const COLOR_INPUT_ID = 'pref-cursor-ring-color-input'
 
@@ -279,10 +264,15 @@ export function CursorRingSetting(): JSX.Element {
       </Stack>
 
       <Stack direction="row" spacing={3} alignItems="center" flexWrap="wrap" useFlexGap>
-        <RingSliders prefs={prefs} onChange={update} />
-        <RingShapePicker prefs={prefs} onChange={update} />
-        <RingColor prefs={prefs} onChange={update} />
-        <RingPreview prefs={prefs} />
+        <Stack spacing={1.5}>
+          <Stack direction="row" spacing={3} alignItems="center" flexWrap="wrap" useFlexGap>
+            <RingSliders prefs={prefs} onChange={update} />
+            <RingShapePicker prefs={prefs} onChange={update} />
+            <RingColor prefs={prefs} onChange={update} />
+          </Stack>
+          <RingOffsets prefs={prefs} onChange={update} />
+        </Stack>
+        <CursorRingDemo prefs={prefs} />
       </Stack>
 
       <Typography variant="caption" color="text.secondary">
@@ -311,7 +301,7 @@ export function cursorRingSection(): PrefSection {
         id: 'cursor-ring',
         label: 'Cursor ring',
         keywords:
-          'cursor mouse pointer ring circle halo highlight find lost locate ultimate size thickness white color colour picker shape oval square rounded diamond dot target bullseye double',
+          'cursor mouse pointer ring circle halo highlight find lost locate ultimate size thickness white color colour picker shape oval square rounded diamond dot target bullseye double offset position shift move nudge x y demo',
         content: <CursorRingSetting />
       }
     ]

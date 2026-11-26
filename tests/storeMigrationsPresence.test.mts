@@ -33,8 +33,9 @@ const fixture = (name: string): StoreData => JSON.parse(readFileSync(join(FIXTUR
 // normalizer defaults, so a store already carrying a v5+ ring gains it on its next write and
 // reads as white until then. The colour rules are pinned in tests/cursorRingColor.test.mts.
 // `shape` joined the same way (2026-11-26): unknown or missing reads as the circle the ring has
-// always been. The shape rules are pinned in tests/cursorRingShape.test.mts.
-const RING_DEFAULT = { enabled: false, sizePx: 44, thicknessPx: 4, colorHex: '#ffffff', shape: 'circle' }
+// always been. The shape rules are pinned in tests/cursorRingShape.test.mts. The X/Y offset joined
+// the same way (2026-11-26): missing reads as 0/0, centred (tests/cursorRingOffset.test.mts).
+const RING_DEFAULT = { enabled: false, sizePx: 44, thicknessPx: 4, colorHex: '#ffffff', shape: 'circle', offsetXPx: 0, offsetYPx: 0 }
 const AUTOHIDE_DEFAULT = { hideWhenNotRunning: true, hideWhenUnfocused: false }
 
 /** `store-v4-presence.json` — a fully-populated voice-era store (v0.2.0): characters, alerts
@@ -100,7 +101,9 @@ test('an EXISTING cursor-ring blob is repaired field by field, never replaced wh
     // A CSS colour name is not a hex colour, and the store never learns to speak CSS.
     colorHex: '#ffffff',
     // A shape this build does not know draws the circle.
-    shape: 'circle'
+    shape: 'circle',
+    offsetXPx: 0,
+    offsetYPx: 0
   })
 
   // A stroke wider than the radius is a filled dot, not a ring. A colour the user DID choose
@@ -114,7 +117,9 @@ test('an EXISTING cursor-ring blob is repaired field by field, never replaced wh
     sizePx: 20,
     thicknessPx: 10,
     colorHex: '#ff8800',
-    shape: 'diamond'
+    shape: 'diamond',
+    offsetXPx: 0,
+    offsetYPx: 0
   })
 
   for (const junk of [null, 42, 'nonsense', [], { nested: true }]) {

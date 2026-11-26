@@ -105,7 +105,7 @@ test('a thick stroke on a short shape stays an outline, and the stored thickness
   const prefs = normalizeCursorRing({ sizePx: 20, thicknessPx: 10, shape: 'oval' })
   assert.equal(prefs.thicknessPx, 10)
   assert.equal(ringGeometry(prefs).strokePx, 6)
-  assert.equal(ringGeometry({ ...prefs, shape: 'circle' }).strokePx, 10)
+  assert.equal(ringGeometry({ ...prefs, shape: 'circle', offsetXPx: 0, offsetYPx: 0 }).strokePx, 10)
   for (const shape of RING_SHAPES) {
     const g = ring(shape, 20, 12)
     assert.ok(g.strokePx >= 1 && g.strokePx * 2 <= Math.min(g.widthPx, g.heightPx), shape)
@@ -160,6 +160,6 @@ test('ONLY A KNOWN SHAPE SURVIVES the normalizer', () => {
   }
   // A bad shape never costs the player the rest of their settings.
   const v = normalizeCursorRing({ enabled: true, sizePx: 90, thicknessPx: 6, colorHex: '#00ff00', shape: 'star' })
-  assert.deepEqual(v, { enabled: true, sizePx: 90, thicknessPx: 6, colorHex: '#00ff00', shape: 'circle' })
+  assert.deepEqual(v, { enabled: true, sizePx: 90, thicknessPx: 6, colorHex: '#00ff00', shape: 'circle', offsetXPx: 0, offsetYPx: 0 })
   assert.equal(normalizeCursorRing({ shape: 'diamond' }).shape, 'diamond')
 })

@@ -114,6 +114,9 @@ test('the ring centres on the point it is sent, by subtracting half its own widt
   // geometry it computed from the config; tests/cursorRingShape.test.mts pins its output.
   const SHAPE = codeOf('src/shared/cursorRingShape.ts')
   assert.match(RING, /geometry = ringGeometry\(cfg\)/)
-  assert.match(RING, /ring\.style\.transform = ringTransform\(geometry, latest\)/)
-  assert.match(SHAPE, /translate3d\(\$\{Math\.round\(p\.x - g\.widthPx \/ 2\)\}px, \$\{Math\.round\(p\.y - g\.heightPx \/ 2\)\}px, 0\)/)
+  assert.match(RING, /ring\.style\.transform = ringTransform\(geometry, latest, offset\)/)
+  // The player's X/Y offset (2026-11-26) is added to the point before the half box comes off.
+  assert.match(SHAPE, /Math\.round\(p\.x \+ offset\.x - g\.widthPx \/ 2\)/)
+  assert.match(SHAPE, /Math\.round\(p\.y \+ offset\.y - g\.heightPx \/ 2\)/)
+  assert.match(SHAPE, /translate3d\(\$\{x\}px, \$\{y\}px, 0\)/)
 })
