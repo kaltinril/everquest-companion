@@ -3,7 +3,8 @@
 // STATS/DATA, RESEARCH and CONFIG headings.
 //
 // A heading is keyed by the id of the FIRST section under it; `buildSections` lists the sections
-// in group order. Searching still matches sections, not headings.
+// in group order. Searching still matches sections, not headings. Each heading folds
+// (./PrefsRail.tsx).
 
 export const RAIL_GROUP_STARTS: Readonly<Record<string, string>> = {
   game: 'Game',

@@ -79,8 +79,8 @@
 //             drawing them asks nobody for anything). Lives in ./ThanksSetting.tsx, descriptor
 //             and all. Last in the rail on purpose — see the table.
 
-import { Fragment, type JSX, useCallback, useDeferredValue, useMemo, useState } from 'react'
-import { Box, List, ListItemButton, ListItemText, TextField, Typography } from '@mui/material'
+import { type JSX, useCallback, useDeferredValue, useMemo, useState } from 'react'
+import { Box, TextField, Typography } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt'
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
@@ -92,7 +92,7 @@ import { ClassComboSetting } from '../profiles/ClassComboPanel'
 import { UpdateSetting, VersionSetting, useUpdateStatus } from './UpdateSetting'
 import type { UpdateStatus } from '@shared/types'
 import { dropObsSection, gameSection, logArchiveSection } from './GameSections'
-import { RAIL_GROUP_STARTS } from './prefsRailGroups'
+import { SectionRail } from './PrefsRail'
 // Combat: whose damage the meters show (JOS-115) + where the pet's sits. Its own file with its own
 // descriptor, same ceiling and same answer as PerfSetting and GraphicsSetting.
 import { combatSection } from './CombatSection'
@@ -168,8 +168,6 @@ export interface PrefSection {
    */
   fill?: boolean
 }
-
-const RAIL_WIDTH = 168
 
 /**
  * Spoken alerts (docs/plans/voice-alerts.md §2). Its own factory rather than a literal inside
@@ -400,78 +398,6 @@ function filterSections(
       return { ...s, items: s.items.filter((i) => keys[`${s.id}/${i.id}`]?.includes(q)) }
     })
     .filter((s) => s.items.length > 0)
-}
-
-/**
- * Left rail: one row per section, ALWAYS all of them — it is the switcher, so it can
- * never shrink out from under the user's pointer. `active` is null while searching
- * (there is no single active section in that mode, so nothing is highlighted), and
- * `unmatched` holds the sections the current query found nothing in — those rows dim
- * to say so. They stay clickable on purpose: a query that matches nothing would
- * otherwise disable every row and strand the user in search mode.
- */
-function SectionRail({
-  sections,
-  active,
-  unmatched,
-  onPick
-}: {
-  sections: PrefSection[]
-  active: string | null
-  unmatched: ReadonlySet<string>
-  onPick: (id: string) => void
-}): JSX.Element {
-  return (
-    // The rail scrolls WITHIN the split rather than growing the page: thirteen rows (JOS-198
-    // added Thanks) outgrow a short window, and a rail that stretches the document makes the
-    // whole page scroll — the exact thing the whats-new pane's "the LIST scrolls, never the
-    // page" contract forbids. minHeight: 0 is what lets a flex child shrink below its content.
-    <List dense disablePadding sx={{ width: RAIL_WIDTH, flexShrink: 0, minHeight: 0, overflowY: 'auto' }}>
-      {sections.map((s, i) => {
-        const dim = unmatched.has(s.id)
-        const group = RAIL_GROUP_STARTS[s.id]
-        return (
-          <Fragment key={s.id}>
-            {group && <RailHeading label={group} first={i === 0} />}
-            <ListItemButton
-              dense
-              data-testid={`prefs-rail-${s.id}`}
-              selected={active === s.id}
-              aria-disabled={dim}
-              onClick={() => onPick(s.id)}
-              // Indented 4px under its group heading (owner, 2026-11-26).
-              sx={{ borderRadius: 1, gap: 1, ml: '4px', opacity: dim ? 0.38 : 1 }}
-            >
-              <Box sx={{ display: 'flex', color: 'text.secondary' }}>{s.icon}</Box>
-              <ListItemText slotProps={{ primary: { variant: 'body2' } }} primary={s.label} />
-            </ListItemButton>
-          </Fragment>
-        )
-      })}
-    </List>
-  )
-}
-
-/** A group heading in the rail, in the main nav's style (STATS/DATA, RESEARCH, CONFIG). */
-function RailHeading({ label, first }: { label: string; first: boolean }): JSX.Element {
-  return (
-    <Typography
-      variant="caption"
-      component="div"
-      data-testid={`prefs-rail-group-${label.toLowerCase().replace(/[^a-z]+/g, '-')}`}
-      sx={{
-        px: 2,
-        pt: first ? 0.5 : 1.5,
-        pb: 0.5,
-        color: 'text.secondary',
-        fontWeight: 600,
-        letterSpacing: '0.06em',
-        textTransform: 'uppercase'
-      }}
-    >
-      {label}
-    </Typography>
-  )
 }
 
 /** The search field, sized to the content column so it aligns with the cards it filters. */
