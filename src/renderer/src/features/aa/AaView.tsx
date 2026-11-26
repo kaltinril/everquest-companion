@@ -5,9 +5,10 @@
 // read through useAaRanks. A rank the player picks is kept for this character only.
 
 import { type JSX, useMemo, useState } from 'react'
-import { Box, FormControlLabel, Stack, Switch, Tab, Tabs, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
+import { Box, FormControlLabel, Stack, Switch, Tab, Tabs, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import { resolvedClasses, type ClassAbbr } from '@shared/classCombo'
 import { archetypeRows } from '@shared/aaArchetypeClasses'
+import { AA_POINT_CAP, aaPointsWarnOf } from '@shared/aaPointsWarn'
 import { aaClassGroups, aaGroupRows, aaPointsSpent, aaSectionRows, aaUnplaced, type AaRanked } from '@shared/aaRanks'
 import type { AaSection } from '@shared/aaTable.generated'
 import { statCapOf } from '@shared/reincarnationCap'
@@ -19,6 +20,7 @@ import { Tooltip } from '../../lib/Tooltip'
 import { useComboSnap } from '../profiles/ClassComboData'
 import { AaClassTable, AaTable, type SetPick } from './AaRows'
 import { useAaRanks } from './useAaRanks'
+import { useAaAlertAt, useAaUnspent } from './useAaUnspent'
 
 const TABS: readonly { id: AaSection; label: string }[] = [
   { id: 'general', label: 'General' },
@@ -37,6 +39,8 @@ const UNPLACED_TIP = 'Your log bought these, but no wiki AA row has the same nam
 const MINE_TIP = "Which classes have each Archetype AA, from the game's /alternateadv list, 2026-11-25."
 const MAY_APPLY = 'May apply: melee AAs not yet checked for your classes.'
 const MAY_APPLY_TIP = 'Your classes were only listed beside Warrior and Monk, so these are unconfirmed.'
+const UNSPENT_TIP = 'From your log: the last "You now have" count, less purchases since.'
+const ALERT_AT_TIP = "Turn on the Alerts tab's Unspent AA points alert to hear this."
 
 function Points({ rows }: { rows: AaRanked[] }): JSX.Element {
   const { points, unknown } = aaPointsSpent(rows)
@@ -143,6 +147,45 @@ function SectionTab(p: { section: AaSection; ranked: AaRanked[]; reincarnations:
   )
 }
 
+/** Unspent points with the nav row's warning state, and the alert's N beside them. */
+function UnspentLine(): JSX.Element | null {
+  const unspent = useAaUnspent()
+  const [at, setAt] = useAaAlertAt()
+  const [draft, setDraft] = useState<string | null>(null)
+  if (unspent === null) return null
+  const warn = aaPointsWarnOf(unspent)
+  const commit = (): void => {
+    if (draft !== null && draft.trim() !== '') setAt(Number(draft))
+    setDraft(null)
+  }
+  return (
+    <Stack direction="row" alignItems="center" spacing={2} sx={{ mt: 0.5 }}>
+      <Tooltip title={warn?.tip ?? UNSPENT_TIP}>
+        <Typography variant="body2" color={warn === null ? 'text.primary' : warn.cap ? 'error.main' : 'warning.main'} data-testid="aa-unspent">
+          {`Unspent: ${String(unspent)} of ${String(AA_POINT_CAP)}${warn === null ? '' : ' !'}`}
+        </Typography>
+      </Tooltip>
+      <Tooltip title={ALERT_AT_TIP}>
+        <TextField
+          size="small"
+          type="number"
+          label="Alert at"
+          value={draft ?? String(at)}
+          onChange={(e) => {
+            setDraft(e.target.value)
+          }}
+          onBlur={commit}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') commit()
+          }}
+          sx={{ width: 90 }}
+          slotProps={{ htmlInput: { min: 1, max: AA_POINT_CAP, 'data-testid': 'aa-alert-at' } }}
+        />
+      </Tooltip>
+    </Stack>
+  )
+}
+
 /** Log names no row answers to, so the player is not left wondering where a purchase went. */
 function Unplaced(): JSX.Element | null {
   const snap = useModule<LevelingSnap>('leveling')
@@ -168,6 +211,7 @@ function AaView(): JSX.Element {
       <Typography variant="caption" color="text.secondary">
         {CAPTION}
       </Typography>
+      {ready && <UnspentLine />}
       {ready && <Unplaced />}
       <Tabs
         value={tab}

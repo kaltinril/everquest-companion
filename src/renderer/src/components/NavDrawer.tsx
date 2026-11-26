@@ -38,6 +38,7 @@ import GitHubIcon from '@mui/icons-material/GitHub'
 import HandshakeIcon from '@mui/icons-material/Handshake'
 import AutoStoriesIcon from '@mui/icons-material/AutoStories'
 import UpdateChip from './UpdateChip'
+import AaNavBadge from '../features/aa/AaNavBadge'
 import { useNavMenu } from './useNavMenu'
 import { navPx } from '@shared/navMenu'
 import { useBoolPref } from '../features/combat/useCombatPrefs'
@@ -150,8 +151,8 @@ const GROUPS: NavGroup[] = [
       { view: 'leveling', icon: <TrendingUpIcon /> },
       // SKILLS sits under Leveling: the other thing your log watches go up.
       { view: 'skills', icon: <HandymanIcon /> },
-      // ALT. ADVANCEMENT sits under Skills: the AA ranks the log has seen bought.
-      { view: 'aa', icon: <WorkspacePremiumIcon /> }
+      // ALT. ADVANCEMENT sits under Skills: the AA ranks the log has seen bought. Its '!' is 45+ unspent points.
+      { view: 'aa', icon: <WorkspacePremiumIcon />, badge: <AaNavBadge /> }
     ]
   },
 {

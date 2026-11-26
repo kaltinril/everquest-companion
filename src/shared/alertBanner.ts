@@ -196,7 +196,9 @@ const CELEBRATED_SIGNAL: Record<AppSignal, boolean> = {
   questComplete: true,
   // The Bazaar tab keeps a list of what it heard, but nothing draws a card: the banner is the news.
   bazaarWatch: false,
-  respawnSoon: false
+  respawnSoon: false,
+  // The Alt. Adv. nav row's '!' is a badge, not a card.
+  aaPointsUnspent: false
 }
 
 const isCelebrated = (t: AlertTriggerPrimitive): boolean => t.type === 'app' && CELEBRATED_SIGNAL[t.signal]

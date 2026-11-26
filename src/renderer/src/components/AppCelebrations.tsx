@@ -36,6 +36,7 @@ import { tierStyle } from '../lib/tierChip'
 import AlertPlayer, { fireAppSignal } from '../features/alerts/player'
 import { UnreleasedBazaarWatcher } from '../unreleasedBazaar'
 import RespawnAlertWatcher from '../features/timers/RespawnAlertWatcher'
+import AaPointsWatcher from '../features/aa/AaPointsWatcher'
 import { getBossData } from '../data'
 import { useBossKills } from '../features/bosses/useBossKills'
 import type { TargetStatus } from '../features/bosses/bossStatus'
@@ -183,6 +184,7 @@ export default function AppCelebrations(): JSX.Element {
       <AlertPlayer />
       <UnreleasedBazaarWatcher />
       <RespawnAlertWatcher />
+      <AaPointsWatcher />
       <CelebrationToasts
         defeatToast={defeatToast}
         questToast={questToast}

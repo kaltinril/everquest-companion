@@ -109,6 +109,8 @@ export interface StoreShape {
   alertBazaarSeed?: boolean
   /** True once the respawn pre-alert was seeded (src/main/alertRespawnSeed.ts). */
   alertRespawnSeed?: boolean
+  /** True once the unspent-AA-points alert was seeded (src/main/alertAaPointsSeed.ts). */
+  alertAaPointsSeed?: boolean
   /**
    * WHICH SOUND PACK IS YOURS, AND WHICH SHIPPED ONES YOU THREW AWAY (JOS-273;
    * shared/soundPacks.ts). Two keys, both absent for almost everybody: the default-pack

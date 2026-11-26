@@ -74,16 +74,19 @@ export function computeAAAccounting(gains: AAGainLike[], spends: AASpendLike[]):
     }
   }
 
-  // unspent: last authoritative "You now have M" minus spends strictly after it.
-  // (Same rule as before — index/ts order from the main process is authoritative.)
-  let unspent = 0
-  if (gains.length) {
-    let lastGain = gains[0]
-    for (const g of gains) if (g.ts >= lastGain.ts) lastGain = g
-    let pool = lastGain.nowHave
-    for (const s of spends) if (s.ts > lastGain.ts) pool = Math.max(0, pool - s.cost)
-    unspent = pool
-  }
-
+  const unspent = unspentAaPoints(gains, spends) ?? 0
   return { allocated, unspent, earned: allocated + unspent, boughtCount, lifetimeCost }
+}
+
+/**
+ * The unspent pool: the last authoritative "You now have M" minus spends strictly after it
+ * (index/ts order from the main process is authoritative). Null when no gain line was seen.
+ */
+export function unspentAaPoints(gains: readonly AAGainLike[], spends: readonly AASpendLike[]): number | null {
+  if (gains.length === 0) return null
+  let lastGain = gains[0]
+  for (const g of gains) if (g.ts >= lastGain.ts) lastGain = g
+  let pool = lastGain.nowHave
+  for (const s of spends) if (s.ts > lastGain.ts) pool = Math.max(0, pool - s.cost)
+  return pool
 }

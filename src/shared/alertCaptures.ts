@@ -310,7 +310,8 @@ export const APP_SIGNAL_CAPTURES: Record<AppSignal, readonly string[]> = {
   bossDefeat: [],
   questComplete: [],
   bazaarWatch: ['item', 'seller', 'price', 'what', 'offer', 'why'],
-  respawnSoon: ['mob', 'seconds', 'place', 'zone', 'when']
+  respawnSoon: ['mob', 'seconds', 'place', 'zone', 'when'],
+  aaPointsUnspent: ['points', 'cap']
 }
 
 /**
@@ -328,7 +329,8 @@ export const APP_SIGNAL_SAMPLE_CAPTURES: Record<AppSignal, Record<string, string
     offer: 'Leric WTS Fleeting Quiver +4 18k',
     why: 'at or under your 20k'
   },
-  respawnSoon: { mob: 'Enynti', seconds: '20', place: 'open +0', zone: 'Lake Nerius', when: 'in 20 seconds' }
+  respawnSoon: { mob: 'Enynti', seconds: '20', place: 'open +0', zone: 'Lake Nerius', when: 'in 20 seconds' },
+  aaPointsUnspent: { points: '45', cap: '50' }
 }
 
 /**
