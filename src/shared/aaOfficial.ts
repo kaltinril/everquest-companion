@@ -70,8 +70,6 @@ const GAME: AaSource = { by: 'game', date: '2026-11-25', where: "the game's AA w
 const STRIKE_AS_ONE =
   // The game's own text (#2261); the level is Daybreak's notes'.
   "This passive ability grants the Beastlord a chance on hit to increase their Warder's chance to flurry by 30% for 12 seconds. Requirements: Level 35."
-const POTTERY_4 =
-  'Rank 4: reduces the chance of failing Pottery recipes by 50% and allows you to increase your skill past its Specialization cap by 5 points by learning more recipes.'
 
 const HK_NOTE = 'Refresh 2:00, shared timer 90; rank 3 keeps its passive.'
 
@@ -112,7 +110,7 @@ const ENTRIES: readonly AaCorrection[] = [
   { name: 'Quick Buff', source: notes('2026-09-15', 'eql-update-notes-9-15-2026'), tip: "Daybreak's 2026-09-15 notes: the Quick Buff timer resets on death.", append: 'Its timer resets on death.', onPage: /death/i },
   { name: 'Point Blank Fire', source: notes('2026-09-22', 'eql-update-notes-9-22-2026'), tip: "Daybreak's 2026-09-22 notes: Rangers, Rogues, Monks and Berserkers get it automatically.", append: 'Rangers, Rogues, Monks and Berserkers get it automatically.', onPage: /berserker/i },
   { name: 'Point Blank Fire', source: GAME, tip: "The game's AA window lists it in a Monk combo's Archetype tab.", confirms: true },
-  { name: 'Pottery Mastery', source: GAME, tip: "The game's AA window shows a fourth rank costing 20 points.", ranks: 4, cost: '2/4/6/20', append: POTTERY_4, onPage: /rank 4/i },
+  // No Pottery Mastery entry: the "rank 4, cost 20" text was a stale list right after buying rank 3; the window shows 3/3.
   ...raceRenames(AA_TABLE),
   ...classHotkeys(AA_TABLE),
   { name: 'Special AAs header', source: GAME, tip: "The game's AA window: the hotkeys share ability timer 90, refresh 2 minutes.", gapsOnly: true, header: { says: 'HK Share CoolDown on 90sec timer', should: 'the hotkeys share ability timer 90; each refreshes in 2 minutes (seen on Warrior, Monk, Shaman)', line: '! Name !! Ranks I !! Rank II !! Rank III !! Description !! HK (shared ability timer 90, refresh 2:00)' } },

@@ -36,7 +36,7 @@ test('with no log, each correction the page lacks is a row; one row per AA, name
   assert.deepEqual(fieldsOf(ROWS.get('Rampage')), ['ranks', 'text', 'cost'])
   assert.deepEqual(fieldsOf(ROWS.get('Unbound Strikethrough')), ['name'])
   assert.deepEqual(fieldsOf(ROWS.get('Quick Buff')), ['text', 'text', 'text', 'text'])
-  assert.deepEqual(fieldsOf(ROWS.get('Pottery Mastery')), ['ranks', 'cost', 'text'])
+  assert.equal(ROWS.get('Pottery Mastery'), undefined, 'the game window shows 3/3, as the page says')
   assert.deepEqual(fieldsOf(ROWS.get('Race Reincarnation: Half Elf')), ['name'])
   assert.deepEqual(fieldsOf(ROWS.get('Race Reincarnation: Drakkin')), ['row'])
   assert.equal(ROWS.get('Race Reincarnation: Race 18')?.aaFix?.placeholder, true)

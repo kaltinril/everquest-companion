@@ -396,10 +396,12 @@ Sources beside `plans/2026-11-25-aa-window/`: seven AA-window screenshots and th
   - The game has `Race Reincarnation: Drakkin` (#26145) and a placeholder `Race Reincarnation:
     Race 18` (#26151); the wiki has neither.
   - Rampage 2/2 shows cost 4 (the wiki: 1 rank, cost 5); Daybreak's 2026-10-22 notes added rank 2.
-  - Pottery Mastery prints a fourth rank, cost 20: "reduces the chance of failing Pottery recipes
-    by 50% and allows you to increase your skill past its Specialization cap by 5 points by
-    learning more recipes" (the wiki: 3 ranks, 2/4/6; the window, a minute earlier, 3/3). Seen
-    after a rank-3 purchase at 15:42 (cost 6).
+  - NOT a fourth Pottery Mastery rank. Right after a rank-3 purchase (15:42, cost 6), the 15:44 and
+    15:59 lists still printed Pottery's rank-2 and rank-3 blocks plus a third, "rank 4" text at cost 20
+    ("... past its Specialization cap by 5 points by learning more recipes"). From the first loadout
+    swap (16:02) every list prints one block, rank 3 maxed, and the window shows 3/3 (owner,
+    screenshot). TRAP: a list taken soon after a purchase can be stale until a swap or zone; a hidden
+    rank's text can show there that the game does not sell.
   - Point Blank Fire is in the combo's Archetype list (Monk; Daybreak 2026-09-22: Rangers, Rogues,
     Monks, Berserkers).
 - **The list follows the combo in force and includes AAs not owned** (16:02 to 16:07, WAR + MNK +
@@ -408,7 +410,7 @@ Sources beside `plans/2026-11-25-aa-window/`: seven AA-window screenshots and th
   Every wiki Class table matches the game's per class except the two removed steeds and the
   Unbound(ed) Strikethrough name; `Strike As One` is #2261, cost 6, game text "grants the Beastlord a
   chance on hit to increase their Warder's chance to flurry by 30% for 12 seconds". Costs differ only
-  on Rampage (5 then 4) and Pottery Mastery (rank 4 at 20).
+  on Rampage (5 then 4).
 - **Archetype AAs by class** (the wiki's Archetype table names no classes). In every run, so from
   WAR or MNK (a WAR-out and a MNK-out run would split them): Point Blank Fire, Finishing Blow,
   Improved Bash, Ambidexterity, Double Riposte, Physical Enhancement, Acrobatics, Rampage,

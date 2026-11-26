@@ -72,11 +72,10 @@ test('Quick Buff: the four rules, before Requirements, one mark tooltip for the 
   assert.equal(aaMarkTip(marks), "Daybreak's notes from 2026-05-28 to 2026-09-15 changed this, 4 times.")
 })
 
-test('Point Blank Fire names its classes; Pottery Mastery has its fourth rank at 20', () => {
+test("Point Blank Fire names its classes; Pottery Mastery keeps the wiki's three ranks", () => {
   assert.match(row('Point Blank Fire').text, /Rangers, Rogues, Monks and Berserkers get it automatically\. Requirements: Level 1$/)
   const pot = row('Pottery Mastery')
-  assert.deepEqual([pot.ranks, pot.cost], [4, '2/4/6/20'])
-  assert.match(pot.text, /Rank 4: .*by 5 points by learning more recipes\. Requirements: Level 1\.$/)
+  assert.deepEqual([pot.ranks, pot.cost], [3, '2/4/6'], 'the game window shows 3/3')
 })
 
 test('race rows take the game name; Drakkin is added; Race 18 (a placeholder) stays off the tab', () => {
