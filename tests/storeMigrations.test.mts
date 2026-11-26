@@ -193,8 +193,9 @@ test('an EMPTY pre-framework store migrates to a valid current store, not to jun
     // `audio` is the whole switch), so a fresh store carries configuration and no permission.
     voice: { engine: 'system', voiceId: null, rate: 1, volume: 1 },
     // `colorHex` joined the ring blob in JOS-125 with NO schema bump — one more field the
-    // step-5 normalizer defaults, and white is the colour the ring already had.
-    cursorRing: { enabled: false, sizePx: 44, thicknessPx: 4, colorHex: '#ffffff' },
+    // step-5 normalizer defaults, and white is the colour the ring already had. `shape` joined
+    // the same way (2026-11-26), and the circle is the shape it already had.
+    cursorRing: { enabled: false, sizePx: 44, thicknessPx: 4, colorHex: '#ffffff', shape: 'circle', offsetXPx: 0, offsetYPx: 0, showShape: true, crosshairEnabled: false, crosshairColorHex: '#ffffff', crosshairWeightPx: 2, trail: 'off', trailLength: 5, imageDataUrl: '', drawing: { n: 16, cells: new Array(256).fill('') } },
     overlayAutoHide: { hideWhenNotRunning: true, hideWhenUnfocused: false },
     // `funnelsDone` is the once-ever funnel ledger (src/main/telemetry/funnels.ts): empty here,
     // which is what makes a fresh install able to report `installed` exactly once.

@@ -14,6 +14,9 @@
 // leave any value in any key (storeMigrations.ts's downgrade contract), so `normalize*` takes
 // `unknown` and always answers with a complete, in-range blob.
 
+// The picture's validator lives in its own pure module (no runtime imports of its own, so no cycle).
+import { normalizePictureDataUrl } from './cursorPicture'
+
 /**
  * A screen rectangle in DIP (device-independent pixels) — the coordinate space Electron's
  * `screen.getCursorScreenPoint()` and `BrowserWindow.getBounds()` both speak, and the space a
@@ -153,6 +156,155 @@ export interface CursorRingPrefs {
    * moves nobody's ring. `ringStrokeColor()` is the ONE place it becomes a CSS value.
    */
   colorHex: string
+  /**
+   * The outline the stroke draws (owner, 2026-11-26: "the cursor thing is very plain"). CIRCLE by
+   * default, which is the ring every player has had, so an upgrade moves nobody's ring. Every
+   * shape fits the same `sizePx` footprint; `shared/cursorRingShape.ts` turns one into a box.
+   */
+  shape: RingShape
+  /**
+   * Where the shape sits relative to the pointer's hot spot, in CSS px (owner, 2026-11-26: "can we
+   * also control the offset, X/Y"). Positive X moves it right, positive Y moves it down. 0/0 by
+   * default, which centres it on the pointer as it always was.
+   */
+  offsetXPx: number
+  offsetYPx: number
+  /**
+   * Draw the shape at all (2026-11-26, the "Cursor overlay" slice: the crosshair is "on with or
+   * without the shape"). TRUE by default, which is the ring every player has had. `enabled` stays
+   * the master switch for the whole overlay (window, poll, watcher); this hides only the shape.
+   */
+  showShape: boolean
+  /**
+   * The CROSSHAIR (owner, 2026-11-26: "1 vertical line across the entire screen at the mouse
+   * position, and 1 horizontal ... they can control line color and weight"). One vertical and one
+   * horizontal line through the pointer, spanning the overlay window, which is sized to the
+   * EverQuest window (the whole screen in fullscreen). They follow the raw pointer, not the
+   * shape's offset. OFF by default, so an upgrade adds nothing to anybody's screen.
+   */
+  crosshairEnabled: boolean
+  /** The lines' colour, `#rrggbb` through the same strict `normalizeRingColor`. White by default. */
+  crosshairColorHex: string
+  /** The lines' weight, whole CSS px, 1 to 8. */
+  crosshairWeightPx: number
+  /**
+   * TRAIL / PARTICLES behind the pointer (owner, 2026-11-26: "trail/particle affects"), drawn in
+   * the shape's colour on one canvas (`shared/cursorTrail.ts` holds the maths). OFF by default:
+   * off means no canvas work at all.
+   */
+  trail: CursorTrailMode
+  /** How long the trail is (how long each point lives, and for sparkles how many), 1 to 10. */
+  trailLength: number
+  /**
+   * The player's own picture, drawn when `shape` is `'image'` (owner, 2026-11-26: "user can upload
+   * an icon ... a simple quick NxN grid they can draw on"). A small PNG data URL, from the upload
+   * (downsized in Preferences) or the drawing grid (one pixel per cell): one picture, two ways to
+   * make it. '' (the default) is no picture, and `'image'` with none draws the circle. Only
+   * `shared/cursorPicture.ts normalizePictureDataUrl` decides what may be stored here.
+   */
+  imageDataUrl: string
+  /** The drawing grid itself, kept so Edit reopens the last drawing. Not read by the overlay. */
+  drawing: CursorDrawing
+}
+
+/**
+ * The drawing grid (owner, 2026-11-26: "a simple quick NxN grid they can draw on like paint"):
+ * `n` x `n` cells, row by row, each '' (empty) or a `#rrggbb` through `normalizeRingColor`.
+ */
+export interface CursorDrawing {
+  n: number
+  cells: string[]
+}
+
+/** The grid sizes the editor offers; the normalizer accepts nothing else. */
+export const DRAWING_SIZES: readonly number[] = [8, 12, 16, 24, 32]
+export const DEFAULT_DRAWING_SIZE = 16
+
+/** A blank `n` x `n` grid. */
+export function emptyDrawing(n: number = DEFAULT_DRAWING_SIZE): CursorDrawing {
+  return { n, cells: new Array<string>(n * n).fill('') }
+}
+
+/**
+ * The drawing, defaulted: `n` one of DRAWING_SIZES (else 16), exactly n*n cells (padded with '',
+ * trimmed past the end), every cell '' or a lower-case `#rrggbb`; anything else in a cell is ''.
+ */
+export function normalizeDrawing(value: unknown): CursorDrawing {
+  const v = isPlainObject(value) ? value : {}
+  const n = DRAWING_SIZES.find((s) => s === v.n) ?? DEFAULT_DRAWING_SIZE
+  const given = Array.isArray(v.cells) ? (v.cells as unknown[]) : []
+  const cells = new Array<string>(n * n)
+  for (let i = 0; i < cells.length; i++) cells[i] = normalizeRingColor(given[i], '')
+  return { n, cells }
+}
+
+/** `off` draws nothing; `trail` is a fading line behind the pointer; `sparkles` sheds little
+ *  falling specks. */
+export type CursorTrailMode = 'off' | 'trail' | 'sparkles'
+
+/** Every trail mode, in the order Preferences lists them. The normalizer accepts nothing else. */
+export const CURSOR_TRAIL_MODES: readonly CursorTrailMode[] = ['off', 'trail', 'sparkles']
+
+/** A known trail mode, or `off`: a store file, a share import or a newer build may carry anything. */
+export function normalizeTrailMode(value: unknown): CursorTrailMode {
+  return CURSOR_TRAIL_MODES.find((m) => m === value) ?? 'off'
+}
+
+/** Trail length bounds: a unitless 1 to 10 the trail maths turns into a lifetime and a count. */
+export const MIN_TRAIL_LENGTH = 1
+export const MAX_TRAIL_LENGTH = 10
+export const DEFAULT_TRAIL_LENGTH = 5
+
+/**
+ * The ring's outline. All of them are drawn with CSS on the two prebuilt divs in cursor.html (the
+ * ring and its inner mark), so a cursor move still changes only a `transform`.
+ *
+ *   circle   the original ring.            oval     the circle squashed to 60% height.
+ *   square   sharp corners.                rounded  a square with rounded corners.
+ *   diamond  a square turned 45 degrees.   dot      the ring with a filled centre dot.
+ *   target   a ring inside a ring.
+ *
+ *   image    the player's own picture (`imageDataUrl`: an uploaded icon or a grid drawing),
+ *            drawn at the size footprint instead of an outline; with no picture, the circle.
+ */
+export type RingShape =
+  | 'circle'
+  | 'oval'
+  | 'square'
+  | 'rounded'
+  | 'diamond'
+  | 'dot'
+  | 'target'
+  | 'image'
+
+/** Every shape, in the order Preferences lists them. The normalizer accepts these and nothing else. */
+export const RING_SHAPES: readonly RingShape[] = [
+  'circle',
+  'oval',
+  'square',
+  'rounded',
+  'diamond',
+  'dot',
+  'target',
+  'image'
+]
+
+/** Offset bounds, each axis. Past 60px the shape stops reading as the pointer's own mark. */
+export const MIN_RING_OFFSET_PX = -60
+export const MAX_RING_OFFSET_PX = 60
+
+/** Crosshair line weight bounds. 1px is a hairline; past 8px the lines start hiding the game. */
+export const MIN_CROSSHAIR_WEIGHT_PX = 1
+export const MAX_CROSSHAIR_WEIGHT_PX = 8
+export const DEFAULT_CROSSHAIR_WEIGHT_PX = 2
+
+/** The shape the ring has always had. */
+export const DEFAULT_RING_SHAPE: RingShape = 'circle'
+
+/** A known shape name, or the circle. A store file, a share import or a newer build may carry
+ *  any string here; an unknown one draws the ring the player had before shapes existed. */
+export function normalizeRingShape(value: unknown): RingShape {
+  return RING_SHAPES.find((s) => s === value) ?? DEFAULT_RING_SHAPE
 }
 
 /**
@@ -236,7 +388,18 @@ export const DEFAULT_CURSOR_RING: CursorRingPrefs = {
   enabled: false,
   sizePx: DEFAULT_RING_SIZE_PX,
   thicknessPx: DEFAULT_RING_THICKNESS_PX,
-  colorHex: DEFAULT_RING_COLOR
+  colorHex: DEFAULT_RING_COLOR,
+  shape: DEFAULT_RING_SHAPE,
+  offsetXPx: 0,
+  offsetYPx: 0,
+  showShape: true,
+  crosshairEnabled: false,
+  crosshairColorHex: DEFAULT_RING_COLOR,
+  crosshairWeightPx: DEFAULT_CROSSHAIR_WEIGHT_PX,
+  trail: 'off',
+  trailLength: DEFAULT_TRAIL_LENGTH,
+  imageDataUrl: '',
+  drawing: emptyDrawing()
 }
 
 export const DEFAULT_OVERLAY_AUTO_HIDE: OverlayAutoHidePrefs = {
@@ -276,7 +439,23 @@ export function normalizeCursorRing(value: unknown): CursorRingPrefs {
     enabled: bool(v.enabled, DEFAULT_CURSOR_RING.enabled),
     sizePx,
     thicknessPx: Math.max(MIN_RING_THICKNESS_PX, Math.min(thickness, Math.floor(sizePx / 2))),
-    colorHex: normalizeRingColor(v.colorHex)
+    colorHex: normalizeRingColor(v.colorHex),
+    shape: normalizeRingShape(v.shape),
+    offsetXPx: clampPx(v.offsetXPx, MIN_RING_OFFSET_PX, MAX_RING_OFFSET_PX, 0),
+    offsetYPx: clampPx(v.offsetYPx, MIN_RING_OFFSET_PX, MAX_RING_OFFSET_PX, 0),
+    showShape: bool(v.showShape, DEFAULT_CURSOR_RING.showShape),
+    crosshairEnabled: bool(v.crosshairEnabled, DEFAULT_CURSOR_RING.crosshairEnabled),
+    crosshairColorHex: normalizeRingColor(v.crosshairColorHex),
+    crosshairWeightPx: clampPx(
+      v.crosshairWeightPx,
+      MIN_CROSSHAIR_WEIGHT_PX,
+      MAX_CROSSHAIR_WEIGHT_PX,
+      DEFAULT_CROSSHAIR_WEIGHT_PX
+    ),
+    trail: normalizeTrailMode(v.trail),
+    trailLength: clampPx(v.trailLength, MIN_TRAIL_LENGTH, MAX_TRAIL_LENGTH, DEFAULT_TRAIL_LENGTH),
+    imageDataUrl: normalizePictureDataUrl(v.imageDataUrl),
+    drawing: normalizeDrawing(v.drawing)
   }
 }
 

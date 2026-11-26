@@ -1183,7 +1183,7 @@ export function createCursorRingWindow(bounds: ScreenRect): void {
     // turns the ring off; there is no solid version of it to offer.
     backgroundColor: TRANSPARENT_OVERLAY_BG,
     hasShadow: false,
-    title: 'Cursor Ring',
+    title: 'Cursor Overlay',
     // Same hardened posture as every other window in this app — ONE definition (WEB_PREFERENCES).
     webPreferences: WEB_PREFERENCES(join(__dirname, '../preload/cursor.js'))
   })

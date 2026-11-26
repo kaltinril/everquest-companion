@@ -1,9 +1,13 @@
-// CursorRingSetting — Preferences → Cursor ring.
+// CursorRingSetting — Preferences → Cursor overlay (called "Cursor ring" on screen until the owner's
+// 2026-11-26 rename; the file, the `cursorRing` store key and every data-testid keep the old name,
+// because existing installs and tests depend on them).
 //
 // A thick circle that follows the mouse, drawn ONLY over the EverQuest window (owner request:
 // "I lose my mouse on EQ screens"). Off by default; the toggle is the only thing that makes it
-// exist. It is white until the player picks another colour (JOS-125), and the default is the
-// old colour exactly, so nobody's ring changes by upgrading.
+// exist. It is white until the player picks another colour (JOS-125), and a circle until the
+// player picks another shape (owner, 2026-11-26); both defaults are the old ring exactly, so
+// nobody's ring changes by upgrading. The last shape, "My icon / drawing" (2026-11-26), draws the
+// player's own picture; its row (upload, drawing grid) is CursorIconSetting.tsx.
 //
 // THE NOTE ABOUT SCOPE IS NOT DECORATION. "Only over EverQuest" is the single most surprising
 // thing about this feature — a user who turns it on while reading Preferences sees nothing
@@ -17,18 +21,26 @@
 // ONE BORDER: PreferencesView wraps each item in an outlined Paper, so this renders bare Stacks.
 
 import { type JSX, useCallback, useState } from 'react'
-import { FormControlLabel, Slider, Stack, Switch, Typography } from '@mui/material'
+import { FormControlLabel, MenuItem, Select, Slider, Stack, Switch, Typography } from '@mui/material'
 import AdjustIcon from '@mui/icons-material/Adjust'
 import type { PrefSection } from './PreferencesView'
 import { recordPref, usePrefsSeed } from './prefsHydration'
 import {
   type CursorRingPrefs,
+  MAX_RING_OFFSET_PX,
   MAX_RING_SIZE_PX,
   MAX_RING_THICKNESS_PX,
+  MIN_RING_OFFSET_PX,
   MIN_RING_SIZE_PX,
   MIN_RING_THICKNESS_PX,
-  ringStrokeColor
+  RING_SHAPES,
+  type RingShape,
+  normalizeRingShape
 } from '@shared/presencePrefs'
+import { CursorRingDemo } from './CursorRingDemo'
+import { CrosshairRow } from './CursorCrosshairSetting'
+import { TrailRow } from './CursorTrailSetting'
+import { PictureRow } from './CursorIconSetting'
 
 /**
  * SEEDED from the pane's hydration snapshot, written back on every change; main's reply is
@@ -55,42 +67,51 @@ function useCursorRing(): [CursorRingPrefs, (patch: Partial<CursorRingPrefs>) =>
   return [prefs, update]
 }
 
-/**
- * A small live sample of the ring, so the sliders describe something you can see without
- * alt-tabbing into the game. Same three shadows as the real thing (cursor.html).
- *
- * IT IS A SAMPLE, NOT A RULER, and one divergence is worth stating rather than rediscovering
- * (JOS-154). This card is drawn in the MAIN window, which carries the app's text size
- * (`uiScale`), while the ring window is pinned at zoom 1 so its CSS pixels stay DIPs — so at 125%
- * this circle is 25% wider on screen than the halo the game gets. Left alone on purpose: a
- * preview that shrank while the labels beside it grew would read as broken, and the number the
- * player is actually choosing is on the slider's own label. The ring's POSITION, which is what
- * the ticket was about, is fixed at the window that draws it.
- */
-function RingPreview({ prefs }: { prefs: CursorRingPrefs }): JSX.Element {
+/** What each shape is called in the picker, in `RING_SHAPES` order. */
+const SHAPE_LABELS: Record<RingShape, string> = {
+  circle: 'Circle',
+  oval: 'Oval',
+  square: 'Square',
+  rounded: 'Rounded square',
+  diamond: 'Diamond',
+  dot: 'Ring with a centre dot',
+  target: 'Target (double ring)',
+  image: 'My icon / drawing'
+}
+
+/** The shape picker (owner, 2026-11-26). A plain select: seven names read better as words than
+ *  as a row of tiny icons, and main re-checks the value (an unknown one draws the circle). */
+function RingShapePicker({
+  prefs,
+  onChange
+}: {
+  prefs: CursorRingPrefs
+  onChange: (patch: Partial<CursorRingPrefs>) => void
+}): JSX.Element {
   return (
-    <div
-      data-testid="pref-cursor-ring-preview"
-      style={{
-        width: prefs.sizePx,
-        height: prefs.sizePx,
-        boxSizing: 'border-box',
-        borderRadius: '50%',
-        borderStyle: 'solid',
-        borderWidth: prefs.thicknessPx,
-        // The SAME seam the ring window paints with, so what this sample shows is what the game
-        // gets — not a second opinion about how a hex becomes a stroke.
-        borderColor: ringStrokeColor(prefs.colorHex),
-        boxShadow:
-          '0 0 0 1px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(0,0,0,0.6), 0 0 14px 4px rgba(0,0,0,0.28)',
-        flexShrink: 0
-      }}
-    />
+    <Stack sx={{ minWidth: 180 }}>
+      <Typography variant="caption" color="text.secondary">
+        Shape
+      </Typography>
+      <Select
+        size="small"
+        data-testid="pref-cursor-ring-shape"
+        value={prefs.shape}
+        onChange={(e) => onChange({ shape: normalizeRingShape(e.target.value) })}
+        sx={{ width: 200 }}
+      >
+        {RING_SHAPES.map((shape) => (
+          <MenuItem key={shape} value={shape}>
+            {SHAPE_LABELS[shape]}
+          </MenuItem>
+        ))}
+      </Select>
+    </Stack>
   )
 }
 
 /** Size + stroke. Both are whole px and both are clamped in main; the labels state the value so
- *  the cap is legible rather than felt. */
+ *  the cap is legible rather than felt. A picture has no outline, so its thickness is hidden. */
 function RingSliders({
   prefs,
   onChange
@@ -115,7 +136,7 @@ function RingSliders({
           sx={{ width: 160 }}
         />
       </Stack>
-      <Stack sx={{ minWidth: 180 }}>
+      <Stack sx={{ minWidth: 180, display: prefs.shape === 'image' ? 'none' : undefined }}>
         <Typography variant="caption" color="text.secondary">
           Thickness ({prefs.thicknessPx}px)
         </Typography>
@@ -130,6 +151,54 @@ function RingSliders({
           sx={{ width: 160 }}
         />
       </Stack>
+    </Stack>
+  )
+}
+
+/** One offset axis. Whole px, clamped in main; 0 is centred on the pointer. */
+function OffsetSlider({
+  axis,
+  value,
+  onChange
+}: {
+  axis: 'X' | 'Y'
+  value: number
+  onChange: (v: number) => void
+}): JSX.Element {
+  return (
+    <Stack sx={{ minWidth: 180 }}>
+      <Typography variant="caption" color="text.secondary">
+        Offset {axis} ({value > 0 ? `+${value}` : value}px{axis === 'X' ? ', + is right' : ', + is down'})
+      </Typography>
+      <Slider
+        size="small"
+        data-testid={`pref-cursor-ring-offset-${axis.toLowerCase()}`}
+        min={MIN_RING_OFFSET_PX}
+        max={MAX_RING_OFFSET_PX}
+        step={1}
+        value={value}
+        marks={[{ value: 0 }]}
+        onChange={(_e, v) => onChange(v)}
+        onDoubleClick={() => onChange(0)}
+        sx={{ width: 160 }}
+      />
+    </Stack>
+  )
+}
+
+/** Where the shape sits relative to the pointer (owner, 2026-11-26). Double-click a slider to
+ *  put it back on the pointer. */
+function RingOffsets({
+  prefs,
+  onChange
+}: {
+  prefs: CursorRingPrefs
+  onChange: (patch: Partial<CursorRingPrefs>) => void
+}): JSX.Element {
+  return (
+    <Stack direction="row" spacing={3} alignItems="center" flexWrap="wrap" useFlexGap>
+      <OffsetSlider axis="X" value={prefs.offsetXPx} onChange={(v) => onChange({ offsetXPx: v })} />
+      <OffsetSlider axis="Y" value={prefs.offsetYPx} onChange={(v) => onChange({ offsetYPx: v })} />
     </Stack>
   )
 }
@@ -178,6 +247,30 @@ function RingColor({
   )
 }
 
+/** The shape's own switch (2026-11-26: the crosshair is "on with or without the shape"). On by
+ *  default, which is the ring every player has had; off leaves the crosshair and trail alone. */
+function ShapeSwitch({
+  prefs,
+  onChange
+}: {
+  prefs: CursorRingPrefs
+  onChange: (patch: Partial<CursorRingPrefs>) => void
+}): JSX.Element {
+  return (
+    <FormControlLabel
+      control={
+        <Switch
+          size="small"
+          data-testid="pref-cursor-ring-show-shape"
+          checked={prefs.showShape}
+          onChange={(e) => onChange({ showShape: e.target.checked })}
+        />
+      }
+      label={<Typography variant="body2">Shape around the pointer</Typography>}
+    />
+  )
+}
+
 export function CursorRingSetting(): JSX.Element {
   const [prefs, update] = useCursorRing()
   return (
@@ -192,23 +285,35 @@ export function CursorRingSetting(): JSX.Element {
               onChange={(e) => update({ enabled: e.target.checked })}
             />
           }
-          label={<Typography variant="body2">Show a ring around your mouse cursor</Typography>}
+          label={<Typography variant="body2">Show a cursor overlay</Typography>}
         />
         <Typography variant="caption" color="text.secondary">
           {prefs.enabled
-            ? 'A ring follows your pointer so you can find it on a busy screen. Your real cursor is untouched - the ring never gets in the way of a click.'
+            ? 'A shape, crosshair lines or a trail follow your pointer so you can find it on a busy screen. Your real cursor is untouched - the overlay never gets in the way of a click.'
             : 'Off. Nothing is drawn and nothing is tracked.'}
         </Typography>
       </Stack>
 
       <Stack direction="row" spacing={3} alignItems="center" flexWrap="wrap" useFlexGap>
-        <RingSliders prefs={prefs} onChange={update} />
-        <RingColor prefs={prefs} onChange={update} />
-        <RingPreview prefs={prefs} />
+        <Stack spacing={1.5}>
+          <ShapeSwitch prefs={prefs} onChange={update} />
+          <Stack direction="row" spacing={3} alignItems="center" flexWrap="wrap" useFlexGap>
+            <RingSliders prefs={prefs} onChange={update} />
+            <RingShapePicker prefs={prefs} onChange={update} />
+            <RingColor prefs={prefs} onChange={update} />
+          </Stack>
+          <RingOffsets prefs={prefs} onChange={update} />
+          {prefs.shape === 'image' && <PictureRow prefs={prefs} onChange={update} />}
+        </Stack>
+        <CursorRingDemo prefs={prefs} />
       </Stack>
 
+      <CrosshairRow prefs={prefs} onChange={update} />
+
+      <TrailRow prefs={prefs} onChange={update} />
+
       <Typography variant="caption" color="text.secondary">
-        The ring only appears over EverQuest, while the game is the window you’re in.
+        The overlay only appears over EverQuest, while the game is the window you’re in.
       </Typography>
     </Stack>
   )
@@ -226,14 +331,14 @@ export function CursorRingSetting(): JSX.Element {
 export function cursorRingSection(): PrefSection {
   return {
     id: 'cursor',
-    label: 'Cursor ring',
+    label: 'Cursor overlay',
     icon: <AdjustIcon fontSize="small" />,
     items: [
       {
         id: 'cursor-ring',
-        label: 'Cursor ring',
+        label: 'Cursor overlay',
         keywords:
-          'cursor mouse pointer ring circle halo highlight find lost locate ultimate size thickness white color colour picker',
+          'cursor overlay mouse pointer ring circle halo highlight find lost locate ultimate size thickness white color colour picker shape oval square rounded diamond dot target bullseye double offset position shift move nudge x y demo crosshair cross hair lines vertical horizontal weight aim trail particle particles sparkle sparkles effect length fade icon image picture upload custom my own draw drawing paint grid pixel art',
         content: <CursorRingSetting />
       }
     ]

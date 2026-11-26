@@ -222,6 +222,8 @@ test("this app's own windows never look like EverQuest", () => {
     'Fight Overlay',
     'Zone Overlay',
     'Event Log Overlay',
+    'Cursor Overlay',
+    // The cursor overlay's title before the 2026-11-26 rename.
     'Cursor Ring'
   ]) {
     assert.equal(isEqWindow({ exePath: 'C:\\app\\companion.exe', title }, EQ_ROOT), false, title)
@@ -442,7 +444,19 @@ test('the shipped defaults are the zero-cost posture', () => {
     enabled: false,
     sizePx: 44,
     thicknessPx: 4,
-    colorHex: '#ffffff'
+    colorHex: '#ffffff',
+    // The circle is the shape every ring drawn before shapes existed had (2026-11-26).
+    shape: 'circle',
+    offsetXPx: 0,
+    offsetYPx: 0,
+    showShape: true,
+    crosshairEnabled: false,
+    crosshairColorHex: '#ffffff',
+    crosshairWeightPx: 2,
+    trail: 'off',
+    trailLength: 5,
+    imageDataUrl: '',
+    drawing: { n: 16, cells: new Array(256).fill('') }
   })
   assert.deepEqual(DEFAULT_OVERLAY_AUTO_HIDE, { hideWhenNotRunning: true, hideWhenUnfocused: false })
 })
@@ -466,7 +480,18 @@ test('ring prefs are clamped, rounded, and never silently re-intended', () => {
     enabled: true,
     sizePx: 44,
     thicknessPx: 3,
-    colorHex: '#ffffff'
+    colorHex: '#ffffff',
+    shape: 'circle',
+    offsetXPx: 0,
+    offsetYPx: 0,
+    showShape: true,
+    crosshairEnabled: false,
+    crosshairColorHex: '#ffffff',
+    crosshairWeightPx: 2,
+    trail: 'off',
+    trailLength: 5,
+    imageDataUrl: '',
+    drawing: { n: 16, cells: new Array(256).fill('') }
   })
   assert.equal(normalizeCursorRing({ sizePx: 5 }).sizePx, 20, 'below the floor clamps up')
   assert.equal(normalizeCursorRing({ sizePx: 5000 }).sizePx, 200, 'above the cap clamps down')

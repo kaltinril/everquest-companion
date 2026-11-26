@@ -490,6 +490,11 @@ Sources beside `plans/2026-11-25-aa-window/`: seven AA-window screenshots and th
   90sec timer". Rank values match the wiki's columns (Warrior 2/4/6, Monk 2/4/6, Shaman 3/6/9,
   Half Elf stat caps and resists +3/+6, Iksar HP regen 2/4 and AC 5/10). Completionist's text
   matches the wiki word for word.
+- **A free grant is logged up to a second BEFORE its ding** (owner's logs, 2026-11-26): `You have
+  gained the ability "Unbound Affliction" at a cost of 0 ability points.` then `Welcome to level 12!`
+  in the same second, or the ding one second later (Harm Touch, Unbound Drain). A grant's level is
+  the NEXT ding's. Paid purchases were all at or above the wiki's level except Tireless Sprint, rank
+  1 bought at shown level 8 (wiki: 10). `plans/2026-11-26-aa-wiki-levels.md`.
 
 ## Converted items (pet illusions)
 

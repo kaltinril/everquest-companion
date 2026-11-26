@@ -32,7 +32,13 @@ const fixture = (name: string): StoreData => JSON.parse(readFileSync(join(FIXTUR
 // `colorHex` joined the blob in JOS-125 with NO schema bump: it is one more field the same
 // normalizer defaults, so a store already carrying a v5+ ring gains it on its next write and
 // reads as white until then. The colour rules are pinned in tests/cursorRingColor.test.mts.
-const RING_DEFAULT = { enabled: false, sizePx: 44, thicknessPx: 4, colorHex: '#ffffff' }
+// `shape` joined the same way (2026-11-26): unknown or missing reads as the circle the ring has
+// always been. The shape rules are pinned in tests/cursorRingShape.test.mts. The X/Y offset joined
+// the same way (2026-11-26): missing reads as 0/0, centred (tests/cursorRingOffset.test.mts).
+// The shape switch, the crosshair and the trail joined the same way (2026-11-26, the cursor
+// overlay): missing reads as shape shown, crosshair off, trail off (tests/cursorCrosshair.test.mts,
+// tests/cursorTrail.test.mts).
+const RING_DEFAULT = { enabled: false, sizePx: 44, thicknessPx: 4, colorHex: '#ffffff', shape: 'circle', offsetXPx: 0, offsetYPx: 0, showShape: true, crosshairEnabled: false, crosshairColorHex: '#ffffff', crosshairWeightPx: 2, trail: 'off', trailLength: 5, imageDataUrl: '', drawing: { n: 16, cells: new Array(256).fill('') } }
 const AUTOHIDE_DEFAULT = { hideWhenNotRunning: true, hideWhenUnfocused: false }
 
 /** `store-v4-presence.json` — a fully-populated voice-era store (v0.2.0): characters, alerts
@@ -89,27 +95,50 @@ test('an EXISTING cursor-ring blob is repaired field by field, never replaced wh
   // share import). Out-of-range numbers CLAMP — the user asked for "as big as possible", and
   // answering with the default would discard their intent — while wrong-typed values fall back
   // to the documented default and `enabled` is never invented as true.
-  const messy = { enabled: true, sizePx: 900, thicknessPx: 'fat', colorHex: 'chartreuse' }
+  const messy = { enabled: true, sizePx: 900, thicknessPx: 'fat', colorHex: 'chartreuse', shape: 'hexagon' }
   const { data } = migrateStoreData({ [SCHEMA_VERSION_KEY]: 4, cursorRing: messy })
   assert.deepEqual(data['cursorRing'], {
     enabled: true,
     sizePx: 200,
     thicknessPx: 4,
     // A CSS colour name is not a hex colour, and the store never learns to speak CSS.
-    colorHex: '#ffffff'
+    colorHex: '#ffffff',
+    // A shape this build does not know draws the circle.
+    shape: 'circle',
+    offsetXPx: 0,
+    offsetYPx: 0,
+    showShape: true,
+    crosshairEnabled: false,
+    crosshairColorHex: '#ffffff',
+    crosshairWeightPx: 2,
+    trail: 'off',
+    trailLength: 5,
+    imageDataUrl: '',
+    drawing: { n: 16, cells: new Array(256).fill('') }
   })
 
   // A stroke wider than the radius is a filled dot, not a ring. A colour the user DID choose
   // comes through untouched beside it.
   const fat = migrateStoreData({
     [SCHEMA_VERSION_KEY]: 4,
-    cursorRing: { sizePx: 20, thicknessPx: 12, colorHex: '#FF8800' }
+    cursorRing: { sizePx: 20, thicknessPx: 12, colorHex: '#FF8800', shape: 'diamond' }
   })
   assert.deepEqual(fat.data['cursorRing'], {
     enabled: false,
     sizePx: 20,
     thicknessPx: 10,
-    colorHex: '#ff8800'
+    colorHex: '#ff8800',
+    shape: 'diamond',
+    offsetXPx: 0,
+    offsetYPx: 0,
+    showShape: true,
+    crosshairEnabled: false,
+    crosshairColorHex: '#ffffff',
+    crosshairWeightPx: 2,
+    trail: 'off',
+    trailLength: 5,
+    imageDataUrl: '',
+    drawing: { n: 16, cells: new Array(256).fill('') }
   })
 
   for (const junk of [null, 42, 'nonsense', [], { nested: true }]) {

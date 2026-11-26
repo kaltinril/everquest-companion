@@ -2,8 +2,8 @@
 // the next rank's price), opened in place on a click (AaRowDetail).
 
 import { type JSX, Fragment, useEffect, useRef } from 'react'
-import { Box, Typography } from '@mui/material'
-import { aaNotFor, type AaBoardRow, type AaListGroup } from '@shared/aaBoard'
+import { Box, TableSortLabel, Typography } from '@mui/material'
+import { aaNotFor, aaSortGroups, aaStartLevel, type AaBoardRow, type AaListGroup, type AaSort } from '@shared/aaBoard'
 import { aaCostText } from '@shared/aaCost'
 import { aaEffectLine } from '@shared/aaEffects'
 import type { ClassAbbr } from '@shared/classCombo'
@@ -11,8 +11,8 @@ import { Tooltip } from '../../lib/Tooltip'
 import { aaDomId, aaRowId, useAaNav } from './aaNav'
 import { AaRowDetail, Mark, type SetPick } from './AaRowDetail'
 
-/** Name · pips · rank · effect · points · next: the pips column is fixed so every row lines up. */
-const GRID = 'minmax(130px, 1.3fr) 112px 84px minmax(120px, 2fr) 92px 72px'
+/** Name · level · pips · rank · effect · points · next: the pips column is fixed so every row lines up. */
+const GRID = 'minmax(130px, 1.3fr) 44px 112px 84px minmax(120px, 2fr) 92px 72px'
 const MAX_PIPS = 10
 const SOURCE_WORD = { list: 'alt list', activated: 'used', pick: 'you', log: 'log', granted: 'granted', none: '' } as const
 const SOURCE_TIP = {
@@ -24,6 +24,48 @@ const SOURCE_TIP = {
   none: ''
 } as const
 const ELSEWHERE_TIP = 'Your log bought this under another class combo; these classes do not get it.'
+const LEVEL_TIP = 'The level the wiki gives for rank 1. The wiki can be wrong: fix it there when the game says otherwise.'
+
+/** The level column: rank 1's wiki level, "?" when the text does not state it clearly, "-" on Special rows (not level-gated). */
+function LevelCell({ b }: { b: AaBoardRow }): JSX.Element {
+  const level = b.r.row.section === 'special' ? '-' : (aaStartLevel(b) ?? '?')
+  return (
+    <Typography variant="caption" color={b.usable ? 'text.secondary' : 'text.disabled'} data-testid="aa-level">
+      {String(level)}
+    </Typography>
+  )
+}
+
+/** The column headings; Name and Level sort the list when the list is sortable. */
+function HeaderRow({ sort, setSort }: { sort?: AaSort; setSort?: (s: AaSort) => void }): JSX.Element {
+  const sortable = sort !== undefined && setSort !== undefined
+  const head = (key: 'name' | 'level', label: string): JSX.Element => {
+    if (!sortable) return <span>{label}</span>
+    const active = sort.key === key
+    const next = (): void => {
+      if (!active) setSort({ key, dir: 'asc' })
+      else if (sort.dir === 'asc') setSort({ key, dir: 'desc' })
+      else setSort({ key: 'wiki', dir: 'asc' })
+    }
+    return (
+      <TableSortLabel active={active} direction={active ? sort.dir : 'asc'} onClick={next} data-testid={`aa-sort-${key}`}>
+        {label}
+      </TableSortLabel>
+    )
+  }
+  const level = head('level', 'Lvl')
+  return (
+    <Box sx={{ display: 'grid', gridTemplateColumns: GRID, gap: 1.5, px: 1, pb: 0.25, borderBottom: 1, borderColor: 'divider', typography: 'caption', color: 'text.disabled' }} data-testid="aa-list-head">
+      {head('name', 'Name')}
+      <Tooltip title={LEVEL_TIP}>{level}</Tooltip>
+      <span>Ranks</span>
+      <span>Have</span>
+      <span>What it does</span>
+      <span>Points</span>
+      <span>Next</span>
+    </Box>
+  )
+}
 
 /** The quiet note after an unusable row's name: another loadout's rank, "may apply", or "not for". */
 function NotForNote({ b, classes }: { b: AaBoardRow; classes: readonly ClassAbbr[] }): JSX.Element | null {
@@ -152,6 +194,7 @@ function AaLine({ b, classes, setPick, showClass }: { b: AaBoardRow; classes: re
           {showClass && b.r.row.class !== undefined && <Box component="small" sx={{ ml: 0.75, color: 'text.disabled' }}>{b.r.row.class}</Box>}
           <NotForNote b={b} classes={classes} />
         </Typography>
+        <LevelCell b={b} />
         <Pips b={b} />
         <RankCell b={b} />
         <EffectCell b={b} />
@@ -163,7 +206,7 @@ function AaLine({ b, classes, setPick, showClass }: { b: AaBoardRow; classes: re
 }
 
 /** The groups of one list, each under its quiet heading. */
-export function AaList({ groups, classes, setPick, showClass = false, empty }: { groups: AaListGroup[]; classes: readonly ClassAbbr[]; setPick: SetPick; showClass?: boolean; empty: string }): JSX.Element {
+export function AaList({ groups, classes, setPick, showClass = false, sort, setSort, empty }: { groups: AaListGroup[]; classes: readonly ClassAbbr[]; setPick: SetPick; showClass?: boolean; sort?: AaSort; setSort?: (s: AaSort) => void; empty: string }): JSX.Element {
   if (groups.length === 0) {
     return (
       <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>
@@ -173,7 +216,8 @@ export function AaList({ groups, classes, setPick, showClass = false, empty }: {
   }
   return (
     <Box data-testid="aa-list">
-      {groups.map((g) => (
+      <HeaderRow sort={sort} setSort={setSort} />
+      {(sort === undefined ? groups : aaSortGroups(groups, sort)).map((g) => (
         <Fragment key={`${g.kind}:${g.title ?? ''}`}>
           {g.title !== null && (
             <Typography variant="overline" component="div" color={g.kind === 'mine' ? 'text.secondary' : 'text.disabled'} sx={{ px: 1, pt: 1.25, lineHeight: 1.6 }}>

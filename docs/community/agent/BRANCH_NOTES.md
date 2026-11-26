@@ -3532,3 +3532,83 @@ what a later change must know. Each fix has a unit test that failed before it.
 - **Combat copy.** Under "With its owner" the level-1 paste follows `petGroupPrintLines` (master,
   pets, `Together`). The per-mob drill reads "all sources combined": its events are everything but
   `enemy`, so a group's damage is in it.
+
+## Cursor ring (on screen: Cursor overlay): shapes, crosshair, trail (2026-11-26, requirements/cursor-ring.md)
+
+- **Field:** `CursorRingPrefs.shape` (`RingShape`: `circle` | `oval` | `square` | `rounded` |
+  `diamond` | `dot` | `target`), default `circle`. Rides the `cursorRing` blob with no schema bump,
+  like `colorHex`: `normalizeRingShape` takes `unknown`, and an unknown or missing name draws the
+  circle (store file, renderer, share import, a config sent without one).
+- **Geometry:** `shared/cursorRingShape.ts` `ringGeometry` (box, stroke, radius, turn, inner mark)
+  and `ringTransform`. The ring window and the Preferences sample both read it; never a second copy.
+  Every shape fits the `sizePx` footprint: oval = full width, 60% height; diamond = side
+  size/sqrt(2) turned 45 degrees. The drawn stroke is capped at half the shorter side; the stored
+  thickness is not touched.
+- **Default pinned:** the circle's geometry and transform string are the old ring's exactly
+  (`tests/cursorRingShape.test.mts`); `cursorRingZoom.test.mts` now pins the centring line in the
+  shape module.
+- **Performance contract, extended:** still one moving element. `dot` and `target` draw their inner
+  mark on `#ring-inner`, a child of `#ring` styled once per config, so the ring's transform carries
+  it. The diamond's `rotate(45deg)` is appended to the same transform string, after the translate.
+  No timer, no canvas, no layout on a move.
+- **Offset:** `offsetXPx` / `offsetYPx`, whole px clamped to +-60 (`MIN/MAX_RING_OFFSET_PX`), default
+  0/0 (centred, as before), no schema bump. `ringTransform(g, p, offset)` adds it before the half
+  box comes off; `ringOffset(prefs)` reads a config without one as 0/0. +-60 keeps a parked ring
+  (-9999) off screen. Pinned in `tests/cursorRingOffset.test.mts`.
+- **Preferences sample:** `CursorRingDemo.tsx`, a box holding a drawn arrow pointer whose tip is the
+  hot spot, with the shape at the offset; keeps `data-testid="pref-cursor-ring-preview"` on the
+  shape (the colour e2e reads its border colour). Grows with size + offset so nothing clips.
+- **Renamed "Cursor overlay" on screen (owner, 2026-11-26):** Preferences section and item, the
+  switch ("Show a cursor overlay"), captions, window title (`Cursor Overlay`; `presence.test.mts`
+  keeps the old title in its own-windows list). Internal names stay `cursorRing`: files, IPC
+  channels, the store key, data-testids, CSS ids. Renaming them would orphan every installed
+  store blob and break the e2e selectors for no player-visible gain. Keywords keep "ring".
+- **Shape switch:** `showShape` (default true). `enabled` is still the master switch (window, poll,
+  watcher); `showShape` only hides `#ring`, so the crosshair or trail can run alone.
+  `shapeShown(prefs)` reads a config without it as shown.
+- **Crosshair:** `crosshairEnabled` (false), `crosshairColorHex` (`#ffffff`, `normalizeRingColor`),
+  `crosshairWeightPx` (2, clamped 1 to 8). `shared/cursorCrosshair.ts`: `crosshairOf`,
+  `crosshairTransforms`, `crosshairLineStyles`, `isParkedPoint` (any negative coordinate: main
+  only sends in-window points or -9999). Two prebuilt divs `#cross-v` / `#cross-h` (100vh / 100vw
+  = the EQ window, the whole screen only in fullscreen), 1px dark contour. Raw pointer, never the
+  shape's offset. Parked: both at -9999. Pinned in `tests/cursorCrosshair.test.mts`.
+- **Trail:** `trail` (`'off'` | `'trail'` | `'sparkles'`, default `'off'`, `normalizeTrailMode`),
+  `trailLength` (5, clamped 1 to 10), drawn in the shape's `colorHex`. Maths in
+  `shared/cursorTrail.ts` (no DOM): trail life 60 ms x length; sparkles 300 + 50 x length ms, 1 to 3
+  specks per sample; caps 96 / 160 live, oldest dropped; positions are closed forms of age, so a
+  late frame or a hidden window just finds them expired. Canvas painter:
+  `renderer/src/overlay/cursorTrailCanvas.ts`. Pinned in `tests/cursorTrail.test.mts`.
+- **Performance contract, extended again (cursorRing.ts rules 4 and 5):** the crosshair is two more
+  transform-only elements, painted in the ring's frame, skipped on one boolean when off. The trail
+  is the window's one canvas: Off = hidden, no 2D context ever requested, `point()` returns on
+  its first line. On = each sample spawns and starts one rAF loop that clears only last frame's
+  `trailBounds` box and stops itself on `stepTrail` = idle, so a still mouse costs nothing. A
+  parked point clears the trail. Backing store = CSS size x devicePixelRatio, re-fitted on
+  `resize` and on each loop start.
+- **Store blob:** all six new fields ride `cursorRing` with no schema bump; defaults leave every
+  install's overlay as it was. The five blob-pinning tests list them (grep `trailLength: 5`).
+- **Picture (`'image'` shape, owner 2026-11-26: icon upload + NxN drawing grid):** one picture,
+  two ways to make it. New fields, no schema bump: `imageDataUrl` (`''` = none) and
+  `drawing: { n, cells }` (default `{ n: 16, cells: 256 x '' }`; n in `DRAWING_SIZES` 8/12/16/24/32,
+  cells padded/trimmed to n*n, each `''` or `#rrggbb` via `normalizeRingColor(c, '')`). Both make a
+  PNG data URL: upload = `createImageBitmap` + canvas fit to 64 px (`fitWithin`), grid = one pixel
+  per cell. The overlay draws `#ring-img` (child of `#ring`) and never knows which made it.
+- **Validator = the security boundary:** `shared/cursorPicture.ts normalizePictureDataUrl`: only
+  `data:image/png;base64,` + base64 chars (padded, length % 4), whole string <= 64 KB
+  (`MAX_PICTURE_CHARS`), decoded head = PNG signature + IHDR, 1 to 128 px a side; else `''`. Runs
+  in `normalizeCursorRing`, so main's IPC write, the store reader and migrations all clamp it.
+  The cursorRing blob is not in the settings share export (share.ts carries no presence prefs).
+- **CSP:** cursor.html `img-src 'none'` became `img-src data:` (no http(s), file:, blob:). The
+  picture reaches the DOM only as `pic.src = ringPicture(cfg)`; no innerHTML, no CSS url().
+- **Geometry:** `ringPicture(prefs)` = the validated URL only when shape is `'image'`;
+  `ringGeometry` then gives a size x size box, stroke 0, radius 0. `'image'` with no picture draws
+  the circle. `pictureRendering`: <= 32 px a side = `pixelated` (grid, tiny icons), else smooth.
+- **Performance contract rule 6:** the picture is set once per config, and its src only when the
+  picture itself changes (a slider drag does not re-decode); a move still changes only the ring's
+  transform. `#ring.picture` drops the shadows.
+- **Preferences:** `CursorIconSetting.tsx` (upload, Remove, error line), `CursorDrawingGrid.tsx`
+  (one canvas, not N*N elements). Shown while Shape = "My icon / drawing"; Upload/Save also pick
+  that shape. Thickness is hidden for it. Pinned in `tests/cursorPicture.test.mts`; the blob pins
+  list the two new fields.
+- **Optional, not built:** "load current icon into the grid"; a trail colour of its own (today
+  the shape's).

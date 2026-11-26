@@ -109,7 +109,14 @@ test('the text size still applies to the MAIN window and to nothing else', () =>
 test('the ring centres on the point it is sent, by subtracting half its own width', () => {
   // The centring itself is one line, and it is only correct in a window whose CSS pixels are
   // DIPs — which is what the pin guarantees. Pinned here so a "simplification" that drops the
-  // radius (or starts scaling it) has to be a deliberate edit.
-  assert.match(RING, /radius = cfg\.sizePx \/ 2/)
-  assert.match(RING, /translate3d\(\$\{Math\.round\(latest\.x - radius\)\}px, \$\{Math\.round\(latest\.y - radius\)\}px, 0\)/)
+  // half-box offset (or starts scaling it) has to be a deliberate edit. Since the ring got shapes
+  // (2026-11-26) the line lives in the shared shape module, and the ring window calls it with the
+  // geometry it computed from the config; tests/cursorRingShape.test.mts pins its output.
+  const SHAPE = codeOf('src/shared/cursorRingShape.ts')
+  assert.match(RING, /geometry = ringGeometry\(cfg\)/)
+  assert.match(RING, /ring\.style\.transform = ringTransform\(geometry, latest, offset\)/)
+  // The player's X/Y offset (2026-11-26) is added to the point before the half box comes off.
+  assert.match(SHAPE, /Math\.round\(p\.x \+ offset\.x - g\.widthPx \/ 2\)/)
+  assert.match(SHAPE, /Math\.round\(p\.y \+ offset\.y - g\.heightPx \/ 2\)/)
+  assert.match(SHAPE, /translate3d\(\$\{x\}px, \$\{y\}px, 0\)/)
 })
