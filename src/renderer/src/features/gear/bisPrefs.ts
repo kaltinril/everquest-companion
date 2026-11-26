@@ -22,6 +22,7 @@ import {
   type TierSetup,
   type TierStep
 } from '../../../../shared/planner/tierChips'
+import { maxCharacterLevel } from '../../../../shared/planner/statCaps'
 import { TIER_PRESETS, defaultBoard, type TierPreset } from '../../../../shared/planner/tierDefaults'
 
 export const BIS_KEY = 'eq.gear.tiers'
@@ -50,7 +51,7 @@ export interface BisPrefs {
 /** Legends' published attribute cap (agent/MEASURED.md, "BiS sheet research"). */
 export const LEGENDS_STAT_CAP = 510
 
-export const DEFAULT_LEVEL = 60
+export const DEFAULT_LEVEL = 50
 
 export const DEFAULT_BIS_PREFS: BisPrefs = { preset: 'classes', board: null, step: DEFAULT_STEP, split: false, caps: {}, level: DEFAULT_LEVEL, era: true, owned: false, list: null, targets: false, statCap: LEGENDS_STAT_CAP }
 
@@ -77,8 +78,9 @@ function sanitizeCaps(raw: unknown): Partial<Record<TierChip, number>> {
   return caps
 }
 
-export function clampLevel(n: number): number {
-  return Number.isFinite(n) ? Math.min(70, Math.max(1, Math.round(n))) : DEFAULT_LEVEL
+/** 1 to the level cap on `now` (50, 55 from Rulers of Kunark); a stored level above it comes down. */
+export function clampLevel(n: number, now: Date = new Date()): number {
+  return Number.isFinite(n) ? Math.min(maxCharacterLevel(now), Math.max(1, Math.round(n))) : DEFAULT_LEVEL
 }
 
 /** Whatever the store held, as a usable choice: every field checked, anything odd its default. */

@@ -10,6 +10,7 @@ import { defaultBoard } from '../src/shared/planner/tierDefaults'
 import { conversionsFor, deriveChips, type TierModel } from '../src/shared/planner/tierWeights'
 import { CAPPED_ATTRIBUTES, DEFAULT_BIS_PREFS, LEGENDS_STAT_CAP, activeSetup, tankResistTargets, withCaps, clampLevel, sanitizeBisPrefs, matchesSaved, sanitizeSaved, withCleared, withLoadedBoard, withPasted, withSavedBoard, withSplit } from '../src/renderer/src/features/gear/bisPrefs'
 import { budgetText, chipHint, chipValueText, compareRows, hasteNote, loadoutTotals, ownedCopies, sourceText, termText, totalsRows } from '../src/renderer/src/features/gear/bisText'
+import { maxCharacterLevel } from '../src/shared/planner/statCaps'
 import { sortValue } from '../src/renderer/src/features/gear/gearFilter'
 import type { GearOwnershipMap } from '../src/renderer/src/features/gear/gearOwnership'
 
@@ -29,13 +30,18 @@ test('stored prefs: anything odd reads as its default; a board must name every c
   assert.equal(p.preset, 'ranged')
   assert.equal(p.step, 25)
   assert.equal(p.split, true)
-  assert.equal(p.level, 70, 'clamped')
+  assert.equal(p.level, maxCharacterLevel(), 'clamped to the level cap')
   assert.deepEqual(p.caps, { DEX: 510 }, 'no cap on a ratio, none that is not a number')
   assert.equal(p.board, null, 'a partial board is not a board')
   assert.equal(p.era, false)
   assert.equal(p.owned, true)
   assert.equal(sanitizeBisPrefs({ step: 3 }).step, 4)
-  assert.equal(clampLevel(Number.NaN), 60)
+  assert.equal(clampLevel(Number.NaN), 50)
+  assert.equal(DEFAULT_BIS_PREFS.level, 50, 'characters are level 50 at most (owner, 2026-11-25)')
+  assert.equal(clampLevel(60, new Date(2026, 11, 7, 23, 59)), 50, 'a stored 60 comes down to 50 before Kunark')
+  assert.equal(clampLevel(60, new Date(2026, 11, 8)), 55, 'and to 55 from its local launch day')
+  assert.equal(clampLevel(53, new Date(2026, 11, 8)), 53)
+  assert.equal(sanitizeBisPrefs({ level: 60 }).level, maxCharacterLevel(), 'clamped on load')
 })
 
 test('the board in force follows the classes until the player edits it', () => {

@@ -14,6 +14,7 @@ import { ITEM_UPGRADE_BASE, type ItemUpgradeState } from '@shared/itemUpgrade'
 import { alignPairsToWorn, buildBisSheet, usableBy } from '@shared/planner/bisSheet'
 import type { GearRow } from '@shared/planner/gear'
 import { scaleGearRow } from '@shared/planner/gearScale'
+import { maxCharacterLevel } from '@shared/planner/statCaps'
 import { activeChips, type TierChip, type TierSetup } from '@shared/planner/tierChips'
 import { GUIDE_CREDIT } from '@shared/planner/tierDefaults'
 import type { TierModel } from '@shared/planner/tierWeights'
@@ -95,7 +96,7 @@ function Controls({ prefs, setPrefs, classes, setup }: { prefs: BisPrefs; setPre
         )}
         <BisStartFrom prefs={prefs} setPrefs={setPrefs} setup={setup} />
         <Chip size="small" variant="outlined" label="Reset board" title="Back to the preset's starting tiers" data-testid="bis-reset" onClick={() => setPrefs({ ...prefs, board: null, caps: {}, list: null })} />
-        <TextField size="small" type="number" label="Level" value={prefs.level} onChange={(e) => setPrefs({ ...prefs, level: clampLevel(Number(e.target.value)) })} sx={{ width: 90 }} slotProps={{ htmlInput: { min: 1, max: 70, 'data-testid': 'bis-level' } }} />
+        <TextField size="small" type="number" label="Level" value={prefs.level} onChange={(e) => setPrefs({ ...prefs, level: clampLevel(Number(e.target.value)) })} sx={{ width: 90 }} slotProps={{ htmlInput: { min: 1, max: maxCharacterLevel(), 'data-testid': 'bis-level' } }} />
         <Chip size="small" label="Current era" data-testid="bis-era" color={prefs.era ? 'primary' : 'default'} variant={prefs.era ? 'filled' : 'outlined'} onClick={() => setPrefs({ ...prefs, era: !prefs.era })} />
         <Chip size="small" label="Owned only" data-testid="bis-owned" color={prefs.owned ? 'primary' : 'default'} variant={prefs.owned ? 'filled' : 'outlined'} onClick={() => setPrefs({ ...prefs, owned: !prefs.owned })} />
       </Stack>
