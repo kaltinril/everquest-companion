@@ -19,7 +19,7 @@ import { REVAMP_ERA_TAGS, weaponKindOf, type TierModel } from '@shared/planner/t
 import type { PlanSlotId } from '@shared/planner/types'
 import { ItemIcon } from '../../lib/ItemIcon'
 import BisCompare, { type WornCell } from './BisCompare'
-import { cellLabel, hasteNote, termText } from './bisText'
+import { arrowText, cellLabel, hasteNote, termText } from './bisText'
 
 export type { WornCell } from './BisCompare'
 
@@ -180,6 +180,11 @@ function CardBody({ cell, props, pickWorn }: { cell: BisCell; props: BisCellsPro
       <Tags cell={cell} owned={props.owned} worn={pickWorn} />
       <Typography variant="caption" color="text.secondary">{pick.reasons.map((t) => termText(pick.row, t)).join('  ·  ')}</Typography>
       {note !== undefined && <Typography variant="caption" color="text.disabled">{note}</Typography>}
+      {cell.arrowForBow === true && (
+        <Typography variant="caption" color="info.main" data-testid="bis-arrow-for-bow">
+          {arrowText(pick.row)}
+        </Typography>
+      )}
       {pick.damageFirst !== undefined && (
         <Typography variant="caption" color="info.main" data-testid="bis-damage-first">
           {`Damage first: ratio ${pick.damageFirst.toFixed(2)} (your weapon ratio is in S; stats only break a tie)`}

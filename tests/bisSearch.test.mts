@@ -88,3 +88,47 @@ test('the exact choice equals brute force on 400 random small sheets', () => {
     assert.ok(Math.abs(value(cells, got.choice, rate) - got.total) < 1e-6, `case ${String(n)}: the choice is worth what it says`)
   }
 })
+
+/** Cell 0 PRIMARY, 1 SECONDARY, 2 RANGE (some candidates bows), 3 AMMO (with an arrow among its candidates), then plain cells. */
+function bowCells(next: () => number): SearchCell[] {
+  const cells = randomCells(next)
+  while (cells.length < 4) cells.push({ candidates: [], isPrimary: false, isSecondary: false })
+  const range = cells[2]
+  cells[2] = { ...range, isRange: true, candidates: range.candidates.map((c) => ({ ...c, key: `r${c.key}`, bow: next() < 0.5 })) }
+  const arrow: SearchCandidate = { key: 'arrow', base: Math.round(next() * 20 - 6), haste: 0, copies: next() < 0.3 ? 1 : Number.POSITIVE_INFINITY, twoHand: false }
+  const ammo = [...cells[3].candidates, arrow].sort((x, y) => y.base - x.base)
+  cells[3] = { ...cells[3], candidates: ammo, arrow }
+  return cells
+}
+
+/** The bow rule on top of `value`: a bow in RANGE leaves AMMO only its arrow or nothing. */
+function bowValue(cells: readonly SearchCell[], choice: readonly number[], rate: HasteRate): number {
+  const bowUp = choice[2] >= 0 && cells[2].candidates[choice[2]].bow === true
+  if (bowUp && choice[3] >= 0 && cells[3].candidates[choice[3]].key !== 'arrow') return Number.NEGATIVE_INFINITY
+  return value(cells, choice, rate)
+}
+
+test('with a bow rule, the exact choice still equals brute force on 400 random small sheets (owner: an arrow with a bow)', () => {
+  const next = rng(20261125)
+  for (let n = 0; n < 400; n++) {
+    const cells = bowCells(next)
+    const rate: HasteRate = { perPercent: n % 3 === 0 ? 0 : next() * 2 }
+    const got = searchLoadout(cells, rate)
+    let want = 0
+    const choice = cells.map(() => -1)
+    const visit = (i: number): void => {
+      if (i === cells.length) {
+        want = Math.max(want, bowValue(cells, choice, rate))
+        return
+      }
+      for (let k = -1; k < cells[i].candidates.length; k++) {
+        choice[i] = k
+        visit(i + 1)
+      }
+    }
+    visit(0)
+    assert.ok(Math.abs(got.total - want) < 1e-6, `case ${String(n)}: got ${String(got.total)}, brute force ${String(want)}`)
+    const read = got.choice.map((k, i) => (got.bow && i === 3 && k >= 0 ? cells[3].candidates.findIndex((c) => c.key === 'arrow') : k))
+    assert.ok(Math.abs(bowValue(cells, read, rate) - got.total) < 1e-6, `case ${String(n)}: the choice is worth what it says`)
+  }
+})

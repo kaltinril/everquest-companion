@@ -25,12 +25,17 @@ export interface CapCandidate {
   terms: readonly TierTerm[]
   /** stated haste percent, 0 when none */
   haste: number
+  /** a bow: in RANGE it keeps AMMO on its arrow */
+  bow?: boolean
 }
 
 export interface CapCell {
   list: readonly CapCandidate[]
   isPrimary: boolean
   isSecondary: boolean
+  isRange?: boolean
+  /** AMMO: the arrow it must hold while RANGE holds a bow (bisSearch.ts rule 4) */
+  arrowKey?: string
 }
 
 export interface CapRules {
@@ -75,11 +80,22 @@ function used(cells: readonly CapCell[], choice: readonly number[], skip: number
   return out
 }
 
+/** A bow in RANGE keeps AMMO on its arrow: would `cand` in cell `i` keep that true? */
+function bowRuleHolds(cells: readonly CapCell[], choice: readonly number[], i: number, cand: CapCandidate): boolean {
+  const ammo = cells.findIndex((c) => c.arrowKey !== undefined)
+  const range = cells.findIndex((c) => c.isRange === true)
+  if (ammo < 0 || range < 0) return true
+  const arrowKey = cells[ammo].arrowKey
+  if (i === range) return cand.bow !== true || choice[ammo] < 0 || cells[ammo].list[choice[ammo]].key === arrowKey
+  if (i === ammo) return choice[range] < 0 || cells[range].list[choice[range]].bow !== true || cand.key === arrowKey
+  return true
+}
+
 /** Would putting candidate `j` (or nothing, -1) in cell `i` keep the loadout legal? */
 function legal(cells: readonly CapCell[], choice: readonly number[], i: number, j: number): boolean {
   if (j < 0) return true
   const cand = cells[i].list[j]
-  if ((used(cells, choice, i).get(cand.key) ?? 0) + 1 > cand.copies) return false
+  if ((used(cells, choice, i).get(cand.key) ?? 0) + 1 > cand.copies || !bowRuleHolds(cells, choice, i, cand)) return false
   const primary = cells.findIndex((c) => c.isPrimary)
   const secondary = cells.findIndex((c) => c.isSecondary)
   if (cells[i].isPrimary && cand.twoHand) return secondary < 0 || choice[secondary] < 0

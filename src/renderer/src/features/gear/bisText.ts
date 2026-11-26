@@ -97,6 +97,12 @@ export function hasteNote(stated: number | undefined, counted: number, otherHast
     : `${head}: does not count, another slot gives ${String(Math.round(otherHaste))}% (haste does not stack)`
 }
 
+/** Why AMMO holds this arrow: a bow is in Range, and arrows rank by damage. */
+export function arrowText(row: Pick<GearRow, 'stats' | 'elementalDmg'>): string {
+  const elemental = row.elementalDmg === undefined || row.elementalDmg === 0 ? '' : `, elemental ${String(row.elementalDmg)} (counts half)`
+  return `Arrow for your bow, best damage first: DMG ${String(row.stats.DMG ?? 0)}${elemental}`
+}
+
 /** One line of the hover's compare: a stat, the best item's value, the worn item's, and who is ahead. */
 export interface CompareRow {
   chip: TierChip

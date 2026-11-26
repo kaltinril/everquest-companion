@@ -15,6 +15,7 @@ import { CHIP_KEYS, uniformBoard, type Tier, type TierChip, type TierSetup } fro
 import { defaultBoard } from '../src/shared/planner/tierDefaults'
 import { buildTierModel, conversionsFor, deriveChips, type TierModel } from '../src/shared/planner/tierWeights'
 import type { PlanSlotId } from '../src/shared/planner/types'
+import { ARROW_ELEMENTAL_WEIGHT, arrowRank, isArrow } from '../src/shared/planner/bisArrows'
 import { hasteCapAt, itemHasteRoom } from '../src/shared/planner/statCaps'
 
 function row(name: string, over: Partial<GearRow> = {}): GearRow {
@@ -189,6 +190,28 @@ test('a cap stops a stat counting above it, and the loadout fills with other sta
   assert.equal(RINGS.filter((c) => pickOf(capped, c) === 'Plated Ring').length, 3)
   assert.equal(capped.totals.DEX, 10)
   assert.equal(capped.total, 64 * 10 + 3 * 10)
+})
+
+test('a bow in Range puts the best arrow in Ammo: damage first, elemental at half, stats break a tie (owner, 2026-11-25)', () => {
+  const bow = row('Plain Bow', { slots: ['RANGE'], skill: 'Archery', stats: { DMG: 10, DELAY: 30 } })
+  const charm = row('Agile Charm', { slots: ['AMMO'], stats: { AGI: 5 } })
+  const shard = row('Shardwing Arrow', { slots: ['AMMO'], stats: { DMG: 12 } })
+  const blessed = row('Blessed Champion Arrows', { slots: ['AMMO'], skill: 'Archery', elementalDmg: 4, stats: { DMG: 11 } })
+  const frost = row('Frost Arrow', { slots: ['AMMO'], skill: 'Archery', elementalDmg: 3, stats: { DMG: 10 } })
+  const dex = row('Dex Arrow', { slots: ['AMMO'], skill: 'Archery', stats: { DMG: 12, AGI: 1 } })
+  const lanes = setup({ RATIO_RANGED: 'S', AGI: 'C' })
+  const s = sheet([bow, charm, shard, blessed, frost], lanes, { classes: ['RNG'] })
+  assert.equal(pickOf(s, 'RANGE'), 'Plain Bow')
+  const ammo = s.cells.find((c) => c.cell === 'AMMO')
+  assert.equal(ammo?.pick?.row.name, 'Blessed Champion Arrows', 'DMG 11 + 4 elemental at half (13) beats DMG 12, and beats the AGI charm')
+  assert.equal(ammo?.arrowForBow, true)
+  assert.deepEqual(ammo?.runnersUp.map((r) => r.row.name), ['Shardwing Arrow', 'Frost Arrow'], 'the next arrows, by damage: 12 beats 10 + 3 at half')
+  assert.equal(pickOf(sheet([bow, shard, dex], lanes, { classes: ['RNG'] }), 'AMMO'), 'Dex Arrow', 'same damage: the stats break the tie')
+  const noBow = sheet([charm, shard, blessed], lanes, { classes: ['RNG'] })
+  assert.equal(pickOf(noBow, 'AMMO'), 'Agile Charm', 'no bow: Ammo is scored as before')
+  assert.equal(noBow.cells.find((c) => c.cell === 'AMMO')?.arrowForBow, undefined)
+  assert.ok(isArrow(shard) && !isArrow(charm) && !isArrow(row('Velium Bolt', { slots: ['AMMO'], stats: { DMG: 5 } })))
+  assert.equal(arrowRank(blessed), 11 + ARROW_ELEMENTAL_WEIGHT * 4)
 })
 
 test('owned-only: an item fills no more cells than copies owned', () => {

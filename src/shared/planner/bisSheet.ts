@@ -23,8 +23,9 @@
 
 import type { ClassAbbr } from '../classCombo'
 import type { GearRow } from './gear'
+import { arrowRank, isArrow, isBow } from './bisArrows'
 import { improveUnderCaps, type CapCell, type CapRules } from './bisCaps'
-import { searchLoadout, type HasteRate, type SearchCandidate, type SearchCell } from './bisSearch'
+import { searchLoadout, type SearchCandidate, type SearchCell } from './bisSearch'
 import { gearHandedness } from './roleWeights'
 import { RATIO_CHIPS, activeChips, isRatioChip, tierWeight, type TierChip, type TierSetup } from './tierChips'
 import { chipUnit, ratioCounts, round3, tierTerms, type TierModel, type TierTerm } from './tierWeights'
@@ -67,6 +68,8 @@ export interface BisCell {
   otherHaste: number
   /** SECONDARY left empty because a two-hander sits in PRIMARY */
   closedByTwoHander?: true
+  /** AMMO holds the best arrow because RANGE holds a bow; runners-up are the next arrows */
+  arrowForBow?: true
 }
 
 export interface BisSheet {
@@ -200,9 +203,14 @@ function scoreCell(cell: PlanSlotId, rows: readonly GearRow[], opts: BisOptions)
     const stats = round3(terms.reduce((sum, t) => sum + t.points, 0))
     const haste = underCap(row.stats.HASTE ?? 0, cap)
     const prio = damageFirst(row, cell, opts)
-    out.push({ key: row.key, row, terms, base: stats + prio * DAMAGE_FIRST, prio, haste, copies: copiesOf(row, opts.owned), twoHand: gearHandedness(row.skill) === '2h', display: round3(stats + Math.max(0, haste) * rate) })
+    out.push({ key: row.key, row, terms, base: stats + prio * DAMAGE_FIRST, prio, haste, copies: copiesOf(row, opts.owned), twoHand: gearHandedness(row.skill) === '2h', bow: isBow(row), display: round3(stats + Math.max(0, haste) * rate) })
   }
   return out.sort((a, b) => b.prio - a.prio || b.display - a.display || a.row.name.localeCompare(b.row.name))
+}
+
+/** AMMO's arrows best-first: DMG with elemental damage at its weight (`bisArrows.ts`), then the score, then the name. */
+function arrowList(list: readonly Scored[]): Scored[] {
+  return list.filter((s) => isArrow(s.row)).sort((a, b) => arrowRank(b.row) - arrowRank(a.row) || b.display - a.display || a.row.name.localeCompare(b.row.name))
 }
 
 /** The rows the sheet may use at all: the class picks, the caller's gates, owned-only. */
@@ -240,10 +248,19 @@ function capPool(list: readonly Scored[], rules: CapRules): Scored[] {
   return [...new Set([...list.slice(0, CAP_WIDTH), ...extra])]
 }
 
-/** The choice under caps, as indices into each cell's full list; the loadout's capped value. */
-function solveWithCaps(lists: readonly Scored[][], start: readonly number[], rules: CapRules): { choice: number[]; total: number } {
-  const pools = lists.map((list) => capPool(list, rules))
-  const cells: CapCell[] = searchOrder().map((cell, i) => ({ list: pools[i], isPrimary: cell === 'PRIMARY', isSecondary: cell === 'SECONDARY' }))
+/** The choice under caps, as indices into each cell's full list; the loadout's capped value. A placed arrow stays in its pool. */
+function solveWithCaps(lists: readonly Scored[][], start: readonly number[], rules: CapRules, arrow: Scored | undefined): { choice: number[]; total: number } {
+  const pools = lists.map((list, i) => {
+    const pool = capPool(list, rules)
+    return arrow !== undefined && start[i] >= 0 && list[start[i]] === arrow && !pool.includes(arrow) ? [...pool, arrow] : pool
+  })
+  const cells: CapCell[] = searchOrder().map((cell, i) => ({
+    list: pools[i],
+    isPrimary: cell === 'PRIMARY',
+    isSecondary: cell === 'SECONDARY',
+    isRange: cell === 'RANGE',
+    ...(cell === 'AMMO' && arrow !== undefined ? { arrowKey: arrow.key } : {})
+  }))
   const choice = start.map((idx, i) => (idx < 0 ? -1 : pools[i].indexOf(lists[i][idx])))
   const total = improveUnderCaps(cells, choice, rules)
   return { choice: choice.map((j, i) => (j < 0 ? -1 : lists[i].indexOf(pools[i][j]))), total }
@@ -252,17 +269,18 @@ function solveWithCaps(lists: readonly Scored[][], start: readonly number[], rul
 /** How far down a cell's list the runners-up are re-scored against the loadout's haste before the top five are kept. */
 const RUNNER_POOL = 40
 
-function readCell(cell: PlanSlotId, list: readonly Scored[], index: number, { otherHaste, opts }: { otherHaste: number; opts: BisOptions }): BisCell {
+/** One cell read back; `ordered` keeps the list's own order for the runners-up (the arrows, by damage). */
+function readCell(cell: PlanSlotId, list: readonly Scored[], index: number, { otherHaste, opts, ordered }: { otherHaste: number; opts: BisOptions; ordered?: boolean }): BisCell {
   const picked = index >= 0 ? list[index] : undefined
-  const runnersUp = list
+  const scored = list
     .filter((s) => s !== picked)
     .slice(0, RUNNER_POOL)
     .map((s) => {
       const c = cellScore(s.row, cell, otherHaste, opts)
       return { row: s.row, score: c.score, hasteCounted: c.hasteCounted, ...(s.prio > 0 ? { damageFirst: s.prio } : {}) }
     })
-    .sort((a, b) => (b.damageFirst ?? 0) - (a.damageFirst ?? 0) || b.score - a.score || a.row.name.localeCompare(b.row.name))
-    .slice(0, RUNNERS_UP)
+  if (ordered !== true) scored.sort((a, b) => (b.damageFirst ?? 0) - (a.damageFirst ?? 0) || b.score - a.score || a.row.name.localeCompare(b.row.name))
+  const runnersUp = scored.slice(0, RUNNERS_UP)
   if (picked === undefined) return { cell, runnersUp, otherHaste }
   const c = cellScore(picked.row, cell, otherHaste, opts)
   const reasons = c.terms.filter((t) => t.points > 0).slice(0, REASONS)
@@ -310,23 +328,54 @@ export function alignPairsToWorn(sheet: BisSheet, wornKey: (cell: PlanSlotId) =>
 }
 
 /**
- * THE SHEET. Scores every admitted row once per cell, keeps the top `SEARCH_WIDTH` per cell for the
- * exact assignment, applies the caps pass when a cap is set, and reads the answer in `PLAN_SLOTS` order.
+ * The loadout, as indices into each cell's full list: the exact search over the top `SEARCH_WIDTH`
+ * per cell (AMMO offered `arrow` for a bow), the arrow's index read back onto AMMO's list when the bow
+ * variant won, then the caps pass when a cap is set.
+ */
+function chooseLoadout(order: readonly PlanSlotId[], lists: readonly Scored[][], arrow: Scored | undefined, opts: BisOptions): { choice: number[]; total: number } {
+  const cells: SearchCell[] = order.map((cell, i) => ({
+    candidates: lists[i].slice(0, SEARCH_WIDTH),
+    isPrimary: cell === 'PRIMARY',
+    isSecondary: cell === 'SECONDARY',
+    isRange: cell === 'RANGE',
+    ...(cell === 'AMMO' && arrow !== undefined ? { arrow } : {})
+  }))
+  const exact = searchLoadout(cells, { perPercent: hastePerPercent(opts) })
+  const ammo = order.indexOf('AMMO')
+  const start = exact.choice.map((idx, i) => (exact.bow && i === ammo && idx >= 0 && arrow !== undefined ? lists[i].indexOf(arrow) : idx))
+  const total = exact.total + withArrow(start, lists, arrow, [order.indexOf('RANGE'), ammo])
+  const rules = capRules(opts)
+  return rules === undefined ? { choice: start, total } : solveWithCaps(lists, start, rules, arrow)
+}
+
+/** A bow whose AMMO came back empty (an arrow scores nothing on most boards) still gets its arrow when a copy is free; returns its points. */
+function withArrow(choice: number[], lists: readonly Scored[][], arrow: Scored | undefined, [range, ammo]: readonly [number, number]): number {
+  if (arrow === undefined || choice[ammo] >= 0 || choice[range] < 0 || lists[range][choice[range]].bow !== true) return 0
+  if (choice.filter((idx, i) => idx >= 0 && lists[i][idx].key === arrow.key).length >= arrow.copies) return 0
+  choice[ammo] = lists[ammo].indexOf(arrow)
+  return arrow.base
+}
+
+/**
+ * THE SHEET. Scores every admitted row once per cell, chooses the loadout (`chooseLoadout`), and reads
+ * the answer in `PLAN_SLOTS` order. With a bow in RANGE, AMMO is read off the arrows, best damage first.
  */
 export function buildBisSheet(opts: BisOptions): BisSheet {
   const rows = admitted(opts)
   const order = searchOrder()
   const lists = order.map((cell) => scoreCell(cell, rows, opts))
-  const cells: SearchCell[] = order.map((cell, i) => ({ candidates: lists[i].slice(0, SEARCH_WIDTH), isPrimary: cell === 'PRIMARY', isSecondary: cell === 'SECONDARY' }))
-  const rate: HasteRate = { perPercent: hastePerPercent(opts) }
-  const exact = searchLoadout(cells, rate)
-  const rules = capRules(opts)
-  const { choice, total } = rules === undefined ? exact : solveWithCaps(lists, exact.choice, rules)
+  const [ammo, range] = [order.indexOf('AMMO'), order.indexOf('RANGE')]
+  const arrows = arrowList(lists[ammo])
+  const { choice, total } = chooseLoadout(order, lists, arrows.at(0), opts)
+  const bowUp = choice[range] >= 0 && lists[range][choice[range]].bow === true
   const byCell = new Map<PlanSlotId, BisCell>()
   const totals: Partial<Record<TierChip, number>> = {}
   const other = othersHaste(order.map((_, i) => (choice[i] >= 0 ? lists[i][choice[i]] : undefined)))
   order.forEach((cell, i) => {
-    const read = readCell(cell, lists[i], choice[i], { otherHaste: other[i], opts })
+    const onArrows = bowUp && i === ammo
+    const index = onArrows && choice[i] >= 0 ? arrows.indexOf(lists[i][choice[i]]) : choice[i]
+    const read = readCell(cell, onArrows ? arrows : lists[i], index, { otherHaste: other[i], opts, ordered: onArrows })
+    if (onArrows && read.pick !== undefined) read.arrowForBow = true
     if (read.pick !== undefined) addTotals(totals, read.pick.row, opts)
     byCell.set(cell, read)
   })
