@@ -470,6 +470,16 @@ Sources beside `plans/2026-11-25-aa-window/`: seven AA-window screenshots and th
   measured (WIZ MAG and ENC WIZ too), so it is read as everyone's. A class seen only beside WAR and
   MNK may still have some of the melee nine (Daybreak's notes add Rampage for BER, Point Blank Fire
   for RNG, ROG, BER). A new character can change classes in the starting area.
+- **The stale list's third block is far from the other two** (owner's 15:44 list): Pottery Mastery's
+  rank-2 and rank-3 blocks are back to back, the unsold "rank 4" block about seventy blocks later. So a
+  repeated `#id` inside one run is not a new run; every measured run opens on `#1` Innate Eminence.
+- **Other ownership evidence in the owner's live log** (2026-11-25, 35 MB, read-only scan; parsed into
+  the leveling snapshot's used set since then, BRANCH_NOTES.md "Alt. Advancement"):
+  `You can use the ability <AA> again in N minute(s) N seconds.` (Heroic Leap 20,320, Rampage 887);
+  `You begin casting <AA> <roman>.` names the rank (`Rampage II`, `Heroic Leap I`, `Cannibalization I`,
+  `Area Taunt I`, `Dragon Force I`); `... (Finishing Blow)` after your own melee hit; `You disable Point
+  Blank Fire.`; `Your Quick Buff combat ability is interrupted.`. `You activate X.` also names skills
+  (`Skull Bash`).
 - **The window's rank panels** (`aa-special-*.png`): Current Rank and Next Rank show the text plus
   "Requirements: Level: 1, No previous ability requirements". `/alt list` prints neither the
   requirements nor, for an activated rank, its passive half or its refresh. Rank 3 of a class

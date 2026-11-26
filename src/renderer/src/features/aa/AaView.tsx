@@ -1,6 +1,7 @@
 // aa/AaView.tsx — the Alt. Advancement tab (owner, 2026-11-25; docs/community/requirements/
-// alt-advancement.md), redesigned from mockup v4: one header line, the class combo, three cards, then
-// Summary / General / Archetype / Class / Special with a search across them.
+// alt-advancement.md), redesigned from mockup v4: the `/alt list` line first (owner, 2026-11-25: "the
+// /alt list should be first above everything in the AA tab"), one header line, the class combo, the
+// cards, then Summary / General / Archetype / Class / Special with a search across them.
 //
 // The table is shared/aaOfficial.ts `AA_ROWS`; ranks are shared/aaRanks.ts through useAaRanks (log,
 // grants, the player's picks); the combo's view of them is shared/aaBoard.ts through useAaBoard.
@@ -9,7 +10,7 @@ import { type JSX, useCallback, useMemo, useState } from 'react'
 import { Box, Chip, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
-import { AA_WIKI_ORDER, aaLeft, aaPlanDelta, aaSearchCount, aaSearchGroups, aaTabCount, aaTabGroups, type AaBoardRow, type AaScope, type AaSort } from '@shared/aaBoard'
+import { AA_WIKI_ORDER, aaCantTell, aaLeft, aaPlanDelta, aaSearchCount, aaSearchGroups, aaTabCount, aaTabGroups, type AaBoardRow, type AaScope, type AaSort } from '@shared/aaBoard'
 import { aaCostSumText } from '@shared/aaCost'
 import { aaRecommend, type AaRecs } from '@shared/aaRecommend'
 import { aaUnplaced } from '@shared/aaRanks'
@@ -19,11 +20,12 @@ import { classDisplayName } from '@shared/spellLevels'
 import type { LevelingSnap } from '@shared/types'
 import type { View } from '../../appViews'
 import ChipMultiSelect from '../../components/ChipMultiSelect'
+import OutputFileLine from '../../components/OutputFileLine'
 import { LogReadInline } from '../../components/LogReadInline'
 import type { TradeskillFocus } from '../../lib/tradeskillLink'
 import { useModule } from '../../lib/useModule'
 import { Tooltip } from '../../lib/Tooltip'
-import { PaceCard, PointsCard, SpendCard } from './AaCards'
+import { CantTellCard, PaceCard, PointsCard, SpendCard } from './AaCards'
 import { AaList } from './AaList'
 import { AaSpecial } from './AaSpecial'
 import { AaSummary } from './AaSummary'
@@ -38,6 +40,24 @@ const SECTIONS: readonly { id: AaSection; label: string }[] = [
   { id: 'class', label: 'Class' },
   { id: 'special', label: 'Special' }
 ]
+
+const ALT_LIST_STEPS = [
+  'Type /alt list in game (the long form is /alternateadv list).',
+  'Run it again after a class swap or a purchase: right after a purchase it can lag until you zone or swap loadouts.'
+] as const
+
+/** The command that feeds this tab its ranks, and when it last ran: the first thing on the tab. */
+function AltListLine({ listTs }: { listTs: number | null }): JSX.Element {
+  return (
+    <OutputFileLine
+      command="/alt list"
+      why="reads every AA rank your class combo has"
+      updatedAt={listTs === null ? undefined : new Date(listTs).toISOString()}
+      steps={ALT_LIST_STEPS}
+      testId="aa-alt-list"
+    />
+  )
+}
 
 const UNPLACED_TIP = 'Your log bought these, but no wiki AA row has the same name.'
 
@@ -61,9 +81,11 @@ function headerLine(s: AaBoardState): string {
   const who = [s.character ?? '', s.detected.join('/'), s.level === null ? '' : String(s.level)].filter((w) => w !== '').join(' · ')
   const left = aaLeft(s.ownBoard)
   const banked = s.unspent === null ? '' : ` · ${String(s.unspent)} points banked`
-  if (left.count === 0) return `${who} · everything your classes can buy is maxed${banked}`
+  const unsure = aaCantTell(s.ownBoard).length
+  const cantTell = unsure === 0 ? '' : ` · ${String(unsure)} the log can't tell`
+  if (left.count === 0) return `${who} · everything your classes can buy is maxed${cantTell}${banked}`
   const unspent = s.unspent === null ? '' : ` · ${String(s.unspent)} unspent`
-  return `${who} · ${String(left.count)} AA${left.count === 1 ? '' : 's'} left to buy, ${String(left.points)}${left.unknown ? '+' : ''} pts${unspent}`
+  return `${who} · ${String(left.count)} AA${left.count === 1 ? '' : 's'} left to buy, ${String(left.points)}${left.unknown ? '+' : ''} pts${cantTell}${unspent}`
 }
 
 /** The header: the page's name and one line about the character. The unspent warning (aa-points-warn) sits beside it. */
@@ -251,6 +273,7 @@ function AaView({ onGo, onOpenTradeskill }: AaLinksProps): JSX.Element {
   return (
     <AaNavContext.Provider value={nav}>
       <Box data-testid="aa-view" sx={{ height: '100%', overflow: 'auto', overscrollBehavior: 'contain', p: 2, minHeight: 0 }}>
+        <AltListLine listTs={s.listTs} />
         {!ready && (
           <LogReadInline module="leveling" served={s.served} sx={{ py: 4, textAlign: 'center' }}>
             <Typography variant="body2" color="text.secondary" data-testid="aa-empty" sx={{ py: 4, textAlign: 'center' }}>
@@ -266,6 +289,7 @@ function AaView({ onGo, onOpenTradeskill }: AaLinksProps): JSX.Element {
               <PointsCard unspent={s.unspent} ownBoard={s.ownBoard} planning={s.planning} />
               <PaceCard />
               <SpendCard recs={recs} unspent={s.unspent} />
+              <CantTellCard board={s.ownBoard} setPick={s.setPick} />
             </Stack>
             <TabRow s={s} tab={tab} setTab={setTab} scope={scope} query={query} setQuery={setQuery} maxLevel={maxLevel} />
             <Body s={s} recs={recs} tab={tab} setTab={setTab} scope={scope} query={query} maxLevel={maxLevel} sort={sort} setSort={setSort} />

@@ -1,5 +1,6 @@
 // Types shared across the main process, preload bridge, and renderer.
 
+import type { AaActivation, AaListRun } from './aaList'
 import type { ConsiderFaction, LootDisposition } from './logEvents'
 import type { ItemStatBlock } from './itemStats'
 import type { MobKnowledge } from './mobTypes'
@@ -891,12 +892,19 @@ export interface LevelingSnap {
   /** AA-potion quaffs in log order. Uncapped like its siblings — the charge count is read off
    *  the LAST one, and a bottle never expires, so an old activation is still load-bearing. */
   aaPotions: AAPotionEvent[]
+  /** The latest `/alt list` run (shared/aaList.ts); null before one. Absent from an engine or an
+   *  archived segment older than the field. */
+  aaList?: AaListRun | null
+  /** Every name seen in `You activate X.`, AA or not; absent as `aaList` is. */
+  aaActivations?: AaActivation[]
 }
 export interface LevelingDelta {
   levels: LevelEvent[]
   aaGains: AAEvent[]
   aaSpends: AASpendEvent[]
   aaPotions: AAPotionEvent[]
+  aaList?: AaListRun | null
+  aaActivations?: AaActivation[]
 }
 
 /** character module: current character, zone, and the level the log last STATED (JOS-192). The

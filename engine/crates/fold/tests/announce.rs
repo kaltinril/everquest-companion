@@ -199,6 +199,18 @@ fn leveling_announces_on_every_arm_that_appends_and_on_nothing_between_them() {
 }
 
 #[test]
+fn leveling_announces_an_alt_list_line_and_a_first_activation_but_not_a_repeat_one() {
+    let mut p = Probe::new();
+    let header =
+        r#"{"kind":"aaList","seq":1,"ts":1000,"raw":"h","value":40,"ability":"Combat Fury"}"#;
+    assert!(p.fold(header).contains(&"leveling"));
+    let first = r#"{"kind":"aaActivate","seq":2,"ts":2000,"raw":"a","name":"Quick Buff"}"#;
+    assert!(p.fold(first).contains(&"leveling"));
+    let again = r#"{"kind":"aaActivate","seq":3,"ts":9000,"raw":"a","name":"Quick Buff"}"#;
+    assert!(!p.fold(again).contains(&"leveling"));
+}
+
+#[test]
 fn kills_announces_the_counted_kill_and_not_the_zone_or_the_experience_that_set_it_up() {
     let mut p = Probe::new();
     // Both of these mutate state — the tier label and the parked experience stamp — and neither is

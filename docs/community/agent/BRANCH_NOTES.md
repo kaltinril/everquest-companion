@@ -179,7 +179,7 @@ where one exists.
   from `scripts/gen-aa-table.mts` + `scripts/sources/allAas.ts`, parsing the cached page only.
   `tests/aaTable.test.mts` is red while the committed table is behind the cache: regenerate, never
   hand-edit. Corrections from the game and Daybreak's notes go in a layer over it, not into it.
-- Rank = the player's pick, else the log's top rank (`aaLedger`), else 0. Picks: localStorage
+- Rank: the ORDER OF PROOF below (2026-11-25). Picks: localStorage
   `eq.aa.ranks` = `{ [character]: { [rowKey]: rank } }`, one `useSyncExternalStore` store, so the tab
   and the Best in slot sheet stay in step.
 - THE LOG WINS (WORKFLOW.md ruling 2026-11-25): top rank = max(wiki rank count, log rank); the shown
@@ -191,8 +191,33 @@ where one exists.
 - Soft cap (`reincarnationCap.ts`): no reincarnation in the log = hard 510; else 510 + 10 a
   reincarnation before Rulers of Kunark, 11 from it, + 5 a Human rank, + 3 a Half Elf rank, a point
   above counting `SOFT_CAP_OVER` 0.2. A reincarnation before the log began is not counted.
-- `/alternateadv list` writes every AA the combo can see into the log (MEASURED.md, "Alternate
-  advancement"); not parsed yet. `/outputfile` has no AA kind.
+- ORDER OF PROOF (owner, 2026-11-25; `shared/aaRanks.ts` `rankAasFrom`): the first source that says
+  something wins. 1. the latest `/alt list` run (`shared/aaList.ts`), except a purchase line logged
+  after the run OR after the last zone-in before it raises it (`aaBeatsList`; a list is stale until a
+  zone after a purchase); purchases before that zone-in are superseded (respecs exist:
+  `tests/fixtures/aa-mnemonic-respec.log`). No zone-in seen before the run (`zoneBefore` null, e.g. the
+  zone was in an older archive segment): every purchase counts. Loadout swaps are not detected.
+  2. the player's own use lines for a table name: the rank a cast's numeral names, else at least 1
+  (a numeral above the wiki's count raises the top rank).
+  3. the pick. 4. purchase lines (`aaLedger`), then grants (`withGranted` never moves a list or pick
+  rank). A one-rank row the list printed with none of 2-4 is `unknown`: not buyable, out of
+  `aaLeft` and the tab counts, listed in the "Can't tell from the log" card ("I have it" = pick).
+  The row detail names the deciding source; the picker is disabled where the list or (one-rank)
+  activation decides.
+- `/alt list` DATA FLOW: engine `eqlog/src/parse/aa_list.rs` (kind `aaList`: header `value`+`ability`,
+  `text`, `cost`; first in the cascade) → `fold/src/modules/leveling_aa.rs` (latest run; a new run on
+  a >2 s gap or the run's first id again, not on other repeats: a stale list repeats an id far apart;
+  `zoneBefore` = the last `zone` event before the run; the used set name/first/last/rank, fed by
+  `aaActivate`, `castBegin` (rank via `names::spell_rank`), `aaOwned` (reuse timer, `You disable X.`,
+  `Your X combat ability is interrupted.`; classifier last in the cascade) and the player's own
+  melee `damage` with `(Finishing Blow)` (raw-tail gate); only a new name or a higher rank announces;
+  every cast name is kept, the app filters by the table) → `LevelingSnap.aaList`,
+  `.aaActivations` (optional: absent from older segments) → `mergeLeveling` (newer run by stamp,
+  activations joined by name, fields only when a side has them). Reading a rank: each slash group of
+  the row text with one value a rank (`1/2/3/5%`) against the block's numbers, else the cost; one
+  block of rank 1 = 0; two = current then next (min); three or more = stale, says nothing. The tab's
+  first row is the shared `OutputFileLine` for `/alt list` (no `/outputfile` kind: `/outputfile` has
+  none for AAs), stamped with the run's log time.
 - CORRECTIONS (`shared/aaOfficial.ts`): `AA_CORRECTIONS`, a source and date per entry; `AA_ROWS` is the
   table every reader uses (tab, ranks, points, the Best in slot cap). Never hand-edit the generated
   table. A correction the wiki has caught up with changes nothing (`correctionAgrees`). Entry fields:

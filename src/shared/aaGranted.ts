@@ -97,7 +97,10 @@ export function aaGrantedRank(row: AaTableRow & { removed?: unknown }, who: AaCh
   return rank
 }
 
-/** The ranks with each grant applied: pick, then the higher of log and grant, then 0. */
+/** A rank a grant does not move: the player's pick, or what the `/alt list` run read. */
+const settled = (r: AaRanked): boolean => r.source === 'pick' || r.source === 'list'
+
+/** The ranks with each grant applied: list or pick, then the higher of the rest and the grant, then 0. */
 export function withGranted(ranked: readonly AaRanked[], who: AaCharacter): AaRanked[] {
   if (who.level === null) return [...ranked]
   const byName = new Map<string, AaRanked[]>()
@@ -110,17 +113,19 @@ export function withGranted(ranked: readonly AaRanked[], who: AaCharacter): AaRa
     // A requirement that leads back to this row grants nothing.
     if (busy.has(r)) return 0
     busy.add(r)
-    const g = r.source === 'pick' ? 0 : aaGrantedRank(r.row, who, rankOf)
+    const g = settled(r) ? 0 : aaGrantedRank(r.row, who, rankOf)
     busy.delete(r)
     granted.set(r, g)
     return g
   }
-  const held = (r: AaRanked): number => (r.source === 'pick' ? r.rank : Math.max(r.rank, grantOf(r)))
+  const held = (r: AaRanked): number => (settled(r) ? r.rank : Math.max(r.rank, grantOf(r)))
   function rankOf(name: string): number {
     return Math.max(0, ...(byName.get(aaFold(name)) ?? []).map(held))
   }
   return ranked.map((r) => {
     const g = grantOf(r)
-    return r.source !== 'pick' && g > r.rank ? { ...r, rank: g, source: 'granted' as const } : r
+    if (settled(r) || g <= r.rank) return r
+    const { unknown: _, ...rest } = r
+    return { ...rest, rank: g, source: 'granted' as const }
   })
 }
