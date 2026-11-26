@@ -5,7 +5,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { withGranted } from '../src/shared/aaGranted'
 import { rankAas, type AaPicks, type AaRanked } from '../src/shared/aaRanks'
-import { aaBoard, aaComboMax, aaFit, aaLeft, aaPlanDelta, aaSearchGroups, aaStartLevel, aaTabCount, aaTabGroups, aaWithinLevel, type AaBoardRow, type AaCombo } from '../src/shared/aaBoard'
+import { AA_WIKI_ORDER, aaBoard, aaComboMax, aaFit, aaLeft, aaPlanDelta, aaSearchGroups, aaSortGroups, aaStartLevel, aaTabCount, aaTabGroups, aaWithinLevel, type AaBoardRow, type AaCombo } from '../src/shared/aaBoard'
 import { aaNotForPoints, aaRecFit, aaRecommend } from '../src/shared/aaRecommend'
 import { aaSigned, aaStatTotals } from '../src/shared/aaStats'
 import { aaActivation, aaLinks } from '../src/shared/aaLinks'
@@ -138,6 +138,25 @@ test('LEVEL FILTER: rank 1 by the wiki; a row whose level the text does not stat
   assert.equal(unfiltered.of - filtered.of, 2, 'Full Potential and Widened Perception drop out')
   assert.equal(aaSearchGroups(board, 'usable', 'loadout', 10).length, 0)
   assert.equal(aaSearchGroups(board, 'usable', 'loadout', 25).length, 1)
+})
+
+test('SORT: by level or name inside each group, groups kept in place; the wiki order by default', () => {
+  const board = aaBoard(ranked(), own)
+  const groups = aaTabGroups(board, 'class', OWN, { scope: 'usable', query: '' })
+  assert.deepEqual(aaSortGroups(groups, AA_WIKI_ORDER), groups)
+  const up = aaSortGroups(groups, { key: 'level', dir: 'asc' })
+  assert.deepEqual(up.map((g) => g.title), groups.map((g) => g.title), 'a class stays a class')
+  for (const g of up) {
+    const levels = g.rows.map((b) => aaStartLevel(b)).filter((l): l is number => l !== null)
+    assert.deepEqual(levels, [...levels].sort((a, b) => a - b))
+  }
+  const down = aaSortGroups(groups, { key: 'level', dir: 'desc' })
+  for (const g of down) {
+    const levels = g.rows.map((b) => aaStartLevel(b)).filter((l): l is number => l !== null)
+    assert.deepEqual(levels, [...levels].sort((a, b) => b - a))
+  }
+  const names = aaSortGroups(groups, { key: 'name', dir: 'asc' })[0].rows.map((b) => b.r.key)
+  assert.deepEqual(names, [...names].sort((a, b) => a.localeCompare(b)))
 })
 
 test('WHAT YOUR AAS GIVE YOU: totals from held usable ranks, race and class lines included', () => {

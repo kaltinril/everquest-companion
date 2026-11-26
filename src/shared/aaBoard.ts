@@ -108,6 +108,32 @@ export function aaWithinLevel(b: AaBoardRow, maxLevel: number | null): boolean {
   return level === null || level <= maxLevel
 }
 
+/** How a list's rows are ordered inside each group: the wiki's order, or by name or level. */
+export interface AaSort {
+  key: 'wiki' | 'name' | 'level'
+  dir: 'asc' | 'desc'
+}
+
+export const AA_WIKI_ORDER: AaSort = { key: 'wiki', dir: 'asc' }
+
+/**
+ * Each group's rows in the sort's order; the groups themselves stay where they are (a class stays a
+ * class). A row whose level the wiki does not state clearly sorts after every stated one, either way;
+ * ties keep the wiki's order.
+ */
+export function aaSortGroups(groups: readonly AaListGroup[], sort: AaSort): AaListGroup[] {
+  if (sort.key === 'wiki') return [...groups]
+  const sign = sort.dir === 'asc' ? 1 : -1
+  const cmp = (a: AaBoardRow, b: AaBoardRow): number => {
+    if (sort.key === 'name') return sign * a.r.key.localeCompare(b.r.key)
+    const la = aaStartLevel(a)
+    const lb = aaStartLevel(b)
+    if (la === null || lb === null) return (la === null ? 1 : 0) - (lb === null ? 1 : 0)
+    return sign * (la - lb)
+  }
+  return groups.map((g) => ({ ...g, rows: [...g.rows].sort(cmp) }))
+}
+
 /** What a list shows: the scope, the search and the level filter. */
 export interface AaFilter {
   scope: AaScope

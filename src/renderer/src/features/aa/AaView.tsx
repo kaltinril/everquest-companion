@@ -9,7 +9,7 @@ import { type JSX, useCallback, useMemo, useState } from 'react'
 import { Box, Chip, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
-import { aaLeft, aaPlanDelta, aaSearchCount, aaSearchGroups, aaTabCount, aaTabGroups, type AaBoardRow, type AaScope } from '@shared/aaBoard'
+import { AA_WIKI_ORDER, aaLeft, aaPlanDelta, aaSearchCount, aaSearchGroups, aaTabCount, aaTabGroups, type AaBoardRow, type AaScope, type AaSort } from '@shared/aaBoard'
 import { aaCostSumText } from '@shared/aaCost'
 import { aaRecommend, type AaRecs } from '@shared/aaRecommend'
 import { aaUnplaced } from '@shared/aaRanks'
@@ -199,7 +199,7 @@ function TabRow({ s, tab, setTab, scope, query, setQuery, maxLevel }: { s: AaBoa
 }
 
 /** One sub-tab's count line and list. */
-function SectionTab({ s, section, scope, query, maxLevel }: { s: AaBoardState; section: AaSection; scope: AaScope; query: string; maxLevel: number | null }): JSX.Element {
+function SectionTab({ s, section, scope, query, maxLevel, sort, setSort }: { s: AaBoardState; section: AaSection; scope: AaScope; query: string; maxLevel: number | null; sort: AaSort; setSort: (v: AaSort) => void }): JSX.Element {
   const groups = useMemo(() => aaTabGroups(s.board, section, s.classes, { scope, query, maxLevel }), [s.board, section, s.classes, scope, query, maxLevel])
   const c = aaTabCount(s.board, section, { scope, query, maxLevel })
   const filtered = maxLevel !== null
@@ -211,17 +211,17 @@ function SectionTab({ s, section, scope, query, maxLevel }: { s: AaBoardState; s
           {`${name} ${String(c.maxed)}/${String(c.of)} · ${aaCostSumText(c.points)}${filtered ? ` · up to level ${String(maxLevel)}, by the wiki` : ''}`}
         </Typography>
       )}
-      <AaList groups={groups} classes={s.classes} setPick={s.setPick} showLevel={filtered} empty={query.trim() === '' && !filtered ? 'Nothing here for these classes.' : 'Nothing matches.'} />
+      <AaList groups={groups} classes={s.classes} setPick={s.setPick} sort={sort} setSort={setSort} empty={query.trim() === '' && !filtered ? 'Nothing here for these classes.' : 'Nothing matches.'} />
     </>
   )
 }
 
-function Body({ s, recs, tab, setTab, scope, query, maxLevel }: { s: AaBoardState; recs: AaRecs; tab: AaTabId; setTab: (t: AaTabId) => void; scope: AaScope; query: string; maxLevel: number | null }): JSX.Element {
+function Body({ s, recs, tab, setTab, scope, query, maxLevel, sort, setSort }: { s: AaBoardState; recs: AaRecs; tab: AaTabId; setTab: (t: AaTabId) => void; scope: AaScope; query: string; maxLevel: number | null; sort: AaSort; setSort: (v: AaSort) => void }): JSX.Element {
   // Special rows come from reincarnating and achievements, not a level: the level filter leaves them be.
   if (tab === 'special') return <AaSpecial board={s.board} ranked={s.ranked} reincarnations={s.reincarnations} classes={s.classes} setPick={s.setPick} query={query} />
-  if (tab !== 'summary') return <SectionTab s={s} section={tab} scope={scope} query={query} maxLevel={maxLevel} />
+  if (tab !== 'summary') return <SectionTab s={s} section={tab} scope={scope} query={query} maxLevel={maxLevel} sort={sort} setSort={setSort} />
   if (query.trim() !== '') {
-    return <AaList groups={aaSearchGroups(s.board, scope, query, maxLevel)} classes={s.classes} setPick={s.setPick} showClass showLevel={maxLevel !== null} empty="Nothing matches." />
+    return <AaList groups={aaSearchGroups(s.board, scope, query, maxLevel)} classes={s.classes} setPick={s.setPick} showClass sort={sort} setSort={setSort} empty="Nothing matches." />
   }
   return <AaSummary board={s.board} planning={s.planning} recs={recs} unspent={s.unspent} classes={s.classes} onSpecial={() => setTab('special')} />
 }
@@ -237,6 +237,7 @@ function AaView({ onGo, onOpenTradeskill }: AaLinksProps): JSX.Element {
   const [scope, setScope] = useState<AaScope>('usable')
   const [query, setQuery] = useState('')
   const [maxLevel, setMaxLevel] = useState<number | null>(null)
+  const [sort, setSort] = useState<AaSort>(AA_WIKI_ORDER)
   const [open, setOpen] = useState<string | null>(null)
   const toggle = useCallback((id: string) => setOpen((o) => (o === id ? null : id)), [])
   const jump = useCallback((b: AaBoardRow) => {
@@ -267,7 +268,7 @@ function AaView({ onGo, onOpenTradeskill }: AaLinksProps): JSX.Element {
               <SpendCard recs={recs} unspent={s.unspent} />
             </Stack>
             <TabRow s={s} tab={tab} setTab={setTab} scope={scope} query={query} setQuery={setQuery} maxLevel={maxLevel} />
-            <Body s={s} recs={recs} tab={tab} setTab={setTab} scope={scope} query={query} maxLevel={maxLevel} />
+            <Body s={s} recs={recs} tab={tab} setTab={setTab} scope={scope} query={query} maxLevel={maxLevel} sort={sort} setSort={setSort} />
           </>
         )}
       </Box>
