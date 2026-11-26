@@ -144,6 +144,10 @@ where one exists.
     (Unknown Era shown). Trigger: Dwarven Plate Boots (Enchanted Imbued), a cultural piece no page
     dates, filled Feet. A held copy passes the era gate (`bisAdmits`; an owned item is owned). The
     tier model still measures over `!eraHidden` rows.
+  - Class: NONE (owner, 2026-11-25): `normalize.statesNoClass` -> `GearRow.noClass`; `bisAdmits` drops
+    it always, the Plan route via `isRecommendable`. `normalizeClasses` still returns `[]` for both
+    NONE and an unstated list; `noClass` is what tells them apart. 7 slotted pages; two are
+    pet-illusion forms of wearable items (MEASURED.md, Converted items), whose wearable form stays.
   - Not done: P5 (effects chips, a "My tier list" focus on Recommended and Void motes, per-character
     boards); the upgrade slider on the sheet; the Lore Group rule; not looked at in the running app.
   - 2026-11-25 batch (owner's asks, `requirements/bis-sheet.md`; merged, not seen on screen by the owner):

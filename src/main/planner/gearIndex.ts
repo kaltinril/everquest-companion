@@ -47,6 +47,7 @@ import { runSteps, type Steps } from '../yieldingSteps'
 import {
   isHasteEffect,
   normalizeClasses,
+  statesNoClass,
   normalizeSlotTokens,
   parseFocusEffect,
   socketTypeOf
@@ -433,6 +434,7 @@ function pageRow(entry: ItemDbEntry, deps: BuildDeps, acc: Acc): GearRow | null 
     ...(skillMods.length === 0 ? {} : { skillMods }),
     // Listed all the same; the recommenders leave it out (`GearRow.unobtainable`).
     ...(isUnobtainable(k) ? { unobtainable: true as const } : {}),
+    ...(statesNoClass(block.classes) ? { noClass: true as const } : {}),
     quest: k.quest,
     playerCrafted: k.playerCrafted === true,
     stats: read.stats,

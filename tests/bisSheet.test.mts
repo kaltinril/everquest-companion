@@ -370,3 +370,17 @@ test('over the corpus under the recommenders\' era gate: the WAR/MNK/SHM sheet t
   assert.ok(!picks.some((r) => /^summoned:/i.test(r.name) || r.flags.includes('Temporary')), picks.map((r) => r.name).join(', '))
   assert.ok(!picks.some((r) => admit(r) === false), 'every pick is positively in era')
 })
+
+// `Class: NONE`: no player wears it, e.g. the pet-illusion form an item converts to (owner, 2026-11-25).
+test('a Class: NONE item is never a pick, held or not; the wearable form it converts from is', () => {
+  const collar = row('Collar of Necropotence', { slots: ['NECK'], classes: [], noClass: true, stats: { AC: 50 } })
+  const amulet = row('Amulet of Necropotence', { slots: ['NECK'], classes: [], stats: { AC: 5 } })
+  for (const extra of [{}, { held: new Map([['collar of necropotence', 1]]) }] as Partial<BisOptions>[]) {
+    assert.equal(pickOf(sheet([collar, amulet], setup({ AC: 'S' }), extra), 'NECK'), 'Amulet of Necropotence')
+  }
+  assert.equal(bisAdmits(collar, { classes: ['WAR'] }), false)
+  const flagged = corpus.filter((r) => r.noClass === true).map((r) => r.key)
+  assert.ok(flagged.includes('collar of necropotence') && flagged.includes('guise of the deceived'), flagged.join(', '))
+  assert.ok(!flagged.includes('amulet of necropotence') && !flagged.includes('guise of the deceiver'))
+  assert.ok((corpus.find((r) => r.key === 'amulet of necropotence')?.classes.length ?? 0) > 0, 'the wearable form states classes')
+})
