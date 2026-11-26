@@ -25,6 +25,7 @@ import { useModule } from '../../lib/useModule'
 import { Tooltip } from '../../lib/Tooltip'
 import { PaceCard, PointsCard, SpendCard } from './AaCards'
 import { AaList } from './AaList'
+import { AaSpecial } from './AaSpecial'
 import { AaSummary } from './AaSummary'
 import { AaNavContext, aaRowId, type AaNav } from './aaNav'
 import { useAaBoard, type AaBoardState } from './useAaBoard'
@@ -183,6 +184,7 @@ function SectionTab({ s, section, scope, query }: { s: AaBoardState; section: Aa
 }
 
 function Body({ s, recs, tab, setTab, scope, query }: { s: AaBoardState; recs: AaRecs; tab: AaTabId; setTab: (t: AaTabId) => void; scope: AaScope; query: string }): JSX.Element {
+  if (tab === 'special') return <AaSpecial board={s.board} ranked={s.ranked} reincarnations={s.reincarnations} classes={s.classes} setPick={s.setPick} query={query} />
   if (tab !== 'summary') return <SectionTab s={s} section={tab} scope={scope} query={query} />
   if (query.trim() !== '') {
     return <AaList groups={aaSearchGroups(s.board, scope, query)} classes={s.classes} setPick={s.setPick} showClass empty="Nothing matches." />
