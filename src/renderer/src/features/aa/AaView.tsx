@@ -164,7 +164,7 @@ function AaView(): JSX.Element {
   const ready = served && character !== null
   return (
     <Box data-testid="aa-view" sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 2, minHeight: 0 }}>
-      <Typography variant="h6">Alt. Advancement</Typography>
+      <Typography variant="h6">Alternate Advancement</Typography>
       <Typography variant="caption" color="text.secondary">
         {CAPTION}
       </Typography>

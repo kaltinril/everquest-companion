@@ -141,9 +141,13 @@ function TextCell({ r }: { r: AaRanked }): JSX.Element {
   }
   return (
     <TableCell sx={CELL_SX}>
-      <Tooltip title={r.row.hk === undefined ? r.row.text : `${r.row.text} Hotkey: ${r.row.hk}`} cursor="inherit">
+      {r.row.hk === undefined ? (
         <Box sx={TEXT_SX}>{r.row.text}</Box>
-      </Tooltip>
+      ) : (
+        <Tooltip title={`Hotkey: ${r.row.hk}`} cursor="inherit">
+          <Box sx={TEXT_SX}>{r.row.text}</Box>
+        </Tooltip>
+      )}
       <Mark r={r} fields={['text', 'hk']} />
     </TableCell>
   )

@@ -116,7 +116,7 @@ export const VIEW_LABELS: Record<View, string> = {
   alerts: 'Alerts',
   leveling: 'Leveling',
   skills: 'Skills',
-  aa: 'Alt. Advancement',
+  aa: 'Alt. Adv.',
   tradeskills: 'Tradeskills',
   macros: 'Macros',
   loot: 'Loot',
