@@ -10,13 +10,13 @@ import { buildGearIndex } from '../src/main/planner/gearIndex'
 import { eraHides } from '../src/renderer/src/features/planner/plannerData'
 import type { ClassAbbr } from '../src/shared/classCombo'
 import type { GearRow } from '../src/shared/planner/gear'
-import { DAMAGE_FIRST, alignPairsToWorn, buildBisSheet, cellScore, hasteCounted, isLoreRow, itemHasteCap, type BisOptions, type BisSheet } from '../src/shared/planner/bisSheet'
+import { DAMAGE_FIRST, alignPairsToWorn, buildBisSheet, cellScore, defaultChipCaps, hasteCounted, isLoreRow, itemHasteCap, type BisOptions, type BisSheet } from '../src/shared/planner/bisSheet'
 import { CHIP_KEYS, uniformBoard, type Tier, type TierChip, type TierSetup } from '../src/shared/planner/tierChips'
 import { defaultBoard } from '../src/shared/planner/tierDefaults'
-import { buildTierModel, conversionsFor, deriveChips, type TierModel } from '../src/shared/planner/tierWeights'
+import { buildTierModel, conversionsFor, deriveChips, round3, type TierModel } from '../src/shared/planner/tierWeights'
 import type { PlanSlotId } from '../src/shared/planner/types'
 import { ARROW_ELEMENTAL_WEIGHT, arrowRank, isArrow } from '../src/shared/planner/bisArrows'
-import { hasteCapAt, itemHasteRoom } from '../src/shared/planner/statCaps'
+import { HARD_STAT_CAPS, countedAmount, hasteCapAt, itemHasteRoom } from '../src/shared/planner/statCaps'
 
 function row(name: string, over: Partial<GearRow> = {}): GearRow {
   return { key: name.toLowerCase(), name, searchKey: name.toLowerCase(), slots: ['FINGER'], classes: [], races: ['ALL'], flags: [], quest: false, playerCrafted: false, stats: {}, effects: [], ...over }
@@ -212,6 +212,46 @@ test('a bow in Range puts the best arrow in Ammo: damage first, elemental at hal
   assert.equal(noBow.cells.find((c) => c.cell === 'AMMO')?.arrowForBow, undefined)
   assert.ok(isArrow(shard) && !isArrow(charm) && !isArrow(row('Velium Bolt', { slots: ['AMMO'], stats: { DMG: 5 } })))
   assert.equal(arrowRank(blessed), 11 + ARROW_ELEMENTAL_WEIGHT * 4)
+})
+
+test("attributes stop at eqlwiki's hard cap, 510, with no click; a cap the player sets wins (owner, 2026-11-25)", () => {
+  const str = row('Str Ring', { stats: { STR: 300 } })
+  const ac = row('Plated Ring', { stats: { AC: 10 } })
+  const lanes = setup({ STR: 'S', AC: 'C' })
+  const byDefault = sheet([str, ac], lanes)
+  assert.equal(RINGS.filter((c) => pickOf(byDefault, c) === 'Str Ring').length, 2, 'a third 300 STR ring would be past 510')
+  assert.equal(byDefault.total, 64 * 510 + 2 * 10)
+  assert.equal(byDefault.totals.STR, 600, 'the totals stay what the gear gives')
+  const own = sheet([str, ac], setup({ STR: 'S', AC: 'C' }, { caps: { STR: 1000 } }))
+  assert.equal(RINGS.filter((c) => pickOf(own, c) === 'Str Ring').length, 4, "the player's 1000 replaces the 510")
+  assert.equal(own.total, 64 * 1000)
+  assert.deepEqual(defaultChipCaps(), { STR: 510, AGI: 510, DEX: 510, CHA: 510 })
+})
+
+test('a soft cap counts each point above it at its rate: the seam for reincarnation and AA bonuses', () => {
+  assert.equal(countedAmount(600, { value: 510, over: 0.2 }), 528)
+  assert.equal(countedAmount(600, { value: 510, over: 0 }), 510, 'hard')
+  assert.equal(countedAmount(400, { value: 510, over: 0 }), 400)
+  assert.equal(HARD_STAT_CAPS.WIS?.value, 510)
+  const str = row('Str Ring', { stats: { STR: 300 } })
+  const s = sheet([str, row('Plated Ring', { stats: { AC: 10 } })], setup({ STR: 'S', AC: 'C' }), { statCaps: { STR: { value: 510, over: 0.2 } } })
+  assert.equal(RINGS.filter((c) => pickOf(s, c) === 'Str Ring').length, 4)
+  assert.equal(s.total, round3(64 * (510 + 690 * 0.2)), 'above 510 a point counts a fifth')
+})
+
+test('STA, INT and WIS are capped inside HP and Mana: STA above 510 adds no HP', () => {
+  const sta = row('Sta Ring', { stats: { STA: 300 } })
+  const s = sheet([sta, row('Plated Ring', { stats: { AC: 10 } })], setup({ HP: 'S', AC: 'C' }), { classes: ['WAR'] })
+  assert.equal(RINGS.filter((c) => pickOf(s, c) === 'Sta Ring').length, 2)
+  assert.equal(s.total, 64 * 510 * 6 + 2 * 10, 'a warrior at 60: 6 HP a point of STA, 510 of them')
+})
+
+test('under a binding cap the weapon is still ranked damage first', () => {
+  const wu = row("Wu's Fist", { slots: ['PRIMARY', 'SECONDARY'], skill: 'Hand to Hand', stats: { DMG: 16, DELAY: 22 } })
+  const blood = row("Blood's Unity", { slots: ['PRIMARY'], skill: '1H Slashing', stats: { DMG: 11, DELAY: 20, STR: 15, AGI: 15 } })
+  const s = sheet([wu, blood], setup({ RATIO_1H: 'S', STR: 'S', AGI: 'S' }), { classes: ['MNK'], statCaps: { STR: { value: 20, over: 0 } } })
+  assert.equal(pickOf(s, 'PRIMARY'), "Wu's Fist")
+  assert.ok(s.total > 0 && s.total < DAMAGE_FIRST, 'the ranking weight is taken back out of a capped total too')
 })
 
 test('owned-only: an item fills no more cells than copies owned', () => {

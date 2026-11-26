@@ -11,7 +11,7 @@ import { useCallback, useDeferredValue, useMemo, type JSX } from 'react'
 import { Box, Chip, Stack, TextField, Typography } from '@mui/material'
 import { CLASS_ABBRS, type ClassAbbr } from '@shared/classCombo'
 import { ITEM_UPGRADE_BASE, type ItemUpgradeState } from '@shared/itemUpgrade'
-import { alignPairsToWorn, buildBisSheet, itemHasteCap, usableBy } from '@shared/planner/bisSheet'
+import { alignPairsToWorn, buildBisSheet, defaultChipCaps, itemHasteCap, usableBy } from '@shared/planner/bisSheet'
 import type { GearRow } from '@shared/planner/gear'
 import { scaleGearRow } from '@shared/planner/gearScale'
 import { itemHasteRoom, maxCharacterLevel } from '@shared/planner/statCaps'
@@ -141,7 +141,7 @@ function useBisSheet(rows: readonly GearRow[], prefs: BisPrefs, { classes, model
     [scaled, setup, model, classes, admit, owned, prefs.owned, hasteRoom]
   )
   const sheet = useMemo(() => alignPairsToWorn(built, (cell) => worn.cells.get(cell)?.row?.key), [built, worn])
-  const totals = useMemo(() => totalsRows(sheet.totals, loadoutTotals(worn.rows, model, setup.split, itemHasteCap({ setup, hasteRoom })), setup), [sheet, worn, model, setup, hasteRoom])
+  const totals = useMemo(() => totalsRows(sheet.totals, loadoutTotals(worn.rows, model, setup.split, itemHasteCap({ setup, hasteRoom })), setup, defaultChipCaps()), [sheet, worn, model, setup, hasteRoom])
   return { setup, owned, admit, worn, sheet, totals, hasteRoom }
 }
 

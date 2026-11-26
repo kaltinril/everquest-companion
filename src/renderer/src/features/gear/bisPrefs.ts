@@ -22,7 +22,7 @@ import {
   type TierSetup,
   type TierStep
 } from '../../../../shared/planner/tierChips'
-import { maxCharacterLevel } from '../../../../shared/planner/statCaps'
+import { ATTRIBUTE_HARD_CAP, maxCharacterLevel } from '../../../../shared/planner/statCaps'
 import { TIER_PRESETS, defaultBoard, type TierPreset } from '../../../../shared/planner/tierDefaults'
 
 export const BIS_KEY = 'eq.gear.tiers'
@@ -50,8 +50,8 @@ export interface BisPrefs {
   spellHaste: number
 }
 
-/** Legends' published attribute cap (agent/MEASURED.md, "BiS sheet research"). */
-export const LEGENDS_STAT_CAP = 510
+/** Legends' published attribute cap (agent/MEASURED.md, "BiS sheet research"; eqlwiki's Statistics page). */
+export const LEGENDS_STAT_CAP = ATTRIBUTE_HARD_CAP
 
 export const DEFAULT_LEVEL = 50
 

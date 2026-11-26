@@ -38,7 +38,7 @@ function TargetInput({ row, onSet }: { row: TotalsRow; onSet: (chip: TierChip, v
     <TextField
       size="small"
       value={text}
-      placeholder="none"
+      placeholder={row.capDefault === undefined ? 'none' : String(row.capDefault)}
       onChange={(e) => setText(e.target.value)}
       onBlur={commit}
       onKeyDown={(e) => e.key === 'Enter' && commit()}
@@ -78,7 +78,7 @@ function Toolbar({ prefs, setPrefs, setup }: Omit<BisTargetsProps, 'rows' | 'plu
             Clear targets
           </Button>
           <Typography variant="caption" color="text.secondary" sx={{ flexBasis: '100%' }}>
-            A target stops a stat counting once the loadout reaches it, so the sheet spends the remaining slots on your other stats. Legends caps attributes at 510; reincarnation AAs raise that (no published amount), so type your own cap. STA counts inside HP and INT/WIS inside Mana, so they take no attribute target.
+            A target stops a stat counting once the loadout reaches it, so the sheet spends the remaining slots on your other stats. Attributes stop counting at 510 by default (the hard cap on eqlwiki's Statistics page), STA inside HP and INT/WIS inside Mana too; a target you set wins. Reincarnation AAs raise the cap (no published amount), so type your own.
           </Typography>
         </>
       )}

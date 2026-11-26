@@ -24,11 +24,12 @@
 import type { ClassAbbr } from '../classCombo'
 import type { GearRow } from './gear'
 import { arrowRank, isArrow, isBow } from './bisArrows'
-import { improveUnderCaps, type CapCell, type CapRules } from './bisCaps'
+import { improveUnderCaps, type CapCell, type CapRules, type FoldedCap } from './bisCaps'
 import { searchLoadout, type SearchCandidate, type SearchCell } from './bisSearch'
 import { gearHandedness } from './roleWeights'
-import { RATIO_CHIPS, activeChips, isRatioChip, tierWeight, type TierChip, type TierSetup } from './tierChips'
-import { chipUnit, ratioCounts, round3, tierTerms, type TierModel, type TierTerm } from './tierWeights'
+import { HARD_STAT_CAPS, isAttribute, type Attribute, type StatCap, type StatCaps } from './statCaps'
+import { CHIP_KEYS, RATIO_CHIPS, activeChips, isRatioChip, tierWeight, type TierChip, type TierSetup } from './tierChips'
+import { chipUnit, ratioCounts, round3, tierTerms, type Conversions, type TierModel, type TierTerm } from './tierWeights'
 import { PLAN_SLOTS, equipSlotOf, isAnyCell, type PlanSlotId } from './types'
 
 export interface BisOptions {
@@ -43,6 +44,8 @@ export interface BisOptions {
   owned?: ReadonlyMap<string, number>
   /** item haste that can still count: the level's haste cap less the spell haste (`itemHasteRoom`); absent = no limit */
   hasteRoom?: number
+  /** the attribute caps; absent = eqlwiki's hard cap, 510 (`HARD_STAT_CAPS`). A cap the player sets on a chip wins */
+  statCaps?: StatCaps
 }
 
 export interface BisPick {
@@ -114,6 +117,8 @@ interface Scored extends SearchCandidate {
   display: number
   /** the damage-first ratio (`damageFirst`); `base` carries it times `DAMAGE_FIRST` for the search */
   prio: number
+  /** its stated stats, for the attribute caps the caps pass reads */
+  attrs: GearRow['stats']
 }
 
 function copiesOf(row: GearRow, owned: ReadonlyMap<string, number> | undefined): number {
@@ -203,7 +208,7 @@ function scoreCell(cell: PlanSlotId, rows: readonly GearRow[], opts: BisOptions)
     const stats = round3(terms.reduce((sum, t) => sum + t.points, 0))
     const haste = underCap(row.stats.HASTE ?? 0, cap)
     const prio = damageFirst(row, cell, opts)
-    out.push({ key: row.key, row, terms, base: stats + prio * DAMAGE_FIRST, prio, haste, copies: copiesOf(row, opts.owned), twoHand: gearHandedness(row.skill) === '2h', bow: isBow(row), display: round3(stats + Math.max(0, haste) * rate) })
+    out.push({ key: row.key, row, terms, base: stats + prio * DAMAGE_FIRST, prio, haste, copies: copiesOf(row, opts.owned), twoHand: gearHandedness(row.skill) === '2h', bow: isBow(row), attrs: row.stats, display: round3(stats + Math.max(0, haste) * rate) })
   }
   return out.sort((a, b) => b.prio - a.prio || b.display - a.display || a.row.name.localeCompare(b.row.name))
 }
@@ -226,19 +231,58 @@ function searchOrder(): PlanSlotId[] {
   return [...hands, ...PLAN_SLOTS.filter((c) => !hands.includes(c) && !isAnyCell(c)), ...PLAN_SLOTS.filter(isAnyCell)]
 }
 
-/** The caps that bind on the board: active chips with a cap and a lane. */
+/** Points one value unit of a chip is worth on the board (lane weight / unit). */
+function chipRate(opts: Pick<BisOptions, 'setup' | 'model'>, chip: TierChip): number {
+  return tierWeight(opts.setup.board[chip], opts.setup.step) / chipUnit(opts.model.units, chip)
+}
+
+/** The attribute chips' default caps as plain numbers, for the totals table (STA, INT and WIS count inside HP and Mana). */
+export function defaultChipCaps(statCaps: StatCaps = HARD_STAT_CAPS): Partial<Record<TierChip, number>> {
+  const out: Partial<Record<TierChip, number>> = {}
+  for (const chip of CHIP_KEYS) if (isAttribute(chip) && statCaps[chip] !== undefined) out[chip] = statCaps[chip].value
+  return out
+}
+
+/** The attributes that count inside a chip, and the conversion that turns a point into it. */
+const FOLDED: readonly { attr: Attribute; chip: TierChip; per: keyof Conversions }[] = [
+  { attr: 'STA', chip: 'HP', per: 'hpPerSta' },
+  { attr: 'WIS', chip: 'MANA', per: 'manaPerWis' },
+  { attr: 'INT', chip: 'MANA', per: 'manaPerInt' }
+]
+
+/** STA's cap inside HP, INT's and WIS's inside Mana, for the classes that convert them; their chips get a rate. */
+function foldedCaps(opts: BisOptions, statCaps: StatCaps, perValue: Map<TierChip, number>): FoldedCap[] {
+  const out: FoldedCap[] = []
+  for (const f of FOLDED) {
+    const cap = statCaps[f.attr]
+    const perPoint = opts.model.conv[f.per]
+    if (cap === undefined || perPoint === 0 || opts.setup.board[f.chip] === 'Off') continue
+    perValue.set(f.chip, chipRate(opts, f.chip))
+    out.push({ attr: f.attr, chip: f.chip, cap, perPoint })
+  }
+  return out
+}
+
+/**
+ * The caps on the board: the player's own on any chip (hard), else the attribute default
+ * (eqlwiki's hard cap, or the caller's `statCaps`). The damage-first weight rides along so the caps
+ * pass ranks weapons the way the search does.
+ */
 function capRules(opts: BisOptions): CapRules | undefined {
-  const { setup, model } = opts
-  const caps = new Map<TierChip, number>()
+  const { setup } = opts
+  const statCaps = opts.statCaps ?? HARD_STAT_CAPS
+  const caps = new Map<TierChip, StatCap>()
   const perValue = new Map<TierChip, number>()
   for (const chip of activeChips(setup.split)) {
-    const cap = setup.caps[chip]
+    const own = setup.caps[chip]
+    const cap = own !== undefined ? { value: own, over: 0 } : isAttribute(chip) ? statCaps[chip] : undefined
     if (cap === undefined || isRatioChip(chip) || setup.board[chip] === 'Off') continue
     if (chip !== 'HASTE') caps.set(chip, cap)
-    perValue.set(chip, tierWeight(setup.board[chip], setup.step) / chipUnit(model.units, chip))
+    perValue.set(chip, chipRate(opts, chip))
   }
+  const folded = foldedCaps(opts, statCaps, perValue)
   if (perValue.size === 0) return undefined
-  return { caps, perValue, hastePerPercent: hastePerPercent(opts), hasteCap: itemHasteCap(opts) }
+  return { caps, perValue, folded, prioWeight: DAMAGE_FIRST, hastePerPercent: hastePerPercent(opts), hasteCap: itemHasteCap(opts) }
 }
 
 /** Each cell's pool for the caps pass: the best by full score, plus the best by uncapped stats. */

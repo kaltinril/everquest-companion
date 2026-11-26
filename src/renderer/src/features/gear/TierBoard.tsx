@@ -220,7 +220,7 @@ export default function TierBoard(props: TierBoardProps): JSX.Element {
         </Button>
       </Stack>
       <Typography variant="caption" color="text.secondary">
-        Unassigned stats do not count: drop a stat there when you have maxed it or no longer need it. Clear tiers drops every stat there. Click a stat for its menu: its tier, what it does, and a cap (it then counts only up to that total across the loadout; Legends caps attributes at 510).
+        Unassigned stats do not count: drop a stat there when you have maxed it or no longer need it. Clear tiers drops every stat there. Click a stat for its menu: its tier, what it does, and a cap (it then counts only up to that total across the loadout; attributes stop at 510 by default).
       </Typography>
       <BoardText setup={setup} onLoad={props.onLoad} />
       {menu !== null && <ChipMenu chip={menu.chip} anchor={menu.anchor} props={props} onClose={() => setMenu(null)} />}

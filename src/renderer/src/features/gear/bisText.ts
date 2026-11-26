@@ -194,6 +194,8 @@ export interface TotalsRow {
   capped: boolean
   /** the target (the board's cap) as a number, for the Target column's input */
   capValue?: number
+  /** the default cap that applies when no target is set (510 on the attributes) */
+  capDefault?: number
   /** the worn total has reached the target */
   wornReached: boolean
 }
@@ -204,15 +206,20 @@ function totalText(chip: TierChip, v: number | undefined): string {
   return chip === 'RESISTS' ? v.toFixed(1) : String(Math.round(v))
 }
 
-/** The totals table: the stats on the board that the loadout or the worn gear states, best lane first. */
-export function totalsRows(best: Partial<Record<TierChip, number>>, worn: Partial<Record<TierChip, number>>, setup: TierSetup): TotalsRow[] {
+/** The totals table: the stats on the board that the loadout or the worn gear states, best lane first. A target wins over a default cap. */
+export function totalsRows(
+  best: Partial<Record<TierChip, number>>,
+  worn: Partial<Record<TierChip, number>>,
+  setup: TierSetup,
+  defaults: Partial<Record<TierChip, number>> = {}
+): TotalsRow[] {
   const chips = activeChips(setup.split).filter(
     (c) => !isRatioChip(c) && setup.board[c] !== 'Off' && (best[c] !== undefined || worn[c] !== undefined || setup.caps[c] !== undefined)
   )
   const rank = (c: TierChip): number => RANKED_TIERS.indexOf(setup.board[c] as never)
   chips.sort((a, b) => rank(a) - rank(b))
   return chips.map((chip) => {
-    const cap = setup.caps[chip]
+    const cap = setup.caps[chip] ?? defaults[chip]
     const capped = cap !== undefined && (best[chip] ?? 0) >= cap
     return {
       chip,
@@ -222,7 +229,8 @@ export function totalsRows(best: Partial<Record<TierChip, number>>, worn: Partia
       worn: totalText(chip, worn[chip]),
       cap: cap === undefined ? '' : `${String(cap)}${capped ? ' capped' : ''}`,
       capped,
-      ...(cap === undefined ? {} : { capValue: cap }),
+      ...(setup.caps[chip] === undefined ? {} : { capValue: setup.caps[chip] }),
+      ...(defaults[chip] === undefined ? {} : { capDefault: defaults[chip] }),
       wornReached: cap !== undefined && (worn[chip] ?? 0) >= cap
     }
   })
