@@ -177,6 +177,25 @@ where one exists.
   above counting `SOFT_CAP_OVER` 0.2. A reincarnation before the log began is not counted.
 - `/alternateadv list` writes every AA the combo can see into the log (MEASURED.md, "Alternate
   advancement"); not parsed yet. `/outputfile` has no AA kind.
+- CORRECTIONS (`shared/aaOfficial.ts`): `AA_CORRECTIONS`, a source and date per entry; `AA_ROWS` is the
+  table every reader uses (tab, ranks, points, the Best in slot cap). Never hand-edit the generated
+  table. A correction the wiki has caught up with changes nothing (`correctionAgrees`). Entry fields:
+  add, rename, ranks, cost, append, removed, `hkNote`, `tabOnly` (no Gaps row), `header` (a table
+  header line as a Gaps row), `confirms` (a second source). A removed row ignores picks, keeps the
+  log's rank, and is out of `aaPointsSpent`.
+- ARCHETYPE CLASSES (`shared/aaArchetypeClasses.ts`), from `/alt list` runs (MEASURED.md): WAR and MNK
+  split by a fresh character's runs; Physical Enhancement read as everyone's (in every combo); a
+  class seen only beside WAR and MNK may still have some of the melee nine (`mayApply`), except
+  where Daybreak's notes say (Rampage: BER; Point Blank Fire: RNG, ROG, BER). A held rank always
+  shows. The Archetype tab's My classes filter reads it.
+- WIKI GAPS "AAs" domain: `shared/gapAas.ts` `aaGapRows(spends)`, joined in `useGapsList` through
+  `useAaGapRows` (the attached character's leveling snapshot only, even with All characters; no day
+  window). An update domain (`gapJob`); action in `gapFieldActions`; Copy is `wikiPage`
+  `PAGE_OF.aa`; editor `GapRowButtons` `ownPageEditor`. Rows keyed by the game's name; log evidence
+  joins an existing correction's row. The two removed steeds are no row (the page already strikes
+  them). Faction words moved to `shared/gapFactionWords.ts` (re-exported from `gaps.ts`, at its ceiling).
+- Labels: the nav says "Alt. Adv." (`VIEW_LABELS`), the page "Alternate Advancement". The description
+  has no hover (it is shown in full); a hotkey row's hover holds the hotkey text only.
 ## Maps (was map-improvements)
 
 - Owner ruling: nothing that does not relate to EQ Legends. `portsInClient` drops a cast port
