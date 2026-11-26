@@ -29,8 +29,8 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import itemsJson from '../src/main/data/items.json'
-import type { ItemDbEntry, ItemDbFile } from '../src/main/itemsDb'
-import { ITEMS_RESEARCH, knowledgeWithResearch } from '../src/main/itemsResearch'
+import { itemKey, type ItemDbEntry, type ItemDbFile } from '../src/main/itemsDb'
+import { ITEMS_RESEARCH, isUnobtainable, knowledgeWithResearch } from '../src/main/itemsResearch'
 import { buildGearIndex, gearStatNumber, gearWeightNumber, readGearStats } from '../src/main/planner/gearIndex'
 import { buildPlannerIndex } from '../src/main/planner/effectIndex'
 import {
@@ -627,4 +627,30 @@ test('the payload states its version and the corpus it was built from', () => {
   // The vocabulary is closed, and a scaled vector may only ever speak it.
   const keys = new Set<string>(GEAR_STAT_KEYS)
   for (const r of rows) for (const k of Object.keys(r.stats)) assert.ok(keys.has(k), `stray key ${k}`)
+})
+
+test('UNOBTAINABLE IS ON THE ROW (2026-11-25): the Does Not Exist banner or a GM provenance, and the row is still listed', () => {
+  const oakwynd = byKey.get('oakwynd')
+  assert.ok(oakwynd, 'Oakwynd is still a Gear tab row: looking one up is valid')
+  assert.equal(oakwynd.unobtainable, true)
+  // Banner only (no curated entry), GM only (no banner), and an ordinary row.
+  assert.equal(ITEMS_RESEARCH['shield of hatred'], undefined)
+  assert.equal(byKey.get('shield of hatred')?.unobtainable, true, 'the banner alone marks it')
+  assert.equal(byKey.get('da oogly stick')?.unobtainable, true, 'a GM only item without the banner')
+  assert.equal(byKey.get(itemKey('Thelvorn, Blade of Light'))?.unobtainable, undefined, 'absent, never false')
+  // Every row agrees with the one verdict, read from its own page.
+  // The row's own page: the canonical one when two pages claim the key ('a key two pages claim' above).
+  const pages = new Map<string, ItemDbEntry>()
+  for (const e of Object.values(file.items)) {
+    const key = itemKey(knowledgeWithResearch(e).name)
+    if (!pages.has(key) || itemKey(e.page) === key) pages.set(key, e)
+  }
+  let flagged = 0
+  for (const row of rows) {
+    const entry = pages.get(row.key)
+    if (entry === undefined) continue
+    assert.equal(row.unobtainable === true, isUnobtainable(knowledgeWithResearch(entry)), row.name)
+    if (row.unobtainable === true) flagged++
+  }
+  assert.ok(flagged >= 10, `only ${String(flagged)} unobtainable rows`)
 })

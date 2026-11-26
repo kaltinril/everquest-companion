@@ -11,7 +11,7 @@ import { useCallback, useDeferredValue, useMemo, type JSX } from 'react'
 import { Box, Chip, Stack, TextField, Typography } from '@mui/material'
 import { CLASS_ABBRS, type ClassAbbr } from '@shared/classCombo'
 import { ITEM_UPGRADE_BASE, type ItemUpgradeState } from '@shared/itemUpgrade'
-import { alignPairsToWorn, buildBisSheet, usableBy } from '@shared/planner/bisSheet'
+import { alignPairsToWorn, bisAdmits, buildBisSheet } from '@shared/planner/bisSheet'
 import type { GearRow } from '@shared/planner/gear'
 import { scaleGearRow } from '@shared/planner/gearScale'
 import { activeChips, type TierChip, type TierSetup } from '@shared/planner/tierChips'
@@ -55,12 +55,12 @@ function useWorn(compare: GearCompareData, state: ItemUpgradeState): { cells: Ma
   }, [compare, state])
 }
 
-/** The chips some item the player could wear states: the rest are drawn faded. */
+/** The chips some item the player could wear states (the sheet's own row gate, `bisAdmits`): the rest are drawn faded. */
 function useStated(rows: readonly GearRow[], model: TierModel, classes: readonly ClassAbbr[], admit: (r: GearRow) => boolean): Set<TierChip> {
   return useMemo(() => {
     const out = new Set<TierChip>()
     for (const row of rows) {
-      if (!usableBy(row, classes) || !admit(row)) continue
+      if (!bisAdmits(row, { classes, admit })) continue
       for (const [chip, v] of Object.entries(model.valuesOf(row))) if (v !== 0) out.add(chip as TierChip)
     }
     return out

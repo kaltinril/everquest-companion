@@ -10,7 +10,7 @@ import { buildGearIndex } from '../src/main/planner/gearIndex'
 import { eraHides } from '../src/renderer/src/features/planner/plannerData'
 import type { ClassAbbr } from '../src/shared/classCombo'
 import type { GearRow } from '../src/shared/planner/gear'
-import { DAMAGE_FIRST, alignPairsToWorn, buildBisSheet, hasteCounted, isLoreRow, type BisOptions, type BisSheet } from '../src/shared/planner/bisSheet'
+import { DAMAGE_FIRST, alignPairsToWorn, bisAdmits, buildBisSheet, hasteCounted, isLoreRow, type BisOptions, type BisSheet } from '../src/shared/planner/bisSheet'
 import { CHIP_KEYS, uniformBoard, type Tier, type TierChip, type TierSetup } from '../src/shared/planner/tierChips'
 import { defaultBoard } from '../src/shared/planner/tierDefaults'
 import { buildTierModel, conversionsFor, deriveChips, type TierModel } from '../src/shared/planner/tierWeights'
@@ -206,4 +206,37 @@ test('over the corpus: every cell read, no lore item twice, and fast', () => {
     const lorePicks = s.cells.flatMap((c) => (c.pick !== undefined && isLoreRow(c.pick.row) ? [c.pick.row.key] : []))
     assert.equal(new Set(lorePicks).size, lorePicks.length, 'no lore item twice')
   }
+})
+
+// Oakwynd as the gear index builds it (a GM-event bow whose page carries the Does Not Exist banner),
+// beside a bow a ranger can get (owner, 2026-11-25: "Oakwynd is not obtainable in EverQuest Legends").
+const OAKWYND = row('Oakwynd', { slots: ['RANGE'], classes: ['RNG'], skill: 'Archery', flags: ['Magic Item', 'Lore Item'], stats: { DMG: 175, DELAY: 20 }, unobtainable: true })
+const WAR_BOW = row('War Bow', { slots: ['RANGE'], classes: ['RNG'], skill: 'Archery', stats: { DMG: 24, DELAY: 25 } })
+
+test('an item no player can obtain is dropped before the sheet scores: Oakwynd is not the ranger RANGE pick (owner)', () => {
+  const s = sheet([OAKWYND, WAR_BOW], setup({ RATIO_RANGED: 'S' }), { classes: ['RNG'] })
+  const range = s.cells.find((c) => c.cell === 'RANGE')
+  assert.equal(range?.pick?.row.name, 'War Bow')
+  assert.ok(!s.cells.some((c) => c.pick?.row.key === 'oakwynd' || c.runnersUp.some((r) => r.row.key === 'oakwynd')), 'nowhere, runners-up included')
+  assert.equal(bisAdmits(OAKWYND, { classes: ['RNG'] }), false, 'the gate the tab\'s other walk (useStated) asks')
+  assert.equal(bisAdmits(WAR_BOW, { classes: ['RNG'] }), true)
+})
+
+test('owned-only keeps an unobtainable item the character owns: owning it proves it can be had', () => {
+  const owned = sheet([OAKWYND, WAR_BOW], setup({ RATIO_RANGED: 'S' }), { classes: ['RNG'], owned: new Map([['oakwynd', 1], ['war bow', 1]]) })
+  assert.equal(pickOf(owned, 'RANGE'), 'Oakwynd')
+  assert.equal(bisAdmits(OAKWYND, { classes: ['RNG'], owned: new Map([['oakwynd', 1]]) }), true)
+  const notOwned = sheet([OAKWYND, WAR_BOW], setup({ RATIO_RANGED: 'S' }), { classes: ['RNG'], owned: new Map([['war bow', 1]]) })
+  assert.equal(pickOf(notOwned, 'RANGE'), 'War Bow')
+  // Best overall ignores ownership altogether, as it always has: the row stays out.
+  assert.equal(bisAdmits(OAKWYND, { classes: ['RNG'] }), false)
+})
+
+test('over the corpus: the ranger sheet never offers Oakwynd (the 2026-11-25 report)', () => {
+  const classes: ClassAbbr[] = ['RNG']
+  assert.equal(inEra.find((r) => r.key === 'oakwynd')?.unobtainable, true, 'in the rows Current era admits, flagged')
+  const s = buildBisSheet({ rows: inEra, setup: { board: defaultBoard('classes', classes), step: 4, split: false, caps: {} }, model: buildTierModel(inEra, classes, 60), classes })
+  const range = s.cells.find((c) => c.cell === 'RANGE')
+  assert.ok(range?.pick !== undefined && range.pick.row.key !== 'oakwynd', range?.pick?.row.name)
+  assert.ok(!s.cells.some((c) => c.pick?.row.unobtainable === true || c.runnersUp.some((r) => r.row.unobtainable === true)))
 })

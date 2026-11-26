@@ -22,7 +22,7 @@
 // PURE, relative value imports (the shared/planner house rule) so the node test runner loads it.
 
 import type { ClassAbbr } from '../classCombo'
-import type { GearRow } from './gear'
+import { isObtainable, type GearRow } from './gear'
 import { improveUnderCaps, type CapCell, type CapRules } from './bisCaps'
 import { searchLoadout, type HasteRate, type SearchCandidate, type SearchCell } from './bisSearch'
 import { gearHandedness } from './roleWeights'
@@ -190,11 +190,22 @@ function scoreCell(cell: PlanSlotId, rows: readonly GearRow[], opts: BisOptions)
   return out.sort((a, b) => b.prio - a.prio || b.display - a.display || a.row.name.localeCompare(b.row.name))
 }
 
-/** The rows the sheet may use at all: the class picks, the caller's gates, owned-only. */
+/**
+ * THE ROW GATE: may the sheet use this row at all? The class picks, the caller's gates (Current era),
+ * owned-only, and never a row no player can obtain (`GearRow.unobtainable`; owner, 2026-11-25: *"we
+ * simply need to just ignore items that are impossible to get before we even start our
+ * calculation"*), except in owned-only mode a copy the character owns: owning it proves it can be
+ * had. Exported so the tab's other walk over the rows (`BisView.useStated`) asks the same question.
+ */
+export function bisAdmits(row: GearRow, gate: Pick<BisOptions, 'classes' | 'admit' | 'owned'>): boolean {
+  const held = gate.owned === undefined ? undefined : (gate.owned.get(row.key) ?? 0) > 0
+  if (held === false) return false
+  return (held === true || isObtainable(row)) && usableBy(row, gate.classes) && (gate.admit === undefined || gate.admit(row))
+}
+
+/** The rows the sheet may use at all, dropped before any scoring. */
 function admitted(opts: BisOptions): GearRow[] {
-  return opts.rows.filter(
-    (row) => usableBy(row, opts.classes) && (opts.admit === undefined || opts.admit(row)) && (opts.owned === undefined || (opts.owned.get(row.key) ?? 0) > 0)
-  )
+  return opts.rows.filter((row) => bisAdmits(row, opts))
 }
 
 /** PRIMARY before SECONDARY, so the two-hander rule sees the hand first; ANY cells last. */
