@@ -3,9 +3,11 @@
 //!
 //! THE RUN (MEASURED.md, "Alternate advancement"). Each AA prints a three-line block (`aaList` events:
 //! header `value`+`ability`, then `text`, then `cost`), every block of one run inside about a second.
-//! An AA owned but not maxed prints two blocks with the same id back to back (current rank, next
-//! rank), so only a repeat of an id that is NOT the block just before starts a new run; so does a
-//! header more than `RUN_GAP_MS` after the run's last line. A new run replaces the old one whole.
+//! A header more than `RUN_GAP_MS` after the run's last line starts a new run, and so does the run's
+//! FIRST id coming round again (every measured run opens on `#1`), unless it is back to back (an AA
+//! owned but not maxed prints current and next rank as two blocks in a row). Any other repeated id
+//! stays in the run: a list taken right after a purchase printed Pottery Mastery's two blocks and,
+//! seventy blocks later, a third (owner's 15:44 list, MEASURED.md). A new run replaces the old whole.
 //! Reading a rank out of a block is the app's (`src/shared/aaList.ts`), which holds the AA table.
 //!
 //! ACTIVATIONS. `You activate <name>.` (`aaActivate`) for every name, AA or not (`Skull Bash` is a
@@ -40,8 +42,9 @@ impl AaListRun {
         if ts - self.last_ts > RUN_GAP_MS {
             return false;
         }
+        let first = self.blocks.first().map(|b| b.id);
         let prev = self.blocks.last().map(|b| b.id);
-        prev == Some(id) || !self.blocks.iter().any(|b| b.id == id)
+        first != Some(id) || prev == Some(id)
     }
 }
 
@@ -168,7 +171,7 @@ mod tests {
     }
 
     #[test]
-    fn a_later_run_replaces_the_earlier_one_on_a_gap_or_a_repeated_id() {
+    fn a_later_run_replaces_the_earlier_one_on_a_gap_or_its_first_id_again() {
         let mut run = None;
         block(&mut run, 1000, 40, "Combat Fury", "by 1%.", 1);
         block(&mut run, 1000, 4, "Quick Buff", "q", 5);
@@ -176,12 +179,31 @@ mod tests {
         block(&mut run, 5000, 40, "Combat Fury", "by 5%.", 4);
         let r = run.as_ref().unwrap();
         assert_eq!((r.ts, r.blocks.len(), r.blocks[0].cost), (5000, 1, Some(4)));
-        // Within the second, an id already in the run (not the block before) starts a new run.
+        // Within the second, the run's first id again (not back to back) starts a new run.
         block(&mut run, 5000, 4, "Quick Buff", "q", 5);
         block(&mut run, 5000, 40, "Combat Fury", "by 2%.", 2);
         let r = run.as_ref().unwrap();
         assert_eq!(r.blocks.len(), 1);
         assert_eq!(r.blocks[0].description, "by 2%.");
+    }
+
+    #[test]
+    fn a_repeated_id_further_into_the_run_stays_in_it() {
+        // The stale-list shape: Pottery's current and next blocks, other AAs, then a third Pottery.
+        let mut run = None;
+        block(&mut run, 1000, 1, "Innate Eminence", "by 10 points.", 3);
+        block(&mut run, 1000, 328, "Pottery Mastery", "by 25%.", 4);
+        block(&mut run, 1000, 328, "Pottery Mastery", "by 50%.", 6);
+        block(&mut run, 1000, 329, "Tailoring Mastery", "by 50%.", 6);
+        block(
+            &mut run,
+            1000,
+            328,
+            "Pottery Mastery",
+            "by 50% and 5 points.",
+            20,
+        );
+        assert_eq!(run.unwrap().blocks.len(), 5);
     }
 
     #[test]
