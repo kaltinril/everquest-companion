@@ -460,6 +460,14 @@ Sources beside `plans/2026-11-25-aa-window/`: seven AA-window screenshots and th
     Mental Clarity, Destructive Fury, Fury of Magic, Master of All, Healing Boon, Critical
     Affliction, Persistent Casting, Mnemonic Retention.
   Every Archetype row on the wiki appeared in at least one run.
+- **The ten split** (a fresh level-1 two-class character, 16:16 to 16:20, `WIZ MAG`, `ENC WIZ`, `ENC
+  WAR`, `ENC MNK`; raw `alt-list-runs-fresh-character-2026-11-25.txt`). A level-1 list still shows
+  level-50 AAs (Mass Group Buff), so the list ignores level. WAR: Finishing Blow, Improved Bash,
+  Ambidexterity, Double Riposte, Rampage, Burst of Power. MNK: Point Blank Fire, Finishing Blow,
+  Ambidexterity, Double Riposte, Acrobatics, Intimidation. Physical Enhancement is in every combo
+  measured (WIZ MAG and ENC WIZ too), so it is read as everyone's. A class seen only beside WAR and
+  MNK may still have some of the melee nine (Daybreak's notes add Rampage for BER, Point Blank Fire
+  for RNG, ROG, BER). A new character can change classes in the starting area.
 - **The window's rank panels** (`aa-special-*.png`): Current Rank and Next Rank show the text plus
   "Requirements: Level: 1, No previous ability requirements". `/alt list` prints neither the
   requirements nor, for an activated rank, its passive half or its refresh. Rank 3 of a class

@@ -35,8 +35,8 @@ const NO_CLASSES = 'Your classes are not known yet, so every class is shown.'
 const CAP_TIP = 'Your base stat cap after reincarnations and the Human and Half Elf AAs.'
 const UNPLACED_TIP = 'Your log bought these, but no wiki AA row has the same name.'
 const MINE_TIP = "Which classes have each Archetype AA, from the game's /alternateadv list, 2026-11-25."
-const MAY_APPLY = 'May apply: WAR or MNK has these, and maybe other classes too.'
-const MAY_APPLY_TIP = 'Every list run had WAR and MNK, so these are not split yet.'
+const MAY_APPLY = 'May apply: melee AAs not yet checked for your classes.'
+const MAY_APPLY_TIP = 'Your classes were only listed beside Warrior and Monk, so these are unconfirmed.'
 
 function Points({ rows }: { rows: AaRanked[] }): JSX.Element {
   const { points, unknown } = aaPointsSpent(rows)
