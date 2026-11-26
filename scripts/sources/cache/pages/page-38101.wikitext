@@ -2473,3 +2473,5 @@ Restless_Bones_Summon
 Animate_Dead_Summon
 Haunting_Corpse_Summon
 Summon_Dead_Summon
+Broken_Bow_Part_B
+Mithril-Runed_Tunic

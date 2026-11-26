@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-25T05:15:32.799Z",
+  "scrapedAt": "2026-11-26T04:54:21.559Z",
   "source": "eqlwiki.com — Category:NPCs/Named Mobs/Merchants/Raid Encounters ∪ embeddedin Template:Namedmobpage/MerchantPage, filtered to pages opening a mob template + recentchanges delta (scripts/scrape-delta.mts)",
   "mobs": [
     {
@@ -62910,7 +62910,10 @@
           "ew": 1504
         }
       ],
-      "image": "npc_a_woodland_lioness.png"
+      "image": "npc_a_woodland_lioness.png",
+      "commonDrops": [
+        "Ruined Lion Skin"
+      ]
     },
     {
       "page": "A wooly mammoth",
