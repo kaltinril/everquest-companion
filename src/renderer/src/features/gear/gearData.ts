@@ -42,7 +42,7 @@ import { equippedIndex, type EquippedIndex } from './gearCompare'
 // witnesses (mob catalog ∪ the page's own drop list ∪ the era banner). A `GearRow` carries `key`,
 // `wikiSources` and `eraTag`, which is exactly what an `EraSubject` is — so this is a call, never
 // a second copy of the rule.
-import { eraChip, eraHides, type EraChipInfo } from '../planner/plannerData'
+import { eraChip, eraHides, eraUnconfirmed, type EraChipInfo } from '../planner/plannerData'
 import { sourceIndex } from '../planner/sourceIndex'
 import { sameClasses } from '../planner/plannerClasses'
 import { gearOwnershipMap, ownershipFor, type GearOwnershipMap } from './gearOwnership'
@@ -180,10 +180,19 @@ export function useGearIndex(): GearIndexState {
  *  filter answer (`lib/kept.ts`) keys on this identity, and a per-mount closure would miss on
  *  every re-open. A NEW identity whenever the player's log meets more (lib/useMetInLog), because
  *  the verdict moved: the window's one slot is keyed by the evidence's version. */
-const ERA_HIDDEN: Kept<{ eraHidden: (row: GearRow) => boolean }> = { last: null }
-export function useEraHidden(): { eraHidden: (row: GearRow) => boolean } {
+interface EraGates {
+  /** the lists' gate: a positive out-of-era hides (`eraHides`) */
+  eraHidden: (row: GearRow) => boolean
+  /** the recommenders' gate: anything but a positive in-era (`eraUnconfirmed`) */
+  eraUnconfirmed: (row: GearRow) => boolean
+}
+const ERA_HIDDEN: Kept<EraGates> = { last: null }
+export function useEraHidden(): EraGates {
   const met = useMetVersion()
-  return kept(ERA_HIDDEN, [met], () => ({ eraHidden: (row: GearRow): boolean => eraHides(row, true) }))
+  return kept(ERA_HIDDEN, [met], () => ({
+    eraHidden: (row: GearRow): boolean => eraHides(row, true),
+    eraUnconfirmed: (row: GearRow): boolean => eraUnconfirmed(row, true)
+  }))
 }
 
 // ---- the ownership join (JOS-285, phase 4) --------------------------------------------

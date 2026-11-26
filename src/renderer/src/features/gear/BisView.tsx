@@ -128,12 +128,13 @@ function Controls({ prefs, setPrefs, classes, setup }: { prefs: BisPrefs; setPre
  * like with like. The model (units) stays measured at base, so the slider moves scores, not what S means.
  */
 function useBisSheet(rows: readonly GearRow[], prefs: BisPrefs, { classes, model, state, statCaps }: { classes: readonly ClassAbbr[]; model: TierModel; state: ItemUpgradeState; statCaps: StatCaps }) {
-  const { eraHidden } = useEraHidden()
+  const { eraUnconfirmed } = useEraHidden()
   const ownership = useGearOwnership()
   const compare = useGearCompare(rows, ITEM_UPGRADE_BASE)
   const setup = useMemo(() => activeSetup(prefs, classes), [prefs, classes])
   const owned = useMemo(() => ownedCopies(ownership.map), [ownership.map])
-  const admit = useMemo(() => (prefs.era ? (r: GearRow) => !eraHidden(r) : () => true), [prefs.era, eraHidden])
+  // Current era here is the Recommended tab's rule: only a positive in-era (`eraUnconfirmed`); a held copy passes anyway (`bisAdmits`).
+  const admit = useMemo(() => (prefs.era ? (r: GearRow) => !eraUnconfirmed(r) : () => true), [prefs.era, eraUnconfirmed])
   const scaled = useMemo(() => scaleAll(rows, state), [rows, state])
   const worn = useWorn(compare, state)
   const hasteRoom = itemHasteRoom(prefs.level, prefs.spellHaste)

@@ -7,7 +7,7 @@ import assert from 'node:assert/strict'
 import itemsJson from '../src/main/data/items.json'
 import type { ItemDbFile } from '../src/main/itemsDb'
 import { buildGearIndex } from '../src/main/planner/gearIndex'
-import { eraHides } from '../src/renderer/src/features/planner/plannerData'
+import { eraHides, eraUnconfirmed } from '../src/renderer/src/features/planner/plannerData'
 import type { ClassAbbr } from '../src/shared/classCombo'
 import type { GearRow } from '../src/shared/planner/gear'
 import { DAMAGE_FIRST, alignPairsToWorn, bisAdmits, buildBisSheet, cellScore, defaultChipCaps, hasteCounted, isLoreRow, itemHasteCap, type BisOptions, type BisSheet } from '../src/shared/planner/bisSheet'
@@ -332,4 +332,41 @@ test('over the corpus: the ranger sheet never offers Oakwynd (the 2026-11-25 rep
   const range = s.cells.find((c) => c.cell === 'RANGE')
   assert.ok(range?.pick !== undefined && range.pick.row.key !== 'oakwynd', range?.pick?.row.name)
   assert.ok(!s.cells.some((c) => c.pick?.row.unobtainable === true || c.runnersUp.some((r) => r.row.unobtainable === true)))
+})
+
+// A mage's summoned item and a Temporary NPC drop: gone at the next camp, never a recommendation,
+// held or not (owner, 2026-11-25, on Summoned: Coldstone in Ammo).
+const COLDSTONE = row('Summoned: Coldstone', { slots: ['NECK', 'PRIMARY', 'SECONDARY', 'AMMO'], flags: ['Magic Item', 'Temporary'], stats: { AC: 15 } })
+const SHADOWED = row('Shadowed Ring', { flags: ['Magic Item', 'Temporary'], stats: { AC: 40 } })
+const PLAIN_AMMO = row('Plain Stone', { slots: ['AMMO'], stats: { AC: 1 } })
+
+test('a summoned or Temporary item is dropped before scoring, even held, even in owned-only mode (owner)', () => {
+  const held = new Map([['summoned: coldstone', 1], ['shadowed ring', 1], ['plain stone', 1]])
+  for (const extra of [{}, { held }, { owned: held }] as Partial<BisOptions>[]) {
+    const s = sheet([COLDSTONE, SHADOWED, PLAIN_AMMO], setup({ AC: 'S' }), extra)
+    // one owned copy may sit in an ANY cell instead; what matters is the summoned stone never does
+    assert.ok(s.cells.some((c) => c.pick?.row.name === 'Plain Stone'), JSON.stringify(s.cells.map((c) => [c.cell, c.pick?.row.name])))
+    assert.ok(!s.cells.some((c) => c.pick?.row.flags.includes('Temporary') || c.runnersUp.some((r) => r.row.flags.includes('Temporary'))))
+  }
+  assert.equal(bisAdmits(row('Summoned: Bread'), { classes: [] }), false, 'the name prefix alone is enough')
+})
+
+test("the caller's era gate refuses a row, but a copy the character holds passes it (an owned item is owned)", () => {
+  const undated = row('Undated Ring', { stats: { AC: 30 } })
+  const admit = (r: GearRow): boolean => r.key !== 'undated ring'
+  assert.equal(bisAdmits(undated, { classes: [], admit }), false)
+  assert.equal(bisAdmits(undated, { classes: [], admit, held: new Map([['undated ring', 1]]) }), true)
+  assert.equal(pickOf(sheet([undated, row('Plain Ring', { stats: { AC: 1 } })], setup({ AC: 'S' }), { admit }), 'FINGER'), 'Plain Ring')
+})
+
+test('over the corpus under the recommenders\' era gate: the WAR/MNK/SHM sheet takes no summoned item and no undated one (the 2026-11-25 screenshot)', () => {
+  const classes: ClassAbbr[] = ['WAR', 'MNK', 'SHM']
+  const admit = (r: GearRow): boolean => !eraUnconfirmed(r as never, true)
+  assert.equal(admit(corpus.find((r) => r.key === 'dwarven plate boots (enchanted imbued)') as GearRow), false, 'no page dates it')
+  assert.equal(admit(corpus.find((r) => r.key === 'golden efreeti turban') as GearRow), true, 'a Plane of Sky drop is in era')
+  const s = buildBisSheet({ rows: corpus, setup: { board: defaultBoard('classes', classes), step: 4, split: false, caps: {} }, model: buildTierModel(inEra, classes, 50), classes, admit })
+  const picks = s.cells.flatMap((c) => (c.pick === undefined ? [] : [c.pick.row]))
+  assert.ok(picks.length > 15, `${String(picks.length)} cells filled`)
+  assert.ok(!picks.some((r) => /^summoned:/i.test(r.name) || r.flags.includes('Temporary')), picks.map((r) => r.name).join(', '))
+  assert.ok(!picks.some((r) => admit(r) === false), 'every pick is positively in era')
 })

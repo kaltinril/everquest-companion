@@ -452,6 +452,18 @@ export function eraHides(subject: EraSubject, eraOnly: boolean): boolean {
   return donorEra(subject).verdict === 'out-of-era'
 }
 
+/**
+ * THE RECOMMENDERS' ERA GATE: nothing but a POSITIVE in-era passes (the log, a banner, a drop zone,
+ * layer 3), so an `Unknown Era` row is not recommended. The Recommended tab's rule
+ * (`progressionPlan.ts eraLegal`) over the same verdict the lists use (`donorEra`), for the Best in
+ * slot sheet (owner, 2026-11-25: Dwarven Plate Boots (Enchanted Imbued), a cultural armor piece no
+ * page dates, filled Feet under Current era). The lists keep `eraHides`: they show what they cannot date.
+ */
+export function eraUnconfirmed(subject: EraSubject, eraOnly: boolean): boolean {
+  if (!eraOnly) return false
+  return donorEra(subject).verdict !== 'in-era'
+}
+
 const ERA_KEY = 'eq.planner.era'
 
 /**

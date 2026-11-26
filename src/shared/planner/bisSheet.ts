@@ -22,7 +22,7 @@
 // PURE, relative value imports (the shared/planner house rule) so the node test runner loads it.
 
 import type { ClassAbbr } from '../classCombo'
-import { isObtainable, type GearRow } from './gear'
+import { isObtainable, isTemporary, type GearRow } from './gear'
 import { arrowRank, isArrow, isBow } from './bisArrows'
 import { improveUnderCaps, type CapCell, type CapRules, type FoldedCap } from './bisCaps'
 import { searchLoadout, type SearchCandidate, type SearchCell } from './bisSearch'
@@ -225,17 +225,24 @@ function arrowList(list: readonly Scored[]): Scored[] {
 }
 
 /**
- * THE ROW GATE: may the sheet use this row at all? The class picks, the caller's gates (Current era),
- * owned-only, and never a row no player can obtain (`GearRow.unobtainable`; owner, 2026-11-25: *"we
+ * THE ROW GATE: may the sheet use this row at all? Dropped before any scoring (owner, 2026-11-25: *"we
  * simply need to just ignore items that are impossible to get before we even start our
- * calculation"*), except a copy the character holds, in either mode: holding it proves it can be had
- * (owner, 2026-11-25). Exported so the tab's other walk over the rows (`BisView.useStated`) asks the
- * same question.
+ * calculation"*):
+ *   - a `Temporary` or `Summoned:` item, always, held or not: it is gone at the next camp (`isTemporary`);
+ *   - owned-only mode: a row the character does not hold;
+ *   - a class the picks do not include (`usableBy`);
+ *   - a row no player can obtain (`GearRow.unobtainable`), and a row the caller's gates refuse
+ *     (Current era, which here admits only a POSITIVE in-era, the Recommended tab's rule), unless
+ *     the character holds a copy: holding it proves it can be had (owner, 2026-11-25: *"If the
+ *     character ACTUALLY OWNS an item, sure it should be considered"*; BRANCH_NOTES: an owned item is owned).
+ * Exported so the tab's other walk over the rows (`BisView.useStated`) asks the same question.
  */
 export function bisAdmits(row: GearRow, gate: Pick<BisOptions, 'classes' | 'admit' | 'owned' | 'held'>): boolean {
+  if (isTemporary(row)) return false
   if (gate.owned !== undefined && (gate.owned.get(row.key) ?? 0) <= 0) return false
+  if (!usableBy(row, gate.classes)) return false
   const holds = ((gate.owned ?? gate.held)?.get(row.key) ?? 0) > 0
-  return (holds || isObtainable(row)) && usableBy(row, gate.classes) && (gate.admit === undefined || gate.admit(row))
+  return holds || (isObtainable(row) && (gate.admit === undefined || gate.admit(row)))
 }
 
 /** The rows the sheet may use at all, dropped before any scoring. */

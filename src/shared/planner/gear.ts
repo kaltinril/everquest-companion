@@ -292,6 +292,23 @@ export function isObtainable(row: Pick<GearRow, 'unobtainable'>): boolean {
   return row.unobtainable !== true
 }
 
+/**
+ * GONE WHEN THE CHARACTER CAMPS: the stat block's `Temporary` flag, or a mage's `Summoned:` item (the
+ * wiki's own name prefix; 77 of the 78 slotted ones also carry the flag). Measured 2026-11-25: 101
+ * slotted rows carry the flag, 77 summoned and 24 NPC drops (the Shadowed weapons, Coldain Crossbow).
+ * Never a recommendation, even held (owner, 2026-11-25, on Summoned: Coldstone in Ammo: *"Like i'm
+ * going to go randomly hail a magician or whoever summons this thing to get me the ammo slot item
+ * every time i play?"*). The Gear tab still lists them.
+ */
+export function isTemporary(row: Pick<GearRow, 'flags' | 'name'>): boolean {
+  return /^summoned:/i.test(row.name) || row.flags.some((f) => /^\s*temporary\s*$/i.test(f))
+}
+
+/** Obtainable and not temporary: the Plan route's one question to a row it does not own. */
+export function isRecommendable(row: Pick<GearRow, 'unobtainable' | 'flags' | 'name'>): boolean {
+  return isObtainable(row) && !isTemporary(row)
+}
+
 // ---- the served payload ---------------------------------------------------------------------
 
 /**
