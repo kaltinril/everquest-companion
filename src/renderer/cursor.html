@@ -6,7 +6,8 @@
     <!--
       The CURSOR RING window (owner request: "I lose my mouse on EQ screens"). A transparent,
       click-through, always-on-top window sized to the EverQuest window, containing exactly one
-      element: a white circle that follows the pointer.
+      element that moves: a white circle (or the shape the player picked) that follows the
+      pointer, with one child for the shapes that have an inner mark.
 
       CSP: the same deny-by-default policy as index.html / overlay.html, minus everything this
       page cannot use. It loads no images, no fonts, and speaks to nothing — the only relaxation
@@ -73,10 +74,30 @@
         transform: translate3d(-9999px, -9999px, 0);
         pointer-events: none;
       }
+
+      /*
+        THE INNER MARK of the `dot` and `target` shapes (shared/cursorRingShape.ts): a filled dot
+        or a smaller ring, centred inside #ring. It is a CHILD of the ring, so the ring's transform
+        moves it on the same compositor layer; cursorRing.ts styles it once per config and never
+        on a move. Hidden for every other shape. The two contours give it the ring's readability
+        on snow; the wide glow is left to the outer ring, which already darkens the middle.
+      */
+      #ring-inner {
+        display: none;
+        position: absolute;
+        box-sizing: border-box;
+        border-radius: 50%;
+        border-style: solid;
+        border-color: rgba(255, 255, 255, 0.9);
+        box-shadow:
+          0 0 0 1px rgba(0, 0, 0, 0.6),
+          inset 0 0 0 1px rgba(0, 0, 0, 0.6);
+        pointer-events: none;
+      }
     </style>
   </head>
   <body>
-    <div id="ring"></div>
+    <div id="ring"><div id="ring-inner"></div></div>
     <script type="module" src="/src/overlay/cursorRing.ts"></script>
   </body>
 </html>
