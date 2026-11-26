@@ -120,7 +120,7 @@
 
 import type { ClassAbbr } from '../classCombo'
 import type { ConBand } from '../conBands'
-import type { GearRow } from './gear'
+import { isObtainable, type GearRow } from './gear'
 import type { EquipSlot } from './types'
 import { perObject } from '../gapMemo'
 import { layeredVerdict } from './era'
@@ -838,6 +838,8 @@ export function candidatePool(scope: PlanScope, corpora: PlanCorpora): PlanCandi
   const value = roleValuer(scope.role, { classes: scope.classes, survivability: scope.survivability })
   for (const row of corpora.gear) {
     if (corpora.owned.has(row.key)) continue
+    // No player can obtain it (owner, 2026-11-25): never a farm target, whatever its page lists.
+    if (!isObtainable(row)) continue
     if (!wearable(row, scope.classes)) continue
     const sources = sourcesOf(row)
     if (!eraLegal(sources, row.eraTag, scope.eraOnly)) continue

@@ -34,6 +34,7 @@ import { itemKey, type ItemDbEntry, type ItemDbFile } from '../itemsDb'
 import { renamedItems } from '../../shared/itemRenames'
 import {
   ITEMS_RESEARCH,
+  isUnobtainable,
   knowledgeWithResearch,
   type ItemResearchFile,
   type ResearchedKnowledge
@@ -430,6 +431,8 @@ function pageRow(entry: ItemDbEntry, deps: BuildDeps, acc: Acc): GearRow | null 
     ...(deities.length === 0 ? {} : { deities }),
     flags: [...block.flags],
     ...(skillMods.length === 0 ? {} : { skillMods }),
+    // Listed all the same; the recommenders leave it out (`GearRow.unobtainable`).
+    ...(isUnobtainable(k) ? { unobtainable: true as const } : {}),
     quest: k.quest,
     playerCrafted: k.playerCrafted === true,
     stats: read.stats,
