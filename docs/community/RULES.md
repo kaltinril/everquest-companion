@@ -93,11 +93,16 @@ and 4).
 
 ## Gate
 
-11. **Nothing merges into `main_community` without the gate passing on both sides.** The gate is
-    `npm run typecheck`, `npm run lint`, and `npm test` on Node 24, run on the work branch and
-    again on `main_community` after the merge; a change under `engine/` also runs
-    `cargo test --workspace` in `engine/`. Known reds are listed in BRANCHES.md; anything not on
-    that list is a regression and the merge does not stand. A change to `electron`,
+11. **Nothing merges into `main_community` without the gate passing.** The gate is SCOPED to what
+    the change touches (owner, 2026-11-26, standing: "i want it to be as small of tests so we are
+    not wasting my time"): `npm run typecheck`, `npm run lint`, and on Node 24 only the unit test
+    files that name a changed or deleted source file, plus the ones that scan the source tree
+    (WORKFLOW.md, Gate, says how to pick them). It runs once on the work branch; a merge whose tree
+    equals the gated tree is not gated again. A change under `engine/` runs the cargo tests of the
+    crates it touches. The FULL suite (`npm test` via `known-reds.sh`, and `cargo test --workspace`
+    after an engine change) runs only before a release (RELEASING.md) or when the owner asks.
+    Known reds are listed in BRANCHES.md; anything not on that list is a regression and the merge
+    does not stand. A change to `electron`,
     `electron-builder`, `electron-vite` or `electron-builder.yml` also gets a real `npm run dist`.
     A change that touches only documentation (Markdown under `docs/`, `CLAUDE.md`, a README)
     merges without the gate, and no test may read those files, so a docs change never needs a

@@ -124,6 +124,16 @@ disagree, RULES.md wins; fix this file.
 
 ## Gate
 
+- **THE STANDING RULE: SCOPED, NOT THE FULL SUITE** (owner, 2026-11-26, after two full-suite runs
+  for a small cursor-ring change: "i want it to be as small of tests so we are not wasting my
+  time"). Every work branch gets: `npm run typecheck` (restore tsbuildinfo), `npm run lint` (or
+  `npx eslint <changed files>` for a small change), and only the affected unit test files on Node 24:
+  `grep -lE "<changed basenames, exported names>" tests/*.test.mts`, plus the tests that scan the
+  source tree when a file is added or removed. Run them with
+  `node --import tsx --test --test-concurrency=4 <files>`. No `known-reds.sh`, no
+  `cargo test --workspace`, no e2e for an ordinary merge. The full suite runs before a release
+  (RELEASING.md) or on the owner's word. The older bullets below are history; where they say
+  "full gate", read the scoped gate, except for a release.
 - **Make all the changes, then gate once** (owner, 2026-10-21: "why run it on every change, make
   all the changes, run it once"). While fixing, run only the focused test files for what changed;
   the full gate runs once per work branch at the end, and the merged check once. Parallel agents share
