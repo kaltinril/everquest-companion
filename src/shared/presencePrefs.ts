@@ -166,6 +166,24 @@ export interface CursorRingPrefs {
    */
   offsetXPx: number
   offsetYPx: number
+  /**
+   * Draw the shape at all (2026-11-26, the "Cursor overlay" slice: the crosshair is "on with or
+   * without the shape"). TRUE by default, which is the ring every player has had. `enabled` stays
+   * the master switch for the whole overlay (window, poll, watcher); this hides only the shape.
+   */
+  showShape: boolean
+  /**
+   * The CROSSHAIR (owner, 2026-11-26: "1 vertical line across the entire screen at the mouse
+   * position, and 1 horizontal ... they can control line color and weight"). One vertical and one
+   * horizontal line through the pointer, spanning the overlay window, which is sized to the
+   * EverQuest window (the whole screen in fullscreen). They follow the raw pointer, not the
+   * shape's offset. OFF by default, so an upgrade adds nothing to anybody's screen.
+   */
+  crosshairEnabled: boolean
+  /** The lines' colour, `#rrggbb` through the same strict `normalizeRingColor`. White by default. */
+  crosshairColorHex: string
+  /** The lines' weight, whole CSS px, 1 to 8. */
+  crosshairWeightPx: number
 }
 
 /**
@@ -196,6 +214,11 @@ export const RING_SHAPES: readonly RingShape[] = [
 /** Offset bounds, each axis. Past 60px the shape stops reading as the pointer's own mark. */
 export const MIN_RING_OFFSET_PX = -60
 export const MAX_RING_OFFSET_PX = 60
+
+/** Crosshair line weight bounds. 1px is a hairline; past 8px the lines start hiding the game. */
+export const MIN_CROSSHAIR_WEIGHT_PX = 1
+export const MAX_CROSSHAIR_WEIGHT_PX = 8
+export const DEFAULT_CROSSHAIR_WEIGHT_PX = 2
 
 /** The shape the ring has always had. */
 export const DEFAULT_RING_SHAPE: RingShape = 'circle'
@@ -290,7 +313,11 @@ export const DEFAULT_CURSOR_RING: CursorRingPrefs = {
   colorHex: DEFAULT_RING_COLOR,
   shape: DEFAULT_RING_SHAPE,
   offsetXPx: 0,
-  offsetYPx: 0
+  offsetYPx: 0,
+  showShape: true,
+  crosshairEnabled: false,
+  crosshairColorHex: DEFAULT_RING_COLOR,
+  crosshairWeightPx: DEFAULT_CROSSHAIR_WEIGHT_PX
 }
 
 export const DEFAULT_OVERLAY_AUTO_HIDE: OverlayAutoHidePrefs = {
@@ -333,7 +360,16 @@ export function normalizeCursorRing(value: unknown): CursorRingPrefs {
     colorHex: normalizeRingColor(v.colorHex),
     shape: normalizeRingShape(v.shape),
     offsetXPx: clampPx(v.offsetXPx, MIN_RING_OFFSET_PX, MAX_RING_OFFSET_PX, 0),
-    offsetYPx: clampPx(v.offsetYPx, MIN_RING_OFFSET_PX, MAX_RING_OFFSET_PX, 0)
+    offsetYPx: clampPx(v.offsetYPx, MIN_RING_OFFSET_PX, MAX_RING_OFFSET_PX, 0),
+    showShape: bool(v.showShape, DEFAULT_CURSOR_RING.showShape),
+    crosshairEnabled: bool(v.crosshairEnabled, DEFAULT_CURSOR_RING.crosshairEnabled),
+    crosshairColorHex: normalizeRingColor(v.crosshairColorHex),
+    crosshairWeightPx: clampPx(
+      v.crosshairWeightPx,
+      MIN_CROSSHAIR_WEIGHT_PX,
+      MAX_CROSSHAIR_WEIGHT_PX,
+      DEFAULT_CROSSHAIR_WEIGHT_PX
+    )
   }
 }
 

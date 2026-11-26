@@ -4,10 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!--
-      The CURSOR RING window (owner request: "I lose my mouse on EQ screens"). A transparent,
-      click-through, always-on-top window sized to the EverQuest window, containing exactly one
-      element that moves: a white circle (or the shape the player picked) that follows the
-      pointer, with one child for the shapes that have an inner mark.
+      The CURSOR OVERLAY window (owner request: "I lose my mouse on EQ screens"; called the cursor
+      ring until 2026-11-26, and the file names keep that). A transparent, click-through,
+      always-on-top window sized to the EverQuest window. What moves: a white circle (or the shape
+      the player picked) that follows the pointer, with one child for the shapes that have an
+      inner mark, and, only when the player turns it on, the two crosshair lines.
 
       CSP: the same deny-by-default policy as index.html / overlay.html, minus everything this
       page cannot use. It loads no images, no fonts, and speaks to nothing — the only relaxation
@@ -94,9 +95,40 @@
           inset 0 0 0 1px rgba(0, 0, 0, 0.6);
         pointer-events: none;
       }
+
+      /*
+        THE CROSSHAIR (owner, 2026-11-26): one full-height column and one full-width row through
+        the pointer. Hidden until the player turns it on; cursorRing.ts then sets their weight and
+        colour once per config, and a move changes only their transforms (translateX on the
+        column, translateY on the row; shared/cursorCrosshair.ts). The overlay window is sized to
+        the EverQuest window, so 100vh / 100vw span the game. The 1px dark contour is the ring's
+        own, so a white line still reads on snow. Drawn under the ring.
+      */
+      .cross {
+        display: none;
+        position: absolute;
+        left: 0;
+        top: 0;
+        background-color: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+        will-change: transform;
+        pointer-events: none;
+      }
+      #cross-v {
+        width: 2px;
+        height: 100vh;
+        transform: translate3d(-9999px, 0, 0);
+      }
+      #cross-h {
+        width: 100vw;
+        height: 2px;
+        transform: translate3d(0, -9999px, 0);
+      }
     </style>
   </head>
   <body>
+    <div id="cross-v" class="cross"></div>
+    <div id="cross-h" class="cross"></div>
     <div id="ring"><div id="ring-inner"></div></div>
     <script type="module" src="/src/overlay/cursorRing.ts"></script>
   </body>

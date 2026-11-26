@@ -121,7 +121,11 @@ test('the colour rides the existing ring blob, defaulted field by field like eve
     colorHex: DEFAULT_RING_COLOR,
     shape: 'circle',
     offsetXPx: 0,
-    offsetYPx: 0
+    offsetYPx: 0,
+    showShape: true,
+    crosshairEnabled: false,
+    crosshairColorHex: '#ffffff',
+    crosshairWeightPx: 2
   })
   assert.deepEqual(normalizeCursorRing({ enabled: true, sizePx: 60, thicknessPx: 5, colorHex: '#00E5FF' }), {
     enabled: true,
@@ -130,7 +134,11 @@ test('the colour rides the existing ring blob, defaulted field by field like eve
     colorHex: '#00e5ff',
     shape: 'circle',
     offsetXPx: 0,
-    offsetYPx: 0
+    offsetYPx: 0,
+    showShape: true,
+    crosshairEnabled: false,
+    crosshairColorHex: '#ffffff',
+    crosshairWeightPx: 2
   })
   // A bad colour never costs the user the rest of their settings.
   assert.equal(normalizeCursorRing({ sizePx: 120, colorHex: 'chartreuse' }).sizePx, 120)

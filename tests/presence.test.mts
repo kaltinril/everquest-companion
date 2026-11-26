@@ -448,7 +448,11 @@ test('the shipped defaults are the zero-cost posture', () => {
     // The circle is the shape every ring drawn before shapes existed had (2026-11-26).
     shape: 'circle',
     offsetXPx: 0,
-    offsetYPx: 0
+    offsetYPx: 0,
+    showShape: true,
+    crosshairEnabled: false,
+    crosshairColorHex: '#ffffff',
+    crosshairWeightPx: 2
   })
   assert.deepEqual(DEFAULT_OVERLAY_AUTO_HIDE, { hideWhenNotRunning: true, hideWhenUnfocused: false })
 })
@@ -475,7 +479,11 @@ test('ring prefs are clamped, rounded, and never silently re-intended', () => {
     colorHex: '#ffffff',
     shape: 'circle',
     offsetXPx: 0,
-    offsetYPx: 0
+    offsetYPx: 0,
+    showShape: true,
+    crosshairEnabled: false,
+    crosshairColorHex: '#ffffff',
+    crosshairWeightPx: 2
   })
   assert.equal(normalizeCursorRing({ sizePx: 5 }).sizePx, 20, 'below the floor clamps up')
   assert.equal(normalizeCursorRing({ sizePx: 5000 }).sizePx, 200, 'above the cap clamps down')
