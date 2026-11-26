@@ -1,0 +1,196 @@
+// aaBoard.ts — the Alt. Advancement tab's rows for a class combination: which AAs the combo can use,
+// their top rank for it, what they do and cost, and the lists each sub-tab shows (owner, 2026-11-25:
+// "someone may want to look at other class combinations"; "what if i want to look at aa's i can't
+// use, just to see what they are??"). Pure.
+//
+// USABLE: General and Special always; an Archetype AA by `archetypeFit`; a Class AA by its class. For
+// the character's own (detected) classes a held rank always counts (THE LOG WINS, WORKFLOW.md); for
+// another combo the ranks carry over only where that combo can use the AA. A row the combo cannot use
+// is kept, flagged, and left out of every total and recommendation.
+
+import { AA_GROUPS, type AaGroup } from './aaEffectTable'
+import { aaEffect, type AaEffect } from './aaEffects'
+import { aaCostSum, aaRowCost, type AaCostSum, type AaRowCost } from './aaCost'
+import { archetypeFit, type ArchetypeFit } from './aaArchetypeClasses'
+import type { AaRanked } from './aaRanks'
+import type { AaSection } from './aaTable.generated'
+import type { ClassAbbr } from './classCombo'
+import { classAbbrForDisplayName, classDisplayName } from './spellLevels'
+
+export type AaFit = ArchetypeFit
+
+export interface AaBoardRow {
+  r: AaRanked
+  fit: AaFit
+  usable: boolean
+  /** The top rank for this combo (never below a held rank). */
+  max: number
+  effect: AaEffect
+  cost: AaRowCost | null
+  /** Usable, bought with points, not removed, below its top rank. */
+  buyable: boolean
+}
+
+export interface AaCombo {
+  classes: readonly ClassAbbr[]
+  /** The classes are the character's own, so a held rank always counts. */
+  own: boolean
+}
+
+/** Top ranks a class decides (the rows' own text, Daybreak's notes): [classes, top] pairs, then the rest's top. */
+const CLASS_TOPS: Readonly<Record<string, { by: readonly [readonly ClassAbbr[], number][]; rest: number }>> = {
+  'Steadfast Will': { by: [[['WAR', 'PAL', 'SHD'], 8], [['RNG', 'MNK'], 7]], rest: 6 },
+  Rampage: { by: [[['WAR', 'BER'], 2]], rest: 1 }
+}
+
+/** Whether these classes can use the row. */
+export function aaFit(r: AaRanked, combo: AaCombo): AaFit {
+  const { section } = r.row
+  if (section === 'general' || section === 'special') return 'mine'
+  if (combo.own && r.rank > 0) return 'mine'
+  if (combo.classes.length === 0) return 'mayApply'
+  if (section === 'archetype') return archetypeFit(r.row.name, combo.classes)
+  const abbr = classAbbrForDisplayName(r.row.class ?? '')
+  return abbr !== undefined && combo.classes.includes(abbr) ? 'mine' : 'other'
+}
+
+/** The row's top rank for these classes: a class-decided top where the row has one, never below the held rank. */
+export function aaComboMax(r: AaRanked, classes: readonly ClassAbbr[]): number {
+  const tops = CLASS_TOPS[r.row.name]
+  if (tops === undefined || classes.length === 0) return r.max
+  const top = Math.max(tops.rest, ...tops.by.filter(([who]) => who.some((c) => classes.includes(c))).map(([, n]) => n))
+  return Math.max(r.rank, Math.min(r.max, top))
+}
+
+/** Every ranked row, read for this combo. */
+export function aaBoard(ranked: readonly AaRanked[], combo: AaCombo): AaBoardRow[] {
+  return ranked.map((r) => {
+    const fit = aaFit(r, combo)
+    const usable = fit === 'mine'
+    const max = aaComboMax(r, combo.classes)
+    const cost = aaRowCost(r.row, r.rank, max)
+    const buyable = usable && cost !== null && r.rank < max
+    return { r, fit, usable, max, effect: aaEffect(r.row), cost, buyable }
+  })
+}
+
+const fold = (s: string): string => s.toLowerCase().replace(/['’]/g, '')
+
+/** Whether a row matches a search: its name, the wiki's name, what it does, its class, its text. */
+export function aaMatches(b: AaBoardRow, query: string): boolean {
+  const q = fold(query.trim())
+  if (q === '') return true
+  const { r, effect } = b
+  return fold([r.key, r.wikiName ?? '', effect.label, r.row.class ?? '', r.row.text, r.row.hk ?? ''].join(' ')).includes(q)
+}
+
+export type AaScope = 'usable' | 'all'
+
+export interface AaListGroup {
+  /** Null for a list with one group. */
+  title: string | null
+  kind: 'mine' | 'may' | 'other'
+  rows: AaBoardRow[]
+}
+
+const comboText = (classes: readonly ClassAbbr[]): string => classes.join('/')
+
+/** What a row's "not for" note and an unusable group's title say. */
+export function aaNotFor(classes: readonly ClassAbbr[]): string {
+  return classes.length === 0 ? 'not for your classes' : `not for ${comboText(classes)}`
+}
+
+function classGroups(rows: readonly AaBoardRow[], classes: readonly ClassAbbr[], scope: AaScope): AaListGroup[] {
+  const byClass = new Map<string, AaBoardRow[]>()
+  for (const b of rows) byClass.set(b.r.row.class ?? '', [...(byClass.get(b.r.row.class ?? '') ?? []), b])
+  const own = classes.map(classDisplayName).filter((c) => byClass.has(c))
+  const out: AaListGroup[] = own.map((c) => ({ title: c, kind: 'mine' as const, rows: byClass.get(c) ?? [] }))
+  // A held row of a class outside the combo (the log's) still shows under its class.
+  for (const [cls, list] of byClass) {
+    if (own.includes(cls)) continue
+    const held = list.filter((b) => b.usable)
+    if (held.length > 0) out.push({ title: cls, kind: 'mine', rows: held })
+    const rest = list.filter((b) => !b.usable)
+    if (scope === 'all' && rest.length > 0) out.push({ title: `${cls} · ${aaNotFor(classes)}`, kind: 'other', rows: rest })
+  }
+  return out
+}
+
+/** One sub-tab's list: the combo's rows, then (Archetype) the ones that may apply, then with `all` the rest. */
+export function aaTabGroups(board: readonly AaBoardRow[], section: Exclude<AaSection, 'special'>, classes: readonly ClassAbbr[], view: { scope: AaScope; query: string }): AaListGroup[] {
+  const rows = board.filter((b) => b.r.row.section === section && aaMatches(b, view.query))
+  if (section === 'class') return classGroups(rows, classes, view.scope).filter((g) => g.rows.length > 0)
+  const groups: AaListGroup[] = [
+    { title: null, kind: 'mine', rows: rows.filter((b) => b.usable) },
+    { title: 'May apply · measured only beside Warrior and Monk', kind: 'may', rows: rows.filter((b) => b.fit === 'mayApply') },
+    { title: `${aaNotFor(classes)} · shown to read, not counted`, kind: 'other', rows: view.scope === 'all' ? rows.filter((b) => b.fit === 'other') : [] }
+  ]
+  return groups.filter((g) => g.rows.length > 0)
+}
+
+const SECTIONS: readonly { id: AaSection; label: string }[] = [
+  { id: 'general', label: 'General' },
+  { id: 'archetype', label: 'Archetype' },
+  { id: 'class', label: 'Class' },
+  { id: 'special', label: 'Special' }
+]
+
+/** A search across every tab: the matching rows the scope shows, one group a section. */
+export function aaSearchGroups(board: readonly AaBoardRow[], scope: AaScope, query: string): AaListGroup[] {
+  const shown = board.filter((b) => (b.usable || scope === 'all') && aaMatches(b, query))
+  return SECTIONS.map((s) => ({ title: s.label, kind: 'mine' as const, rows: shown.filter((b) => b.r.row.section === s.id) })).filter((g) => g.rows.length > 0)
+}
+
+export interface AaTabCount {
+  maxed: number
+  of: number
+  points: AaCostSum
+  /** Rows matching the search the scope shows; null with no search. */
+  matches: number | null
+}
+
+/** A sub-tab's count: maxed of usable, their points, and the search's matches. */
+export function aaTabCount(board: readonly AaBoardRow[], section: AaSection, scope: AaScope, query: string): AaTabCount {
+  const mine = board.filter((b) => b.r.row.section === section && b.usable)
+  const matches = query.trim() === '' ? null : board.filter((b) => b.r.row.section === section && (b.usable || scope === 'all') && aaMatches(b, query)).length
+  return { maxed: mine.filter((b) => b.r.rank >= b.max).length, of: mine.length, points: aaCostSum(mine.map((b) => b.cost)), matches }
+}
+
+export interface AaLeft {
+  /** Buyable rows. */
+  count: number
+  /** Points to the top rank of every buyable row. */
+  points: number
+  unknown: boolean
+}
+
+/** What the combo has left to buy. */
+export function aaLeft(board: readonly AaBoardRow[]): AaLeft {
+  const left = board.filter((b) => b.buyable)
+  const sum = aaCostSum(left.map((b) => b.cost))
+  return { count: left.length, points: sum.total - sum.spent, unknown: sum.unknown }
+}
+
+export interface AaPlanDelta {
+  /** Rows another combo can use that the character's own cannot. */
+  adds: number
+  /** Points to max what it adds, with the ranks carried over. */
+  points: number
+  unknown: boolean
+  /** The character's own rows that combo cannot use. */
+  drops: number
+}
+
+/** What planning another combo changes against the character's own. */
+export function aaPlanDelta(planned: readonly AaBoardRow[], own: readonly AaBoardRow[]): AaPlanDelta {
+  const ownUsable = new Set(own.filter((b) => b.usable).map((b) => b.r))
+  const added = planned.filter((b) => b.usable && !ownUsable.has(b.r) && b.cost !== null)
+  const sum = aaCostSum(added.map((b) => b.cost))
+  const plannedUsable = new Set(planned.filter((b) => b.usable).map((b) => b.r))
+  return { adds: added.length, points: sum.total - sum.spent, unknown: sum.unknown, drops: [...ownUsable].filter((r) => !plannedUsable.has(r)).length }
+}
+
+/** The groups in "what it does" order, each with its rows; empty groups left out. */
+export function aaByGroup<T>(items: readonly T[], groupOf: (t: T) => AaGroup): { group: AaGroup; label: string; items: T[] }[] {
+  return AA_GROUPS.map((g) => ({ group: g.id, label: g.label, items: items.filter((t) => groupOf(t) === g.id) })).filter((g) => g.items.length > 0)
+}
