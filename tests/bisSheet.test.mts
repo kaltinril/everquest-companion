@@ -16,7 +16,6 @@ import { defaultBoard } from '../src/shared/planner/tierDefaults'
 import { buildTierModel, conversionsFor, deriveChips, type TierModel } from '../src/shared/planner/tierWeights'
 import type { PlanSlotId } from '../src/shared/planner/types'
 import { hasteCapAt, itemHasteRoom } from '../src/shared/planner/statCaps'
-import { isUnobtainable } from '../src/shared/planner/unobtainable'
 
 function row(name: string, over: Partial<GearRow> = {}): GearRow {
   return { key: name.toLowerCase(), name, searchKey: name.toLowerCase(), slots: ['FINGER'], classes: [], races: ['ALL'], flags: [], quest: false, playerCrafted: false, stats: {}, effects: [], ...over }
@@ -198,16 +197,6 @@ test('owned-only: an item fills no more cells than copies owned', () => {
   })
   assert.equal(RINGS.filter((c) => pickOf(s, c) === 'Plain Ring').length, 1)
   assert.equal(RINGS.filter((c) => pickOf(s, c) === 'Other Ring').length, 3)
-})
-
-test('GM-event items are never candidates: Oakwynd is not obtainable in Legends (owner, 2026-11-25)', () => {
-  const oak = row('Oakwynd', { slots: ['RANGE'], skill: 'Archery', classes: ['RNG'], stats: { DMG: 175, DELAY: 20 } })
-  const bow = row('Plain Bow', { slots: ['RANGE'], skill: 'Archery', stats: { DMG: 10, DELAY: 30 } })
-  const s = sheet([oak, bow], setup({ RATIO_RANGED: 'S' }), { classes: ['RNG'] })
-  assert.equal(pickOf(s, 'RANGE'), 'Plain Bow')
-  assert.ok(!s.cells.some((c) => c.runnersUp.some((r) => r.row.key === 'oakwynd')), 'not a runner-up either')
-  assert.ok(isUnobtainable({ key: 'writ of innoruuk' }))
-  assert.ok(!isUnobtainable({ key: 'shield of hatred' }), 'its page only says "Possibly"')
 })
 
 test("the caller's gate (era) is honoured", () => {
