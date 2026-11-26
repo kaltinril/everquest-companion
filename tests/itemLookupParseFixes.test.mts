@@ -180,3 +180,37 @@ test('AN UNFILLED ITEM BLUEPRINT STATES NOTHING: NO SLOTS, STATS, DROPS, QUESTS,
   // A real page that names a mob is no blueprint.
   assert.equal(isUnfilledItemBlueprint(BLUEPRINT.replace(/Mob_Name/, 'Lord Rikantus Everling').replace(/Zone_Name/, 'Nektropos Castle').replace(/Quest_Name/, 'The Betrayer').replace(/Slot: PRIMARY[^<]*/, 'Slot: BACK')), false)
 })
+
+// The cached Oakwynd page, whole (2026-11-25): a GM-event bow whose page opens with the banner.
+const OAKWYND = `{{:Does Not Exist}}
+
+<onlyinclude>{{Itempage
+|notes       = {{Item Lore|Bow passed down by the Oakwynd family}}
+
+Obtained during a GM event.
+|itemname    = Oakwynd
+|lucy_img_ID = 1104
+|statsblock  = 
+MAGIC ITEM LORE ITEM ARTIFACT NO TRADE<br>
+Slot: RANGE<br>
+Skill: Archery Atk Delay: 20<br>
+DMG: 175<br>
+WT: 0.1 Range: 150 Size: MEDIUM<br>
+Class: RNG<br>
+Race: ALL<br>
+|gmitem = 
+
+* Given out in a GM event.
+}}</onlyinclude>`
+
+test('THE {{:Does Not Exist}} BANNER IS READ AS doesNotExist; without it the field is absent', () => {
+  const page = parseItemWikitext('Oakwynd', OAKWYND)
+  assert.equal(page.doesNotExist, true)
+  assert.equal(page.stats?.slot, 'RANGE', 'the rest of the page still parses')
+  assert.equal(parseItemWikitext('Oakwynd', OAKWYND.replace('{{:Does Not Exist}}', '')).doesNotExist, undefined)
+  for (const spelling of ['{{: Does Not Exist}}', '{{Does Not Exist}}', '{{ :does not exist }}', '{{:Does_Not_Exist}}']) {
+    assert.equal(parseItemWikitext('Oakwynd', OAKWYND.replace('{{:Does Not Exist}}', spelling)).doesNotExist, true, spelling)
+  }
+  assert.equal(parseItemWikitext('Oakwynd', OAKWYND.replace('{{:Does Not Exist}}', '<!-- {{:Does Not Exist}} -->')).doesNotExist, undefined, 'a comment is not the page')
+  assert.equal(parseItemWikitext('Oakwynd', OAKWYND.replace('{{:Does Not Exist}}', '{{DNE}}')).doesNotExist, undefined, '{{DNE}} is another template')
+})
