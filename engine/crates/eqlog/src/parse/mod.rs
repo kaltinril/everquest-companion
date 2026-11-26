@@ -5,6 +5,7 @@
 //! last so it can never shadow a real family; item merges come after loot so an auto-merge on
 //! pickup stays one combined loot event. Never reorder.
 
+pub mod aa_list;
 pub mod acquire;
 pub mod casts;
 pub mod combat;
@@ -215,7 +216,8 @@ impl Parser {
     fn classify(&self, c: &Ctx, out: &mut Ev) {
         let db = self.db.as_deref();
         let name = self.character.as_deref();
-        let claimed = combat::classify_miss(&self.combat, c, out)
+        let claimed = aa_list::classify_aa_list(c, out)
+            || combat::classify_miss(&self.combat, c, out)
             || combat::classify_mitigation(&self.combat, c, out)
             || combat::classify_resist(&self.combat, c, out)
             || combat::classify_damage(&self.combat, c, out)

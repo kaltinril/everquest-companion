@@ -42,6 +42,7 @@ use crate::jsstr::{write_js_number, write_json_string};
 pub enum Kind {
     AaActivate,
     AaGain,
+    AaList,
     AaPotion,
     AaSpend,
     AllyPetLeader,
@@ -119,6 +120,7 @@ impl Kind {
         match self {
             Kind::AaActivate => "aaActivate",
             Kind::AaGain => "aaGain",
+            Kind::AaList => "aaList",
             Kind::AaPotion => "aaPotion",
             Kind::AaSpend => "aaSpend",
             Kind::AllyPetLeader => "allyPetLeader",
@@ -195,6 +197,7 @@ impl Kind {
         match s {
             "aaActivate" => Kind::AaActivate,
             "aaGain" => Kind::AaGain,
+            "aaList" => Kind::AaList,
             "aaPotion" => Kind::AaPotion,
             "aaSpend" => Kind::AaSpend,
             "allyPetLeader" => Kind::AllyPetLeader,
@@ -263,9 +266,10 @@ impl Kind {
 
     /// Every kind this build knows, for the round-trip test. `Other` is deliberately absent: it is
     /// the answer to an unknown string, not a kind anything writes.
-    pub const ALL: [Kind; 63] = [
+    pub const ALL: [Kind; 64] = [
         Kind::AaActivate,
         Kind::AaGain,
+        Kind::AaList,
         Kind::AaPotion,
         Kind::AaSpend,
         Kind::AllyPetLeader,

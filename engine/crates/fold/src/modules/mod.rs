@@ -77,6 +77,7 @@ pub mod gaps_trade;
 pub mod item_tiers;
 pub mod kills;
 pub mod leveling;
+pub mod leveling_aa;
 pub mod loot;
 /// `met`: the names the log met and the roster's kill records, served small for the era verdicts.
 pub mod met;
