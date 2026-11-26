@@ -39,6 +39,8 @@ export interface BisCellsProps {
   wishes: BisWishes
   /** the slider's tier: every item on the sheet, worn ones too, is scaled to it */
   plus: number
+  /** item haste that can still count (`itemHasteRoom`), for the hover's worn score */
+  hasteRoom?: number
   onOpenLoot?: (item: string) => void
 }
 
@@ -133,7 +135,7 @@ function NextBest({ cell, worn, props, onInner }: { cell: BisCell; worn: WornCel
             placement="right-start"
             enterDelay={250}
             enterNextDelay={100}
-            title={<BisCompare cell={{ ...cell, pick: { ...r, reasons: [] } }} worn={worn} model={props.model} setup={props.setup} classes={props.classes} plus={props.plus} label="Next best:" />}
+            title={<BisCompare cell={{ ...cell, pick: { ...r, reasons: [] } }} worn={worn} model={props.model} setup={props.setup} classes={props.classes} plus={props.plus} hasteRoom={props.hasteRoom} label="Next best:" />}
             slotProps={TIP_SLOT}
           >
           <Stack
@@ -212,7 +214,7 @@ function Card({ cell, props, open, onToggle }: { cell: BisCell; props: BisCellsP
       open={tip && !inner}
       onOpen={() => setTip(true)}
       onClose={() => setTip(false)}
-      title={<BisCompare cell={cell} worn={worn} model={props.model} setup={props.setup} classes={props.classes} plus={props.plus} />}
+      title={<BisCompare cell={cell} worn={worn} model={props.model} setup={props.setup} classes={props.classes} plus={props.plus} hasteRoom={props.hasteRoom} />}
       slotProps={TIP_SLOT}
     >
       <Box

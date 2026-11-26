@@ -162,8 +162,8 @@ export function ownedCopies(map: GearOwnershipMap | null): Map<string, number> {
   return out
 }
 
-/** A loadout's value per chip: summed, haste the best single one, ratios left out. */
-export function loadoutTotals(rows: readonly Pick<GearRow, 'stats'>[], model: TierModel, split: boolean): Partial<Record<TierChip, number>> {
+/** A loadout's value per chip: summed, haste the best single one (down to the item haste cap), ratios left out. */
+export function loadoutTotals(rows: readonly Pick<GearRow, 'stats'>[], model: TierModel, split: boolean, hasteCap?: number): Partial<Record<TierChip, number>> {
   const totals: Partial<Record<TierChip, number>> = {}
   const chips = activeChips(split).filter((c) => !isRatioChip(c))
   for (const row of rows) {
@@ -174,6 +174,7 @@ export function loadoutTotals(rows: readonly Pick<GearRow, 'stats'>[], model: Ti
       totals[chip] = chip === 'HASTE' ? Math.max(totals.HASTE ?? v, v) : (totals[chip] ?? 0) + v
     }
   }
+  if (totals.HASTE !== undefined && hasteCap !== undefined && totals.HASTE > hasteCap) totals.HASTE = hasteCap
   return totals
 }
 

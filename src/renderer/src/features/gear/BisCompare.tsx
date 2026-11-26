@@ -28,6 +28,8 @@ export interface BisCompareProps {
   classes: readonly ClassAbbr[]
   /** the slider's tier both items are scored at */
   plus: number
+  /** item haste that can still count (`itemHasteRoom`) */
+  hasteRoom?: number
   /** the item's label: "Best:" for the slot's pick, "Next best:" when a runner-up is hovered */
   label?: string
 }
@@ -44,10 +46,10 @@ interface CompareModel {
   budget?: { text: string; tone: Tone }
 }
 
-function compareModel({ cell, worn, model, setup, classes }: BisCompareProps): CompareModel {
+function compareModel({ cell, worn, model, setup, classes, hasteRoom }: BisCompareProps): CompareModel {
   const pick = cell.pick
   const wornRow = worn?.row
-  const wornScore = wornRow === undefined ? undefined : cellScore(wornRow, cell.cell, cell.otherHaste, { model, setup, classes })
+  const wornScore = wornRow === undefined ? undefined : cellScore(wornRow, cell.cell, cell.otherHaste, { model, setup, classes, hasteRoom })
   const same = pick !== undefined && wornRow?.key === pick.row.key
   const rows = compareRows(
     pick === undefined ? {} : model.valuesOf(pick.row),

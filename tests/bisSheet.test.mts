@@ -10,11 +10,12 @@ import { buildGearIndex } from '../src/main/planner/gearIndex'
 import { eraHides } from '../src/renderer/src/features/planner/plannerData'
 import type { ClassAbbr } from '../src/shared/classCombo'
 import type { GearRow } from '../src/shared/planner/gear'
-import { DAMAGE_FIRST, alignPairsToWorn, buildBisSheet, hasteCounted, isLoreRow, type BisOptions, type BisSheet } from '../src/shared/planner/bisSheet'
+import { DAMAGE_FIRST, alignPairsToWorn, buildBisSheet, cellScore, hasteCounted, isLoreRow, itemHasteCap, type BisOptions, type BisSheet } from '../src/shared/planner/bisSheet'
 import { CHIP_KEYS, uniformBoard, type Tier, type TierChip, type TierSetup } from '../src/shared/planner/tierChips'
 import { defaultBoard } from '../src/shared/planner/tierDefaults'
 import { buildTierModel, conversionsFor, deriveChips, type TierModel } from '../src/shared/planner/tierWeights'
 import type { PlanSlotId } from '../src/shared/planner/types'
+import { hasteCapAt, itemHasteRoom } from '../src/shared/planner/statCaps'
 import { isUnobtainable } from '../src/shared/planner/unobtainable'
 
 function row(name: string, over: Partial<GearRow> = {}): GearRow {
@@ -156,6 +157,27 @@ test('hasteCounted: the part above the other haste, both under the cap; a penalt
   assert.equal(hasteCounted(30, 36, undefined), 0)
   assert.equal(hasteCounted(41, 36, 40), 4, 'both sides under the cap')
   assert.equal(hasteCounted(-5, 36, undefined), -5, 'a penalty always counts')
+})
+
+test('the haste cap by level less spell haste: item haste counts only up to the room left (owner, 2026-11-25)', () => {
+  assert.deepEqual([hasteCapAt(20), hasteCapAt(50), hasteCapAt(55), hasteCapAt(60)], [45, 75, 85, 100], 'level+25 to 50, 85 at 51-59, 100 from 60')
+  assert.equal(itemHasteRoom(50, 30), 45)
+  assert.equal(itemHasteRoom(50, 90), 0, 'never below 0')
+  const fast = row('Fast Belt', { slots: ['WAIST'], stats: { HASTE: 40 } })
+  const plated = row('Plated Belt', { slots: ['WAIST'], stats: { HASTE: 25, AC: 2 } })
+  const lanes = setup({ HASTE: 'S', AC: 'C' })
+  assert.equal(pickOf(sheet([fast, plated], lanes), 'WAIST'), 'Fast Belt', 'no spell haste field: all 40% counts')
+  const room = itemHasteRoom(50, 50)
+  const s = sheet([fast, plated], lanes, { hasteRoom: room })
+  assert.equal(room, 25)
+  assert.equal(pickOf(s, 'WAIST'), 'Plated Belt', 'only 25% can count, so its AC decides')
+  assert.equal(s.total, 64 * 25 + 3 * 2, 'haste once, at the room; the AC in WAIST and both ANY cells')
+  assert.equal(s.totals.HASTE, 25, 'the totals read the room')
+  const lone = sheet([{ ...fast, flags: ['Lore Item'] }], lanes, { hasteRoom: room }).cells.find((c) => c.cell === 'WAIST')?.pick
+  assert.deepEqual([lone?.hasteCounted, lone?.score], [25, 64 * 25], 'the card scores read the same room')
+  assert.equal(cellScore(fast, 'WAIST', 0, { model: flatModel(), setup: lanes, classes: [], hasteRoom: room }).hasteCounted, 25)
+  assert.equal(sheet([fast], lanes, { hasteRoom: 0 }).totals.HASTE ?? 0, 0, 'spell haste at the cap: item haste counts nothing')
+  assert.equal(itemHasteCap({ setup: setup({}, { caps: { HASTE: 20 } }), hasteRoom: 25 }), 20, "the player's own cap when lower")
 })
 
 test('a cap stops a stat counting above it, and the loadout fills with other stats instead (owner)', () => {

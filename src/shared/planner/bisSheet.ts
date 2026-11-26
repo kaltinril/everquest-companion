@@ -41,6 +41,8 @@ export interface BisOptions {
   admit?: (row: GearRow) => boolean
   /** owned-only mode: item key -> copies owned (bags, bank, worn). Absent = best overall */
   owned?: ReadonlyMap<string, number>
+  /** item haste that can still count: the level's haste cap less the spell haste (`itemHasteRoom`); absent = no limit */
+  hasteRoom?: number
 }
 
 export interface BisPick {
@@ -133,6 +135,18 @@ export function hasteCounted(haste: number, other: number, cap: number | undefin
   return Math.max(0, under(haste) - under(Math.max(0, other)))
 }
 
+/** The cap on item haste: the player's own HASTE cap or the room under the level's cap, the lower. */
+export function itemHasteCap(opts: Pick<BisOptions, 'setup' | 'hasteRoom'>): number | undefined {
+  const own = opts.setup.caps.HASTE
+  if (opts.hasteRoom === undefined) return own
+  return own === undefined ? opts.hasteRoom : Math.min(own, opts.hasteRoom)
+}
+
+/** Positive haste down to the cap; a penalty untouched. */
+function underCap(haste: number, cap: number | undefined): number {
+  return haste > 0 && cap !== undefined ? Math.min(haste, cap) : haste
+}
+
 /** An item's score in one cell beside a loadout whose other cells give `otherHaste`. */
 export interface CellScore {
   score: number
@@ -142,9 +156,9 @@ export interface CellScore {
 }
 
 /** What each card, each runner-up and the worn compare read, so the three can never disagree. */
-export function cellScore(row: GearRow, cell: PlanSlotId, otherHaste: number, opts: Pick<BisOptions, 'setup' | 'model' | 'classes'>): CellScore {
+export function cellScore(row: GearRow, cell: PlanSlotId, otherHaste: number, opts: Pick<BisOptions, 'setup' | 'model' | 'classes' | 'hasteRoom'>): CellScore {
   const terms = tierTerms(row, { model: opts.model, setup: opts.setup, slot: cell, classes: opts.classes, skipHaste: true })
-  const counted = hasteCounted(row.stats.HASTE ?? 0, otherHaste, opts.setup.caps.HASTE)
+  const counted = hasteCounted(row.stats.HASTE ?? 0, otherHaste, itemHasteCap(opts))
   const rate = hastePerPercent(opts)
   if (counted !== 0 && rate !== 0) terms.push({ chip: 'HASTE', value: counted, points: counted * rate })
   terms.sort((a, b) => b.points - a.points)
@@ -179,12 +193,13 @@ export function damageFirst(row: GearRow, cell: PlanSlotId, opts: Pick<BisOption
 function scoreCell(cell: PlanSlotId, rows: readonly GearRow[], opts: BisOptions): Scored[] {
   const rate = hastePerPercent(opts)
   const ctx = { model: opts.model, setup: opts.setup, slot: cell, classes: opts.classes, skipHaste: true }
+  const cap = itemHasteCap(opts)
   const out: Scored[] = []
   for (const row of rows) {
     if (!fitsCell(row, cell)) continue
     const terms = tierTerms(row, ctx)
     const stats = round3(terms.reduce((sum, t) => sum + t.points, 0))
-    const haste = row.stats.HASTE ?? 0
+    const haste = underCap(row.stats.HASTE ?? 0, cap)
     const prio = damageFirst(row, cell, opts)
     out.push({ key: row.key, row, terms, base: stats + prio * DAMAGE_FIRST, prio, haste, copies: copiesOf(row, opts.owned), twoHand: gearHandedness(row.skill) === '2h', display: round3(stats + Math.max(0, haste) * rate) })
   }
@@ -217,7 +232,7 @@ function capRules(opts: BisOptions): CapRules | undefined {
     perValue.set(chip, tierWeight(setup.board[chip], setup.step) / chipUnit(model.units, chip))
   }
   if (perValue.size === 0) return undefined
-  return { caps, perValue, hastePerPercent: hastePerPercent(opts), hasteCap: setup.caps.HASTE }
+  return { caps, perValue, hastePerPercent: hastePerPercent(opts), hasteCap: itemHasteCap(opts) }
 }
 
 /** Each cell's pool for the caps pass: the best by full score, plus the best by uncapped stats. */
@@ -317,6 +332,7 @@ export function buildBisSheet(opts: BisOptions): BisSheet {
     if (read.pick !== undefined) addTotals(totals, read.pick.row, opts)
     byCell.set(cell, read)
   })
+  if (totals.HASTE !== undefined) totals.HASTE = underCap(totals.HASTE, itemHasteCap(opts))
   const secondary = byCell.get('SECONDARY')
   if (secondary !== undefined && gearHandedness(byCell.get('PRIMARY')?.pick?.row.skill) === '2h') secondary.closedByTwoHander = true
   const cellsOut = PLAN_SLOTS.map((cell) => byCell.get(cell) ?? { cell, runnersUp: [], otherHaste: 0 })

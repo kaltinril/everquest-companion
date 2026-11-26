@@ -109,6 +109,17 @@ test('totals: summed, haste the best one, the best lane first, a reached cap mar
   assert.equal(out[0].cap, '12 capped')
   assert.equal(out[0].worn, '3')
   assert.equal(out[2].worn, '-')
+  assert.equal(loadoutTotals(rows, m, false, 25).HASTE, 25, 'item haste down to the room left under the cap')
+})
+
+test('spell haste: 0 by default, stored whole between 0 and 100 (owner, 2026-11-25)', () => {
+  assert.equal(DEFAULT_BIS_PREFS.spellHaste, 0)
+  assert.equal(sanitizeBisPrefs({ spellHaste: 30.4 }).spellHaste, 30)
+  assert.equal(sanitizeBisPrefs({ spellHaste: -5 }).spellHaste, 0)
+  assert.equal(sanitizeBisPrefs({ spellHaste: 140 }).spellHaste, 100)
+  assert.equal(sanitizeBisPrefs({ spellHaste: 'x' }).spellHaste, 0)
+  const back = sanitizeBisPrefs(JSON.parse(JSON.stringify({ ...DEFAULT_BIS_PREFS, spellHaste: 45 })))
+  assert.equal(back.spellHaste, 45, 'round-trips through the store')
 })
 
 test('the Gear tab BEST column reads the board when one is handed in, and the Ignore haste chip still drops haste', () => {
