@@ -206,6 +206,14 @@ where one exists.
   `PAGE_OF.aa`; editor `GapRowButtons` `ownPageEditor`. Rows keyed by the game's name; log evidence
   joins an existing correction's row. The two removed steeds are no row (the page already strikes
   them). Faction words moved to `shared/gapFactionWords.ts` (re-exported from `gaps.ts`, at its ceiling).
+- GRANTED (owner, 2026-11-25: "free AA's should be marked as obtained as long as the level or requirement
+  has been reached"): `shared/aaGranted.ts` `withGranted` over `rankAas`; order pick > the higher of log
+  and grant > 0, source `granted`. Needs a known level (`CharacterSnap.level`) and the row being the
+  character's own (General; Archetype if `archetypeFit` is mine; Class if held; never Special). Leading
+  cost-0 ranks whose "Requirements:" level (one, or one per rank) and AA prerequisites are met; text it
+  cannot read grants nothing. WAR/SHM/MNK 50: Gather Party, Origin, Full Potential, Intimidation, Point
+  Blank Fire, Heroic Leap, Innate Fighters Tenacity, Unbound Wrath/Cascade/Alacrity 3/3. Not measured:
+  whether Lay on Hands (10/10 at 6) and Hunter's Attack Power (26/26 at 8) are granted gradually.
 - Labels: the nav says "Alt. Adv." (`VIEW_LABELS`), the page "Alternate Advancement". The description
   has no hover (it is shown in full); a hotkey row's hover holds the hotkey text only.
 ## Maps (was map-improvements)
