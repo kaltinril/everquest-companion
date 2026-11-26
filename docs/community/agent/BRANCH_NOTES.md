@@ -121,6 +121,49 @@ where one exists.
     in the bound). The assignment (Hungarian) plus enumeration is exact and fast.
   - Not done: P5 (effects chips, a "My tier list" focus on Recommended and Void motes, per-character
     boards); the upgrade slider on the sheet; the Lore Group rule; not looked at in the running app.
+  - 2026-11-25 batch (owner's asks, `requirements/bis-sheet.md`; merged, not seen on screen by the owner):
+    - ARROWS (`planner/bisArrows.ts`): a bow in RANGE puts the best usable arrow in AMMO, DMG first,
+      elemental at `ARROW_ELEMENTAL_WEIGHT` 0.5. An arrow = AMMO with Archery, or no skill and "arrow"
+      in the name (46 arrows, Shardwing DMG 12 the best, state no skill). `GearRow.elementalDmg` =
+      Fire+Cold+Poison+Magic+Disease DMG, unscaled; Bane left out (one body type). The bow rule lives
+      in THREE places that must agree: the search's bow variant (`bisSearch.ts`), `bisCaps`
+      `bowRuleHolds`, and `withArrow` (places a zero-score arrow the search left out).
+    - SPLIT RESISTS count a fifth each through `tierWeights.chipUnit()` (Resists unit x 5). Anything
+      dividing by `model.units[chip]` directly bypasses it.
+    - LEVEL: default 50; `planner/statCaps.maxCharacterLevel` 50, 55 from `KUNARK_LAUNCH` (local
+      midnight 2026-12-08). One date: `reincarnationCap.RULERS_OF_KUNARK` reads it.
+    - SPELL HASTE (`BisPrefs.spellHaste`): item haste is clamped to `itemHasteCap` (the lower of the
+      player's HASTE cap and `hasteCapAt(level)` less spell haste) BEFORE the search, so the search
+      stays exact. The Gear tab's BEST column does not read spell haste.
+    - ATTRIBUTE CAPS by default: `BisOptions.statCaps` (`{ value, over }` per attribute;
+      `countedAmount`), default `HARD_STAT_CAPS` 510. The view passes `attributeCaps(useReincarnationCap())`:
+      the reincarnation soft cap (Alt. Advancement section below). STA, INT, WIS are capped inside HP
+      and Mana through `CapRules.folded`. A cap the player sets wins as a hard cap. The Targets bar's
+      stat cap starts at the cap in force; only a number the player changed is stored.
+    - The caps pass runs only when a cap binds (`capsBind`); its total now carries the damage-first
+      weight (before: negative totals whenever a cap was set).
+    - Totals are gear only (no base stats), so 510 binds only on heavy gear or high upgrade tiers.
+## Alt. Advancement tab (owner, 2026-11-25; requirements/alt-advancement.md)
+
+- View `aa`, Stats/Data row after Skills. `features/aa/AaView.tsx`, `AaRows.tsx`, `useAaRanks.ts`;
+  `shared/aaRanks.ts`, `aaLogMatch.ts`, `reincarnationCap.ts`; table `shared/aaTable.generated.ts`
+  from `scripts/gen-aa-table.mts` + `scripts/sources/allAas.ts`, parsing the cached page only.
+  `tests/aaTable.test.mts` is red while the committed table is behind the cache: regenerate, never
+  hand-edit. Corrections from the game and Daybreak's notes go in a layer over it, not into it.
+- Rank = the player's pick, else the log's top rank (`aaLedger`), else 0. Picks: localStorage
+  `eq.aa.ranks` = `{ [character]: { [rowKey]: rank } }`, one `useSyncExternalStore` store, so the tab
+  and the Best in slot sheet stay in step.
+- THE LOG WINS (WORKFLOW.md ruling 2026-11-25): top rank = max(wiki rank count, log rank); the shown
+  name is the log's (near match, `NEAR_EDITS` 2, unique, only to a row no log name matched exactly),
+  the wiki's in the hover; a log AA with no row gets an `unlisted` General row.
+- Race lines: the game says `Race Reincarnation: <race>`, the wiki `Class Reincarnation: <race>`;
+  the row key is the game's form. A race purchase line states no rank, so a race's rank counts the
+  reincarnations into it (`reincarnationClimbs.reincarnations`, same re-log guard as the climbs).
+- Soft cap (`reincarnationCap.ts`): no reincarnation in the log = hard 510; else 510 + 10 a
+  reincarnation before Rulers of Kunark, 11 from it, + 5 a Human rank, + 3 a Half Elf rank, a point
+  above counting `SOFT_CAP_OVER` 0.2. A reincarnation before the log began is not counted.
+- `/alternateadv list` writes every AA the combo can see into the log (MEASURED.md, "Alternate
+  advancement"); not parsed yet. `/outputfile` has no AA kind.
 ## Maps (was map-improvements)
 
 - Owner ruling: nothing that does not relate to EQ Legends. `portsInClient` drops a cast port
