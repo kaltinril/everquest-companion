@@ -1,6 +1,6 @@
 // shared/gapFieldActions.ts — the chips of the rows that are one field of a mob page: a picture
 // (gapImages.ts), a respawn (gapRespawns.ts) and a known NPC's missing quests, its related_quests
-// (gapQuestGivers.ts). Out of gaps.ts, which sits at the factoring ceiling (eslint max-lines).
+// (gapQuestGivers.ts); an AA's row on the AA page (gapAas.ts). Out of gaps.ts, which sits at the factoring ceiling (eslint max-lines).
 
 import type { GapAction, GapDomain, GapRow } from './gaps'
 import { respawnAction } from './gapRespawns'
@@ -8,6 +8,7 @@ import { questGiverAction } from './gapQuestGivers'
 import { wikiEditUrl, wikiUploadUrl } from './gapUrls'
 import { iconWhy } from './gapIcons'
 import { recipeWhy } from './gapRecipe'
+import { AA_PAGE, aaFixWhy } from './gapAas'
 
 /** An image row's chip: upload the file; the page's imagefilename line added, or fixed when it names another file. */
 function imageAction(row: GapRow, file = row.image ?? ''): GapAction {
@@ -17,7 +18,8 @@ function imageAction(row: GapRow, file = row.image ?? ''): GapAction {
 
 const FIELD_ACTION: Partial<Record<GapDomain, (row: GapRow) => GapAction>> = {
   image: (row) => imageAction(row),
-  respawn: (row) => respawnAction(row)
+  respawn: (row) => respawnAction(row),
+  aa: (row) => ({ kind: 'checkWiki', label: row.aaFix?.placeholder === true ? 'Check AA page' : 'Fix AA page', why: row.aaFix === undefined ? '' : aaFixWhy(row.aaFix), href: wikiEditUrl(AA_PAGE) })
 }
 
 /** The row's one chip when it is one field of a mob page; undefined otherwise. */

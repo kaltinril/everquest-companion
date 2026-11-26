@@ -22,6 +22,7 @@ import { Tooltip } from '../../lib/Tooltip'
 import { existingEditor } from '@shared/gapExistingPage'
 import { wikiPageUrl } from '@shared/gapUrls'
 import { questPageTitle } from '@shared/gapQuests'
+import { AA_PAGE } from '@shared/gapAas'
 import { lookupOnCopy, readGapVerdict } from '../../lib/gapVerdicts'
 import { QuestCopyDialog, readQuestPage, type QuestRead } from './QuestCopyDialog'
 import { MobCopyDialog, readMobPage, type MobRead } from './MobCopyDialog'
@@ -100,6 +101,7 @@ function copyWords(row: GapRow): { label: string; tip: string } {
   if (row.suggest !== undefined && (row.domain === 'item' || row.domain === 'spell' || row.domain === 'zone')) {
     return { label: 'Copy redirect', tip: `A redirect from the game's spelling to ${row.suggest.page}, so both spellings reach one page.` }
   }
+  if (row.domain === 'aa') return { label: 'Copy table row', tip: "The AA's row in the AA page's table layout, to paste or replace." }
   if (row.domain === 'notice') return { label: 'Copy proof', tip: 'What your log proves (how often, when, where, the lines), for the talk page or the edit summary.' }
   // A quest reads its wiki page first and adds to it (owner, 2026-10-23: "implement the diff idea").
   if (row.domain === 'quest') return { label: 'Copy wiki page', tip: 'Reads the wiki page and adds what your log saw, removing nothing.' }
@@ -175,11 +177,13 @@ function CopyPageButton({ text, row, compact }: { text: () => string; row: GapRo
 /**
  * A row with a page title of its own: a quest, under the catalog's page when the wiki has one, else
  * the wiki's spelling; a mob whose plain name is another zone's page, under a title with this zone
- * (owner, 2026-11-10: `A kobold (Rathe Mountains)`). Undefined for every other row.
+ * (owner, 2026-11-10: `A kobold (Rathe Mountains)`); an AA, the Alternate Advancement page. Undefined for every other row.
  */
 function ownPageEditor(row: GapRow): { target: string; create: string; existing: boolean } | undefined {
   if (row.domain === 'quest') return row.page === undefined ? { target: questPageTitle(row.name), create: 'Create page', existing: false } : { target: row.page, create: 'Edit page', existing: true }
   if (row.domain === 'mob' && row.zoneTitled === true) return { target: zoneTitledPage(row), create: 'Create page', existing: false }
+  // An AA's row: the AA page, which exists (gapAas.ts).
+  if (row.domain === 'aa') return { target: AA_PAGE, create: 'Edit AA page', existing: true }
   return undefined
 }
 

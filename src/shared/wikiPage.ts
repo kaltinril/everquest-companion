@@ -43,6 +43,7 @@ import type { QuestExtras } from './gapQuests'
 import { withFightFields } from './gapFight'
 import { respawnFieldLine, withRespawnField } from './gapRespawns'
 import { itemsSoldBlock, itemsSoldField, type SoldSeen } from './gapItemsSold'
+import { aaFixText } from './gapAas'
 import { pageOrAdd, withDescription, withoutStated, type MerchantExtras, type PageStated } from './gapMerchantDescription'
 
 /** A log zone name as the wiki spells it (shared/gapWikiZone.ts); as printed when none is given. */
@@ -683,6 +684,8 @@ const PAGE_OF: Record<GapDomain, (row: GapRow, c: PageContext) => string> = {
   notice: (row) => noticeProof(row),
   // A Zones row is always a redirect (gapZoneRedirects.ts); `wikiPageText` answers it above.
   zone: (row) => `#REDIRECT [[${row.suggest?.page ?? row.name}]]\n`,
+  // An AA's row as the AA page's table writes it (gapAas.ts).
+  aa: (row) => aaFixText(row),
   quest: (row, c) => questRowPage(row, { zoneName: c.zoneName, mobPage: c.mobPage, entry: c.questEntry?.(row.name), journal: c.questJournal?.(row.name), players: c.players }),
   // A drop: its group's link (`[[Rusty Weapons]]`), else the item; each with the rate seen, a
   // group's being the corpses that dropped any member (the row's count) over the mob's kills.
@@ -723,7 +726,8 @@ const NEEDED_OF: Partial<Record<GapDomain, (row: GapRow, seen: PageExtras) => st
   image: () => [],
   respawn: () => [],
   notice: () => [],
-  quest: () => []
+  quest: () => [],
+  aa: () => []
 }
 
 /**

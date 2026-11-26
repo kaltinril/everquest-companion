@@ -19,12 +19,13 @@ import { fieldAction } from './gapFieldActions'
 import { perObject } from './gapMemo'
 import type { RespawnFact } from './gapRespawns'
 import { offerCheckText, offerText } from './gapOffers'
-import { decodeFactionAmount } from './mobFactionAmounts'
 import { wikiPageUrl } from './wiki'
 import { zoneBaseName, zoneKey } from './zones'
 import { wikiCreateUrl, wikiEditUrl, wikiSearchUrl, wikiUploadUrl } from './gapUrls'
+import { logSaysText, pageSaysText } from './gapFactionWords'
+import type { AaFix } from './gapAas'
 
-export { wikiCreateUrl, wikiEditUrl, wikiSearchUrl, wikiUploadUrl }
+export { wikiCreateUrl, wikiEditUrl, wikiSearchUrl, wikiUploadUrl, logSaysText, pageSaysText }
 
 export const GAPS_MODULE_ID = 'gaps'
 
@@ -33,10 +34,11 @@ export const GAPS_MODULE_ID = 'gaps'
  *  mob whose page lists neither it nor its group (shared/gapDrops.ts); `image`: a mob met whose page
  *  has no image (shared/gapImages.ts) (owner asks, 2026-10-18); `notice`: a mob or item the log met
  *  whose page says it may not be in Legends, `{{DNE}}` or `{{delete}}` (gaps_notices.rs; owner, 2026-10-22);
- *  `quest`: a task the log named, its page made or filled (gaps_quest_log.rs, shared/gapQuests.ts). */
-export type GapDomain = 'item' | 'mob' | 'spell' | 'merchant' | 'faction' | 'drop' | 'image' | 'respawn' | 'notice' | 'quest' | 'zone'
-export const GAP_DOMAINS: readonly GapDomain[] = ['item', 'mob', 'spell', 'merchant', 'faction', 'drop', 'image', 'respawn', 'notice', 'quest', 'zone']
-export const GAP_DOMAIN_LABELS: Record<GapDomain, string> = { item: 'Items', mob: 'Mobs', spell: 'Spells', merchant: 'Merchants', faction: 'Factions', drop: 'Drops', image: 'Images', respawn: 'Respawns', notice: 'Notices', quest: 'Quests', zone: 'Zones' }
+ *  `quest`: a task the log named, its page made or filled (gaps_quest_log.rs, shared/gapQuests.ts);
+ *  `aa`: an AA the game states otherwise than the wiki's Alternate Advancement page (shared/gapAas.ts). */
+export type GapDomain = 'item' | 'mob' | 'spell' | 'merchant' | 'faction' | 'drop' | 'image' | 'respawn' | 'notice' | 'quest' | 'zone' | 'aa'
+export const GAP_DOMAINS: readonly GapDomain[] = ['item', 'mob', 'spell', 'merchant', 'faction', 'drop', 'image', 'respawn', 'notice', 'quest', 'zone', 'aa']
+export const GAP_DOMAIN_LABELS: Record<GapDomain, string> = { item: 'Items', mob: 'Mobs', spell: 'Spells', merchant: 'Merchants', faction: 'Factions', drop: 'Drops', image: 'Images', respawn: 'Respawns', notice: 'Notices', quest: 'Quests', zone: 'Zones', aa: 'AAs' }
 
 /** What the shown-count line calls a domain's rows: "Showing 11 of 395 mobs missing a wiki picture" (owner, 2026-10-19: "unknown images" read oddly). */
 export const GAP_SHOWN_NOUN: Record<GapDomain, string> = {
@@ -50,7 +52,8 @@ export const GAP_SHOWN_NOUN: Record<GapDomain, string> = {
   respawn: 'mob pages missing or misstating a respawn',
   notice: 'pages that say they are not in Legends',
   quest: 'quests your log took part in',
-  zone: 'zone names that need a redirect'
+  zone: 'zone names that need a redirect',
+  aa: 'AAs the wiki page lacks or states otherwise'
 }
 
 /** One line under the toggle saying what the chosen domain's rows are (owner ask, 2026-10-18). */
@@ -65,7 +68,8 @@ export const GAP_DOMAIN_HELP: Record<GapDomain, string> = {
   respawn: "Mobs whose respawn your kills agree on, and whose page states none, another, or words to check: set the page's respawn_time.",
   notice: 'Mobs and items you met whose page says "not in Legends" or "up for deletion": remove the notice, since your log proves they exist.',
   quest: 'Quests your log took part in: make the page, or fill what its page is missing.',
-  zone: 'Zone names your log printed that the wiki titles otherwise: make a redirect page.'
+  zone: 'Zone names your log printed that the wiki titles otherwise: make a redirect page.',
+  aa: "AAs your log or Daybreak's notes state otherwise than the wiki's AA page: fix its row."
 }
 
 /**
@@ -83,7 +87,8 @@ export const GAP_CAPTURE: Record<GapDomain, string> = {
   respawn: 'Stay in the zone and kill it again: each spawn you see adds a gap.',
   notice: 'Nothing: remove the notice and cite the lines below.',
   quest: 'Paste the Quest Journal for its level; hail and say each [keyword].',
-  zone: 'Nothing: copy the redirect and save it as a new page.'
+  zone: 'Nothing: copy the redirect and save it as a new page.',
+  aa: "Nothing: copy the row into the AA page's table."
 }
 
 /**
@@ -229,7 +234,8 @@ export type GapKind =
    */
   | 'held' | 'captured'
   /** `fished`: caught fishing (gaps_fished.rs); `assigned` / `updated`: a Quests row's task lines; `entered`: a Zones row's zone. */
-  | 'fished' | 'assigned' | 'updated' | 'entered'
+  /** An AAs row's evidence: `trained` (a log purchase line), `announced` (Daybreak's notes), `listed` (the game's AA window). */
+  | 'fished' | 'assigned' | 'updated' | 'entered' | 'trained' | 'announced' | 'listed'
 
 /**
  * One distinct merchant offer for an item, from the sell slot (`X told you, 'I'll give you ...'`;
@@ -363,6 +369,8 @@ export interface GapRow {
   edit?: GapEdit
   /** A Respawns row, or a Mobs row whose kills agree on a respawn: the number and what it stands on (gapRespawns.ts). */
   respawn?: RespawnFact
+  /** An AAs row: what the AA page says, what it should say, the evidence, and its row as wikitext (gapAas.ts). */
+  aaFix?: AaFix
 }
 
 export interface GapsSnap {
@@ -547,22 +555,6 @@ export interface GapAction {
   href?: string
   /** A chip that warns: check the page before acting (a respawn page that states words). */
   warn?: true
-}
-
-/** What a page's faction statement says, in words: `(-10) to (-30) (unconfirmed)`, `a lowering of no stated amount`. */
-export function pageSaysText(said: string): string {
-  const h = decodeFactionAmount(said)
-  const guess = h.unconfirmed === true ? ' (unconfirmed)' : ''
-  if (h.min === undefined || h.max === undefined) return `${h.side === 'lowers' ? 'a lowering' : 'a raise'} of no stated amount${guess}`
-  // The wiki writes the smaller hit first: `(-10) to (-30)`, `(10) to (30)`.
-  const [a, b] = Math.abs(h.min) <= Math.abs(h.max) ? [h.min, h.max] : [h.max, h.min]
-  return (h.min === h.max ? `(${String(h.min)})` : `(${String(a)}) to (${String(b)})`) + guess
-}
-
-/** What the log says of a faction row: its amount, or the side a capped line showed. */
-export function logSaysText(row: Pick<GapRow, 'adjust' | 'raised'>): string {
-  if (row.adjust !== undefined) return `(${String(row.adjust)})`
-  return row.raised === true ? 'a raise (at max standing, no amount)' : 'a lowering (at min standing, no amount)'
 }
 
 /** A row about a mob's page (a missing faction, drop or image): its domain is one of these. An image row is the mob itself. */
