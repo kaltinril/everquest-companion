@@ -14,9 +14,14 @@
 // THE CIRCLE IS THE OLD RING, NUMBER FOR NUMBER: the same box, the same stroke, the same transform
 // string. `tests/cursorRingShape.test.mts` pins that, so an upgrade moves nobody's ring.
 //
+// THE PICTURE (`'image'`, 2026-11-26) is a box like the square with no stroke at all: the overlay
+// draws the player's PNG in it (object-fit contain), so it fills the same footprint. `'image'` with
+// no valid picture draws the circle, exactly as an unknown shape does.
+//
 // No DOM, no React: plain numbers and strings, so the node tests can hold every shape.
 
 import { normalizeRingShape } from './presencePrefs'
+import { normalizePictureDataUrl } from './cursorPicture'
 import type { CursorPoint, CursorRingPrefs } from './presencePrefs'
 
 /** The oval's height as a share of its width. Fixed: one more slider would buy little. */
@@ -48,7 +53,8 @@ export interface RingGeometry {
   widthPx: number
   heightPx: number
   /** The stroke actually drawn: the chosen thickness, capped at half the shorter side, so a thick
-   *  stroke on the short oval stays an outline. The stored thickness is never changed. */
+   *  stroke on the short oval stays an outline. The stored thickness is never changed. 0 for a
+   *  picture, which has no outline. */
   strokePx: number
   /** A CSS border-radius: '50%' for round shapes, px for the rounded square, '0' for sharp. */
   borderRadius: string
@@ -106,15 +112,33 @@ function innerOf(shape: CursorRingPrefs['shape'], size: number, stroke: number):
   return null
 }
 
+/** What a drawing needs to know about the shape: the prefs it reads, all optional past size and
+ *  thickness, because an older main or a test harness may send a config without them. */
+type ShapeInput = Pick<CursorRingPrefs, 'sizePx' | 'thicknessPx'> & {
+  shape?: unknown
+  imageDataUrl?: unknown
+}
+
+/** The picture to draw, or null: only when the shape is `'image'` AND the stored picture passes
+ *  the validator. Both the overlay window and the Preferences sample read this, never the field. */
+export function ringPicture(prefs: { shape?: unknown; imageDataUrl?: unknown }): string | null {
+  if (normalizeRingShape(prefs.shape) !== 'image') return null
+  const url = normalizePictureDataUrl(prefs.imageDataUrl)
+  return url === '' ? null : url
+}
+
 /**
  * The box for the chosen shape. Takes the shape as `unknown`-safe: the ring window may be handed
- * a config without one (an older main, a test harness), and that draws the circle.
+ * a config without one (an older main, a test harness), and that draws the circle. So does
+ * `'image'` without a picture.
  */
-export function ringGeometry(
-  prefs: Pick<CursorRingPrefs, 'sizePx' | 'thicknessPx'> & { shape?: unknown }
-): RingGeometry {
-  const shape = normalizeRingShape(prefs.shape)
+export function ringGeometry(prefs: ShapeInput): RingGeometry {
   const size = prefs.sizePx
+  if (ringPicture(prefs) !== null) {
+    return { widthPx: size, heightPx: size, strokePx: 0, borderRadius: '0', rotateDeg: 0, inner: null }
+  }
+  const named = normalizeRingShape(prefs.shape)
+  const shape = named === 'image' ? 'circle' : named
   const box = boxOf(shape, size)
   const strokePx = Math.max(1, Math.min(prefs.thicknessPx, Math.floor(Math.min(box.w, box.h) / 2)))
   return {

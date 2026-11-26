@@ -6,7 +6,8 @@
 // "I lose my mouse on EQ screens"). Off by default; the toggle is the only thing that makes it
 // exist. It is white until the player picks another colour (JOS-125), and a circle until the
 // player picks another shape (owner, 2026-11-26); both defaults are the old ring exactly, so
-// nobody's ring changes by upgrading.
+// nobody's ring changes by upgrading. The last shape, "My icon / drawing" (2026-11-26), draws the
+// player's own picture; its row (upload, drawing grid) is CursorIconSetting.tsx.
 //
 // THE NOTE ABOUT SCOPE IS NOT DECORATION. "Only over EverQuest" is the single most surprising
 // thing about this feature — a user who turns it on while reading Preferences sees nothing
@@ -39,6 +40,7 @@ import {
 import { CursorRingDemo } from './CursorRingDemo'
 import { CrosshairRow } from './CursorCrosshairSetting'
 import { TrailRow } from './CursorTrailSetting'
+import { PictureRow } from './CursorIconSetting'
 
 /**
  * SEEDED from the pane's hydration snapshot, written back on every change; main's reply is
@@ -73,7 +75,8 @@ const SHAPE_LABELS: Record<RingShape, string> = {
   rounded: 'Rounded square',
   diamond: 'Diamond',
   dot: 'Ring with a centre dot',
-  target: 'Target (double ring)'
+  target: 'Target (double ring)',
+  image: 'My icon / drawing'
 }
 
 /** The shape picker (owner, 2026-11-26). A plain select: seven names read better as words than
@@ -108,7 +111,7 @@ function RingShapePicker({
 }
 
 /** Size + stroke. Both are whole px and both are clamped in main; the labels state the value so
- *  the cap is legible rather than felt. */
+ *  the cap is legible rather than felt. A picture has no outline, so its thickness is hidden. */
 function RingSliders({
   prefs,
   onChange
@@ -133,7 +136,7 @@ function RingSliders({
           sx={{ width: 160 }}
         />
       </Stack>
-      <Stack sx={{ minWidth: 180 }}>
+      <Stack sx={{ minWidth: 180, display: prefs.shape === 'image' ? 'none' : undefined }}>
         <Typography variant="caption" color="text.secondary">
           Thickness ({prefs.thicknessPx}px)
         </Typography>
@@ -300,6 +303,7 @@ export function CursorRingSetting(): JSX.Element {
             <RingColor prefs={prefs} onChange={update} />
           </Stack>
           <RingOffsets prefs={prefs} onChange={update} />
+          {prefs.shape === 'image' && <PictureRow prefs={prefs} onChange={update} />}
         </Stack>
         <CursorRingDemo prefs={prefs} />
       </Stack>
@@ -334,7 +338,7 @@ export function cursorRingSection(): PrefSection {
         id: 'cursor-ring',
         label: 'Cursor overlay',
         keywords:
-          'cursor overlay mouse pointer ring circle halo highlight find lost locate ultimate size thickness white color colour picker shape oval square rounded diamond dot target bullseye double offset position shift move nudge x y demo crosshair cross hair lines vertical horizontal weight aim trail particle particles sparkle sparkles effect length fade',
+          'cursor overlay mouse pointer ring circle halo highlight find lost locate ultimate size thickness white color colour picker shape oval square rounded diamond dot target bullseye double offset position shift move nudge x y demo crosshair cross hair lines vertical horizontal weight aim trail particle particles sparkle sparkles effect length fade icon image picture upload custom my own draw drawing paint grid pixel art',
         content: <CursorRingSetting />
       }
     ]

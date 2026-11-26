@@ -3562,7 +3562,28 @@ what a later change must know. Each fix has a unit test that failed before it.
   `resize` and on each loop start.
 - **Store blob:** all six new fields ride `cursorRing` with no schema bump; defaults leave every
   install's overlay as it was. The five blob-pinning tests list them (grep `trailLength: 5`).
-- **Queued, next slice:** icon upload (would add `'image'` to `RingShape`; the window then draws a
-  picture on `#ring` or the trail canvas; cursor.html's CSP has `img-src 'none'` today) and the
-  NxN drawing grid (could feed the same `'image'` path). Optional: a trail colour of its own (today
+- **Picture (`'image'` shape, owner 2026-11-26: icon upload + NxN drawing grid):** one picture,
+  two ways to make it. New fields, no schema bump: `imageDataUrl` (`''` = none) and
+  `drawing: { n, cells }` (default `{ n: 16, cells: 256 x '' }`; n in `DRAWING_SIZES` 8/12/16/24/32,
+  cells padded/trimmed to n*n, each `''` or `#rrggbb` via `normalizeRingColor(c, '')`). Both make a
+  PNG data URL: upload = `createImageBitmap` + canvas fit to 64 px (`fitWithin`), grid = one pixel
+  per cell. The overlay draws `#ring-img` (child of `#ring`) and never knows which made it.
+- **Validator = the security boundary:** `shared/cursorPicture.ts normalizePictureDataUrl`: only
+  `data:image/png;base64,` + base64 chars (padded, length % 4), whole string <= 64 KB
+  (`MAX_PICTURE_CHARS`), decoded head = PNG signature + IHDR, 1 to 128 px a side; else `''`. Runs
+  in `normalizeCursorRing`, so main's IPC write, the store reader and migrations all clamp it.
+  The cursorRing blob is not in the settings share export (share.ts carries no presence prefs).
+- **CSP:** cursor.html `img-src 'none'` became `img-src data:` (no http(s), file:, blob:). The
+  picture reaches the DOM only as `pic.src = ringPicture(cfg)`; no innerHTML, no CSS url().
+- **Geometry:** `ringPicture(prefs)` = the validated URL only when shape is `'image'`;
+  `ringGeometry` then gives a size x size box, stroke 0, radius 0. `'image'` with no picture draws
+  the circle. `pictureRendering`: <= 32 px a side = `pixelated` (grid, tiny icons), else smooth.
+- **Performance contract rule 6:** the picture is set once per config, and its src only when the
+  picture itself changes (a slider drag does not re-decode); a move still changes only the ring's
+  transform. `#ring.picture` drops the shadows.
+- **Preferences:** `CursorIconSetting.tsx` (upload, Remove, error line), `CursorDrawingGrid.tsx`
+  (one canvas, not N*N elements). Shown while Shape = "My icon / drawing"; Upload/Save also pick
+  that shape. Thickness is hidden for it. Pinned in `tests/cursorPicture.test.mts`; the blob pins
+  list the two new fields.
+- **Optional, not built:** "load current icon into the grid"; a trail colour of its own (today
   the shape's).

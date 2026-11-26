@@ -155,11 +155,11 @@ test("the inner mark's style paints a dot's fill or a ring's border, in the stro
 
 test('ONLY A KNOWN SHAPE SURVIVES the normalizer', () => {
   for (const shape of RING_SHAPES) assert.equal(normalizeRingShape(shape), shape)
-  for (const junk of ['hexagon', 'Circle', 'DIAMOND', ' oval', 'image', '', '__proto__', 'constructor', 7, null, undefined, {}, ['square']]) {
+  for (const junk of ['hexagon', 'Circle', 'DIAMOND', ' oval', 'Image', 'picture', '', '__proto__', 'constructor', 7, null, undefined, {}, ['square']]) {
     assert.equal(normalizeRingShape(junk), 'circle', `${String(junk)} draws the circle`)
   }
   // A bad shape never costs the player the rest of their settings.
   const v = normalizeCursorRing({ enabled: true, sizePx: 90, thicknessPx: 6, colorHex: '#00ff00', shape: 'star' })
-  assert.deepEqual(v, { enabled: true, sizePx: 90, thicknessPx: 6, colorHex: '#00ff00', shape: 'circle', offsetXPx: 0, offsetYPx: 0, showShape: true, crosshairEnabled: false, crosshairColorHex: '#ffffff', crosshairWeightPx: 2, trail: 'off', trailLength: 5 })
+  assert.deepEqual(v, { enabled: true, sizePx: 90, thicknessPx: 6, colorHex: '#00ff00', shape: 'circle', offsetXPx: 0, offsetYPx: 0, showShape: true, crosshairEnabled: false, crosshairColorHex: '#ffffff', crosshairWeightPx: 2, trail: 'off', trailLength: 5, imageDataUrl: '', drawing: { n: 16, cells: new Array(256).fill('') } })
   assert.equal(normalizeCursorRing({ shape: 'diamond' }).shape, 'diamond')
 })
