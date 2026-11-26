@@ -17,7 +17,7 @@ const MAX_PIPS = 10
 const SOURCE_WORD = { list: 'alt list', activated: 'used', pick: 'you', log: 'log', granted: 'granted', none: '' } as const
 const SOURCE_TIP = {
   list: 'Read from your latest /alt list.',
-  activated: 'Your log shows you activating it.',
+  activated: 'Your log shows you using it.',
   pick: 'You set this rank; open the row to go back to the log.',
   log: "Your log's purchase lines show this rank.",
   granted: 'Free AA: the game grants it once you reach its level.',

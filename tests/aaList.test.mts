@@ -115,10 +115,42 @@ test('ACTIVATION: "You activate Quick Buff." holds it; "You activate Skull Bash.
   )
 })
 
-test('RUNG 1, the list, beats a pick and every purchase logged before it', () => {
+test('RUNG 1, the list, beats a pick and every purchase logged before the zone-in before it', () => {
   const before = [1, 2, 3, 4].map((k) => spend('Combat Fury', k, T - 1000 + k))
-  const ranked = ranks({ list: FRESH, spends: before }, { 'Combat Fury': 3 }, ['ENC', 'WAR'])
+  // A zone (or a respec since, as in tests/fixtures/aa-mnemonic-respec.log) between them: the list is current.
+  const list = { ...FRESH, zoneBefore: T - 500 }
+  const ranked = ranks({ list, spends: before }, { 'Combat Fury': 3 }, ['ENC', 'WAR'])
   assert.deepEqual([row(ranked, 'Combat Fury').rank, row(ranked, 'Combat Fury').source], [0, 'list'])
+})
+
+test('THE POTTERY CASE: a purchase with no zone-in before the list beats it (purchase 15:42, list 15:44)', () => {
+  const at = (hm: string): number => Date.parse(`2026-11-25T${hm}`)
+  const list: AaListRun = { ...OWNER, ts: at('15:44:21'), zoneBefore: at('15:30:00') }
+  const bought = [1, 2, 3].map((k) => spend('Pottery Mastery', k, at('15:42:00') + k))
+  const ranked = ranks({ list, spends: bought })
+  assert.deepEqual([row(ranked, 'Pottery Mastery').rank, row(ranked, 'Pottery Mastery').source], [3, 'log'])
+  // The same shape where the list reads the row (current and next block): the purchase still wins.
+  const fury = (pct: number, cost: number): AaListBlock => ({ id: 40, name: 'Combat Fury', description: `with all skills by ${String(pct)}%.`, cost })
+  const stale: AaListRun = { ts: at('15:44:21'), zoneBefore: at('15:30:00'), blocks: [fury(2, 2), fury(3, 3)] }
+  const furyBought = [1, 2, 3].map((k) => spend('Combat Fury', k, at('15:42:00') + k))
+  const read = ranks({ list: stale, spends: furyBought })
+  assert.deepEqual([row(read, 'Combat Fury').rank, row(read, 'Combat Fury').source], [3, 'log'])
+  // A zone-in between the purchase and the list: the list is current and wins.
+  const zoned = ranks({ list: { ...stale, zoneBefore: at('15:43:00') }, spends: furyBought })
+  assert.deepEqual([row(zoned, 'Combat Fury').rank, row(zoned, 'Combat Fury').source], [2, 'list'])
+})
+
+test('RUNG 2: a ranked cast holds the AA at its numeral; a spell no AA row names changes nothing', () => {
+  const ranked = ranks({ activations: [{ ...act('Rampage'), rank: 2 }, { ...act('Scorching Arrow'), rank: 4 }] })
+  assert.deepEqual([row(ranked, 'Rampage').rank, row(ranked, 'Rampage').source], [2, 'activated'])
+  assert.ok(row(ranked, 'Rampage').max >= 2)
+  assert.deepEqual(
+    ranks({ activations: [{ ...act('Scorching Arrow'), rank: 4 }] }).map((r) => [r.key, r.rank, r.source]),
+    ranks({}).map((r) => [r.key, r.rank, r.source])
+  )
+  // The reuse timer, a toggle off, an interrupt and (Finishing Blow) reach here as a name alone.
+  const named = ranks({ activations: [act('Heroic Leap'), act('Point Blank Fire'), act('Finishing Blow')] })
+  for (const k of ['Heroic Leap', 'Point Blank Fire', 'Finishing Blow']) assert.ok(row(named, k).rank >= 1, k)
 })
 
 test('THE STALE-LIST EXCEPTION: a purchase logged after the list raises the rank above it', () => {
@@ -161,11 +193,13 @@ test('the list maps its names onto the rows: apostrophes and race rows', () => {
 test('mergeLeveling: the newer list run wins, activations join by name', () => {
   const base: LevelingSnap = { levels: [], aaGains: [], aaSpends: [], aaPotions: [] }
   const older: LevelingSnap = { ...base, aaList: { ts: 5, blocks: [] }, aaActivations: [{ name: 'Quick Buff', first: 1, last: 4 }] }
-  const newer: LevelingSnap = { ...base, aaList: null, aaActivations: [{ name: 'Quick Buff', first: 8, last: 9 }, act('Rampage', 7)] }
+  const newer: LevelingSnap = { ...base, aaList: null, aaActivations: [{ name: 'Quick Buff', first: 8, last: 9 }, { ...act('Rampage', 7), rank: 2 }] }
   const m = mergeLeveling(older, newer)
   assert.ok(m !== null)
   assert.equal(m.aaList?.ts, 5)
-  assert.deepEqual(m.aaActivations, [{ name: 'Quick Buff', first: 1, last: 9 }, { name: 'Rampage', first: 7, last: 7 }])
+  assert.deepEqual(m.aaActivations, [{ name: 'Quick Buff', first: 1, last: 9 }, { name: 'Rampage', first: 7, last: 7, rank: 2 }])
+  const lower = mergeLeveling(newer, { ...base, aaActivations: [{ ...act('Rampage', 9), rank: 1 }] })
+  assert.deepEqual(lower?.aaActivations?.find((a) => a.name === 'Rampage'), { name: 'Rampage', first: 7, last: 9, rank: 2 })
   const later = mergeLeveling(older, { ...base, aaList: { ts: 9, blocks: [] } })
   assert.equal(later?.aaList?.ts, 9)
   // A segment written before the fields reads as one without them.

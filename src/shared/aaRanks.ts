@@ -4,9 +4,10 @@
 //
 // WHERE A RANK COMES FROM (owner, 2026-11-25, the order of proof): the first source that says
 // something wins. 1. the latest `/alt list` run (shared/aaList.ts; it reads a rank only for a row with
-// more than one), except that a purchase line logged AFTER the run raises it (a list can be stale
-// until a loadout swap or zone, MEASURED.md); 2. the player activating it (`You activate X.`: at
-// least rank 1); 3. the player's own pick for this character; 4. the highest rank the log's purchase
+// more than one), except that a purchase line logged after the run, or after the last zone-in before
+// it, raises it (a list is stale until a zone after a purchase, MEASURED.md); 2. the player's own
+// lines using it (`You activate X.`, a ranked cast, the reuse timer ...: its rank, else at least 1);
+// 3. the player's own pick for this character; 4. the highest rank the log's purchase
 // lines state (`aaLedger`), and a free rank the game grants, laid over by shared/aaGranted.ts
 // `withGranted` (the log writes no line for it). A one-rank row the list printed with none of 2-4 is
 // `unknown`: the list prints it the same owned or not, so it is never guessed and never sold. THE LOG WINS OVER THE WIKI (owner,
@@ -24,7 +25,7 @@ import type { AaSection, AaTableRow } from './aaTable.generated'
 import { AA_ROWS, type AaRow } from './aaOfficial'
 import { aaFold, aaLogAas, aaLogMatch, type LogAa } from './aaLogMatch'
 import type { AASpendLike } from './aa'
-import { aaActivatedRows, aaListRead, type AaActivation, type AaListRun } from './aaList'
+import { aaActivatedRows, aaBeatsList, aaListRead, type AaActivation, type AaListRun } from './aaList'
 import type { ClassAbbr } from './classCombo'
 import { classAbbrForDisplayName } from './spellLevels'
 
@@ -57,10 +58,10 @@ export interface AaEvidence {
   list?: number
   /** The run printed the row (read or not). */
   printed?: boolean
-  /** The highest rank a purchase line logged after the run states. */
+  /** The highest rank a purchase line that beats the run states (`aaBeatsList`). */
   after?: number
-  /** The log shows the player activating it. */
-  activated?: boolean
+  /** The rank the player's own lines show (at least 1); absent when none names it. */
+  activated?: number
 }
 
 /** Everything the log gives the ranks: purchases, reincarnations, the latest list run, activations. */
@@ -96,10 +97,11 @@ const clamp = (n: number, max: number): number => Math.max(0, Math.min(max, Math
 
 type Held = Pick<AaRanked, 'rank' | 'source'> & { unknown?: true }
 
-/** Below the list: activation (at least 1), else the pick, else the purchase lines. */
+/** Below the list: what the player's own lines show, else the pick, else the purchase lines. */
 function heldBelowList(pick: number | undefined, logRank: number | null, ev: AaEvidence, max: number): Held {
   const lower: Held | null = pick !== undefined ? { rank: clamp(pick, max), source: 'pick' } : logRank !== null && logRank > 0 ? { rank: logRank, source: 'log' } : null
-  if (ev.activated === true) return lower !== null && lower.rank >= 1 ? lower : { rank: 1, source: 'activated' }
+  // A pick or purchase above what the lines show still counts; below it, the lines win.
+  if (ev.activated !== undefined) return lower !== null && lower.rank >= ev.activated ? lower : { rank: ev.activated, source: 'activated' }
   if (lower !== null) return lower
   return ev.printed === true ? { rank: 0, source: 'none', unknown: true } : { rank: 0, source: 'none' }
 }
@@ -110,6 +112,9 @@ function heldByList(ev: AaEvidence): Held | null {
   const after = ev.after ?? 0
   return after > ev.list ? { rank: after, source: 'log' } : { rank: ev.list, source: 'list' }
 }
+
+/** THE LOG WINS on the top rank: the wiki's count, or a purchase's or a cast's numeral above it. */
+const topRank = (row: AaRow, logRank: number | null, ev: AaEvidence): number => Math.max(row.ranks, logRank ?? 0, ev.activated ?? 0)
 
 export interface RankAaOptions {
   /** A log AA the wiki's page does not list. */
@@ -122,9 +127,9 @@ export function rankAa(row: AaRow, log: LogAa | null, picks: AaPicks, opts: Rank
   const unlisted = opts.unlisted === true
   const key = log !== null && (log.near === true || unlisted) ? log.name : aaKey(row)
   const logRank = log?.rank ?? null
-  const max = Math.max(row.ranks, logRank ?? 0)
-  const base = { row, key, max, logRank, wikiName: unlisted || key === row.name ? null : row.name, unlisted }
   const ev = opts.ev ?? {}
+  const max = topRank(row, logRank, ev)
+  const base = { row, key, max, logRank, wikiName: unlisted || key === row.name ? null : row.name, unlisted }
   // A removed AA takes no pick: only what the log shows (THE LOG WINS) is held.
   const pick = row.removed === undefined ? picks[key] : undefined
   return { ...base, ...(heldByList(ev) ?? heldBelowList(pick, logRank, ev, max)) }
@@ -139,16 +144,17 @@ function unlistedRow(aa: LogAa): AaTableRow {
 function evidenceOf(input: AaLogInput, table: readonly AaRow[]): (row: AaTableRow) => AaEvidence {
   const run = input.list ?? null
   const read = run === null ? null : aaListRead(run, table, aaKey)
-  const later = run === null ? null : aaLogMatch(aaLogAas(input.spends.filter((x) => x.ts > run.ts)), table, aaKey).byRow
+  const later = run === null ? null : aaLogMatch(aaLogAas(input.spends.filter((x) => aaBeatsList(run, x.ts))), table, aaKey).byRow
   const acted = aaActivatedRows(input.activations ?? [], table, aaKey)
   return (row) => {
     const f = aaFold(row.name)
     const list = read?.ranks.get(f)
+    const used = acted.get(f)
     return {
       ...(list === undefined ? {} : { list }),
       ...(read?.printed.has(f) === true ? { printed: true } : {}),
       ...(later?.get(f) === undefined ? {} : { after: later.get(f)?.rank }),
-      ...(acted.has(f) ? { activated: true } : {})
+      ...(used === undefined ? {} : { activated: used })
     }
   }
 }

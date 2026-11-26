@@ -9,8 +9,10 @@
 // one-rank AA prints the same block owned or not: the list says nothing of it, and it is never
 // guessed (`printed` without a rank).
 //
-// ACTIVATIONS: a name the table has, seen in `You activate <name>.`, is held (at least rank 1). Only
-// an exact name counts: `Skull Bash` is a skill and matches no row.
+// USED: a name the table has, seen in the player's own lines (`You activate X.`, `You begin casting
+// X II.`, the reuse timer, a toggle switched off, an interrupted combat ability, `(Finishing Blow)` on
+// their own hit; the engine's leveling_aa.rs), is held: at the rank a cast's numeral names, else at
+// least rank 1. Only an exact name counts: `Skull Bash` is a skill and matches no row.
 
 import { aaFold, aaLogMatch, type LogAa } from './aaLogMatch'
 import type { AaTableRow } from './aaTable.generated'
@@ -30,13 +32,18 @@ export interface AaListRun {
   /** The first line's stamp. */
   ts: number
   blocks: AaListBlock[]
+  /** The last zone-in before the run; null when the log showed none. A purchase after it and before
+   *  the run beats the run (a list is stale until a zone after a purchase). */
+  zoneBefore?: number | null
 }
 
-/** One name the log shows the player activating. */
+/** One name the log shows the player using. */
 export interface AaActivation {
   name: string
   first: number
   last: number
+  /** The highest rank a line named (`Rampage II`); absent when none did. */
+  rank?: number
 }
 
 export interface AaListRead {
@@ -105,8 +112,19 @@ export function aaListRead(run: AaListRun, table: readonly AaTableRow[], keyOf: 
   return out
 }
 
-/** Folded names of the rows the log shows the player activating (exact names only). */
-export function aaActivatedRows(acts: readonly AaActivation[], table: readonly AaTableRow[], keyOf: (row: AaTableRow) => string): Set<string> {
-  const seen = new Set(acts.map((a) => aaFold(a.name)))
-  return new Set(table.filter((row) => seen.has(aaFold(row.name)) || seen.has(aaFold(keyOf(row)))).map((row) => aaFold(row.name)))
+/** By folded row name, the rank the player's own lines show them holding (at least 1; exact names only). */
+export function aaActivatedRows(acts: readonly AaActivation[], table: readonly AaTableRow[], keyOf: (row: AaTableRow) => string): Map<string, number> {
+  const seen = new Map<string, number>()
+  for (const a of acts) seen.set(aaFold(a.name), Math.max(seen.get(aaFold(a.name)) ?? 1, a.rank ?? 1))
+  const out = new Map<string, number>()
+  for (const row of table) {
+    const rank = seen.get(aaFold(row.name)) ?? seen.get(aaFold(keyOf(row)))
+    if (rank !== undefined) out.set(aaFold(row.name), rank)
+  }
+  return out
+}
+
+/** Whether a purchase at `ts` beats the run: logged after it, or after the last zone-in before it. */
+export function aaBeatsList(run: AaListRun, ts: number): boolean {
+  return ts > run.ts || ts > (run.zoneBefore ?? Number.NEGATIVE_INFINITY)
 }

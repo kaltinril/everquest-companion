@@ -39,7 +39,7 @@ function sourceLine(b: AaBoardRow, classes: readonly ClassAbbr[]): string {
   if (b.r.unknown === true) return "Can't tell from the log: /alt list prints a one-rank AA the same whether you have it or not. Set it below."
   const said = {
     list: 'Rank read from your latest /alt list.',
-    activated: 'Held: your log shows you activating it.',
+    activated: 'Held: your log shows you using it (a cast names its rank).',
     pick: 'Rank set by you.',
     log: "Rank from your log's purchase lines.",
     granted: 'Free at your level, so counted as held.',
@@ -51,7 +51,7 @@ function sourceLine(b: AaBoardRow, classes: readonly ClassAbbr[]): string {
 /** What settles the rank when the log does and a pick would not count (the order of proof, aaRanks.ts). */
 function settledBy(b: AaBoardRow): string | null {
   if (b.r.source === 'list') return 'from /alt list'
-  if (b.r.source === 'activated' && b.r.max <= 1) return 'seen activated'
+  if (b.r.source === 'activated' && b.r.rank >= b.r.max) return 'seen used'
   return null
 }
 
