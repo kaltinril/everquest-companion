@@ -32,6 +32,7 @@ import {
   SPLIT_RESISTS,
   activeChips,
   isRatioChip,
+  isSplitResist,
   tierWeight,
   type RatioChip,
   type TierChip,
@@ -305,6 +306,15 @@ function countedValue(chip: TierChip, value: number, ctx: TierContext): number |
   return ctx.skipHaste === true ? undefined : hasteCredit(value, ctx.ownedHaste ?? 0)
 }
 
+/**
+ * The value that counts as one lane weight. A split resist counts a fifth, on the Resists unit, so the
+ * five split chips in one lane score exactly what the one Resists chip scores there (owner, 2026-11-25:
+ * *"Resists are overweighted when split"*).
+ */
+export function chipUnit(units: Readonly<Record<TierChip, number>>, chip: TierChip): number {
+  return isSplitResist(chip) ? units.RESISTS * SPLIT_RESISTS.length : units[chip]
+}
+
 /** Every chip the item earns points on, in chip order. Off chips and zero values are left out. */
 export function tierTerms(item: TierItem, ctx: TierContext): TierTerm[] {
   const values = ctx.model.valuesOf(item)
@@ -315,7 +325,7 @@ export function tierTerms(item: TierItem, ctx: TierContext): TierTerm[] {
     if (weight === 0 || stated === undefined) continue
     const value = countedValue(chip, stated, ctx)
     if (value === undefined || value === 0) continue
-    terms.push({ chip, value, points: (weight * value) / ctx.model.units[chip] })
+    terms.push({ chip, value, points: (weight * value) / chipUnit(ctx.model.units, chip) })
   }
   return terms
 }

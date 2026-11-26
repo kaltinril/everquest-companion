@@ -109,7 +109,8 @@ const VIEWS = [
   'features/loot/LootChrome.tsx',
   'features/gaps/GapsView.tsx',
   'features/bazaar/BazaarView.tsx',
-  'features/skills/SkillsView.tsx'
+  'features/skills/SkillsView.tsx',
+  'features/aa/AaView.tsx'
 ]
 
 test('NO VIEW TELLS THE LINE ITS MODULE IS SERVED WITHOUT ASKING: `served` is never a bare true', () => {

@@ -2,7 +2,7 @@
 // them without a window (plans/2026-11-24-bis-sheet.md "Version 2 design"; mockup v2 is the reference).
 
 import type { GearRow } from '../../../../shared/planner/gear'
-import { chipGroup, chipLabel, isRatioChip, activeChips, RANKED_TIERS, type TierChip, type TierSetup } from '../../../../shared/planner/tierChips'
+import { chipGroup, chipLabel, isRatioChip, isSplitResist, activeChips, RANKED_TIERS, type TierChip, type TierSetup } from '../../../../shared/planner/tierChips'
 import type { Conversions, ItemBudget, TierModel, TierTerm } from '../../../../shared/planner/tierWeights'
 import { planSlotLabel, type PlanSlotId } from '../../../../shared/planner/types'
 import type { GearOwnershipMap } from './gearOwnership'
@@ -68,6 +68,7 @@ export function chipHint(chip: TierChip, conv: Conversions, level: number): stri
 
 /** "A good endgame item carries +6; that much counts as 1 x the lane." */
 export function unitText(chip: TierChip, unit: number): string {
+  if (isSplitResist(chip)) return `Each resist counts a fifth of Resists: ${chipValueText(chip, Number(unit.toPrecision(3)))} counts as 1 x the lane.`
   return `A good endgame item carries ${chipValueText(chip, Number(unit.toPrecision(3)))}; that much counts as 1 x the lane.`
 }
 
@@ -94,6 +95,12 @@ export function hasteNote(stated: number | undefined, counted: number, otherHast
   return counted > 0
     ? `${head}: only ${String(Math.round(counted))}% counts, another slot gives ${String(Math.round(otherHaste))}% (haste does not stack)`
     : `${head}: does not count, another slot gives ${String(Math.round(otherHaste))}% (haste does not stack)`
+}
+
+/** Why AMMO holds this arrow: a bow is in Range, and arrows rank by damage. */
+export function arrowText(row: Pick<GearRow, 'stats' | 'elementalDmg'>): string {
+  const elemental = row.elementalDmg === undefined || row.elementalDmg === 0 ? '' : `, elemental ${String(row.elementalDmg)} (counts half)`
+  return `Arrow for your bow, best damage first: DMG ${String(row.stats.DMG ?? 0)}${elemental}`
 }
 
 /** One line of the hover's compare: a stat, the best item's value, the worn item's, and who is ahead. */
@@ -161,8 +168,8 @@ export function ownedCopies(map: GearOwnershipMap | null): Map<string, number> {
   return out
 }
 
-/** A loadout's value per chip: summed, haste the best single one, ratios left out. */
-export function loadoutTotals(rows: readonly Pick<GearRow, 'stats'>[], model: TierModel, split: boolean): Partial<Record<TierChip, number>> {
+/** A loadout's value per chip: summed, haste the best single one (down to the item haste cap), ratios left out. */
+export function loadoutTotals(rows: readonly Pick<GearRow, 'stats'>[], model: TierModel, split: boolean, hasteCap?: number): Partial<Record<TierChip, number>> {
   const totals: Partial<Record<TierChip, number>> = {}
   const chips = activeChips(split).filter((c) => !isRatioChip(c))
   for (const row of rows) {
@@ -173,6 +180,7 @@ export function loadoutTotals(rows: readonly Pick<GearRow, 'stats'>[], model: Ti
       totals[chip] = chip === 'HASTE' ? Math.max(totals.HASTE ?? v, v) : (totals[chip] ?? 0) + v
     }
   }
+  if (totals.HASTE !== undefined && hasteCap !== undefined && totals.HASTE > hasteCap) totals.HASTE = hasteCap
   return totals
 }
 
@@ -186,6 +194,8 @@ export interface TotalsRow {
   capped: boolean
   /** the target (the board's cap) as a number, for the Target column's input */
   capValue?: number
+  /** the default cap that applies when no target is set (510 on the attributes) */
+  capDefault?: number
   /** the worn total has reached the target */
   wornReached: boolean
 }
@@ -196,15 +206,20 @@ function totalText(chip: TierChip, v: number | undefined): string {
   return chip === 'RESISTS' ? v.toFixed(1) : String(Math.round(v))
 }
 
-/** The totals table: the stats on the board that the loadout or the worn gear states, best lane first. */
-export function totalsRows(best: Partial<Record<TierChip, number>>, worn: Partial<Record<TierChip, number>>, setup: TierSetup): TotalsRow[] {
+/** The totals table: the stats on the board that the loadout or the worn gear states, best lane first. A target wins over a default cap. */
+export function totalsRows(
+  best: Partial<Record<TierChip, number>>,
+  worn: Partial<Record<TierChip, number>>,
+  setup: TierSetup,
+  defaults: Partial<Record<TierChip, number>> = {}
+): TotalsRow[] {
   const chips = activeChips(setup.split).filter(
     (c) => !isRatioChip(c) && setup.board[c] !== 'Off' && (best[c] !== undefined || worn[c] !== undefined || setup.caps[c] !== undefined)
   )
   const rank = (c: TierChip): number => RANKED_TIERS.indexOf(setup.board[c] as never)
   chips.sort((a, b) => rank(a) - rank(b))
   return chips.map((chip) => {
-    const cap = setup.caps[chip]
+    const cap = setup.caps[chip] ?? defaults[chip]
     const capped = cap !== undefined && (best[chip] ?? 0) >= cap
     return {
       chip,
@@ -214,7 +229,8 @@ export function totalsRows(best: Partial<Record<TierChip, number>>, worn: Partia
       worn: totalText(chip, worn[chip]),
       cap: cap === undefined ? '' : `${String(cap)}${capped ? ' capped' : ''}`,
       capped,
-      ...(cap === undefined ? {} : { capValue: cap }),
+      ...(setup.caps[chip] === undefined ? {} : { capValue: setup.caps[chip] }),
+      ...(defaults[chip] === undefined ? {} : { capDefault: defaults[chip] }),
       wornReached: cap !== undefined && (worn[chip] ?? 0) >= cap
     }
   })

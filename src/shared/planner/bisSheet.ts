@@ -23,11 +23,13 @@
 
 import type { ClassAbbr } from '../classCombo'
 import type { GearRow } from './gear'
-import { improveUnderCaps, type CapCell, type CapRules } from './bisCaps'
-import { searchLoadout, type HasteRate, type SearchCandidate, type SearchCell } from './bisSearch'
+import { arrowRank, isArrow, isBow } from './bisArrows'
+import { improveUnderCaps, type CapCell, type CapRules, type FoldedCap } from './bisCaps'
+import { searchLoadout, type SearchCandidate, type SearchCell } from './bisSearch'
 import { gearHandedness } from './roleWeights'
-import { RATIO_CHIPS, activeChips, isRatioChip, tierWeight, type TierChip, type TierSetup } from './tierChips'
-import { ratioCounts, round3, tierTerms, type TierModel, type TierTerm } from './tierWeights'
+import { HARD_STAT_CAPS, isAttribute, type Attribute, type StatCap, type StatCaps } from './statCaps'
+import { CHIP_KEYS, RATIO_CHIPS, activeChips, isRatioChip, tierWeight, type TierChip, type TierSetup } from './tierChips'
+import { chipUnit, ratioCounts, round3, tierTerms, type Conversions, type TierModel, type TierTerm } from './tierWeights'
 import { PLAN_SLOTS, equipSlotOf, isAnyCell, type PlanSlotId } from './types'
 
 export interface BisOptions {
@@ -40,6 +42,10 @@ export interface BisOptions {
   admit?: (row: GearRow) => boolean
   /** owned-only mode: item key -> copies owned (bags, bank, worn). Absent = best overall */
   owned?: ReadonlyMap<string, number>
+  /** item haste that can still count: the level's haste cap less the spell haste (`itemHasteRoom`); absent = no limit */
+  hasteRoom?: number
+  /** the attribute caps; absent = eqlwiki's hard cap, 510 (`HARD_STAT_CAPS`). A cap the player sets on a chip wins */
+  statCaps?: StatCaps
 }
 
 export interface BisPick {
@@ -65,6 +71,8 @@ export interface BisCell {
   otherHaste: number
   /** SECONDARY left empty because a two-hander sits in PRIMARY */
   closedByTwoHander?: true
+  /** AMMO holds the best arrow because RANGE holds a bow; runners-up are the next arrows */
+  arrowForBow?: true
 }
 
 export interface BisSheet {
@@ -109,6 +117,8 @@ interface Scored extends SearchCandidate {
   display: number
   /** the damage-first ratio (`damageFirst`); `base` carries it times `DAMAGE_FIRST` for the search */
   prio: number
+  /** its stated stats, for the attribute caps the caps pass reads */
+  attrs: GearRow['stats']
 }
 
 function copiesOf(row: GearRow, owned: ReadonlyMap<string, number> | undefined): number {
@@ -132,6 +142,18 @@ export function hasteCounted(haste: number, other: number, cap: number | undefin
   return Math.max(0, under(haste) - under(Math.max(0, other)))
 }
 
+/** The cap on item haste: the player's own HASTE cap or the room under the level's cap, the lower. */
+export function itemHasteCap(opts: Pick<BisOptions, 'setup' | 'hasteRoom'>): number | undefined {
+  const own = opts.setup.caps.HASTE
+  if (opts.hasteRoom === undefined) return own
+  return own === undefined ? opts.hasteRoom : Math.min(own, opts.hasteRoom)
+}
+
+/** Positive haste down to the cap; a penalty untouched. */
+function underCap(haste: number, cap: number | undefined): number {
+  return haste > 0 && cap !== undefined ? Math.min(haste, cap) : haste
+}
+
 /** An item's score in one cell beside a loadout whose other cells give `otherHaste`. */
 export interface CellScore {
   score: number
@@ -141,9 +163,9 @@ export interface CellScore {
 }
 
 /** What each card, each runner-up and the worn compare read, so the three can never disagree. */
-export function cellScore(row: GearRow, cell: PlanSlotId, otherHaste: number, opts: Pick<BisOptions, 'setup' | 'model' | 'classes'>): CellScore {
+export function cellScore(row: GearRow, cell: PlanSlotId, otherHaste: number, opts: Pick<BisOptions, 'setup' | 'model' | 'classes' | 'hasteRoom'>): CellScore {
   const terms = tierTerms(row, { model: opts.model, setup: opts.setup, slot: cell, classes: opts.classes, skipHaste: true })
-  const counted = hasteCounted(row.stats.HASTE ?? 0, otherHaste, opts.setup.caps.HASTE)
+  const counted = hasteCounted(row.stats.HASTE ?? 0, otherHaste, itemHasteCap(opts))
   const rate = hastePerPercent(opts)
   if (counted !== 0 && rate !== 0) terms.push({ chip: 'HASTE', value: counted, points: counted * rate })
   terms.sort((a, b) => b.points - a.points)
@@ -178,16 +200,22 @@ export function damageFirst(row: GearRow, cell: PlanSlotId, opts: Pick<BisOption
 function scoreCell(cell: PlanSlotId, rows: readonly GearRow[], opts: BisOptions): Scored[] {
   const rate = hastePerPercent(opts)
   const ctx = { model: opts.model, setup: opts.setup, slot: cell, classes: opts.classes, skipHaste: true }
+  const cap = itemHasteCap(opts)
   const out: Scored[] = []
   for (const row of rows) {
     if (!fitsCell(row, cell)) continue
     const terms = tierTerms(row, ctx)
     const stats = round3(terms.reduce((sum, t) => sum + t.points, 0))
-    const haste = row.stats.HASTE ?? 0
+    const haste = underCap(row.stats.HASTE ?? 0, cap)
     const prio = damageFirst(row, cell, opts)
-    out.push({ key: row.key, row, terms, base: stats + prio * DAMAGE_FIRST, prio, haste, copies: copiesOf(row, opts.owned), twoHand: gearHandedness(row.skill) === '2h', display: round3(stats + Math.max(0, haste) * rate) })
+    out.push({ key: row.key, row, terms, base: stats + prio * DAMAGE_FIRST, prio, haste, copies: copiesOf(row, opts.owned), twoHand: gearHandedness(row.skill) === '2h', bow: isBow(row), attrs: row.stats, display: round3(stats + Math.max(0, haste) * rate) })
   }
   return out.sort((a, b) => b.prio - a.prio || b.display - a.display || a.row.name.localeCompare(b.row.name))
+}
+
+/** AMMO's arrows best-first: DMG with elemental damage at its weight (`bisArrows.ts`), then the score, then the name. */
+function arrowList(list: readonly Scored[]): Scored[] {
+  return list.filter((s) => isArrow(s.row)).sort((a, b) => arrowRank(b.row) - arrowRank(a.row) || b.display - a.display || a.row.name.localeCompare(b.row.name))
 }
 
 /** The rows the sheet may use at all: the class picks, the caller's gates, owned-only. */
@@ -203,19 +231,58 @@ function searchOrder(): PlanSlotId[] {
   return [...hands, ...PLAN_SLOTS.filter((c) => !hands.includes(c) && !isAnyCell(c)), ...PLAN_SLOTS.filter(isAnyCell)]
 }
 
-/** The caps that bind on the board: active chips with a cap and a lane. */
+/** Points one value unit of a chip is worth on the board (lane weight / unit). */
+function chipRate(opts: Pick<BisOptions, 'setup' | 'model'>, chip: TierChip): number {
+  return tierWeight(opts.setup.board[chip], opts.setup.step) / chipUnit(opts.model.units, chip)
+}
+
+/** The attribute chips' default caps as plain numbers, for the totals table (STA, INT and WIS count inside HP and Mana). */
+export function defaultChipCaps(statCaps: StatCaps = HARD_STAT_CAPS): Partial<Record<TierChip, number>> {
+  const out: Partial<Record<TierChip, number>> = {}
+  for (const chip of CHIP_KEYS) if (isAttribute(chip) && statCaps[chip] !== undefined) out[chip] = statCaps[chip].value
+  return out
+}
+
+/** The attributes that count inside a chip, and the conversion that turns a point into it. */
+const FOLDED: readonly { attr: Attribute; chip: TierChip; per: keyof Conversions }[] = [
+  { attr: 'STA', chip: 'HP', per: 'hpPerSta' },
+  { attr: 'WIS', chip: 'MANA', per: 'manaPerWis' },
+  { attr: 'INT', chip: 'MANA', per: 'manaPerInt' }
+]
+
+/** STA's cap inside HP, INT's and WIS's inside Mana, for the classes that convert them; their chips get a rate. */
+function foldedCaps(opts: BisOptions, statCaps: StatCaps, perValue: Map<TierChip, number>): FoldedCap[] {
+  const out: FoldedCap[] = []
+  for (const f of FOLDED) {
+    const cap = statCaps[f.attr]
+    const perPoint = opts.model.conv[f.per]
+    if (cap === undefined || perPoint === 0 || opts.setup.board[f.chip] === 'Off') continue
+    perValue.set(f.chip, chipRate(opts, f.chip))
+    out.push({ attr: f.attr, chip: f.chip, cap, perPoint })
+  }
+  return out
+}
+
+/**
+ * The caps on the board: the player's own on any chip (hard), else the attribute default
+ * (eqlwiki's hard cap, or the caller's `statCaps`). The damage-first weight rides along so the caps
+ * pass ranks weapons the way the search does.
+ */
 function capRules(opts: BisOptions): CapRules | undefined {
-  const { setup, model } = opts
-  const caps = new Map<TierChip, number>()
+  const { setup } = opts
+  const statCaps = opts.statCaps ?? HARD_STAT_CAPS
+  const caps = new Map<TierChip, StatCap>()
   const perValue = new Map<TierChip, number>()
   for (const chip of activeChips(setup.split)) {
-    const cap = setup.caps[chip]
+    const own = setup.caps[chip]
+    const cap = own !== undefined ? { value: own, over: 0 } : isAttribute(chip) ? statCaps[chip] : undefined
     if (cap === undefined || isRatioChip(chip) || setup.board[chip] === 'Off') continue
     if (chip !== 'HASTE') caps.set(chip, cap)
-    perValue.set(chip, tierWeight(setup.board[chip], setup.step) / model.units[chip])
+    perValue.set(chip, chipRate(opts, chip))
   }
+  const folded = foldedCaps(opts, statCaps, perValue)
   if (perValue.size === 0) return undefined
-  return { caps, perValue, hastePerPercent: hastePerPercent(opts), hasteCap: setup.caps.HASTE }
+  return { caps, perValue, folded, prioWeight: DAMAGE_FIRST, hastePerPercent: hastePerPercent(opts), hasteCap: itemHasteCap(opts) }
 }
 
 /** Each cell's pool for the caps pass: the best by full score, plus the best by uncapped stats. */
@@ -225,10 +292,19 @@ function capPool(list: readonly Scored[], rules: CapRules): Scored[] {
   return [...new Set([...list.slice(0, CAP_WIDTH), ...extra])]
 }
 
-/** The choice under caps, as indices into each cell's full list; the loadout's capped value. */
-function solveWithCaps(lists: readonly Scored[][], start: readonly number[], rules: CapRules): { choice: number[]; total: number } {
-  const pools = lists.map((list) => capPool(list, rules))
-  const cells: CapCell[] = searchOrder().map((cell, i) => ({ list: pools[i], isPrimary: cell === 'PRIMARY', isSecondary: cell === 'SECONDARY' }))
+/** The choice under caps, as indices into each cell's full list; the loadout's capped value. A placed arrow stays in its pool. */
+function solveWithCaps(lists: readonly Scored[][], start: readonly number[], rules: CapRules, arrow: Scored | undefined): { choice: number[]; total: number } {
+  const pools = lists.map((list, i) => {
+    const pool = capPool(list, rules)
+    return arrow !== undefined && start[i] >= 0 && list[start[i]] === arrow && !pool.includes(arrow) ? [...pool, arrow] : pool
+  })
+  const cells: CapCell[] = searchOrder().map((cell, i) => ({
+    list: pools[i],
+    isPrimary: cell === 'PRIMARY',
+    isSecondary: cell === 'SECONDARY',
+    isRange: cell === 'RANGE',
+    ...(cell === 'AMMO' && arrow !== undefined ? { arrowKey: arrow.key } : {})
+  }))
   const choice = start.map((idx, i) => (idx < 0 ? -1 : pools[i].indexOf(lists[i][idx])))
   const total = improveUnderCaps(cells, choice, rules)
   return { choice: choice.map((j, i) => (j < 0 ? -1 : lists[i].indexOf(pools[i][j]))), total }
@@ -237,17 +313,18 @@ function solveWithCaps(lists: readonly Scored[][], start: readonly number[], rul
 /** How far down a cell's list the runners-up are re-scored against the loadout's haste before the top five are kept. */
 const RUNNER_POOL = 40
 
-function readCell(cell: PlanSlotId, list: readonly Scored[], index: number, { otherHaste, opts }: { otherHaste: number; opts: BisOptions }): BisCell {
+/** One cell read back; `ordered` keeps the list's own order for the runners-up (the arrows, by damage). */
+function readCell(cell: PlanSlotId, list: readonly Scored[], index: number, { otherHaste, opts, ordered }: { otherHaste: number; opts: BisOptions; ordered?: boolean }): BisCell {
   const picked = index >= 0 ? list[index] : undefined
-  const runnersUp = list
+  const scored = list
     .filter((s) => s !== picked)
     .slice(0, RUNNER_POOL)
     .map((s) => {
       const c = cellScore(s.row, cell, otherHaste, opts)
       return { row: s.row, score: c.score, hasteCounted: c.hasteCounted, ...(s.prio > 0 ? { damageFirst: s.prio } : {}) }
     })
-    .sort((a, b) => (b.damageFirst ?? 0) - (a.damageFirst ?? 0) || b.score - a.score || a.row.name.localeCompare(b.row.name))
-    .slice(0, RUNNERS_UP)
+  if (ordered !== true) scored.sort((a, b) => (b.damageFirst ?? 0) - (a.damageFirst ?? 0) || b.score - a.score || a.row.name.localeCompare(b.row.name))
+  const runnersUp = scored.slice(0, RUNNERS_UP)
   if (picked === undefined) return { cell, runnersUp, otherHaste }
   const c = cellScore(picked.row, cell, otherHaste, opts)
   const reasons = c.terms.filter((t) => t.points > 0).slice(0, REASONS)
@@ -295,26 +372,58 @@ export function alignPairsToWorn(sheet: BisSheet, wornKey: (cell: PlanSlotId) =>
 }
 
 /**
- * THE SHEET. Scores every admitted row once per cell, keeps the top `SEARCH_WIDTH` per cell for the
- * exact assignment, applies the caps pass when a cap is set, and reads the answer in `PLAN_SLOTS` order.
+ * The loadout, as indices into each cell's full list: the exact search over the top `SEARCH_WIDTH`
+ * per cell (AMMO offered `arrow` for a bow), the arrow's index read back onto AMMO's list when the bow
+ * variant won, then the caps pass when a cap is set.
+ */
+function chooseLoadout(order: readonly PlanSlotId[], lists: readonly Scored[][], arrow: Scored | undefined, opts: BisOptions): { choice: number[]; total: number } {
+  const cells: SearchCell[] = order.map((cell, i) => ({
+    candidates: lists[i].slice(0, SEARCH_WIDTH),
+    isPrimary: cell === 'PRIMARY',
+    isSecondary: cell === 'SECONDARY',
+    isRange: cell === 'RANGE',
+    ...(cell === 'AMMO' && arrow !== undefined ? { arrow } : {})
+  }))
+  const exact = searchLoadout(cells, { perPercent: hastePerPercent(opts) })
+  const ammo = order.indexOf('AMMO')
+  const start = exact.choice.map((idx, i) => (exact.bow && i === ammo && idx >= 0 && arrow !== undefined ? lists[i].indexOf(arrow) : idx))
+  const total = exact.total + withArrow(start, lists, arrow, [order.indexOf('RANGE'), ammo])
+  const rules = capRules(opts)
+  return rules === undefined ? { choice: start, total } : solveWithCaps(lists, start, rules, arrow)
+}
+
+/** A bow whose AMMO came back empty (an arrow scores nothing on most boards) still gets its arrow when a copy is free; returns its points. */
+function withArrow(choice: number[], lists: readonly Scored[][], arrow: Scored | undefined, [range, ammo]: readonly [number, number]): number {
+  if (arrow === undefined || choice[ammo] >= 0 || choice[range] < 0 || lists[range][choice[range]].bow !== true) return 0
+  if (choice.filter((idx, i) => idx >= 0 && lists[i][idx].key === arrow.key).length >= arrow.copies) return 0
+  choice[ammo] = lists[ammo].indexOf(arrow)
+  return arrow.base
+}
+
+/**
+ * THE SHEET. Scores every admitted row once per cell, chooses the loadout (`chooseLoadout`), and reads
+ * the answer in `PLAN_SLOTS` order. With a bow in RANGE, AMMO is read off the arrows, best damage first.
  */
 export function buildBisSheet(opts: BisOptions): BisSheet {
   const rows = admitted(opts)
   const order = searchOrder()
   const lists = order.map((cell) => scoreCell(cell, rows, opts))
-  const cells: SearchCell[] = order.map((cell, i) => ({ candidates: lists[i].slice(0, SEARCH_WIDTH), isPrimary: cell === 'PRIMARY', isSecondary: cell === 'SECONDARY' }))
-  const rate: HasteRate = { perPercent: hastePerPercent(opts) }
-  const exact = searchLoadout(cells, rate)
-  const rules = capRules(opts)
-  const { choice, total } = rules === undefined ? exact : solveWithCaps(lists, exact.choice, rules)
+  const [ammo, range] = [order.indexOf('AMMO'), order.indexOf('RANGE')]
+  const arrows = arrowList(lists[ammo])
+  const { choice, total } = chooseLoadout(order, lists, arrows.at(0), opts)
+  const bowUp = choice[range] >= 0 && lists[range][choice[range]].bow === true
   const byCell = new Map<PlanSlotId, BisCell>()
   const totals: Partial<Record<TierChip, number>> = {}
   const other = othersHaste(order.map((_, i) => (choice[i] >= 0 ? lists[i][choice[i]] : undefined)))
   order.forEach((cell, i) => {
-    const read = readCell(cell, lists[i], choice[i], { otherHaste: other[i], opts })
+    const onArrows = bowUp && i === ammo
+    const index = onArrows && choice[i] >= 0 ? arrows.indexOf(lists[i][choice[i]]) : choice[i]
+    const read = readCell(cell, onArrows ? arrows : lists[i], index, { otherHaste: other[i], opts, ordered: onArrows })
+    if (onArrows && read.pick !== undefined) read.arrowForBow = true
     if (read.pick !== undefined) addTotals(totals, read.pick.row, opts)
     byCell.set(cell, read)
   })
+  if (totals.HASTE !== undefined) totals.HASTE = underCap(totals.HASTE, itemHasteCap(opts))
   const secondary = byCell.get('SECONDARY')
   if (secondary !== undefined && gearHandedness(byCell.get('PRIMARY')?.pick?.row.skill) === '2h') secondary.closedByTwoHander = true
   const cellsOut = PLAN_SLOTS.map((cell) => byCell.get(cell) ?? { cell, runnersUp: [], otherHaste: 0 })
