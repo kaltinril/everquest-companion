@@ -46,8 +46,9 @@
 // agnostic; `preferredOutputFile` grew a prefix rule so a multi-character machine still resolves
 // the right character's dump. The kinds still `awaiting-sample` are waiting for the same thing —
 // and the same sample's usage line says the server also knows `guildbank`, `guildhall`,
-// `missingspells`, `realestate` and `recipes`, and does NOT list `alternateadv` (its entry below
-// keeps the community spelling until someone tries it and looks).
+// `missingspells`, `realestate` and `recipes`, and does NOT list `alternateadv`: the owner typed it on
+// 2026-11-25 and got the usage line, so that kind is gone. AAs print to the LOG with `/alt list`
+// (agent/MEASURED.md, "Alternate advancement").
 
 /** Every `/outputfile` kind this app knows the name of. */
 export type OutputKindId =
@@ -60,7 +61,6 @@ export type OutputKindId =
   // filename is the client's own spelling and is a separate fact.
   | 'faction'
   | 'achievements'
-  | 'alternateadv'
 
 export interface OutputKindDef {
   id: OutputKindId
@@ -180,16 +180,6 @@ export const OUTPUT_KINDS: readonly OutputKindDef[] = [
     // (bank/hoard/depot windows). This one is not: the server already knows which achievements you
     // have, no window has to be open, and it can be typed anywhere. Saying nothing is the honest
     // answer; inventing a ritual would be a caveat with no fact under it.
-    steps: []
-  },
-  {
-    id: 'alternateadv',
-    command: '/outputfile alternateadv',
-    why: 'Dumps your alternate-advancement abilities and what they cost.',
-    fileKind: 'AlternateAdv',
-    fileKindVerified: false,
-    status: 'awaiting-sample',
-    note: 'Alternate-advancement dump - no verified sample; run /outputfile alternateadv and commit a fixture.',
     steps: []
   }
 ]
