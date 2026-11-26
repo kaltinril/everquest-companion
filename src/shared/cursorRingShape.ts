@@ -135,6 +135,12 @@ export interface RingOffset {
 
 const NO_OFFSET: RingOffset = { x: 0, y: 0 }
 
+/** Is the shape drawn at all (`showShape`, 2026-11-26)? A config without the field (an older
+ *  main) draws it, as every ring before the switch existed was drawn. */
+export function shapeShown(prefs: { showShape?: unknown }): boolean {
+  return prefs.showShape !== false
+}
+
 /** The offset carried by the prefs; a config without one (an older main) is centred. */
 export function ringOffset(prefs: { offsetXPx?: unknown; offsetYPx?: unknown }): RingOffset {
   const n = (v: unknown): number => (typeof v === 'number' && Number.isFinite(v) ? Math.round(v) : 0)

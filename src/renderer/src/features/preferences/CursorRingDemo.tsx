@@ -10,16 +10,23 @@
 // opinion. IT IS A SAMPLE, NOT A RULER (JOS-154): this card carries the app's text size and the
 // ring window is pinned at zoom 1, so at 125% everything here is 25% larger than in the game; the
 // numbers on the sliders are the real ones.
+//
+// The crosshair (2026-11-26) is drawn here too, through the same seams (`crosshairOf`,
+// `crosshairLineStyles`): two lines through the arrow's tip, clipped to the box the way the game
+// window clips them. They ignore the offset, as in the game.
 
 import type { JSX } from 'react'
 import type { CursorRingPrefs } from '@shared/presencePrefs'
 import { ringStrokeColor } from '@shared/presencePrefs'
-import { innerMarkStyle, ringBoxStyle, ringGeometry, ringOffset } from '@shared/cursorRingShape'
+import { innerMarkStyle, ringBoxStyle, ringGeometry, ringOffset, shapeShown } from '@shared/cursorRingShape'
+import { crosshairLineOffset, crosshairLineStyles, crosshairOf } from '@shared/cursorCrosshair'
 
 /** cursor.html's three readability shadows, and the inner mark's two contours. */
 const RING_SHADOW =
   '0 0 0 1px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(0,0,0,0.6), 0 0 14px 4px rgba(0,0,0,0.28)'
 const INNER_SHADOW = '0 0 0 1px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(0,0,0,0.6)'
+/** cursor.html's crosshair contour. */
+const CROSS_SHADOW = '0 0 0 1px rgba(0,0,0,0.6)'
 
 /** Clear space around the shape inside the demo box, px. */
 const DEMO_PAD_PX = 16
@@ -47,6 +54,24 @@ function PointerArrow(): JSX.Element {
   )
 }
 
+/** The two crosshair lines through the pointer at (`at`, `at`), or nothing when it is off. */
+function DemoCrosshair({ prefs, at }: { prefs: CursorRingPrefs; at: number }): JSX.Element | null {
+  const c = crosshairOf(prefs)
+  if (!c.on) return null
+  const styles = crosshairLineStyles(c)
+  const edge = crosshairLineOffset(at, c.weightPx)
+  const line = { position: 'absolute', boxShadow: CROSS_SHADOW } as const
+  return (
+    <>
+      <div
+        data-testid="pref-cursor-crosshair-preview"
+        style={{ ...line, ...styles.vertical, left: edge, top: 0, height: '100%' }}
+      />
+      <div style={{ ...line, ...styles.horizontal, top: edge, left: 0, width: '100%' }} />
+    </>
+  )
+}
+
 export function CursorRingDemo({ prefs }: { prefs: CursorRingPrefs }): JSX.Element {
   const stroke = ringStrokeColor(prefs.colorHex)
   const g = ringGeometry(prefs)
@@ -69,10 +94,12 @@ export function CursorRingDemo({ prefs }: { prefs: CursorRingPrefs }): JSX.Eleme
         background: 'rgba(128,128,128,0.18)'
       }}
     >
+      <DemoCrosshair prefs={prefs} at={Math.round(centre)} />
       <div
         data-testid="pref-cursor-ring-preview"
         data-shape={prefs.shape}
         style={{
+          display: shapeShown(prefs) ? undefined : 'none',
           ...ringBoxStyle(g, stroke),
           position: 'absolute',
           left: Math.round(centre + off.x - g.widthPx / 2),

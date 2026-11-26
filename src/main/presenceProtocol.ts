@@ -361,7 +361,7 @@ function titleIsEqClient(title: string): boolean {
  * THE TITLE IS THE LAST RESORT, and only when the path is UNKNOWN (elevation, protected
  * processes: the watcher reports an empty path and there is nothing else to go on).
  *
- * (This app's own windows are titled "EQ Legends Companion" / "… Overlay" / "Cursor Ring" and
+ * (This app's own windows are titled "EQ Legends Companion" / "… Overlay" / "Cursor Overlay" and
  * match none of it — and are classified by pid before they ever reach this predicate.)
  */
 export function isEqWindow(w: { exePath: string; title: string }, eqRoot: string): boolean {
