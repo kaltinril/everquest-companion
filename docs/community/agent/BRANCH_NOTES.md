@@ -3508,7 +3508,7 @@ what a later change must know. Each fix has a unit test that failed before it.
   pets, `Together`). The per-mob drill reads "all sources combined": its events are everything but
   `enemy`, so a group's damage is in it.
 
-## Cursor ring: shapes (2026-11-26, requirements/cursor-ring.md)
+## Cursor ring (on screen: Cursor overlay): shapes, crosshair, trail (2026-11-26, requirements/cursor-ring.md)
 
 - **Field:** `CursorRingPrefs.shape` (`RingShape`: `circle` | `oval` | `square` | `rounded` |
   `diamond` | `dot` | `target`), default `circle`. Rides the `cursorRing` blob with no schema bump,
@@ -3533,6 +3533,36 @@ what a later change must know. Each fix has a unit test that failed before it.
 - **Preferences sample:** `CursorRingDemo.tsx`, a box holding a drawn arrow pointer whose tip is the
   hot spot, with the shape at the offset; keeps `data-testid="pref-cursor-ring-preview"` on the
   shape (the colour e2e reads its border colour). Grows with size + offset so nothing clips.
-- **Queued (owner, 2026-11-26: shapes first):** icon upload (would add `'image'` to `RingShape`; the
-  window then draws a picture; cursor.html's CSP has `img-src 'none'` today), NxN drawing grid,
-  crosshair (full-window lines, own colour and weight), trail / particles.
+- **Renamed "Cursor overlay" on screen (owner, 2026-11-26):** Preferences section and item, the
+  switch ("Show a cursor overlay"), captions, window title (`Cursor Overlay`; `presence.test.mts`
+  keeps the old title in its own-windows list). Internal names stay `cursorRing`: files, IPC
+  channels, the store key, data-testids, CSS ids. Renaming them would orphan every installed
+  store blob and break the e2e selectors for no player-visible gain. Keywords keep "ring".
+- **Shape switch:** `showShape` (default true). `enabled` is still the master switch (window, poll,
+  watcher); `showShape` only hides `#ring`, so the crosshair or trail can run alone.
+  `shapeShown(prefs)` reads a config without it as shown.
+- **Crosshair:** `crosshairEnabled` (false), `crosshairColorHex` (`#ffffff`, `normalizeRingColor`),
+  `crosshairWeightPx` (2, clamped 1 to 8). `shared/cursorCrosshair.ts`: `crosshairOf`,
+  `crosshairTransforms`, `crosshairLineStyles`, `isParkedPoint` (any negative coordinate: main
+  only sends in-window points or -9999). Two prebuilt divs `#cross-v` / `#cross-h` (100vh / 100vw
+  = the EQ window, the whole screen only in fullscreen), 1px dark contour. Raw pointer, never the
+  shape's offset. Parked: both at -9999. Pinned in `tests/cursorCrosshair.test.mts`.
+- **Trail:** `trail` (`'off'` | `'trail'` | `'sparkles'`, default `'off'`, `normalizeTrailMode`),
+  `trailLength` (5, clamped 1 to 10), drawn in the shape's `colorHex`. Maths in
+  `shared/cursorTrail.ts` (no DOM): trail life 60 ms x length; sparkles 300 + 50 x length ms, 1 to 3
+  specks per sample; caps 96 / 160 live, oldest dropped; positions are closed forms of age, so a
+  late frame or a hidden window just finds them expired. Canvas painter:
+  `renderer/src/overlay/cursorTrailCanvas.ts`. Pinned in `tests/cursorTrail.test.mts`.
+- **Performance contract, extended again (cursorRing.ts rules 4 and 5):** the crosshair is two more
+  transform-only elements, painted in the ring's frame, skipped on one boolean when off. The trail
+  is the window's one canvas: Off = hidden, no 2D context ever requested, `point()` returns on
+  its first line. On = each sample spawns and starts one rAF loop that clears only last frame's
+  `trailBounds` box and stops itself on `stepTrail` = idle, so a still mouse costs nothing. A
+  parked point clears the trail. Backing store = CSS size x devicePixelRatio, re-fitted on
+  `resize` and on each loop start.
+- **Store blob:** all six new fields ride `cursorRing` with no schema bump; defaults leave every
+  install's overlay as it was. The five blob-pinning tests list them (grep `trailLength: 5`).
+- **Queued, next slice:** icon upload (would add `'image'` to `RingShape`; the window then draws a
+  picture on `#ring` or the trail canvas; cursor.html's CSP has `img-src 'none'` today) and the
+  NxN drawing grid (could feed the same `'image'` path). Optional: a trail colour of its own (today
+  the shape's).
