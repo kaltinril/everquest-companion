@@ -23,7 +23,7 @@ review what each output change would be." This file is the record.
 
 ## To fix (sent to Opus fixers)
 
-The outcome of each is in "Fix results" below.
+All fixed and merged 2026-11-27; see "Fix results" below.
 
 - **tradeskills-1** (Tradeskills tab; finder opus; Fable: CONFIRMED) Pick up where you left off says 'Your log shows no combine yet' right above 'Your last crafting run: N combines'. `src/shared/tradeskillHome.ts:118`
   - Scenario: Say a player's log shows Fishing raises (Fishing is in TRADESKILLS and in the skills module) and one quest-kit combine ('You have fashioned the items together to create something new: X.'). The wiki holds that item only as a combine with no tradeskill, or holds no recipe for it, and no raise named it. Home's panel then picks Fishing as the 'highest tradeskill' and prints 'Your highest tradeskill. Your log shows no combine yet.' Directly under it, it prints 'Your last crafting run, on <date>: 1 combine (1 made, 0 failed), no raise.' The panel contradicts itself, and the first sentence states something false about the log.
@@ -333,7 +333,32 @@ before/after image (see "Prototypes").
 
 ## Fix results
 
-Pending.
+- Four Opus fixers, one worktree each, a unit test that failed before every fix; a Sonnet review
+  per branch (all sound; one should-fix: `aaPlanDelta` still double-counted Quick Evacuation,
+  corrected with its own test). Merged as one candidate `bughunt-1127` into `main_community`
+  2026-11-27; the trunk's tree equals the gated tree.
+- Fixed (13 findings, 14 commits): tradeskills-1, -2, -3; aa-1, -2, -3 (plus the planning header),
+  -4; gear-1 (= gear-6), gear-4 (= gear-7), gear-5; macros-1; logread-1; dup-ui-a-1. Nothing left
+  unfixed. Rules left in force: `agent/BRANCH_NOTES.md`, "Bug hunt 2026-11-27".
+- Gate on the candidate, run once (the owner asked for full testing): typecheck green; lint green
+  on the merged tree (no file changed by two branches); `known-reds.sh` on Node 24: 7843 tests,
+  7837 pass, 2 fail, both known reds. e2e, serially: `tradeskills-log`, `leveling`, `tradeskills`,
+  `bis-sheet` green; `engine-boots` red in the batch (the no-wmic engine count flake), green alone.
+  No AA-tab or macros spec exists.
+- Review nits left open: a caps pass that moves a bow in while AMMO holds a non-arrow item (card
+  empty, total counts it); the BiS Level box shows an out-of-range number until blur (stored value
+  clamped); a stored AA pick below `usedRank` shows a disabled item as selected; archive segments
+  from before `castOnly` still count a bare Divine Aura/Stoicism/Rampage cast until refolded.
+
+### Found while gating (not caused by this batch, not fixed)
+
+- `cargo test --workspace`: engined `ingest::kept::tests::a_kept_key_never_holds_while_the_state_moves`
+  fails every time, alone too: on `w8-wears-off.log` at event 300 the leveling module's state moves
+  while its key stays at cursor 210. It fails the same with `main_community`'s `leveling_aa.rs`
+  swapped into the candidate, so it predates this batch. Not in `known-reds.txt`. Likely cause, not
+  verified: `fold_used` (2026-11-25, AA tab) moves an activation's `last` stamp on a repeat without
+  moving the announce cursor. Needs a fix or an owner ruling before the next release (RELEASING.md
+  runs cargo).
 
 ## Prototypes
 
