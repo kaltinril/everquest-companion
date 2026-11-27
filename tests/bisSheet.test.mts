@@ -214,6 +214,36 @@ test('a bow in Range puts the best arrow in Ammo: damage first, elemental at hal
   assert.equal(arrowRank(blessed), 11 + ARROW_ELEMENTAL_WEIGHT * 4)
 })
 
+test('a bow in Range with no arrow to fire: the Ammo item the total counts is shown on the Ammo card (audit 2026-11-27 gear-1)', () => {
+  const bow = row('Dex Bow', { slots: ['RANGE'], skill: 'Archery', stats: { DEX: 5 } })
+  const stone = row('Dex Stone', { slots: ['AMMO'], stats: { DEX: 4 } })
+  const ring = row('Dex Ring', { stats: { DEX: 10 } })
+  const s = sheet([bow, stone, ring], setup({ DEX: 'S' }), { owned: new Map([['dex bow', 1], ['dex stone', 1], ['dex ring', 4]]) })
+  assert.equal(RINGS.filter((c) => pickOf(s, c) === 'Dex Ring').length, 4, 'the rings take the fingers and the ANY cells')
+  assert.equal(pickOf(s, 'RANGE'), 'Dex Bow')
+  const ammo = s.cells.find((c) => c.cell === 'AMMO')
+  assert.equal(ammo?.pick?.row.name, 'Dex Stone', 'no arrow is held, so the stone the search placed is what Ammo shows')
+  assert.equal(ammo?.arrowForBow, undefined, 'it is not an arrow for the bow')
+  assert.equal(s.total, 64 * (40 + 5 + 4))
+  assert.equal(s.totals.DEX, 49, 'the totals table counts the stone the total counts')
+  assert.equal(s.filled, 6)
+})
+
+test('a bow the caps pass moves into Range still gets its arrow in Ammo (audit 2026-11-27 gear-5)', () => {
+  const sling = row('Str Sling', { slots: ['RANGE'], skill: 'Throwing', stats: { STR: 100 } })
+  const bow = row('Hp Bow', { slots: ['RANGE'], skill: 'Archery', stats: { HP: 50 } })
+  const arrow = row('Dull Arrow', { slots: ['AMMO'], skill: 'Archery', stats: { HP: -1 } })
+  const ring = row('Str Ring', { stats: { STR: 100 } })
+  const lanes = setup({ STR: 'S', HP: 'S' }, { caps: { STR: 100 } })
+  const s = sheet([sling, bow, arrow, ring], lanes)
+  assert.equal(pickOf(s, 'RANGE'), 'Hp Bow', 'STR is past its cap, so the HP bow beats the STR sling')
+  const ammo = s.cells.find((c) => c.cell === 'AMMO')
+  assert.equal(ammo?.pick?.row.name, 'Dull Arrow', 'a bow in Range puts an arrow in Ammo, in the caps pass too')
+  assert.equal(ammo?.arrowForBow, true)
+  assert.equal(s.totals.HP, s.cells.reduce((sum, c) => sum + (c.pick?.row.stats.HP ?? 0), 0))
+  assert.equal(s.total, round3(64 * 100 + 64 * (s.totals.HP ?? 0)), 'the total prices the arrow under the caps')
+})
+
 test("attributes stop at eqlwiki's hard cap, 510, with no click; a cap the player sets wins (owner, 2026-11-25)", () => {
   const str = row('Str Ring', { stats: { STR: 300 } })
   const ac = row('Plated Ring', { stats: { AC: 10 } })
