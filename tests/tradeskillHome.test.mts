@@ -175,10 +175,22 @@ test('with no combine it is the highest-level tradeskill; with no level at all t
   const none = indexCrafting(fixtureSnap({ items: [], spans: [] }), index)
   const pick = pickUp(ownerAsk({ index, craft: none }))
   assert.deepEqual([pick?.tradeskill, pick?.level, pick?.lastCombine, pick?.lastRun], ['Jewelcrafting', OWNER_LEVEL, null, null])
-  assert.equal(pickUpWhyText({ lastCombine: null }, ''), 'Your highest tradeskill. Your log shows no combine yet.')
+  assert.equal(pickUpWhyText({ lastCombine: null, lastRun: null }, ''), 'Your highest tradeskill. Your log shows no combine yet.')
   assert.equal(pickUp(ownerAsk({ index, craft: none, rows: [] })), null)
   // A level in a skill that is no tradeskill does not count.
   assert.equal(pickUp(ownerAsk({ index, craft: none, rows: [skill('Taunt', 200)] })), null)
+})
+
+test('combines no tradeskill can place: picked for its level, and the panel never says the log shows no combine', () => {
+  // Audit 2026-11-27 tradeskills-1: a quest-kit combine nothing places, and a run of one combine.
+  const index = ownerIndex()
+  const snap = fixtureSnap({ items: [item('Mystery Stew', { made: 1, lastTs: SEP_12 })], spans: [span(0, 0, 1, {})] })
+  const pick = pickUp(ownerAsk({ index, craft: indexCrafting(snap, index) }))
+  assert.ok(pick)
+  assert.deepEqual([pick.tradeskill, pick.lastCombine, pick.lastRun?.combines], ['Jewelcrafting', null, 1])
+  const why = pickUpWhyText(pick, '')
+  assert.equal(why, 'Your highest tradeskill.')
+  assert.doesNotMatch(why, /no combine/)
 })
 
 test('what is unknown is left out: no held count without a dump, no next recipe above the top', () => {
