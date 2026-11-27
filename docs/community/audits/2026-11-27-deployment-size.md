@@ -54,3 +54,40 @@ Dev tools (eslint, typescript, vite, electron-builder, playwright) ship 0 MB.
   `DirectML.dll` (measured required, see electron-builder.yml), `LICENSES.chromium.html`.
 - The packaged app never writes `userData/engine-run` (dev launch only); a copy there on a player PC
   is stale.
+
+## Second pass: deprecations and majors (same day)
+
+Taken (all on main_community):
+- chokidar 5 -> 6, electron-store 11 -> 12 (conf 16). chokidar 6 picks recursive native watching only
+  when `depth` is unset on a DIRECTORY; our dir watchers set `depth: 0` and file targets watch the
+  parent per-directory, so no recursive watch on the EQ folder (measured with an fs.watch probe;
+  same events as 5, fewer handles). conf 16 opened a copy of a real settings file deep-equal.
+- GitHub Actions to latest majors, SHA-pinned (checkout 7, setup-node 7, cache 6, upload-artifact 7,
+  configure-pages 6, deploy-pages 5, upload-pages-artifact 5). Three pins had stale comments (cache
+  and deploy-pages were already latest, setup-node was v7.0.0 labelled v4). Resolve an ANNOTATED tag
+  through `git/tags/<sha>` to get the commit SHA.
+- MUI 7 -> 9 (there is no v8): system props moved into `sx`, removed `...Outline` icons ->
+  `...OutlineOutlined`, Autocomplete `params.inputProps` -> `params.slotProps.htmlInput`, computed
+  Typography colours into `sx` (v9 silently drops a non-palette `color` prop: text went white).
+  Not compared on screen: dialogs, menus, Maps, Bazaar, Plane of Sky, overlays.
+- Rust: protocol-codegen to typify 0.10, syn 3, prettyplease 0.3, sha2 0.11; eqlog off chrono and
+  chrono-tz onto jiff 1 (bundled tzdb, host zone still named by iana-time-zone). Parity output
+  byte-identical on the owner's logs; engined.exe -0.9 MB; OSV 0 advisories. jiff carries a newer
+  IANA database (2026f vs 2025b): western Canada from Nov 2026 now reads correctly.
+  Required-nullable protocol fields (ComboCorrection.endTs, Resist*Benchmark.mobLevel) must now be
+  present when the engine reads them; the app has always sent `endTs`.
+
+Not taken, and why (re-check these, not the rest):
+- TypeScript 7: typescript-eslint (8.74) supports `typescript <6.1`; TS 7 has no stable JS API.
+- schemars 1: typify 0.10.2 still takes a schemars 0.8 `RootSchema`.
+- Node 26 LTS for dev/CI and `@types/node` 26: the app runs Electron 45's Node 24 (45 is the newest
+  Electron); tests and types stay on the runtime players get. Move when Electron moves.
+- Deprecated transitive packages with no trusted swap in our hands: lodash.isequal (electron-updater
+  6.8.11, latest), glob 7 / inflight / rimraf 2 / boolean (electron-builder 26.18, latest),
+  whatwg-encoding (cheerio 1.2, latest).
+- onnxruntime-node 1.31 (minor, not major): onnxruntime.dll 14 -> 32 MB plus a new 18 MB
+  dxcompiler.dll, and the binaries moved from napi-v3 to napi-v6 (electron-builder.yml paths).
+- vite 8.4 (minor): a second rolldown copy beside electron-vite's.
+- Rust toolchain pin 1.99 (latest 1.100.1): minor; bump with `npm run gen:protocol`.
+- Known red outside known-reds.txt: engined `ingest::kept::tests::a_kept_key_never_holds_while_the_state_moves`
+  (pre-existing, in the 2026-11-27 bug-hunt audit).
