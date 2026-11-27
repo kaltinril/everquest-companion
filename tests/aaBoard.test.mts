@@ -5,7 +5,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { withGranted } from '../src/shared/aaGranted'
 import { rankAas, type AaPicks, type AaRanked } from '../src/shared/aaRanks'
-import { AA_WIKI_ORDER, aaBoard, aaComboMax, aaFit, aaLeft, aaPlanDelta, aaSearchGroups, aaSortGroups, aaStartLevel, aaTabCount, aaTabGroups, aaWithinLevel, type AaBoardRow, type AaCombo } from '../src/shared/aaBoard'
+import { AA_WIKI_ORDER, aaBoard, aaComboMax, aaFit, aaLeft, aaPlanDelta, aaSearchGroups, aaSortGroups, aaSpent, aaStartLevel, aaTabCount, aaTabGroups, aaWithinLevel, type AaBoardRow, type AaCombo } from '../src/shared/aaBoard'
 import { aaNotForPoints, aaRecFit, aaRecommend } from '../src/shared/aaRecommend'
 import { aaSigned, aaStatTotals } from '../src/shared/aaStats'
 import { aaActivation, aaLinks } from '../src/shared/aaLinks'
@@ -240,4 +240,21 @@ test('LINKS: masteries to their workbench, stat AAs to Best in slot, activated A
   assert.ok(labels('Race Reincarnation: Half Elf').includes('Leveling · reincarnations'))
   assert.deepEqual(labels('Banestrike'), ['Slayer achievements'])
   assert.deepEqual(aaActivation('Ability Activation ID: 109 - Refresh Time: 0:10:00 - Ability Timer(s): 81. x'), { refresh: '10 min', timer: 81 })
+})
+
+test('QUICK EVACUATION (a Druid and a Wizard row) is one AA for a DRU/WIZ combo: left, spent, tab count and the plan count it once', () => {
+  const dw: ClassAbbr[] = ['DRU', 'WIZ']
+  const combo: AaCombo = { classes: dw, own: true }
+  for (const picks of [{}, { 'Quick Evacuation': 2 }] as AaPicks[]) {
+    const board = aaBoard(ranked(picks, dw), combo)
+    assert.equal(board.filter((b) => b.r.key === 'Quick Evacuation' && b.usable).length, 2, 'both rows stay listed')
+    // The same board with the Wizard twin taken out: what one AA should add up to.
+    const once = board.filter((b) => !(b.r.key === 'Quick Evacuation' && b.r.row.class === 'Wizard'))
+    assert.deepEqual(aaLeft(board), aaLeft(once))
+    assert.deepEqual(aaSpent(board), aaSpent(once))
+    assert.deepEqual(aaTabCount(board, 'class', { scope: 'usable', query: '', maxLevel: null }), aaTabCount(once, 'class', { scope: 'usable', query: '', maxLevel: null }))
+    const recs = aaRecommend(board, 40)
+    assert.equal(recs.items.filter((i) => i.b.r.key === 'Quick Evacuation').length, 1)
+    assert.deepEqual([recs.used, recs.total], [aaRecommend(once, 40).used, aaRecommend(once, 40).total])
+  }
 })

@@ -212,9 +212,15 @@ export interface AaTabCount {
   matches: number | null
 }
 
+/** The first row of each key: an AA two classes list (Quick Evacuation: Druid, Wizard) is one AA in a total. */
+export function aaOnePerKey(rows: readonly AaBoardRow[]): AaBoardRow[] {
+  const seen = new Set<string>()
+  return rows.filter((b) => !seen.has(b.r.key) && seen.add(b.r.key))
+}
+
 /** A sub-tab's count: maxed of usable (within the level filter; a row the log cannot settle left out), their points, and the search's matches. */
 export function aaTabCount(board: readonly AaBoardRow[], section: AaSection, { scope, query, maxLevel = null }: AaFilter): AaTabCount {
-  const mine = board.filter((b) => b.r.row.section === section && b.usable && b.r.unknown !== true && aaWithinLevel(b, maxLevel))
+  const mine = aaOnePerKey(board.filter((b) => b.r.row.section === section && b.usable && b.r.unknown !== true && aaWithinLevel(b, maxLevel)))
   const matches = query.trim() === '' ? null : board.filter((b) => b.r.row.section === section && (b.usable || scope === 'all') && shown(b, query, maxLevel)).length
   return { maxed: mine.filter((b) => b.r.rank >= b.max).length, of: mine.length, points: aaCostSum(mine.map((b) => b.cost)), matches }
 }
@@ -234,7 +240,7 @@ export function aaCantTell(board: readonly AaBoardRow[]): AaBoardRow[] {
 
 /** What the combo has left to buy. */
 export function aaLeft(board: readonly AaBoardRow[]): AaLeft {
-  const left = board.filter((b) => b.buyable)
+  const left = aaOnePerKey(board.filter((b) => b.buyable))
   const sum = aaCostSum(left.map((b) => b.cost))
   return { count: left.length, points: sum.total - sum.spent, unknown: sum.unknown }
 }
@@ -270,7 +276,7 @@ export function aaSameClasses(a: readonly ClassAbbr[], b: readonly ClassAbbr[]):
 
 /** Points the usable rows' held ranks cost, at the corrected prices. */
 export function aaSpent(board: readonly AaBoardRow[]): AaCostSum {
-  return aaCostSum(board.filter((b) => b.usable).map((b) => b.cost))
+  return aaCostSum(aaOnePerKey(board.filter((b) => b.usable)).map((b) => b.cost))
 }
 
 /** Which of the classes bring a row: "Every class has it.", "From your Warrior and Monk.", "A Monk AA."; null for General and Special. */

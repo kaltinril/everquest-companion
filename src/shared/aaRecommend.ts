@@ -7,7 +7,7 @@
 // listed but never planned. Points never buy Banestrike (Slayer achievements) or the reincarnation lines.
 
 import { AA_POINT_CAP } from './aaPointsWarn'
-import type { AaBoardRow } from './aaBoard'
+import { aaOnePerKey, type AaBoardRow } from './aaBoard'
 import { aaEffectValue } from './aaEffects'
 import { aaRankCosts } from './aaRanks'
 
@@ -54,7 +54,7 @@ function cheapestStep(rows: readonly AaBoardRow[], reach: ReadonlyMap<AaBoardRow
 
 /** The next ranks to buy and how far `budget` points go, cheapest first. */
 export function aaRecommend(board: readonly AaBoardRow[], budget: number): AaRecs {
-  const rows = board.filter((b) => b.buyable)
+  const rows = aaOnePerKey(board.filter((b) => b.buyable))
   const reach = new Map(rows.map((b) => [b, b.r.rank]))
   let left = Math.max(0, budget)
   for (let step = cheapestStep(rows, reach); step !== null && step.c <= left; step = cheapestStep(rows, reach)) {
