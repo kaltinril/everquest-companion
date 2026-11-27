@@ -7,13 +7,14 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { aaBlockRank, aaListRead, aaRowListRank, type AaActivation, type AaListBlock, type AaListRun } from '../src/shared/aaList'
+import { AA_SPELL_NAMES, aaBlockRank, aaListRead, aaRowListRank, type AaActivation, type AaListBlock, type AaListRun } from '../src/shared/aaList'
 import { aaKey, rankAasFrom, type AaLogInput, type AaPicks, type AaRanked } from '../src/shared/aaRanks'
 import { withGranted } from '../src/shared/aaGranted'
 import { aaBoard, aaCantTell, aaLeft } from '../src/shared/aaBoard'
 import { aaRecommend } from '../src/shared/aaRecommend'
 import { AA_ROWS } from '../src/shared/aaOfficial'
 import { mergeLeveling } from '../src/shared/logArchive/mergeLeveling'
+import { aaFold } from '../src/shared/aaLogMatch'
 import type { ClassAbbr } from '../src/shared/classCombo'
 import type { AASpendEvent, LevelingSnap } from '../src/shared/types'
 
@@ -212,4 +213,34 @@ test('mergeLeveling: the newer list run wins, activations join by name', () => {
   // A segment written before the fields reads as one without them.
   assert.equal(mergeLeveling(base, base)?.aaActivations, undefined)
   assert.equal(mergeLeveling(base, older)?.aaList?.ts, 5)
+})
+
+test('AA_SPELL_NAMES is every AA table name that is also a spell name (spells.json)', () => {
+  const spells = (JSON.parse(readFileSync(new URL('../src/main/data/spells.json', import.meta.url), 'utf8')) as { spells: { name: string }[] }).spells
+  const names = new Set(spells.map((s) => aaFold(s.name)))
+  const both = AA_ROWS.filter((r) => names.has(aaFold(r.name))).map((r) => aaFold(r.name))
+  assert.deepEqual([...new Set(both)].sort(), [...AA_SPELL_NAMES].sort())
+  assert.deepEqual([...AA_SPELL_NAMES].sort(), ['divine aura', 'rampage', 'stoicism'])
+})
+
+test('A SPELL CAST with no numeral does not prove the AA of the same name; an activation, reuse line or ranked cast still does', () => {
+  // The engine marks a name seen only in `You begin casting X.` with no numeral (castOnly).
+  const cast = (name: string): AaActivation => ({ ...act(name), castOnly: true })
+  const casts = ranks({ activations: [cast('Divine Aura'), cast('Stoicism'), cast('Rampage')] }, {}, ['CLR', 'SHM', 'ENC'])
+  for (const key of ['Divine Aura', 'Stoicism', 'Rampage']) assert.deepEqual([key, row(casts, key).source], [key, 'none'])
+  // `You activate Divine Aura.` (no castOnly) and `You begin casting Rampage II.` keep counting.
+  const used = ranks({ activations: [act('Divine Aura'), { ...act('Rampage'), rank: 2 }] }, {}, ['CLR', 'ENC'])
+  assert.deepEqual([row(used, 'Divine Aura').rank, row(used, 'Divine Aura').source], [1, 'activated'])
+  assert.deepEqual([row(used, 'Rampage').rank, row(used, 'Rampage').source], [2, 'activated'])
+  // A numeral-less cast of an AA no spell shares a name with keeps counting (the engine keeps `Origin`).
+  assert.equal(row(ranks({ activations: [cast('Quick Buff')] }), 'Quick Buff').source, 'activated')
+})
+
+test('mergeLeveling: a name stays castOnly only when every segment saw it only as a bare cast', () => {
+  const base: LevelingSnap = { levels: [], aaGains: [], aaSpends: [], aaPotions: [] }
+  const bare: LevelingSnap = { ...base, aaActivations: [{ name: 'Divine Aura', first: 1, last: 2, castOnly: true }] }
+  const proved: LevelingSnap = { ...base, aaActivations: [{ name: 'Divine Aura', first: 5, last: 6 }] }
+  assert.deepEqual(mergeLeveling(bare, bare)?.aaActivations, [{ name: 'Divine Aura', first: 1, last: 2, castOnly: true }])
+  assert.deepEqual(mergeLeveling(bare, proved)?.aaActivations, [{ name: 'Divine Aura', first: 1, last: 6 }])
+  assert.deepEqual(mergeLeveling(proved, bare)?.aaActivations, [{ name: 'Divine Aura', first: 1, last: 6 }])
 })
