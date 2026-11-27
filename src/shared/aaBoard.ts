@@ -287,3 +287,22 @@ export function aaBroughtBy(r: AaRanked, classes: readonly ClassAbbr[]): string 
   const who = classes.filter((c) => ARCHETYPE_BY_CLASS[c].includes(r.row.name)).map(classDisplayName)
   return who.length === 0 ? null : `From your ${who.join(' and ')}.`
 }
+
+export interface AaJumpView {
+  scope: AaScope
+  maxLevel: number | null
+}
+
+/**
+ * The scope and level filter a jump to row `b` (a Spend card, Recommendations or Can't tell entry) opens
+ * its sub-tab with: as they are while `board` shows the row there, else the level filter cleared when
+ * the row is past it, then all AAs when the scope still hides it. Special is not level-gated or scoped.
+ */
+export function aaJumpView(board: readonly AaBoardRow[], b: AaBoardRow, classes: readonly ClassAbbr[], view: AaJumpView): AaJumpView {
+  const { section } = b.r.row
+  const same = (x: AaBoardRow): boolean => x.r.row.section === section && x.r.row.class === b.r.row.class && x.r.key === b.r.key
+  const visible = (v: AaJumpView): boolean => aaTabGroups(board, section, classes, { ...v, query: '' }).some((g) => g.rows.some(same))
+  if (section === 'special' || visible(view)) return view
+  const level = aaWithinLevel(b, view.maxLevel) ? view : { ...view, maxLevel: null }
+  return visible(level) ? level : { ...level, scope: 'all' }
+}
