@@ -10,7 +10,7 @@ import { type JSX, useCallback, useMemo, useState } from 'react'
 import { Box, Chip, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
-import { AA_WIKI_ORDER, aaCantTell, aaLeft, aaPlanDelta, aaSearchCount, aaSearchGroups, aaTabCount, aaTabGroups, type AaBoardRow, type AaScope, type AaSort } from '@shared/aaBoard'
+import { AA_WIKI_ORDER, aaCantTell, aaJumpView, aaLeft, aaPlanDelta, aaSearchCount, aaSearchGroups, aaTabCount, aaTabGroups, type AaBoardRow, type AaScope, type AaSort } from '@shared/aaBoard'
 import { aaCostSumText } from '@shared/aaCost'
 import { aaRecommend, type AaRecs } from '@shared/aaRecommend'
 import { aaUnplaced } from '@shared/aaRanks'
@@ -262,11 +262,18 @@ function AaView({ onGo, onOpenTradeskill }: AaLinksProps): JSX.Element {
   const [sort, setSort] = useState<AaSort>(AA_WIKI_ORDER)
   const [open, setOpen] = useState<string | null>(null)
   const toggle = useCallback((id: string) => setOpen((o) => (o === id ? null : id)), [])
-  const jump = useCallback((b: AaBoardRow) => {
-    setQuery('')
-    setTab(b.r.row.section)
-    setOpen(aaRowId(b))
-  }, [])
+  const jump = useCallback(
+    (b: AaBoardRow) => {
+      // A row the level filter or the scope hides would open nothing: widen just enough to show it.
+      const v = aaJumpView(s.board, b, s.classes, { scope, maxLevel })
+      setScope(v.scope)
+      setMaxLevel(v.maxLevel)
+      setQuery('')
+      setTab(b.r.row.section)
+      setOpen(aaRowId(b))
+    },
+    [s.board, s.classes, scope, maxLevel]
+  )
   const nav = useMemo<AaNav>(() => ({ go: onGo, openTradeskill: onOpenTradeskill, open, toggle, jump }), [onGo, onOpenTradeskill, open, toggle, jump])
   const recs = useMemo(() => aaRecommend(s.board, s.unspent ?? 0), [s.board, s.unspent])
   const ready = s.served && s.character !== null
