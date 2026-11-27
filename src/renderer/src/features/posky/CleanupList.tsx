@@ -106,7 +106,7 @@ function TurnInLine({
   const keep = t.sets >= 1
   return (
     <Box data-testid="posky-cleanup-turnin" data-sets={t.sets} sx={{ py: 0.4 }}>
-      <Typography variant="body2" color="text.secondary" component="div">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }} component="div">
         {turnInHeading(t)} {'· '}
         {timesLine(t)}
         {t.reward ? (
@@ -201,13 +201,11 @@ function HandHiddenLine({
     <Stack
       direction="row"
       spacing={1}
-      alignItems="center"
       useFlexGap
-      flexWrap="wrap"
       data-testid="posky-cleanup-hand-hidden"
-      sx={{ mb: 2 }}
+      sx={{ alignItems: 'center', flexWrap: 'wrap', mb: 2 }}
     >
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
         {CLEANUP_HAND_HIDDEN_LEAD}
       </Typography>
       {hidden.map((h) => (
@@ -267,7 +265,7 @@ export default function CleanupList({
       <Alert severity="warning" data-testid="posky-cleanup-caveat" sx={{ mb: 2 }}>
         {CLEANUP_CAVEAT}
       </Alert>
-      <Stack direction="row" spacing={2} alignItems="center" useFlexGap sx={{ mb: 2 }}>
+      <Stack direction="row" spacing={2} useFlexGap sx={{ alignItems: 'center', mb: 2 }}>
         {/* A row zeroed by hand is gone from the table; this is the trace it leaves on the tab. */}
         <OverrideSummaryChip overrides={itemOverrides} hint={CLEANUP_HAND_HINT} />
         <Box sx={{ flexGrow: 1 }} />
@@ -282,7 +280,7 @@ export default function CleanupList({
       <Box data-testid="posky-cleanup-scroll" sx={{ flexGrow: 1, overflow: 'auto' }}>
         <HandHiddenLine hidden={hidden} onSetItemCount={onSetItemCount} />
         {rows.length === 0 ? (
-          <Typography color="text.secondary" data-testid="posky-cleanup-empty">
+          <Typography sx={{ color: 'text.secondary' }} data-testid="posky-cleanup-empty">
             Nothing here to destroy - every Sky item you are holding is still wanted by a quest you
             have not turned in.
           </Typography>
@@ -290,9 +288,8 @@ export default function CleanupList({
           <>
             <Typography
               variant="body2"
-              color="text.secondary"
               data-testid="posky-cleanup-count"
-              sx={{ mb: 1 }}
+              sx={{ color: 'text.secondary', mb: 1 }}
             >
               {rows.length} item{rows.length === 1 ? '' : 's'} no un-turned-in quest still needs.
             </Typography>

@@ -46,12 +46,12 @@ function PaceTile({ tile }: { tile: AaPaceTile }): JSX.Element {
       >
         <Box sx={{ color: accent, display: 'flex', alignItems: 'center' }}>{ICON[tile.id]}</Box>
         <Box sx={{ minWidth: 0 }}>
-          <Stack direction="row" spacing={0.5} alignItems="baseline">
+          <Stack direction="row" spacing={0.5} sx={{ alignItems: 'baseline' }}>
             <Typography variant="h5" sx={{ lineHeight: 1.1, color: accent }} noWrap>
               {tile.value}
             </Typography>
             {tile.unit && (
-              <Typography variant="caption" color="text.secondary" noWrap>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>
                 {tile.unit}
               </Typography>
             )}
@@ -90,14 +90,13 @@ export function AaPacePanel({ pace, windowLabel }: AaPacePanelProps): JSX.Elemen
       {/* The caption ends in 'over 42m active' — a native title says what that span is (JOS-249). */}
       <Typography
         variant="caption"
-        color="text.secondary"
+        sx={{ color: 'text.secondary', display: 'block' }}
         gutterBottom
-        display="block"
         title={BASIS_TITLE[basis]}
       >
         {windowLabel} - {aaPaceCaption(pace, basis)}
       </Typography>
-      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 1 }}>
+      <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', mt: 1 }}>
         {tiles.map((t) => (
           <PaceTile key={t.id} tile={t} />
         ))}

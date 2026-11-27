@@ -21,7 +21,7 @@ function Kept({ name, kept, fromFile }: { name: string; kept: SpellPageShot; fro
   const fields = Object.entries(kept.fields ?? {})
   return (
     <>
-      <Stack direction="row" spacing={1} alignItems="center">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
         <Chip size="small" color="success" label="Spell window ✓" onDelete={() => setSpellShot(name, null)} title="Clear image data" data-testid="gaps-shot-clear-spell" />
       </Stack>
       {fromFile ? (
@@ -96,7 +96,7 @@ export default function SpellShot({ row }: { row: GapRow }): JSX.Element {
     <Stack spacing={0.75} data-testid="gaps-shot">
       <PasteZone label="Click here and paste the spell display window to read it" busy={busy} onPicture={onPicture} />
       {failed !== null && (
-        <Typography variant="body2" color="error.main" data-testid="gaps-shot-error">
+        <Typography variant="body2" sx={{ color: 'error.main' }} data-testid="gaps-shot-error">
           ERROR: unable to read image. {failed}
         </Typography>
       )}

@@ -105,9 +105,9 @@ function BannerKnobs({
   onChange: (patch: Partial<AlertBannerOverlayConfig>) => void
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={3} flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={3} sx={{ flexWrap: 'wrap' }} useFlexGap>
       <Stack sx={{ minWidth: 160 }}>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           A line stays for
         </Typography>
         <Select
@@ -125,7 +125,7 @@ function BannerKnobs({
         </Select>
       </Stack>
       <Stack sx={{ minWidth: 160 }}>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Lines on screen at once
         </Typography>
         <Select
@@ -142,7 +142,7 @@ function BannerKnobs({
           ))}
         </Select>
       </Stack>
-      <Typography variant="caption" color="text.secondary" sx={{ flexBasis: '100%' }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', flexBasis: '100%' }}>
         The newest alert sits at the bottom; when the strip is full the oldest one leaves.
       </Typography>
     </Stack>
@@ -176,7 +176,7 @@ export function AlertBannerSetting(): JSX.Element {
           }
           label={<Typography variant="body2">Show alerts on screen</Typography>}
         />
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {state.open
             ? 'Alerts marked Show on screen appear as large text over the game, then fade. Point at a line to keep it up. Each alert says whether it appears here, in the Alerts tab.'
             : 'Off. Your alerts still play their sound and speak - nothing appears over the game.'}
@@ -184,7 +184,7 @@ export function AlertBannerSetting(): JSX.Element {
         {/* JOS-405: same as the toast and the con card — the strip's own A− / A+ and bg slider live
             in a drag frame you have to unlock to see, so this says where else they are. The section
             is called Appearance since JOS-408, and both controls are in its one Overlays card. */}
-        <Typography variant="caption" color="text.secondary" data-testid="pref-banner-text-size-note">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="pref-banner-text-size-note">
           Its text size and transparency are Appearance → Overlays.
         </Typography>
       </Stack>
@@ -202,7 +202,7 @@ export function AlertBannerSetting(): JSX.Element {
           }
           label={<Typography variant="body2">Move it</Typography>}
         />
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {state.locked
             ? 'The strip sits where you left it and clicks pass straight through to the game.'
             : 'The strip is showing its outline - drag it anywhere, and size its text with A- / A+ on the frame. Turn this off (or press Done) when it sits where you want it.'}

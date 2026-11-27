@@ -93,7 +93,7 @@ function InstructionsCard(): JSX.Element {
     <Paper variant="outlined" data-testid="character-sheet-help" sx={{ p: 1.5 }}>
       <Stack spacing={0.5}>
         <Typography variant="subtitle2">Fill this in from the game</Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           Type <b>/outputfile inventory</b> in EverQuest. Every slot below fills with what you are
           wearing, straight away - leave this tab open and watch it happen.
         </Typography>
@@ -176,8 +176,7 @@ export default function CharacterView(): JSX.Element {
         <Stack
           direction={{ xs: 'column', lg: 'row' }}
           spacing={1}
-          alignItems="flex-start"
-          sx={{ minWidth: 0, flexShrink: 0 }}
+          sx={{ alignItems: 'flex-start', minWidth: 0, flexShrink: 0 }}
           data-testid="character-sheet"
         >
           <Box sx={{ flexGrow: 1, minWidth: 0 }}>

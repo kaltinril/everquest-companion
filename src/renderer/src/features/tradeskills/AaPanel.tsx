@@ -51,7 +51,7 @@ export function useAaFacts(): AaFacts {
 function BoughtWords({ line, text }: { line: AaLine; text: string }): JSX.Element | null {
   if (text === '') return null
   const words = (
-    <Typography variant="caption" color={line.bought ? 'success.main' : 'text.secondary'} noWrap data-testid="tradeskill-aa-bought">
+    <Typography variant="caption" sx={{ color: line.bought ? 'success.main' : 'text.secondary' }} noWrap data-testid="tradeskill-aa-bought">
       {text}
     </Typography>
   )
@@ -61,7 +61,7 @@ function BoughtWords({ line, text }: { line: AaLine; text: string }): JSX.Elemen
 /** One AA on the closed line: its name (the wiki's words on hover) and the rank the log shows. */
 function AaEntry({ line }: { line: AaLine }): JSX.Element {
   return (
-    <Stack direction="row" spacing={0.75} alignItems="baseline" sx={{ minWidth: 0 }} data-testid="tradeskill-aa-item">
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'baseline', minWidth: 0 }} data-testid="tradeskill-aa-item">
       <Tooltip title={line.aa.text}>
         <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap data-testid="tradeskill-aa-name">
           {line.aa.name}
@@ -77,7 +77,7 @@ function CapLines({ cap }: { cap: AaCapLines }): JSX.Element {
   return (
     <Box data-testid="tradeskill-aa-cap">
       {cap.rules.map((rule) => (
-        <Typography key={rule} variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-aa-rule">
+        <Typography key={rule} variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-aa-rule">
           {AA_RULE_LABEL} {rule}
         </Typography>
       ))}
@@ -87,7 +87,7 @@ function CapLines({ cap }: { cap: AaCapLines }): JSX.Element {
         </Typography>
       )}
       {cap.named !== '' && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-aa-named">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-aa-named">
           {cap.named}
         </Typography>
       )}
@@ -99,22 +99,22 @@ function CapLines({ cap }: { cap: AaCapLines }): JSX.Element {
 export function AaDetail({ line }: { line: AaLine }): JSX.Element {
   return (
     <Box sx={{ minWidth: 0 }} data-testid="tradeskill-aa-detail">
-      <Stack direction="row" spacing={1} alignItems="baseline" sx={{ flexWrap: 'wrap' }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', flexWrap: 'wrap' }}>
         <Typography variant="body2" sx={{ fontWeight: 600 }}>
           {line.aa.name}
         </Typography>
-        <Typography variant="caption" color="text.secondary" data-testid="tradeskill-aa-cost">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="tradeskill-aa-cost">
           {line.costText}
         </Typography>
         <BoughtWords line={line} text={line.boughtText} />
         {line.atRankText !== '' && (
-          <Typography variant="caption" color="text.secondary" data-testid="tradeskill-aa-at-rank">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="tradeskill-aa-at-rank">
             {line.atRankText}
           </Typography>
         )}
       </Stack>
       {/* The wiki's own words, set off as a quote. */}
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', borderLeft: 2, borderColor: 'divider', pl: 1, my: 0.25 }} data-testid="tradeskill-aa-text">
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', borderLeft: 2, borderColor: 'divider', pl: 1, my: 0.25 }} data-testid="tradeskill-aa-text">
         {line.aa.text}
       </Typography>
       {line.cap !== null && <CapLines cap={line.cap} />}
@@ -125,7 +125,7 @@ export function AaDetail({ line }: { line: AaLine }): JSX.Element {
 /** Where the descriptions come from, with the app's standard wiki link to the page. */
 function SourceLine(): JSX.Element {
   return (
-    <Typography variant="caption" color="text.disabled" sx={{ display: 'block' }} data-testid="tradeskill-aa-source">
+    <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block' }} data-testid="tradeskill-aa-source">
       {AA_SOURCE_TEXT}{' '}
       {AA_WIKI_URL !== undefined && (
         <a href={AA_WIKI_URL} target="_blank" rel="noreferrer" title={WIKI_LINK_TIP} style={{ color: 'inherit' }} data-testid="tradeskill-aa-wiki-link">
@@ -143,7 +143,7 @@ export function AaPanel({ tradeskill }: { tradeskill: Tradeskill }): JSX.Element
   if (lines.length === 0) return null
   return (
     <Paper variant="outlined" sx={{ px: 1.5, py: 0.75, flexShrink: 0 }} data-testid="tradeskill-aa">
-      <Stack direction="row" alignItems="baseline" sx={{ flexWrap: 'wrap', columnGap: 2.5, rowGap: 0.5 }}>
+      <Stack direction="row" sx={{ alignItems: 'baseline', flexWrap: 'wrap', columnGap: 2.5, rowGap: 0.5 }}>
         <Typography variant="subtitle2">{AA_PANEL_HEADING}</Typography>
         {lines.map((line) => (
           <AaEntry key={line.aa.name} line={line} />

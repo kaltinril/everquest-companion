@@ -36,10 +36,9 @@ export function LevelStepper({ level, onChange, dimmed = false, testidPrefix }: 
     <Stack
       direction="row"
       spacing={0.25}
-      alignItems="center"
       data-testid={`${testidPrefix}-stepper`}
       data-dimmed={dimmed ? 'true' : 'false'}
-      sx={{ opacity: dimmed ? 0.4 : 1 }}
+      sx={{ alignItems: 'center', opacity: dimmed ? 0.4 : 1 }}
     >
       <IconButton
         size="small"

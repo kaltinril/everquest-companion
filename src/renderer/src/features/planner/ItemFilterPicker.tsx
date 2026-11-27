@@ -38,10 +38,9 @@ function HitRow({ hit, onPick }: { hit: PlannerItemHit; onPick: (h: PlannerItemH
     <Stack
       direction="row"
       spacing={1}
-      alignItems="center"
       data-testid="planner-item-hit"
       onClick={() => onPick(hit)}
-      sx={{ px: 1, py: 0.5, cursor: 'pointer', flexWrap: 'nowrap', '&:hover': { bgcolor: 'action.hover' } }}
+      sx={{ alignItems: 'center', px: 1, py: 0.5, cursor: 'pointer', flexWrap: 'nowrap', '&:hover': { bgcolor: 'action.hover' } }}
     >
       {hit.iconId !== undefined && (
         <Box
@@ -116,9 +115,9 @@ export default function ItemFilterPicker({ anchor, onClose, onPick }: ItemFilter
           <HitRow key={hit.key} hit={hit} onPick={onPick} />
         ))}
         {usable.length === 0 && (
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ p: 1.5 }}>
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center', p: 1.5 }}>
             {loading && <CircularProgress size={14} />}
-            <Typography variant="caption" color="text.secondary" data-testid="planner-item-empty">
+            <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="planner-item-empty">
               {emptyLine(text, loading, hits.length)}
             </Typography>
           </Stack>

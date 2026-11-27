@@ -53,7 +53,7 @@ function LevelZone({ k }: { k?: MobKnowledge }): JSX.Element | null {
   // Falsiness, not nullishness: an empty string from the page says nothing.
   if (!k?.levelText && !k?.zone) return null
   return (
-    <Typography variant="caption" color="text.secondary" noWrap>
+    <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>
       {k.levelText && `level ${k.levelText}`}
       {k.levelText && k.zone && ' · '}
       {k.zone}
@@ -66,7 +66,7 @@ function DropsEmpty({ state }: { state: CurrentMobState }): JSX.Element {
   const { knowledge, loading } = state
   if (loading && !knowledge) {
     return (
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ color: 'text.secondary' }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', color: 'text.secondary' }}>
         <CircularProgress size={13} thickness={5} />
         <Typography variant="caption">Looking up this mob…</Typography>
       </Stack>
@@ -82,7 +82,7 @@ function DropsEmpty({ state }: { state: CurrentMobState }): JSX.Element {
 function DropLine({ drop, seen }: { drop: MobDrop; seen?: { count: number } }): JSX.Element {
   return (
     <KnownItemTooltip name={drop.item}>
-      <Stack direction="row" spacing={1} alignItems="baseline" sx={{ py: 0.15, minWidth: 0 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', py: 0.15, minWidth: 0 }}>
         <Typography variant="caption" noWrap sx={{ minWidth: 0 }}>
           {drop.item}
         </Typography>
@@ -184,9 +184,9 @@ export function CurrentMobCard({ state, onOpenMob }: CurrentMobCardProps): JSX.E
         </QuietNote>
       ) : (
         <>
-          <Stack direction="row" spacing={0.75} alignItems="baseline" flexWrap="wrap" useFlexGap sx={{ minWidth: 0 }}>
+          <Stack direction="row" spacing={0.75} useFlexGap sx={{ alignItems: 'baseline', flexWrap: 'wrap', minWidth: 0 }}>
             {!live && (
-              <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', flexShrink: 0 }}>
                 Last target -
               </Typography>
             )}
@@ -217,7 +217,7 @@ export function CurrentMobCard({ state, onOpenMob }: CurrentMobCardProps): JSX.E
             {live && <Chip size="small" color="primary" label="live" sx={{ height: 20 }} />}
           </Stack>
           <LevelZone k={knowledge} />
-          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.75, mb: 0.25 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', mt: 0.75, mb: 0.25 }}>
             Drops
           </Typography>
           <DropList state={state} onOpen={open} />

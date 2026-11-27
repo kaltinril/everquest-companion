@@ -71,7 +71,7 @@ function RailGroupBlock({ group, ...row }: RowProps & { group: RailGroup }): JSX
         onClick={() => setOpen(!open)}
         sx={GROUP_HEADING_SX}
       >
-        <Typography color="text.secondary" sx={GROUP_HEADING_TEXT_SX}>
+        <Typography sx={{ color: 'text.secondary', ...GROUP_HEADING_TEXT_SX }}>
           {group.heading}
         </Typography>
         <Box sx={{ ml: 'auto', display: 'flex', color: 'text.secondary' }}>

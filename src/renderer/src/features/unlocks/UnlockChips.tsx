@@ -39,9 +39,9 @@ export default function UnlockChips({
   const open = useUnlockLink()
   if (paths.length === 0) return null
   return (
-    <Stack direction="row" spacing={0.5} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
       {lead !== '' && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {lead}
         </Typography>
       )}

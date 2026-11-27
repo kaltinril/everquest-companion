@@ -116,7 +116,7 @@ export function ConCardSetting(): JSX.Element {
           }
           label={<Typography variant="body2">Show a mob card when you con</Typography>}
         />
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {state.open
             ? 'Con a creature and a card appears over the game with its level and what your logs know about its resists. Click it to open that creature in the app - its drops, your kills and the full resist table. The next con replaces it, and it closes on its own x.'
             : 'Off. Conning a creature does nothing over the game - the mobs you con are still listed on the Overview.'}
@@ -124,7 +124,7 @@ export function ConCardSetting(): JSX.Element {
         {/* JOS-405. Two 1.4.0 reports about this card said the text was too small and that the
             text size options did not affect it - and this card's own Preferences entry is where
             they looked. One sentence, state not process, pointing at the control that moves it. */}
-        <Typography variant="caption" color="text.secondary" data-testid="pref-con-card-text-size-note">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="pref-con-card-text-size-note">
           Its text size and transparency are Appearance → Overlays.
         </Typography>
       </Stack>
@@ -142,7 +142,7 @@ export function ConCardSetting(): JSX.Element {
           }
           label={<Typography variant="body2">Move it</Typography>}
         />
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {state.locked
             ? 'The card sits where you left it and clicks pass straight through to the game.'
             : 'The card area is showing its outline - drag it anywhere, and size its text with A- / A+ on the frame. Turn this off (or press Done) when it sits where you want it.'}
@@ -150,7 +150,7 @@ export function ConCardSetting(): JSX.Element {
       </Stack>
 
       <Stack sx={{ minWidth: 200, maxWidth: 260 }}>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           A card stays for
         </Typography>
         <Select

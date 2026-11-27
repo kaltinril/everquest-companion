@@ -61,7 +61,7 @@ function DropsLine({ ingredient }: { ingredient: BookIngredient }): JSX.Element 
   }, [ingredient, index, eraOnly, met])
   if (drops.shown.length === 0) return null
   return (
-    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-material-drops">
+    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-material-drops">
       Drops:{' '}
       {drops.shown.map((source, i) => (
         <Box key={`${source.mobPage ?? ''}:${source.mob}`} component="span">
@@ -86,7 +86,7 @@ function ForageLine({ ingredient }: { ingredient: BookIngredient }): JSX.Element
   const zones = material?.foraged ?? []
   if (zones.length === 0 && material?.foragedNote === undefined) return null
   return (
-    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-material-forage">
+    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-material-forage">
       Forage: <ZoneList zones={zones} />
       {zones.length > 0 && material?.foragedNote !== undefined && ', '}
       {material?.foragedNote}
@@ -132,7 +132,7 @@ export function WhereCell({ ingredient, own }: { ingredient: BookIngredient; own
 /** A recipe that makes the material but lists nothing to open: one line, with its wiki page. */
 function BareRecipeLine({ recipe }: { recipe: BookRecipe }): JSX.Element {
   return (
-    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-material-bare">
+    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-material-bare">
       {bareRecipeText(recipe)} <WikiPageLink recipe={recipe} />
     </Typography>
   )
@@ -143,7 +143,7 @@ function GuideTail({ line }: { line: GuideMaterialLine | undefined }): JSX.Eleme
   const tail = line === undefined ? '' : guideMaterialTail(line)
   if (tail === '') return null
   return (
-    <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5, flexShrink: 0 }}>
+    <Typography variant="caption" sx={{ color: 'text.secondary', ml: 0.5, flexShrink: 0 }}>
       {tail}
     </Typography>
   )
@@ -281,7 +281,7 @@ function MaterialList({ recipe, trail, heads }: MaterialListProps): JSX.Element 
 function SubRecipe({ recipe, trail }: { recipe: BookRecipe; trail: readonly string[] }): JSX.Element {
   return (
     <Box data-testid="tradeskill-subrecipe">
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', pl: `${String((trail.length - 1) * DEPTH_INDENT + OPEN_COL)}px` }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', pl: `${String((trail.length - 1) * DEPTH_INDENT + OPEN_COL)}px` }}>
         Made with: {recipeFacts(recipe, true)}
       </Typography>
       <MaterialList recipe={recipe} trail={trail} />
@@ -319,12 +319,12 @@ function PanelFoot({ recipe }: { recipe: BookRecipe }): JSX.Element {
   return (
     <>
       {have !== '' && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.75 }} data-testid="tradeskill-have-date">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.75 }} data-testid="tradeskill-have-date">
           {have}
         </Typography>
       )}
       {credited && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.25 }} data-testid="tradeskill-guide-credit">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }} data-testid="tradeskill-guide-credit">
           {recipeGuideCreditText()}
         </Typography>
       )}
@@ -378,22 +378,22 @@ export function RecipePanel({ recipe, state, facts, unlisted }: RecipePanelProps
   return (
     <FactsProvider value={facts}>
       <Paper variant="outlined" sx={{ p: 1.5, maxHeight: '40vh', overflow: 'auto', flexShrink: 0 }} data-testid="tradeskill-picked">
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5, mb: 0.5 }}>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 0.5, mb: 0.5 }}>
           <ItemLabel name={recipe.item} bold />
           {state !== null && <StateChip state={state} />}
           <PickedCanMake recipe={recipe} />
           <NoticeChip row={recipeHistory(facts.craft, recipe)} />
           <EraChip subject={recipe} />
-          <Typography variant="body2" color="text.secondary" data-testid="tradeskill-picked-facts">
+          <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="tradeskill-picked-facts">
             {recipeFacts(recipe, false)}
           </Typography>
           {unlisted != null && (
-            <Typography variant="caption" color="text.secondary" data-testid="tradeskill-picked-unlisted">
+            <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="tradeskill-picked-unlisted">
               {unlisted}
             </Typography>
           )}
           {/* The two doors out of the panel sit together at its right edge: plan it, wish for it. */}
-          <Stack direction="row" spacing={0.5} alignItems="center" sx={{ ml: 'auto', minWidth: 0 }}>
+          <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', ml: 'auto', minWidth: 0 }}>
             <PlanThis recipe={recipe} />
             <RecipeWish recipe={recipe} testId="tradeskill-wish" />
           </Stack>

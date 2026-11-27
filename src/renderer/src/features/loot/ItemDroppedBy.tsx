@@ -25,10 +25,10 @@ export interface LootTally {
    the item. */
 export function ObservedHead({ title, hint }: { title: string; hint?: string }): JSX.Element {
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mb: 0.5 }}>
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', mb: 0.5 }}>
       <Typography variant="subtitle2">{title}</Typography>
       {hint !== undefined && (
-        <Typography component="span" variant="caption" color="text.secondary">
+        <Typography component="span" variant="caption" sx={{ color: 'text.secondary' }}>
           {hint}
         </Typography>
       )}
@@ -51,11 +51,11 @@ function Bar({
   const pct = max > 0 ? (value / max) * 100 : 0
   return (
     <Box sx={{ mb: 0.75 }}>
-      <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
+      <Stack direction="row" sx={{ justifyContent: 'space-between', mb: 0.25 }}>
         <Typography variant="caption" noWrap sx={{ maxWidth: 220 }}>
           {label}
         </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {right}
         </Typography>
       </Stack>

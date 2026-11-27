@@ -63,7 +63,7 @@ export function ResistEvidenceSetting(): JSX.Element {
         }
         label={<Typography variant="body2">Count pets and other creatures as evidence</Typography>}
       />
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {prefs.includeNpcCasters
           ? 'A charmed pet or another creature casting on a mob counts toward that mob’s resist numbers, alongside what you and other players cast.'
           : 'Only spells cast by people count toward a mob’s resist numbers. What pets and other creatures cast is still listed as evidence on the mob page, and no number is worked out from it.'}

@@ -175,10 +175,8 @@ function CatalogueNote({ text, testid }: { text: string; testid: string }): JSX.
   return (
     <Typography
       variant="caption"
-      color="text.disabled"
-      display="block"
       data-testid={testid}
-      sx={{ fontSize: 9.5, mt: 0.25 }}
+      sx={{ color: 'text.disabled', display: 'block', fontSize: 9.5, mt: 0.25 }}
     >
       {text}
     </Typography>
@@ -307,14 +305,14 @@ export function BestSpellsCatalogue({
                       page as one found by name, and this file neither knows a router exists nor
                       decides per-surface whether a name is a link. */}
                   <SpellTooltip name={row.name}>
-                    <Typography variant="caption" display="block" sx={{ fontSize: 10.5 }}>
+                    <Typography variant="caption" sx={{ display: 'block', fontSize: 10.5 }}>
                       {row.name}
                     </Typography>
                   </SpellTooltip>
                   {/* THE TWO WORDS THE GAME PRINTS, in the slot the era verdict and the class levels
                       already share — see the header for the measurement that keeps them off the
                       column axis. */}
-                  <Stack direction="row" spacing={0.5} alignItems="baseline" flexWrap="wrap" useFlexGap>
+                  <Stack direction="row" spacing={0.5} sx={{ alignItems: 'baseline', flexWrap: 'wrap' }} useFlexGap>
                     <TypeChips row={row} />
                     <CatalogueClassChips row={row} />
                   </Stack>

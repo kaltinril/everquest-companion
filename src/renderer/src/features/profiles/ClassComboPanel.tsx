@@ -44,7 +44,7 @@ function FuzzyMark({ interval }: { interval: ComboInterval }): JSX.Element | nul
   if (!text) return null
   return (
     <Tooltip title={text}>
-      <Typography component="span" variant="caption" color="warning.main">
+      <Typography component="span" variant="caption" sx={{ color: 'warning.main' }}>
         ~
       </Typography>
     </Tooltip>
@@ -62,7 +62,7 @@ function IntervalRow({
   const levels = levelRangeText(interval)
   return (
     <Paper variant="outlined" sx={{ p: 1, mb: 0.75 }} data-testid="combo-interval-row">
-      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap sx={{ minWidth: 0 }}>
+      <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap', minWidth: 0 }}>
         <SlotChips slots={interval.slots} />
         <Box sx={{ flexGrow: 1 }} />
         <ProvenanceChip interval={interval} />
@@ -79,7 +79,7 @@ function IntervalRow({
           Edit
         </Button>
       </Stack>
-      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.25, display: 'block' }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', mt: 0.25, display: 'block' }}>
         <FuzzyMark interval={interval} /> {spanText(interval)}
         {levels && ` · ${levels}`}
         {interval.evidenceCount > 0 && ` · ${interval.evidenceCount} signals`}
@@ -111,7 +111,7 @@ export function ClassComboSetting(): JSX.Element {
         sx={{ height: LIST_HEIGHT, overflow: 'auto', pr: 0.5 }}
       >
         {newestFirst.length === 0 ? (
-          <Typography variant="caption" color="text.disabled">
+          <Typography variant="caption" sx={{ color: 'text.disabled' }}>
             Nothing recorded yet.
           </Typography>
         ) : (
@@ -120,7 +120,7 @@ export function ClassComboSetting(): JSX.Element {
           ))
         )}
       </Box>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Edit any past range you know better - your correction wins over autodetection until a
         /who row says otherwise, and the panel tells you when one does.
       </Typography>

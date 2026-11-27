@@ -157,7 +157,7 @@ function SeenRow({
   onConfirmSighting?: (rowId: string) => void
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5, minWidth: 0 }}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mt: 0.5, minWidth: 0 }}>
       <Typography variant="caption" data-testid="respawn-seen" sx={{ flex: 1, minWidth: 0, color: 'error.main' }}>
         {respawnSeenLabel(row, nowMs, fmtDuration)}
       </Typography>
@@ -234,10 +234,10 @@ function DurationUnit({ row, onEdit }: { row: RespawnRow; onEdit?: () => void })
     <Stack
       direction="row"
       spacing={0.5}
-      alignItems="center"
       data-testid="respawn-duration"
       data-respawn-overridden={over ? 'true' : 'false'}
       sx={{
+        alignItems: 'center',
         flexShrink: 0,
         pl: 0.75,
         pr: onEdit === undefined ? 0.75 : 0.25,
@@ -318,7 +318,7 @@ function NameAndClock({
   links?: TimerLinks | undefined
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="baseline" sx={{ minWidth: 0 }}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', minWidth: 0 }}>
       <Typography
         variant="body2"
         sx={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
@@ -461,7 +461,7 @@ export function RespawnRowBar({
           }}
         >
             <NameAndClock row={row} nowMs={nowMs} r={r} t={t} onUnwatch={onUnwatch} links={links} />
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.25 }}>
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mt: 0.25 }}>
             <WhereLine zone={row.zone} basis={basis} links={links} />
             <DurationUnit
               row={row}

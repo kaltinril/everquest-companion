@@ -65,7 +65,7 @@ function LevelLine({ band }: { band: ZoneLevelBand | null }): JSX.Element | null
   return (
     <Typography
       variant="caption"
-      color="text.secondary"
+      sx={{ color: 'text.secondary' }}
       data-testid="map-level-band"
       title={`${String(band.n)} catalog mobs, level ${String(band.min)} to ${String(band.max)} outright. The band is the tenth to ninetieth percentile - what the zone is for, rather than what can wander into it.`}
     >
@@ -265,12 +265,12 @@ function LandingRow({
   onOpenItem?: OpenItem
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center" data-testid="map-travel-landing" data-hops={landing.path.length}>
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center' }} data-testid="map-travel-landing" data-hops={landing.path.length}>
       <CasterChip label="WIZ" ports={landing.wizard} />
       <CasterChip label="DRU" ports={landing.druid} />
       {/* Where it lands comes before the items and never shrinks: twelve item names once pushed
           "lands in Misty Thicket" off the card's right edge (owner, 2026-11-17). */}
-      <Typography variant="caption" component="span" color="text.secondary" noWrap sx={{ flexShrink: 0 }} title={walkText(landing)}>
+      <Typography variant="caption" component="span" noWrap sx={{ color: 'text.secondary', flexShrink: 0 }} title={walkText(landing)}>
         <Walk landing={landing} onPick={onPick} />
       </Typography>
       <ItemChip ports={landing.items} onOpenItem={onOpenItem} />
@@ -299,12 +299,12 @@ function TravelBody({
     <Stack spacing={0.5} data-testid="map-travel-body">
       {/* The crossings somebody built, read as arrivals - what the ask called the "boat". */}
       {rides.map((ride) => (
-        <Stack key={`${ride.kind}-${ride.zone}`} direction="row" spacing={0.75} alignItems="center" data-testid="map-travel-ride">
+        <Stack key={`${ride.kind}-${ride.zone}`} direction="row" spacing={0.75} sx={{ alignItems: 'center' }} data-testid="map-travel-ride">
           <Chip size="small" variant="outlined" label={ride.kind === 'translocator' ? 'dock' : 'portal'} sx={TINY} />
           <Typography variant="caption" component="span" sx={{ color: 'text.primary' }}>
             <ZoneLink zone={ride.zone} name={ride.name} onPick={onPick} />
           </Typography>
-          <Typography variant="caption" color="text.secondary" noWrap sx={{ minWidth: 0 }}>
+          <Typography variant="caption" noWrap sx={{ color: 'text.secondary', minWidth: 0 }}>
             {ride.kind === 'translocator' ? 'translocator at the dock' : 'portal from here'}
           </Typography>
         </Stack>
@@ -313,12 +313,12 @@ function TravelBody({
         <LandingRow key={landing.zone} landing={landing} onPick={onPick} onOpenItem={onOpenItem} />
       ))}
       {ready && landings.length === 0 && (
-        <Typography variant="caption" color="text.disabled">
+        <Typography variant="caption" sx={{ color: 'text.disabled' }}>
           {`No port lands within ${String(MAX_HOPS)} zones of here, by the seams the maps label.`}
         </Typography>
       )}
       {landings.length > SHOWN && (
-        <Typography variant="caption" color="text.disabled">
+        <Typography variant="caption" sx={{ color: 'text.disabled' }}>
           {`and ${String(landings.length - SHOWN)} more zones`}
         </Typography>
       )}
@@ -338,7 +338,7 @@ function TravelHead({
 }): JSX.Element {
   const { landings, eraOnly, setEraOnly } = travel
   return (
-    <Stack direction="row" spacing={0.5} alignItems="center">
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
       <IconButton
         size="small"
         data-testid="map-travel-toggle"
@@ -350,7 +350,7 @@ function TravelHead({
       >
         {open ? <ExpandMoreIcon fontSize="small" /> : <ChevronRightIcon fontSize="small" />}
       </IconButton>
-      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
         Closest port
       </Typography>
       {/* ON BY DEFAULT (owner, 2026-09-12): the pack ships every zone the client ever had, and a
@@ -369,7 +369,7 @@ function TravelHead({
         sx={TINY}
       />
       {!open && landings.length > 0 && (
-        <Typography variant="caption" color="text.disabled" noWrap sx={{ minWidth: 0 }}>
+        <Typography variant="caption" noWrap sx={{ color: 'text.disabled', minWidth: 0 }}>
           {`${landings[0].zoneName}${landings.length > 1 ? ` and ${String(landings.length - 1)} more` : ''}`}
         </Typography>
       )}

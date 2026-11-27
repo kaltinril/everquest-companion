@@ -418,13 +418,13 @@ function CountLine({
   columns: readonly GearColumn[]
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="baseline" sx={{ mb: 0.5, flexShrink: 0 }}>
-      <Typography variant="caption" color="text.secondary" data-testid="gear-count">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', mb: 0.5, flexShrink: 0 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="gear-count">
         {counts.shown.toLocaleString()} of {counts.total.toLocaleString()} items
       </Typography>
       {/* WHEN the data is from, never when the index was built — the corpus's own `scrapedAt`. */}
       {scrapedAt !== null && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           · wiki data from {scrapedAt.slice(0, 10)}
         </Typography>
       )}
@@ -716,7 +716,7 @@ export default function GearView({ onOpenLoot, onOpenMob, onOpenMapZone }: GearV
           compare={compare}
         />
         {table.settled && table.rows.length === 0 && (
-          <Typography variant="body2" color="text.secondary" data-testid="gear-empty" sx={{ p: 2 }}>
+          <Typography variant="body2" data-testid="gear-empty" sx={{ color: 'text.secondary', p: 2 }}>
             {emptyText(ready, refused, table)}
           </Typography>
         )}

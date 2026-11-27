@@ -21,7 +21,7 @@ import type { PrefItem } from './PreferencesView'
 /** A labelled row with one stepper on the right, the shape the Overlays card's rows have. */
 function Row({ label, children }: { label: string; children: JSX.Element }): JSX.Element {
   return (
-    <Stack direction="row" alignItems="center" spacing={1}>
+    <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
       <Typography variant="body2" sx={{ flexGrow: 1, minWidth: 0 }} noWrap>
         {label}
       </Typography>
@@ -55,7 +55,7 @@ function NavMenuSetting(): JSX.Element {
           testid="pref-nav-row"
         />
       </Row>
-      <Typography variant="caption" color="text.secondary" data-testid="pref-nav-note">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="pref-nav-note">
         This sizes the left menu only; In-app text size scales it too.
       </Typography>
     </Stack>

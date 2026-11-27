@@ -56,7 +56,7 @@ export default function SettingsRecoveryNotice(): JSX.Element | null {
         sx={{ alignItems: 'flex-start', maxWidth: 520, maxHeight: 'calc(100vh - 72px)', overflowY: 'auto' }}
       >
         <AlertTitle>{notice.title}</AlertTitle>
-        <Stack spacing={1} alignItems="flex-start">
+        <Stack spacing={1} sx={{ alignItems: 'flex-start' }}>
           <span data-testid="settings-recovery-notice-text" style={{ overflowWrap: 'anywhere' }}>
             {notice.text}
           </span>

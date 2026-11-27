@@ -47,7 +47,7 @@ function HeroCard({
         </Typography>
         <Typography variant="body2">{label}</Typography>
         {sub && (
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             {sub}
           </Typography>
         )}
@@ -85,7 +85,7 @@ export function LevelingHeroes({
   boughtCount
 }: LevelingHeroesProps): JSX.Element {
   return (
-    <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap' }} useFlexGap>
       <HeroCard
         icon={<MilitaryTechIcon fontSize="large" />}
         value={currentLevel != null ? String(currentLevel) : '-'}

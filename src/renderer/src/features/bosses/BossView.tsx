@@ -126,7 +126,7 @@ function BossToolbar({
   tally: string
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
       <ToggleButtonGroup
         data-testid="boss-mode"
         size="small"
@@ -198,7 +198,7 @@ function BossToolbar({
         <ToggleButton value="comfortable">Comfortable</ToggleButton>
       </ToggleButtonGroup>
       <Box sx={{ flexGrow: 1 }} />
-      <Typography data-testid="boss-tally" variant="body2" color="text.secondary">
+      <Typography data-testid="boss-tally" variant="body2" sx={{ color: 'text.secondary' }}>
         {tally}
       </Typography>
     </Stack>

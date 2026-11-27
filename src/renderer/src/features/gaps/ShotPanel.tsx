@@ -53,7 +53,7 @@ function Parts({ name, kept }: { name: string; kept: StoredShot | undefined }): 
   const windowIn = hasWindowPart(kept)
   const loreIn = kept?.lore !== undefined
   return (
-    <Stack direction="row" spacing={1} alignItems="center" data-testid="gaps-shot-parts">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} data-testid="gaps-shot-parts">
       {windowIn && kept !== undefined ? (
         <Chip size="small" color="success" label="Item window ✓" onDelete={() => keep(name, cleared(kept, 'window'))} title="Clear image data" data-testid="gaps-shot-clear-window" />
       ) : (
@@ -75,7 +75,7 @@ function IconPicker({ name, kept, matches }: { name: string; kept: StoredShot; m
   const ids = matches.length > 0 ? matches : (kept.iconChoices ?? (kept.iconId === undefined ? [] : [kept.iconId]))
   if (ids.length === 0) return null
   return (
-    <Stack direction="row" spacing={0.5} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
       <Line>Icon (lucy_img_ID), best match first; click to choose:</Line>
       {ids.slice(0, shown).map((id) => (
         <IconChoice key={id} id={id} picked={kept.iconId === id} onPick={() => keep(name, { ...kept, iconId: id })} />
@@ -118,7 +118,7 @@ function TierChoice({ name, kept }: { name: string; kept: StoredShot }): JSX.Ele
   if (tier === undefined || tier === 0) return null
   const atBase = (statsblock: string | undefined): void => keep(name, { ...kept, statsblock, tier: undefined, baseStatsblock: undefined })
   return (
-    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap data-testid="gaps-shot-tier">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap data-testid="gaps-shot-tier">
       <Line warn>+{tier}: Copy wiki page leaves the stats out until they are the +0 item's.</Line>
       {baseStatsblock !== undefined && (
         <Button size="small" onClick={() => atBase(baseStatsblock)} data-testid="gaps-shot-estimate">
@@ -246,7 +246,7 @@ function ItemShot({ row }: { row: GapRow }): JSX.Element {
     <Stack spacing={0.75} data-testid="gaps-shot">
       <PasteZone label="Click here and paste an image to read it" busy={busy} onPicture={read} />
       {failed !== null && (
-        <Typography variant="body2" color="error.main" data-testid="gaps-shot-error">
+        <Typography variant="body2" sx={{ color: 'error.main' }} data-testid="gaps-shot-error">
           ERROR: unable to read image. {failed}
         </Typography>
       )}

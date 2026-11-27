@@ -61,7 +61,7 @@ function Step(props: { n: number; title: string; children: ReactNode }): JSX.Ele
 /** Step 1: what to do on the wiki, in the order its pages ask. */
 function MakeBotPassword(): JSX.Element {
   return (
-    <Typography variant="caption" color="text.secondary" component="div">
+    <Typography variant="caption" sx={{ color: 'text.secondary' }} component="div">
       Sign in to the wiki, open{' '}
       <Link href={BOT_PASSWORDS_URL} {...ext}>
         Special:BotPasswords
@@ -137,7 +137,7 @@ function SignInFields(props: { st: DropObsStatus; run: Run; onDone?: () => void 
         )}
       </Stack>
       {!st.encryptionAvailable && (
-        <Typography variant="caption" color="warning.main">
+        <Typography variant="caption" sx={{ color: 'warning.main' }}>
           This computer cannot encrypt a saved password, so the sign-in cannot be saved.
         </Typography>
       )}
@@ -158,7 +158,7 @@ function StatusBox(props: { st: DropObsStatus; run: Run }): JSX.Element {
         {view.headline}
       </Typography>
       {view.detail !== null && (
-        <Typography variant="caption" color="text.secondary" display="block">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
           {view.detail}
         </Typography>
       )}
@@ -175,13 +175,13 @@ function StatusBox(props: { st: DropObsStatus; run: Run }): JSX.Element {
           <Collapse in={showKept} unmountOnExit>
             <Box component="ul" sx={{ m: 0, mt: 0.5, pl: 2.5, maxHeight: 180, overflowY: 'auto' }}>
               {st.keptItems.map((k, i) => (
-                <Typography component="li" variant="caption" color="text.secondary" key={`${k.observedAt}-${String(i)}`}>
+                <Typography component="li" variant="caption" sx={{ color: 'text.secondary' }} key={`${k.observedAt}-${String(i)}`}>
                   {k.item} from {k.npc}, {new Date(k.observedAt).toLocaleString()}: {keptReason(k.code)}
                 </Typography>
               ))}
             </Box>
             {st.kept > st.keptItems.length && (
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                 Showing the newest {fmtCount(st.keptItems.length)}.
               </Typography>
             )}
@@ -218,7 +218,7 @@ function ModeChoice(props: { st: DropObsStatus; run: Run; locked: boolean }): JS
             label={
               <Box>
                 <Typography variant="body2">{m.label}</Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                   {m.hint}
                 </Typography>
               </Box>
@@ -227,7 +227,7 @@ function ModeChoice(props: { st: DropObsStatus; run: Run; locked: boolean }): JS
         ))}
       </RadioGroup>
       {locked && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Sign in above first.
         </Typography>
       )}
@@ -284,7 +284,7 @@ export function DropObsSetting(): JSX.Element {
   const signedIn = stage === 'signed-in'
   return (
     <Stack spacing={1.5} data-testid="pref-drop-obs">
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Sends the loot you take off corpses (zone, corpse, item, count, time) to the wiki, so its loot lists show real drop
         rates. No character name, chat or log lines are sent. Loot already in your log is sent too, newest first. See the
         results on the wiki&apos;s{' '}
@@ -311,7 +311,7 @@ export function DropObsSetting(): JSX.Element {
           <Typography variant="body2">
             Signed in as <b>{st.signedInAs}</b>
           </Typography>
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             ({st.username})
           </Typography>
           <Button size="small" onClick={() => setEditing(true)}>

@@ -94,7 +94,7 @@ export function Planner({ index, eraOnly, plan, setPlan, back, onOpenBench, rest
   }
   return (
     <Stack spacing={1} sx={{ flexGrow: 1, minHeight: 0 }} data-testid="tradeskill-planner">
-      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5, flexShrink: 0 }}>
+      <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 0.5, flexShrink: 0 }}>
         <Button size="small" startIcon={<ArrowBackIcon />} onClick={back.go} data-testid="tradeskill-plan-back">
           {back.label}
         </Button>
@@ -132,7 +132,7 @@ export function PlannerHomePanel({ index, eraOnly, plan, onPlan }: PlannerHomePa
   const last = plan.item === null ? null : pickRecipe(itemRecipes(deps, plan.item), plan.recipe)
   return (
     <Paper variant="outlined" sx={{ px: 1.5, py: 1, mb: 1.5 }} data-testid="tradeskill-plan-home">
-      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
+      <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 0.5 }}>
         <Tooltip title={PLAN_HOME_TIP}>
           <Typography variant="subtitle1" sx={{ fontWeight: 600, flexShrink: 0 }}>
             Make an item
@@ -140,8 +140,8 @@ export function PlannerHomePanel({ index, eraOnly, plan, onPlan }: PlannerHomePa
         </Tooltip>
         <PlanSearchBox query={query} onQuery={setQuery} state={search} />
         {!search.typed && last !== null && (
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0 }} data-testid="tradeskill-plan-continue">
-            <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center', minWidth: 0 }} data-testid="tradeskill-plan-continue">
+            <Typography variant="caption" sx={{ color: 'text.secondary', flexShrink: 0 }}>
               Your plan:
             </Typography>
             {/* The name opens the plan: its item page is one click further, on the plan's own head. */}

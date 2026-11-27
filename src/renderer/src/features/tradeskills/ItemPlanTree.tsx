@@ -38,7 +38,7 @@ function NodeName({ node }: { node: PlanNode }): JSX.Element {
     <Box sx={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
       {node.linked ? <ItemLabel name={node.name} /> : <Typography variant="body2">{node.name}</Typography>}
       {tail !== '' && (
-        <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5, flexShrink: 0 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', ml: 0.5, flexShrink: 0 }}>
           {tail}
         </Typography>
       )}
@@ -54,7 +54,7 @@ function LeafWhere({ node }: { node: PlanNode }): JSX.Element {
       {node.linked && <WhereCell ingredient={node.ingredient} own={node.guide ?? undefined} />}
       {!node.linked && node.guide !== null && <GuideSourceLine source={node.guide.source} />}
       {why !== '' && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-plan-closed">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-plan-closed">
           {why}
         </Typography>
       )}
@@ -67,7 +67,7 @@ function MadeWhere({ node }: { node: PlanNode }): JSX.Element {
   return (
     <Box sx={{ minWidth: 0 }}>
       {node.bought && <WhereCell ingredient={node.ingredient} own={node.guide ?? undefined} />}
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', minWidth: 0 }} data-testid="tradeskill-plan-made-with">
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', minWidth: 0 }} data-testid="tradeskill-plan-made-with">
         {madeWithText(node)}
       </Typography>
     </Box>

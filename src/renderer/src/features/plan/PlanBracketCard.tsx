@@ -125,7 +125,7 @@ export default function PlanBracketCard({ bracket, onAdd, compare, onOpenLoot, o
       data-from={String(bracket.from)}
       sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 1.5, mb: 1.5 }}
     >
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'nowrap', minWidth: 0 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'nowrap', minWidth: 0 }}>
         <Typography variant="subtitle2" sx={{ flexShrink: 0 }}>
           {/* One level is one number: at the cap the bracket is the character's own level. */}
           {bracket.from === bracket.to ? bracket.from : `${String(bracket.from)}-${String(bracket.to)}`}
@@ -135,7 +135,7 @@ export default function PlanBracketCard({ bracket, onAdd, compare, onOpenLoot, o
             <ZoneChip key={pick.zone} pick={pick} onOpenMapZone={onOpenMapZone} />
           ))}
           {bracket.expZones.length === 0 && (
-            <Typography variant="caption" color="text.secondary" noWrap>
+            <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>
               no exp zone at these levels
             </Typography>
           )}
@@ -181,7 +181,7 @@ export default function PlanBracketCard({ bracket, onAdd, compare, onOpenLoot, o
       </Box>
       {/* STATE, NOT PROCESS: the one fact — nothing here beats what you wear — and no advice. */}
       {bracket.runs.length === 0 && (
-        <Typography variant="caption" color="text.secondary" data-testid="plan-no-targets" sx={{ display: 'block', mt: 0.5 }}>
+        <Typography variant="caption" data-testid="plan-no-targets" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
           Nothing here beats what you are wearing.
         </Typography>
       )}

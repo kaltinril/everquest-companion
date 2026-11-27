@@ -96,7 +96,7 @@ function AlertPreviewRow({
         onChange={onToggle}
       />
       <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-        <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap">
+        <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
             {item.finalName}
           </Typography>
@@ -114,13 +114,12 @@ function AlertPreviewRow({
         </Stack>
         <Typography
           variant="caption"
-          color="text.secondary"
-          sx={{ fontFamily: 'monospace', wordBreak: 'break-all', display: 'block' }}
+          sx={{ color: 'text.secondary', fontFamily: 'monospace', wordBreak: 'break-all', display: 'block' }}
         >
           {describeTrigger(item.incoming.trigger)} · {item.incoming.sound.packId}/
           {item.incoming.sound.soundId}
         </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {item.reason}
         </Typography>
       </Box>
@@ -143,7 +142,7 @@ function AlertsSection({
   const alreadyHave = alerts.length - importable
   return (
     <Box>
-      <Typography variant="overline" color="text.secondary">
+      <Typography variant="overline" sx={{ color: 'text.secondary' }}>
         Alerts - {importable} to add
         {alreadyHave > 0 ? `, ${alreadyHave} you already have` : ''}
       </Typography>
@@ -175,7 +174,7 @@ function ScalarsSection({
   return (
     <Box>
       <Divider sx={{ mb: 1 }} />
-      <Typography variant="overline" color="text.secondary">
+      <Typography variant="overline" sx={{ color: 'text.secondary' }}>
         Settings - these REPLACE your value, so they&apos;re opt-in
       </Typography>
       <Stack spacing={0.25} sx={{ maxHeight: 200, overflow: 'auto', mt: 0.5 }}>
@@ -201,8 +200,7 @@ function ScalarsSection({
                 </Typography>
                 <Typography
                   variant="caption"
-                  color="text.secondary"
-                  sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}
+                  sx={{ color: 'text.secondary', fontFamily: 'monospace', wordBreak: 'break-all' }}
                 >
                   {s.current || '-'} → {s.incoming}
                 </Typography>
@@ -218,7 +216,7 @@ function ScalarsSection({
 /** Provenance line: what kind of payload this is and where it came from. */
 function PreviewMeta({ preview }: { preview: SharePreview }): JSX.Element {
   return (
-    <Typography variant="caption" color="text.secondary">
+    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
       {preview.kind === 'alerts' ? 'Alert set' : 'Settings bundle'}
       {preview.appVersion ? ` · made with v${preview.appVersion}` : ''}
       {preview.createdAt ? ` · ${formatDateTime(Date.parse(preview.createdAt))}` : ''}
@@ -406,7 +404,7 @@ export default function ShareImportDialog(props: ShareImportDialogProps): JSX.El
               htmlInput: { style: { fontFamily: 'monospace', fontSize: 12, wordBreak: 'break-all' } }
             }}
           />
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <Button
               size="small"
               variant="contained"

@@ -117,7 +117,7 @@ function SurvivabilitySlider(props: Pick<PicksProps, 'role' | 'survivability' | 
   if (!readsSurvivability(props.role)) return null
   return (
     <Box title={SURVIVABILITY_HINT} sx={{ width: 170, flexShrink: 0, px: 1 }}>
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1.2, whiteSpace: 'nowrap' }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1.2, whiteSpace: 'nowrap' }}>
         Glass cannon · Wooden sword
       </Typography>
       <Slider
@@ -197,10 +197,9 @@ function LevelChip({ stated }: { stated: StatedLevel }): JSX.Element | null {
   return (
     <Typography
       variant="body2"
-      color="text.secondary"
       data-testid="plan-level"
       title={stated.title}
-      sx={{ flexShrink: 0 }}
+      sx={{ color: 'text.secondary', flexShrink: 0 }}
     >
       Level {stated.level}
       {stated.cue === '' ? '' : ` · ${stated.cue}`}
@@ -222,8 +221,7 @@ function PlanHeader(props: HeaderProps): JSX.Element {
     <Stack
       direction="row"
       spacing={1}
-      alignItems="center"
-      sx={{ flexWrap: 'nowrap', minWidth: 0, mb: 1, flexShrink: 0 }}
+      sx={{ alignItems: 'center', flexWrap: 'nowrap', minWidth: 0, mb: 1, flexShrink: 0 }}
     >
       <PlanPickers
         role={props.role}
@@ -383,9 +381,8 @@ export default function PlanView({ onOpenLoot, onOpenMapZone, onOpenMob }: PlanV
           classes can actually use (the class gate, in the player's words). `planBlurb.ts`. */}
       <Typography
         variant="body2"
-        color="text.secondary"
         data-testid="plan-blurb"
-        sx={{ mb: 1, px: 0.5, flexShrink: 0 }}
+        sx={{ color: 'text.secondary', mb: 1, px: 0.5, flexShrink: 0 }}
       >
         {planBlurb(role, classes.classes)}
       </Typography>
@@ -397,9 +394,8 @@ export default function PlanView({ onOpenLoot, onOpenMapZone, onOpenMob }: PlanV
       {ownedUps.length > 0 && (
         <Typography
           variant="body2"
-          color="warning.main"
           data-testid="plan-owned-upgrades"
-          sx={{ mb: 1, px: 0.5, flexShrink: 0 }}
+          sx={{ color: 'warning.main', mb: 1, px: 0.5, flexShrink: 0 }}
         >
           You already own upgrades - equip:{' '}
           {ownedUps.slice(0, 5).map((u, i) => (
@@ -427,7 +423,7 @@ export default function PlanView({ onOpenLoot, onOpenMapZone, onOpenMob }: PlanV
           />
         ))}
         {route.length === 0 && (
-          <Typography variant="body2" color="text.secondary" data-testid="plan-empty" sx={{ p: 2 }}>
+          <Typography variant="body2" data-testid="plan-empty" sx={{ color: 'text.secondary', p: 2 }}>
             {emptyText(stated.level, ready)}
           </Typography>
         )}

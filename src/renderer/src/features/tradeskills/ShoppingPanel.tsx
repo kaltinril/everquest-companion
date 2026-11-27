@@ -64,7 +64,7 @@ function FoundLine({ where }: { where: Extract<ShoppingWhere, { kind: 'found' }>
   return (
     <>
       {drops.shown.length > 0 && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-shopping-drops">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-shopping-drops">
           Drops:{' '}
           {drops.shown.map((source, i) => (
             <Box key={`${source.mobPage ?? ''}:${source.mob}`} component="span">
@@ -83,7 +83,7 @@ function FoundLine({ where }: { where: Extract<ShoppingWhere, { kind: 'found' }>
         </Typography>
       )}
       {(forage.length > 0 || forageNote !== undefined) && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-shopping-forage">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-shopping-forage">
           Forage: <ZoneList zones={forage} />
           {forage.length > 0 && forageNote !== undefined && ', '}
           {forageNote}
@@ -100,7 +100,7 @@ function WhereCell({ line }: { line: ShoppingLine }): JSX.Element {
   if (where.kind === 'guide') return <GuideSourceLine source={where.source} />
   if (where.kind === 'found') return <FoundLine where={where} />
   return (
-    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-shopping-where">
+    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-shopping-where">
       {whereText(where)}
     </Typography>
   )
@@ -114,7 +114,7 @@ function LineRow({ line }: { line: ShoppingLine }): JSX.Element {
         {/* A name the reader goes to buy is never cut: it wraps inside its column. */}
         {line.linked ? <ItemLabel name={line.name} wrap /> : <Typography variant="body2">{line.name}</Typography>}
         {into !== '' && (
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
             {into}
           </Typography>
         )}
@@ -122,7 +122,7 @@ function LineRow({ line }: { line: ShoppingLine }): JSX.Element {
       <Typography variant="body2" align="right" data-testid="tradeskill-shopping-need">
         {line.need}
       </Typography>
-      <Typography variant="body2" align="right" color={line.short === 0 ? 'success.main' : 'text.secondary'} data-testid="tradeskill-shopping-have">
+      <Typography variant="body2" align="right" sx={{ color: line.short === 0 ? 'success.main' : 'text.secondary' }} data-testid="tradeskill-shopping-have">
         {line.have ?? ''}
       </Typography>
       <Typography variant="body2" align="right" sx={{ fontWeight: line.short > 0 ? 700 : 400 }} data-testid="tradeskill-shopping-buy">
@@ -194,12 +194,12 @@ function CopyList({ list }: { list: ShoppingList }): JSX.Element {
     })
   }, [list])
   return (
-    <Stack direction="row" spacing={1} alignItems="center">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
       <Button size="small" variant="outlined" startIcon={<ContentCopyIcon />} onClick={copy} data-testid="tradeskill-shopping-copy">
         Copy list
       </Button>
       {state !== 'idle' && (
-        <Typography variant="caption" color={state === 'copied' ? 'success.main' : 'warning.main'} role="status" data-testid="tradeskill-shopping-copied" data-state={state}>
+        <Typography variant="caption" sx={{ color: state === 'copied' ? 'success.main' : 'warning.main' }} role="status" data-testid="tradeskill-shopping-copied" data-state={state}>
           {COPY_NOTE[state]}
         </Typography>
       )}
@@ -214,7 +214,7 @@ function HaveFrom(): JSX.Element | null {
   const text = haveFromText(held.dumpedAt === null ? null : formatDate(held.dumpedAt), logCountsInUse(craft, dump))
   if (text === '') return null
   return (
-    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-shopping-have-from">
+    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-shopping-have-from">
       {text}
     </Typography>
   )
@@ -239,13 +239,13 @@ function ListBody({ list }: { list: ShoppingList }): JSX.Element {
         <LineRow key={line.key} line={line} />
       ))}
       {list.recipe.container !== undefined && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }} data-testid="tradeskill-shopping-container">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }} data-testid="tradeskill-shopping-container">
           Combined in: {list.recipe.container}
         </Typography>
       )}
       <HaveFrom />
       {!list.haveKnown && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-shopping-have-unknown">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-shopping-have-unknown">
           {HAVE_UNKNOWN_TEXT}
         </Typography>
       )}
@@ -283,22 +283,22 @@ export function ShoppingPanel({ step, facts, eraOnly }: ShoppingPanelProps): JSX
   const none = noListText(step)
   return (
     <Paper variant="outlined" sx={{ p: 1.5, minHeight: 0, overflow: { xs: 'visible', lg: 'auto' }, overscrollBehavior: 'contain' }} data-testid="tradeskill-shopping">
-      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.75, mb: 0.75 }}>
+      <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 0.75, mb: 0.75 }}>
         <Typography variant="subtitle2">Shopping list for the next step</Typography>
         <Box sx={{ flexGrow: 1 }} />
         {list !== null && list.lines.length > 0 && <CombinesField combines={combines} onCombines={setCombines} />}
         {list !== null && list.lines.length > 0 && <CopyList list={list} />}
       </Stack>
       {step !== null && (
-        <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0, mb: 0.5 }} data-testid="tradeskill-shopping-for">
+        <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', minWidth: 0, mb: 0.5 }} data-testid="tradeskill-shopping-for">
           {step.linked ? <ItemLabel name={step.name} bold wrap /> : <Typography variant="body2">{step.name}</Typography>}
-          <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', flexShrink: 0 }}>
             {[step.range, containerText(step.recipe)].filter((part) => part !== '').join(' · ')}
           </Typography>
         </Stack>
       )}
       {none !== null && (
-        <Typography variant="body2" color="text.secondary" sx={{ py: 2 }} data-testid="tradeskill-shopping-none">
+        <Typography variant="body2" sx={{ color: 'text.secondary', py: 2 }} data-testid="tradeskill-shopping-none">
           {none}
         </Typography>
       )}

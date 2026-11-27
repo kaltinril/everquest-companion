@@ -109,7 +109,7 @@ export function DropperCell({ droppers, who, where, onOpenMob }: DropperCellProp
     const stated = (who ?? []).join(', ')
     if (stated === '') return null
     return (
-      <Typography variant="caption" color="text.secondary" data-testid="posky-dropper">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="posky-dropper">
         {island ? `${stated} · ${island}` : stated}
       </Typography>
     )
@@ -120,7 +120,7 @@ export function DropperCell({ droppers, who, where, onOpenMob }: DropperCellProp
   return (
     <Typography
       variant="caption"
-      color="text.secondary"
+      sx={{ color: 'text.secondary' }}
       data-testid="posky-dropper"
       title={dropperRoster(droppers)}
     >
@@ -149,8 +149,7 @@ export function KillTargetCaption({ targets }: { targets: readonly KillTarget[] 
   return (
     <Typography
       variant="caption"
-      color="text.secondary"
-      display="block"
+      sx={{ color: 'text.secondary', display: 'block' }}
       data-testid="posky-kill-target"
       title={targets.map((t) => killTargetFacts(t)).join('\n')}
     >

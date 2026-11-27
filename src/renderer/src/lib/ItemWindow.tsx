@@ -74,7 +74,7 @@ function Row({
   compact?: boolean
 }): JSX.Element {
   return (
-    <Stack direction="row" justifyContent="space-between" spacing={1} sx={{ lineHeight: 1.45 }}>
+    <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between', lineHeight: 1.45 }}>
       {label && (
         <Typography component="span" sx={{ color: EQ_ITEM_COLORS.label, fontSize: compact ? 11 : 12, fontFamily: MONO }}>
           {label}
@@ -134,7 +134,7 @@ function TierBlock({
   const sockets = unlockedExaltationSlots(tier)
   return (
     <Box sx={{ my: 0.75 }}>
-      <Stack direction="row" justifyContent="space-between" alignItems="baseline">
+      <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'baseline' }}>
         <Typography sx={{ color: EQ_ITEM_COLORS.text, fontSize: compact ? 11 : 12, fontFamily: MONO }}>
           Tier {tier}
           <Typography component="span" sx={{ color: EQ_ITEM_COLORS.label, fontSize: 'inherit', fontFamily: MONO }}>
@@ -163,7 +163,7 @@ function TierBlock({
         </Typography>
       )}
       {!compact && (
-        <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap sx={{ mt: 0.6 }}>
+        <Stack direction="row" spacing={0.5} useFlexGap sx={{ flexWrap: 'wrap', mt: 0.6 }}>
           {sockets.map((s) => (
             <Tooltip key={s.type} title={`${s.what} - unlocks at +${s.unlocksAt}`} placement="top">
               <Chip
@@ -243,7 +243,7 @@ function ItemHeader({
   compact?: boolean
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 0.5 }}>
       {iconId !== undefined && (
         <Box
           component="img"

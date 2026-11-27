@@ -105,7 +105,7 @@ function LevelInput({ level, onSet }: { level: number; onSet: (level: number) =>
 function Controls({ prefs, setPrefs, classes, setup }: { prefs: BisPrefs; setPrefs: (p: BisPrefs) => void; classes: GearClasses; setup: TierSetup }): JSX.Element {
   return (
     <Stack spacing={0.5}>
-      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap data-testid="bis-controls">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap data-testid="bis-controls">
         <ChipMultiSelect options={CLASS_ABBRS} value={classes.classes} onChange={classes.set} label="Classes" placeholder="every class" optionLabel={classDisplayName} minWidth={190} testId="bis-classes" />
         {classes.offer !== null && (
           <Chip
@@ -135,7 +135,7 @@ function Controls({ prefs, setPrefs, classes, setup }: { prefs: BisPrefs; setPre
         <Chip size="small" label="Owned only" data-testid="bis-owned" color={prefs.owned ? 'primary' : 'default'} variant={prefs.owned ? 'filled' : 'outlined'} onClick={() => setPrefs({ ...prefs, owned: !prefs.owned })} />
       </Stack>
       {prefs.preset === 'classes' && prefs.list === null && (
-        <Typography variant="caption" color="text.secondary" data-testid="bis-credit">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="bis-credit">
           {GUIDE_CREDIT}
         </Typography>
       )}
@@ -191,15 +191,15 @@ export default function BisView({ onOpenLoot }: BisViewProps = {}): JSX.Element 
   }
 
   if (!ready || refused) {
-    return <Typography color="text.secondary" sx={{ p: 2 }} data-testid="bis-empty">{refused ? 'The item data could not be read, so nothing can be ranked.' : 'Reading the item database…'}</Typography>
+    return <Typography sx={{ color: 'text.secondary', p: 2 }} data-testid="bis-empty">{refused ? 'The item data could not be read, so nothing can be ranked.' : 'Reading the item database…'}</Typography>
   }
   return (
     <Box data-testid="bis-view" sx={{ display: 'flex', flexDirection: 'column', gap: 1, height: '100%', minHeight: 0, overflow: 'auto', pr: 0.5 }}>
       <OutputKindLine kind="inventory" quiet testId="bis-dump-line" />
       <Controls prefs={prefs} setPrefs={setPrefs} classes={classes} setup={setup} />
-      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
         <UpgradeSlider state={upgrade.state} onChange={upgrade.set} testId="bis" />
-        <Typography variant="caption" color="text.secondary">Every item, worn ones too, is scored at this tier, so the comparison is like for like.</Typography>
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>Every item, worn ones too, is scored at this tier, so the comparison is like for like.</Typography>
       </Stack>
       <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 440px) minmax(0, 1fr)' }, alignItems: 'start' }}>
         <TierBoard
@@ -219,11 +219,11 @@ export default function BisView({ onOpenLoot }: BisViewProps = {}): JSX.Element 
           }}
         />
         <Stack spacing={1} sx={{ minWidth: 0 }}>
-          <Typography variant="caption" color="text.secondary" data-testid="bis-summary">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="bis-summary">
             {`${String(sheet.filled)} of ${String(sheet.cells.length)} slots filled · board total ${sheet.total.toFixed(1)} · ${String(activeChips(setup.split).filter((c) => setup.board[c] !== 'Off').length)} stats count`}
           </Typography>
           <BisCells sheet={sheet} worn={worn.cells} model={model} setup={setup} classes={classes.classes} owned={owned} wishes={wishes} plus={plus.full} hasteRoom={hasteRoom} onOpenLoot={onOpenLoot} />
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             Hover a slot to compare its best item with what you wear and see where it drops; click it for the next five. An amber card means the best item is not what you wear. Haste does not stack: a slot is credited only for haste above what your other slots give. Weapon ratios count only in Primary, Secondary and Range, never in an Any slot. A Lore item is placed once; any other item may fill both rings, both ears, both wrists.
           </Typography>
         </Stack>

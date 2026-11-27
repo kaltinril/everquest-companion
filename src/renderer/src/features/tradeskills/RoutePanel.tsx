@@ -104,7 +104,7 @@ interface HeldSwitchProps {
 /** "Only use materials I have": disabled, with the reason beside it, where it cannot apply. */
 function HeldSwitch({ on, onChange, blocked }: HeldSwitchProps): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
       <Tooltip title={HELD_ONLY_TIP}>
         <FormControlLabel
           control={
@@ -122,7 +122,7 @@ function HeldSwitch({ on, onChange, blocked }: HeldSwitchProps): JSX.Element {
         />
       </Tooltip>
       {blocked !== '' && (
-        <Typography variant="caption" color="text.secondary" data-testid="tradeskill-held-only-why">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="tradeskill-held-only-why">
           {blocked}
         </Typography>
       )}
@@ -138,7 +138,7 @@ function Basis({ route }: { route: Route }): JSX.Element {
         {route.basis}
       </Typography>
       {route.caveats.map((caveat) => (
-        <Typography key={caveat} variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-route-caveat">
+        <Typography key={caveat} variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-route-caveat">
           {caveat}
         </Typography>
       ))}
@@ -150,7 +150,7 @@ function Basis({ route }: { route: Route }): JSX.Element {
 function StepLine({ text, id, color }: { text: string; id: string; color?: string }): JSX.Element | null {
   if (text === '') return null
   return (
-    <Typography variant="caption" color={color ?? 'text.secondary'} sx={{ display: 'block' }} data-testid={`tradeskill-route-${id}`}>
+    <Typography variant="caption" sx={{ color: color ?? 'text.secondary', display: 'block' }} data-testid={`tradeskill-route-${id}`}>
       {text}
     </Typography>
   )
@@ -204,10 +204,10 @@ function StepRow({ step, next, onOpenRecipe }: StepRowProps): JSX.Element {
         {next && <Chip size="small" color="primary" label="next step" sx={CHIP_SX} data-testid="tradeskill-route-next" />}
       </Box>
       <Box sx={{ minWidth: 0 }}>
-        <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0 }}>
+        <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', minWidth: 0 }}>
           <StepName step={step} />
           {containerText(recipe) !== '' && (
-            <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }} data-testid="tradeskill-route-container">
+            <Typography variant="caption" sx={{ color: 'text.secondary', flexShrink: 0 }} data-testid="tradeskill-route-container">
               {containerText(recipe)}
             </Typography>
           )}
@@ -258,7 +258,7 @@ function RouteList({ route, tradeskill, onOpenRecipe }: RouteListProps): JSX.Ele
     <Paper variant="outlined" sx={PANE_SX} data-testid="tradeskill-route-list">
       <Typography variant="subtitle2">Your route</Typography>
       {route.empty !== '' && (
-        <Typography variant="body2" color="text.secondary" sx={{ py: 2 }} data-testid="tradeskill-route-empty">
+        <Typography variant="body2" sx={{ color: 'text.secondary', py: 2 }} data-testid="tradeskill-route-empty">
           {route.empty}
         </Typography>
       )}
@@ -267,7 +267,7 @@ function RouteList({ route, tradeskill, onOpenRecipe }: RouteListProps): JSX.Ele
       ))}
       <StepLine id="end" text={routeEndText(route, tradeskill)} />
       {route.credits.map((credit) => (
-        <Typography key={credit} variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }} data-testid="tradeskill-route-credit">
+        <Typography key={credit} variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }} data-testid="tradeskill-route-credit">
           {credit}
         </Typography>
       ))}
@@ -324,7 +324,7 @@ export function RoutePanel({ tradeskill, level, ready, facts, onOpenRecipe }: Ro
   return (
     <FactsProvider value={facts}>
       <Stack spacing={1} sx={{ flexGrow: 1, minHeight: 0 }} data-testid="tradeskill-route" data-goal={goal} data-held-only={heldOnly}>
-        <Stack direction="row" spacing={2} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
+        <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 0.5 }}>
           <GoalSwitch goal={goal} onGoal={setGoal} />
           <HeldSwitch on={heldChoice} onChange={setHeldChoice} blocked={blocked} />
           <OutputKindLine kind="inventory" quiet loadedAt={held.readAt} testId="tradeskills-route-dump-line" />

@@ -25,11 +25,11 @@ export function MapTrackedSection({
   if (track.points.length === 0) return null
   return (
     <Stack spacing={0.5} sx={{ mb: 1 }} data-testid="maps-pane-tracked">
-      <Stack direction="row" spacing={0.75} alignItems="baseline" sx={{ px: 1 }}>
+      <Stack direction="row" spacing={0.75} sx={{ alignItems: 'baseline', px: 1 }}>
         <Typography variant="caption" sx={{ fontWeight: 600, color: TRACK_COLOR }}>
           Tracked
         </Typography>
-        <Typography variant="caption" color="text.disabled" noWrap>
+        <Typography variant="caption" sx={{ color: 'text.disabled' }} noWrap>
           also on the Map pins overlay
         </Typography>
       </Stack>
@@ -68,7 +68,7 @@ function TrackedRow({
           slotProps={{ primary: { variant: 'body2', noWrap: true }, secondary: { variant: 'caption' } }}
         />
       </ListItemButton>
-      <Stack direction="row" alignItems="center" sx={{ flexShrink: 0, pr: 0.5 }}>
+      <Stack direction="row" sx={{ alignItems: 'center', flexShrink: 0, pr: 0.5 }}>
         <Tooltip title="Copy the /waypoint command for this spot">
           <IconButton size="small" data-testid="maps-tracked-copy" onClick={() => { onCopy(first, point.name) }}>
             <ContentCopyIcon sx={{ fontSize: 14 }} />

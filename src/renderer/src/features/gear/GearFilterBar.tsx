@@ -187,7 +187,7 @@ function SelectRow({ filters, setFilters, visible }: Pick<GearFilterBarProps, 'f
 /** WHICH ITEMS: name, slot, classes, effect kind, era. Search is always drawn — see the header. */
 function IdentityRow({ filters, setFilters, text, setText, classes, visible, hasteRelevant }: Omit<GearFilterBarProps, 'upgrade' | 'zoneOptions'>): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'nowrap' }}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'nowrap' }}>
       <TextField
         size="small"
         label="Search gear"
@@ -289,7 +289,7 @@ function IdentityRow({ filters, setFilters, text, setText, classes, visible, has
  *  spellings of Unrest are one pick (gearZones.ts holds the measurement). */
 function NumbersRow({ filters, setFilters, zoneOptions, upgrade, visible }: Omit<GearFilterBarProps, 'text' | 'setText' | 'classes' | 'hasteRelevant'>): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'nowrap', minWidth: 0 }}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'nowrap', minWidth: 0 }}>
       {visible.has('zone') && (
         <ChipMultiSelect
           options={zoneOptionsWith(zoneOptions, filters.zones)}

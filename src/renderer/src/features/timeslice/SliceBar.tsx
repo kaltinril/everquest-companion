@@ -218,9 +218,8 @@ export function SliceControls({
     <Stack
       direction="row"
       spacing={1.5}
-      alignItems="center"
       data-testid={testId}
-      sx={{ flexWrap: 'wrap', rowGap: 1 }}
+      sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 1 }}
       useFlexGap
     >
       {available.length > 1 && (
@@ -282,9 +281,8 @@ export function SliceCaption({
     <Typography
       component="span"
       variant="caption"
-      color="text.secondary"
       noWrap={noWrap}
-      sx={{ minWidth: 0 }}
+      sx={{ color: 'text.secondary', minWidth: 0 }}
       data-testid={`${testId}-window`}
     >
       {edge(slice.range.t0)} → {edge(slice.range.t1)}
@@ -299,8 +297,7 @@ export function SliceBar(props: SliceBarProps): JSX.Element {
     <Stack
       direction="row"
       spacing={1.5}
-      alignItems="center"
-      sx={{ flexWrap: 'wrap', rowGap: 1, minWidth: 0 }}
+      sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 1, minWidth: 0 }}
       useFlexGap
     >
       <SliceControls {...props} />

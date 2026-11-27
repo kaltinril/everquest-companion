@@ -128,7 +128,7 @@ function WhoFilter({
             <Stack sx={{ minWidth: 0 }}>
               <span>{name}</span>
               {text !== '' && (
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                   {text}
                 </Typography>
               )}
@@ -159,8 +159,8 @@ export default function BazaarQuotes({ quotes, title, withItem = false, maxHeigh
   const shown = ordered.slice(0, SHOWN)
   return (
     <Box data-testid={withItem ? 'bazaar-offers' : 'bazaar-quotes'}>
-      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
-        <Typography variant="caption" color="text.secondary">
+      <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', mb: 0.5 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {title}
           {ordered.length > shown.length ? ` (first ${shown.length} of ${ordered.length}; Export CSV has them all)` : ''}
         </Typography>

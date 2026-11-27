@@ -15,9 +15,9 @@
 import { type JSX, useCallback, useEffect, useRef, useState } from 'react'
 import { Button, CircularProgress, Stack, Typography } from '@mui/material'
 import CheckIcon from '@mui/icons-material/Check'
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlineOutlined'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutlineOutlined'
 import { captureRow, iconFree, keptAfter, otherItemNote, PART_WORDS, plausibleItemName, shotKind } from '@shared/itemShotKeep'
 import { partPicture } from '@shared/mobPicture'
 import { captureHowTo, readNames, type Captured } from '@shared/shotTrigger'
@@ -125,9 +125,9 @@ function StatusMark({ status }: { status: Status }): JSX.Element | null {
   }
   if (status.kind === 'filed') {
     return (
-      <Stack direction="row" spacing={0.5} alignItems="center" data-testid="gaps-capture-filed">
+      <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }} data-testid="gaps-capture-filed">
         <CheckIcon fontSize="small" color="success" />
-        <Typography variant="caption" color="success.main">
+        <Typography variant="caption" sx={{ color: 'success.main' }}>
           {status.rows.join(', ')}
         </Typography>
       </Stack>
@@ -203,14 +203,14 @@ export default function CaptureBar({ rows }: { rows: readonly string[] }): JSX.E
     void copyText(text).then((ok) => setCopied(ok ? text : null))
   }
   return (
-    <Stack direction="row" spacing={1} alignItems="center" data-testid="gaps-capture">
-      <Typography variant="body2" color="text.secondary" data-testid="gaps-capture-macro">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} data-testid="gaps-capture">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="gaps-capture-macro">
         Capture: {how.text}
       </Typography>
       <Button size="small" onClick={copy} data-testid="gaps-capture-copy">
         {copied === text ? 'Copied' : 'Copy'}
       </Button>
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
         Or 📷 on an overlay.
       </Typography>
       <Tooltip title={HOW_TIP}>

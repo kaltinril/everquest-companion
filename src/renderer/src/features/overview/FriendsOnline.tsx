@@ -59,7 +59,7 @@ export function FriendsOnline(): JSX.Element {
   const seen = seenFriendNames(friends, last)
   const summary = friends.length === 0 ? 'Friends' : seen.length > 0 ? seen.join(', ') : 'No friends seen'
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center" sx={{ ml: 'auto', minWidth: 0 }} data-testid="overview-friends">
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', ml: 'auto', minWidth: 0 }} data-testid="overview-friends">
       <Tooltip title="Friends the last /who or /friends listing showed in game.">
         <IconButton size="small" aria-label="Friends" onClick={(e) => setAnchor(e.currentTarget)}>
           <PeopleIcon sx={{ fontSize: 16 }} />
@@ -69,7 +69,7 @@ export function FriendsOnline(): JSX.Element {
         {summary}
       </Typography>
       {friends.length > 0 && (
-        <Typography variant="caption" color="text.secondary" noWrap data-testid="overview-friends-when">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap data-testid="overview-friends-when">
           {last === null ? 'type /who in game' : `/who ${when(last.at)}`}
         </Typography>
       )}
@@ -88,7 +88,7 @@ export function FriendsOnline(): JSX.Element {
             }}
             slotProps={{ htmlInput: { 'data-testid': 'overview-friends-add' } }}
           />
-          <Stack direction="row" useFlexGap flexWrap="wrap" spacing={0.5} sx={{ mt: 1 }}>
+          <Stack direction="row" useFlexGap spacing={0.5} sx={{ flexWrap: 'wrap', mt: 1 }}>
             {rows.map((r) => (
               <Chip key={r.name} size="small" label={r.name} color={r.seen ? 'success' : 'default'} variant={r.seen ? 'filled' : 'outlined'} onDelete={() => setFriends(removeFriend(friends, r.name))} />
             ))}

@@ -70,11 +70,11 @@ function HitRow({
     <Stack
       direction="row"
       spacing={1}
-      alignItems="center"
       data-testid="wishlist-hit"
       data-kind={hit.kind}
       onClick={wished ? undefined : () => onPick(hit)}
       sx={{
+        alignItems: 'center',
         px: 1,
         py: 0.5,
         flexWrap: 'nowrap',
@@ -198,9 +198,8 @@ export default function WishAdd({ gear, donors, ready, wished, onPick }: WishAdd
           {hits.length === 0 && (
             <Typography
               variant="caption"
-              color="text.secondary"
               data-testid="wishlist-add-empty"
-              sx={{ display: 'block', p: 1.5 }}
+              sx={{ color: 'text.secondary', display: 'block', p: 1.5 }}
             >
               {emptyLine(text, ready)}
             </Typography>

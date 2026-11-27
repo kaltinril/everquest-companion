@@ -129,9 +129,9 @@ function sideRow(label: string, s: BazaarSide, color: string): TooltipRow | null
 
 function Legend(): JSX.Element {
   const key = (color: string, label: string): JSX.Element => (
-    <Stack direction="row" spacing={0.75} alignItems="center">
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center' }}>
       <Box sx={{ width: 14, height: 3, borderRadius: 2, bgcolor: color }} />
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {label}
       </Typography>
     </Stack>
@@ -140,7 +140,7 @@ function Legend(): JSX.Element {
     <Stack direction="row" spacing={2}>
       {key(ASK_COLOR, 'Asking (selling)')}
       {key(OFFER_COLOR, 'Offered (buying)')}
-      <Typography variant="caption" color="text.disabled">
+      <Typography variant="caption" sx={{ color: 'text.disabled' }}>
         Line: daily median. Band: that day&apos;s low to high. Dashed to the ring: predicted.
       </Typography>
     </Stack>
@@ -208,7 +208,7 @@ export function BazaarChart({ item, endDay }: { item: BazaarItem; endDay: string
   const hp = hov === null ? undefined : item.points.find((p) => p.day === hov.day)
   return (
     <Stack spacing={1}>
-      <Typography variant="caption" color="text.secondary" data-testid="bazaar-chart-title">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="bazaar-chart-title">
         Price by day
       </Typography>
       <Legend />

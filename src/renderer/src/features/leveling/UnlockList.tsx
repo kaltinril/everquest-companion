@@ -328,11 +328,9 @@ const RowDetail = memo(function RowDetail({
     <Stack
       direction="row"
       spacing={0.75}
-      alignItems="center"
-      flexWrap="wrap"
       useFlexGap
       data-testid="unlock-detail"
-      sx={{ pl: 0.25, mt: -0.5, mb: 0.25, minWidth: 0 }}
+      sx={{ alignItems: 'center', flexWrap: 'wrap', pl: 0.25, mt: -0.5, mb: 0.25, minWidth: 0 }}
     >
       {figures.length > 0 && <Note text={figures.join(' · ')} testid="unlock-figures" />}
       {owned !== null && <Note text={owned} testid="unlock-already-yours" />}
@@ -387,8 +385,7 @@ const Row = memo(function Row({
     <Stack
       direction="row"
       spacing={0.75}
-      alignItems="center"
-      sx={{ height: ROW_H, minWidth: 0 }}
+      sx={{ alignItems: 'center', height: ROW_H, minWidth: 0 }}
     >
       {row.kind !== 'spell' && (
         <Chip
@@ -454,7 +451,6 @@ function OutOfEraRows({
     <Box>
       <Stack
         direction="row"
-        alignItems="center"
         role="button"
         tabIndex={0}
         aria-expanded={open}
@@ -464,6 +460,7 @@ function OutOfEraRows({
         }}
         data-testid="unlock-era-toggle"
         sx={{
+          alignItems: 'center',
           display: 'inline-flex',
           cursor: 'pointer',
           color: 'text.secondary',
@@ -532,7 +529,7 @@ export function UnlockList({
 }): JSX.Element {
   return (
     <Box sx={{ flex: 1, minWidth: 0 }} data-testid="unlock-list">
-      <Typography variant="caption" color="text.secondary" sx={{ mb: 0.25 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.25 }}>
         {title} ({count ?? rows.length})
       </Typography>
       <Box>
@@ -540,7 +537,7 @@ export function UnlockList({
             has spells, so the empty sentence must not claim otherwise — the disclosure is what it
             has to say. */}
         {rows.length === 0 && outOfEra.length === 0 ? (
-          <Typography variant="caption" color="text.disabled">
+          <Typography variant="caption" sx={{ color: 'text.disabled' }}>
             {empty}
           </Typography>
         ) : (

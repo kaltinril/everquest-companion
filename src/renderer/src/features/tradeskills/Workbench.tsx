@@ -71,14 +71,14 @@ function LevelLine({ bar }: { bar: LevelBar }): JSX.Element {
   return (
     <>
       {bar.level !== null ? (
-        <Stack direction="row" spacing={0.5} alignItems="baseline">
+        <Stack direction="row" spacing={0.5} sx={{ alignItems: 'baseline' }}>
           <Typography variant="h6" color="primary" data-testid="tradeskill-level">
             {bar.level}
           </Typography>
           <BarOf bar={bar} />
         </Stack>
       ) : (
-        <Typography variant="body2" color="text.secondary" data-testid="tradeskill-level-unseen">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="tradeskill-level-unseen">
           {LEVEL_UNSEEN_TEXT}
         </Typography>
       )}
@@ -101,7 +101,7 @@ interface HeadProps {
 function BenchHead({ tradeskill, levels, onHome, totals }: HeadProps): JSX.Element {
   const rank = useMasteryRank()
   return (
-    <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
+    <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 0.5 }}>
       <Button size="small" startIcon={<ArrowBackIcon />} onClick={onHome} data-testid="tradeskill-home">
         All tradeskills
       </Button>
@@ -112,7 +112,7 @@ function BenchHead({ tradeskill, levels, onHome, totals }: HeadProps): JSX.Eleme
       {levels.served ? <LevelLine bar={levelBar(levels.rows, tradeskill, rank)} /> : <LogReadInline module={SKILLS_MODULE} served={false} />}
       <Box sx={{ flexGrow: 1 }} />
       {totals !== '' && (
-        <Typography variant="body2" color="text.secondary" data-testid="tradeskill-totals">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="tradeskill-totals">
           {totals}
         </Typography>
       )}
@@ -152,7 +152,7 @@ interface BarProps {
 function BenchBar({ query, onQuery, hideTrivial, onHideTrivial, ladder, made, filters }: BarProps): JSX.Element {
   const count = ladder.shown === ladder.total ? `${String(ladder.total)} wiki recipes` : `${String(ladder.shown)} of ${String(ladder.total)} wiki recipes`
   return (
-    <Stack direction="row" spacing={2} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
+    <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 0.5 }}>
       <SearchField
         query={query}
         onChange={onQuery}
@@ -178,7 +178,7 @@ function BenchBar({ query, onQuery, hideTrivial, onHideTrivial, ladder, made, fi
       />
       <RecipeFilterSwitches state={filters} />
       <Box sx={{ flexGrow: 1 }} />
-      <Typography variant="caption" color="text.secondary" data-testid="tradeskill-count">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="tradeskill-count">
         {count}
         {madeByYouText(made)}
       </Typography>
@@ -246,7 +246,7 @@ function RecipesTab({ tradeskill, level, ready, facts, memory, setMemory, restor
       )}
       <OutputKindLine kind="inventory" quiet loadedAt={held.readAt} testId="tradeskills-dump-line" />
       {empty !== null ? (
-        <Typography variant="body2" color="text.secondary" data-testid="tradeskill-empty" sx={{ py: 4, textAlign: 'center' }}>
+        <Typography variant="body2" data-testid="tradeskill-empty" sx={{ color: 'text.secondary', py: 4, textAlign: 'center' }}>
           {empty}
         </Typography>
       ) : (

@@ -94,7 +94,7 @@ function FilterRow({
   const newest = query.newestOnly === true
   const inEra = query.inEraOnly === true
   return (
-    <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
       <TextField
         size="small"
         label="Search spells"
@@ -183,7 +183,7 @@ function TierRow({
       note={tierEffectNote(categories)}
       testId="spellbook-tier-slider"
       trailing={
-        <Typography variant="caption" color="text.secondary" data-testid="spellbook-count">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="spellbook-count">
           {shown === total ? `${String(total)} spells` : `${String(shown)} of ${String(total)} spells`}
         </Typography>
       }

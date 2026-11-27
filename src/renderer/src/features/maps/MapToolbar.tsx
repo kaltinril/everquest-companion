@@ -127,10 +127,9 @@ function FloorStepper({
     <Stack
       direction="row"
       spacing={0.25}
-      alignItems="center"
       data-testid="maps-floors"
       {...(empty ? { 'aria-hidden': true, 'data-reserved': 'true' } : {})}
-      sx={empty ? { visibility: 'hidden' } : undefined}
+      sx={{ alignItems: 'center', visibility: empty ? 'hidden' : undefined }}
       onKeyDown={onKeyDown}
     >
       {/* The spans stay: a DISABLED button swallows no mouse events, so the hover text has to
@@ -438,11 +437,9 @@ export default function MapToolbar(props: MapToolbarProps): JSX.Element {
     <Stack
       direction="row"
       spacing={1}
-      alignItems="center"
-      flexWrap="wrap"
       useFlexGap
       data-testid="maps-toolbar"
-      sx={{ flexShrink: 0 }}
+      sx={{ alignItems: 'center', flexWrap: 'wrap', flexShrink: 0 }}
     >
       <ZoneSelect zones={zones} zone={zone} onPick={onPick} />
       {/* Beside the selector and OUTSIDE the `hasMap` gate, for the same reason the selector is:

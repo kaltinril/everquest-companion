@@ -129,8 +129,7 @@ export default function PrefSectionBlock({
     >
       <Typography
         variant="overline"
-        color="text.secondary"
-        sx={{ display: 'block', letterSpacing: 1, mb: 0.5 }}
+        sx={{ color: 'text.secondary', display: 'block', letterSpacing: 1, mb: 0.5 }}
       >
         {section.label}
       </Typography>

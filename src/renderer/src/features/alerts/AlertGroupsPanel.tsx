@@ -82,7 +82,7 @@ export default function AlertGroupsPanel({
   onCreate: (group: AlertGroup, defs: AlertDef[]) => void
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap sx={{ px: 0.5, py: 0.25 }}>
+    <Stack direction="row" spacing={0.5} useFlexGap sx={{ flexWrap: 'wrap', px: 0.5, py: 0.25 }}>
       {groups.map((g) => (
         <GroupChip
           key={g.id}

@@ -49,7 +49,7 @@ function ChoiceLabel({ title, note }: { title: string; note: string }): JSX.Elem
   return (
     <Stack>
       <Typography variant="body2">{title}</Typography>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {note}
       </Typography>
     </Stack>
@@ -62,7 +62,7 @@ function TypedReading({ draft, typed }: { draft: string; typed: number | null })
   return (
     <Typography
       variant="caption"
-      color={typed === null && !empty ? 'error.main' : 'text.secondary'}
+      sx={{ color: typed === null && !empty ? 'error.main' : 'text.secondary' }}
       data-testid="buff-duration-reading"
     >
       {typed !== null
@@ -116,7 +116,7 @@ export function BuffDurationDialog({
         <Typography variant="subtitle1" component="div">
           {stat.spell}
         </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Now {fmtPrecise(stat.estimateMs)} · {estimatorSourceTitle(stat.estimatorSource)}
         </Typography>
       </DialogTitle>

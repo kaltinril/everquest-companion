@@ -43,7 +43,7 @@ function Section({ title, lines }: { title: string; lines: JSX.Element[] }): JSX
   if (lines.length === 0) return null
   return (
     <>
-      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
         {title}
       </Typography>
       {lines}
@@ -53,7 +53,7 @@ function Section({ title, lines }: { title: string; lines: JSX.Element[] }): JSX
 
 function swapLines(recs: Recommendations): JSX.Element[] {
   return recs.swaps.map((s, i) => (
-    <Typography key={`s${String(i)}`} variant="body2" color="text.secondary" data-testid="exaltation-swap">
+    <Typography key={`s${String(i)}`} variant="body2" sx={{ color: 'text.secondary' }} data-testid="exaltation-swap">
       {`${s.cellLabel} ${s.type}: `}
       <Name>{s.fromName}</Name>
       {` (${s.fromEffect}) → `}
@@ -65,7 +65,7 @@ function swapLines(recs: Recommendations): JSX.Element[] {
 
 function fillLines(recs: Recommendations): JSX.Element[] {
   return recs.fills.map((f, i) => (
-    <Typography key={`f${String(i)}`} variant="body2" color="text.secondary" data-testid="exaltation-fill">
+    <Typography key={`f${String(i)}`} variant="body2" sx={{ color: 'text.secondary' }} data-testid="exaltation-fill">
       {`${f.cellLabel} ${f.type} is empty: socket `}
       <Name>{f.gemName}</Name>
       {` (${f.effect}) from ${f.where}`}
@@ -75,7 +75,7 @@ function fillLines(recs: Recommendations): JSX.Element[] {
 
 function redundantLines(recs: Recommendations): JSX.Element[] {
   return recs.redundant.map((r, i) => (
-    <Typography key={`r${String(i)}`} variant="body2" color="text.secondary" data-testid="exaltation-redundant">
+    <Typography key={`r${String(i)}`} variant="body2" sx={{ color: 'text.secondary' }} data-testid="exaltation-redundant">
       {r.noBenefit !== undefined
         ? `${r.cellLabel} ${r.type}: ${r.effect} does nothing for you (it only helps ${r.noBenefit})`
         : r.keptEffect === r.effect
@@ -126,7 +126,7 @@ function scrapLines(audit: ExaltationAudit, spending: ReadonlySet<string>): JSX.
   return audit.superseded
     .filter((f) => !f.socketed && !spending.has(ownershipKey(f.name)))
     .map((f, i) => (
-      <Typography key={`x${String(i)}`} variant="body2" color="text.secondary" data-testid="exaltation-scrap">
+      <Typography key={`x${String(i)}`} variant="body2" sx={{ color: 'text.secondary' }} data-testid="exaltation-scrap">
         <Name>{f.name}</Name>
         {` (${f.effect}) in ${f.wheres.join(', ')} - outclassed by `}
         <Name>{f.betterName}</Name>
@@ -140,7 +140,7 @@ function benchedLines(plan: BoardPlan): JSX.Element[] {
   return plan.contested
     .filter((c) => !c.noSeat)
     .map((c, i) => (
-      <Typography key={`c${String(i)}`} variant="body2" color="text.secondary" data-testid="exaltation-plan-contested">
+      <Typography key={`c${String(i)}`} variant="body2" sx={{ color: 'text.secondary' }} data-testid="exaltation-plan-contested">
         {'Benched: '}
         <Name>{c.gemName}</Name>
         {` (${c.effect}) - ${c.options.map((o) => `${o.cellLabel} holds ${o.heldBy}`).join('; ')}. Your call.`}
@@ -153,7 +153,7 @@ function noSeatLines(plan: BoardPlan): JSX.Element[] {
   return plan.contested
     .filter((c) => c.noSeat)
     .map((c, i) => (
-      <Typography key={`n${String(i)}`} variant="body2" color="text.secondary" data-testid="exaltation-plan-noseat">
+      <Typography key={`n${String(i)}`} variant="body2" sx={{ color: 'text.secondary' }} data-testid="exaltation-plan-noseat">
         {`${c.effect} (`}
         <Name>{c.gemName}</Name>
         {') has no legal socket on what you wear'}
@@ -193,7 +193,7 @@ function ViewToggle({ view, onView }: { view: ExaltView; onView: (v: ExaltView) 
 
 function copyLine(f: DuplicateFinding): JSX.Element {
   return (
-    <Typography key={f.name} variant="caption" color="text.secondary" data-testid="exaltation-duplicate">
+    <Typography key={f.name} variant="caption" sx={{ color: 'text.secondary' }} data-testid="exaltation-duplicate">
       <Name>{f.name}</Name>
       {` x${String(f.copies)} (${String(f.socketed)} socketed): ${f.wheres.join(', ')}`}
     </Typography>
@@ -246,7 +246,7 @@ function Details({ lists }: { lists: DetailLists }): JSX.Element | null {
           <Section title="No socket fits" lines={lists.noSeat} />
           <Section title="Scrap candidates" lines={lists.scrap} />
           <Section title="Copies" lines={lists.copies} />
-          <Typography variant="caption" color="text.disabled">
+          <Typography variant="caption" sx={{ color: 'text.disabled' }}>
             Assumes same-name effects do not stack (only the highest applies), except a proc, which
             counts per weapon: one in each hand both fire. Upgrades compare within one effect family
             only; nothing is changed for you.
@@ -288,7 +288,7 @@ export default function ExaltationAuditPanel({
   return (
     <Paper variant="outlined" data-testid="exaltation-audit" sx={{ p: 1.5 }}>
       <Stack spacing={0.5}>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
+        <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }} spacing={1}>
           <Typography variant="subtitle2">Exaltation cleanup</Typography>
           {changes > 0 && <ViewToggle view={view} onView={onView} />}
         </Stack>
@@ -297,7 +297,7 @@ export default function ExaltationAuditPanel({
         </Typography>
         {benched}
         {lockedCount > 0 && (
-          <Typography variant="caption" color="text.secondary" data-testid="exaltation-locked-count">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="exaltation-locked-count">
             {`${String(lockedCount)} locked - the layout works around ${lockedCount === 1 ? 'it' : 'them'}.`}
           </Typography>
         )}
@@ -307,7 +307,7 @@ export default function ExaltationAuditPanel({
             and advice that merely looks narrowed - `planner/deity.deityFits` passes on a null and
             a reader has no way to know that from the lists above. */}
         {deity === null && (
-          <Typography variant="caption" color="text.disabled" data-testid="exaltation-deity-unknown">
+          <Typography variant="caption" sx={{ color: 'text.disabled' }} data-testid="exaltation-deity-unknown">
             Deity is not checked yet: type /outputfile achievements in game and this list will stop
             offering gems your deity cannot use.
           </Typography>

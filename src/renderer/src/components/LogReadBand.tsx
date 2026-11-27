@@ -71,7 +71,7 @@ export function LogReadBand({ report, kind }: LogReadBandProps): JSX.Element {
         bgcolor: theme.palette.background.paper
       }}
     >
-      <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
         <Box sx={{ minWidth: 0, flexGrow: 1, flexBasis: 240 }}>
           {waiting && (
             <Typography variant="body2" sx={{ fontWeight: 600 }} data-testid="log-read-band-wait">
@@ -79,12 +79,12 @@ export function LogReadBand({ report, kind }: LogReadBandProps): JSX.Element {
             </Typography>
           )}
           {waiting && report.tryLine !== null && (
-            <Typography variant="body2" color="text.secondary" data-testid="log-read-band-try">
+            <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="log-read-band-try">
               {report.tryLine}
             </Typography>
           )}
           {position !== null && (
-            <Typography variant="body2" color="text.secondary" data-testid="log-read-band-position">
+            <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="log-read-band-position">
               {position.label}: {position.value}
             </Typography>
           )}
@@ -93,7 +93,7 @@ export function LogReadBand({ report, kind }: LogReadBandProps): JSX.Element {
               <Box key={note.id} data-testid="log-read-band-note">
                 <Typography variant="body2">{note.text}</Typography>
                 {note.tryLine !== undefined && (
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     {note.tryLine}
                   </Typography>
                 )}

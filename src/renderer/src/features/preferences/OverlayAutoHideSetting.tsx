@@ -71,7 +71,7 @@ export function OverlayAutoHideSetting(): JSX.Element {
           }
           label={<Typography variant="body2">Hide overlays when EverQuest isn’t running</Typography>}
         />
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {prefs.hideWhenNotRunning
             ? 'Your open overlays disappear while the game is closed and come back when it starts. They keep their position, size and lock - nothing is closed.'
             : 'Off. Open overlays stay on screen whether or not the game is running.'}
@@ -90,7 +90,7 @@ export function OverlayAutoHideSetting(): JSX.Element {
           }
           label={<Typography variant="body2">Hide overlays when you’re not in EverQuest</Typography>}
         />
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {prefs.hideWhenUnfocused
             ? 'Your open overlays disappear whenever anything else is in front - including this app’s own window, so they’re out of the way while you browse it. Clicking an overlay itself keeps them up.'
             : 'Off. Open overlays stay on screen while you work in other apps.'}

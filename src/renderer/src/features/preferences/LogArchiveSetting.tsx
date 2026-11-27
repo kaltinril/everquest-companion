@@ -55,7 +55,7 @@ const FILL = { p: 1.25, borderRadius: 1, bgcolor: 'action.hover' } as const
 function Stat(props: { label: string; value: string; mono?: boolean; testId?: string }): JSX.Element {
   return (
     <Box sx={{ minWidth: 0 }}>
-      <Typography variant="caption" color="text.secondary" display="block">
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
         {props.label}
       </Typography>
       <Typography
@@ -77,10 +77,10 @@ function SegmentLine(props: { s: SegmentRow; newest: boolean; run: (p: Promise<L
       sx={{ ...FILL, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1, flexWrap: 'wrap' }}
     >
       <Box sx={{ minWidth: 0 }}>
-        <Typography variant="body2" fontWeight={600} title={s.archivePath ?? undefined}>
+        <Typography variant="body2" sx={{ fontWeight: 600 }} title={s.archivePath ?? undefined}>
           {s.firstStamp.slice(0, 10)} to {s.lastStamp.slice(0, 10)}
         </Typography>
-        <Typography variant="caption" color="text.secondary" display="block">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
           {fmtBytes(s.logBytes)}
           {s.gzBytes !== null ? `, ${fmtBytes(s.gzBytes)} compressed` : ''}
           {s.olderEngine && (
@@ -90,7 +90,7 @@ function SegmentLine(props: { s: SegmentRow; newest: boolean; run: (p: Promise<L
           )}
         </Typography>
         {s.gapLines > 0 && (
-          <Typography variant="caption" color="text.secondary" display="block">
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
             {s.gapLines} line(s) written during the move are archived but not counted.
           </Typography>
         )}
@@ -140,17 +140,17 @@ function OnPanel(props: { st: LogArchiveStatus; run: (p: Promise<LogArchiveReply
         />
       </Box>
       {st.rotateBlockers.length > 0 && (
-        <Typography variant="caption" color="text.secondary" data-testid="log-archive-blockers">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="log-archive-blockers">
           Archiving is not available right now: {st.rotateBlockers.join(' ')}
         </Typography>
       )}
       {st.autoFailed !== null && (
-        <Typography variant="caption" color="warning.main" data-testid="log-archive-auto-failed">
+        <Typography variant="caption" sx={{ color: 'warning.main' }} data-testid="log-archive-auto-failed">
           {st.autoFailed}
         </Typography>
       )}
       {st.archived.length > 0 && (
-        <Typography variant="overline" color="text.secondary" sx={{ lineHeight: 1 }}>
+        <Typography variant="overline" sx={{ color: 'text.secondary', lineHeight: 1 }}>
           History
         </Typography>
       )}
@@ -158,16 +158,16 @@ function OnPanel(props: { st: LogArchiveStatus; run: (p: Promise<LogArchiveReply
         <SegmentLine key={s.id} s={s} newest={s.id === st.newestSealedId} run={run} />
       ))}
       {st.held.map((h) => (
-        <Typography key={h.id} variant="caption" color="text.secondary" display="block">
+        <Typography key={h.id} variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
           {h.text}
         </Typography>
       ))}
       {st.skipped.map((k) => (
-        <Typography key={k.file} variant="caption" color="warning.main" display="block">
+        <Typography key={k.file} variant="caption" sx={{ color: 'warning.main', display: 'block' }}>
           {k.file} could not be read: {k.reason}
         </Typography>
       ))}
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Kills, loot, levels and AA carry over. Fight details, alerts, zone and group start fresh.
       </Typography>
     </Stack>
@@ -216,11 +216,11 @@ export function LogArchiveSetting(): JSX.Element {
         }
         label={<Typography variant="body2">Summarize and archive log</Typography>}
       />
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {switchCaption(st)}
       </Typography>
       {offAsking && (
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <Typography variant="body2">Turn it off? Archived history stops showing; your archives stay on disk.</Typography>
           <Button size="small" variant="contained" data-testid="log-archive-off-yes" onClick={() => { setOffAsking(false); run(window.eq.setLogArchiveEnabled(false)) }}>
             Turn off

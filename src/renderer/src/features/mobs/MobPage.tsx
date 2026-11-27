@@ -153,11 +153,11 @@ function StatCard({
       <Typography variant="h5" sx={{ color: 'primary.main', lineHeight: 1.1 }}>
         {value}
       </Typography>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {label}
       </Typography>
       {hint && (
-        <Typography variant="caption" color="text.disabled" display="block">
+        <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block' }}>
           {hint}
         </Typography>
       )}
@@ -178,7 +178,7 @@ function MobIdentity({
   const factionColor = con ? CONSIDER_FACTION_COLOR[con.faction] : undefined
   const tier = kill && kill.count > 0 ? tierStyle(kill.bestTier) : null
   return (
-    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
       <Typography variant="h6" sx={{ color: factionColor ?? 'text.primary' }}>
         {mob}
       </Typography>
@@ -209,7 +209,7 @@ function MobIdentity({
 function MobConsiderLine({ con }: { con?: MobConsiderContext }): JSX.Element | null {
   if (!con) return null
   return (
-    <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.25, mb: 1.5 }}>
+    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.25, mb: 1.5 }}>
       {considerDifficultyShort(con.difficulty) ?? con.difficulty}
       {con.difficulty && ` - “${con.difficulty}”`}
       {con.zone && ` · ${con.zone}`}
@@ -249,7 +249,7 @@ function MobStats({
   kill?: MobKillFacts
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap sx={{ mb: 2, mt: con ? 0 : 1.5 }}>
+    <Stack direction="row" spacing={1.5} useFlexGap sx={{ flexWrap: 'wrap', mb: 2, mt: con ? 0 : 1.5 }}>
       <StatCard
         label="Known drops"
         testId="mob-stat-drops"
@@ -285,7 +285,7 @@ function WikiLevelZone({
   if (!zone && !levelText) return null
   const stem = zone ? dropZoneTarget(zone) : null
   return (
-    <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1.5 }}>
+    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1.5 }}>
       {zone &&
         (stem !== null && onOpenMapZone !== undefined ? (
           <CellLink text={zone} onOpen={() => { onOpenMapZone(stem) }} />
@@ -315,7 +315,7 @@ function QuestsSection({ name, quests }: { name: string; quests: MobQuestUse[] }
         </Box>
       )}
       {quests.length > 0 ? (
-        <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
+        <Stack direction="row" spacing={0.75} sx={{ flexWrap: 'wrap' }} useFlexGap>
           {quests.map((q) => (
             <Chip
               key={q.quest}
@@ -350,7 +350,7 @@ function KillsSection({ kill }: { kill?: MobKillFacts }): JSX.Element {
         Your kills
       </Typography>
       {kill && kill.count > 0 ? (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {kill.count} kill{kill.count === 1 ? '' : 's'} · first {formatDateTime(kill.firstTs)} · last{' '}
           {formatDateTime(kill.lastTs)}
         </Typography>
@@ -365,7 +365,7 @@ function KillsSection({ kill }: { kill?: MobKillFacts }): JSX.Element {
 function WikiSourceLine({ wikiUrl }: { wikiUrl?: string }): JSX.Element | null {
   if (!wikiUrl) return null
   return (
-    <Typography variant="caption" color="text.disabled" display="block" sx={{ mt: 2 }}>
+    <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block', mt: 2 }}>
       Source:{' '}
       <a href={wikiUrl} target="_blank" rel="noreferrer" style={{ color: 'inherit' }}>
         eqlwiki.com

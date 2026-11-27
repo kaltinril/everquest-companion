@@ -97,8 +97,8 @@ function CountEditor({
   onCancel: () => void
 }): JSX.Element {
   return (
-    <Stack spacing={0.25} alignItems="flex-start">
-      <Stack direction="row" spacing={0.25} alignItems="center">
+    <Stack spacing={0.25} sx={{ alignItems: 'flex-start' }}>
+      <Stack direction="row" spacing={0.25} sx={{ alignItems: 'center' }}>
         <TextField
           size="small"
           type="number"
@@ -226,7 +226,7 @@ export function HandCountCell({
     )
   }
   return (
-    <Stack direction="row" spacing={0.5} alignItems="center">
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
       {children}
       {override && onSetItemCount && (
         <OverrideChip o={override} onClear={() => onSetItemCount(name, null)} />

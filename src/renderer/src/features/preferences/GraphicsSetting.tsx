@@ -194,7 +194,7 @@ export function GraphicsSetting(): JSX.Element {
             </Typography>
           }
         />
-        <Typography variant="caption" color="text.secondary" data-testid="pref-graphics-safe-mode-note">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="pref-graphics-safe-mode-note">
           {caption(
             resolved.safeMode,
             env.auto.safeMode,
@@ -221,7 +221,7 @@ export function GraphicsSetting(): JSX.Element {
         />
         <Typography
           variant="caption"
-          color="text.secondary"
+          sx={{ color: 'text.secondary' }}
           data-testid="pref-graphics-opaque-overlays-note"
         >
           {caption(resolved.opaqueOverlays, env.auto.opaqueOverlays, OPAQUE_COPY)}

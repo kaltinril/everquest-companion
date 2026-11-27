@@ -6,7 +6,7 @@
 
 import { useState, type JSX } from 'react'
 import { Button, Chip, IconButton, ListSubheader, MenuItem, Popover, Stack, TextField, Tooltip, Typography } from '@mui/material'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import SaveIcon from '@mui/icons-material/Save'
 import type { TierSetup } from '@shared/planner/tierChips'
 import { PRESET_LABEL, TIER_PRESETS, type TierPreset } from '@shared/planner/tierDefaults'
@@ -28,7 +28,7 @@ function SaveBox({ anchor, initial, onSave, onClose }: { anchor: HTMLElement; in
   return (
     <Popover open anchorEl={anchor} onClose={onClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
       <Stack spacing={0.75} sx={{ p: 1.5, width: 300 }} data-testid="bis-save-box">
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <TextField
             autoFocus
             size="small"
@@ -41,7 +41,7 @@ function SaveBox({ anchor, initial, onSave, onClose }: { anchor: HTMLElement; in
           />
           <Button size="small" variant="contained" disabled={name.trim() === ''} onClick={save} data-testid="bis-saved-save">Save</Button>
         </Stack>
-        <Typography variant="caption" color="text.secondary">A new name adds a list to the Start from menu; the same name replaces it. Saves the tiers, the step, split resists and caps.</Typography>
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>A new name adds a list to the Start from menu; the same name replaces it. Saves the tiers, the step, split resists and caps.</Typography>
       </Stack>
     </Popover>
   )
@@ -78,7 +78,7 @@ export default function BisStartFrom({ prefs, setPrefs, setup }: BisStartFromPro
     setPrefs({ ...prefs, board: { ...setup.board }, list: null })
   }
   return (
-    <Stack direction="row" spacing={0.5} alignItems="center">
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
       <TextField select size="small" label="Start from" value={current === undefined ? prefs.preset : `${SAVED}${current.name}`} onChange={(e) => pick(e.target.value)} sx={{ minWidth: 220 }} slotProps={{ htmlInput: { 'data-testid': 'bis-preset' } }}>
         <ListSubheader>Presets</ListSubheader>
         {TIER_PRESETS.map((p) => <MenuItem key={p} value={p}>{PRESET_LABEL[p]}</MenuItem>)}

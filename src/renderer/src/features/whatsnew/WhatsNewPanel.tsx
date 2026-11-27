@@ -124,7 +124,7 @@ function EntryGroup({ label, entries }: { label: string | null; entries: readonl
   return (
     <Stack spacing={0.25}>
       {label !== null && (
-        <Typography variant="caption" sx={{ fontWeight: 700, letterSpacing: 0.5 }} color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: 0.5 }}>
           {label}
         </Typography>
       )}
@@ -146,11 +146,11 @@ function ReleaseBlock({ note, isNew }: { note: ReleaseNote; isNew: boolean }): J
   const unkinded = note.entries.filter((e) => e.kind === undefined)
   return (
     <Stack spacing={0.75} data-testid={`whats-new-release-${note.version}`} data-new={isNew ? 'true' : undefined}>
-      <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
+      <Stack direction="row" sx={{ alignItems: 'center', flexWrap: 'wrap' }} spacing={1}>
         <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
           v{note.version}
         </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {formatCalendarDate(note.date)}
         </Typography>
         {isNew && (
@@ -226,8 +226,7 @@ export function WhatsNewPanel(): JSX.Element {
       {RELEASE_NOTES.some(hasReportedEntry) && (
         <Typography
           variant="caption"
-          color="text.secondary"
-          sx={{ fontStyle: 'italic' }}
+          sx={{ color: 'text.secondary', fontStyle: 'italic' }}
           data-testid="whats-new-thanks"
         >
           Thanks to everyone who filed reports - many of these came from you.
@@ -271,9 +270,8 @@ export function WhatsNewPanel(): JSX.Element {
         target="_blank"
         rel="noreferrer"
         variant="caption"
-        color="text.secondary"
         data-testid="whats-new-original"
-        sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, alignSelf: 'flex-start' }}
+        sx={{ color: 'text.secondary', display: 'inline-flex', alignItems: 'center', gap: 0.5, alignSelf: 'flex-start' }}
       >
         The original app&apos;s releases (by jmoyers, no longer updated)
         <OpenInNewIcon sx={{ fontSize: 13 }} />

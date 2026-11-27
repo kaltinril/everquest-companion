@@ -39,7 +39,7 @@
 
 import { type JSX, useEffect, useMemo } from 'react'
 import { Box, Chip, IconButton, Stack } from '@mui/material'
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutlineOutlined'
 import { CLASS_ABBRS, MAX_COMBO_SLOTS, resolvedClasses, type ClassAbbr } from '@shared/classCombo'
 import { classDisplayName } from '@shared/spellLevels'
 import { useComboSnap } from '../profiles/ClassComboData'
@@ -170,7 +170,7 @@ export default function PlannerView({ onOpenLoot }: PlannerViewProps = {}): JSX.
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }} data-testid="planner-view">
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'nowrap', mb: 1.5 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'nowrap', mb: 1.5 }}>
         <ClassFilter classes={classes} />
         {offer !== null && <DetectedChip offer={offer} onApply={() => classes.adopt(offer)} />}
         <Box sx={{ flexGrow: 1, minWidth: 8 }} />

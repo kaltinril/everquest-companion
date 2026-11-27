@@ -50,10 +50,9 @@ export function RateBasisControls({ testId }: RateBasisBarProps): JSX.Element {
     <Stack
       direction="row"
       spacing={1.5}
-      alignItems="center"
       data-testid={testId}
       data-basis={basis}
-      sx={{ flexWrap: 'wrap', rowGap: 1 }}
+      sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 1 }}
       useFlexGap
     >
       <ToggleButtonGroup
@@ -98,8 +97,7 @@ export function RateBasisCaption({ testId }: RateBasisBarProps): JSX.Element {
     <Typography
       component="span"
       variant="caption"
-      color="text.secondary"
-      sx={{ minWidth: 0 }}
+      sx={{ color: 'text.secondary', minWidth: 0 }}
       data-testid={`${testId}-caption`}
       title={BASIS_TITLE[basis]}
     >

@@ -49,7 +49,7 @@ function EventConditionFields({ draft, onChange }: ConditionFieldProps): JSX.Ele
   return (
     <>
       <Box>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Event kind
         </Typography>
         <Select
@@ -97,7 +97,7 @@ function EventConditionFields({ draft, onChange }: ConditionFieldProps): JSX.Ele
           . Kept on save; clearing both boxes or changing the kind drops it.
         </Typography>
       )}
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Leave BOTH boxes blank to fire on every {draft.kind} event. A value needs a field to match
         against, so name one: a dropped item is <code>item</code>, and <code>loot</code> also
         carries <code>source</code>. A value in /slashes/ is a
@@ -125,7 +125,7 @@ function RawConditionFields({ draft, onChange }: ConditionFieldProps): JSX.Eleme
         error={rawErr != null}
         helperText={rawErr ?? 'Valid pattern'}
       />
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Matches anywhere in the line. Escape regex metacharacters
         (e.g. <code>\.</code>, <code>\(</code>) with a backslash.
       </Typography>
@@ -138,7 +138,7 @@ function AppSignalField({ draft, onChange }: ConditionFieldProps): JSX.Element |
   if (draft.ttype !== 'app') return null
   return (
     <Box>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Signal
       </Typography>
       <Select
@@ -162,7 +162,7 @@ export default function ConditionEditor({ draft, onChange }: ConditionFieldProps
   return (
     <Stack spacing={1.5}>
       <Box>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Trigger type
         </Typography>
         <Select

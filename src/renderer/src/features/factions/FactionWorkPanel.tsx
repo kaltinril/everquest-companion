@@ -137,7 +137,7 @@ function ItemLinks({
   const shown = names.slice(0, LIST_CAP)
   const rest = names.slice(LIST_CAP)
   return (
-    <Typography variant="caption" color="text.secondary" data-testid={testId} sx={{ display: 'block' }}>
+    <Typography variant="caption" data-testid={testId} sx={{ color: 'text.secondary', display: 'block' }}>
       {label} {count !== undefined && `${String(count)} x `}
       {shown.map((n, i) => {
         const have = held?.[n.toLowerCase()] ?? 0
@@ -283,7 +283,7 @@ function QuestLine({
             sx={{ ml: 0.75, height: 18, fontSize: 11, '& .MuiChip-label': { px: 0.625 } }}
           />
         )}
-        <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+        <Typography component="span" variant="caption" sx={{ color: 'text.secondary', ml: 1 }}>
           {quest.giver !== undefined && <GiverLink giver={quest.giver} onOpenMob={links.onOpenMob} />}
           {quest.startZone !== undefined && (
             <>
@@ -339,7 +339,7 @@ export default function FactionWorkPanel({
 }): JSX.Element {
   if (work === null) {
     return (
-      <Typography variant="caption" color="text.secondary" data-testid="factions-no-work" sx={{ py: 1, display: 'block' }}>
+      <Typography variant="caption" data-testid="factions-no-work" sx={{ color: 'text.secondary', py: 1, display: 'block' }}>
         No quest on record names this faction. The catalog knows what the wiki's quest pages state;
         kills and unlisted turn-ins still move it in game.
       </Typography>
@@ -356,7 +356,7 @@ export default function FactionWorkPanel({
           user's own necklace. The label keeps the claim honest: same neighborhood, no receipt. */}
       {work.nearby.length > 0 && work.homeZone !== undefined && (
         <Box sx={{ pt: work.raise.length > 0 ? 1 : 0 }} data-testid="factions-nearby">
-          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
             Also in {work.homeZone} (faction effect unstated on the wiki):
           </Typography>
           {work.nearby.map((q) => (
@@ -366,7 +366,7 @@ export default function FactionWorkPanel({
       )}
       {work.lower.length > 0 && (
         <Box sx={{ pt: 1 }}>
-          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
             Costs this faction:
           </Typography>
           {work.lower.map((q) => (

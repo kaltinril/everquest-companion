@@ -204,7 +204,7 @@ function useKokoroInstall(): KokoroInstallState {
  */
 function VoiceIntro(): JSX.Element {
   return (
-    <Typography variant="caption" color="text.secondary" data-testid="pref-voice-intro">
+    <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="pref-voice-intro">
       Alerts speak when you set their output to Voice, in the Alerts tab - there is no switch here.
       This is the voice they use. Muting alerts silences speech too.
     </Typography>
@@ -240,8 +240,7 @@ function InstallProgress({ prog }: { prog: SpeechInstallProgress }): JSX.Element
       <Typography
         variant="caption"
         color="error"
-        display="block"
-        sx={{ mt: 0.5 }}
+        sx={{ display: 'block', mt: 0.5 }}
         data-testid="pref-voice-install-error"
       >
         Download failed - {prog.message ?? 'no detail given'}. Nothing was installed.
@@ -251,7 +250,7 @@ function InstallProgress({ prog }: { prog: SpeechInstallProgress }): JSX.Element
   const percent = prog.total > 0 ? Math.round((prog.received / prog.total) * 100) : null
   return (
     <Box sx={{ mt: 0.5 }} data-testid="pref-voice-install-progress">
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {phaseLabel(prog, percent)}
       </Typography>
       <LinearProgress
@@ -273,7 +272,7 @@ function KokoroInstall({ install }: { install: KokoroInstallState }): JSX.Elemen
   const running = busy || (progress !== null && progress.phase !== 'failed')
   return (
     <Box sx={{ mt: 0.5 }}>
-      <Typography variant="caption" color="warning.main" display="block" data-testid="pref-voice-not-installed">
+      <Typography variant="caption" sx={{ color: 'warning.main', display: 'block' }} data-testid="pref-voice-not-installed">
         Not installed yet - alerts speak with a Windows voice until it is.
       </Typography>
       {progress && <InstallProgress prog={progress} />}
@@ -307,7 +306,7 @@ function EngineRow({
 }): JSX.Element {
   return (
     <Box sx={{ maxWidth: 360 }}>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Voice engine
       </Typography>
       <Select
@@ -350,9 +349,7 @@ function EngineFaultNote(): JSX.Element | null {
   return (
     <Typography
       variant="caption"
-      color="warning.main"
-      display="block"
-      sx={{ mt: 0.5, maxWidth: 520, lineHeight: 1.4 }}
+      sx={{ color: 'warning.main', display: 'block', mt: 0.5, maxWidth: 520, lineHeight: 1.4 }}
       data-testid="pref-voice-engine-fault"
     >
       {SPEECH_SETUP_NOTES[fault]}
@@ -371,9 +368,9 @@ function VoicePickerRow({
   onChange: (p: VoicePrefs) => void
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1.5} alignItems="flex-end" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={1.5} sx={{ alignItems: 'flex-end', flexWrap: 'wrap' }} useFlexGap>
       <Box sx={{ minWidth: 260, flexGrow: 1, maxWidth: 360 }}>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Voice
         </Typography>
         <Select
@@ -419,9 +416,9 @@ function VoicePickerRow({
 /** Rate + volume. Both are applied on top of the alerts module's own master volume. */
 function RateVolumeRow({ prefs, onChange }: { prefs: VoicePrefs; onChange: (p: VoicePrefs) => void }): JSX.Element {
   return (
-    <Stack direction="row" spacing={3} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={3} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
       <Stack sx={{ minWidth: 180 }}>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Speed ({prefs.rate.toFixed(2)}×)
         </Typography>
         <Slider
@@ -436,7 +433,7 @@ function RateVolumeRow({ prefs, onChange }: { prefs: VoicePrefs; onChange: (p: V
         />
       </Stack>
       <Stack sx={{ minWidth: 180 }}>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Volume ({Math.round(prefs.volume * 100)}%)
         </Typography>
         <Slider

@@ -75,7 +75,7 @@ export function PictureRow({ prefs, onChange }: { prefs: CursorRingPrefs; onChan
   const has = prefs.imageDataUrl !== ''
   return (
     <Stack spacing={1} data-testid="pref-cursor-picture">
-      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
         <Button size="small" variant="outlined" data-testid="pref-cursor-icon-upload" onClick={() => fileRef.current?.click()}>
           Upload icon…
         </Button>
@@ -104,7 +104,7 @@ export function PictureRow({ prefs, onChange }: { prefs: CursorRingPrefs; onChan
           {error}
         </Typography>
       )}
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {has
           ? 'Your picture is drawn at the Size above, with the offset applied. Color and thickness do not change it (the color still tints the trail).'
           : 'No picture yet, so the circle is drawn. Upload one (shrunk to fit 64 x 64) or draw one.'}

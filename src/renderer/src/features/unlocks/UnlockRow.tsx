@@ -145,7 +145,7 @@ function Need({ need, unlock, c }: { need: UnlockNeed; unlock: Unlock; c: Unlock
         <>
           <Typography
             variant="caption"
-            color={need.done ? 'success.main' : 'text.secondary'}
+            sx={{ color: need.done ? 'success.main' : 'text.secondary' }}
             data-testid="unlock-line"
           >
             {need.done ? '✓ ' : ''}
@@ -156,7 +156,7 @@ function Need({ need, unlock, c }: { need: UnlockNeed; unlock: Unlock; c: Unlock
       )
     case 'placeholder':
       return (
-        <Typography variant="caption" color="text.disabled" data-testid="unlock-placeholder">
+        <Typography variant="caption" sx={{ color: 'text.disabled' }} data-testid="unlock-placeholder">
           no requirements published yet
         </Typography>
       )
@@ -164,7 +164,7 @@ function Need({ need, unlock, c }: { need: UnlockNeed; unlock: Unlock; c: Unlock
       return (
         <Typography
           variant="caption"
-          color={need.done ? 'success.main' : 'text.secondary'}
+          sx={{ color: need.done ? 'success.main' : 'text.secondary' }}
           data-testid="unlock-line"
         >
           {need.done ? '✓ ' : ''}
@@ -185,7 +185,7 @@ function Standing({ unlock, known }: { unlock: Unlock; known: boolean }): JSX.El
   const counted = countedNeeds(unlock)
   if (counted === 0) return <></>
   return (
-    <Typography variant="caption" color="text.secondary">
+    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
       {String(unlock.done)} of {String(counted)}
       {unlock.unstated > 0 ? `, ${String(unlock.unstated)} not in the dump` : ''}
     </Typography>
@@ -229,7 +229,7 @@ export default function UnlockRow({
         bgcolor: focused ? 'action.selected' : undefined
       }}
     >
-      <Stack direction="row" spacing={0.75} alignItems="center">
+      <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center' }}>
         <StatusIcon unlock={unlock} known={known} />
         <Typography variant="body2" sx={{ fontWeight: 600, minWidth: 150 }} data-testid="unlock-name">
           {unlock.name}
@@ -242,10 +242,8 @@ export default function UnlockRow({
         <Stack
           direction="row"
           spacing={0.5}
-          alignItems="center"
-          flexWrap="wrap"
           useFlexGap
-          sx={{ pl: 3, pt: 0.5 }}
+          sx={{ alignItems: 'center', flexWrap: 'wrap', pl: 3, pt: 0.5 }}
         >
           {unlock.needs.map((need) => (
             <Need key={need.text} need={need} unlock={unlock} c={c} />

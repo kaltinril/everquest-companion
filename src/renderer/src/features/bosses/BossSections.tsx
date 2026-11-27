@@ -192,7 +192,7 @@ function TargetKillDate({ s, compact }: { s: TargetStatus; compact: boolean }): 
           : `Defeated ${formatDateTime(s.lastTs || s.firstTs)}`
       }
     >
-      <Typography variant="caption" color="text.secondary" noWrap display="block">
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} noWrap>
         {formatDate(s.lastTs || s.firstTs)}
         {!compact && ` · ${s.count} kill${s.count === 1 ? '' : 's'}`}
       </Typography>
@@ -236,7 +236,7 @@ function TargetCardCaption({
         {s.target.name}
       </Typography>
       {!compact && (
-        <Typography variant="caption" color="text.secondary" noWrap display="block">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} noWrap>
           {s.target.zone ?? ''}
         </Typography>
       )}
@@ -250,7 +250,7 @@ function TargetCardCaption({
         <TargetKillDate s={s} compact={compact} />
       ) : (
         !compact && (
-          <Typography variant="caption" color="text.disabled" display="block">
+          <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block' }}>
             not defeated
           </Typography>
         )
@@ -429,7 +429,7 @@ export function CategorySection({ category, list, ...grid }: SectionProps & { ca
       header={
         <Typography variant="subtitle2" sx={{ mb: 0.75, color: 'primary.main' }}>
           {category}{' '}
-          <Typography component="span" variant="caption" color="text.secondary">
+          <Typography component="span" variant="caption" sx={{ color: 'text.secondary' }}>
             ({list.filter((s) => s.killed).length}/{list.length})
           </Typography>
         </Typography>
@@ -470,34 +470,32 @@ function LoadoutHeader({ group }: { group: LoadoutGrouping }): JSX.Element {
         data-loadout={interval ? 'named' : group.uncertain ? 'mixed' : 'unknown'}
         direction="row"
         spacing={0.75}
-        alignItems="center"
-        flexWrap="wrap"
         useFlexGap
-        sx={{ mb: 0.75 }}
+        sx={{ alignItems: 'center', flexWrap: 'wrap', mb: 0.75 }}
       >
         {interval ? (
           <>
             <SlotChips slots={interval.slots} />
             <ProvenanceChip interval={interval} />
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               {spansText(ranges)}
             </Typography>
           </>
         ) : group.uncertain ? (
           <>
-            <Typography variant="subtitle2" color="warning.main">
+            <Typography variant="subtitle2" sx={{ color: 'warning.main' }}>
               Mixed loadouts
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               {spansText(ranges)}
             </Typography>
           </>
         ) : (
-          <Typography variant="subtitle2" color="text.secondary">
+          <Typography variant="subtitle2" sx={{ color: 'text.secondary' }}>
             Loadout not known
           </Typography>
         )}
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           ({group.rows.length})
         </Typography>
       </Stack>
@@ -536,9 +534,9 @@ export function LoadoutSections({
           {...grid}
           rows={wholeRows(undefeated)}
           header={
-            <Typography variant="subtitle2" sx={{ mb: 0.75 }} color="text.secondary">
+            <Typography variant="subtitle2" sx={{ color: 'text.secondary', mb: 0.75 }}>
               Not defeated{' '}
-              <Typography component="span" variant="caption" color="text.secondary">
+              <Typography component="span" variant="caption" sx={{ color: 'text.secondary' }}>
                 ({undefeated.length})
               </Typography>
             </Typography>

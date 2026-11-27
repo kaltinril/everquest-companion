@@ -73,7 +73,7 @@ function GridTools({
   onClear: () => void
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
       <Select
         size="small"
         data-testid="pref-cursor-draw-size"
@@ -177,7 +177,7 @@ export function CursorDrawingGrid({
           stroke.current = null
         }}
       />
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Click or drag to paint; right-click or the eraser clears a cell. Empty cells are see-through.
       </Typography>
       <Stack direction="row" spacing={1}>

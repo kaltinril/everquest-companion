@@ -116,7 +116,7 @@ function ClassChips({ donor, planClasses }: { donor: DonorRow; planClasses: read
         />
       ))}
       {donor.classes.length > CLASS_CHIP_CAP && (
-        <Typography variant="caption" color="text.secondary" sx={{ alignSelf: 'center' }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', alignSelf: 'center' }}>
           +{donor.classes.length - CLASS_CHIP_CAP}
         </Typography>
       )}
@@ -252,15 +252,14 @@ function SourceLine({ src }: { src: SourceText }): JSX.Element {
     <>
       <Typography
         variant="caption"
-        color="text.secondary"
         noWrap
         title={src.text}
-        sx={{ minWidth: 0, flexShrink: SHRINK.source, maxWidth: 320 }}
+        sx={{ color: 'text.secondary', minWidth: 0, flexShrink: SHRINK.source, maxWidth: 320 }}
       >
         {src.text}
       </Typography>
       {src.more !== '' && (
-        <Typography variant="caption" color="text.disabled" sx={{ flexShrink: 0 }}>
+        <Typography variant="caption" sx={{ color: 'text.disabled', flexShrink: 0 }}>
           {src.more}
         </Typography>
       )}
@@ -312,13 +311,12 @@ export function DonorLine({
     <Stack
       direction="row"
       spacing={1}
-      alignItems="center"
       // JOS-344 — the corpus join key rides the row now, so a spec can point at ONE donor and say
       // which. Same key the gear table's rows carry (`itemKey`), which is what makes the compare
       // pair's own `data-item-key` checkable against the row it was opened from.
       data-testid="planner-donor-row" data-item-key={donor.key}
       data-unusable={unusable === undefined ? undefined : 'yes'}
-      sx={{ height: ROW_HEIGHT, pl: 5, pr: 1, flexWrap: 'nowrap', borderBottom: 1, borderColor: 'divider' }}
+      sx={{ alignItems: 'center', height: ROW_HEIGHT, pl: 5, pr: 1, flexWrap: 'nowrap', borderBottom: 1, borderColor: 'divider' }}
     >
       {donor.iconId !== undefined && (
         <Box
@@ -337,10 +335,9 @@ export function DonorLine({
       {namesEffect && (
         <Typography
           variant="caption"
-          color="text.secondary"
           noWrap
           data-testid="planner-donor-effect"
-          sx={{ minWidth: 0, flexShrink: 0, maxWidth: EFFECT_MAX_WIDTH }}
+          sx={{ color: 'text.secondary', minWidth: 0, flexShrink: 0, maxWidth: EFFECT_MAX_WIDTH }}
         >
           {donor.effect}
         </Typography>
@@ -348,11 +345,10 @@ export function DonorLine({
       {says !== '' && (
         <Typography
           variant="caption"
-          color="text.disabled"
           noWrap
           title={says}
           data-testid="planner-effect-says"
-          sx={{ minWidth: 0, flexShrink: SHRINK.says }}
+          sx={{ color: 'text.disabled', minWidth: 0, flexShrink: SHRINK.says }}
         >
           {says}
         </Typography>
@@ -410,11 +406,11 @@ export function GroupLine({
     <Stack
       direction="row"
       spacing={1}
-      alignItems="center"
       data-testid="planner-effect-row"
       data-axis={group.axis}
       onClick={() => onToggle(group.id)}
       sx={{
+        alignItems: 'center',
         height: ROW_HEIGHT,
         px: 1,
         flexWrap: 'nowrap',
@@ -433,7 +429,7 @@ export function GroupLine({
         {group.label}
       </Typography>
       {group.note !== '' && (
-        <Typography variant="caption" color="text.secondary" noWrap sx={{ minWidth: 0, flexShrink: SHRINK.name }}>
+        <Typography variant="caption" noWrap sx={{ color: 'text.secondary', minWidth: 0, flexShrink: SHRINK.name }}>
           best: {group.note}
         </Typography>
       )}
@@ -443,11 +439,10 @@ export function GroupLine({
       {group.says !== '' && (
         <Typography
           variant="caption"
-          color="text.disabled"
           noWrap
           title={group.says}
           data-testid="planner-group-says"
-          sx={{ minWidth: 0, flexShrink: SHRINK.says }}
+          sx={{ color: 'text.disabled', minWidth: 0, flexShrink: SHRINK.says }}
         >
           {group.says}
         </Typography>
@@ -473,7 +468,7 @@ export function GroupLine({
         />
       )}
       <Box sx={{ flexGrow: 1 }} />
-      <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', flexShrink: 0 }}>
         {group.donors.length} {group.donors.length === 1 ? 'donor' : 'donors'}
       </Typography>
     </Stack>

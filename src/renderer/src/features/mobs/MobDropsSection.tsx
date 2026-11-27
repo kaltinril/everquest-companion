@@ -31,7 +31,7 @@ import { foldSeenVariants, type SeenVariantGroup } from './seenVariants'
 /** A quiet, honest empty note — never a claim that a source said "nothing". */
 export function Quiet({ children }: { children: React.ReactNode }): JSX.Element {
   return (
-    <Typography variant="caption" color="text.disabled" display="block">
+    <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block' }}>
       {children}
     </Typography>
   )
@@ -52,7 +52,7 @@ function DropsEmptyState({
   return (
     <Box sx={{ mb: 2 }}>
       {loading && !data && (
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ color: 'text.secondary' }}>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', color: 'text.secondary' }}>
           <CircularProgress size={14} />
           <Typography variant="caption">Looking up this mob…</Typography>
         </Stack>
@@ -120,7 +120,6 @@ function OutOfEraDrops({
     <Box>
       <Stack
         direction="row"
-        alignItems="center"
         role="button"
         tabIndex={0}
         aria-expanded={open}
@@ -130,6 +129,7 @@ function OutOfEraDrops({
         }}
         data-testid="mob-drops-era-toggle"
         sx={{
+          alignItems: 'center',
           display: 'inline-flex',
           cursor: 'pointer',
           color: 'text.secondary',
@@ -173,7 +173,7 @@ export function DropsSection({
     <>
       <Typography variant="subtitle2" gutterBottom>
         Drops{' '}
-        <Typography component="span" variant="caption" color="text.secondary">
+        <Typography component="span" variant="caption" sx={{ color: 'text.secondary' }}>
           (wiki drop table){wiki.length > 0 && ` · ${wiki.length}`}
         </Typography>
       </Typography>
@@ -212,7 +212,7 @@ export function AlsoLootedSection({
       <Divider sx={{ my: 1.5 }} />
       <Typography variant="subtitle2" gutterBottom>
         Also looted by you{' '}
-        <Typography component="span" variant="caption" color="text.secondary">
+        <Typography component="span" variant="caption" sx={{ color: 'text.secondary' }}>
           (not listed on the wiki page)
         </Typography>
       </Typography>

@@ -90,7 +90,7 @@ function RingShapePicker({
 }): JSX.Element {
   return (
     <Stack sx={{ minWidth: 180 }}>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Shape
       </Typography>
       <Select
@@ -120,9 +120,9 @@ function RingSliders({
   onChange: (patch: Partial<CursorRingPrefs>) => void
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={3} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={3} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
       <Stack sx={{ minWidth: 180 }}>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Size ({prefs.sizePx}px)
         </Typography>
         <Slider
@@ -137,7 +137,7 @@ function RingSliders({
         />
       </Stack>
       <Stack sx={{ minWidth: 180, display: prefs.shape === 'image' ? 'none' : undefined }}>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Thickness ({prefs.thicknessPx}px)
         </Typography>
         <Slider
@@ -167,7 +167,7 @@ function OffsetSlider({
 }): JSX.Element {
   return (
     <Stack sx={{ minWidth: 180 }}>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Offset {axis} ({value > 0 ? `+${value}` : value}px{axis === 'X' ? ', + is right' : ', + is down'})
       </Typography>
       <Slider
@@ -196,7 +196,7 @@ function RingOffsets({
   onChange: (patch: Partial<CursorRingPrefs>) => void
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={3} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={3} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
       <OffsetSlider axis="X" value={prefs.offsetXPx} onChange={(v) => onChange({ offsetXPx: v })} />
       <OffsetSlider axis="Y" value={prefs.offsetYPx} onChange={(v) => onChange({ offsetYPx: v })} />
     </Stack>
@@ -225,7 +225,7 @@ function RingColor({
 }): JSX.Element {
   return (
     <Stack sx={{ minWidth: 120 }}>
-      <Typography variant="caption" color="text.secondary" component="label" htmlFor={COLOR_INPUT_ID}>
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} component="label" htmlFor={COLOR_INPUT_ID}>
         Color
       </Typography>
       <input
@@ -287,17 +287,17 @@ export function CursorRingSetting(): JSX.Element {
           }
           label={<Typography variant="body2">Show a cursor overlay</Typography>}
         />
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {prefs.enabled
             ? 'A shape, crosshair lines or a trail follow your pointer so you can find it on a busy screen. Your real cursor is untouched - the overlay never gets in the way of a click.'
             : 'Off. Nothing is drawn and nothing is tracked.'}
         </Typography>
       </Stack>
 
-      <Stack direction="row" spacing={3} alignItems="center" flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={3} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
         <Stack spacing={1.5}>
           <ShapeSwitch prefs={prefs} onChange={update} />
-          <Stack direction="row" spacing={3} alignItems="center" flexWrap="wrap" useFlexGap>
+          <Stack direction="row" spacing={3} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
             <RingSliders prefs={prefs} onChange={update} />
             <RingShapePicker prefs={prefs} onChange={update} />
             <RingColor prefs={prefs} onChange={update} />
@@ -312,7 +312,7 @@ export function CursorRingSetting(): JSX.Element {
 
       <TrailRow prefs={prefs} onChange={update} />
 
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         The overlay only appears over EverQuest, while the game is the window you’re in.
       </Typography>
     </Stack>

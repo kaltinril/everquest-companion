@@ -315,7 +315,7 @@ function SlotCell({
     >
       <SlotIcon cell={cell} />
       <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-        <Typography variant="caption" color="text.disabled" sx={{ display: 'block', lineHeight: 1.2 }}>
+        <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block', lineHeight: 1.2 }}>
           {cell.label}
         </Typography>
         {item ? (
@@ -341,7 +341,7 @@ function SlotCell({
             <SocketRow item={item} cellId={cell.id} advice={advice} />
           </>
         ) : (
-          <Typography variant="caption" color="text.disabled" sx={{ display: 'block', opacity: 0.6 }}>
+          <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block', opacity: 0.6 }}>
             empty
           </Typography>
         )}
@@ -413,7 +413,7 @@ function Legend({
     )
   if (wishes) parts.push('Wish chips are your wish list - the Wish list tab has the route.')
   return (
-    <Typography variant="caption" color="text.secondary" data-testid="character-slot-legend">
+    <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="character-slot-legend">
       {parts.join(' ')}
     </Typography>
   )
@@ -457,7 +457,7 @@ export default function SlotGrid({
   const wishesOf = wishLookup(slotWishes, cellsShowingWishes(cells))
   return (
     <Stack spacing={0.6} data-testid="character-slot-grid">
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={0.6} alignItems="stretch">
+      <Stack direction={{ xs: 'column', md: 'row' }} spacing={0.6} sx={{ alignItems: 'stretch' }}>
         <Column cells={inColumn(cells, 'left')} wishesOf={wishesOf} advice={advice} />
         <Column cells={inColumn(cells, 'right')} wishesOf={wishesOf} advice={advice} />
       </Stack>

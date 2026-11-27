@@ -74,7 +74,7 @@ export function RecipeFilterSwitches({ state }: { state: RecipeFilterState }): J
         />
       </Tooltip>
       {!known && (
-        <Typography variant="caption" color="text.secondary" data-testid="tradeskill-can-make-why">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="tradeskill-can-make-why">
           {HELD_UNKNOWN_SHORT}
         </Typography>
       )}

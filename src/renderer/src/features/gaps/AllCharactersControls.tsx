@@ -15,9 +15,9 @@ const WARNING = "Joins every character's saved Gaps across accounts and servers:
 /** While main reads every character's saves or the tab joins them: a spinner and what it is doing. */
 function Working(): JSX.Element {
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center" data-testid="gaps-all-working">
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center' }} data-testid="gaps-all-working">
       <CircularProgress size={14} />
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Reading every character…
       </Typography>
     </Stack>
@@ -39,7 +39,7 @@ export function AllCharactersBox({
   working?: boolean
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
       <Tooltip title={WARNING}>
         <FormControlLabel
           sx={{ mr: 0 }}
@@ -73,7 +73,7 @@ export function AllCharactersBox({
 export function CharactersLine({ live, others, failed = false }: { live: string; others: readonly CharacterGaps[] | undefined; failed?: boolean }): JSX.Element {
   if (others === undefined) {
     return (
-      <Typography variant="caption" color="text.secondary" data-testid="gaps-characters">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="gaps-characters">
         Reading every character&apos;s Gaps…
       </Typography>
     )
@@ -81,7 +81,7 @@ export function CharactersLine({ live, others, failed = false }: { live: string;
   const now = new Date()
   const end = charactersLineEnd(others.length, failed)
   return (
-    <Typography variant="caption" color="text.secondary" data-testid="gaps-characters">
+    <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="gaps-characters">
       Characters: {live} (live)
       {others.map((c) => {
         const w = savedWords(c, now)
@@ -89,7 +89,7 @@ export function CharactersLine({ live, others, failed = false }: { live: string;
           <span key={c.character}>
             {', '}
             <Tooltip title={w.tip}>
-              <Typography component="span" variant="caption" color={w.stale ? 'warning.main' : 'text.secondary'}>
+              <Typography component="span" variant="caption" sx={{ color: w.stale ? 'warning.main' : 'text.secondary' }}>
                 {w.text}
               </Typography>
             </Tooltip>
@@ -97,7 +97,7 @@ export function CharactersLine({ live, others, failed = false }: { live: string;
         )
       })}
       {end.warn ? (
-        <Typography component="span" variant="caption" color="warning.main" data-testid="gaps-characters-failed">
+        <Typography component="span" variant="caption" sx={{ color: 'warning.main' }} data-testid="gaps-characters-failed">
           {end.text}
         </Typography>
       ) : (

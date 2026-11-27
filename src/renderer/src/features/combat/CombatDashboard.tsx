@@ -66,8 +66,8 @@ function MobCardStats({ seg, mobs }: { seg: SegmentView; mobs: MobBreakdown | nu
   if (!mobs || mobs.rows.length === 0) return null
   const a = mobs.estimated ? '~' : ''
   return (
-    <Stack direction="row" spacing={0.5} alignItems="baseline" sx={{ minWidth: 0 }}>
-      <Typography variant="caption" color="text.secondary" noWrap>
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'baseline', minWidth: 0 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>
         {mobs.rows.length} mob{mobs.rows.length === 1 ? '' : 's'} · {a}
         {fmt(mobs.total)}
       </Typography>
@@ -122,7 +122,7 @@ function MobRows({
         />
       ))}
       {mobs.rows.length > rows.length && (
-        <Typography variant="caption" color="text.disabled">
+        <Typography variant="caption" sx={{ color: 'text.disabled' }}>
           +{mobs.rows.length - rows.length} more
         </Typography>
       )}
@@ -188,12 +188,12 @@ export function TargetSkillBars({
   const share = seg.outTotal > 0 ? (detail.total / seg.outTotal) * 100 : 0
   return (
     <Box>
-      <Stack direction="row" spacing={1} alignItems="baseline" flexWrap="wrap" useFlexGap sx={{ mb: 0.75 }}>
+      <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: 'baseline', flexWrap: 'wrap', mb: 0.75 }}>
         <Typography variant="caption" sx={{ color: KIND_COLOR.enemy, fontWeight: 700 }}>
           {a}
           {fmt(detail.total)} dealt to {target}
         </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {Math.round(share)}% of this segment’s outgoing · {a}
           {detail.hits} hits
           {detail.crits > 0 ? ` · ${a}${detail.crits} crit` : ''}
@@ -201,7 +201,7 @@ export function TargetSkillBars({
           {detail.resists > 0 ? ` · ${a}${detail.resists} resisted` : ''}
         </Typography>
         <Tooltip title="Everyone’s damage to this mob, combined. Use the source rows above to split it.">
-          <Typography variant="caption" color="text.disabled">
+          <Typography variant="caption" sx={{ color: 'text.disabled' }}>
             all sources combined
           </Typography>
         </Tooltip>

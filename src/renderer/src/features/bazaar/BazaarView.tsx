@@ -91,13 +91,13 @@ function SortHead({ sort, onSort }: { sort: BazaarSort; onSort: (s: BazaarSort) 
 function Tile({ label, value, color, children }: { label: string; value: string; color?: string; children?: JSX.Element | null }): JSX.Element {
   return (
     <Box sx={{ minWidth: 120 }}>
-      <Stack direction="row" spacing={0.75} alignItems="center">
+      <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center' }}>
         {color !== undefined && <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: color }} />}
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {label}
         </Typography>
       </Stack>
-      <Stack direction="row" spacing={1} alignItems="baseline">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline' }}>
         <Typography variant="h5" sx={{ fontWeight: 700 }}>
           {value}
         </Typography>
@@ -122,13 +122,13 @@ interface PriceLine {
 function PriceGrid({ item }: { item: BazaarItem }): JSX.Element {
   const line = (l: PriceLine): JSX.Element => (
     <>
-      <Stack direction="row" spacing={0.75} alignItems="center">
+      <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center' }}>
         <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: l.color }} />
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           {l.label}
         </Typography>
       </Stack>
-      <Stack direction="row" spacing={1} alignItems="baseline">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline' }}>
         <Typography variant="h6">{formatPlat(l.now)}</Typography>
         {l.move !== undefined && <Move f={l.move} />}
       </Stack>
@@ -140,7 +140,7 @@ function PriceGrid({ item }: { item: BazaarItem }): JSX.Element {
     <Box sx={{ display: 'grid', gridTemplateColumns: 'auto repeat(3, minmax(110px, auto))', columnGap: 4, rowGap: 0.5, alignItems: 'center' }} data-testid="bazaar-prices">
       <Box />
       {PRICE_HEADS.map((h) => (
-        <Typography key={h} variant="caption" color="text.secondary">
+        <Typography key={h} variant="caption" sx={{ color: 'text.secondary' }}>
           {h}
         </Typography>
       ))}
@@ -167,11 +167,11 @@ function Detail({ item, endDay, ignoreOutliers, onOpenLoot, onHide }: DetailProp
   return (
     <Paper variant="outlined" sx={{ p: 2 }} data-testid="bazaar-detail">
       <Stack spacing={2}>
-        <Stack direction="row" alignItems="baseline" spacing={1.5} flexWrap="wrap">
+        <Stack direction="row" sx={{ alignItems: 'baseline', flexWrap: 'wrap' }} spacing={1.5}>
           <Typography variant="h6" component="div">
             <ItemName item={item} bold onOpenLoot={onOpenLoot} />
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             {item.combined === undefined
               ? ''
               : `all tiers, priced as +${item.combined.at}${item.combined.atSeen ? '' : ` (an estimate: nobody listed +${item.combined.at})`} · `}
@@ -179,18 +179,18 @@ function Detail({ item, endDay, ignoreOutliers, onOpenLoot, onHide }: DetailProp
           </Typography>
           <HideDetailButton onHide={onHide} />
         </Stack>
-        <Stack direction="row" spacing={4} flexWrap="wrap" useFlexGap>
+        <Stack direction="row" spacing={4} sx={{ flexWrap: 'wrap' }} useFlexGap>
           <PriceGrid item={item} />
           <Tile label="Asking range" value={Number.isFinite(low) ? `${formatPlat(low)} to ${formatPlat(high)}` : '-'} />
           <Tile label="Offers seen" value={String(item.sellOffers + item.buyOffers + item.trades)}>
-            <Typography component="span" variant="caption" color="text.secondary">
+            <Typography component="span" variant="caption" sx={{ color: 'text.secondary' }}>
               {item.sellOffers} selling · {item.buyOffers} buying{item.trades > 0 ? ` · ${item.trades} trade` : ''}
             </Typography>
           </Tile>
         </Stack>
         {item.combined !== undefined && <BazaarTierTable c={item.combined} />}
         <BazaarWatchPanel item={item} />
-        <Stack direction="row" spacing={3} flexWrap="wrap" useFlexGap alignItems="flex-start">
+        <Stack direction="row" spacing={3} sx={{ flexWrap: 'wrap', alignItems: 'flex-start' }} useFlexGap>
           <Box sx={{ flex: '2 1 480px', minWidth: 0 }}>
             <BazaarChart item={item} endDay={endDay} />
           </Box>
@@ -200,12 +200,12 @@ function Detail({ item, endDay, ignoreOutliers, onOpenLoot, onHide }: DetailProp
         </Stack>
         {/* Keyed by the item: a Who pick belongs to the item it was made on (review, 2026-10-13). */}
         <BazaarQuotes key={item.key} quotes={item.quotes} title="Who's offering" scale={item.combined} />
-        <Typography variant="caption" color="text.disabled">
+        <Typography variant="caption" sx={{ color: 'text.disabled' }}>
           Predicted: a trend through the last ten priced days, newer and busier days counting more,
           read on the log&apos;s newest day ({endDay}) and kept within half to double the recent median.
         </Typography>
         {item.outliers > 0 && (
-          <Typography variant="caption" color="text.disabled">
+          <Typography variant="caption" sx={{ color: 'text.disabled' }}>
             {item.outliers} price(s) more than four times away from this item&apos;s usual price are left out.
           </Typography>
         )}
@@ -220,7 +220,7 @@ function HeardAlerts(): JSX.Element | null {
   if (heard.length === 0) return null
   return (
     <Paper variant="outlined" sx={{ p: 1.5 }} data-testid="bazaar-heard">
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Watch alerts this session
       </Typography>
       {heard.map((a) => (
@@ -330,7 +330,7 @@ export default function BazaarView({ onOpenLoot }: { onOpenLoot: (item: string) 
 
   return (
     <Stack spacing={2} sx={{ p: 2 }} data-testid="bazaar-view">
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
         What players asked (WTS) and offered (WTB) in trade chat, read from your log
         {sum.days > 0 ? `: ${sum.offers} offers over ${sum.days} days` : ''}. Prices are daily medians; a
         seller repeating an offer in a day counts once.

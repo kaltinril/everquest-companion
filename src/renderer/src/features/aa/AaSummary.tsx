@@ -15,7 +15,7 @@ function StatLine({ line, board }: { line: AaStatLine; board: readonly AaBoardRo
   const nav = useAaNav()
   return (
     <Box sx={{ py: 0.5, borderBottom: 1, borderColor: 'divider', breakInside: 'avoid' }} data-testid="aa-stat">
-      <Stack direction="row" alignItems="baseline" spacing={1}>
+      <Stack direction="row" sx={{ alignItems: 'baseline' }} spacing={1}>
         <Typography variant="body2" sx={{ flex: 1 }}>
           {line.stat}
         </Typography>
@@ -23,7 +23,7 @@ function StatLine({ line, board }: { line: AaStatLine; board: readonly AaBoardRo
           {line.total === 0 && line.seeText ? 'see text' : aaSigned(line.total, line.unit)}
         </Typography>
       </Stack>
-      <Typography variant="caption" color="text.secondary" component="div">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} component="div">
         {line.from.map((f) => {
           const b = board.find((x) => x.r.key === f.key)
           return (
@@ -33,7 +33,7 @@ function StatLine({ line, board }: { line: AaStatLine; board: readonly AaBoardRo
           )
         })}
         {line.stat === 'Stat cap' && (
-          <Link component="button" variant="caption" onClick={() => nav.go('bis')} color="success.main">
+          <Link component="button" variant="caption" onClick={() => nav.go('bis')} sx={{ color: 'success.main' }}>
             Best in slot
           </Link>
         )}
@@ -49,15 +49,15 @@ function RecLine({ item, budget }: { item: AaRecItem; budget: number }): JSX.Ele
   const more = b.max - b.r.rank > 1 ? ` · ${String(item.toMax)} to max` : ''
   return (
     <Box sx={{ py: 0.5, borderBottom: 1, borderColor: 'divider' }} data-testid="aa-rec">
-      <Stack direction="row" spacing={1} alignItems="baseline">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline' }}>
         <Typography variant="body2" sx={{ ...LINK_SX, flex: 1 }} onClick={() => nav.jump(b)}>
           {b.r.key}
         </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {item.next === null ? '? pts' : item.next === 0 ? 'free' : `${String(item.next)} pts`}
         </Typography>
       </Stack>
-      <Typography variant="caption" color="text.disabled" component="div">
+      <Typography variant="caption" sx={{ color: 'text.disabled' }} component="div">
         {`${String(b.r.rank)} → ${String(b.r.rank + 1)} of ${String(b.max)}${more} · ${b.effect.label}${item.gives === null ? '' : ` ${item.gives}`}`}
         {fit !== null && <Box component="span" sx={{ color: 'success.main' }}>{` · ${fit}`}</Box>}
       </Typography>
@@ -76,11 +76,11 @@ function Recommendations({ recs, board, unspent, classes, onSpecial }: { recs: A
     <Paper variant="outlined" sx={{ p: 1.5, alignSelf: 'start' }} data-testid="aa-recommendations">
       <Typography variant="subtitle2">Recommendations</Typography>
       {recs.items.length === 0 ? (
-        <Typography variant="caption" color="text.secondary" component="div">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} component="div">
           {`Everything ${combo === '' ? 'you' : combo} can buy is maxed.${unspent === null ? '' : ` ${String(unspent)} of ${String(AA_BANK_CAP)} points banked.`}`}
         </Typography>
       ) : (
-        <Typography variant="caption" color="text.secondary" component="div">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} component="div">
           {`${String(budget)} unspent cover ${String(recs.used)} of the ${String(recs.total)} points left`}
         </Typography>
       )}
@@ -100,7 +100,7 @@ function Recommendations({ recs, board, unspent, classes, onSpecial }: { recs: A
         ? recs.items.map((i) => <RecLine key={i.b.r.key} item={i} budget={budget} />)
         : groups.map((g) => (
             <Box key={g.group}>
-              <Typography variant="overline" color="warning.main" component="div" sx={{ lineHeight: 1.8 }}>
+              <Typography variant="overline" component="div" sx={{ color: 'warning.main', lineHeight: 1.8 }}>
                 {g.label}
               </Typography>
               {g.items.map((i) => (
@@ -108,20 +108,20 @@ function Recommendations({ recs, board, unspent, classes, onSpecial }: { recs: A
               ))}
             </Box>
           ))}
-      <Typography variant="caption" color="text.secondary" component="div" sx={{ mt: 1 }}>
+      <Typography variant="caption" component="div" sx={{ color: 'text.secondary', mt: 1 }}>
         Not bought with points:
       </Typography>
       {bane !== null && (
         <Typography variant="caption" component="div">
           {`Banestrike ${String(bane.rank)} of ${String(bane.max)} · `}
-          <Link component="button" variant="caption" color="success.main" onClick={() => nav.go('slayer')}>
+          <Link component="button" variant="caption" sx={{ color: 'success.main' }} onClick={() => nav.go('slayer')}>
             Slayer achievements
           </Link>
         </Typography>
       )}
       <Typography variant="caption" component="div">
         {'Class and race lines · '}
-        <Link component="button" variant="caption" color="success.main" onClick={onSpecial}>
+        <Link component="button" variant="caption" sx={{ color: 'success.main' }} onClick={onSpecial}>
           plan a reincarnation
         </Link>
       </Typography>
@@ -147,13 +147,13 @@ export function AaSummary(p: AaSummaryProps): JSX.Element {
         <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
           What your AAs give you
         </Typography>
-        <Typography variant="caption" color="text.secondary" component="div" sx={{ mb: 1 }}>
+        <Typography variant="caption" component="div" sx={{ color: 'text.secondary', mb: 1 }}>
           {`Totals from your ranks${p.planning ? `, for ${p.classes.join('/')}` : ''}. Click an AA to open its row.`}
         </Typography>
         <Box sx={{ columnCount: { xs: 1, md: 2, xl: 3 }, columnGap: 3 }}>
           {groups.map((g) => (
             <Box key={g.group} sx={{ breakInside: 'avoid', mb: 1.5 }}>
-              <Typography variant="overline" color="warning.main" component="div" sx={{ fontWeight: 700, lineHeight: 1.8 }}>
+              <Typography variant="overline" component="div" sx={{ color: 'warning.main', fontWeight: 700, lineHeight: 1.8 }}>
                 {g.group}
               </Typography>
               {g.lines.map((l) => (

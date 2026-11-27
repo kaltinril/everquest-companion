@@ -31,8 +31,8 @@ const SLICE_WHY: Partial<Record<SliceId, string>> = {
 export function Card({ title, extra, children, testId }: { title: string; extra?: ReactNode; children: ReactNode; testId: string }): JSX.Element {
   return (
     <Paper variant="outlined" sx={{ p: 1.5, flex: '1 1 240px', minWidth: 0 }} data-testid={testId}>
-      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.75 }}>
-        <Typography variant="overline" sx={{ lineHeight: 1.4 }} color="text.secondary">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 0.75 }}>
+        <Typography variant="overline" sx={{ color: 'text.secondary', lineHeight: 1.4 }}>
           {title}
         </Typography>
         {extra}
@@ -45,10 +45,10 @@ export function Card({ title, extra, children, testId }: { title: string; extra?
 function Figure({ value, label, amber = false, title }: { value: string; label: string; amber?: boolean; title?: string }): JSX.Element {
   const body = (
     <Box>
-      <Typography variant="h5" sx={{ lineHeight: 1.1, fontWeight: 600 }} color={amber ? 'warning.main' : 'text.primary'}>
+      <Typography variant="h5" sx={{ color: amber ? 'warning.main' : 'text.primary', lineHeight: 1.1, fontWeight: 600 }}>
         {value}
       </Typography>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {label}
       </Typography>
     </Box>
@@ -117,7 +117,7 @@ export function PaceCard(): JSX.Element {
   return (
     <Card title="Pace" extra={<ScopeChips available={available} id={slice.id} setId={setId} />} testId="aa-pace-card">
       {pace === null ? (
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           No AA points in your log yet.
         </Typography>
       ) : (
@@ -128,7 +128,7 @@ export function PaceCard(): JSX.Element {
               return t === undefined ? null : <Figure key={id} value={`${t.value}${t.unit === '' ? '' : ` ${t.unit}`}`} label={t.label} title={t.title} />
             })}
           </Stack>
-          <Typography variant="caption" color="text.disabled" sx={{ display: 'block', mt: 0.5 }}>
+          <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block', mt: 0.5 }}>
             {aaPaceCaption(pace, basis)}
           </Typography>
         </>
@@ -141,7 +141,7 @@ function BankBar({ unspent }: { unspent: number }): JSX.Element {
   return (
     <>
       <LinearProgress variant="determinate" color="warning" value={Math.min(100, (unspent / AA_BANK_CAP) * 100)} sx={{ my: 0.75, height: 4, borderRadius: 2 }} />
-      <Typography variant="caption" color="text.disabled">{`${String(unspent)} of ${String(AA_BANK_CAP)} banked`}</Typography>
+      <Typography variant="caption" sx={{ color: 'text.disabled' }}>{`${String(unspent)} of ${String(AA_BANK_CAP)} banked`}</Typography>
     </>
   )
 }
@@ -161,17 +161,17 @@ export function SpendCard({ recs, unspent }: { recs: AaRecs; unspent: number | n
       ) : (
         <>
           {top.map((i) => (
-            <Stack key={i.b.r.key} direction="row" spacing={1} alignItems="baseline">
-              <Typography variant="body2" color="success.main" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} noWrap onClick={() => nav.jump(i.b)}>
+            <Stack key={i.b.r.key} direction="row" spacing={1} sx={{ alignItems: 'baseline' }}>
+              <Typography variant="body2" sx={{ color: 'success.main', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} noWrap onClick={() => nav.jump(i.b)}>
                 {i.b.r.key}
               </Typography>
-              <Typography variant="caption" color="text.disabled" noWrap>{`${String(i.b.r.rank)} → ${String(i.b.r.rank + 1)}`}</Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ ml: 'auto' }} noWrap>
+              <Typography variant="caption" sx={{ color: 'text.disabled' }} noWrap>{`${String(i.b.r.rank)} → ${String(i.b.r.rank + 1)}`}</Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary', ml: 'auto' }} noWrap>
                 {i.next === null ? '? pts' : i.next === 0 ? 'free' : `${String(i.next)} pts`}
               </Typography>
             </Stack>
           ))}
-          <Typography variant="caption" color="text.disabled">
+          <Typography variant="caption" sx={{ color: 'text.disabled' }}>
             {`${String(recs.used)} of ${String(budget)} points · ${String(recs.total)} to max everything`}
           </Typography>
         </>
@@ -188,7 +188,7 @@ export function CantTellCard({ board, setPick }: { board: readonly AaBoardRow[];
   return (
     <Card title="Can't tell from the log" testId="aa-cant-tell">
       {rows.map((b) => (
-        <Stack key={b.r.key} direction="row" spacing={1} alignItems="baseline">
+        <Stack key={b.r.key} direction="row" spacing={1} sx={{ alignItems: 'baseline' }}>
           <Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} noWrap onClick={() => nav.jump(b)}>
             {b.r.key}
           </Typography>

@@ -97,12 +97,12 @@ export interface ItemZoneTableProps {
 export function ItemZoneTable({ rows, clipped, looted, onOpenMapZone }: ItemZoneTableProps): JSX.Element {
   return (
     <Box sx={{ flex: 1.4, minWidth: 0 }} data-testid="item-zone-table">
-      <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mb: 0.5 }} flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', flexWrap: 'wrap', mb: 0.5 }} useFlexGap>
         <Typography variant="subtitle2">Where it drops</Typography>
         {/* The caption that names the denominator now says what it MEANS on hover (JOS-249) —
             a native title, never a popper, and no new element on a header that is already three
             things wide. */}
-        <Typography component="span" variant="caption" color="text.secondary" title={ACTIVE_TIME_TITLE}>
+        <Typography component="span" variant="caption" sx={{ color: 'text.secondary' }} title={ACTIVE_TIME_TITLE}>
           (per hour of active time)
         </Typography>
         <ObservedChip />

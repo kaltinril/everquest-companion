@@ -46,9 +46,8 @@ export default function VoiceSetupLink({
   return (
     <Typography
       variant="caption"
-      color={gap === 'engine-not-installed' ? 'text.secondary' : 'warning.main'}
       data-testid={testId ?? 'voice-setup-note'}
-      sx={{ display: 'block', lineHeight: 1.4 }}
+      sx={{ color: gap === 'engine-not-installed' ? 'text.secondary' : 'warning.main', display: 'block', lineHeight: 1.4 }}
     >
       {SPEECH_SETUP_NOTES[gap]}
       {onOpen && (

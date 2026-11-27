@@ -18,8 +18,8 @@ export function RowMapLinks({ row }: { row: GapRow }): JSX.Element | null {
   const zones = useMemo(() => gapMapZones(row, PAGE_EXTRAS.zoneName), [row])
   if (open === undefined || zones.length === 0) return null
   return (
-    <Stack direction="row" spacing={0.5} alignItems="center" flexWrap="wrap" useFlexGap data-testid="gaps-map-links">
-      <Typography variant="caption" color="text.secondary" sx={{ minWidth: 64 }}>
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap data-testid="gaps-map-links">
+      <Typography variant="caption" sx={{ color: 'text.secondary', minWidth: 64 }}>
         map
       </Typography>
       {zones.map((z) => (

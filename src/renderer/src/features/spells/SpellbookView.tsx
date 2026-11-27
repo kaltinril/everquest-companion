@@ -200,14 +200,13 @@ const SpellRow = memo(function SpellRow({ row }: { row: SpellbookRow }): JSX.Ele
       data-tier={row.tier}
     >
       <TableCell>
-        <Stack direction="row" spacing={0.75} alignItems="center">
+        <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center' }}>
           <SpellIcon iconId={row.iconId} />
           <SpellTooltip name={row.name} placement="right">
             <Typography
               variant="body1"
               noWrap
-              sx={{ fontWeight: 600 }}
-              color={era ? 'warning.main' : undefined}
+              sx={{ color: era ? 'warning.main' : undefined, fontWeight: 600 }}
               title={era ? 'the wiki places this spell out of era' : undefined}
               data-testid={era ? 'spellbook-out-of-era' : undefined}
             >
@@ -220,7 +219,7 @@ const SpellRow = memo(function SpellRow({ row }: { row: SpellbookRow }): JSX.Ele
         {/* THE CELL SHOWS THE CLASSES YOU PICKED, the hover shows every class that gains it. */}
         <Typography
           variant="body2"
-          color="text.secondary"
+          sx={{ color: 'text.secondary' }}
           noWrap
           title={classesText(row.at, row.at.length)}
         >
@@ -228,7 +227,7 @@ const SpellRow = memo(function SpellRow({ row }: { row: SpellbookRow }): JSX.Ele
         </Typography>
       </TableCell>
       <TableCell>
-        <Typography variant="body2" color="text.secondary" noWrap data-testid="spellbook-category">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap data-testid="spellbook-category">
           {UPGRADE_CATEGORY_LABEL[row.category]}
         </Typography>
       </TableCell>
@@ -239,7 +238,7 @@ const SpellRow = memo(function SpellRow({ row }: { row: SpellbookRow }): JSX.Ele
       <TableCell data-testid="spellbook-line">
         <Typography
           variant="body2"
-          color="text.secondary"
+          sx={{ color: 'text.secondary' }}
           noWrap
           title={
             row.replaces === undefined
@@ -381,7 +380,7 @@ export default function SpellbookView(): JSX.Element {
         total={data.spells.length}
       />
       {data.spells.length === 0 ? (
-        <Typography variant="body2" color="text.secondary" data-testid="spellbook-empty">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="spellbook-empty">
           the spell catalogue has not loaded yet
         </Typography>
       ) : (
@@ -419,7 +418,7 @@ export default function SpellbookView(): JSX.Element {
           </Table>
           {settled && rows.length === 0 && (
             <Box sx={{ p: 2 }}>
-              <Typography variant="body2" color="text.secondary" data-testid="spellbook-no-hits">
+              <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="spellbook-no-hits">
                 no spell matches those filters
               </Typography>
             </Box>

@@ -52,11 +52,10 @@ function ItemRow({ row }: { row: SpellItemSource }): JSX.Element {
     <Stack
       direction="row"
       spacing={1}
-      alignItems="baseline"
       data-testid="spell-item"
       data-item={row.name}
       data-socket={row.socket}
-      sx={{ py: 0.25 }}
+      sx={{ alignItems: 'baseline', py: 0.25 }}
     >
       <KnownItemTooltip name={row.name} clickThrough>
         <Typography variant="body2">{row.name}</Typography>
@@ -65,12 +64,12 @@ function ItemRow({ row }: { row: SpellItemSource }): JSX.Element {
           carries a rank (`Improved Healing III`) the spell page's title does not, and hiding that
           would make three different items look like three copies of one. */}
       {row.effect !== '' && (
-        <Typography variant="caption" color="text.secondary" data-testid="spell-item-effect">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="spell-item-effect">
           {row.effect}
         </Typography>
       )}
       {row.detail !== undefined && (
-        <Typography variant="caption" color="text.disabled">
+        <Typography variant="caption" sx={{ color: 'text.disabled' }}>
           {row.detail}
         </Typography>
       )}
@@ -89,11 +88,11 @@ export default function SpellItemsSection({
   if (sources === undefined) return null
   return (
     <Box data-testid="spell-items-section" data-count={sources.length}>
-      <Typography variant="overline" color="text.secondary">
+      <Typography variant="overline" sx={{ color: 'text.secondary' }}>
         Items that carry it
       </Typography>
       {sources.length === 0 ? (
-        <Typography variant="body2" color="text.secondary" data-testid="spell-items-none">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="spell-items-none">
           no item in the catalog carries this spell
         </Typography>
       ) : (

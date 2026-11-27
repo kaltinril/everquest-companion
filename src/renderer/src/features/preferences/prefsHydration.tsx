@@ -135,7 +135,7 @@ export function PrefsGate({ children }: { children: ReactNode }): JSX.Element | 
   if (!hydrated) {
     if (!failed) return null
     return (
-      <Typography variant="body2" color="text.secondary" data-testid="prefs-unreadable">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="prefs-unreadable">
         Your settings could not be read from the app. Restarting it usually fixes this; if it keeps
         happening, please send a report.
       </Typography>

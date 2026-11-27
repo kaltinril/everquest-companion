@@ -80,7 +80,7 @@ export function UnlockSearchResultsList({
       />
       {results.hidden > 0 && (
         <Box>
-          <Typography variant="caption" color="text.disabled" data-testid="new-at-level-more" sx={{ fontSize: 10.5 }}>
+          <Typography variant="caption" data-testid="new-at-level-more" sx={{ color: 'text.disabled', fontSize: 10.5 }}>
             +{results.hidden} more, refine your search
           </Typography>
         </Box>

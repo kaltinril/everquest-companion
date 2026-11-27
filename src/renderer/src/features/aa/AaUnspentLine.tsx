@@ -22,9 +22,9 @@ export function AaUnspentLine(): JSX.Element | null {
     setDraft(null)
   }
   return (
-    <Stack direction="row" alignItems="center" spacing={2} sx={{ mt: 1 }}>
+    <Stack direction="row" spacing={2} sx={{ alignItems: 'center', mt: 1 }}>
       <Tooltip title={warn?.tip ?? UNSPENT_TIP}>
-        <Typography variant="body2" color={warn === null ? 'text.secondary' : warn.cap ? 'error.main' : 'warning.main'} data-testid="aa-unspent">
+        <Typography variant="body2" sx={{ color: warn === null ? 'text.secondary' : warn.cap ? 'error.main' : 'warning.main' }} data-testid="aa-unspent">
           {`Unspent: ${String(unspent)} of ${String(AA_POINT_CAP)}${warn === null ? '' : ' !'}`}
         </Typography>
       </Tooltip>

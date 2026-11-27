@@ -149,10 +149,10 @@ function ChipMenu({ chip, anchor, props, onClose }: { chip: TierChip; anchor: HT
             </Button>
           ))}
         </Stack>
-        {hint !== undefined && <Typography variant="caption" color="text.secondary">{hint}</Typography>}
-        <Typography variant="caption" color="text.secondary">{unitText(chip, chipUnit(props.model.units, chip))}</Typography>
+        {hint !== undefined && <Typography variant="caption" sx={{ color: 'text.secondary' }}>{hint}</Typography>}
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>{unitText(chip, chipUnit(props.model.units, chip))}</Typography>
         {!isRatioChip(chip) && (
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <TextField
               size="small"
               label="Cap the loadout at"
@@ -183,11 +183,11 @@ function BoardText({ setup, onLoad }: { setup: TierSetup; onLoad: (text: string)
     )
   }
   return (
-    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
       <Button size="small" variant="outlined" onClick={copy} data-testid="bis-copy">Copy board</Button>
       <TextField size="small" placeholder="paste a board (bis2:...)" value={text} onChange={(e) => setText(e.target.value)} slotProps={{ htmlInput: { 'data-testid': 'bis-board-text' } }} sx={{ flex: 1, minWidth: 160 }} />
       <Button size="small" variant="outlined" onClick={() => setMsg(onLoad(text) ? 'Board loaded.' : 'That text is not a board. A board starts with bis2:')} data-testid="bis-load">Load</Button>
-      {msg !== '' && <Typography variant="caption" color="text.secondary">{msg}</Typography>}
+      {msg !== '' && <Typography variant="caption" sx={{ color: 'text.secondary' }}>{msg}</Typography>}
     </Stack>
   )
 }
@@ -203,8 +203,8 @@ export default function TierBoard(props: TierBoardProps): JSX.Element {
           <Lane key={t} tier={t} props={props} onOpen={open} />
         ))}
       </Box>
-      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
-        <Typography variant="caption" color="text.secondary">Each tier counts</Typography>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>Each tier counts</Typography>
         <ToggleButtonGroup size="small" exclusive value={setup.step} onChange={(_e, v: TierStep | null) => v !== null && props.onStep(v)}>
           {TIER_STEPS.map((s) => (
             <ToggleButton key={s} value={s} data-testid={`bis-step-${String(s)}`} sx={{ py: 0.25 }}>
@@ -219,7 +219,7 @@ export default function TierBoard(props: TierBoardProps): JSX.Element {
           Clear tiers
         </Button>
       </Stack>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Unassigned stats do not count: drop a stat there when you have maxed it or no longer need it. Clear tiers drops every stat there. Click a stat for its menu: its tier, what it does, and a cap (it then counts only up to that total across the loadout; attributes stop at your stat cap by default).
       </Typography>
       <BoardText setup={setup} onLoad={props.onLoad} />

@@ -88,6 +88,14 @@ disagree, RULES.md wins; fix this file.
   `New-Item -ItemType Junction -Path <wt>\node_modules -Target <clone>\node_modules` (Git Bash
   `mklink` mangles paths). Without it, a gate grep can false-pass: npm's tool-not-found text
   contains no "error". Check real exit codes.
+- **A dependency change needs its own `node_modules`, and that one still leaks** (2026-11-27, MUI 7
+  to 9). A worktree under `.claude/worktrees/` sits inside the main clone, so any module missing
+  from the worktree's own install is resolved from the main clone's `node_modules` one level up, by
+  tsc and vite alike: four icons MUI 9 had removed typechecked clean against MUI 7's copies. After a
+  bump, run `npx tsc --noEmit -p tsconfig.web.json --tsBuildInfoFile <scratch>/x --traceResolution |
+  grep "resolved to 'C:/git/everquest-companion/node_modules"` (and the same for tsconfig.node.json):
+  it must print nothing. The scratch build-info file also keeps the incremental cache from hiding a
+  file whose imports broke but whose text did not change.
 - **Stage your own files by name in a shared worktree.** Several sessions may write to one tree at
   once (the owner often has a second agent drafting a plan). `git add docs/community` sweeps their
   uncommitted drafts into your commit (2026-10-20: a screenshot-to-wiki plan went out under a

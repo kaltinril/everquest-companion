@@ -84,11 +84,11 @@ function StatCard({ label, value, hint }: { label: string; value: string; hint?:
       <Typography variant="h5" sx={{ color: 'primary.main', lineHeight: 1.1 }}>
         {value}
       </Typography>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {label}
       </Typography>
       {hint && (
-        <Typography variant="caption" color="text.disabled" display="block">
+        <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block' }}>
           {hint}
         </Typography>
       )}
@@ -139,11 +139,11 @@ function Timeline({ events }: { events: LootEvent[] }): JSX.Element {
           )
         })}
       </svg>
-      <Stack direction="row" justifyContent="space-between">
-        <Typography variant="caption" color="text.secondary">
+      <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {fmt(bins.from)}
         </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {fmt(bins.to)}
         </Typography>
       </Stack>
@@ -245,7 +245,7 @@ function ItemWindowColumn({
       )}
       <ItemWishRow item={item} />
       {knowledge.loading && !knowledge.data && (
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1, color: 'text.secondary' }}>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mt: 1, color: 'text.secondary' }}>
           <CircularProgress size={14} />
           <Typography variant="caption">Looking up this item…</Typography>
         </Stack>
@@ -285,7 +285,7 @@ function ObservedColumn({
 }): JSX.Element {
   return (
     <Box sx={{ flex: 1, minWidth: 0, width: '100%' }}>
-      <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap sx={{ mb: 2 }}>
+      <Stack direction="row" spacing={1.5} useFlexGap sx={{ flexWrap: 'wrap', mb: 2 }}>
         {/* TWO WITNESSES, EACH LABELLED WITH WHO SAID IT (JOS-160). "Times looted" counts loot
             lines and is honest to the LOG; "In your inventory export" is what the last
             `/outputfile inventory` vouched for and is honest to the DUMP. They disagree all the
@@ -397,7 +397,7 @@ export function ItemDetailContent({
   // that is not simply a fold of `events`.
   const zoneRates = useItemZoneRates(looted, slice)
   return (
-    <Stack direction={{ xs: 'column', md: 'row' }} spacing={2.5} alignItems="flex-start">
+    <Stack direction={{ xs: 'column', md: 'row' }} spacing={2.5} sx={{ alignItems: 'flex-start' }}>
       <ItemWindowColumn key={item} item={item} stats={stats} knowledge={knowledge} />
       <ObservedColumn
         events={looted}
@@ -437,7 +437,7 @@ export function ItemDetailDialog({
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle sx={{ pr: 6 }}>
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <Box component="span" sx={{ color: EQ_ITEM_COLORS.name }}>
             {item}
           </Box>

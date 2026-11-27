@@ -64,9 +64,8 @@ export function ScopeBar({ available, slice, onPick, onCustom, custom, testId }:
           the row it wrapped out of rather than by whichever group happens to sit at the seam. */}
       <Stack
         direction="row"
-        alignItems="center"
         useFlexGap
-        sx={{ flexWrap: 'wrap', columnGap: 1.5, rowGap: 1 }}
+        sx={{ alignItems: 'center', flexWrap: 'wrap', columnGap: 1.5, rowGap: 1 }}
       >
         <SliceControls
           available={available}
@@ -84,9 +83,8 @@ export function ScopeBar({ available, slice, onPick, onCustom, custom, testId }:
           places them, it does not restate them. */}
       <Typography
         variant="caption"
-        color="text.secondary"
         noWrap
-        sx={{ minWidth: 0 }}
+        sx={{ color: 'text.secondary', minWidth: 0 }}
         data-testid={`${testId}-scope-caption`}
       >
         <SliceCaption slice={slice} testId={`${testId}-slice`} />

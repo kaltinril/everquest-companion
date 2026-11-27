@@ -79,7 +79,7 @@ function ComboChips({
   ambiguous: boolean
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={0.5} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
       {classes.map((c) => (
         <Chip
           key={c}
@@ -200,7 +200,7 @@ export function NewAtLevelPanel({
       {/* THE ARRIVAL PULSE, keyed on the nonce so a repeat link restarts it (see useFocusLanding).
           A sibling of the content rather than a style on the Paper, and inert to the pointer. */}
       {landing.seq !== null && <Box key={landing.seq} aria-hidden sx={LANDING_PULSE_SX} />}
-      <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" useFlexGap sx={{ mb: 0.75 }}>
+      <Stack direction="row" spacing={1.5} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap', mb: 0.75 }}>
         <Typography variant="subtitle2">New at this level</Typography>
         <LevelStepper level={level} onChange={(n) => onPick(n)} dimmed={searching} testidPrefix="new-at-level" />
         {/* ONE QUIET WORD, ONCE (JOS-391, AGENTS.md's caveat diet). The row figures are base
@@ -208,7 +208,7 @@ export function NewAtLevelPanel({
             said here in a word rather than footnoted on twelve rows. The per-second figures DO
             carry the re-use timer now (JOS-444) - they are sustained numbers, not cast-window
             ones - which is a change in the arithmetic and not in what this word covers. */}
-        <Typography variant="caption" color="text.disabled" data-testid="new-at-level-directional">
+        <Typography variant="caption" sx={{ color: 'text.disabled' }} data-testid="new-at-level-directional">
           directional
         </Typography>
         {picked !== null && currentLevel !== null && picked !== currentLevel && (
@@ -253,7 +253,7 @@ export function NewAtLevelPanel({
           />
         </Stack>
       ) : (
-        <Typography variant="caption" color="text.secondary" data-testid="new-at-level-unknown">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="new-at-level-unknown">
           Your class loadout isn&apos;t known yet - a <code>/who</code> on yourself, or a correction on the
           Profile tab, and this fills in.
         </Typography>

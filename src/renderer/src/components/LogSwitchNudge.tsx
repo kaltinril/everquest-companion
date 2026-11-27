@@ -56,7 +56,7 @@ export default function LogSwitchNudge(): JSX.Element | null {
         sx={{ alignItems: 'flex-start', maxWidth: 420 }}
       >
         <AlertTitle>Another character&apos;s log is active</AlertTitle>
-        <Stack spacing={1} alignItems="flex-start">
+        <Stack spacing={1} sx={{ alignItems: 'flex-start' }}>
           <span data-testid="log-switch-nudge-text">
             {attached.name}&apos;s log has been quiet for {quietFor(nudge.quietMs)}, but{' '}
             {candidate.name}&apos;s is being written to right now. Switch to {candidate.name}?

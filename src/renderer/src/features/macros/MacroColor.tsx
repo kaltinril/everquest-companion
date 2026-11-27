@@ -69,7 +69,7 @@ export function ColorPicker({ value, warning, onPick }: PickerProps): JSX.Elemen
   const outside = macroSwatch(value) === null
   return (
     <Stack spacing={0.5} data-testid="macro-color">
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
         Text colour{outside ? `: ${String(value)}` : ''}
       </Typography>
       <Box role="group" aria-label="Text colour" sx={{ display: 'grid', gridTemplateColumns: 'repeat(10, 24px)', gap: 0.5, width: 'fit-content' }}>
@@ -78,7 +78,7 @@ export function ColorPicker({ value, warning, onPick }: PickerProps): JSX.Elemen
         ))}
       </Box>
       {warning !== undefined && (
-        <Typography variant="caption" color="warning.main" data-testid="macro-color-warning">
+        <Typography variant="caption" sx={{ color: 'warning.main' }} data-testid="macro-color-warning">
           {warning}
         </Typography>
       )}

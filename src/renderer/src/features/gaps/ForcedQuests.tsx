@@ -42,7 +42,7 @@ export function QuestScopes({ extras, forced, children }: { extras: RowFactConte
 
 /** The visits to pick from: NPC, zone and time, then the NPC's first line. */
 function VisitList({ talks, picked, onToggle }: { talks: readonly TalkVisit[]; picked: ReadonlySet<string>; onToggle: (id: string) => void }): JSX.Element {
-  if (talks.length === 0) return <Typography variant="body2" color="text.secondary">No NPC talk left to add. Hail an NPC first.</Typography>
+  if (talks.length === 0) return <Typography variant="body2" sx={{ color: 'text.secondary' }}>No NPC talk left to add. Hail an NPC first.</Typography>
   return (
     <List dense sx={{ maxHeight: '45vh', overflow: 'auto' }} data-testid="forced-visits">
       {[...talks].reverse().map((v) => (
@@ -77,7 +77,7 @@ function AddQuestDialog({ scope, fixedName, onClose }: { scope: ForcedScope; fix
             options={scope.titles}
             inputValue={name}
             onInputChange={(_e, v) => setName(v)}
-            renderInput={(p) => <TextField {...p} label="Quest name" size="small" sx={{ mt: 1, mb: 1 }} slotProps={{ htmlInput: { ...p.inputProps, 'data-testid': 'forced-name' } }} />}
+            renderInput={(p) => <TextField {...p} label="Quest name" size="small" sx={{ mt: 1, mb: 1 }} slotProps={{ ...p.slotProps, htmlInput: { ...p.slotProps.htmlInput, 'data-testid': 'forced-name' } }} />}
           />
         )}
         <VisitList talks={scope.talks} picked={picked} onToggle={toggle} />

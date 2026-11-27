@@ -171,7 +171,7 @@ function ManageDialog({ store, onClose }: { store: MacroStore; onClose: () => vo
         <Stack spacing={1}>
           {layouts.length === 0 && <Quiet testid="macro-layout-manage-none">No saved layouts yet. Save a character&apos;s buttons as one first.</Quiet>}
           {layouts.map((set) => (
-            <Stack key={set.id} direction="row" spacing={1} alignItems="center" data-testid="macro-layout-row">
+            <Stack key={set.id} direction="row" spacing={1} sx={{ alignItems: 'center' }} data-testid="macro-layout-row">
               <TextField
                 size="small"
                 value={set.name}
@@ -182,7 +182,7 @@ function ManageDialog({ store, onClose }: { store: MacroStore; onClose: () => vo
                 sx={{ flexGrow: 1 }}
                 slotProps={{ htmlInput: { 'aria-label': 'Layout name', 'data-testid': 'macro-layout-rename' } }}
               />
-              <Typography variant="caption" color="text.secondary" noWrap>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>
                 {buttonCount(filledCount(store.library, set))}
               </Typography>
               <Button

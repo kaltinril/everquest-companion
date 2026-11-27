@@ -41,7 +41,7 @@ export default function BuffStatsPanel({
   const rows = totals.rows
   return (
     <Paper variant="outlined" sx={{ p: 1.25, position: 'sticky', top: 8 }} data-testid="buff-stats">
-      <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 0.75 }}>
+      <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', mb: 0.75 }}>
         <Typography variant="subtitle2">{grouped === true ? "From the group's buffs" : 'From your buffs'}</Typography>
         <Chip
           size="small"
@@ -52,7 +52,7 @@ export default function BuffStatsPanel({
         />
       </Stack>
       {rows.length === 0 ? (
-        <Typography variant="caption" color="text.secondary" data-testid="buff-stats-empty">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="buff-stats-empty">
           No buff in the set states a stat this app reads.
         </Typography>
       ) : (
@@ -61,14 +61,12 @@ export default function BuffStatsPanel({
             <Stack
               key={`${r.key}-${r.percent ? 'pct' : 'pt'}`}
               direction="row"
-              justifyContent="space-between"
-              alignItems="baseline"
-              sx={{ gap: 1 }}
+              sx={{ justifyContent: 'space-between', alignItems: 'baseline', gap: 1 }}
               data-testid="buff-stat-row"
               data-stat={r.key}
               title={`from ${r.from.join(', ')}`}
             >
-              <Typography variant="caption" color="text.secondary" sx={{ minWidth: 0 }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', minWidth: 0 }}>
                 {spellStatLabel(r.key)}
               </Typography>
               <Typography
@@ -86,9 +84,7 @@ export default function BuffStatsPanel({
       {/* Since 2026-11-15 the totals move with rank: the game's spell windows show it. */}
       <Typography
         variant="caption"
-        color="text.secondary"
-        display="block"
-        sx={{ mt: 1, pt: 1, borderTop: 1, borderColor: 'divider' }}
+        sx={{ color: 'text.secondary', display: 'block', mt: 1, pt: 1, borderTop: 1, borderColor: 'divider' }}
         data-testid="buff-stats-rank-note"
       >
         Each buff is read at your rank of it. The slider lifts them all; haste and run speed do not

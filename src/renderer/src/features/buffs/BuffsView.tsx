@@ -58,7 +58,7 @@ function OverlayDiagnostics(): JSX.Element {
   const [open, setOpen] = useState(false)
   return (
     <Box>
-      <Stack direction="row" alignItems="center" spacing={0.5}>
+      <Stack direction="row" sx={{ alignItems: 'center' }} spacing={0.5}>
         <Box sx={{ flexGrow: 1 }} />
         <Tooltip title="Diagnostics">
           <IconButton size="small" onClick={() => setOpen((v) => !v)}>
@@ -157,7 +157,7 @@ function ActiveHeader({
   onToggle: () => void
 }): JSX.Element {
   return (
-    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 0.5 }}>
       <Typography variant="subtitle2">Active</Typography>
       {/* The chip is absent when there is nothing to reveal — a switch for an empty set would be
           the app inviting you to look at nothing. Its label carries the COUNT, which is the whole
@@ -195,7 +195,7 @@ function ActiveGroup({
 }): JSX.Element {
   return (
     <Box>
-      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 0.5 }}>
         <Typography variant="caption" sx={{ fontWeight: 600 }}>
           {label}
         </Typography>
@@ -280,7 +280,7 @@ function AllowModeSwitch({ optIn, onChange }: { optIn: boolean; onChange: (v: bo
         />
       }
       label={
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Only track buffs and debuffs I check
         </Typography>
       }
@@ -337,7 +337,7 @@ export default function BuffsView(): JSX.Element {
   return (
     <Stack spacing={2}>
       <Box>
-        <Stack direction="row" alignItems="center" spacing={1}>
+        <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
           <AutoFixHighIcon color="primary" />
           <Typography variant="h6">Buffs</Typography>
           {/* THE MODEL'S COUNT, not the drawn one (JOS-215): this chip summarizes what the app
@@ -362,7 +362,7 @@ export default function BuffsView(): JSX.Element {
         />
         {active.length === 0 ? (
           <LogReadInline module="buffs" served={served !== null}>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               No active buffs.
             </Typography>
           </LogReadInline>

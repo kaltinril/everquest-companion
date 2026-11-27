@@ -35,7 +35,7 @@ function NextLine({ pick, onOpenRecipe }: { pick: PickUp; onOpenRecipe: OpenReci
   if (pick.next === null) {
     if (!pick.topped) return null
     return (
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
         {PICK_UP_TOPPED_TEXT}
       </Typography>
     )
@@ -43,8 +43,8 @@ function NextLine({ pick, onOpenRecipe }: { pick: PickUp; onOpenRecipe: OpenReci
   const heldText = pickUpHeldText(pick)
   const next = pick.next
   return (
-    <Stack direction="row" spacing={0.75} alignItems="baseline" sx={{ minWidth: 0, flexWrap: 'wrap' }} data-testid="tradeskills-pickup-next">
-      <Typography variant="body2" color="text.secondary" sx={{ flexShrink: 0 }}>
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'baseline', minWidth: 0, flexWrap: 'wrap' }} data-testid="tradeskills-pickup-next">
+      <Typography variant="body2" sx={{ color: 'text.secondary', flexShrink: 0 }}>
         Next:
       </Typography>
       <Typography variant="body2" component="span" sx={{ minWidth: 0, display: 'flex' }}>
@@ -55,11 +55,11 @@ function NextLine({ pick, onOpenRecipe }: { pick: PickUp; onOpenRecipe: OpenReci
           }}
         />
       </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ flexShrink: 0 }}>
+      <Typography variant="body2" sx={{ color: 'text.secondary', flexShrink: 0 }}>
         trivial {next.trivial}
       </Typography>
       {heldText !== '' && (
-        <Typography variant="body2" color={pick.canMake === 0 ? 'text.secondary' : 'success.main'} data-testid="tradeskills-pickup-held">
+        <Typography variant="body2" sx={{ color: pick.canMake === 0 ? 'text.secondary' : 'success.main' }} data-testid="tradeskills-pickup-held">
           {heldText}
         </Typography>
       )}
@@ -85,7 +85,7 @@ export function HomePickUp({ facts, onOpen, onOpenRecipe }: HomePickUpProps): JS
   if (pick === null) return null
   return (
     <Paper variant="outlined" sx={{ p: 1.5, mb: 1.5 }} data-testid="tradeskills-pickup" data-tradeskill={pick.tradeskill}>
-      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5, mb: 0.5 }}>
+      <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 0.5, mb: 0.5 }}>
         <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
           {PICK_UP_HEADING}
         </Typography>
@@ -101,7 +101,7 @@ export function HomePickUp({ facts, onOpen, onOpenRecipe }: HomePickUpProps): JS
           {pickUpOpenLabel(pick.tradeskill)}
         </Button>
       </Stack>
-      <Stack direction="row" spacing={1} alignItems="baseline" sx={{ flexWrap: 'wrap' }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', flexWrap: 'wrap' }}>
         <Typography variant="body1" sx={{ fontWeight: 600 }}>
           {pick.tradeskill}
         </Typography>
@@ -110,13 +110,13 @@ export function HomePickUp({ facts, onOpen, onOpenRecipe }: HomePickUpProps): JS
             {pick.level}
           </Typography>
         )}
-        <Typography variant="body2" color="text.secondary" data-testid="tradeskills-pickup-why">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="tradeskills-pickup-why">
           {pickUpWhyText(pick, pick.lastCombine === null ? '' : formatDate(pick.lastCombine))}
         </Typography>
       </Stack>
       <NextLine pick={pick} onOpenRecipe={onOpenRecipe} />
       {pick.lastRun !== null && (
-        <Typography variant="body2" color="text.secondary" data-testid="tradeskills-pickup-run">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="tradeskills-pickup-run">
           {lastRunText(pick.lastRun, formatDate(pick.lastRun.end))}
         </Typography>
       )}

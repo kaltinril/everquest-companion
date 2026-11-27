@@ -65,7 +65,7 @@ export function TagGroupsDialog({ store, set, onClose }: TagGroupsProps): JSX.El
             </TextField>
           )}
           {status !== null && (
-            <Typography variant="body2" color={short ? 'warning.main' : 'text.primary'} data-testid="macro-tag-groups-status">
+            <Typography variant="body2" sx={{ color: short ? 'warning.main' : 'text.primary' }} data-testid="macro-tag-groups-status">
               {tagStatusText(status)}
             </Typography>
           )}

@@ -42,7 +42,7 @@
 
 import { type JSX, useState } from 'react'
 import { Box, Button, Collapse, LinearProgress, Stack, Typography, useTheme } from '@mui/material'
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlineOutlined'
 import type { EngineFaultSay, FoldReadout } from '../../../shared/engineLaunch'
 import { NO_ENGINE_CONSEQUENCE, bannerFor, failureWords, reportPrefill } from '../../../shared/engineLaunch'
 import { useEngineLaunch } from '../lib/engineLaunchHud'
@@ -92,22 +92,22 @@ function FoldBar({ readout }: { readout: FoldReadout }): JSX.Element {
         bgcolor: theme.palette.background.paper
       }}
     >
-      <Stack direction="row" spacing={1} alignItems="baseline" sx={{ mb: 0.75 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', mb: 0.75 }}>
         <Typography variant="body2" sx={{ fontWeight: 600 }}>
           Catching up on your log
         </Typography>
-        <Typography variant="body2" color="text.secondary" data-testid="engine-launch-progress-pct">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="engine-launch-progress-pct">
           {readout.pctText}
         </Typography>
-        <Typography variant="body2" color="text.secondary" data-testid="engine-launch-progress-bytes">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="engine-launch-progress-bytes">
           {readout.bytesText}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           {readout.eventsText}
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
         {readout.etaText !== null && (
-          <Typography variant="body2" color="text.secondary" data-testid="engine-launch-progress-eta">
+          <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="engine-launch-progress-eta">
             {readout.etaText}
           </Typography>
         )}
@@ -145,7 +145,7 @@ function FailureCard({ fault }: { fault: EngineFaultSay }): JSX.Element {
         bgcolor: theme.palette.action.hover
       }}
     >
-      <Stack direction="row" spacing={1.5} alignItems="flex-start">
+      <Stack direction="row" spacing={1.5} sx={{ alignItems: 'flex-start' }}>
         <ErrorOutlineIcon color="warning" fontSize="small" sx={{ mt: 0.25 }} />
         <Box sx={{ minWidth: 0, flexGrow: 1 }}>
           <Typography
@@ -155,13 +155,13 @@ function FailureCard({ fault }: { fault: EngineFaultSay }): JSX.Element {
           >
             {words.headline}
           </Typography>
-          <Typography variant="body2" color="text.secondary" data-testid="engine-launch-failure-body">
+          <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="engine-launch-failure-body">
             {words.body}
           </Typography>
           {words.remedy !== null && (
             <Typography
               variant="body2"
-              color="text.secondary"
+              sx={{ color: 'text.secondary' }}
               data-testid="engine-launch-failure-remedy"
             >
               {words.remedy}
@@ -169,14 +169,13 @@ function FailureCard({ fault }: { fault: EngineFaultSay }): JSX.Element {
           )}
           <Typography
             variant="body2"
-            color="text.secondary"
-            sx={{ mt: 0.5 }}
+            sx={{ color: 'text.secondary', mt: 0.5 }}
             data-testid="engine-launch-failure-consequence"
           >
             {NO_ENGINE_CONSEQUENCE}
           </Typography>
           {fault.detail !== null && (
-            <Typography variant="caption" color="text.secondary" component="div" sx={{ mt: 0.5 }}>
+            <Typography variant="caption" component="div" sx={{ color: 'text.secondary', mt: 0.5 }}>
               It last said: {fault.detail}
             </Typography>
           )}
@@ -194,8 +193,7 @@ function FailureCard({ fault }: { fault: EngineFaultSay }): JSX.Element {
                   key={path}
                   variant="caption"
                   component="div"
-                  color="text.secondary"
-                  sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}
+                  sx={{ color: 'text.secondary', fontFamily: 'monospace', wordBreak: 'break-all' }}
                 >
                   {path}
                 </Typography>
@@ -232,7 +230,7 @@ function CardActions({
 }): JSX.Element {
   const [retrying, setRetrying] = useState(false)
   return (
-    <Stack direction="row" spacing={1} sx={{ mt: 1 }} flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', mt: 1 }} useFlexGap>
       <Button
         size="small"
         variant="contained"

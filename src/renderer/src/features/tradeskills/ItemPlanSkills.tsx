@@ -57,12 +57,12 @@ function NeedRow({ need, onOpenBench }: { need: SkillNeed; onOpenBench: OpenBenc
   const also = alsoText(need)
   return (
     <Box sx={{ py: 0.5, borderBottom: 1, borderColor: 'divider' }} data-testid="tradeskill-plan-skill" data-stand={need.stand}>
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.25 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 0.25 }}>
         <Chip size="small" variant="outlined" color={STAND_COLOR[need.stand]} label={`${need.tradeskill}: ${levelText(need)}`} data-testid="tradeskill-plan-skill-level" />
         <Typography variant="body2">{skillNeedText(need)}</Typography>
       </Stack>
       {also !== '' && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
           {also}
         </Typography>
       )}
@@ -81,7 +81,7 @@ function RouteRow({ line }: { line: RouteLine }): JSX.Element {
       <Box sx={{ minWidth: 0 }}>
         {line.wikiName === null ? <Typography variant="body2">{line.item}</Typography> : <ItemLabel name={line.wikiName} />}
         {line.detail !== '' && (
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
             {line.detail}
           </Typography>
         )}
@@ -98,12 +98,12 @@ function RouteBlock({ route, onOpenBench }: { route: SkillRoute; onOpenBench: Op
         {routeHeading(route)}
       </Typography>
       {!route.placed && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
           {ROUTE_UNPLACED_TEXT}
         </Typography>
       )}
       {route.lines.length === 0 && (
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           {ROUTE_EMPTY_TEXT}
         </Typography>
       )}
@@ -111,12 +111,12 @@ function RouteBlock({ route, onOpenBench }: { route: SkillRoute; onOpenBench: Op
         <RouteRow key={line.id} line={line} />
       ))}
       {tail !== '' && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-plan-route-tail">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-plan-route-tail">
           {tail}
         </Typography>
       )}
       {route.lines.length > 0 && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-plan-route-source">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-plan-route-source">
           {routeSourceText(route)} <BenchLink tradeskill={route.tradeskill} onOpenBench={onOpenBench} />
         </Typography>
       )}
@@ -130,9 +130,9 @@ function RouteBlock({ route, onOpenBench }: { route: SkillRoute; onOpenBench: Op
  */
 export function PlanStandLine({ skills, onOpenBench }: { skills: PlanSkills; onOpenBench: OpenBench }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5, mt: 0.75 }} data-testid="tradeskill-plan-stand">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 0.5, mt: 0.75 }} data-testid="tradeskill-plan-stand">
       {skills.needs.map((need) => (
-        <Stack key={need.tradeskill} direction="row" spacing={0.75} alignItems="center" data-testid="tradeskill-plan-stand-skill">
+        <Stack key={need.tradeskill} direction="row" spacing={0.75} sx={{ alignItems: 'center' }} data-testid="tradeskill-plan-stand-skill">
           <Tooltip title={`Open the ${need.tradeskill} workbench`}>
             <Chip
               size="small"
@@ -144,7 +144,7 @@ export function PlanStandLine({ skills, onOpenBench }: { skills: PlanSkills; onO
               }}
             />
           </Tooltip>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             {skillMetText(need)}
           </Typography>
         </Stack>
@@ -171,12 +171,12 @@ export function ItemPlanSkills({ skills, routes, served, onOpenBench }: ItemPlan
         <NeedRow key={need.tradeskill} need={need} onOpenBench={onOpenBench} />
       ))}
       {skills.other.map((recipe) => (
-        <Typography key={recipe.item} variant="body2" color="text.secondary" sx={{ py: 0.5 }} data-testid="tradeskill-plan-unskilled">
+        <Typography key={recipe.item} variant="body2" sx={{ color: 'text.secondary', py: 0.5 }} data-testid="tradeskill-plan-unskilled">
           {unskilledText(recipe)}
         </Typography>
       ))}
       {allMet && (
-        <Typography variant="body2" color="success.main" sx={{ pt: 0.5 }} data-testid="tradeskill-plan-all-met">
+        <Typography variant="body2" sx={{ color: 'success.main', pt: 0.5 }} data-testid="tradeskill-plan-all-met">
           {ALL_MET_TEXT}
         </Typography>
       )}
@@ -190,7 +190,7 @@ export function ItemPlanSkills({ skills, routes, served, onOpenBench }: ItemPlan
           ))}
         </Box>
       )}
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }} data-testid="tradeskill-plan-chance-note">
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }} data-testid="tradeskill-plan-chance-note">
         {CHANCE_NOTE}
       </Typography>
     </Paper>

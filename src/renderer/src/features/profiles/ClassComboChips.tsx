@@ -66,7 +66,7 @@ export function SlotChip({ slot }: { slot: ComboSlot }): JSX.Element {
 /** The loadout as chips, slot order preserved. Zero slots renders nothing, not an empty box. */
 export function SlotChips({ slots }: { slots: readonly ComboSlot[] }): JSX.Element {
   return (
-    <Stack direction="row" spacing={0.5} alignItems="center" flexWrap="wrap" useFlexGap sx={{ minWidth: 0 }}>
+    <Stack direction="row" spacing={0.5} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap', minWidth: 0 }}>
       {slots.map((slot, i) => (
         <SlotChip key={`${i}:${slot.candidates.join('|')}`} slot={slot} />
       ))}

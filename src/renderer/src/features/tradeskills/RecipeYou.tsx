@@ -58,7 +58,7 @@ function YouLine({ recipe }: { recipe: BookRecipe }): JSX.Element | null {
   if (!craft.served) return null
   const row = recipeHistory(craft, recipe)
   return (
-    <Typography variant="body2" color="text.secondary" data-testid="tradeskill-picked-you">
+    <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="tradeskill-picked-you">
       <SourceChip kind="log" />
       {row === null ? NO_HISTORY_TEXT : `You ${historyWords(row)}. Last combine ${formatDate(row.lastTs)}.`}
     </Typography>
@@ -70,7 +70,7 @@ function CostLine({ money }: { money: RecipeMoney }): JSX.Element | null {
   const none = noCostText(money)
   if (money.perCombine === null && none === '') return null
   return (
-    <Typography variant="body2" color="text.secondary" data-testid="tradeskill-picked-cost">
+    <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="tradeskill-picked-cost">
       <SourceChip kind="log" />
       {money.perCombine === null ? none : `One combine costs ${ppText(money.perCombine)} at the prices you last paid: ${costPartsText(money)}.`}
       {money.perCombine !== null && money.returned.length > 0 && ` Not counted, the wiki says the combine gives it back: ${money.returned.join(', ')}.`}
@@ -84,7 +84,7 @@ function SaleLine({ money }: { money: RecipeMoney }): JSX.Element | null {
   if (sale === null) return null
   const against = differenceText(money)
   return (
-    <Typography variant="body2" color="text.secondary" data-testid="tradeskill-picked-sale">
+    <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="tradeskill-picked-sale">
       <SourceChip kind="log" />
       Last sold for {ppText(sale.lastCopper)} to <MerchantLink name={sale.merchant} />
       {` on ${formatDate(sale.ts)}`}

@@ -91,12 +91,12 @@ function OverrideDialog({
       <DialogContent>
         <Stack spacing={1.5}>
           <ClassPicker picked={picked} onToggle={(c) => setPicked((prev) => togglePicked(prev, c))} />
-          <Typography variant="caption" color="text.secondary" data-testid="loadout-override-count">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="loadout-override-count">
             {picked.length === 0
               ? 'Pick 1 to 3 classes.'
               : `${picked.map(classDisplayName).join(' / ')} - ${picked.length} of ${MAX_COMBO_SLOTS} slots.`}
           </Typography>
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             This applies from the start of your current loadout onward and stays until you change
             it or go back to autodetect.
           </Typography>
@@ -134,7 +134,7 @@ export default function LoadoutOverride({ current }: { current: ComboInterval | 
 
   if (!current) {
     return (
-      <Typography variant="caption" color="text.disabled" data-testid="loadout-override">
+      <Typography variant="caption" sx={{ color: 'text.disabled' }} data-testid="loadout-override">
         No loadout read yet - one appears as soon as the log names classes you played, and you
         can set it by hand from there.
       </Typography>
@@ -144,8 +144,8 @@ export default function LoadoutOverride({ current }: { current: ComboInterval | 
   const overruled = overruledText(current)
   return (
     <Stack spacing={0.75} data-testid="loadout-override">
-      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
-        <Typography variant="caption" color="text.secondary">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           In effect now
         </Typography>
         <SlotChips slots={current.slots} />
@@ -174,7 +174,7 @@ export default function LoadoutOverride({ current }: { current: ComboInterval | 
           </Button>
         )}
       </Stack>
-      <Typography variant="caption" color="text.secondary" data-testid="loadout-override-source">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="loadout-override-source">
         {loadoutSourceText(current)}
       </Typography>
       {overruled && (

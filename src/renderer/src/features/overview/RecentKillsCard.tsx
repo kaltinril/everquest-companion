@@ -62,7 +62,7 @@ function ExpCell({ row }: { row: ProgressionKill }): JSX.Element {
       : 'Experience gained, but the log stated no percentage.'
   return (
     <Tooltip title={tip}>
-      <Typography variant="caption" color="text.disabled" sx={{ flexShrink: 0 }}>
+      <Typography variant="caption" sx={{ color: 'text.disabled', flexShrink: 0 }}>
         -
       </Typography>
     </Tooltip>
@@ -78,9 +78,8 @@ function Row({ row, onOpenMob }: { row: ProgressionKill; onOpenMob: (t: MobTarge
     <Stack
       direction="row"
       spacing={0.75}
-      alignItems="center"
       data-testid="overview-kill-row"
-      sx={{ minWidth: 0, py: 0.3, px: 0.5, borderRadius: 0.5 }}
+      sx={{ alignItems: 'center', minWidth: 0, py: 0.3, px: 0.5, borderRadius: 0.5 }}
     >
       {/* The name is the link, not the row: the rest of the row is facts about the KILL (what it
           paid, where, when) and clicking a percentage should not navigate. Same in-place link
@@ -112,7 +111,7 @@ function Row({ row, onOpenMob }: { row: ProgressionKill; onOpenMob: (t: MobTarge
       )}
       <Box sx={{ flexGrow: 1 }} />
       {row.zone !== '' && (
-        <Typography variant="caption" color="text.secondary" noWrap sx={{ flexShrink: 1, minWidth: 0 }}>
+        <Typography variant="caption" noWrap sx={{ color: 'text.secondary', flexShrink: 1, minWidth: 0 }}>
           {row.zone}
         </Typography>
       )}
@@ -122,7 +121,7 @@ function Row({ row, onOpenMob }: { row: ProgressionKill; onOpenMob: (t: MobTarge
         </Tooltip>
       )}
       <ExpCell row={row} />
-      <Typography variant="caption" color="text.disabled" sx={{ flexShrink: 0 }}>
+      <Typography variant="caption" sx={{ color: 'text.disabled', flexShrink: 0 }}>
         {formatTime(row.ts)}
       </Typography>
     </Stack>

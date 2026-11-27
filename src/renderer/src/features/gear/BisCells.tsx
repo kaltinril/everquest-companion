@@ -65,7 +65,7 @@ function Tags({ cell, owned, worn }: { cell: BisCell; owned: ReadonlyMap<string,
   if (kind !== null) tags.push({ label: KIND_LABEL[kind], color: 'default' })
   if (tags.length === 0) return null
   return (
-    <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'wrap' }} useFlexGap>
       {tags.map((t) => (
         <Chip key={t.label} size="small" variant="outlined" color={t.color} label={t.label} sx={{ height: 18, fontSize: 11 }} />
       ))}
@@ -98,7 +98,7 @@ function WishButton({ row, wishes }: { row: GearRow; wishes: BisWishes }): JSX.E
 
 function ItemLine({ row, props }: { row: GearRow; props: BisCellsProps }): JSX.Element {
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0 }}>
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', minWidth: 0 }}>
       <ItemIcon name={row.name} />
       {/* ONLY THE NAME IS THE LINK (owner: *"if i'm clikcing to the RIGHT of the text for the item name, don't make
           that a hyperlink"*): the box takes the row's width, the link only its text, so a click beside the
@@ -125,8 +125,8 @@ const TIP_SLOT = { tooltip: { sx: { maxWidth: 400, bgcolor: (t: Theme) => (t.pal
 function NextBest({ cell, worn, props, onInner }: { cell: BisCell; worn: WornCell | undefined; props: BisCellsProps; onInner: (on: boolean) => void }): JSX.Element {
   return (
     <Stack sx={{ borderTop: 1, borderColor: 'divider', pt: 0.5 }} spacing={0.25} data-testid="bis-cell-next" onMouseEnter={() => onInner(true)} onMouseLeave={() => onInner(false)}>
-      <Typography variant="overline" color="text.secondary">Next best</Typography>
-      {cell.runnersUp.length === 0 && <Typography variant="caption" color="text.secondary">None.</Typography>}
+      <Typography variant="overline" sx={{ color: 'text.secondary' }}>Next best</Typography>
+      {cell.runnersUp.length === 0 && <Typography variant="caption" sx={{ color: 'text.secondary' }}>None.</Typography>}
       {cell.runnersUp.map((r) => {
         const on = isWorn(r.row, worn)
         return (
@@ -142,18 +142,17 @@ function NextBest({ cell, worn, props, onInner }: { cell: BisCell; worn: WornCel
             key={r.row.key}
             direction="row"
             spacing={0.75}
-            alignItems="center"
             data-testid="bis-next-row"
             data-worn={on ? 'true' : undefined}
-            sx={{ px: 0.5, mx: -0.5, borderRadius: 0.5, bgcolor: on ? 'rgba(102, 187, 106, 0.18)' : undefined, outline: on ? '1px solid' : 'none', outlineColor: 'success.main' }}
+            sx={{ alignItems: 'center', px: 0.5, mx: -0.5, borderRadius: 0.5, bgcolor: on ? 'rgba(102, 187, 106, 0.18)' : undefined, outline: on ? '1px solid' : 'none', outlineColor: 'success.main' }}
           >
             <ItemIcon name={r.row.name} />
             <Typography variant="caption" sx={{ flex: 1, minWidth: 0, overflowWrap: 'anywhere' }}>
               {r.row.name}
               {on && <Box component="span" sx={{ ml: 0.5, color: 'success.main', fontWeight: 700 }}>worn</Box>}
             </Typography>
-            {r.damageFirst !== undefined && <Typography variant="caption" color="info.main" sx={{ fontVariantNumeric: 'tabular-nums' }}>{`ratio ${r.damageFirst.toFixed(2)}`}</Typography>}
-            <Typography variant="caption" color="text.secondary" sx={{ fontVariantNumeric: 'tabular-nums' }}>{r.score.toFixed(1)}</Typography>
+            {r.damageFirst !== undefined && <Typography variant="caption" sx={{ color: 'info.main', fontVariantNumeric: 'tabular-nums' }}>{`ratio ${r.damageFirst.toFixed(2)}`}</Typography>}
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontVariantNumeric: 'tabular-nums' }}>{r.score.toFixed(1)}</Typography>
             <WishButton row={r.row} wishes={props.wishes} />
           </Stack>
           </Tooltip>
@@ -168,7 +167,7 @@ function CardBody({ cell, props, pickWorn }: { cell: BisCell; props: BisCellsPro
   const pick = cell.pick
   if (pick === undefined) {
     return (
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
         {cell.closedByTwoHander === true ? 'Closed: the two-hander in Primary scores more than a one-hander and an offhand.' : 'Nothing you could wear here adds to your board.'}
       </Typography>
     )
@@ -178,15 +177,15 @@ function CardBody({ cell, props, pickWorn }: { cell: BisCell; props: BisCellsPro
     <>
       <ItemLine row={pick.row} props={props} />
       <Tags cell={cell} owned={props.owned} worn={pickWorn} />
-      <Typography variant="caption" color="text.secondary">{pick.reasons.map((t) => termText(pick.row, t)).join('  ·  ')}</Typography>
-      {note !== undefined && <Typography variant="caption" color="text.disabled">{note}</Typography>}
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>{pick.reasons.map((t) => termText(pick.row, t)).join('  ·  ')}</Typography>
+      {note !== undefined && <Typography variant="caption" sx={{ color: 'text.disabled' }}>{note}</Typography>}
       {cell.arrowForBow === true && (
-        <Typography variant="caption" color="info.main" data-testid="bis-arrow-for-bow">
+        <Typography variant="caption" sx={{ color: 'info.main' }} data-testid="bis-arrow-for-bow">
           {arrowText(pick.row)}
         </Typography>
       )}
       {pick.damageFirst !== undefined && (
-        <Typography variant="caption" color="info.main" data-testid="bis-damage-first">
+        <Typography variant="caption" sx={{ color: 'info.main' }} data-testid="bis-damage-first">
           {`Damage first: ratio ${pick.damageFirst.toFixed(2)} (your weapon ratio is in S; stats only break a tie)`}
         </Typography>
       )}
@@ -238,9 +237,9 @@ function Card({ cell, props, open, onToggle }: { cell: BisCell; props: BisCellsP
           cursor: 'pointer'
         }}
       >
-        <Stack direction="row" justifyContent="space-between">
-          <Typography variant="overline" sx={{ lineHeight: 1.4 }} color="text.secondary">{cellLabel(cell.cell)}</Typography>
-          {pick !== undefined && <Typography variant="caption" color="primary.main" sx={{ fontVariantNumeric: 'tabular-nums' }}>{pick.score.toFixed(1)}</Typography>}
+        <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+          <Typography variant="overline" sx={{ color: 'text.secondary', lineHeight: 1.4 }}>{cellLabel(cell.cell)}</Typography>
+          {pick !== undefined && <Typography variant="caption" sx={{ color: 'primary.main', fontVariantNumeric: 'tabular-nums' }}>{pick.score.toFixed(1)}</Typography>}
         </Stack>
         <CardBody cell={cell} props={props} pickWorn={pickWorn} />
         {open && <NextBest cell={cell} worn={worn} props={props} onInner={setInner} />}

@@ -72,8 +72,8 @@ function Sparkline({ values, color }: { values: number[]; color: string }): JSX.
 /** One `label · value` row — the popover is a list of facts, not a form. */
 function Fact({ label, value }: { label: string; value: string }): JSX.Element {
   return (
-    <Stack direction="row" justifyContent="space-between" spacing={2}>
-      <Typography variant="caption" color="text.secondary">
+    <Stack direction="row" sx={{ justifyContent: 'space-between' }} spacing={2}>
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {label}
       </Typography>
       <Typography variant="caption" sx={{ fontVariantNumeric: 'tabular-nums' }}>
@@ -141,7 +141,7 @@ function PerfDetail({
     <Stack spacing={1} sx={{ p: 1.5, minWidth: 280 }} data-testid="perf-popover">
       <Typography variant="subtitle2">{formatChip(latest)}</Typography>
       <Sparkline values={ring.map((s) => s.cpuPercent)} color="currentColor" />
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         CPU, last {String(ring.length)} samples (2 s apart)
       </Typography>
       <Divider />

@@ -35,9 +35,9 @@ export function TrailRow({
   const off = prefs.trail === 'off'
   return (
     <Stack spacing={0.5} data-testid="pref-cursor-trail">
-      <Stack direction="row" spacing={3} alignItems="center" flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={3} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
         <Stack sx={{ minWidth: 180 }}>
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             Trail
           </Typography>
           <Select
@@ -55,7 +55,7 @@ export function TrailRow({
           </Select>
         </Stack>
         <Stack sx={{ minWidth: 180 }}>
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             Length ({prefs.trailLength} of {MAX_TRAIL_LENGTH})
           </Typography>
           <Slider
@@ -71,7 +71,7 @@ export function TrailRow({
           />
         </Stack>
       </Stack>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {off
           ? 'No trail.'
           : 'Drawn behind the pointer in the shape’s colour while the mouse moves; it fades out when the mouse stops. Longer keeps each point (and, for sparkles, more of them) on screen longer.'}

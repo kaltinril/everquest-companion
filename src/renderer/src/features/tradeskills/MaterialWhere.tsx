@@ -48,7 +48,7 @@ export function PaidLine({ ingredient }: { ingredient: BookIngredient }): JSX.El
   const paid = lastPaid(useFacts().craft, ingredient.key)
   if (paid === null) return null
   return (
-    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-material-paid">
+    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-material-paid">
       <SourceChip kind="log" />
       Last bought for {ppText(paid.unit)} each from <MerchantLink name={paid.merchant} zone={paid.zone} />
       {paid.zone !== undefined && (
@@ -86,7 +86,7 @@ function SourceWords({ source }: { source: GuideSource }): JSX.Element {
 /** The recipe guide's merchant, zone and loc for a material. */
 export function GuideSourceLine({ source }: { source: GuideSource }): JSX.Element {
   return (
-    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-material-guide">
+    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-material-guide">
       <SourceChip kind="guide" />
       <SourceWords source={source} />
       {source.merchant !== undefined && <MerchantMapLink name={source.merchant} zone={source.zone} />}
@@ -110,15 +110,14 @@ export function Have({ ingredient, line }: { ingredient: BookIngredient; line?: 
       <Typography
         variant="body2"
         align="right"
-        color={enough ? 'success.main' : 'text.secondary'}
-        sx={line === undefined ? undefined : { lineHeight: `${String(line)}px` }}
+        sx={{ color: enough ? 'success.main' : 'text.secondary', lineHeight: line === undefined ? undefined : `${String(line)}px` }}
         data-testid="tradeskill-material-have"
       >
         {have.count}
       </Typography>
       {have.source === 'depot' && have.ts !== null && (
         <Tooltip title={depotTip(formatDateTime(have.ts), held.dumpedAt === null ? '' : formatDate(held.dumpedAt))}>
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1.1 }} data-testid="tradeskill-material-have-log">
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1.1 }} data-testid="tradeskill-material-have-log">
             log
           </Typography>
         </Tooltip>

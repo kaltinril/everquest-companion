@@ -30,7 +30,7 @@ const LEVEL_TIP = 'The level the wiki gives for rank 1. The wiki can be wrong: f
 function LevelCell({ b }: { b: AaBoardRow }): JSX.Element {
   const level = b.r.row.section === 'special' ? '-' : (aaStartLevel(b) ?? '?')
   return (
-    <Typography variant="caption" color={b.usable ? 'text.secondary' : 'text.disabled'} data-testid="aa-level">
+    <Typography variant="caption" sx={{ color: b.usable ? 'text.secondary' : 'text.disabled' }} data-testid="aa-level">
       {String(level)}
     </Typography>
   )
@@ -105,11 +105,11 @@ function RankCell({ b }: { b: AaBoardRow }): JSX.Element {
   if (!b.usable || b.r.row.removed !== undefined) {
     // Another loadout's rank stays in sight, dimmed: the log bought it.
     const text = b.r.row.removed !== undefined ? 'removed' : b.elsewhere ? `${String(b.r.rank)}/${String(b.max)}` : '-'
-    return <Typography variant="caption" color="text.disabled">{text}</Typography>
+    return <Typography variant="caption" sx={{ color: 'text.disabled' }}>{text}</Typography>
   }
   if (b.r.unknown === true) {
     return (
-      <Typography variant="caption" color="text.secondary" noWrap data-testid="aa-source-unknown">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap data-testid="aa-source-unknown">
         {`?/${String(b.max)}`}
         <Box component="span" sx={{ ml: 0.75, color: 'text.disabled' }}>
           can&apos;t tell
@@ -119,7 +119,7 @@ function RankCell({ b }: { b: AaBoardRow }): JSX.Element {
   }
   const word = SOURCE_WORD[b.r.source]
   return (
-    <Typography variant="caption" color="text.secondary" noWrap>
+    <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>
       {`${String(b.r.rank)}/${String(b.max)}`}
       <Mark b={b} fields={['ranks']} />
       {word !== '' && (
@@ -136,7 +136,7 @@ function RankCell({ b }: { b: AaBoardRow }): JSX.Element {
 function EffectCell({ b }: { b: AaBoardRow }): JSX.Element {
   const line = aaEffectLine(b.effect, b.usable ? b.r.rank : 0, b.max)
   return (
-    <Typography variant="caption" color={b.usable ? 'text.secondary' : 'text.disabled'} noWrap>
+    <Typography variant="caption" sx={{ color: b.usable ? 'text.secondary' : 'text.disabled' }} noWrap>
       {line.label}
       {line.now !== null && (
         <Box component="b" sx={{ ml: 0.75, color: 'text.primary' }}>
@@ -153,11 +153,11 @@ function PointsCells({ b }: { b: AaBoardRow }): JSX.Element {
   const next = b.cost?.next ?? null
   return (
     <>
-      <Typography variant="caption" color="text.disabled" noWrap>
+      <Typography variant="caption" sx={{ color: 'text.disabled' }} noWrap>
         {b.cost !== null && b.usable ? aaCostText(b.cost, b.r.rank, b.max) : ''}
         {b.usable && <Mark b={b} fields={['cost']} />}
       </Typography>
-      <Typography variant="caption" color="warning.main" noWrap>
+      <Typography variant="caption" sx={{ color: 'warning.main' }} noWrap>
         {b.buyable ? `next ${next === null ? '?' : String(next)} pts` : ''}
       </Typography>
     </>
@@ -209,7 +209,7 @@ function AaLine({ b, classes, setPick, showClass }: { b: AaBoardRow; classes: re
 export function AaList({ groups, classes, setPick, showClass = false, sort, setSort, empty }: { groups: AaListGroup[]; classes: readonly ClassAbbr[]; setPick: SetPick; showClass?: boolean; sort?: AaSort; setSort?: (s: AaSort) => void; empty: string }): JSX.Element {
   if (groups.length === 0) {
     return (
-      <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>
+      <Typography variant="body2" sx={{ color: 'text.secondary', py: 2 }}>
         {empty}
       </Typography>
     )
@@ -220,7 +220,7 @@ export function AaList({ groups, classes, setPick, showClass = false, sort, setS
       {(sort === undefined ? groups : aaSortGroups(groups, sort)).map((g) => (
         <Fragment key={`${g.kind}:${g.title ?? ''}`}>
           {g.title !== null && (
-            <Typography variant="overline" component="div" color={g.kind === 'mine' ? 'text.secondary' : 'text.disabled'} sx={{ px: 1, pt: 1.25, lineHeight: 1.6 }}>
+            <Typography variant="overline" component="div" sx={{ color: g.kind === 'mine' ? 'text.secondary' : 'text.disabled', px: 1, pt: 1.25, lineHeight: 1.6 }}>
               {g.title}
             </Typography>
           )}

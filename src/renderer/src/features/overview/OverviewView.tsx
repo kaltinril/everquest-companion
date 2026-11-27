@@ -100,9 +100,9 @@ const NOW_ROW_MIN_PX = 304
 function OverviewHydrating(): JSX.Element {
   return (
     <Paper variant="outlined" data-testid="overview-hydrating" sx={{ p: 1.5, minWidth: 0 }}>
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1 }}>
         <CircularProgress size={13} thickness={5} />
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Reading log…
         </Typography>
       </Stack>

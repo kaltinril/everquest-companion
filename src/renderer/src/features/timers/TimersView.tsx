@@ -165,16 +165,15 @@ const CandidateRow = memo(function CandidateRow({
       <Stack
         direction="row"
         spacing={1}
-        alignItems="center"
         data-testid="respawn-candidate"
         data-respawn-mob={cand.key}
-        sx={{ py: 0.5 }}
+        sx={{ alignItems: 'center', py: 0.5 }}
       >
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography variant="body2" noWrap>
             <MobNameLink name={cand.display} links={links} />
           </Typography>
-          <Typography variant="caption" color="text.secondary" noWrap>
+          <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>
             <ZoneLink zone={cand.zone} links={links} /> · {cand.kills} kill
             {cand.kills === 1 ? '' : 's'}
             {cand.wikiText !== undefined ? ` · wiki: ${cand.wikiText}` : ''}
@@ -268,7 +267,7 @@ function ClocksPanel({
 }): JSX.Element {
   if (rows.length === 0) {
     return (
-      <Typography variant="body2" color="text.secondary" data-testid="respawn-empty" sx={{ py: 2 }}>
+      <Typography variant="body2" data-testid="respawn-empty" sx={{ color: 'text.secondary', py: 2 }}>
         {elsewhere > 0
           ? `No clocks in ${zoneName}. ${cappedRowCount(elsewhere, elsewhere)} running in other zones.`
           : 'No clocks running. Watch a mob from Recently killed.'}
@@ -358,7 +357,7 @@ function RecentEmpty({
         : 'Nothing has died yet in this log.'
   return (
     <LogReadInline module="respawn" served={served}>
-      <Typography variant="body2" color="text.secondary" data-testid="respawn-recent-empty">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="respawn-recent-empty">
         {text}
       </Typography>
     </LogReadInline>
@@ -401,10 +400,10 @@ function DiscoveryPanel({
   const shown = useMemo(() => filterRespawnCandidates(recent, query), [recent, query])
   return (
     <Box sx={{ flex: 1, minWidth: 0 }}>
-      <Stack direction="row" spacing={1} alignItems="baseline" sx={{ mb: 1 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', mb: 1 }}>
         <Typography variant="subtitle2">Recently killed</Typography>
         {shown.length !== recent.length && (
-          <Typography variant="caption" color="text.secondary" data-testid="respawn-search-count">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="respawn-search-count">
             {shown.length} of {recent.length}
           </Typography>
         )}
@@ -473,14 +472,14 @@ export default function TimersView({
 
   return (
     <Box sx={{ p: 2, height: '100%', overflow: 'auto' }} data-testid="timers-view">
-      <Stack direction="row" spacing={1} alignItems="baseline" sx={{ mb: 0.5 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', mb: 0.5 }}>
         {/* ROUND 7: the page is called what the tab is called. "Respawn clocks" described the rows;
             the nav row has said Timers since the tab existed, and two names for one surface is the
             thing VIEW_LABELS exists to prevent one floor up. */}
         <Typography variant="h6">Timers</Typography>
         {snap.zone.length > 0 && <Chip size="small" label={zoneName} variant="outlined" />}
       </Stack>
-      <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" useFlexGap sx={{ mb: 2, mt: 1.5 }}>
+      <Stack direction="row" spacing={1.5} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap', mb: 2, mt: 1.5 }}>
         <ScopeSwitch
           scope={scope}
           onScope={setScope}
@@ -498,7 +497,7 @@ export default function TimersView({
         <RespawnAlertControl />
       </Stack>
 
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems="flex-start">
+      <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} sx={{ alignItems: 'flex-start' }}>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography variant="subtitle2" sx={{ mb: 1 }}>
             Running

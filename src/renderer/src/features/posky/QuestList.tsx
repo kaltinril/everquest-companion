@@ -69,7 +69,7 @@ function ListFooter({ total, list }: { total: number; list: QuestListState }): J
   }
   if (total <= list.visibleCount) return null
   return (
-    <Stack direction="row" spacing={1} justifyContent="center" sx={{ py: 1.5 }}>
+    <Stack direction="row" spacing={1} sx={{ justifyContent: 'center', py: 1.5 }}>
       <Button variant="outlined" size="small" data-testid="posky-show-more" onClick={list.showMore}>
         Show more ({total - list.visibleCount} more)
       </Button>

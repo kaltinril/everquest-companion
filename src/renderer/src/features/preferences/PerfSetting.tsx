@@ -112,7 +112,7 @@ function YieldCpuSetting(): JSX.Element {
           <Typography variant="body2">Yield CPU to the game (below-normal priority)</Typography>
         }
       />
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {prefs.yieldToGame
           ? 'EverQuest gets the processor first whenever this app and the game want it at the same moment.'
           : 'Off. This app and EverQuest compete for the processor on equal terms.'}
@@ -124,8 +124,8 @@ function YieldCpuSetting(): JSX.Element {
 /** One phase's row: its name, a bar proportional to its share of the launch, and its duration. */
 function PhaseBar({ label, ms, share }: { label: string; ms: number; share: number }): JSX.Element {
   return (
-    <Stack direction="row" alignItems="center" spacing={1}>
-      <Typography variant="caption" sx={{ width: 190, flexShrink: 0 }} color="text.secondary">
+    <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', width: 190, flexShrink: 0 }}>
         {label}
       </Typography>
       <Box sx={{ flexGrow: 1, minWidth: 0, height: 8, bgcolor: 'action.hover', borderRadius: 1 }}>
@@ -170,7 +170,7 @@ function StartupBreakdown({ profile }: { profile: StartupProfile }): JSX.Element
           />
         ))}
       </Stack>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Launched {formatDateTime(profile.startedAt)}
         {profile.version ? ` · version ${profile.version}` : ''}
         {profile.complete ? '' : ' · this launch is still starting up'}
@@ -239,7 +239,7 @@ function DevRestartRow(): JSX.Element {
 
   return (
     <Stack spacing={0.5}>
-      <Stack direction="row" alignItems="center" spacing={1}>
+      <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
         <Button
           size="small"
           variant="outlined"
@@ -259,7 +259,7 @@ function DevRestartRow(): JSX.Element {
         />
       </Stack>
       {phase !== 'idle' && (
-        <Typography variant="caption" color="text.secondary" data-testid="pref-dev-restart-note">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="pref-dev-restart-note">
           {phase === 'waiting' && 'Rebuilding - the dev watcher relaunches the app.'}
           {phase === 'stalled' &&
             'Nothing restarted. This dev server is running without --watch, so restart it from the terminal.'}
@@ -328,7 +328,7 @@ export function PerfSetting(): JSX.Element {
           }
           label={<Typography variant="body2">Show CPU and memory in the title bar</Typography>}
         />
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {prefs.enabled
             ? 'A live reading sits in the title bar. Click it for a breakdown by process, how far behind the app is running, and the last two minutes. It turns amber or red only when the app is actually being held up - not merely when it is busy.'
             : 'Off. Nothing is measured and nothing is shown. Turn it on if the app ever feels like it is stuttering - a low reading here while the app feels slow says the machine is loaded, not this app.'}
@@ -338,7 +338,7 @@ export function PerfSetting(): JSX.Element {
       {profile.phases.length > 0 ? (
         <StartupBreakdown profile={profile} />
       ) : (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           No startup breakdown recorded yet.
         </Typography>
       )}

@@ -108,7 +108,7 @@ function RowWikiLink({ recipe, place }: { recipe: BookRecipe; place: 'materials'
   const link = wikiRowLink(recipe)
   if (link?.place !== place) return null
   return (
-    <Typography variant="caption" component="span" color="text.secondary" sx={{ flexShrink: 0 }}>
+    <Typography variant="caption" component="span" sx={{ color: 'text.secondary', flexShrink: 0 }}>
       <WikiPageLink recipe={recipe} label={WIKI_CELL_LINK} tip={link.tip} />
     </Typography>
   )
@@ -202,7 +202,7 @@ const RecipeRow = memo(function RecipeRow({ recipe, state, picked, onPick, log, 
     >
       <TrivialCell recipe={recipe} craft={log.craft} />
       <TableCell sx={{ fontWeight: picked ? 700 : 400 }}>
-        <Stack direction="row" spacing={0.75} alignItems="center" sx={{ flexWrap: 'nowrap', minWidth: 0 }}>
+        <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', flexWrap: 'nowrap', minWidth: 0 }}>
           {/* The row's own click picks the recipe; the name joins it (the panel's head links the item's page). */}
           <ItemLabel name={recipe.item} bold={state === 'next'} act={PICKS_WITH_ROW} />
           <StateChip state={state} />

@@ -55,13 +55,13 @@ export function LadderLegend(): JSX.Element {
             <Typography variant="caption" noWrap sx={{ display: 'block', color: CONSIDER_FACTION_COLOR[b.faction], lineHeight: 1.4 }}>
               {CONSIDER_FACTION_LABEL[b.faction]}
             </Typography>
-            <Typography variant="caption" noWrap color="text.secondary" sx={{ display: 'block', fontSize: 10, lineHeight: 1.2 }}>
+            <Typography variant="caption" noWrap sx={{ color: 'text.secondary', display: 'block', fontSize: 10, lineHeight: 1.2 }}>
               {range(b)}
             </Typography>
           </Box>
         ))}
       </Box>
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: 10, pt: 0.25 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', fontSize: 10, pt: 0.25 }}>
         Rungs as /con names them, hostile to friendly, drawn equal width. The ranges are the classic
         EverQuest thresholds; the faction file states the number, never the rung.
       </Typography>

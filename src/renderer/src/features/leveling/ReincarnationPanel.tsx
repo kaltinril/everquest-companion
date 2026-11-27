@@ -57,15 +57,15 @@ function ClimbRow({ row }: { row: ReincarnationClimb }): JSX.Element {
   return (
     <TableRow data-testid="reincarnation-row">
       <TableCell sx={CELL_SX}>
-        <Typography variant="caption" display="block" sx={{ fontWeight: 600 }}>
+        <Typography variant="caption" sx={{ display: 'block', fontWeight: 600 }}>
           {row.race ?? 'Reincarnation'}
           {row.rank !== null && (
-            <Typography component="span" variant="caption" color="text.secondary">
+            <Typography component="span" variant="caption" sx={{ color: 'text.secondary' }}>
               {` rank ${String(row.rank)}`}
             </Typography>
           )}
         </Typography>
-        <Typography variant="caption" display="block" color="text.secondary">
+        <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary' }}>
           {row.classes.join(' / ')}
         </Typography>
       </TableCell>
@@ -100,7 +100,7 @@ export const ReincarnationPanel = memo(function ReincarnationPanel({
   return (
     <Paper variant="outlined" sx={{ p: 2 }} data-testid="reincarnation-panel">
       <Typography variant="subtitle2">Reincarnations</Typography>
-      <Typography variant="caption" color="text.secondary" gutterBottom display="block">
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} gutterBottom>
         each climb back to 50, from the reincarnation to the first level-50 ding
       </Typography>
       <Box sx={{ overflowX: 'auto' }}>

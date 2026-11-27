@@ -37,7 +37,7 @@ import { ItemLabel } from './tradeskillLinks'
 function Figure({ figure, testid }: { figure: GatherFigure; testid: string }): JSX.Element {
   const box = (
     <Box data-testid={testid}>
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1.2 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1.2 }}>
         {figure.label}
       </Typography>
       <Typography variant="h6" sx={{ lineHeight: 1.2 }}>
@@ -62,11 +62,11 @@ export function GatherFigures({ figures, prefix }: { figures: readonly GatherFig
 /** Items caught or foraged: the standard item link, how many, and the part of the whole. */
 export function GatherItems({ items, prefix }: { items: readonly GatherItemLine[]; prefix: string }): JSX.Element {
   return (
-    <Stack direction="row" alignItems="center" sx={{ flexWrap: 'wrap', columnGap: 2.5, rowGap: 0.5 }} data-testid={`${prefix}-items`}>
+    <Stack direction="row" sx={{ alignItems: 'center', flexWrap: 'wrap', columnGap: 2.5, rowGap: 0.5 }} data-testid={`${prefix}-items`}>
       {items.map((line) => (
-        <Stack key={line.item} direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0 }} data-testid={`${prefix}-item`}>
+        <Stack key={line.item} direction="row" spacing={0.75} sx={{ alignItems: 'center', minWidth: 0 }} data-testid={`${prefix}-item`}>
           <ItemLabel name={line.item} />
-          <Typography variant="caption" color="text.secondary" noWrap data-testid={`${prefix}-item-count`}>
+          <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap data-testid={`${prefix}-item-count`}>
             {line.count} · {line.share}
           </Typography>
         </Stack>
@@ -83,7 +83,7 @@ function Reasons({ fishing }: { fishing: FishingSnap }): JSX.Element | null {
     <Tooltip title={FISHING_REASONS_TIP}>
       <Stack direction="row" sx={{ flexWrap: 'wrap', columnGap: 2, width: 'fit-content' }} data-testid="tradeskill-fishing-reasons">
         {reasons.map((reason) => (
-          <Typography key={reason.id} variant="caption" color="text.secondary" data-testid={`tradeskill-fishing-${reason.id}`}>
+          <Typography key={reason.id} variant="caption" sx={{ color: 'text.secondary' }} data-testid={`tradeskill-fishing-${reason.id}`}>
             {reason.label} {reason.value}
           </Typography>
         ))}
@@ -96,7 +96,7 @@ function Reasons({ fishing }: { fishing: FishingSnap }): JSX.Element | null {
 function Quiet({ text, testid }: { text: string; testid: string }): JSX.Element | null {
   if (text === '') return null
   return (
-    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid={testid}>
+    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid={testid}>
       {text}
     </Typography>
   )
@@ -108,7 +108,7 @@ export function GatherPanel(): JSX.Element | null {
   const { fishing } = snap
   if (!hasFishing(fishing)) {
     return (
-      <Typography variant="body2" color="text.secondary" data-testid="tradeskill-fishing-empty">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="tradeskill-fishing-empty">
         {NO_FISHING_TEXT}
       </Typography>
     )

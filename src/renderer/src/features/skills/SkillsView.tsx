@@ -153,7 +153,7 @@ function SkillsView(): JSX.Element {
   const empty = skillsEmptyText(snap, rows.length)
   return (
     <Box data-testid="skills-view" sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 2, minHeight: 0 }}>
-      <Stack direction="row" alignItems="center" spacing={2}>
+      <Stack direction="row" sx={{ alignItems: 'center' }} spacing={2}>
         <Typography variant="h6">Skills</Typography>
         <OpenTradeskills />
         <FormControlLabel
@@ -170,14 +170,14 @@ function SkillsView(): JSX.Element {
           label="Tradeskills only"
         />
       </Stack>
-      <Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', mb: 1 }}>
         Skills appear here once the log shows them going up.
       </Typography>
       {rows.length > 0 && <SkillsTable rows={rows} />}
       {/* With no snapshot the list is empty because nothing was served: the line says what the app waits on. */}
       {rows.length === 0 && (
         <LogReadInline module={SKILLS_MODULE} served={snap !== null} sx={{ py: 4, textAlign: 'center' }}>
-          <Typography variant="body2" color="text.secondary" data-testid="skills-empty" sx={{ py: 4, textAlign: 'center' }}>
+          <Typography variant="body2" data-testid="skills-empty" sx={{ color: 'text.secondary', py: 4, textAlign: 'center' }}>
             {empty}
           </Typography>
         </LogReadInline>

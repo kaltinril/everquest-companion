@@ -99,7 +99,6 @@ function ClassRow({
     <Stack
       direction="row"
       spacing={2}
-      alignItems="center"
       role="button"
       tabIndex={0}
       aria-label={`Show the ${row.className} quests`}
@@ -125,6 +124,7 @@ function ClassRow({
       data-remaining={row.remaining}
       data-source={row.source ?? ''}
       sx={{
+        alignItems: 'center',
         px: 1,
         py: 0.75,
         borderRadius: 1,
@@ -137,7 +137,7 @@ function ClassRow({
       <Typography variant="subtitle2" sx={{ minWidth: 130 }}>
         {row.className}
       </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ minWidth: 64 }}>
+      <Typography variant="body2" sx={{ color: 'text.secondary', minWidth: 64 }}>
         {row.turnedIn} of {row.total}
       </Typography>
       <Box sx={{ flexGrow: 1, minWidth: 80 }}>
@@ -168,7 +168,7 @@ function SourceNote({ rows }: { rows: readonly ClassUnlockRow[] }): JSX.Element 
   const observed = rows.filter((r) => r.source === 'observed').length
   const derived = rows.filter((r) => r.source === 'derived').length
   return (
-    <Typography variant="body2" color="text.secondary" data-testid="class-unlock-note">
+    <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="class-unlock-note">
       Fewest tests left first. Click a class to see its quests. Star a class to pin it to the top.{' '}
       {observed} unlocked by a line in your log, {derived} read from a complete set of turn-ins.
       Turning in a Sky test prints
@@ -199,7 +199,7 @@ export default function ClassUnlockList({
 
   if (rows.length === 0) {
     return (
-      <Typography color="text.secondary">
+      <Typography sx={{ color: 'text.secondary' }}>
         No Plane of Sky data available, so there are no classes to track.
       </Typography>
     )

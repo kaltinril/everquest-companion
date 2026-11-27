@@ -86,10 +86,10 @@ export function MisfitNote({ held, children }: { held: HeldMisfit; children?: Re
   }
   return (
     <Stack spacing={0.5} data-testid="gaps-shot-misfit">
-      <Typography variant="body2" color="warning.main">
+      <Typography variant="body2" sx={{ color: 'warning.main' }}>
         {misfit.text}
       </Typography>
-      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
         {done === null && (
           <Button size="small" variant="outlined" disabled={busy} onClick={send} data-testid="gaps-shot-misfit-send">
             {misfit.action}

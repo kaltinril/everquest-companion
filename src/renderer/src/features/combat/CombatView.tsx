@@ -62,9 +62,9 @@ function HydratingPanel(): React.JSX.Element {
       data-testid="combat-hydrating"
       sx={{ p: 1.5, flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
     >
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1 }}>
         <CircularProgress size={13} thickness={5} />
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Reading log…
         </Typography>
       </Stack>
@@ -275,7 +275,7 @@ function undrilling(nav: Navigation, setDrill: (d: Drill | null) => void): Navig
 function NoTimelinePane(): React.JSX.Element {
   return (
     <Paper variant="outlined" sx={{ p: 2, flexGrow: 1 }}>
-      <Typography color="text.secondary">No timeline for this selection - pick a recent fight.</Typography>
+      <Typography sx={{ color: 'text.secondary' }}>No timeline for this selection - pick a recent fight.</Typography>
     </Paper>
   )
 }
@@ -287,7 +287,7 @@ function NoTimelinePane(): React.JSX.Element {
 function ScopeEmptyPane({ scope }: { scope: 'fight' | 'overall' }): React.JSX.Element {
   return (
     <Paper variant="outlined" data-testid="scope-empty" sx={{ p: 2, flexGrow: 1 }}>
-      <Typography color="text.secondary">
+      <Typography sx={{ color: 'text.secondary' }}>
         {scope === 'fight'
           ? 'No fights yet - engage something and it’ll appear here live. Switch to Overall for this zone’s totals.'
           : 'No zone session yet - it starts with your first damage in a zone.'}

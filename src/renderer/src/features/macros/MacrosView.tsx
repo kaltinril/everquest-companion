@@ -30,12 +30,12 @@ const NO_FILES: readonly CharacterFileMacros[] = []
 
 function Footer({ game, saveFailed }: { game: GameFilesState; saveFailed: boolean }): JSX.Element {
   return (
-    <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap" justifyContent="space-between" sx={{ flexShrink: 0, pt: 1 }}>
-      <Typography variant="caption" color="text.secondary" data-testid="macros-read-at">
+    <Stack direction="row" spacing={2} useFlexGap sx={{ flexWrap: 'wrap', justifyContent: 'space-between', flexShrink: 0, pt: 1 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="macros-read-at">
         {game.readAt === null ? 'Game files not read yet' : `Game files read ${formatTime(game.readAt)}`}
       </Typography>
       {saveFailed && (
-        <Typography variant="caption" color="warning.main" data-testid="macros-save-failed">
+        <Typography variant="caption" sx={{ color: 'warning.main' }} data-testid="macros-save-failed">
           The last change was not saved.
         </Typography>
       )}
@@ -157,9 +157,9 @@ function MacrosView(): JSX.Element {
   }
   return (
     <Box data-testid="macros-view" sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 2, minHeight: 0 }}>
-      <Stack direction="row" alignItems="baseline" spacing={2} useFlexGap flexWrap="wrap" sx={{ flexShrink: 0 }}>
+      <Stack direction="row" spacing={2} useFlexGap sx={{ alignItems: 'baseline', flexWrap: 'wrap', flexShrink: 0 }}>
         <Typography variant="h6">Macros</Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Pick a character, click a button to edit it, then send.
         </Typography>
       </Stack>

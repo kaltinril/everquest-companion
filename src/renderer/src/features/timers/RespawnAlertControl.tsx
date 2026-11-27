@@ -48,8 +48,8 @@ export function RespawnAlertControl(): JSX.Element {
   // The note sits UNDER the box and the field, on its own line: beside them it took the row's room
   // and squeezed the field until its label was cut off (132 px down to 56 at the minimum window).
   return (
-    <Stack spacing={0.5} alignItems="flex-start" sx={{ minWidth: 0 }}>
-      <Stack direction="row" spacing={1} alignItems="center">
+    <Stack spacing={0.5} sx={{ alignItems: 'flex-start', minWidth: 0 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
         <Tooltip title="Fires the Alerts tab's Respawn timer ending alert for watched mobs in your zone.">
           <FormControlLabel
             sx={{ mr: 0, flexShrink: 0 }}

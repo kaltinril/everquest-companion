@@ -116,10 +116,8 @@ function ResultNote({ text, testid }: { text: string; testid: string }): JSX.Ele
   return (
     <Typography
       variant="caption"
-      color="text.disabled"
-      display="block"
       data-testid={testid}
-      sx={{ fontSize: 9.5, mt: 0.25 }}
+      sx={{ color: 'text.disabled', display: 'block', fontSize: 9.5, mt: 0.25 }}
     >
       {text}
     </Typography>
@@ -166,7 +164,7 @@ export function BestSpellsResults({
       data-desc={String(sort.desc)}
     >
       {results.rows.length === 0 ? (
-        <Typography variant="caption" color="text.disabled" display="block" data-testid="best-spells-search-empty">
+        <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block' }} data-testid="best-spells-search-empty">
           {results.elsewhere > 0
             ? `nothing that matches has a ${TAB_LABEL[tab]} reading - try another tab`
             : 'no spell in the wiki DB matches that - try a name, a class, a level or a range'}
@@ -188,7 +186,7 @@ export function BestSpellsResults({
                 columns={columns}
                 ranks={ranks}
                 extra={
-                  <Stack direction="row" spacing={0.5} alignItems="baseline" flexWrap="wrap" useFlexGap>
+                  <Stack direction="row" spacing={0.5} sx={{ alignItems: 'baseline', flexWrap: 'wrap' }} useFlexGap>
                     <OutOfEraChip outOfEra={r.outOfEra} />
                     <ClassLevelChips levels={r.levels} loadout={loadout} />
                   </Stack>

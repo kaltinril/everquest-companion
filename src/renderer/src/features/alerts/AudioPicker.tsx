@@ -136,11 +136,9 @@ function SoundNoticeLine({ text }: { text: string | null }): JSX.Element | null 
   return (
     <Typography
       variant="caption"
-      color="warning.main"
-      display="block"
       data-testid="alert-sound-notice"
       title={text}
-      sx={{ mt: 0.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+      sx={{ color: 'warning.main', display: 'block', mt: 0.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
     >
       {text}
     </Typography>
@@ -159,15 +157,14 @@ function SoundNoticeLine({ text }: { text: string | null }): JSX.Element | null 
  */
 function EditPhraseEntry({ phrase }: { phrase: string }): JSX.Element {
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0 }}>
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', minWidth: 0 }}>
       <EditIcon sx={{ fontSize: 14 }} />
       <span>{phrase ? EDIT_PHRASE_LABEL : WRITE_PHRASE_LABEL}</span>
       {phrase ? (
         <Typography
           variant="body2"
-          color="text.secondary"
           noWrap
-          sx={{ minWidth: 0, maxWidth: 220 }}
+          sx={{ color: 'text.secondary', minWidth: 0, maxWidth: 220 }}
         >{`“${phrase}”`}</Typography>
       ) : null}
     </Stack>
@@ -293,15 +290,13 @@ function PhrasePopover({
         {tokenHint !== null && (
           <Typography
             variant="caption"
-            color="text.secondary"
-            display="block"
             data-testid="alert-row-phrase-tokens"
-            sx={{ mt: -0.5 }}
+            sx={{ color: 'text.secondary', display: 'block', mt: -0.5 }}
           >
             {tokenHint}
           </Typography>
         )}
-        <Stack direction="row" spacing={1} justifyContent="flex-end">
+        <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end' }}>
           <Button size="small" onClick={onCancel}>
             Cancel
           </Button>

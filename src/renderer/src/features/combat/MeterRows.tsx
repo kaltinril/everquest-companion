@@ -130,18 +130,18 @@ export function DrillCrumb({
   const label = isTarget ? `damage to ${crumb}` : crumb
   if (compact) {
     return (
-      <Stack direction="row" alignItems="center" spacing={0.25} sx={{ mb: 0.25, minWidth: 0 }}>
+      <Stack direction="row" spacing={0.25} sx={{ alignItems: 'center', mb: 0.25, minWidth: 0 }}>
         <IconButton size="small" data-testid="drill-back" onClick={up} sx={{ p: 0.25 }}>
           <ChevronLeftIcon sx={{ fontSize: 16 }} />
         </IconButton>
-        <Typography variant="caption" color="text.secondary" data-testid="drill-crumb" noWrap>
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="drill-crumb" noWrap>
           {label}
         </Typography>
       </Stack>
     )
   }
   return (
-    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.75, flexShrink: 0 }}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 0.75, flexShrink: 0 }}>
       <Button
         size="small"
         data-testid="drill-back"
@@ -169,7 +169,7 @@ export function DrillCrumb({
         ) : null}
         {/* The drilled subject's own name — `drill-crumb` is what tells a test WHICH row is open,
             not merely that one is (the JOS-240 spec asserts the same subject came back). */}
-        <Typography variant="caption" color="text.primary" data-testid="drill-crumb">
+        <Typography variant="caption" sx={{ color: 'text.primary' }} data-testid="drill-crumb">
           {label}
         </Typography>
       </Breadcrumbs>

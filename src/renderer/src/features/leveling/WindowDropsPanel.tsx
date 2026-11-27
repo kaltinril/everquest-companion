@@ -95,8 +95,7 @@ const DropRow = memo(function DropRow({
     <Stack
       direction="row"
       spacing={1}
-      alignItems="center"
-      sx={{ height: DROP_ROW_H }}
+      sx={{ alignItems: 'center', height: DROP_ROW_H }}
       data-testid="leveling-drop-row"
     >
       <Box sx={{ flexGrow: 1, minWidth: 0 }}>
@@ -133,7 +132,7 @@ const DropRow = memo(function DropRow({
       <Typography variant="caption" sx={{ fontWeight: 700, whiteSpace: 'nowrap' }}>
         {row.drops.toLocaleString()}×
       </Typography>
-      <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap', minWidth: 92, textAlign: 'right' }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', whiteSpace: 'nowrap', minWidth: 92, textAlign: 'right' }}>
         {rate}
       </Typography>
     </Stack>
@@ -180,9 +179,8 @@ export function WindowDropsPanel({ scope, onOpenItem }: WindowDropsPanelProps): 
       <Typography variant="subtitle2">Dropping in this window</Typography>
       <Typography
         variant="caption"
-        color="text.secondary"
+        sx={{ color: 'text.secondary', display: 'block' }}
         gutterBottom
-        display="block"
         // The span every drops/hr on this panel divides by, so it hovers what that span IS
         // (JOS-249). Native title, no popper.
         title={rows.length > 0 ? withBasis('How much of this window the rates below are per.', read) : undefined}
@@ -195,7 +193,7 @@ export function WindowDropsPanel({ scope, onOpenItem }: WindowDropsPanelProps): 
       {rows.length === 0 && (
         // An empty window is a STATE and says which window it is empty for. A silently blank box
         // reads as a broken panel rather than as a quiet hour.
-        <Typography variant="caption" color="text.secondary" data-testid="leveling-drops-empty">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="leveling-drops-empty">
           no drops in {scope.label}
         </Typography>
       )}

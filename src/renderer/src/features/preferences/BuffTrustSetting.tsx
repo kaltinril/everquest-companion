@@ -78,7 +78,7 @@ export function BuffTrustSetting(): JSX.Element {
       <Typography variant="body2">
         Show buffs and debuffs cast by these people, as well as your own
       </Typography>
-      <Stack direction="row" spacing={1} alignItems="flex-start">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'flex-start' }}>
         <TextField
           size="small"
           label="Character name"
@@ -98,7 +98,7 @@ export function BuffTrustSetting(): JSX.Element {
       </Stack>
 
       {prefs.externals.length > 0 && (
-        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap data-testid="pref-buff-trust-list">
+        <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }} useFlexGap data-testid="pref-buff-trust-list">
           {prefs.externals.map((name) => (
             <Chip
               key={name.toLowerCase()}
@@ -112,7 +112,7 @@ export function BuffTrustSetting(): JSX.Element {
         </Stack>
       )}
 
-      <Typography variant="caption" color="text.secondary" data-testid="pref-buff-trust-note">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="pref-buff-trust-note">
         {prefs.externals.length === 0
           ? 'Empty, so the bars show only spells you cast. A landing message names no caster, so without a name here there is no way to tell your work from a stranger`s in a crowded zone.'
           : 'Their casts appear on the same bars as yours. Learned durations stay separate: their spell timers come from their gear and abilities, not yours.'}
@@ -131,7 +131,7 @@ export function BuffTrustSetting(): JSX.Element {
         }
         label="Count debuffs your weapon or item procs as yours"
       />
-      <Typography variant="caption" color="text.secondary" data-testid="pref-buff-trust-procs-note">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="pref-buff-trust-procs-note">
         A proc prints no cast line, so a landing counts only on a mob you swung at in the last two seconds, and only
         for a combat effect of an item in your latest /outputfile inventory. Any landing of that spell on a mob you are
         hitting is counted as yours, including a group member`s cast, click or proc of the same spell, which is why this

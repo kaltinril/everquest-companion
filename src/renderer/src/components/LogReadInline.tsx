@@ -33,8 +33,9 @@ export interface LogReadInlineProps {
   readonly served: boolean
   /** The tab's own empty text, drawn only when its module is served. */
   readonly children?: ReactNode
-  /** The spacing the tab's own empty text has, for the line drawn in its place. */
-  readonly sx?: SxProps<Theme>
+  /** The spacing the tab's own empty text has, for the line drawn in its place: one style object
+   *  (no array or theme function), so it merges under the line's own colour. */
+  readonly sx?: Exclude<SxProps<Theme>, readonly unknown[] | ((theme: Theme) => unknown)>
 }
 
 export function LogReadInline({ module, served, children, sx }: LogReadInlineProps): JSX.Element | null {
@@ -42,7 +43,7 @@ export function LogReadInline({ module, served, children, sx }: LogReadInlinePro
   if (line === null) return null
   if (line.kind === 'empty') return <>{children}</>
   return (
-    <Typography variant="body2" color="text.secondary" data-testid="log-read-inline" sx={sx}>
+    <Typography variant="body2" data-testid="log-read-inline" sx={{ color: 'text.secondary', ...sx }}>
       {tabLineText(line)}
     </Typography>
   )

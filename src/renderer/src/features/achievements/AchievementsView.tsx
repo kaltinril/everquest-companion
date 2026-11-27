@@ -30,10 +30,8 @@ const RAIL_WIDTH = 200
 function NoDump(): JSX.Element {
   return (
     <Stack
-      alignItems="center"
-      justifyContent="center"
       spacing={1.5}
-      sx={{ py: 6, color: 'text.secondary' }}
+      sx={{ alignItems: 'center', justifyContent: 'center', py: 6, color: 'text.secondary' }}
     >
       <MilitaryTechIcon sx={{ fontSize: 44, opacity: 0.6 }} />
       <Typography
@@ -53,7 +51,7 @@ function NoDump(): JSX.Element {
 function Plan({ picks, zones }: { picks: PickBundle; zones: ZoneListBundle }): JSX.Element {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: 0, height: '100%' }}>
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ pb: 0.5 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', pb: 0.5 }}>
         <Button size="small" onClick={picks.onPickNearlyDone} data-testid="slayer-pick-nearly">
           Pick nearly done
         </Button>

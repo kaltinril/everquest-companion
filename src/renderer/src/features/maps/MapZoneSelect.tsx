@@ -68,7 +68,7 @@ export default function ZoneSelect({ zones, zone, onPick }: ZoneSelectProps): JS
               {/* The stem is what the file on disk is called — the only name every pack is
                   certain to share. Shown under the long one so both spellings are visible and
                   either can be typed. */}
-              <Typography variant="caption" color="text.secondary" noWrap>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>
                 {z}
               </Typography>
             </Stack>
@@ -81,7 +81,7 @@ export default function ZoneSelect({ zones, zone, onPick }: ZoneSelectProps): JS
           {...params}
           label="Zone"
           placeholder="Find a zone…"
-          slotProps={{ htmlInput: { ...params.inputProps, 'data-testid': 'maps-zone-filter' } }}
+          slotProps={{ ...params.slotProps, htmlInput: { ...params.slotProps.htmlInput, 'data-testid': 'maps-zone-filter' } }}
         />
       )}
     />

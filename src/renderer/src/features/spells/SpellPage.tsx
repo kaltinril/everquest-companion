@@ -66,13 +66,12 @@ function LadderRow({ step, combo }: { step: SpellLineStep; combo: readonly Class
     <Stack
       direction="row"
       spacing={1}
-      alignItems="baseline"
       data-testid="spell-line-step"
       data-spell={step.name}
       data-here={step.queried ? 'yes' : 'no'}
-      sx={{ py: 0.25, opacity: step.queried ? 1 : 0.92 }}
+      sx={{ alignItems: 'baseline', py: 0.25, opacity: step.queried ? 1 : 0.92 }}
     >
-      <Typography variant="caption" color="text.secondary" sx={{ width: 28, flexShrink: 0 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', width: 28, flexShrink: 0 }}>
         {step.level}
       </Typography>
       {step.queried ? (
@@ -87,7 +86,7 @@ function LadderRow({ step, combo }: { step: SpellLineStep; combo: readonly Class
       {/* The rung stays on the ladder (it is the table's); an out-of-era one says so. */}
       <OutOfEraChip outOfEra={step.outOfEra} />
       <Box sx={{ flexGrow: 1 }} />
-      <Typography variant="caption" color="text.secondary" data-testid="spell-line-when">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="spell-line-when">
         {when}
       </Typography>
     </Stack>
@@ -111,23 +110,23 @@ function LineSection({ detail }: { detail: SpellDetail }): JSX.Element | null {
   const neighbours = spellNeighbourLine(detail)
   return (
     <Box data-testid="spell-line-section" data-line={path.line} data-line-class={path.cls}>
-      <Typography variant="overline" color="text.secondary">
+      <Typography variant="overline" sx={{ color: 'text.secondary' }}>
         {path.line} · {path.cls}
       </Typography>
       {note !== null && (
-        <Typography variant="caption" color="warning.main" display="block" data-testid="spell-line-note">
+        <Typography variant="caption" sx={{ color: 'warning.main', display: 'block' }} data-testid="spell-line-note">
           {note}
         </Typography>
       )}
       {neighbours !== null && (
-        <Typography variant="body2" color="text.secondary" data-testid="spell-line-neighbours">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="spell-line-neighbours">
           {neighbours}
         </Typography>
       )}
       {/* A SET rather than a ladder (travel rings, the Imbue gems, the poison tiers) still lists its
           membership — the spell really is one of them — and says why it names no order. */}
       {!path.ladder && (
-        <Typography variant="caption" color="text.secondary" display="block" data-testid="spell-line-set">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="spell-line-set">
           these are one set rather than a progression - none of them replaces another
         </Typography>
       )}
@@ -153,17 +152,17 @@ function LineSection({ detail }: { detail: SpellDetail }): JSX.Element | null {
 function ClassSection({ detail }: { detail: SpellDetail }): JSX.Element | null {
   if (detail.classLevels.length === 0) {
     return (
-      <Typography variant="caption" color="text.secondary" data-testid="spell-classes-none">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="spell-classes-none">
         the database places this spell in no class at all
       </Typography>
     )
   }
   return (
     <Box data-testid="spell-classes-section">
-      <Typography variant="overline" color="text.secondary">
+      <Typography variant="overline" sx={{ color: 'text.secondary' }}>
         Classes
       </Typography>
-      <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap" sx={{ mt: 0.5 }}>
+      <Stack direction="row" spacing={0.75} useFlexGap sx={{ flexWrap: 'wrap', mt: 0.5 }}>
         {detail.classLevels.map((c) => {
           const mine = spellClassIsYours(detail, c.cls)
           return (
@@ -192,9 +191,9 @@ function StatStrip({ detail }: { detail: SpellDetail }): JSX.Element | null {
   const rows = spellStatRows(detail)
   if (rows.length === 0) return null
   return (
-    <Stack direction="row" spacing={1.5} useFlexGap flexWrap="wrap">
+    <Stack direction="row" spacing={1.5} useFlexGap sx={{ flexWrap: 'wrap' }}>
       {rows.map((r) => (
-        <Typography key={r.id} variant="caption" color="text.secondary" data-testid="spell-page-stat" data-stat={r.id}>
+        <Typography key={r.id} variant="caption" sx={{ color: 'text.secondary' }} data-testid="spell-page-stat" data-stat={r.id}>
           {r.label}: {r.value}
         </Typography>
       ))}
@@ -264,7 +263,7 @@ function WikiLine({ name }: { name: string }): JSX.Element | null {
   const url = wikiPageUrl(name)
   if (!url) return null
   return (
-    <Typography variant="caption" color="text.disabled" display="block" data-testid="spell-page-wiki">
+    <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block' }} data-testid="spell-page-wiki">
       <a href={url} target="_blank" rel="noreferrer" style={{ color: 'inherit' }}>
         eqlwiki.com
       </a>
@@ -308,7 +307,7 @@ export function SpellPage({
             </Typography>
             <WikiLine name={name} />
             {detail !== null && spellFactsAreForLine(detail) && (
-              <Typography variant="caption" color="text.secondary" data-testid="spell-page-line-note">
+              <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="spell-page-line-note">
                 these are the {detail.name} line&apos;s numbers - the database states none per rank
               </Typography>
             )}

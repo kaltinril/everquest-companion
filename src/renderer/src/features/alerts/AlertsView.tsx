@@ -130,7 +130,7 @@ function ConfirmResetDialog({
     <Dialog open={open} onClose={onCancel} maxWidth="xs">
       <DialogTitle>Reset alerts to defaults?</DialogTitle>
       <DialogContent>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           This replaces all alerts, including any you added or edited, with the
           seeded built-in set (Charm break + Raid target defeated). This can&apos;t be undone.
         </Typography>

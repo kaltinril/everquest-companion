@@ -34,8 +34,8 @@ function RecipePicker(props: { deps: PlanDeps; recipes: readonly BookRecipe[]; r
   const { deps, recipes, recipe, onPick } = props
   if (recipes.length < 2) return null
   return (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5, mt: 0.75 }}>
-      <Typography variant="body2" color="text.secondary" data-testid="tradeskill-plan-recipe-count">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 0.5, mt: 0.75 }}>
+      <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="tradeskill-plan-recipe-count">
         {recipeCountText(recipes.length)}
       </Typography>
       <TextField
@@ -67,12 +67,12 @@ function PlanFoot({ facts, credited }: { facts: BenchFacts; credited: boolean })
     <Box>
       <OutputKindLine kind="inventory" quiet loadedAt={held.readAt} testId="tradeskill-plan-dump-line" />
       {have !== '' && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-plan-have-date">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-plan-have-date">
           {have}
         </Typography>
       )}
       {credited && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-plan-guide-credit">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-plan-guide-credit">
           {recipeGuideCreditText()}
         </Typography>
       )}
@@ -108,7 +108,7 @@ export function ItemPlan({ recipe, recipes, deps, facts, levels, plan, setPlan, 
     <FactsProvider value={facts}>
       <Stack spacing={1.5} data-testid="tradeskill-plan">
         <Paper variant="outlined" sx={{ p: 1.5 }} data-testid="tradeskill-plan-head">
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 0.5 }}>
             <ItemLabel name={recipe.item} bold />
             {/* Everything on the gather list is held: the same mark a recipe wears on the workbench. */}
             {gatherHeld(gather) && (
@@ -117,7 +117,7 @@ export function ItemPlan({ recipe, recipes, deps, facts, levels, plan, setPlan, 
               </Tooltip>
             )}
             <EraChip subject={recipe} />
-            <Typography variant="body2" color="text.secondary" data-testid="tradeskill-plan-facts">
+            <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="tradeskill-plan-facts">
               {recipeFacts(recipe, true)}
             </Typography>
             {/* The app's one wish control: a wished item is listed on Home under Working towards. */}

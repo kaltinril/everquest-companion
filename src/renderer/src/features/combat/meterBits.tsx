@@ -48,10 +48,9 @@ export function MoreRows({ n, onMore }: { n: number; onMore?: () => void }): Rea
   return (
     <Typography
       variant="caption"
-      color="text.disabled"
       data-testid="meter-more"
       onClick={onMore}
-      sx={onMore ? { cursor: 'pointer', '&:hover': { color: 'text.secondary' } } : undefined}
+      sx={onMore ? { color: 'text.disabled', cursor: 'pointer', '&:hover': { color: 'text.secondary' } } : { color: 'text.disabled' }}
     >
       +{n} more
     </Typography>

@@ -99,7 +99,7 @@ function SetHeader({ set, classes }: { set: LoadoutSet; classes: string }): JSX.
         : 'Without your EverQuest spell file these are spells that state the SAME stat, which is not a stacking verdict - the game may well run some of them together. Which one wins needs that file.'
   return (
     <Box>
-      <Stack direction="row" spacing={1} alignItems="baseline">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline' }}>
         <Typography variant="h6">Buff set</Typography>
         <Chip
           size="small"
@@ -110,11 +110,11 @@ function SetHeader({ set, classes }: { set: LoadoutSet; classes: string }): JSX.
           label={certainty === 'mixed' ? `${String(read.exact)}/${String(read.total)} exact` : certainty}
           sx={TINY_CHIP}
         />
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {classes}
         </Typography>
       </Stack>
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
         {sentence}
       </Typography>
     </Box>
@@ -146,8 +146,8 @@ function BuffSection({
         </Alert>
       ) : (
         <Box>
-          <Stack direction="row" spacing={1} alignItems="baseline" sx={{ mb: 0.5 }}>
-            <Typography variant="overline" color="text.secondary">
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', mb: 0.5 }}>
+            <Typography variant="overline" sx={{ color: 'text.secondary' }}>
               Keep up ({String(set.gems)})
             </Typography>
             {/* With a group the gem count is each caster's own, and the blocks below say it. */}
@@ -182,7 +182,7 @@ function BuffSection({
         <>
           <Divider />
           <Box data-testid="loadout-rejections">
-            <Typography variant="overline" color="text.secondary">
+            <Typography variant="overline" sx={{ color: 'text.secondary' }}>
               Left out, and why
             </Typography>
             <Stack>
@@ -381,7 +381,7 @@ export default function SpellLoadoutView(): JSX.Element {
         }
       />
 
-      <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ pb: 4, mt: 1 }}>
+      <Stack direction="row" spacing={2} sx={{ alignItems: 'flex-start', pb: 4, mt: 1 }}>
         <Stack spacing={2} sx={{ flexGrow: 1, minWidth: 0 }}>
           <Pane pane={shown} sets={sets} level={level} classes={combo.resolved.join(' / ')} rankOf={rankOf} pool={pool} />
         </Stack>

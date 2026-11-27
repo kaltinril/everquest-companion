@@ -52,7 +52,7 @@ function RailRow({
       >
         {label}
       </Typography>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {tallyText(tally, bundle.hasComplete)}
       </Typography>
     </ListItemButton>

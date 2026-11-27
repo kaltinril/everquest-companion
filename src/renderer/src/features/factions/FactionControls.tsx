@@ -92,7 +92,7 @@ export function WorkFilterControls({
   dontCareCount: number
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap" alignItems="center" sx={{ mb: 1 }}>
+    <Stack direction="row" spacing={2} useFlexGap sx={{ flexWrap: 'wrap', alignItems: 'center', mb: 1 }}>
       <ChipMultiSelect
         options={CLASS_ABBRS}
         value={classes}
@@ -180,7 +180,7 @@ function FilterSwitch({
         />
       }
       label={label}
-      slotProps={{ typography: { variant: 'caption', color: 'text.secondary' } }}
+      slotProps={{ typography: { variant: 'caption', sx: { color: 'text.secondary' } } }}
     />
   )
 }
@@ -191,7 +191,7 @@ function FilterSwitch({
 function OtherUnlocksNote(): JSX.Element {
   const open = useUnlockLink()
   return (
-    <Typography variant="caption" color="text.secondary" data-testid="factions-other-unlocks">
+    <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="factions-other-unlocks">
       No faction opens a class or a deity; see{' '}
       {open === null ? (
         'Unlocks'
@@ -373,7 +373,7 @@ export function FilterBar({
   onCollapseAll: () => void
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
+    <Stack direction="row" spacing={2} sx={{ alignItems: 'center', mb: 1 }}>
       <TextField
         size="small"
         placeholder="Search factions, quests, items…"
@@ -426,7 +426,7 @@ export function FilterBar({
           Collapse all ({expandedCount})
         </Button>
       )}
-      <Typography variant="caption" color="text.secondary" data-testid="factions-count">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="factions-count">
         {counts.shown} of {counts.total}
       </Typography>
     </Stack>

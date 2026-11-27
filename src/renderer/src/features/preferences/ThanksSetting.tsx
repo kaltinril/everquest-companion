@@ -84,7 +84,7 @@ export function ThanksSetting(): JSX.Element {
           target="_blank"
           rel="noreferrer"
           variant="caption"
-          color="text.secondary"
+          sx={{ color: 'text.secondary' }}
           data-testid="prefs-thanks-link-original"
         >
           The original app on GitHub (no longer updated; this build updates from kaltinril&apos;s fork)
@@ -107,7 +107,7 @@ export function ThanksSetting(): JSX.Element {
             >
               {c.host}
             </Link>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               {c.what}
             </Typography>
             {c.licence && (
@@ -116,7 +116,7 @@ export function ThanksSetting(): JSX.Element {
                 target="_blank"
                 rel="noreferrer"
                 variant="caption"
-                color="text.secondary"
+                sx={{ color: 'text.secondary' }}
                 data-testid={`prefs-thanks-licence-${c.host}`}
               >
                 {c.licence.text}
@@ -125,7 +125,7 @@ export function ThanksSetting(): JSX.Element {
           </Stack>
         ))}
       </Stack>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Both are run by people who have spent years writing this game down for everyone else, and
         neither is affiliated with this app. If you have ever looked something up mid-raid, you owe
         them one.
@@ -142,12 +142,12 @@ export function ThanksSetting(): JSX.Element {
             <Typography variant="body2" data-testid={`prefs-thanks-guide-${g.id}`}>
               {guideCreditLine(g)}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               {g.what}
             </Typography>
           </Stack>
         ))}
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Neither author is affiliated with this app.
         </Typography>
       </Stack>

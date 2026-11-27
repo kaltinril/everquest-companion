@@ -93,7 +93,7 @@ function LineText({
   const { onOpenMob } = ctx
   if (mobs.length === 0 || onOpenMob === undefined) {
     return (
-      <Typography variant="body2" color={component.done ? 'text.secondary' : 'text.primary'}>
+      <Typography variant="body2" sx={{ color: component.done ? 'text.secondary' : 'text.primary' }}>
         {text}
       </Typography>
     )
@@ -130,12 +130,12 @@ function LineCounter({
   return (
     <>
       {have !== undefined && need !== undefined && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {count(have)} of {count(need)}
         </Typography>
       )}
       {ctx.pickable && row !== undefined && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {reachText(row.zones)}
         </Typography>
       )}
@@ -165,7 +165,7 @@ function NestToggle({
   const { name } = named.achievement
   return (
     <>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {progressText(named.achievement)}
       </Typography>
       <IconButton
@@ -189,7 +189,7 @@ export function ComponentLine(props: LineProps): JSX.Element {
   const id = counterIdOf(group, parent, component)
   return (
     <Box data-testid="achievement-line" data-done={component.done ? 'true' : 'false'}>
-      <Stack direction="row" spacing={0.75} alignItems="center">
+      <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center' }}>
         {!bare && ctx.pickable && id !== null && (
           <PickBox ids={[id]} label={componentText(component)} ctx={ctx} />
         )}
@@ -197,17 +197,15 @@ export function ComponentLine(props: LineProps): JSX.Element {
         <Stack
           direction="row"
           spacing={0.75}
-          alignItems="center"
-          flexWrap="wrap"
           useFlexGap
-          sx={{ flex: 1, minWidth: 0 }}
+          sx={{ alignItems: 'center', flexWrap: 'wrap', flex: 1, minWidth: 0 }}
         >
           <LineText component={component} named={found} ctx={ctx} />
           {isOptional(component) && (
             <Chip size="small" variant="outlined" label="optional" sx={CHIP_SX} />
           )}
         </Stack>
-        <Stack direction="row" spacing={0.75} alignItems="center" sx={{ flexShrink: 0 }}>
+        <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', flexShrink: 0 }}>
           {!bare && <LineCounter id={id} component={component} ctx={ctx} />}
           {named !== null && (
             <NestToggle
@@ -223,7 +221,7 @@ export function ComponentLine(props: LineProps): JSX.Element {
       {named !== null && (
         <Collapse in={open} unmountOnExit>
           <Box sx={{ pl: 3, py: 0.25, borderLeft: '1px solid', borderColor: 'divider', ml: 1 }}>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               {named.group.category}
             </Typography>
             <AchievementLines located={named} ctx={ctx} depth={depth + 1} />

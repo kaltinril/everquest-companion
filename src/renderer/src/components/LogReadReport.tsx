@@ -47,7 +47,7 @@ export function LogReadReport(): JSX.Element | null {
     >
       {logReadLines(report, now).map((line) => (
         <Stack key={line.label} direction="row" spacing={1}>
-          <Typography variant="caption" color="text.secondary" sx={{ width: 76, flexShrink: 0 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', width: 76, flexShrink: 0 }}>
             {line.label}
           </Typography>
           <Typography variant="caption" sx={{ minWidth: 0, wordBreak: 'break-word' }}>
@@ -56,7 +56,7 @@ export function LogReadReport(): JSX.Element | null {
         </Stack>
       ))}
       {report.engineSaid.length > 0 && (
-        <Typography variant="caption" color="text.secondary" component="div">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} component="div">
           Engine said
         </Typography>
       )}
@@ -75,7 +75,7 @@ export function LogReadReport(): JSX.Element | null {
           <LogReadTryAgain testId="log-read-report-try-again" />
         </Box>
       )}
-      <Typography variant="caption" color="text.secondary" component="div" sx={{ mt: 0.5 }}>
+      <Typography variant="caption" component="div" sx={{ color: 'text.secondary', mt: 0.5 }}>
         Stuck here? Post a screenshot of this box on your report.
       </Typography>
     </Box>

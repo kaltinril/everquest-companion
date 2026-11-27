@@ -54,11 +54,11 @@ function OfferRow({
 }): JSX.Element {
   const covered = offer.covered.length > 1 ? ` · already covered: ${offer.covered.join(', ')}` : ''
   return (
-    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
       <Typography variant="body2" sx={{ fontWeight: 600 }}>
         {offer.from} → {offer.to}
       </Typography>
-      <Typography variant="caption" color="text.secondary" sx={{ flexGrow: 1 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', flexGrow: 1 }}>
         {def ? def.name : offer.alertName}
         {covered}
       </Typography>
@@ -106,13 +106,13 @@ export default function UpgradeOffers({
   return (
     <Paper variant="outlined" sx={{ p: 1.25, borderColor: 'primary.main' }}>
       <Stack spacing={1}>
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <TrendingUpIcon fontSize="small" color="primary" />
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
             {headline(offers.length)}
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             Adding keeps the old rank firing - loadout swaps go back to it.
           </Typography>
         </Stack>

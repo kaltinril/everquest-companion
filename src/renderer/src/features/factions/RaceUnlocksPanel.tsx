@@ -57,7 +57,7 @@ function RaceRow({
   onFind?: (name: string) => void
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap" useFlexGap data-testid="factions-race-row">
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap data-testid="factions-race-row">
       <Typography
         variant="caption"
         sx={{ fontWeight: 600, minWidth: 118, color: claim.complete ? 'success.main' : undefined }}
@@ -75,7 +75,7 @@ function RaceRow({
         />
       ))}
       {claim.factions.length === 0 && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           no faction requirements listed
         </Typography>
       )}
