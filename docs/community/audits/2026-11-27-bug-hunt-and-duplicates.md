@@ -362,4 +362,22 @@ before/after image (see "Prototypes").
 
 ## Prototypes
 
-Pending.
+Eight UI-affecting duplicate items, each built as one shared version on its own branch off
+`main_community` (one commit, subject "PROTOTYPE, do not merge: ..."), captured before and after in
+the hidden e2e app, and shown to the owner on a private review page (claude.ai artifact
+`9G8fxa7xLBckSbz52FtpCj`). None is merged; every branch waits on the owner's word. The agents'
+recommendations, from what the images showed:
+
+| Branch | Items | What changes for the player | Recommendation |
+| --- | --- | --- | --- |
+| `proto-1127-hover-cards` | dup-ui-a-2, dup-ui-b-3 | BiS slot hover becomes the Gear compare pair: loses the Best/Worn board view (Mana from WIS, resist average), base-vs-base gain/lose lines next to slider scores, opens over the slot cards below. Loot card and Gear pair byte-identical. | Keep separate |
+| `proto-1127-respawn-labels` | dup-ui-a-3 | Map pin reads UP / "due long ago" like the Timers tab instead of a countdown or "due"; hover reads the seen/stale line. | Merge, after rounding the stale hover age and deciding the overlay's just-due pulse on a seen pin |
+| `proto-1127-class-filter` | dup-ui-a-5 | Exaltations and the Wish list use the Gear class filter: shorter offer chip, and the Exaltations pin becomes per character. Removes `useBrowseClasses` (101 lines). | Owner: merge if Exaltations should be per character |
+| `proto-1127-stat-tiles` | dup-ui-a-6 | One `StatTile`; Leveling hero row about 4 px shorter, everything else pixel-identical. | Merge (or add an inline-caption prop for zero change) |
+| `proto-1127-table-headers` | dup-ui-a-7 | One click rule and one remembered sort: AA loses its third click back to wiki order (requirements/alt-advancement.md 2026-11-26), the two rate tables gain a reverse, six tables remember their sort across restarts. Gear unchanged. | Owner ruling first |
+| `proto-1127-time-ago` | dup-ui-b-1 | One time-ago formatter: fight picker and alert tooltips read "71m ago" where they read "1h ago". | Merge |
+| `proto-1127-chips` | dup-ui-b-9 | One 18 px tag: Combat kind tag 9 to 11 px text (readable), Gaps action chips 24 to 18 px beside a 24 px "looted" chip. | Owner: a density decision |
+| `proto-1127-clock-date` | dup-ui-b-6 | Loot rows read "Aug 5, 20:26" like the slice caption, not "Aug 05, 08:26 PM". The engine's `views/loot.rs` `display_time` and the `engine-loot-view` e2e must change with it. | Owner: 24h or 12h first |
+
+- How the images were taken (no window on screen): `agent/WORKFLOW.md`, Gate, "Screenshots of the
+  hidden app".

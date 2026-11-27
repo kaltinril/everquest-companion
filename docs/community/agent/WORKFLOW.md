@@ -260,6 +260,19 @@ disagree, RULES.md wins; fix this file.
   clipboard round trip again (locked workstation). `voice-alerts` was then fixed the same evening,
   in the spec: `customPhraseSteps.mts` answers the first-run notice before it opens the say picker
   (green alone, 118 s). A red `voice-alerts` is a regression from here on.
+- **Screenshots of the hidden app** (2026-11-27, 8 prototypes, about 20 launches, byte-identical
+  repeats): `page.screenshot` is never used. In the e2e harness (`launchOnFixture`, `EQ_E2E=1`,
+  every window `show:false`), take the pixels in main through `electronApp.evaluate`:
+  `BrowserWindow.webContents.capturePage(rect, { stayHidden: true })`, bounded by a timeout. Three
+  rules make it reliable: (1) `invalidate()`, capture and throw away, wait, `invalidate()`, capture
+  and keep, because the first capture can return the frame from before the last DOM change; (2)
+  inject a style that turns CSS transitions and animations off, or MUI tab underlines and Grow
+  poppers are caught part-way; (3) no named helper functions inside `evaluate` bodies (tsx's
+  keepNames adds `__name()`, which throws there). A tree that changes only renderer code needs no
+  engine build: `EQ_ENGINE_BIN` (read under `EQ_E2E=1`) points it at another tree's `engined.exe`.
+  Side-by-side images: headless Chromium from `playwright-core` with `executablePath` set to the
+  newest `%LOCALAPPDATA%\ms-playwright\chromium_headless_shell-*` (the build playwright-core expects
+  may not be installed).
 - **Headless look at a tab:** every tab is in every build (the `UNRELEASED` gate was removed
   2026-10-29), so `electron-vite build --outDir=<worktree>/out-e2e` and a throwaway spec with
   `launchOnFixture(...)` reach any of them; no flag or env var is needed.
