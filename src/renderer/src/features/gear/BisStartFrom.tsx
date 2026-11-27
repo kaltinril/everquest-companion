@@ -6,7 +6,7 @@
 
 import { useState, type JSX } from 'react'
 import { Button, Chip, IconButton, ListSubheader, MenuItem, Popover, Stack, TextField, Tooltip, Typography } from '@mui/material'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import SaveIcon from '@mui/icons-material/Save'
 import type { TierSetup } from '@shared/planner/tierChips'
 import { PRESET_LABEL, TIER_PRESETS, type TierPreset } from '@shared/planner/tierDefaults'

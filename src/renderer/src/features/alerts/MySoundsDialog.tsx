@@ -31,7 +31,7 @@ import {
   Typography
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import LibraryMusicIcon from '@mui/icons-material/LibraryMusic'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import type { AlertDef, UserSound, UserSoundRejection } from '@shared/types'

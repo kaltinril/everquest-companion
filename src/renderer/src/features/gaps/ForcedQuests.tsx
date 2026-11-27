@@ -77,7 +77,7 @@ function AddQuestDialog({ scope, fixedName, onClose }: { scope: ForcedScope; fix
             options={scope.titles}
             inputValue={name}
             onInputChange={(_e, v) => setName(v)}
-            renderInput={(p) => <TextField {...p} label="Quest name" size="small" sx={{ mt: 1, mb: 1 }} slotProps={{ htmlInput: { ...p.inputProps, 'data-testid': 'forced-name' } }} />}
+            renderInput={(p) => <TextField {...p} label="Quest name" size="small" sx={{ mt: 1, mb: 1 }} slotProps={{ ...p.slotProps, htmlInput: { ...p.slotProps.htmlInput, 'data-testid': 'forced-name' } }} />}
           />
         )}
         <VisitList talks={scope.talks} picked={picked} onToggle={toggle} />

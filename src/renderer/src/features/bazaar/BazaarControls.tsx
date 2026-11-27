@@ -126,7 +126,7 @@ function PurposeControls({ state, set, quests }: Props & { quests: QuestOptions 
         inputValue={state.quest}
         onInputChange={(_e, v) => set({ quest: v })}
         sx={{ minWidth: 220 }}
-        renderInput={(params) => <TextField {...params} label="Quest" placeholder="Part of a quest name" slotProps={{ htmlInput: { ...params.inputProps, 'data-testid': 'bazaar-quest' } }} />}
+        renderInput={(params) => <TextField {...params} label="Quest" placeholder="Part of a quest name" slotProps={{ ...params.slotProps, htmlInput: { ...params.slotProps.htmlInput, 'data-testid': 'bazaar-quest' } }} />}
       />
     </>
   )

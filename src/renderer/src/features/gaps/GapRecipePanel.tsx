@@ -131,7 +131,7 @@ function MaterialSearch({ onAdd }: { onAdd: (m: GapRecipeMaterial) => void }): J
           {o.name}
         </Box>
       )}
-      renderInput={(p) => <TextField {...p} placeholder="Add a material" slotProps={{ htmlInput: { ...p.inputProps, 'data-testid': 'gaps-recipe-search' } }} />}
+      renderInput={(p) => <TextField {...p} placeholder="Add a material" slotProps={{ ...p.slotProps, htmlInput: { ...p.slotProps.htmlInput, 'data-testid': 'gaps-recipe-search' } }} />}
       sx={{ width: 280 }}
     />
   )
@@ -201,7 +201,7 @@ function CombineFields({ draft, help, onChange }: { draft: GapRecipe; help: GapR
         options={[...containerOptions(help, draft.tradeskill)]}
         inputValue={draft.container ?? ''}
         onInputChange={(_e, v) => onChange({ ...draft, container: v })}
-        renderInput={(p) => <TextField {...p} label="Container" error={(draft.container ?? '').trim() === ''} slotProps={{ htmlInput: { ...p.inputProps, 'data-testid': 'gaps-recipe-container' } }} />}
+        renderInput={(p) => <TextField {...p} label="Container" error={(draft.container ?? '').trim() === ''} slotProps={{ ...p.slotProps, htmlInput: { ...p.slotProps.htmlInput, 'data-testid': 'gaps-recipe-container' } }} />}
         sx={{ width: 230 }}
       />
       <NumberField label="Trivial" value={draft.trivial} onChange={(trivial) => onChange({ ...draft, trivial })} testId="gaps-recipe-trivial" />

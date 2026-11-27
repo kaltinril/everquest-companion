@@ -42,7 +42,7 @@
 
 import { type JSX, useState } from 'react'
 import { Box, Button, Collapse, LinearProgress, Stack, Typography, useTheme } from '@mui/material'
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlineOutlined'
 import type { EngineFaultSay, FoldReadout } from '../../../shared/engineLaunch'
 import { NO_ENGINE_CONSEQUENCE, bannerFor, failureWords, reportPrefill } from '../../../shared/engineLaunch'
 import { useEngineLaunch } from '../lib/engineLaunchHud'

@@ -39,7 +39,7 @@
 
 import { type JSX, useEffect, useMemo } from 'react'
 import { Box, Chip, IconButton, Stack } from '@mui/material'
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutlineOutlined'
 import { CLASS_ABBRS, MAX_COMBO_SLOTS, resolvedClasses, type ClassAbbr } from '@shared/classCombo'
 import { classDisplayName } from '@shared/spellLevels'
 import { useComboSnap } from '../profiles/ClassComboData'

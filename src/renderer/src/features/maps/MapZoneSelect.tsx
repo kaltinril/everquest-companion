@@ -81,7 +81,7 @@ export default function ZoneSelect({ zones, zone, onPick }: ZoneSelectProps): JS
           {...params}
           label="Zone"
           placeholder="Find a zone…"
-          slotProps={{ htmlInput: { ...params.inputProps, 'data-testid': 'maps-zone-filter' } }}
+          slotProps={{ ...params.slotProps, htmlInput: { ...params.slotProps.htmlInput, 'data-testid': 'maps-zone-filter' } }}
         />
       )}
     />
