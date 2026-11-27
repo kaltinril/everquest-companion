@@ -442,7 +442,7 @@ export function buildBisSheet(opts: BisOptions): BisSheet {
   const totals: Partial<Record<TierChip, number>> = {}
   const other = othersHaste(order.map((_, i) => (choice[i] >= 0 ? lists[i][choice[i]] : undefined)))
   order.forEach((cell, i) => {
-    const onArrows = bowUp && i === ammo
+    const onArrows = bowUp && i === ammo && arrows.length > 0
     const index = onArrows && choice[i] >= 0 ? arrows.indexOf(lists[i][choice[i]]) : choice[i]
     const read = readCell(cell, onArrows ? arrows : lists[i], index, { otherHaste: other[i], opts, ordered: onArrows })
     if (onArrows && read.pick !== undefined) read.arrowForBow = true
