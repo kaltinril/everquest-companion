@@ -22,7 +22,11 @@ impl Run {
         let mut engine = CombatEngine::new();
         engine.set_player_name("Drywrought");
         Run {
-            parser: Parser::new(Clock::new(Tz::America__Los_Angeles), None, None),
+            parser: Parser::new(
+                Clock::new(Tz::get("America/Los_Angeles").unwrap()),
+                None,
+                None,
+            ),
             engine,
             seq: 0,
         }
@@ -48,7 +52,11 @@ impl Run {
 }
 
 fn parse(raw: &str) -> Value {
-    let p = Parser::new(Clock::new(Tz::America__Los_Angeles), None, None);
+    let p = Parser::new(
+        Clock::new(Tz::get("America/Los_Angeles").unwrap()),
+        None,
+        None,
+    );
     let mut ev = Ev::new();
     assert!(p.parse_event(raw, 0, &mut ev), "{raw}");
     serde_json::from_str(ev.finish()).unwrap()

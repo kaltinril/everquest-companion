@@ -15,7 +15,11 @@ const EXPECTED: &str = include_str!("../../../../tests/fixtures/swing-rounds.jso
 fn swing_rounds() -> Value {
     let mut engine = CombatEngine::new();
     engine.set_player_name("Valtari");
-    let parser = Parser::new(Clock::new(Tz::America__Los_Angeles), None, None);
+    let parser = Parser::new(
+        Clock::new(Tz::get("America/Los_Angeles").unwrap()),
+        None,
+        None,
+    );
     for (seq, raw) in LOG.lines().enumerate() {
         let mut ev = Ev::new();
         if !parser.parse_event(raw, seq as i64, &mut ev) {

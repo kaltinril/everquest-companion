@@ -136,7 +136,7 @@ fn all_fixtures() -> Vec<String> {
 /// a `buffApply`'s candidate list.
 fn parser() -> Parser {
     Parser::new(
-        Clock::new(chrono_tz::America::Los_Angeles),
+        Clock::new(eqlog::Tz::get("America/Los_Angeles").unwrap()),
         None,
         Some("Primitive".to_string()),
     )

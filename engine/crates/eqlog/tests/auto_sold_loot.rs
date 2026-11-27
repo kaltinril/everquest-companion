@@ -12,7 +12,7 @@ fn parse_one(p: &Parser, raw: &str) -> String {
 
 fn bare() -> Parser {
     Parser::new(
-        Clock::new(Tz::America__Los_Angeles),
+        Clock::new(Tz::get("America/Los_Angeles").unwrap()),
         None,
         Some("Primitive".to_string()),
     )

@@ -27,7 +27,7 @@ impl RosterSource for Group {
 /// Fold the lines and return the snapshot's selected view (`selected` = `None` is the open fight).
 fn fold(lines: &[&str], selected: Option<&str>) -> Value {
     let parser = Parser::new(
-        Clock::new(Tz::America__Los_Angeles),
+        Clock::new(Tz::get("America/Los_Angeles").unwrap()),
         None,
         Some("Drywrought".to_string()),
     );
