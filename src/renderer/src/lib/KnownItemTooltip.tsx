@@ -33,8 +33,9 @@
 // the defect does not. So the mode fixes the three things that made the card a click-eater, and
 // each of them is stated here rather than inherited:
 //   1. it opens DOWNWARD (`bottom-start`) and CANNOT go up — `flip` is disabled, and so is
-//      `preventOverflow`'s main axis, which is the other modifier that can slide a card back
-//      across the row it belongs to. A card whose top edge is always below its anchor's top edge
+//      `preventOverflow`'s vertical axis (`altAxis` for a bottom placement), which is the other
+//      modifier that can slide a card back across the row it belongs to; it still slides sideways
+//      to stay on screen. A card whose top edge is always below its anchor's top edge
 //      can never be on a toolbar its anchor is below. (The price is honest: a card anchored on
 //      the very last visible row is clipped by the window bottom rather than flipping above it.)
 //   2. it holds NO pointer events. `disableInteractive` already gets MUI's popper there, but the
@@ -378,14 +379,16 @@ function KnownItemCard({
 
 /**
  * The popper modifiers that make a click-through card unable to reach the toolbar above it
- * (header, point 1). Both are DISABLED modifiers: `flip` is what would move a bottom-placed card
- * to the top when it runs out of room, and `preventOverflow`'s main axis is what would slide it up
- * when the window's bottom edge is close. With neither, the card's top edge is always its anchor's
- * bottom edge, and the anchor is always below the toolbar.
+ * (header, point 1). `flip` is DISABLED: it is what would move a bottom-placed card to the top when
+ * it runs out of room. For a `bottom` placement `preventOverflow`'s `mainAxis` is the HORIZONTAL one
+ * and `altAxis` the vertical (`getMainAxisFromPlacement` gives 'x'), so the pair below slides the
+ * card sideways to stay on screen and never moves it vertically: the measured pair
+ * `features/gear/GearCompareCard.tsx` uses (JOS-344; tests/clickThroughCardAxes.test.mts pins both).
+ * The card's top edge is always its anchor's bottom edge, and the anchor is always below the toolbar.
  */
 const NEVER_UPWARD = [
   { name: 'flip', enabled: false },
-  { name: 'preventOverflow', options: { mainAxis: false, altAxis: true } }
+  { name: 'preventOverflow', options: { mainAxis: true, altAxis: false, padding: 8 } }
 ]
 
 /**
