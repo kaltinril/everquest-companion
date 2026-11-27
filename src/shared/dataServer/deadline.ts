@@ -30,9 +30,13 @@
  */
 export const REQUEST_DEADLINE_MS = 15_000
 
-/** Arm one request's deadline. Disarm with `clearTimeout`; see the header for the `unref`. */
-export function armDeadline(expired: () => void): ReturnType<typeof setTimeout> {
-  const handle = setTimeout(expired, REQUEST_DEADLINE_MS)
+/**
+ * Arm one request's deadline. Disarm with `clearTimeout`; see the header for the `unref`. `ms` is
+ * {@link REQUEST_DEADLINE_MS} unless the caller's own wait is longer (the watchdog's second opinion,
+ * `engineClientHost.ts ownConnectionHealth`).
+ */
+export function armDeadline(expired: () => void, ms: number = REQUEST_DEADLINE_MS): ReturnType<typeof setTimeout> {
+  const handle = setTimeout(expired, ms)
   const timer: unknown = handle
   if (typeof timer === 'object' && timer !== null && 'unref' in timer) {
     ;(timer as { unref: () => void }).unref()
