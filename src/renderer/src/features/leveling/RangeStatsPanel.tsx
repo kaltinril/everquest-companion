@@ -146,7 +146,7 @@ function StatCard({ stat }: { stat: HeroStat }): JSX.Element {
           {stat.value}
         </Typography>
         <Typography variant="body2">{stat.label}</Typography>
-        <Typography variant="caption" color="text.secondary" display="block">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
           {stat.sub}
         </Typography>
       </Box>
@@ -176,7 +176,7 @@ function ChipRow({ stats, basis }: { stats: RangeStats; basis: RateBasis }): JSX
   const killers = deathsTitle(stats)
   return (
     <Box>
-      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
         {/* The chip PRINTS active time, so it carries the definition (JOS-249) — with the gap
             count still leading when there is one, because that is this chip's own detail. */}
         <Tooltip title={gaps ? `${gaps} · ${ACTIVE_TIME_TITLE}` : ACTIVE_TIME_TITLE}>
@@ -211,7 +211,7 @@ function ChipRow({ stats, basis }: { stats: RangeStats; basis: RateBasis }): JSX
           <Chip size="small" variant="outlined" label={deathsText(stats)} sx={CHIP_SX} data-testid="leveling-range-deaths" />
         </Tooltip>
       </Stack>
-      <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
         {idleRuleCaption(stats.idleThresholdMs)}
         {offline && ` · offline: ${OFFLINE_CAPTION}`}
         {aa && ` · AA: ${AA_RESPEC_CAPTION}`}
@@ -375,7 +375,7 @@ function HeaderRow({ stats, scope, zoneCaption, onClear }: RangeStatsPanelProps)
   // Null unless a zone membership actually left part of the range out — see `membershipText`.
   const membership = membershipText(stats, zoneCaption)
   return (
-    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
       <Typography variant="subtitle2" sx={{ fontWeight: 700 }} data-testid="leveling-range-window">
         {formatDateTime(stats.t0)} → {formatDateTime(stats.t1)}
       </Typography>
@@ -384,7 +384,7 @@ function HeaderRow({ stats, scope, zoneCaption, onClear }: RangeStatsPanelProps)
           testid because it is the number the owner's bug report was about: `elapsed 27m` over a
           camp when only one of its tiers was selected. tests/e2e/sliceSteps.mts reads it on both
           sides of the toggle. */}
-      <Typography variant="caption" color="text.secondary" data-testid="leveling-range-duration">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="leveling-range-duration">
         {fmtDuration(stats.durationMs)}
       </Typography>
       {/* …AND WHAT THAT NUMBER LEFT OUT (JOS-454). The elapsed span above is Σ of the visits the
@@ -395,7 +395,7 @@ function HeaderRow({ stats, scope, zoneCaption, onClear }: RangeStatsPanelProps)
       {membership && (
         <Typography
           variant="caption"
-          color="text.secondary"
+          sx={{ color: 'text.secondary' }}
           data-testid="leveling-range-membership"
           title={MEMBERSHIP_TITLE}
         >
@@ -442,7 +442,7 @@ export function RangeStatsPanel({ stats, scope, zoneCaption, onClear }: RangeSta
       data-scope={scope}
     >
       <HeaderRow stats={stats} scope={scope} zoneCaption={zoneCaption} onClear={onClear} />
-      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }} useFlexGap>
         {rangeHeroes(stats, basis).map((s) => (
           <StatCard key={s.id} stat={s} />
         ))}
@@ -450,7 +450,7 @@ export function RangeStatsPanel({ stats, scope, zoneCaption, onClear }: RangeSta
       <ChipRow stats={stats} basis={basis} />
       <ZoneTable stats={stats} basis={basis} />
       {footnote && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {footnote}
         </Typography>
       )}

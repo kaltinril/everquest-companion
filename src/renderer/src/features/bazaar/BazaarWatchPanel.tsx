@@ -51,7 +51,7 @@ export default function BazaarWatchPanel({ item }: { item: BazaarItem }): JSX.El
   }
   return (
     <Stack spacing={0.5} data-testid="bazaar-watch">
-      <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
         <FormControlLabel control={<Switch size="small" checked={w !== null} onChange={(_e, on) => toggle(on)} data-testid="bazaar-watch-on" />} label="Watch" />
         {w !== null && !combined && (
           <FormControlLabel
@@ -73,7 +73,7 @@ export default function BazaarWatchPanel({ item }: { item: BazaarItem }): JSX.El
       </Stack>
       {w !== null && (
         <>
-          <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
+          <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
             <Tick label="Alert on WTS (someone selling)" checked={w.wts} onChange={(wts) => put({ ...w, wts })} testId="bazaar-watch-wts" />
             {w.wts && (
               <>
@@ -94,11 +94,11 @@ export default function BazaarWatchPanel({ item }: { item: BazaarItem }): JSX.El
               </>
             )}
           </Stack>
-          <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
+          <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
             <Tick label="Alert on WTB (someone buying)" checked={w.wtb} onChange={(wtb) => put({ ...w, wtb })} testId="bazaar-watch-wtb" />
             {w.wtb && <PriceField label="at or over" value={w.wtbMin} onCommit={(wtbMin) => put({ ...w, wtbMin })} testId="bazaar-watch-wtb-min" />}
           </Stack>
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             Blank prices alert on any offer; a WTB naming no price always alerts. Sound, voice and banner: the &quot;Bazaar watchlist match&quot; alert in the Alerts tab.
           </Typography>
         </>

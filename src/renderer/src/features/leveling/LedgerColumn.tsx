@@ -51,7 +51,7 @@ function ProgressFeedPanel({ feed, scopeLabel }: { feed: FeedItem[]; scopeLabel:
         Recent progress
       </Typography>
       {feed.length === 0 && (
-        <Typography variant="caption" color="text.secondary" data-testid="leveling-feed-empty">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="leveling-feed-empty">
           no level-ups or AA gains in {scopeLabel}
         </Typography>
       )}
@@ -63,8 +63,7 @@ function ProgressFeedPanel({ feed, scopeLabel }: { feed: FeedItem[]; scopeLabel:
             key={`${f.ts}-${f.kind}-${i}`}
             direction="row"
             spacing={1}
-            alignItems="center"
-            sx={{ py: 0.4 }}
+            sx={{ alignItems: 'center', py: 0.4 }}
           >
             <Chip
               size="small"
@@ -77,10 +76,10 @@ function ProgressFeedPanel({ feed, scopeLabel }: { feed: FeedItem[]; scopeLabel:
                 minWidth: 68
               }}
             />
-            <Typography variant="caption" color="text.secondary" sx={{ flexGrow: 1 }} noWrap>
+            <Typography variant="caption" sx={{ color: 'text.secondary', flexGrow: 1 }} noWrap>
               {f.detail}
             </Typography>
-            <Typography variant="caption" color="text.disabled" noWrap>
+            <Typography variant="caption" sx={{ color: 'text.disabled' }} noWrap>
               {formatDate(f.ts)}
             </Typography>
           </Stack>

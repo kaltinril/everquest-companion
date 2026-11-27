@@ -101,7 +101,7 @@ function PreviewSoundRow({
   onPlay: () => void
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ py: 0.25 }}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', py: 0.25 }}>
       <IconButton
         size="small"
         color={isPlaying ? 'primary' : 'default'}
@@ -113,8 +113,7 @@ function PreviewSoundRow({
       </IconButton>
       <Typography
         variant="caption"
-        color="text.secondary"
-        sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+        sx={{ color: 'text.secondary', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
       >
         {sound.label}
       </Typography>
@@ -153,7 +152,7 @@ function PackPreviewList({
         )
       })}
       {sounds.length === 0 && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           No previewable sounds.
         </Typography>
       )}
@@ -181,9 +180,9 @@ function PackPreviewPanel({
     <Collapse in={isExpanded} unmountOnExit>
       <Box sx={{ mt: 1, pl: 4.5 }}>
         {preview?.loading && (
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <CircularProgress size={14} />
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               Loading sounds…
             </Typography>
           </Stack>
@@ -220,7 +219,7 @@ function PackMeta({
 }): JSX.Element {
   return (
     <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
         <Typography variant="body2" sx={{ fontWeight: 600 }}>
           {p.display_name}
         </Typography>
@@ -243,16 +242,16 @@ function PackMeta({
             data-testid="pack-default-chip"
           />
         )}
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {p.sound_count} sounds · {sizeMb(p.total_size_bytes)}
         </Typography>
       </Stack>
       {p.description && (
-        <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.25 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}>
           {p.description}
         </Typography>
       )}
-      <Stack direction="row" spacing={0.5} sx={{ mt: 0.5 }} flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'wrap', mt: 0.5 }} useFlexGap>
         {p.categories.map((c) => (
           <Chip key={c} size="small" variant="outlined" label={c} sx={{ height: 18, fontSize: 10 }} />
         ))}
@@ -370,7 +369,7 @@ export default function SoundPackRow({
         p: 1.25
       }}
     >
-      <Stack direction="row" spacing={1} alignItems="flex-start">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'flex-start' }}>
         <IconButton
           size="small"
           onClick={() => onToggleExpand(p.name)}

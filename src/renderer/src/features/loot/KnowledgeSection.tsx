@@ -32,7 +32,7 @@ export interface KnowledgeLinks {
 function KnowledgeLoading(): JSX.Element {
   return (
     <Box sx={{ mb: 2 }}>
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ color: 'text.secondary' }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', color: 'text.secondary' }}>
         <CircularProgress size={14} />
         <Typography variant="caption">Looking up what this is for…</Typography>
       </Stack>
@@ -49,11 +49,11 @@ function hasKnowledge(data: ItemKnowledge, recipes: ItemRecipeUse[], crafted?: s
 
 function KnowledgeHeader({ offline }: { offline?: boolean }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1 }}>
       <AutoStoriesIcon fontSize="small" sx={{ color: 'secondary.main' }} />
       <Typography variant="subtitle2">What it&apos;s for</Typography>
       {offline && (
-        <Typography variant="caption" color="text.disabled">
+        <Typography variant="caption" sx={{ color: 'text.disabled' }}>
           (offline - showing what&apos;s known locally)
         </Typography>
       )}
@@ -100,7 +100,7 @@ function QuestUseChip({ use, links }: { use: ItemQuestUse; links: KnowledgeLinks
   const wiki = use.source === 'posky' ? undefined : wikiPageUrl(use.page ?? use.quest)
   const outcomes = questUseOutcomes(use)
   return (
-    <Stack direction="row" spacing={0.5} alignItems="center" sx={{ minWidth: 0 }}>
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', minWidth: 0 }}>
       <Chip
         size="small"
         variant="outlined"
@@ -113,7 +113,7 @@ function QuestUseChip({ use, links }: { use: ItemQuestUse; links: KnowledgeLinks
         sx={{ height: 22 }}
       />
       {outcomes.length > 0 && (
-        <Typography variant="caption" color="text.secondary" data-testid="loot-quest-reward" sx={{ whiteSpace: 'nowrap' }}>
+        <Typography variant="caption" data-testid="loot-quest-reward" sx={{ color: 'text.secondary', whiteSpace: 'nowrap' }}>
           {'reward: '}
           {outcomes.map((name, i) => (
             <Box component="span" key={name} sx={{ color: 'text.primary' }}>
@@ -146,10 +146,10 @@ function QuestUsesBlock({
   if (data.questUses.length > 0) {
     return (
       <Box>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Used in {data.questUses.length === 1 ? 'quest' : 'quests'}:
         </Typography>
-        <Stack direction="row" spacing={1.25} flexWrap="wrap" useFlexGap sx={{ mt: 0.5 }}>
+        <Stack direction="row" spacing={1.25} useFlexGap sx={{ flexWrap: 'wrap', mt: 0.5 }}>
           {/* A lookup (what is this item for), so an out-of-era quest stays listed and is chipped. */}
           {data.questUses.map((u) => (
             <Fragment key={`${u.source}:${u.quest}:${u.role ?? ''}`}>
@@ -163,7 +163,7 @@ function QuestUsesBlock({
   }
   if (!data.quest || recipes.length > 0 || crafted) return null
   return (
-    <Typography variant="caption" color="text.secondary">
+    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
       Flagged as a quest item on the wiki (no specific quest association found).
     </Typography>
   )
@@ -198,10 +198,10 @@ function RecipesBlock({ recipes, questUseCount }: { recipes: ItemRecipeUse[]; qu
   if (recipes.length === 0) return null
   return (
     <Box sx={{ mt: questUseCount > 0 ? 1 : 0 }}>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Used in {recipes.length === 1 ? 'recipe' : 'recipes'}:
       </Typography>
-      <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap sx={{ mt: 0.5 }}>
+      <Stack direction="row" spacing={0.75} useFlexGap sx={{ flexWrap: 'wrap', mt: 0.5 }}>
         {recipes.map((r) => (
           <RecipeUseChip key={`${r.tradeskill ?? ''}:${r.recipe}`} use={r} />
         ))}
@@ -215,7 +215,7 @@ function RecipesBlock({ recipes, questUseCount }: { recipes: ItemRecipeUse[]; qu
 function RecipesNote({ note, recipeCount }: { note?: string; recipeCount: number }): JSX.Element | null {
   if (!note || recipeCount > 0) return null
   return (
-    <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
+    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 1 }}>
       Used in: {note}
     </Typography>
   )
@@ -234,7 +234,7 @@ function CraftedNote({ data, crafted }: { data: ItemKnowledge; crafted?: string 
   const parts = open === null ? [] : craftedByParts(data)
   const planOn = parts.find((part) => part.tradeskill !== undefined)?.tradeskill
   return (
-    <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }} data-testid="loot-crafted">
+    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 1 }} data-testid="loot-crafted">
       Crafted:{' '}
       {parts.length === 0 && crafted}
       {parts.map((part, i) => {
@@ -267,7 +267,7 @@ function CraftedNote({ data, crafted }: { data: ItemKnowledge; crafted?: string 
 function SourceNote({ wikiUrl, questUses }: { wikiUrl?: string; questUses: ItemQuestUse[] }): JSX.Element | null {
   if (!wikiUrl) return null
   return (
-    <Typography variant="caption" color="text.disabled" display="block" sx={{ mt: 1 }}>
+    <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block', mt: 1 }}>
       Source: <a href={wikiUrl} target="_blank" rel="noreferrer" style={{ color: 'inherit' }}>eqlwiki.com</a>
       {questUses.some((u) => u.source === 'posky') && ' + Plane of Sky dataset'}
     </Typography>

@@ -49,7 +49,7 @@ function ChoiceLabel({ title, note }: { title: string; note: string }): JSX.Elem
   return (
     <Stack>
       <Typography variant="body2">{title}</Typography>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {note}
       </Typography>
     </Stack>
@@ -116,7 +116,7 @@ export function BuffDurationDialog({
         <Typography variant="subtitle1" component="div">
           {stat.spell}
         </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Now {fmtPrecise(stat.estimateMs)} · {estimatorSourceTitle(stat.estimatorSource)}
         </Typography>
       </DialogTitle>

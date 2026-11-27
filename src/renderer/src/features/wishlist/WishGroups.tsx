@@ -144,10 +144,9 @@ function Row({ row, classes, imported, onRemove, onOpenLoot, onOpenMob, onOpenMa
     <Stack
       direction="row"
       spacing={1}
-      alignItems="center"
       data-testid="wishlist-row"
       data-item={row.itemKey}
-      sx={{ flexWrap: 'nowrap', py: 0.5, px: 1, borderBottom: 1, borderColor: 'divider' }}
+      sx={{ alignItems: 'center', flexWrap: 'nowrap', py: 0.5, px: 1, borderBottom: 1, borderColor: 'divider' }}
     >
       <Box sx={{ minWidth: 0, flexShrink: 1, width: 260 }}>
         <Typography variant="body2" component="div" noWrap sx={{ minWidth: 0 }}>
@@ -235,8 +234,7 @@ function Group({
       <Stack
         direction="row"
         spacing={1}
-        alignItems="center"
-        sx={{ px: 1, py: 0.75, bgcolor: 'action.hover', flexWrap: 'nowrap' }}
+        sx={{ alignItems: 'center', px: 1, py: 0.75, bgcolor: 'action.hover', flexWrap: 'nowrap' }}
       >
         <Tooltip title={KIND_HINT[group.kind]}>
           <Typography variant="subtitle2" noWrap sx={{ minWidth: 0 }}>
@@ -259,7 +257,7 @@ function Group({
           />
         )}
         <Box sx={{ flexGrow: 1 }} />
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {group.rows.length} {group.rows.length === 1 ? 'wish' : 'wishes'}
         </Typography>
       </Stack>
@@ -340,14 +338,13 @@ export function DoneStrip({ rows, onClear, onOpenLoot }: DoneStripProps): JSX.El
       <Stack
         direction="row"
         spacing={1}
-        alignItems="center"
-        sx={{ px: 1, py: 0.75, bgcolor: 'action.hover', flexWrap: 'nowrap' }}
+        sx={{ alignItems: 'center', px: 1, py: 0.75, bgcolor: 'action.hover', flexWrap: 'nowrap' }}
       >
         <Typography variant="subtitle2" noWrap sx={{ minWidth: 0 }}>
           Got it
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
-        <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', flexShrink: 0 }}>
           {rows.length} {rows.length === 1 ? 'wish' : 'wishes'} fulfilled
         </Typography>
         <Tooltip title="Stop showing these. They stay on your list; nothing is deleted.">
@@ -365,10 +362,9 @@ export function DoneStrip({ rows, onClear, onOpenLoot }: DoneStripProps): JSX.El
           key={row.id}
           direction="row"
           spacing={1}
-          alignItems="center"
           data-testid="wishlist-done-row"
           data-item={row.itemKey}
-          sx={{ flexWrap: 'nowrap', py: 0.5, px: 1, borderBottom: 1, borderColor: 'divider' }}
+          sx={{ alignItems: 'center', flexWrap: 'nowrap', py: 0.5, px: 1, borderBottom: 1, borderColor: 'divider' }}
         >
           <Typography variant="body2" component="div" noWrap sx={{ minWidth: 0, flexShrink: 1 }}>
             <DonorName name={row.name} onOpen={onOpenLoot} card />
@@ -397,7 +393,7 @@ export function WishEraBar({
   outstanding: number
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'nowrap', mb: 1 }}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'nowrap', mb: 1 }}>
       <Tooltip title={`Hide wishes whose only known sources are outside ${CURRENT_ERA_LABEL}.`}>
         <Chip
           size="small"
@@ -414,15 +410,14 @@ export function WishEraBar({
       {hidden > 0 && (
         <Typography
           variant="caption"
-          color="text.secondary"
           data-testid="wishlist-era-hidden"
-          sx={{ flexShrink: 0 }}
+          sx={{ color: 'text.secondary', flexShrink: 0 }}
         >
           {hidden} out of era, hidden
         </Typography>
       )}
       <Box sx={{ flexGrow: 1 }} />
-      <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', flexShrink: 0 }}>
         {outstanding} still to find
       </Typography>
     </Stack>

@@ -278,7 +278,7 @@ function RowList(props: RowListProps): JSX.Element {
       )}
       <Box sx={{ height: win.bottomPad }} />
       {rows.length === 0 && (
-        <Typography variant="body2" color="text.secondary" data-testid="planner-effects-empty" sx={{ p: 2 }}>
+        <Typography variant="body2" data-testid="planner-effects-empty" sx={{ color: 'text.secondary', p: 2 }}>
           {emptyText(ready, hidden, item)}
         </Typography>
       )}

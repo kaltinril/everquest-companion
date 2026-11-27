@@ -78,7 +78,7 @@ function GroupLine({
           borderRadius: 0.5
         }}
       />
-      <Stack direction="row" alignItems="center" spacing={0.75} sx={{ position: 'absolute', inset: 0, px: 0.75 }}>
+      <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', position: 'absolute', inset: 0, px: 0.75 }}>
         <Typography variant="caption" sx={{ color: 'text.secondary', width: 16, flexShrink: 0, textAlign: 'right' }}>
           {rank ?? ''}
         </Typography>

@@ -93,11 +93,10 @@ function RankRungs({ row }: { row: AaAbilityRow }): JSX.Element {
           key={r.rank}
           direction="row"
           spacing={1}
-          alignItems="center"
-          sx={{ py: 0.1 }}
+          sx={{ alignItems: 'center', py: 0.1 }}
           data-testid="aa-ledger-rung"
         >
-          <Typography variant="caption" color="text.secondary" sx={{ minWidth: 46 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', minWidth: 46 }}>
             rank {r.rank}
           </Typography>
           <Typography
@@ -107,12 +106,12 @@ function RankRungs({ row }: { row: AaAbilityRow }): JSX.Element {
             {r.cost > 0 ? `${String(r.cost)} pt${r.cost === 1 ? '' : 's'}` : 'granted'}
           </Typography>
           {r.buys > 1 && (
-            <Typography variant="caption" color="text.disabled">
+            <Typography variant="caption" sx={{ color: 'text.disabled' }}>
               bought {r.buys}×
             </Typography>
           )}
           <Box sx={{ flexGrow: 1 }} />
-          <Typography variant="caption" color="text.disabled" noWrap>
+          <Typography variant="caption" sx={{ color: 'text.disabled' }} noWrap>
             {formatDate(r.ts)}
           </Typography>
         </Stack>
@@ -146,11 +145,11 @@ const AbilityRow = memo(function AbilityRow({
       <Stack
         direction="row"
         spacing={1}
-        alignItems="center"
         onClick={() => {
           onToggle(row.name)
         }}
         sx={{
+          alignItems: 'center',
           py: 0.3,
           px: 0.5,
           cursor: 'pointer',
@@ -244,7 +243,6 @@ function MoreLadders({
     <>
       <Stack
         direction="row"
-        alignItems="center"
         role="button"
         tabIndex={0}
         aria-expanded={shown}
@@ -256,6 +254,7 @@ function MoreLadders({
         }}
         data-testid="aa-ledger-more"
         sx={{
+          alignItems: 'center',
           display: 'inline-flex',
           cursor: 'pointer',
           color: 'text.secondary',
@@ -312,11 +311,11 @@ export function AaLedgerPanel({
     <Paper variant="outlined" sx={{ p: 2 }} data-testid="aa-ledger">
       <Typography variant="subtitle2">
         AA abilities{' '}
-        <Typography component="span" variant="caption" color="text.secondary">
+        <Typography component="span" variant="caption" sx={{ color: 'text.secondary' }}>
           ({summary.abilities})
         </Typography>
       </Typography>
-      <Typography variant="caption" color="text.secondary" gutterBottom display="block">
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} gutterBottom>
         every rank the log recorded, grouped into ladders and sorted by points invested - click a
         row for its rungs
       </Typography>
@@ -333,8 +332,7 @@ export function AaLedgerPanel({
       </Box>
       <Typography
         variant="caption"
-        color="text.disabled"
-        sx={{ pt: 0.75, mt: 0.75, borderTop: 1, borderColor: 'divider' }}
+        sx={{ color: 'text.disabled', pt: 0.75, mt: 0.75, borderTop: 1, borderColor: 'divider' }}
         data-testid="aa-ledger-total"
       >
         {summary.invested.toLocaleString()} pts across {summary.paidRanks} bought rank

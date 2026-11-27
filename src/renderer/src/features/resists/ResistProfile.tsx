@@ -55,7 +55,7 @@ const BAR_H = 8
 
 function Quiet({ children }: { children: React.ReactNode }): JSX.Element {
   return (
-    <Typography variant="caption" color="text.disabled" display="block">
+    <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block' }}>
       {children}
     </Typography>
   )
@@ -141,17 +141,17 @@ function EvidencePanel({ row }: { row: MobResistAxis }): JSX.Element {
     <Box sx={{ pl: 2.5, pb: 1 }} data-testid={`resist-evidence-${row.axis}`}>
       {casts.length === 0 && <Quiet>Nothing observed on this axis yet.</Quiet>}
       {casts.map((ev) => (
-        <Typography key={ev.spellKey} variant="caption" color="text.secondary" display="block">
+        <Typography key={ev.spellKey} variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
           {evidenceText(ev)}
         </Typography>
       ))}
       {song !== null && (
         <>
-          <Typography variant="caption" color="text.disabled" display="block" sx={{ mt: 0.5 }}>
+          <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block', mt: 0.5 }}>
             {song}
           </Typography>
           {songs.map((ev) => (
-            <Typography key={ev.spellKey} variant="caption" color="text.secondary" display="block">
+            <Typography key={ev.spellKey} variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
               {evidenceText(ev)}
             </Typography>
           ))}
@@ -163,9 +163,7 @@ function EvidencePanel({ row }: { row: MobResistAxis }): JSX.Element {
       {npc !== null && (
         <Typography
           variant="caption"
-          color="text.disabled"
-          display="block"
-          sx={{ mt: 0.5 }}
+          sx={{ color: 'text.disabled', display: 'block', mt: 0.5 }}
           data-testid={`resist-npc-${row.axis}`}
         >
           {npc}
@@ -205,7 +203,6 @@ function AxisRow({ row }: { row: MobResistAxis }): JSX.Element {
       <Stack
         direction="row"
         spacing={1}
-        alignItems="center"
         role="button"
         tabIndex={0}
         aria-expanded={open}
@@ -216,7 +213,7 @@ function AxisRow({ row }: { row: MobResistAxis }): JSX.Element {
           if (e.key === 'Enter' || e.key === ' ') setOpen(!open)
         }}
         data-testid={`resist-expand-${row.axis}`}
-        sx={{ cursor: 'pointer', py: 0.4, '&:hover': { bgcolor: 'action.hover' } }}
+        sx={{ alignItems: 'center', cursor: 'pointer', py: 0.4, '&:hover': { bgcolor: 'action.hover' } }}
       >
         <Swatch color={color} />
         <Typography variant="body2" sx={{ color, width: 62, flex: '0 0 auto' }}>
@@ -226,11 +223,11 @@ function AxisRow({ row }: { row: MobResistAxis }): JSX.Element {
             cast at this on this axis" is not "the model could not fit what was cast", and neither
             is an estimate — so each has its own testid and its own sentence. */}
         {est?.pinned === true ? (
-          <Typography variant="caption" color="warning.main" data-testid={`resist-nofit-${row.axis}`} sx={{ flex: 1 }}>
+          <Typography variant="caption" data-testid={`resist-nofit-${row.axis}`} sx={{ color: 'warning.main', flex: 1 }}>
             {doesNotFitText(est.empirical)}
           </Typography>
         ) : empty || !est ? (
-          <Typography variant="caption" color="text.disabled" data-testid={`resist-empty-${row.axis}`} sx={{ flex: 1 }}>
+          <Typography variant="caption" data-testid={`resist-empty-${row.axis}`} sx={{ color: 'text.disabled', flex: 1 }}>
             {NO_DATA_TEXT}
           </Typography>
         ) : (
@@ -241,7 +238,7 @@ function AxisRow({ row }: { row: MobResistAxis }): JSX.Element {
             </Typography>
             {/* Wide enough for the two-number form, which is the honest width: a column sized to
                 `n=83` would push "8 informative · 83 total" onto the tag beside it. */}
-            <Typography variant="caption" color="text.secondary" sx={{ width: 148, flex: '0 0 auto' }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', width: 148, flex: '0 0 auto' }}>
               {countText(est.nInformative, est.n)}
             </Typography>
             {/* The band, its two percentages and the thin-cell caveat are ONE sentence and share one
@@ -251,17 +248,17 @@ function AxisRow({ row }: { row: MobResistAxis }): JSX.Element {
             <Typography variant="caption" sx={{ color, flex: 1, minWidth: 0 }} data-testid={`resist-tag-${row.axis}`}>
               {row.tag}
               {row.benchmark && (
-                <Typography component="span" variant="caption" color="text.secondary" data-testid={`resist-guidance-${row.axis}`}>
+                <Typography component="span" variant="caption" sx={{ color: 'text.secondary' }} data-testid={`resist-guidance-${row.axis}`}>
                   {` · ${row.benchmark.guidance}`}
                 </Typography>
               )}
               {row.benchmark && (
-                <Typography component="span" variant="caption" color="text.secondary" data-testid={`resist-bench-${row.axis}`}>
+                <Typography component="span" variant="caption" sx={{ color: 'text.secondary' }} data-testid={`resist-bench-${row.axis}`}>
                   {` · ${benchmarkText(row.benchmark)}`}
                 </Typography>
               )}
               {lowSamples(est.nInformative) && (
-                <Typography component="span" variant="caption" color="text.disabled" data-testid={`resist-low-${row.axis}`}>
+                <Typography component="span" variant="caption" sx={{ color: 'text.disabled' }} data-testid={`resist-low-${row.axis}`}>
                   {` · ${LOW_SAMPLE_NOTE}`}
                 </Typography>
               )}
@@ -319,7 +316,7 @@ function spellWords(key: string): string {
 function ImmuneLine({ spells }: { spells: readonly string[] }): JSX.Element | null {
   if (spells.length === 0) return null
   return (
-    <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }} data-testid="resist-immune">
+    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }} data-testid="resist-immune">
       Immune to: {spells.map(spellWords).join(', ')}
     </Typography>
   )
@@ -356,7 +353,7 @@ export function ResistProfile({ mob }: { mob: string }): JSX.Element {
       <Divider sx={{ my: 1.5 }} />
       <Typography variant="subtitle2" gutterBottom>
         Resists{' '}
-        <Typography component="span" variant="caption" color="text.secondary">
+        <Typography component="span" variant="caption" sx={{ color: 'text.secondary' }}>
           (mined from logs)
         </Typography>
       </Typography>

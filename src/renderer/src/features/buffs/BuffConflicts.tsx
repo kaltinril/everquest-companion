@@ -48,7 +48,7 @@ export const BuffConflicts = memo(function BuffConflicts(): JSX.Element | null {
   if (rows.length === 0) return null
   return (
     <Box data-testid="buff-conflicts">
-      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 0.5 }}>
         <Typography variant="subtitle2">Buff conflicts</Typography>
         <Chip
           size="small"

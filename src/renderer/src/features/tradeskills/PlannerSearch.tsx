@@ -53,7 +53,7 @@ export function usePlanSearchState(deps: PlanDeps, eraOnly: boolean, query: stri
  */
 export function PlanSearchBox({ query, onQuery, state }: { query: string; onQuery: (q: string) => void; state: PlanSearchState }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5, flexShrink: 0 }}>
+    <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 0.5, flexShrink: 0 }}>
       <SearchField
         query={query}
         onChange={onQuery}
@@ -64,7 +64,7 @@ export function PlanSearchBox({ query, onQuery, state }: { query: string; onQuer
         clearLabel="Clear the search"
         sx={{ width: 320 }}
       />
-      <Typography variant="caption" color="text.secondary" data-testid="tradeskill-plan-count">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="tradeskill-plan-count">
         {choiceCountText(state.choices.list.length)}
       </Typography>
     </Stack>
@@ -73,7 +73,7 @@ export function PlanSearchBox({ query, onQuery, state }: { query: string; onQuer
 
 function ResultRow({ choice, onPlan }: { choice: PlanChoice; onPlan: (choice: PlanChoice) => void }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ py: 0.25, minWidth: 0 }} data-testid="tradeskill-plan-result">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', py: 0.25, minWidth: 0 }} data-testid="tradeskill-plan-result">
       <Button
         size="small"
         variant="outlined"
@@ -87,7 +87,7 @@ function ResultRow({ choice, onPlan }: { choice: PlanChoice; onPlan: (choice: Pl
         Plan
       </Button>
       <ItemLabel name={choice.item} />
-      <Typography variant="caption" color="text.secondary" noWrap data-testid="tradeskill-plan-result-facts">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap data-testid="tradeskill-plan-result-facts">
         {choiceFacts(choice)}
       </Typography>
       <EraChip subject={choice.recipes[0]} />
@@ -101,7 +101,7 @@ export function PlanSearchResults(props: { state: PlanSearchState; eraOnly: bool
   if (!state.typed) {
     if (hint !== true) return null
     return (
-      <Typography variant="body2" color="text.secondary" data-testid="tradeskill-plan-hint">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="tradeskill-plan-hint">
         {PLAN_SEARCH_HINT}
       </Typography>
     )
@@ -110,7 +110,7 @@ export function PlanSearchResults(props: { state: PlanSearchState; eraOnly: bool
   return (
     <Box data-testid="tradeskill-plan-results">
       {state.settled && state.found.shown.length === 0 && (
-        <Typography variant="body2" color="text.secondary" data-testid="tradeskill-plan-none">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="tradeskill-plan-none">
           {searchEmptyText(eraOnly)}
         </Typography>
       )}
@@ -118,7 +118,7 @@ export function PlanSearchResults(props: { state: PlanSearchState; eraOnly: bool
         <ResultRow key={choice.key} choice={choice} onPlan={onPlan} />
       ))}
       {more !== '' && (
-        <Typography variant="caption" color="text.secondary" data-testid="tradeskill-plan-more">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="tradeskill-plan-more">
           {more}
         </Typography>
       )}

@@ -176,7 +176,7 @@ export default function MapZoneHistory({ onPick }: { onPick?: (zone: string) => 
       data-testid="zone-history"
       sx={{ p: 1, display: 'flex', flexDirection: 'column', flexGrow: 1, minHeight: 0 }}
     >
-      <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" useFlexGap sx={{ pb: 1 }}>
+      <Stack direction="row" spacing={1.5} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap', pb: 1 }}>
         <TextField
           size="small"
           label="Level"
@@ -226,7 +226,7 @@ export default function MapZoneHistory({ onPick }: { onPick?: (zone: string) => 
           sx={{ flex: '1 1 160px' }}
         />
       </Stack>
-      <Typography variant="caption" color="text.secondary" sx={{ pb: 0.5 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', pb: 0.5 }}>
         From your own log: time you spent in each zone within {LEVEL_SPREAD} levels of this level.{' '}
         {best
           ? `Best ${String(PEAK_MIN)} min: your best stretch there (kills with no gap over 5 minutes, at least ${String(MIN_STRETCH_KILLS)} kills and 10 minutes), its best ${String(PEAK_MIN)} minutes as an hourly rate - what the zone pays when you farm the right thing.`
@@ -234,7 +234,7 @@ export default function MapZoneHistory({ onPick }: { onPick?: (zone: string) => 
         Zones with under {MIN_ACTIVE_MS / 60_000} minutes there are dimmed and listed last.
       </Typography>
       {rows.length === 0 ? (
-        <Typography variant="body2" color="text.disabled" data-testid="zone-history-empty" sx={{ p: 2 }}>
+        <Typography variant="body2" data-testid="zone-history-empty" sx={{ color: 'text.disabled', p: 2 }}>
           {Number.isFinite(level) && level > 0
             ? search.trim() === ''
               ? `Your log has no active time within ${String(LEVEL_SPREAD)} levels of ${String(level)}.`

@@ -105,11 +105,11 @@ function RankCell({ b }: { b: AaBoardRow }): JSX.Element {
   if (!b.usable || b.r.row.removed !== undefined) {
     // Another loadout's rank stays in sight, dimmed: the log bought it.
     const text = b.r.row.removed !== undefined ? 'removed' : b.elsewhere ? `${String(b.r.rank)}/${String(b.max)}` : '-'
-    return <Typography variant="caption" color="text.disabled">{text}</Typography>
+    return <Typography variant="caption" sx={{ color: 'text.disabled' }}>{text}</Typography>
   }
   if (b.r.unknown === true) {
     return (
-      <Typography variant="caption" color="text.secondary" noWrap data-testid="aa-source-unknown">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap data-testid="aa-source-unknown">
         {`?/${String(b.max)}`}
         <Box component="span" sx={{ ml: 0.75, color: 'text.disabled' }}>
           can&apos;t tell
@@ -119,7 +119,7 @@ function RankCell({ b }: { b: AaBoardRow }): JSX.Element {
   }
   const word = SOURCE_WORD[b.r.source]
   return (
-    <Typography variant="caption" color="text.secondary" noWrap>
+    <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>
       {`${String(b.r.rank)}/${String(b.max)}`}
       <Mark b={b} fields={['ranks']} />
       {word !== '' && (
@@ -153,11 +153,11 @@ function PointsCells({ b }: { b: AaBoardRow }): JSX.Element {
   const next = b.cost?.next ?? null
   return (
     <>
-      <Typography variant="caption" color="text.disabled" noWrap>
+      <Typography variant="caption" sx={{ color: 'text.disabled' }} noWrap>
         {b.cost !== null && b.usable ? aaCostText(b.cost, b.r.rank, b.max) : ''}
         {b.usable && <Mark b={b} fields={['cost']} />}
       </Typography>
-      <Typography variant="caption" color="warning.main" noWrap>
+      <Typography variant="caption" sx={{ color: 'warning.main' }} noWrap>
         {b.buyable ? `next ${next === null ? '?' : String(next)} pts` : ''}
       </Typography>
     </>
@@ -209,7 +209,7 @@ function AaLine({ b, classes, setPick, showClass }: { b: AaBoardRow; classes: re
 export function AaList({ groups, classes, setPick, showClass = false, sort, setSort, empty }: { groups: AaListGroup[]; classes: readonly ClassAbbr[]; setPick: SetPick; showClass?: boolean; sort?: AaSort; setSort?: (s: AaSort) => void; empty: string }): JSX.Element {
   if (groups.length === 0) {
     return (
-      <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>
+      <Typography variant="body2" sx={{ color: 'text.secondary', py: 2 }}>
         {empty}
       </Typography>
     )

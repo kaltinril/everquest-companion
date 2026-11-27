@@ -56,7 +56,7 @@ function GuideName({ name, bold }: { name: string; bold?: boolean }): JSX.Elemen
   }
   const recipe = guideItemRecipe(index, wiki)
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0 }}>
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', minWidth: 0 }}>
       {/* The name opens its Loot page; the click stops here so it does not also open the step's recipe. */}
       <Box
         sx={{ minWidth: 0 }}
@@ -78,10 +78,10 @@ function MaterialTree({ materials }: { materials: readonly GuideMaterial[] }): J
     <Box sx={{ ml: 0.5, pl: 1.5, borderLeft: 1, borderColor: 'divider' }}>
       {materials.map((material, i) => (
         <Box key={`${material.name}:${String(i)}`} data-testid="tradeskill-guide-material-line">
-          <Stack direction="row" spacing={0.5} alignItems="center" sx={{ flexWrap: 'wrap', py: 0.125 }}>
+          <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', flexWrap: 'wrap', py: 0.125 }}>
             {guideQtyPrefix(material) !== '' && <Typography variant="body2">{guideQtyPrefix(material)}</Typography>}
             <GuideName name={material.name} />
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               {guideMaterialTail(material)}
             </Typography>
           </Stack>
@@ -118,10 +118,10 @@ function StepRow({ placed, tradeskill, onOpenRecipe }: StepOpen & { placed: Plac
         {state === 'here' && <Chip size="small" color="primary" label="you are here" sx={CHIP_SX} data-testid="tradeskill-guide-here" />}
       </Box>
       <Box sx={{ minWidth: 0 }}>
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap' }}>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
           <GuideName name={step.item} bold={state === 'here'} />
           {step.note !== undefined && (
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               {step.note}
             </Typography>
           )}
@@ -173,7 +173,7 @@ export function GuidePanel({ tradeskill, level, facts, onOpenRecipe }: GuidePane
   const ladder = useMemo(() => placedLadder(facts.guides, tradeskill, level), [facts.guides, tradeskill, level])
   if (ladder === null) {
     return (
-      <Typography variant="body2" color="text.secondary" sx={{ py: 2 }} data-testid="tradeskill-guide-empty">
+      <Typography variant="body2" sx={{ color: 'text.secondary', py: 2 }} data-testid="tradeskill-guide-empty">
         {noRouteText(tradeskill)}
       </Typography>
     )
@@ -189,7 +189,7 @@ export function GuidePanel({ tradeskill, level, facts, onOpenRecipe }: GuidePane
               </Typography>
             ))}
             {level === null && (
-              <Typography variant="caption" color="text.secondary" data-testid="tradeskill-guide-unplaced">
+              <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="tradeskill-guide-unplaced">
                 {LEVEL_UNPLACED_TEXT}
               </Typography>
             )}
@@ -201,7 +201,7 @@ export function GuidePanel({ tradeskill, level, facts, onOpenRecipe }: GuidePane
               <Steps steps={ladder.alternates} markerAt={null} level={null} tradeskill={tradeskill} onOpenRecipe={onOpenRecipe} />
             </Box>
           )}
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }} data-testid="tradeskill-guide-credit">
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 1 }} data-testid="tradeskill-guide-credit">
             {levelingCreditText()}
           </Typography>
         </Paper>

@@ -64,7 +64,7 @@ export default function MapZoneAdviceBar({
   const pickedWords: string[] = []
   for (const fit of FIT_ORDER) if (query.fits.has(fit)) pickedWords.push(FIT[fit].label)
   return (
-    <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap" sx={{ mb: 1 }}>
+    <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap', mb: 1 }}>
       <TextField
         size="small"
         label="Level"
@@ -127,11 +127,11 @@ export default function MapZoneAdviceBar({
         sx={TINY}
       />
       {Number.isFinite(level) && level > 0 && query.goal !== 'wish' && (
-        <Typography variant="caption" color="text.disabled">
+        <Typography variant="caption" sx={{ color: 'text.disabled' }}>
           {`motes cap at grade ${String(moteGradeCap(level))}`}
         </Typography>
       )}
-      <Typography variant="caption" color="text.disabled" sx={{ ml: 'auto' }} data-testid="zone-advice-count">
+      <Typography variant="caption" sx={{ color: 'text.disabled', ml: 'auto' }} data-testid="zone-advice-count">
         {`${String(count)} zones`}
       </Typography>
     </Stack>

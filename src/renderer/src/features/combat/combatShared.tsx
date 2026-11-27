@@ -99,8 +99,7 @@ export function Bar({
       {accent && <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, bgcolor: accent }} />}
       <Stack
         direction="row"
-        alignItems="center"
-        sx={{ position: 'absolute', inset: 0, pl: accent ? '9px' : 0.75, pr: 0.75 }}
+        sx={{ alignItems: 'center', position: 'absolute', inset: 0, pl: accent ? '9px' : 0.75, pr: 0.75 }}
         spacing={0.75}
       >
         {rank != null && (
@@ -234,7 +233,7 @@ function SkillReadout({
         bgcolor: 'rgba(255,255,255,0.03)'
       }}
     >
-      <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap' }} useFlexGap>
         <StatItem label="Category" value={CATEGORY_LABEL[s.category]} color={color} />
         <StatItem label="Total" value={`${a}${fmt(s.total)}`} />
         <StatItem label="Hits" value={`${a}${s.hits}`} />
@@ -257,7 +256,7 @@ function SkillReadout({
         {s.riposte && <RiposteStats riposte={s.riposte} a={a} />}
       </Stack>
       {multi?.flurry != null && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.25 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}>
           {multi.flurry}
         </Typography>
       )}
@@ -531,10 +530,8 @@ export function DashCard({
     >
       <Stack
         direction="row"
-        justifyContent="space-between"
-        alignItems="baseline"
         spacing={1}
-        sx={{ mb: 0.75, flexShrink: 0 }}
+        sx={{ justifyContent: 'space-between', alignItems: 'baseline', mb: 0.75, flexShrink: 0 }}
       >
         <Typography
           variant="caption"
@@ -564,7 +561,7 @@ export function DashCard({
 /** A one-line quiet state for a panel that has nothing (honest) to show. Never an error. */
 export function QuietNote({ children }: { children: ReactNode }): React.JSX.Element {
   return (
-    <Typography variant="caption" color="text.disabled" sx={{ py: 0.5 }}>
+    <Typography variant="caption" sx={{ color: 'text.disabled', py: 0.5 }}>
       {children}
     </Typography>
   )

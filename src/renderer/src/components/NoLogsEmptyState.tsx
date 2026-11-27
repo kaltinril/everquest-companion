@@ -71,7 +71,7 @@ export default function NoLogsEmptyState({
       }}
     >
       <TravelExploreIcon sx={{ fontSize: 48, opacity: 0.6 }} />
-      <Typography variant="h6" color="text.primary">
+      <Typography variant="h6" sx={{ color: 'text.primary' }}>
         No EverQuest logs found yet
       </Typography>
       {config !== null && (

@@ -56,9 +56,9 @@ export function SectionShell({
       <Stack
         direction="row"
         spacing={0.75}
-        alignItems="center"
         onClick={onToggle}
         sx={{
+          alignItems: 'center',
           position: 'sticky',
           top: 0,
           zIndex: 2,
@@ -76,7 +76,7 @@ export function SectionShell({
         <Typography variant="caption" sx={{ fontWeight: 700, letterSpacing: 0.4 }}>
           {title.toUpperCase()}
         </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {count}
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
@@ -121,7 +121,7 @@ export function SpellRows({
         />
       ))}
       {total > rows.length && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', px: 1, py: 0.5 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', px: 1, py: 0.5 }}>
           +{total - rows.length} more - keep typing to narrow it down.
         </Typography>
       )}
@@ -182,7 +182,7 @@ export function PoisonSlowRow({
         {/* The neighbouring rows in this section carry a buff/debuff chip (`showType`); a slow
             landing on a mob is a debuff, and saying so keeps the column reading as one list. */}
         <Chip size="small" label="debuff" color="error" variant="outlined" sx={ROW_CHIP_SX} />
-        <Typography variant="caption" color="text.secondary" noWrap>
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>
           {observedSlows(offer.count)} · last on {offer.lastTarget}
         </Typography>
       </Box>

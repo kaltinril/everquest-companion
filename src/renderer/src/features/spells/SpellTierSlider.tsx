@@ -53,8 +53,8 @@ export default function SpellTierSlider({
   trailing
 }: SpellTierSliderProps): JSX.Element {
   return (
-    <Stack direction="row" spacing={1.5} alignItems="center" useFlexGap flexWrap="wrap">
-      <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+    <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
+      <Typography variant="caption" sx={{ color: 'text.secondary', flexShrink: 0 }}>
         Simulate upgrade
       </Typography>
       <Box sx={{ width: 200, flexShrink: 0, px: 1 }}>
@@ -79,7 +79,7 @@ export default function SpellTierSlider({
         {tierLabel(tier)}
       </Typography>
       {note !== undefined && (
-        <Typography variant="caption" color="text.secondary" data-testid={`${testId}-note`}>
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid={`${testId}-note`}>
           {note}
         </Typography>
       )}

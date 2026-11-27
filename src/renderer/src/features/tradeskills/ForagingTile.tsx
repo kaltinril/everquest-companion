@@ -48,7 +48,7 @@ function Level({ level }: { level: number | null }): JSX.Element {
   }
   return (
     <Tooltip title={FORAGE_LEVEL_UNSEEN_TIP}>
-      <Typography variant="caption" color="text.secondary" data-testid="tradeskill-forage-level-unseen">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="tradeskill-forage-level-unseen">
         {FORAGE_LEVEL_UNSEEN}
       </Typography>
     </Tooltip>
@@ -58,7 +58,7 @@ function Level({ level }: { level: number | null }): JSX.Element {
 /** One labelled number of the tile's line; `data-value` holds the number alone. A figure that carries a tip explains itself on hover. */
 function Figure({ figure }: { figure: GatherFigure }): JSX.Element {
   const line = (
-    <Typography variant="caption" color="text.secondary" data-testid={`tradeskill-forage-${figure.id}`} data-value={figure.value}>
+    <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid={`tradeskill-forage-${figure.id}`} data-value={figure.value}>
       {figure.label}{' '}
       <Box component="span" sx={{ color: 'text.primary', fontWeight: 600 }}>
         {figure.value}
@@ -72,7 +72,7 @@ function Figure({ figure }: { figure: GatherFigure }): JSX.Element {
 function Counts({ tile }: { tile: ForageTile }): JSX.Element {
   if (tile.figures.length === 0) {
     return (
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-forage-empty">
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-forage-empty">
         {FORAGE_NO_LINE_TEXT}
       </Typography>
     )
@@ -91,7 +91,7 @@ function Found({ tile, onToggle }: { tile: ForageTile; onToggle: () => void }): 
   if (tile.items.length === 0) return null
   return (
     <Box>
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
         {FORAGE_ITEMS_LABEL}
       </Typography>
       <GatherItems items={tile.items} prefix="tradeskill-forage" />
@@ -110,7 +110,7 @@ function Detail({ tile, onToggle }: { tile: ForageTile; onToggle: () => void }):
     <Paper variant="outlined" sx={{ gridColumn: '1 / -1', px: 1.5, py: 1 }} data-testid="tradeskill-forage-detail">
       <Stack spacing={0.75}>
         {tile.session !== '' && (
-          <Typography variant="caption" color="text.secondary" data-testid="tradeskill-forage-session">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="tradeskill-forage-session">
             {tile.session}
           </Typography>
         )}
@@ -149,7 +149,7 @@ export function ForagingTile(): JSX.Element | null {
           }}
           sx={{ px: 1.5, py: 1.25, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'flex-start' }}
         >
-          <Stack direction="row" justifyContent="space-between" alignItems="baseline" spacing={1}>
+          <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'baseline' }} spacing={1}>
             <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
               {FORAGE_TILE_TITLE}
             </Typography>
@@ -159,7 +159,7 @@ export function ForagingTile(): JSX.Element | null {
             <Counts tile={tile} />
           </Box>
           {tile.detail && (
-            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-forage-more">
+            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-forage-more">
               {shown ? FORAGE_HIDE_TEXT : FORAGE_SHOW_TEXT}
             </Typography>
           )}

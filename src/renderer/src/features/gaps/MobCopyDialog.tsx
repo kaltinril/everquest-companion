@@ -63,7 +63,7 @@ function Lead({ copy }: { copy: MobCopy }): JSX.Element {
           Page found on the wiki as of {clock(copy.at)}. The whole page is on your clipboard with {n} {n === 1 ? 'field' : 'fields'} filled in
           {m > 0 ? `; ${String(m)} ${m === 1 ? 'field is' : 'fields are'} left for you below.` : '.'}
         </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {n > 0 ? `Filled because they were empty: ${copy.merge.filled.join(', ')}. ` : 'Nothing on the page was empty where your log has something. '}
           Everything else is word for word as the page had it. Paste over the page in Edit page; the wiki&apos;s own diff shows what moved.
         </Typography>
@@ -126,7 +126,7 @@ export function MobCopyDialog({ row, read, title, draft, onClose }: { row: GapRo
       <DialogTitle>{shown}</DialogTitle>
       <DialogContent>
         {copy === undefined ? (
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <CircularProgress size={16} />
             <Typography variant="body2">Reading the wiki page for {row.name}…</Typography>
           </Stack>

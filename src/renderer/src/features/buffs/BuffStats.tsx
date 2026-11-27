@@ -215,7 +215,7 @@ function StatsSection({
   const win = useWindowedRows({ count: rows.length, rowHeight: STAT_ROW_HEIGHT, scrollRef })
   return (
     <Box>
-      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 0.5 }}>
         <Box sx={{ width: 10, height: 10, borderRadius: 0.5, bgcolor: classAccent(cls) }} />
         <Typography variant="caption" sx={{ fontWeight: 600 }}>
           {CLASS_LABEL[cls]}
@@ -297,7 +297,7 @@ export const BuffStats = memo(function BuffStats({ stats }: { stats: Record<stri
 
   return (
     <Box>
-      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1 }}>
         <Typography variant="subtitle2">Durations</Typography>
         <Box sx={{ flexGrow: 1 }} />
         <TextField
@@ -324,7 +324,7 @@ export const BuffStats = memo(function BuffStats({ stats }: { stats: Record<stri
         />
       </Stack>
       {sections.length === 0 ? (
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           {mined && needle !== '' ? `No spells match "${query.trim()}".` : 'No buff durations yet.'}
         </Typography>
       ) : (

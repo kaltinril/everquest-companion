@@ -214,7 +214,7 @@ export default function CarryAll({ carry }: { carry: CarryAllData }): JSX.Elemen
       //     carries and the same one whose absence is always the bug.
       sx={{ p: 1, display: 'flex', flexDirection: 'column', flex: '1 0 360px', minHeight: 0 }}
     >
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} alignItems={{ md: 'center' }} sx={{ mb: 0.75 }}>
+      <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} sx={{ alignItems: { md: 'center' }, mb: 0.75 }}>
         <Typography variant="subtitle2" sx={{ flexShrink: 0 }}>
           Everything you carry
         </Typography>
@@ -233,9 +233,8 @@ export default function CarryAll({ carry }: { carry: CarryAllData }): JSX.Elemen
             reads, because a windowed table's mounted row count is a fact about the viewport. */}
         <Typography
           variant="caption"
-          color="text.secondary"
           data-testid="character-carry-count"
-          sx={{ ml: { md: 'auto' }, flexShrink: 0 }}
+          sx={{ color: 'text.secondary', ml: { md: 'auto' }, flexShrink: 0 }}
         >
           {rows.length} of {carry.rows.length}
         </Typography>
@@ -275,9 +274,8 @@ export default function CarryAll({ carry }: { carry: CarryAllData }): JSX.Elemen
         {rows.length === 0 && (
           <Typography
             variant="caption"
-            color="text.disabled"
             data-testid="character-carry-empty"
-            sx={{ display: 'block', p: 1 }}
+            sx={{ color: 'text.disabled', display: 'block', p: 1 }}
           >
             Nothing here matches.
           </Typography>

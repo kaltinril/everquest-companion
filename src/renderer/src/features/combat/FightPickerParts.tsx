@@ -43,7 +43,7 @@ export function SelectorRow({
 }): React.JSX.Element {
   return (
     <Box sx={{ minWidth: 0, width: '100%', py: 0.25 }}>
-      <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0 }}>
+      <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', minWidth: 0 }}>
         {live && <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: 'success.main', flexShrink: 0 }} />}
         <Typography variant="body2" noWrap sx={{ fontWeight: 600, flexGrow: 1, minWidth: 0 }}>
           {name}
@@ -142,7 +142,7 @@ export function EmptyRow({
 }): React.JSX.Element {
   return (
     <Box component="li" sx={{ px: 1.25, py: 1 }}>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {emptyRowText(scope, query, results)}
       </Typography>
     </Box>

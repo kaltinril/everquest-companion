@@ -46,7 +46,7 @@ function PasteBox({ store, onSelect, onClose }: { store: MacroStore; onSelect: (
   return (
     <Paper variant="outlined" sx={{ p: 1, bgcolor: 'action.hover' }} data-testid="macros-paste-box">
       <Stack spacing={1}>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           Paste macros copied from a game file or shared by another player
         </Typography>
         <TextField
@@ -139,7 +139,7 @@ export function LibrarySection({ store, files, selected, onSelect, onPlace }: Li
         clearLabel="Clear the search"
         sx={{ width: '100%' }}
       />
-      <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
         <Button size="small" variant="contained" onClick={create} data-testid="macros-new">
           New macro
         </Button>
@@ -153,7 +153,7 @@ export function LibrarySection({ store, files, selected, onSelect, onPlace }: Li
         >
           Paste macros
         </Button>
-        <Typography variant="caption" color="text.secondary" data-testid="macros-count">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="macros-count">
           {shown} of {store.library.macros.length}
         </Typography>
         <Box sx={{ flexGrow: 1 }} />

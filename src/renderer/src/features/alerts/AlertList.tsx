@@ -43,7 +43,7 @@ import { hasFireHistory, triggerBadge } from './conditionDraft'
 function RecentFires({ fires }: { fires: AlertFireRecord[] }): JSX.Element {
   if (fires.length === 0) {
     return (
-      <Typography variant="caption" color="text.disabled" sx={{ pl: 1 }}>
+      <Typography variant="caption" sx={{ color: 'text.disabled', pl: 1 }}>
         No fires recorded yet.
       </Typography>
     )
@@ -150,10 +150,9 @@ function AlertRowIdentity({ def, badge }: { def: AlertDef; badge: string }): JSX
       <Typography
         component="div"
         variant="caption"
-        color="text.secondary"
         noWrap
         title={badge}
-        sx={{ fontFamily: 'monospace' }}
+        sx={{ color: 'text.secondary', fontFamily: 'monospace' }}
       >
         {badge}
       </Typography>
@@ -172,8 +171,8 @@ function AlertRowVolume({
   onCommit: (v: number) => void
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ gridArea: 'volume', minWidth: 0 }}>
-      <Typography variant="caption" color="text.secondary">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', gridArea: 'volume', minWidth: 0 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         vol
       </Typography>
       <Slider
@@ -378,7 +377,7 @@ function AlertRow({
 
       <Collapse in={isOpen && hasHistory} unmountOnExit>
         <Divider sx={{ my: 0.75 }} />
-        <Typography variant="caption" color="text.secondary" sx={{ pl: 1, fontWeight: 600 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', pl: 1, fontWeight: 600 }}>
           Recent fires
         </Typography>
         <RecentFires fires={fires} />
@@ -433,7 +432,7 @@ export default function AlertList({
     <Box data-testid="alerts-list" sx={{ flexGrow: 1, overflow: 'auto' }}>
       <Stack spacing={1}>
         {alerts.length === 0 && (
-          <Typography variant="body2" color="text.secondary" data-testid="alerts-empty">
+          <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="alerts-empty">
             {filtering
               ? 'No alerts match that search.'
               : 'No alerts yet. Add one to play a sound when something happens in your log.'}

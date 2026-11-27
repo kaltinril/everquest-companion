@@ -54,7 +54,7 @@ function OverlayFontSetting(): JSX.Element {
         renderInput={(params) => <TextField {...params} label="Overlay font" />}
         sx={{ maxWidth: 320 }}
       />
-      <Typography variant="caption" color="text.secondary" sx={{ fontFamily: face(pick) }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: face(pick) }}>
         The text on every overlay, from the fonts installed on this PC.
       </Typography>
     </Stack>

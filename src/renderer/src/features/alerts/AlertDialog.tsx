@@ -60,7 +60,7 @@ function CombineModeSection({
 }): JSX.Element {
   return (
     <Box>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Fire when…
       </Typography>
       <Select
@@ -75,7 +75,7 @@ function CombineModeSection({
         <MenuItem value="all">ALL of these match the same event (and)</MenuItem>
       </Select>
       {mode === 'all' && (
-        <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
           “All” requires every condition to match the SAME incoming log event (same-event,
           not a correlation window).
         </Typography>
@@ -100,8 +100,8 @@ function ConditionRow({
 }): JSX.Element {
   return (
     <Paper variant="outlined" sx={{ p: 1.25, position: 'relative' }}>
-      <Stack direction="row" alignItems="center" sx={{ mb: 0.5 }}>
-        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+      <Stack direction="row" sx={{ alignItems: 'center', mb: 0.5 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
           Condition {index + 1}
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
@@ -166,9 +166,9 @@ function ConditionsSection({
 /** The per-alert volume slider + cooldown field + what that cooldown is counted per. */
 function VolumeCooldownSection({ f }: { f: AlertForm }): JSX.Element {
   return (
-    <Stack direction="row" spacing={3} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={3} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
       <Stack sx={{ minWidth: 180 }}>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Volume ({Math.round(f.volume * 100)}%)
         </Typography>
         <Slider
@@ -194,7 +194,7 @@ function VolumeCooldownSection({ f }: { f: AlertForm }): JSX.Element {
           a state ("this alert is quiet per mob"), not a description of how the engine keys a
           map — and the caption below says what changes, never how. */}
       <Stack sx={{ minWidth: 150 }}>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Counted
         </Typography>
         <Select
@@ -207,7 +207,7 @@ function VolumeCooldownSection({ f }: { f: AlertForm }): JSX.Element {
         </Select>
       </Stack>
       {f.cooldownScope === 'target' && (
-        <Typography variant="caption" color="text.secondary" sx={{ flexBasis: '100%' }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', flexBasis: '100%' }}>
           The first match on each mob always plays; only repeats on that same mob wait out the
           cooldown.
         </Typography>
@@ -238,7 +238,7 @@ function isBreakForm(f: AlertForm): boolean {
 
 function EarlyWarnSection({ f }: { f: AlertForm }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
       <TextField
         size="small"
         type="number"
@@ -260,7 +260,7 @@ function EarlyWarnSection({ f }: { f: AlertForm }): JSX.Element {
         <InfoOutlinedIcon fontSize="small" color="disabled" />
       </span>
       {f.earlyWarnSec > 0 && (
-        <Typography variant="caption" color="text.secondary" sx={{ flexBasis: '100%' }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', flexBasis: '100%' }}>
           {isBreakForm(f)
             ? `Fires ${String(f.earlyWarnSec)}s before it is due to end. If it ends sooner than that, you still hear the alert then.`
             : `Fires ${String(f.earlyWarnSec)}s before it is due to wear off, instead of when it lands.`}
@@ -339,7 +339,7 @@ export default function AlertDialog({
 
           <Divider />
           <Box>
-            <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 0.5 }}>
               Sound
             </Typography>
             <SoundPicker

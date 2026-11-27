@@ -157,13 +157,13 @@ export function SegmentHeader({
   // the two figures printed beside it, so rate x time is always the total shown.
   const clockSec = mode === 'out' ? headlineClockSec(total, dps, seg.durationSec) : seg.durationSec
   return (
-    <Stack direction="row" justifyContent="space-between" alignItems="baseline" sx={{ mb: 1, flexShrink: 0 }}>
+    <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'baseline', mb: 1, flexShrink: 0 }}>
       <Typography variant="subtitle1" noWrap>
         {seg.name}
         {seg.active && <CircleIcon sx={{ fontSize: 10, color: 'success.main', ml: 1, verticalAlign: 'middle' }} />}
         <DiedMark seg={seg} />
       </Typography>
-      <Stack direction="row" spacing={0.5} alignItems="baseline" sx={{ minWidth: 0 }}>
+      <Stack direction="row" spacing={0.5} sx={{ alignItems: 'baseline', minWidth: 0 }}>
         {/* The rate carries its own UNIT WORD, so a healing headline can never be read as dps:
             `formatHealRate` prints 'hps' (lib/formatRate — one formatter, every surface). */}
         <Typography
@@ -173,7 +173,7 @@ export function SegmentHeader({
         >
           {heal ? formatHealRate(dps) : formatRate(dps)}{' '}
           <ActiveDpsNote seg={seg} mode={mode} dps={dps} activeDps={activeDps} clockSec={clockSec} />
-          <Typography component="span" variant="caption" color="text.secondary">
+          <Typography component="span" variant="caption" sx={{ color: 'text.secondary' }}>
             {/* The bare total, testid'd because it is the number JOS-170 is about: it must follow
                 the drill and the pet preference, and only the real app can say that it does. */}
             · <span data-testid="meter-total">{fmt(total)}</span> · {fmtDur(clockSec)}

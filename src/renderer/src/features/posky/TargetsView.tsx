@@ -78,7 +78,7 @@ function NeededItemLine({
       <SkyItemCard name={item.name}>
         <strong>{item.name}</strong>
       </SkyItemCard>
-      <Typography component="span" variant="body2" color="text.secondary">
+      <Typography component="span" variant="body2" sx={{ color: 'text.secondary' }}>
         {' - '}
         {item.quests.map((q, i) => (
           // KEYED BY CLASS AND NAME, never by name alone: a Sky quest name occurs under more than
@@ -126,13 +126,13 @@ function TargetRow({
       data-covers={target.covers}
       sx={{ border: 1, borderColor: 'divider', borderRadius: 1, px: 2, py: 1.5 }}
     >
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 0.5 }}>
         {/* The same facts roster the Quests tab's dropper cell hovers - an OS tooltip, no DOM. */}
         <Typography variant="subtitle2" component="span" title={dropperFacts(target.mob)}>
           <DropperName mob={target.mob} onOpenMob={onOpenMob} />
         </Typography>
         {islands !== '' && (
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             {islands}
           </Typography>
         )}
@@ -180,10 +180,9 @@ function IslandSection({
           colour because a heading is scaffolding for the cards, never a row in its own right. */}
       <Typography
         variant="subtitle2"
-        color="text.secondary"
         component="div"
         data-testid="sky-target-island-title"
-        sx={{ mb: 0.75 }}
+        sx={{ color: 'text.secondary', mb: 0.75 }}
       >
         {island ?? UNSTATED_ISLAND_TITLE}
       </Typography>
@@ -295,7 +294,7 @@ export function TargetsView({
       : ''
   return (
     <Box data-testid="posky-targets" sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto' }}>
-      <Stack direction="row" spacing={2} alignItems="center" useFlexGap sx={{ mb: 2.5 }}>
+      <Stack direction="row" spacing={2} useFlexGap sx={{ alignItems: 'center', mb: 2.5 }}>
         <TargetsFirstTimeToggle firstTimeOnly={firstTimeOnly} onFirstTimeOnly={onFirstTimeOnly} />
         <Box sx={{ flexGrow: 1 }} />
         <InventorySource
@@ -305,13 +304,13 @@ export function TargetsView({
         />
       </Stack>
       {empty ? (
-        <Typography color="text.secondary" data-testid="posky-targets-empty">
+        <Typography sx={{ color: 'text.secondary' }} data-testid="posky-targets-empty">
           Nothing left to hunt - every quest you are tracking is ignored, holding everything it
           needs, or {firstTimeOnly ? 'already turned in' : 'wanting nothing'}.{behindTheBox}
         </Typography>
       ) : (
         <Stack spacing={1.5}>
-          <Typography variant="body2" color="text.secondary" data-testid="posky-targets-count">
+          <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="posky-targets-count">
             {n === 0
               ? 'No kill targets right now - what is left is below.'
               : `${String(n)} mob${n === 1 ? '' : 's'} still worth killing - island by island, and inside an island the ones that close the most of what is left come first.`}

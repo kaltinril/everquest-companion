@@ -134,7 +134,7 @@ export const GroupedRow = memo(function GroupedRow({
       onClick={() => onSelect(g.item)}
     >
       <TableCell>
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           {/* The NAME was plain text (JOS-127): it used to anchor a `placement="top"`, interactive
               item card, which on the rows nearest the top of the ledger opened straight across
               the toolbar and held the pointer there. The card is back in the click-through mode
@@ -264,7 +264,7 @@ export const EngineFlatRow = memo(function EngineFlatRow({
           easiest to see in: there is no `fmtTime` here and there cannot be one. */}
       <TableCell sx={{ color: 'text.secondary' }}>{text(cells, 'at') ?? ''}</TableCell>
       <TableCell>
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <ItemIcon name={item} />
           <KnownItemTooltip name={item} knowledge={knowledge} clickThrough>
             <Box component="span" data-testid="loot-item-name">
@@ -276,7 +276,7 @@ export const EngineFlatRow = memo(function EngineFlatRow({
           <DispositionChip disposition={asDisposition(disposition)} />
           {disposition === 'combined' && created !== null && (
             <KnownItemTooltip name={created} clickThrough>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                 → {created}
               </Typography>
             </KnownItemTooltip>
@@ -308,7 +308,7 @@ export const FlatRow = memo(function FlatRow({
     >
       <TableCell sx={{ color: 'text.secondary' }}>{fmtTime(e.ts)}</TableCell>
       <TableCell>
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           {/* The click-through card, same reason as GroupedRow above. */}
           <ItemIcon name={e.item} />
           <KnownItemTooltip name={e.item} knowledge={knowledge} clickThrough>
@@ -321,7 +321,7 @@ export const FlatRow = memo(function FlatRow({
           <DispositionChip disposition={e.disposition} />
           {e.disposition === 'combined' && e.created && (
             <KnownItemTooltip name={e.created} clickThrough>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                 → {e.created}
               </Typography>
             </KnownItemTooltip>

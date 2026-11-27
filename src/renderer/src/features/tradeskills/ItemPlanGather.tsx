@@ -102,13 +102,13 @@ function LeafRow({ line }: { line: GatherLine }): JSX.Element {
       <Typography {...NUM} data-testid="tradeskill-plan-gather-need">
         {line.need}
       </Typography>
-      <Typography {...NUM} color="text.secondary" data-testid="tradeskill-plan-gather-have">
+      <Typography {...NUM} sx={{ color: 'text.secondary' }} data-testid="tradeskill-plan-gather-have">
         {line.have ?? ''}
       </Typography>
       <Typography {...NUM} color={line.toGet === 0 ? 'success.main' : 'text.primary'} sx={{ fontWeight: 600 }} data-testid="tradeskill-plan-gather-toget">
         {line.toGet}
       </Typography>
-      <Typography {...NUM} color="text.secondary">
+      <Typography {...NUM} sx={{ color: 'text.secondary' }}>
         {unitText(line)}
       </Typography>
       <Typography {...NUM} data-testid="tradeskill-plan-gather-cost">
@@ -120,12 +120,12 @@ function LeafRow({ line }: { line: GatherLine }): JSX.Element {
 
 function MadeRow({ line }: { line: MakeLine }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ py: 0.25, flexWrap: 'wrap' }} data-testid="tradeskill-plan-make-line">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', py: 0.25, flexWrap: 'wrap' }} data-testid="tradeskill-plan-make-line">
       <ItemLabel name={line.node.name} />
       <Typography variant="body2">
         {line.need} needed, {makeText(line)}
       </Typography>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {recipeFacts(line.recipe, true)}
       </Typography>
     </Stack>
@@ -143,14 +143,14 @@ export function ItemPlanGather({ gather, item, onCount }: ItemPlanGatherProps): 
   const total = gatherTotalText(gather)
   return (
     <Paper variant="outlined" sx={{ p: 1.5, minWidth: 0 }} data-testid="tradeskill-plan-gather">
-      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.75, flexWrap: 'wrap', rowGap: 0.5 }}>
+      <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', mb: 0.75, flexWrap: 'wrap', rowGap: 0.5 }}>
         <Typography variant="subtitle2" data-testid="tradeskill-plan-gather-heading">
           {gatherHeading(gather.count, item)}
         </Typography>
         <CountField count={gather.count} onCount={onCount} />
       </Stack>
       {gather.leaves.length === 0 && gather.made.length === 0 ? (
-        <Typography variant="body2" color="text.secondary" data-testid="tradeskill-plan-gather-empty">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="tradeskill-plan-gather-empty">
           {GATHER_EMPTY_TEXT}
         </Typography>
       ) : (
@@ -166,7 +166,7 @@ export function ItemPlanGather({ gather, item, onCount }: ItemPlanGatherProps): 
           )}
           {gather.made.length > 0 && (
             <Box sx={{ mt: 1 }} data-testid="tradeskill-plan-gather-made">
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                 Made on the way
               </Typography>
               {gather.made.map((line) => (
@@ -174,7 +174,7 @@ export function ItemPlanGather({ gather, item, onCount }: ItemPlanGatherProps): 
               ))}
             </Box>
           )}
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.75 }} data-testid="tradeskill-plan-gather-note">
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.75 }} data-testid="tradeskill-plan-gather-note">
             {GATHER_NOTE}
           </Typography>
         </>

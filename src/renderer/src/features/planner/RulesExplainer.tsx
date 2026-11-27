@@ -64,7 +64,7 @@ function Rule({ title, children }: { title: string; children: string }): JSX.Ele
       <Typography variant="body2" sx={{ fontWeight: 600 }}>
         {title}
       </Typography>
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
         {children}
       </Typography>
     </Box>

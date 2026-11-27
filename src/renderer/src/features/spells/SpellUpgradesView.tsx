@@ -76,12 +76,12 @@ function CandidateRow({ c }: { c: UpgradeCandidate }): JSX.Element {
             {c.name}
           </Typography>
         </SpellTooltip>
-        <Typography variant="caption" color="text.secondary" sx={{ ml: 0.75 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', ml: 0.75 }}>
           {UPGRADE_CATEGORY_LABEL[c.category]}
         </Typography>
       </TableCell>
       <TableCell data-testid="upgrade-from-to">
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {c.rank === 0 ? 'base' : romanRank(c.rank)} to {romanRank(c.nextTier)}
         </Typography>
       </TableCell>
@@ -110,10 +110,9 @@ function DeadEndRow({ d }: { d: DeadEnd }): JSX.Element {
     <Stack
       direction="row"
       spacing={1}
-      alignItems="baseline"
       data-testid="upgrade-dead-end"
       data-spell={d.name}
-      sx={{ py: 0.25 }}
+      sx={{ alignItems: 'baseline', py: 0.25 }}
     >
       <SpellTooltip name={d.name} placement="right">
         <Typography variant="body2">{d.name}</Typography>
@@ -124,7 +123,7 @@ function DeadEndRow({ d }: { d: DeadEnd }): JSX.Element {
         label={UPGRADE_CATEGORY_LABEL[d.category]}
         sx={{ height: 16, fontSize: 10, '& .MuiChip-label': { px: 0.5 } }}
       />
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {d.sentence}
       </Typography>
     </Stack>
@@ -155,7 +154,7 @@ function NothingHeld(): JSX.Element {
 function OtherClasses({ count }: { count: number }): JSX.Element | null {
   if (count === 0) return null
   return (
-    <Typography variant="caption" color="text.secondary" data-testid="upgrade-other-classes">
+    <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="upgrade-other-classes">
       {String(count)} more {count === 1 ? 'line' : 'lines'} your log has seen you cast belong to
       classes you have not picked above
     </Typography>
@@ -210,12 +209,12 @@ export default function SpellUpgradesView(): JSX.Element {
     <Stack spacing={2} sx={{ maxWidth: 900 }} data-testid="spell-upgrades-view">
       <Box>
         <Typography variant="h6">Your next motes</Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           Ranked by how much of its own base each spell gains per mote spent. Every tier costs double
           the last, so the cheap rungs on a low-ranked spell beat the expensive ones on a high one.
         </Typography>
       </Box>
-      <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
         <SpellClassPicker classes={picked} />
         <SpellClassOffer classes={picked} />
       </Stack>
@@ -230,12 +229,12 @@ export default function SpellUpgradesView(): JSX.Element {
           <CandidateTable plan={plan} />
           {/* STATED, NEVER SILENT - the law the Spellbook's own draw cap follows. */}
           {plan.next.length > SHOWN && (
-            <Typography variant="caption" color="text.secondary" data-testid="upgrade-capped">
+            <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="upgrade-capped">
               showing the top {String(SHOWN)} of {String(plan.next.length)}
             </Typography>
           )}
           {plan.unrankedCount > 0 && (
-            <Typography variant="caption" color="text.secondary" data-testid="upgrade-unranked">
+            <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="upgrade-unranked">
               {String(plan.unrankedCount)} more of your lines are already at the cap or state no
               figure to rank
             </Typography>
@@ -243,10 +242,10 @@ export default function SpellUpgradesView(): JSX.Element {
           <OtherClasses count={plan.otherClassCount} />
           {plan.deadEnds.length > 0 && (
             <Box data-testid="upgrade-dead-ends">
-              <Typography variant="overline" color="text.secondary">
+              <Typography variant="overline" sx={{ color: 'text.secondary' }}>
                 Not worth motes for the numbers
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>
                 These still get cheaper and last longer, and that is often worth having. What they
                 never get is bigger.
               </Typography>

@@ -39,7 +39,7 @@ function OverlayRecoverSetting(): JSX.Element {
   const shown = listening ? 'Press a key with Ctrl, Alt or Win…' : hotkey === undefined ? '' : (hotkey ?? 'Off')
   return (
     <Stack spacing={0.5} data-testid="pref-overlay-recover">
-      <Stack direction="row" spacing={1} alignItems="center">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
         <TextField
           size="small"
           label="Recover overlays hotkey"
@@ -70,7 +70,7 @@ function OverlayRecoverSetting(): JSX.Element {
           Recover now
         </Button>
       </Stack>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {note ?? 'Brings every open overlay back onto a screen and in front, even from the game.'}
       </Typography>
     </Stack>

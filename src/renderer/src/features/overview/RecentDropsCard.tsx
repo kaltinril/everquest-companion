@@ -76,7 +76,6 @@ function Row({ row, onOpenLoot }: { row: DropRow; onOpenLoot: (item?: string) =>
       <Stack
         direction="row"
         spacing={0.75}
-        alignItems="center"
         role="button"
         tabIndex={0}
         data-testid="overview-drop-row"
@@ -85,6 +84,7 @@ function Row({ row, onOpenLoot }: { row: DropRow; onOpenLoot: (item?: string) =>
           if (e.key === 'Enter' || e.key === ' ') open()
         }}
         sx={{
+          alignItems: 'center',
           minWidth: 0,
           py: 0.3,
           px: 0.5,
@@ -115,10 +115,10 @@ function Row({ row, onOpenLoot }: { row: DropRow; onOpenLoot: (item?: string) =>
           {row.item}
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
-        <Typography variant="caption" color="text.secondary" noWrap sx={{ flexShrink: 1, minWidth: 0 }}>
+        <Typography variant="caption" noWrap sx={{ color: 'text.secondary', flexShrink: 1, minWidth: 0 }}>
           {provenance(row)}
         </Typography>
-        <Typography variant="caption" color="text.disabled" sx={{ flexShrink: 0 }}>
+        <Typography variant="caption" sx={{ color: 'text.disabled', flexShrink: 0 }}>
           {formatTime(row.ts)}
         </Typography>
       </Stack>

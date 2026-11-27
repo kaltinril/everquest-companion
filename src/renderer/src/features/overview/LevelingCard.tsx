@@ -103,8 +103,8 @@ function OpenLeveling({ onOpenLeveling }: { onOpenLeveling: () => void }): JSX.E
 /** The label row: which window this is, plus the chips that qualify it. */
 function LevelingChips({ state }: { state: OverviewLevelingState }): JSX.Element {
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap" useFlexGap sx={{ minWidth: 0 }}>
-      <Typography variant="caption" color="text.secondary" data-testid="overview-leveling-window" noWrap>
+    <Stack direction="row" spacing={0.75} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap', minWidth: 0 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="overview-leveling-window" noWrap>
         Last hour
       </Typography>
       {state.atCap && (
@@ -141,7 +141,7 @@ function StatTile({ tile }: { tile: LevelingTile }): JSX.Element {
         data-testid={`overview-leveling-tile-${tile.id}`}
         sx={{ px: 1, py: 0.5, minWidth: 0, flex: '1 1 0', bgcolor: 'action.hover' }}
       >
-        <Stack direction="row" spacing={0.5} alignItems="baseline" sx={{ minWidth: 0 }}>
+        <Stack direction="row" spacing={0.5} sx={{ alignItems: 'baseline', minWidth: 0 }}>
           <Typography
             variant="h5"
             noWrap
@@ -150,12 +150,12 @@ function StatTile({ tile }: { tile: LevelingTile }): JSX.Element {
             {tile.value}
           </Typography>
           {tile.unit && (
-            <Typography variant="caption" color="text.secondary" noWrap sx={{ flexShrink: 0 }}>
+            <Typography variant="caption" noWrap sx={{ color: 'text.secondary', flexShrink: 0 }}>
               {tile.unit}
             </Typography>
           )}
         </Stack>
-        <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block', minWidth: 0 }}>
+        <Typography variant="caption" noWrap sx={{ color: 'text.secondary', display: 'block', minWidth: 0 }}>
           {tile.label}
         </Typography>
       </Paper>
@@ -170,10 +170,9 @@ function StatTiles({ tiles }: { tiles: LevelingTile[] }): JSX.Element {
     <Stack
       direction="row"
       spacing={0.75}
-      flexWrap="wrap"
       useFlexGap
       data-testid="overview-leveling-tiles"
-      sx={{ mt: 0.75, minWidth: 0 }}
+      sx={{ flexWrap: 'wrap', mt: 0.75, minWidth: 0 }}
     >
       {tiles.map((t) => (
         <StatTile key={t.id} tile={t} />
@@ -200,7 +199,7 @@ const SPARK_MIN_H = 2
 function Spark({ spark }: { spark: LevelingSpark }): JSX.Element {
   if (spark.stated === 0 && spark.unstated > 0) {
     return (
-      <Typography variant="caption" color="text.disabled" data-testid="overview-leveling-spark-none" sx={{ mt: 0.5 }}>
+      <Typography variant="caption" data-testid="overview-leveling-spark-none" sx={{ color: 'text.disabled', mt: 0.5 }}>
         No level-bar percentage stated this hour - progress unknown, not zero.
       </Typography>
     )
@@ -252,11 +251,10 @@ function LevelingLines({ state }: { state: OverviewLevelingState }): JSX.Element
       {state.aa && (
         <Typography
           variant="caption"
-          color="text.secondary"
           data-testid="overview-leveling-aa"
           title={state.aa}
           noWrap
-          sx={{ mt: 0.5, minWidth: 0 }}
+          sx={{ color: 'text.secondary', mt: 0.5, minWidth: 0 }}
         >
           {state.aa}
         </Typography>
@@ -265,9 +263,8 @@ function LevelingLines({ state }: { state: OverviewLevelingState }): JSX.Element
         <Tooltip title={state.etaTitle}>
           <Typography
             variant="caption"
-            color="text.secondary"
             data-testid="overview-leveling-eta"
-            sx={{ mt: 0.5, minWidth: 0 }}
+            sx={{ color: 'text.secondary', mt: 0.5, minWidth: 0 }}
           >
             - no next-level estimate
           </Typography>
@@ -276,11 +273,10 @@ function LevelingLines({ state }: { state: OverviewLevelingState }): JSX.Element
       {state.zoneLine && (
         <Typography
           variant="caption"
-          color="text.secondary"
           data-testid="overview-leveling-zone"
           title={state.zoneLine}
           noWrap
-          sx={{ mt: 0.5, minWidth: 0 }}
+          sx={{ color: 'text.secondary', mt: 0.5, minWidth: 0 }}
         >
           {state.zoneLine}
         </Typography>
@@ -288,11 +284,10 @@ function LevelingLines({ state }: { state: OverviewLevelingState }): JSX.Element
       {state.zoneCompare && (
         <Typography
           variant="caption"
-          color="text.secondary"
           data-testid="overview-leveling-zone-compare"
           title={state.zoneCompare}
           noWrap
-          sx={{ minWidth: 0 }}
+          sx={{ color: 'text.secondary', minWidth: 0 }}
         >
           {state.zoneCompare}
         </Typography>
@@ -301,10 +296,9 @@ function LevelingLines({ state }: { state: OverviewLevelingState }): JSX.Element
         <Tooltip title={state.historyTitle}>
           <Typography
             variant="caption"
-            color="text.secondary"
             data-testid="overview-leveling-history"
             noWrap
-            sx={{ minWidth: 0 }}
+            sx={{ color: 'text.secondary', minWidth: 0 }}
           >
             {state.verdict ? `${state.history} · ${state.verdict}` : state.history}
           </Typography>
@@ -331,7 +325,7 @@ export function LevelingCard({ state, onOpenLeveling }: LevelingCardProps): JSX.
           {/* This line prints the hour's kills/hr AND its active/idle split, so its hover carries
               the definition of the denominator under both (JOS-249). */}
           <Tooltip title={`${String(state.kills)} credited kills · ${state.idleCaption} · ${ACTIVE_TIME_TITLE}`}>
-            <Typography variant="caption" color="text.secondary" data-testid="overview-leveling-sub" noWrap>
+            <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="overview-leveling-sub" noWrap>
               {state.killRate} · {state.activity}
             </Typography>
           </Tooltip>

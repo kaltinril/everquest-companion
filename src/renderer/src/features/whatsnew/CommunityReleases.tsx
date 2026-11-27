@@ -48,22 +48,22 @@ function Bullets({ items }: { items: CommunityNoteGroup['items'] }): JSX.Element
 function CommunityReleaseBlock({ note, latest }: { note: CommunityRelease; latest: boolean }): JSX.Element {
   return (
     <Stack spacing={0.75} data-testid={`community-release-${note.version}`}>
-      <Stack direction="row" alignItems="baseline" spacing={1} flexWrap="wrap">
+      <Stack direction="row" sx={{ alignItems: 'baseline', flexWrap: 'wrap' }} spacing={1}>
         <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
           v{note.version}
         </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {formatCalendarDate(note.date)}
         </Typography>
       </Stack>
-      <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+      <Typography variant="body2" sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
         {note.title}
       </Typography>
       {note.intro !== undefined && <Typography variant="body2">{note.intro}</Typography>}
       {note.groups.map((g, i) => (
         <Stack key={`${g.heading ?? ''}-${String(i)}`} spacing={0.25}>
           {g.heading !== undefined && (
-            <Typography variant="caption" sx={{ fontWeight: 700, letterSpacing: 0.5 }} color="text.secondary">
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: 0.5 }}>
               {g.heading}
             </Typography>
           )}
@@ -72,10 +72,10 @@ function CommunityReleaseBlock({ note, latest }: { note: CommunityRelease; lates
       ))}
       {latest && note.knownIssues !== undefined && (
         <Stack spacing={0.25} data-testid="community-known-issues">
-          <Typography variant="caption" sx={{ fontWeight: 700, letterSpacing: 0.5 }} color="text.secondary">
+          <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: 0.5 }}>
             Known issues
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             {note.knownIssues}
           </Typography>
         </Stack>
@@ -88,7 +88,7 @@ function CommunityReleaseBlock({ note, latest }: { note: CommunityRelease; lates
 export function CommunityReleases(): JSX.Element {
   return (
     <>
-      <Typography variant="overline" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+      <Typography variant="overline" sx={{ color: 'text.secondary', lineHeight: 1.5 }}>
         Community build
       </Typography>
       {COMMUNITY_RELEASE_NOTES.map((note, i) => (
@@ -98,7 +98,7 @@ export function CommunityReleases(): JSX.Element {
         </Box>
       ))}
       <Divider sx={{ mt: 1 }} />
-      <Typography variant="overline" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+      <Typography variant="overline" sx={{ color: 'text.secondary', lineHeight: 1.5 }}>
         The original app (by jmoyers, no longer updated)
       </Typography>
     </>

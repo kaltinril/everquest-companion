@@ -44,26 +44,24 @@ export default function CharacterIdentity(): JSX.Element {
     <Stack
       direction="row"
       spacing={1.25}
-      alignItems="baseline"
-      flexWrap="wrap"
       useFlexGap
-      sx={{ minWidth: 0 }}
+      sx={{ alignItems: 'baseline', flexWrap: 'wrap', minWidth: 0 }}
       data-testid="character-identity"
     >
       <Typography variant="h6" sx={{ lineHeight: 1.2 }}>
         {character?.name ?? 'No character'}
       </Typography>
       {character && (
-        <Typography variant="caption" color="text.disabled">
+        <Typography variant="caption" sx={{ color: 'text.disabled' }}>
           {character.server}
         </Typography>
       )}
       {level && (
         <Tooltip title={level.title}>
-          <Typography variant="subtitle2" color="text.secondary" data-testid="character-level">
+          <Typography variant="subtitle2" sx={{ color: 'text.secondary' }} data-testid="character-level">
             Level {level.level}
             {level.cue && (
-              <Typography component="span" variant="caption" color="text.disabled" sx={{ ml: 0.5 }}>
+              <Typography component="span" variant="caption" sx={{ color: 'text.disabled', ml: 0.5 }}>
                 {level.cue}
               </Typography>
             )}
@@ -71,12 +69,12 @@ export default function CharacterIdentity(): JSX.Element {
         </Tooltip>
       )}
       {combo.current ? (
-        <Stack direction="row" spacing={0.5} alignItems="center" flexWrap="wrap" useFlexGap>
+        <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
           <SlotChips slots={combo.current.slots} />
           <ProvenanceChip interval={combo.current} />
         </Stack>
       ) : (
-        <Typography variant="caption" color="text.disabled">
+        <Typography variant="caption" sx={{ color: 'text.disabled' }}>
           No loadout read yet - one appears as soon as the log names classes you played.
         </Typography>
       )}

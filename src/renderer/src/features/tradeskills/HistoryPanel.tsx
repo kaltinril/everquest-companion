@@ -44,7 +44,7 @@ function Totals({ history }: { history: SkillHistory }): JSX.Element | null {
       <Stack direction="row" sx={{ flexWrap: 'wrap', columnGap: 3, rowGap: 0.5 }}>
         {totalsFigures(history.totals).map((figure) => (
           <Box key={figure.id} data-testid={`tradeskill-history-${figure.id}`}>
-            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1.2 }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1.2 }}>
               {figure.label}
             </Typography>
             <Typography variant="h6" sx={{ lineHeight: 1.2 }}>
@@ -55,13 +55,13 @@ function Totals({ history }: { history: SkillHistory }): JSX.Element | null {
       </Stack>
       {pace !== '' && (
         <Tooltip title={PACE_TIP}>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }} data-testid="tradeskill-history-pace">
+          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }} data-testid="tradeskill-history-pace">
             {pace}
           </Typography>
         </Tooltip>
       )}
       {paceTooShort(history.pace) && (
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }} data-testid="tradeskill-history-pace-short">
+        <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }} data-testid="tradeskill-history-pace-short">
           {PACE_SHORT_TEXT}
         </Typography>
       )}
@@ -91,7 +91,7 @@ function ItemRow({ line, onOpenRecipe }: { line: HistoryRow; onOpenRecipe: (id: 
   return (
     <TableRow hover={open !== undefined} onClick={open} title={open === undefined ? undefined : OPEN_TIP} sx={{ cursor: open === undefined ? 'default' : 'pointer' }} data-testid="tradeskill-history-row">
       <TableCell>
-        <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0 }}>
+        <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', minWidth: 0 }}>
           <ItemLabel name={row.item} />
           <NoticeChip row={row} />
         </Stack>
@@ -131,7 +131,7 @@ export function HistoryPanel({ tradeskill, facts, history, onOpenRecipe }: Histo
       {/* Fishing's own outcomes (casts, catches, what was caught) come before its combines. */}
       {tradeskill === 'Fishing' && <GatherPanel />}
       {history.totals === null && (
-        <Typography variant="body2" color="text.secondary" sx={{ py: 2 }} data-testid="tradeskill-history-empty">
+        <Typography variant="body2" sx={{ color: 'text.secondary', py: 2 }} data-testid="tradeskill-history-empty">
           {noCombinesText(tradeskill)}
         </Typography>
       )}
@@ -149,7 +149,7 @@ export function HistoryPanel({ tradeskill, facts, history, onOpenRecipe }: Histo
         </Box>
       )}
       {unplaced !== '' && (
-        <Typography variant="caption" color="text.secondary" data-testid="tradeskill-history-unplaced">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="tradeskill-history-unplaced">
           {unplaced}
         </Typography>
       )}

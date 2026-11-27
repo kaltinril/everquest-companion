@@ -370,7 +370,7 @@ function CharacterPicker({
                 <Typography variant="body2">
                   {c.name} · {c.server}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                   last played {lastPlayed(c.lastPlayed)}
                 </Typography>
               </Box>

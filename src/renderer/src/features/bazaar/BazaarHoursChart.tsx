@@ -86,18 +86,18 @@ interface Hover {
 
 function Legend(): JSX.Element {
   const key = (color: string, label: string): JSX.Element => (
-    <Stack direction="row" spacing={0.75} alignItems="center">
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center' }}>
       <Box sx={{ width: 10, height: 10, borderRadius: 0.5, bgcolor: color }} />
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {label}
       </Typography>
     </Stack>
   )
   return (
-    <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap' }} useFlexGap>
       {key(ASK_COLOR, 'Asking (selling)')}
       {key(OFFER_COLOR, 'Offered (buying)')}
-      <Typography variant="caption" color="text.disabled">
+      <Typography variant="caption" sx={{ color: 'text.disabled' }}>
         Bar: the period&apos;s mean price.
       </Typography>
     </Stack>
@@ -115,7 +115,7 @@ export function BazaarHoursChart({ item, ignoreOutliers }: { item: BazaarItem; i
   const rows = hp === undefined ? [] : [sideRow('Asking', hp.sell, ASK_COLOR), sideRow('Offered', hp.buy, OFFER_COLOR)].flatMap((r) => (r === null ? [] : [r]))
   return (
     <Stack spacing={1}>
-      <Typography variant="caption" color="text.secondary" data-testid="bazaar-hours-title">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="bazaar-hours-title">
         Price by time of day
       </Typography>
       <Legend />
@@ -143,13 +143,13 @@ export function BazaarHoursChart({ item, ignoreOutliers }: { item: BazaarItem; i
             ))}
           </svg>
         ) : (
-          <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>
+          <Typography variant="body2" sx={{ color: 'text.secondary', py: 2 }}>
             No quote with a price yet, so nothing to place by time of day.
           </Typography>
         )}
         {hov !== null && hp !== undefined && rows.length > 0 && <ChartTooltip x={hov.x} y={hov.y} title={hp.bucket} rows={rows} />}
       </Box>
-      <Typography variant="caption" color="text.disabled">
+      <Typography variant="caption" sx={{ color: 'text.disabled' }}>
         Average asking and offered price by time of day, from the quotes kept, one per seller per day.
       </Typography>
     </Stack>

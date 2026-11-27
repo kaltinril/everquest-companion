@@ -112,7 +112,7 @@ function SoundRow({
 }): JSX.Element {
   return (
     <Paper variant="outlined" sx={{ px: 1, py: 0.5 }} data-testid="my-sound-row">
-      <Stack direction="row" spacing={1} alignItems="center">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
         <IconButton size="small" title="Play" onClick={() => onPlay(sound.soundId)}>
           <PlayArrowIcon fontSize="small" />
         </IconButton>
@@ -147,7 +147,7 @@ function ConfirmRemoveDialog({
     <Dialog open={!!target} onClose={onCancel} maxWidth="xs">
       <DialogTitle>Remove “{target?.label}”?</DialogTitle>
       <DialogContent>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           {users.length === 1 ? 'One alert plays it' : `${users.length} alerts play it`}:{' '}
           {users.map((a) => a.name).join(', ')}. They keep firing on the default alert line
           until you point them at another sound. Import the file again to get it back.
@@ -203,7 +203,7 @@ export default function MySoundsDialog({
       </DialogTitle>
       <DialogContent>
         <Stack spacing={1.5} sx={{ mt: 0.5 }}>
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <Button
               startIcon={<LibraryMusicIcon />}
               variant="contained"
@@ -214,7 +214,7 @@ export default function MySoundsDialog({
             >
               Add a sound…
             </Button>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               {USER_SOUND_EXTENSIONS.join(', ')} · up to {MAX_IMPORT_MB} MB
             </Typography>
           </Stack>
@@ -231,7 +231,7 @@ export default function MySoundsDialog({
                 <SoundRow key={s.soundId} sound={s} onPlay={play} onRemove={requestRemove} />
               ))}
               {sounds.length === 0 && (
-                <Typography variant="body2" color="text.secondary" sx={{ p: 1 }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', p: 1 }}>
                   Nothing here yet. Add an audio file and it becomes a choice in every alert.
                 </Typography>
               )}

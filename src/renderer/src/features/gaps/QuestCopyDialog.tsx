@@ -70,12 +70,12 @@ function Summary({ copy }: { copy: QuestLiveCopy }): JSX.Element {
     <Stack spacing={0.5} sx={{ mb: 1 }}>
       <Typography variant="body2">{LEAD[copy.kind](copy)}</Typography>
       {copy.changes.map((c) => (
-        <Typography key={c} variant="caption" color="success.main" data-testid="quest-copy-change">
+        <Typography key={c} variant="caption" sx={{ color: 'success.main' }} data-testid="quest-copy-change">
           + {c}
         </Typography>
       ))}
       {copy.notes.map((n) => (
-        <Typography key={n} variant="caption" color="warning.main" data-testid="quest-copy-note">
+        <Typography key={n} variant="caption" sx={{ color: 'warning.main' }} data-testid="quest-copy-note">
           Check: {n}
         </Typography>
       ))}
@@ -103,7 +103,7 @@ export function QuestCopyDialog({ row, read, offline, onClose }: { row: GapRow; 
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         {copy === undefined ? (
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <CircularProgress size={16} />
             <Typography variant="body2">Reading the wiki page…</Typography>
           </Stack>

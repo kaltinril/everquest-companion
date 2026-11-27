@@ -116,8 +116,8 @@ function MoteControls({ motes, setMotes, disabled }: ControlsProps): JSX.Element
   return (
     <>
       {/* "On hand", short: the row is the panel title's, and at 1280 px the picks must still share it. */}
-      <Stack direction="row" spacing={0.75} alignItems="center" title="How many void motes you have to spend now" sx={{ flexShrink: 0 }}>
-        <Typography variant="caption" color="text.secondary" component="span">
+      <Stack direction="row" spacing={0.75} title="How many void motes you have to spend now" sx={{ alignItems: 'center', flexShrink: 0 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} component="span">
           On hand
         </Typography>
         <ToggleButtonGroup
@@ -204,7 +204,7 @@ function MoteRow({ advice, picks, target, onOpenLoot }: RowProps): JSX.Element {
         {pick ? picks : isMoteReady(advice) ? '' : '-'}
       </TableCell>
       <TableCell sx={{ ...CELL, maxWidth: 260 }}>
-        <Stack direction="row" spacing={0.75} alignItems="baseline" sx={{ minWidth: 0 }}>
+        <Stack direction="row" spacing={0.75} sx={{ alignItems: 'baseline', minWidth: 0 }}>
           <DonorName name={advice.name} onOpen={onOpenLoot} bold={pick} />
           <Box component="span" data-testid="gear-motes-tier" sx={{ color: 'text.secondary', flexShrink: 0 }}>
             +{advice.tier}→+{advice.tier + Math.max(1, picks)}
@@ -252,7 +252,7 @@ function MoteList({ list, plan, motes, classes, onOpenLoot }: ListProps): JSX.El
     <>
       {/* What the highlight means, said under every sort (Malkil, 2026-11-23). */}
       {legend !== '' && (
-        <Typography variant="caption" color="text.secondary" data-testid="gear-motes-legend" sx={{ px: 1, pb: 0.5, flexShrink: 0 }}>
+        <Typography variant="caption" data-testid="gear-motes-legend" sx={{ color: 'text.secondary', px: 1, pb: 0.5, flexShrink: 0 }}>
           {legend}
         </Typography>
       )}
@@ -279,7 +279,7 @@ function MoteList({ list, plan, motes, classes, onOpenLoot }: ListProps): JSX.El
       {reasons.length > 0 && (
         <Box data-testid="gear-motes-why" sx={{ px: 1, pt: 0.5, flexShrink: 0, borderTop: 1, borderColor: 'divider' }}>
           {reasons.map((line) => (
-            <Typography key={line} variant="caption" color="text.secondary" component="p" data-testid="gear-motes-why-line" sx={{ m: 0 }}>
+            <Typography key={line} variant="caption" component="p" data-testid="gear-motes-why-line" sx={{ color: 'text.secondary', m: 0 }}>
               {line}
             </Typography>
           ))}
@@ -318,7 +318,7 @@ export default function VoidMotePanel({ compare, indexReady, indexRefused, class
       {/* The row WRAPS: at the minimum window with larger text the two picks ran out of the panel and
           the page scrolled sideways. The plan line takes what is left of the first line (basis 0),
           so in a wide window nothing moves and the picks drop to a second line only when they must. */}
-      <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" useFlexGap sx={{ px: 1, py: 0.75, flexShrink: 0, rowGap: 0.75 }}>
+      <Stack direction="row" spacing={1.5} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap', px: 1, py: 0.75, flexShrink: 0, rowGap: 0.75 }}>
         <Typography variant="subtitle2" sx={{ flexShrink: 0 }}>
           Void motes
         </Typography>
@@ -335,7 +335,7 @@ export default function VoidMotePanel({ compare, indexReady, indexRefused, class
         <MoteControls motes={motes} setMotes={setMotes} disabled={list.length === 0} />
       </Stack>
       {list.length === 0 ? (
-        <Typography variant="body2" color="text.secondary" data-testid="gear-motes-empty" sx={{ px: 1, pb: 1 }}>
+        <Typography variant="body2" data-testid="gear-motes-empty" sx={{ color: 'text.secondary', px: 1, pb: 1 }}>
           {moteEmptyText({
             indexReady,
             indexRefused,
@@ -351,7 +351,7 @@ export default function VoidMotePanel({ compare, indexReady, indexRefused, class
       )}
       {/* A worn piece with no row in the item data is named, never dropped in silence. */}
       {unranked.length > 0 && (
-        <Typography variant="caption" color="text.secondary" data-testid="gear-motes-unranked" sx={{ px: 1, py: 0.5, flexShrink: 0 }}>
+        <Typography variant="caption" data-testid="gear-motes-unranked" sx={{ color: 'text.secondary', px: 1, py: 0.5, flexShrink: 0 }}>
           {moteUnrankedText(unranked)}
         </Typography>
       )}

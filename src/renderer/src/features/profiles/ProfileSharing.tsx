@@ -70,7 +70,7 @@ export function ExportSettingsSetting(): JSX.Element {
           />
         ))}
       </Box>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Not included: {EXCLUDES.join(' · ')}.
       </Typography>
       <Stack direction="row" spacing={1}>
@@ -123,7 +123,7 @@ export function ImportSettingsSetting(): JSX.Element {
 
   return (
     <Stack spacing={1.25}>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Imports only ever ADD. Anything you already have is left exactly as it is.
       </Typography>
       <Stack direction="row" spacing={1}>

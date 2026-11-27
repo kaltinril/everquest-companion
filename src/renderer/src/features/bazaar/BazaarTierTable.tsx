@@ -9,7 +9,7 @@ import { formatPlat, type CombinedTiers } from '@shared/bazaar'
 export default function BazaarTierTable({ c }: { c: CombinedTiers }): JSX.Element {
   return (
     <Box data-testid="bazaar-tiers">
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Every tier read as +{c.at}: each tier adds about {Math.round((c.rate - 1) * 100)}% for this item
       </Typography>
       <Table size="small" sx={{ maxWidth: 560 }}>

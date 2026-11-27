@@ -53,12 +53,11 @@ export default function UpgradeSlider({ state, onChange, testId = 'gear', wrap =
     <Stack
       direction="row"
       spacing={1.5}
-      alignItems="center"
       useFlexGap={wrap}
-      sx={{ flexWrap: wrap ? 'wrap' : 'nowrap', minWidth: 0 }}
+      sx={{ alignItems: 'center', flexWrap: wrap ? 'wrap' : 'nowrap', minWidth: 0 }}
       data-testid={`${testId}-upgrade`}
     >
-      <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', flexShrink: 0 }}>
         Simulate upgrade
       </Typography>
 

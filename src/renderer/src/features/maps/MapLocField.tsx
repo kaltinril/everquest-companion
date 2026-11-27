@@ -67,7 +67,7 @@ export default function MapLocField({ marker, onPlace, onShow, onClear }: MapLoc
   }
 
   return (
-    <Stack direction="row" spacing={0.5} alignItems="center" flexWrap="wrap" useFlexGap data-testid="maps-loc">
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap data-testid="maps-loc">
       <TextField
         size="small"
         label="/loc marker"

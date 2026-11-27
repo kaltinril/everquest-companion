@@ -69,7 +69,7 @@ function Unplaced(): JSX.Element | null {
   if (names.length === 0) return null
   return (
     <Tooltip title={UNPLACED_TIP}>
-      <Typography variant="caption" color="warning.main" data-testid="aa-unplaced">
+      <Typography variant="caption" sx={{ color: 'warning.main' }} data-testid="aa-unplaced">
         {`Not on the wiki's AA page: ${names.join(', ')}`}
       </Typography>
     </Tooltip>
@@ -93,7 +93,7 @@ function AaHeader({ s }: { s: AaBoardState }): JSX.Element {
   return (
     <Stack spacing={0.25} sx={{ mb: 1 }} data-testid="aa-header">
       <Typography variant="h6">Alternate Advancement</Typography>
-      <Typography variant="body2" color="text.secondary" data-testid="aa-header-line">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="aa-header-line">
         {headerLine(s)}
       </Typography>
       <Unplaced />
@@ -142,7 +142,7 @@ function ClassBar({ s, scope, setScope, maxLevel, setMaxLevel }: { s: AaBoardSta
   const { pick } = s
   return (
     <Stack spacing={0.5} sx={{ mb: 1.5 }}>
-      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
         <ChipMultiSelect<ClassAbbr> options={CLASS_ABBRS} value={pick.classes} onChange={pick.set} label="Classes" placeholder="your classes" max={3} optionLabel={classDisplayName} minWidth={260} testId="aa-classes" />
         {pick.offer !== null && (
           <Chip size="small" color="success" variant="outlined" label={`back to detected · ${pick.offer.join('/')}`} onClick={pick.adopt} data-testid="aa-class-offer" />
@@ -158,12 +158,12 @@ function ClassBar({ s, scope, setScope, maxLevel, setMaxLevel }: { s: AaBoardSta
         <LevelBox maxLevel={maxLevel} setMaxLevel={setMaxLevel} />
       </Stack>
       {s.planning && (
-        <Typography variant="caption" color="warning.main" data-testid="aa-planning">
+        <Typography variant="caption" sx={{ color: 'warning.main' }} data-testid="aa-planning">
           {planningLine(s)}
         </Typography>
       )}
       {s.classes.length === 0 && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Your classes are not known yet: pick them to see your Archetype and Class AAs.
         </Typography>
       )}
@@ -208,7 +208,7 @@ function TabRow({ s, tab, setTab, scope, query, setQuery, maxLevel }: { s: AaBoa
   }
   const total = searching ? aaSearchCount(s.board, scope, query, maxLevel) : null
   return (
-    <Stack direction="row" alignItems="center" spacing={1} sx={{ borderBottom: 1, borderColor: 'divider', mb: 1 }}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', borderBottom: 1, borderColor: 'divider', mb: 1 }}>
       <Tabs value={tab} onChange={(_e, v: AaTabId) => setTab(v)} sx={{ minHeight: 36 }} variant="scrollable" scrollButtons={false}>
         <Tab value="summary" label={total === null ? 'Summary' : `Summary ${String(total)}`} sx={{ minHeight: 36 }} data-testid="aa-tab-summary" />
         {SECTIONS.map((t) => (
@@ -229,7 +229,7 @@ function SectionTab({ s, section, scope, query, maxLevel, sort, setSort }: { s: 
   return (
     <>
       {section !== 'special' && (
-        <Typography variant="caption" color="text.secondary" component="div" sx={{ px: 1, mb: 0.5 }} data-testid="aa-tab-line">
+        <Typography variant="caption" component="div" sx={{ color: 'text.secondary', px: 1, mb: 0.5 }} data-testid="aa-tab-line">
           {`${name} ${String(c.maxed)}/${String(c.of)} · ${aaCostSumText(c.points)}${filtered ? ` · up to level ${String(maxLevel)}, by the wiki` : ''}`}
         </Typography>
       )}
@@ -283,7 +283,7 @@ function AaView({ onGo, onOpenTradeskill }: AaLinksProps): JSX.Element {
         <AltListLine listTs={s.listTs} />
         {!ready && (
           <LogReadInline module="leveling" served={s.served} sx={{ py: 4, textAlign: 'center' }}>
-            <Typography variant="body2" color="text.secondary" data-testid="aa-empty" sx={{ py: 4, textAlign: 'center' }}>
+            <Typography variant="body2" data-testid="aa-empty" sx={{ color: 'text.secondary', py: 4, textAlign: 'center' }}>
               No character yet. Ranks show once your log names the character you play.
             </Typography>
           </LogReadInline>
@@ -292,7 +292,7 @@ function AaView({ onGo, onOpenTradeskill }: AaLinksProps): JSX.Element {
           <>
             <AaHeader s={s} />
             <ClassBar s={s} scope={scope} setScope={setScope} maxLevel={maxLevel} setMaxLevel={setMaxLevel} />
-            <Stack direction="row" spacing={1.5} sx={{ mb: 1.5 }} flexWrap="wrap" useFlexGap>
+            <Stack direction="row" spacing={1.5} sx={{ flexWrap: 'wrap', mb: 1.5 }} useFlexGap>
               <PointsCard unspent={s.unspent} ownBoard={s.ownBoard} planning={s.planning} />
               <PaceCard />
               <SpendCard recs={recs} unspent={s.unspent} />

@@ -56,12 +56,10 @@ export function KeepRow({
     <Stack
       direction="row"
       spacing={1}
-      alignItems="center"
       useFlexGap
-      flexWrap="wrap"
       data-testid="loadout-keep"
       data-spell={c.name}
-      sx={{ py: 0.35 }}
+      sx={{ alignItems: 'center', flexWrap: 'wrap', py: 0.35 }}
     >
       <SpellIcon iconId={c.iconId} />
       <SpellTooltip name={c.name} placement="right">
@@ -127,12 +125,10 @@ export function RejectRow({ r, casters }: { r: LoadoutRejection; casters?: reado
     <Stack
       direction="row"
       spacing={1}
-      alignItems="center"
       useFlexGap
-      flexWrap="wrap"
       data-testid="loadout-rejected"
       data-spell={r.name}
-      sx={{ py: 0.25, opacity: 0.85 }}
+      sx={{ alignItems: 'center', flexWrap: 'wrap', py: 0.25, opacity: 0.85 }}
     >
       <SpellTooltip name={r.name} placement="right">
         <Typography variant="body2" sx={{ fontWeight: 500, minWidth: 190 }}>
@@ -144,13 +140,13 @@ export function RejectRow({ r, casters }: { r: LoadoutRejection; casters?: reado
           {m.name}
         </Typography>
       ))}
-      <Typography variant="caption" color="text.secondary" data-testid="loadout-beaten-by">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="loadout-beaten-by">
         {r.certainty === 'exact' ? 'loses its slot to' : 'probably contests'} {r.beatenBy}
       </Typography>
       {/* THE HALF WORTH PRINTING: what you give up by taking the winner. */}
       {r.loses.length > 0 && (
         <>
-          <Typography variant="caption" color="warning.main" data-testid="loadout-loses">
+          <Typography variant="caption" sx={{ color: 'warning.main' }} data-testid="loadout-loses">
             you lose
           </Typography>
           {r.loses.map((g, i) => (
@@ -174,10 +170,10 @@ export function PetSection({ set, rankOf }: { set: LoadoutSet; rankOf: (name: st
   return (
     <Box data-testid="pet-set">
       <Typography variant="h6">Pet buffs</Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+      <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>
         These land on your pet, so they are not in your totals.
       </Typography>
-      <Typography variant="overline" color="text.secondary">
+      <Typography variant="overline" sx={{ color: 'text.secondary' }}>
         Keep up ({String(set.gems)})
       </Typography>
       <Stack>
@@ -188,7 +184,7 @@ export function PetSection({ set, rankOf }: { set: LoadoutSet; rankOf: (name: st
       {set.rejected.length > 0 && (
         <Box data-testid="pet-rejections" sx={{ mt: 1 }}>
           <Divider />
-          <Typography variant="overline" color="text.secondary">
+          <Typography variant="overline" sx={{ color: 'text.secondary' }}>
             Left out, and why
           </Typography>
           <Stack>
@@ -213,13 +209,11 @@ export function CombatRow({ p }: { p: CombatPick }): JSX.Element {
     <Stack
       direction="row"
       spacing={1}
-      alignItems="center"
       useFlexGap
-      flexWrap="wrap"
       data-testid="combat-pick"
       data-spell={p.name}
       data-tab={p.tab}
-      sx={{ py: 0.35 }}
+      sx={{ alignItems: 'center', flexWrap: 'wrap', py: 0.35 }}
     >
       <SpellIcon iconId={p.iconId} />
       <SpellTooltip name={p.name} placement="right">
@@ -242,8 +236,7 @@ export function CombatRow({ p }: { p: CombatPick }): JSX.Element {
       <Chip size="small" variant="outlined" label={TAB_LABEL[p.tab]} sx={TINY_CHIP} />
       <Typography
         variant="caption"
-        color="text.secondary"
-        sx={{ fontVariantNumeric: 'tabular-nums' }}
+        sx={{ color: 'text.secondary', fontVariantNumeric: 'tabular-nums' }}
       >
         {figure(p.metrics.damage)} dmg · {figure(p.metrics.dps)} dps · {figure(p.mana)} mana
       </Typography>
@@ -261,13 +254,11 @@ export function UtilityRow({ p, casters }: { p: UtilityPick; casters: number }):
     <Stack
       direction="row"
       spacing={1}
-      alignItems="center"
       useFlexGap
-      flexWrap="wrap"
       data-testid="utility-pick"
       data-spell={p.name}
       data-category={p.category}
-      sx={{ py: 0.35 }}
+      sx={{ alignItems: 'center', flexWrap: 'wrap', py: 0.35 }}
     >
       <SpellIcon iconId={p.iconId} />
       <SpellTooltip name={p.name} placement="right">
@@ -278,7 +269,7 @@ export function UtilityRow({ p, casters }: { p: UtilityPick; casters: number }):
       <Chip size="small" variant="outlined" label={`L${String(p.gainedAt)}`} sx={TINY_CHIP} />
       {casters > 1 && <Chip size="small" variant="outlined" label={p.classes.join(' / ')} sx={TINY_CHIP} />}
       {p.line !== undefined && (
-        <Typography variant="caption" color="text.secondary" data-testid="utility-line">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="utility-line">
           {p.line}
         </Typography>
       )}
@@ -290,13 +281,13 @@ export function UtilityRow({ p, casters }: { p: UtilityPick; casters: number }):
 export function UtilitySection({ set, level }: { set: UtilitySet; level: number }): JSX.Element {
   return (
     <Box data-testid="utility-set">
-      <Stack direction="row" spacing={1} alignItems="baseline">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline' }}>
         <Typography variant="h6">Utility</Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {String(set.count)} spells, read at level {String(level)}
         </Typography>
       </Stack>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+      <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>
         The best you have of each job: the highest rung of every spell line you can cast, from the
         shipped ladders, leaving out what the other three panes already placed. Slows, charms,
         mezzes, dispels, pets, and the buffs the buff set could not place: no stat it weighs, or too
@@ -310,7 +301,7 @@ export function UtilitySection({ set, level }: { set: UtilitySet; level: number 
       ) : (
         set.groups.map((g) => (
           <Box key={g.category} sx={{ mb: 1 }}>
-            <Typography variant="overline" color="text.secondary" data-testid="utility-group">
+            <Typography variant="overline" sx={{ color: 'text.secondary' }} data-testid="utility-group">
               {g.label} ({String(g.picks.length)})
             </Typography>
             <Stack>
@@ -346,13 +337,13 @@ export function CastSection({
 }): JSX.Element {
   return (
     <Box data-testid={testId}>
-      <Stack direction="row" spacing={1} alignItems="baseline">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline' }}>
         <Typography variant="h6">{title}</Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {String(set.picks.length)} of {String(set.gems)} gems, read at level {String(level)}
         </Typography>
       </Stack>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+      <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>
         {blurb}
       </Typography>
       {set.picks.length === 0 ? (

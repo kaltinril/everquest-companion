@@ -191,7 +191,7 @@ function VersionRow({ line, notes }: { line: JSX.Element; notes: JSX.Element | n
 function DownloadingChip({ percent }: { percent: number }): JSX.Element {
   return (
     <Box sx={{ px: 2, pt: 0.75, pb: 1 }} data-testid="update-chip-downloading">
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1.4 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1.4 }}>
         Downloading update · {percent}%
       </Typography>
       <LinearProgress

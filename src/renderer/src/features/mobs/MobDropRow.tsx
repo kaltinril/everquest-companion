@@ -122,7 +122,6 @@ function VariantToggle({
     <Tooltip title={open ? 'Hide the +N variants' : 'Show each +N variant separately'}>
       <Stack
         direction="row"
-        alignItems="center"
         role="button"
         tabIndex={0}
         aria-expanded={open}
@@ -131,7 +130,7 @@ function VariantToggle({
           if (e.key === 'Enter' || e.key === ' ') onToggle()
         }}
         data-testid="mob-drop-variants-toggle"
-        sx={{ flexShrink: 0, cursor: 'pointer', color: 'text.secondary', '&:hover': { color: 'primary.main' } }}
+        sx={{ alignItems: 'center', flexShrink: 0, cursor: 'pointer', color: 'text.secondary', '&:hover': { color: 'primary.main' } }}
       >
         <Typography variant="caption">
           {count} variant{count === 1 ? '' : 's'}
@@ -154,13 +153,12 @@ function VariantList({ seen, onOpenItem }: { seen: SeenVariantGroup; onOpenItem:
           key={v.item}
           direction="row"
           spacing={1}
-          alignItems="baseline"
-          sx={{ py: 0.1, minWidth: 0 }}
+          sx={{ alignItems: 'baseline', py: 0.1, minWidth: 0 }}
           data-testid="mob-drop-variant"
         >
           <ItemName name={v.item} dim onOpen={() => onOpenItem(v.item)} />
           <Box sx={{ flexGrow: 1 }} />
-          <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', flexShrink: 0 }}>
             {v.count}× · last {formatDate(v.lastTs)}
           </Typography>
         </Stack>
@@ -200,11 +198,11 @@ export function DropRow({
   const foldable = seen?.hasVariants === true
   return (
     <Box sx={{ py: 0.2, minWidth: 0 }} data-testid="mob-drop-row">
-      <Stack direction="row" spacing={1} alignItems="baseline" sx={{ minWidth: 0 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', minWidth: 0 }}>
         <ItemName name={item} onOpen={() => onOpenItem(item, foldable)} />
         {era && <EraChip subject={era} />}
         {rarity && (
-          <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', flexShrink: 0 }}>
             {rarity}
           </Typography>
         )}

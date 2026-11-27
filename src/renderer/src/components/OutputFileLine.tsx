@@ -303,7 +303,7 @@ export default function OutputFileLine({
   const chrome = quiet ? QUIET : FULL
   return (
     <Paper variant="outlined" data-testid={testId} sx={chrome.root}>
-      <Stack direction="row" spacing={1} alignItems="baseline" sx={{ flexWrap: 'nowrap', minWidth: 0 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', flexWrap: 'nowrap', minWidth: 0 }}>
         <Typography
           variant={chrome.commandVariant}
           sx={chrome.command}
@@ -316,7 +316,7 @@ export default function OutputFileLine({
           {command}
         </Typography>
         {chrome.whyOnRow && (
-          <Typography variant="caption" color="text.secondary" noWrap sx={{ minWidth: 0, flexShrink: 1 }}>
+          <Typography variant="caption" noWrap sx={{ color: 'text.secondary', minWidth: 0, flexShrink: 1 }}>
             {why}
           </Typography>
         )}
@@ -357,7 +357,7 @@ export default function OutputFileLine({
             {/* The separator is its OWN node and carries no testid: it is punctuation between two
                 slots, and a reader of the load slot — a spec, a screen reader — should get the
                 sentence rather than the sentence plus a dot. */}
-            <Typography variant="caption" color="text.disabled" sx={{ flexShrink: 0 }}>
+            <Typography variant="caption" sx={{ color: 'text.disabled', flexShrink: 0 }}>
               ·
             </Typography>
             <Stamp
@@ -378,7 +378,7 @@ export default function OutputFileLine({
           sx={chrome.panel}
         >
           {steps.map((s) => (
-            <Typography key={s} component="li" variant="caption" color="text.secondary">
+            <Typography key={s} component="li" variant="caption" sx={{ color: 'text.secondary' }}>
               {s}
             </Typography>
           ))}

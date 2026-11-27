@@ -29,7 +29,7 @@ function Yours({ book }: { book: UnlockBook }): JSX.Element {
     ['Deity', book.deity]
   ]
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
       {facts.map(([what, value]) => (
         <Chip
           key={what}
@@ -47,7 +47,7 @@ function Yours({ book }: { book: UnlockBook }): JSX.Element {
 /** The never-exported state, over the rulebook rather than instead of them. */
 function NoDumpNote(): JSX.Element {
   return (
-    <Typography variant="caption" color="text.secondary" data-testid="unlocks-empty" sx={{ display: 'block', pb: 1 }}>
+    <Typography variant="caption" data-testid="unlocks-empty" sx={{ color: 'text.secondary', display: 'block', pb: 1 }}>
       These are the game&apos;s requirements. Type <code>/outputfile achievements</code> in game and
       the tab marks which of them this character has done and which unlocks are open. The app
       notices the file by itself.
@@ -77,14 +77,14 @@ function Section({
         {title}
         {c.hasDump ? ` - ${openText(unlocks)}` : ''}
       </Typography>
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', pb: 0.5 }} data-testid="unlocks-token">
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', pb: 0.5 }} data-testid="unlocks-token">
         Or a {UNLOCK_TOKENS[kind]}, sold in the marketplace.
       </Typography>
       {shown.map((u) => (
         <UnlockRow key={u.name} unlock={u} yours={isYours(u.name, yours)} focused={u.name === focused} c={c} />
       ))}
       {shown.length === 0 && unlocks.length > 0 && unlocks.every((u) => u.open) && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Every one is open.
         </Typography>
       )}
@@ -112,7 +112,7 @@ export default function UnlocksView(props: UnlocksViewProps): JSX.Element {
         testId="unlocks-freshness"
       />
       {c.ready && !c.hasDump && <NoDumpNote />}
-      <Stack direction="row" spacing={2} alignItems="center" sx={{ pb: 1 }}>
+      <Stack direction="row" spacing={2} sx={{ alignItems: 'center', pb: 1 }}>
         {c.hasDump && <Yours book={book} />}
         <Box sx={{ flex: 1 }} />
         {c.hasDump && (

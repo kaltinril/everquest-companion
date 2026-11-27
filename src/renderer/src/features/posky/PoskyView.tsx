@@ -64,7 +64,7 @@ function CountsLine({
   if (totalQuests === 0) {
     // Data exists, it is all ignored — say so, and point at the tab that undoes it.
     return (
-      <Typography color="text.secondary">
+      <Typography sx={{ color: 'text.secondary' }}>
         Every quest is ignored - the Ignored tab can bring them back.
       </Typography>
     )
@@ -72,7 +72,7 @@ function CountsLine({
   return (
     // The stable handle for the filter specs: this line is where a narrowing filter becomes
     // VISIBLE, so it is what an e2e reads to prove a facet pick actually removed rows.
-    <Typography variant="body2" color="text.secondary" data-testid="posky-counts">
+    <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="posky-counts">
       {filteredCount} of {totalQuests} quests · counting from {countSourcePhrase(countSource)}
       <OverrideSummaryChip overrides={overrides} />
     </Typography>
@@ -206,7 +206,7 @@ function ReadyList(props: ReadyListProps): JSX.Element {
       data-testid="posky-ready"
       sx={{ flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
     >
-      <Stack direction="row" spacing={2} alignItems="center" useFlexGap sx={{ mb: 2.5 }}>
+      <Stack direction="row" spacing={2} useFlexGap sx={{ alignItems: 'center', mb: 2.5 }}>
         <ReadyFirstTimeToggle list={props.list} />
         <ReadyClassPicker classes={props.classes} picked={picked} onPick={setPicked} />
         <FavoriteAllToggle quests={quests} favorites={props.list.questFavorites} testId="posky-ready-favorite-all" />
@@ -218,7 +218,7 @@ function ReadyList(props: ReadyListProps): JSX.Element {
         />
       </Stack>
       {n === 0 ? (
-        <Typography color="text.secondary" data-testid="posky-ready-empty">
+        <Typography sx={{ color: 'text.secondary' }} data-testid="posky-ready-empty">
           Nothing is ready to turn in{forClasses(picked)} - a quest lands here the moment you are holding every item it
           needs, and leaves when you hand them over.
           {classNote}
@@ -229,7 +229,7 @@ function ReadyList(props: ReadyListProps): JSX.Element {
         </Typography>
       ) : (
         <>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }} data-testid="posky-ready-count">
+          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }} data-testid="posky-ready-count">
             {n} quest{n === 1 ? '' : 's'}{forClasses(picked)} you are holding every item for
             {readyFirstTimeOnly ? ' and have never turned in' : ''}.
             {classNote}
@@ -465,7 +465,7 @@ function PoskyBody(x: PoskyBodyProps): JSX.Element {
           back the numbers this row reports — and because it cannot live on the bar: one more
           control in the bar's right group wrapped the bar onto a fourth row under the dropdown's
           wider labels, moving this very line the freshness caption promises never to move. */}
-      <Stack direction="row" spacing={2} alignItems="center" useFlexGap>
+      <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }} useFlexGap>
         <FavoriteAllToggle quests={list.filtered} favorites={list.questFavorites} testId="posky-favorite-all" />
         <CountsLine
           questCount={x.quests.length}

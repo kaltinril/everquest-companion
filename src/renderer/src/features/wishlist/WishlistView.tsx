@@ -56,7 +56,7 @@ import { useWishlist } from './useWishlist'
 /** The empty state. It names what the tab is FOR, not what it is missing. */
 function NoWishes({ searching }: { searching: boolean }): JSX.Element {
   return (
-    <Stack alignItems="center" justifyContent="center" spacing={1.5} sx={{ py: 6, color: 'text.secondary' }}>
+    <Stack spacing={1.5} sx={{ alignItems: 'center', justifyContent: 'center', py: 6, color: 'text.secondary' }}>
       <FavoriteBorderIcon sx={{ fontSize: 44, opacity: 0.6 }} />
       <Typography variant="body2" data-testid="wishlist-empty" sx={{ maxWidth: 460, textAlign: 'center' }}>
         {searching
@@ -235,7 +235,7 @@ export default function WishlistView({ onOpenLoot, onOpenMob, onOpenMapZone }: W
       data-testid="wishlist-view"
       sx={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}
     >
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'nowrap', mb: 1.5 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'nowrap', mb: 1.5 }}>
         <WishAdd
           gear={gearState.rows}
           donors={donorsState.donors}
@@ -254,7 +254,7 @@ export default function WishlistView({ onOpenLoot, onOpenMob, onOpenMapZone }: W
         <Box sx={{ flexGrow: 1, minWidth: 8 }} />
         {/* The WHOLE list's length, dismissals and fulfilled rows included — the one number on the
             tab that a Clear must not change, because a dismissal is not a deletion. */}
-        <Typography variant="caption" color="text.secondary" data-testid="wishlist-count" sx={{ flexShrink: 0 }}>
+        <Typography variant="caption" data-testid="wishlist-count" sx={{ color: 'text.secondary', flexShrink: 0 }}>
           {entries.length} {entries.length === 1 ? 'wish' : 'wishes'}
         </Typography>
       </Stack>
@@ -285,7 +285,7 @@ export default function WishlistView({ onOpenLoot, onOpenMob, onOpenMapZone }: W
         {/* The era filter can empty a NON-empty list, and it must say so rather than letting the
             list read as "you want nothing" (the JOS-67 lesson, in its smallest form). */}
         {!nothing && view.groups.length === 0 && view.outstanding > 0 && (
-          <Typography variant="body2" color="text.secondary" data-testid="wishlist-all-out-of-era" sx={{ p: 2 }}>
+          <Typography variant="body2" data-testid="wishlist-all-out-of-era" sx={{ color: 'text.secondary', p: 2 }}>
             Every wish still to find is out of {CURRENT_ERA_LABEL}.
           </Typography>
         )}

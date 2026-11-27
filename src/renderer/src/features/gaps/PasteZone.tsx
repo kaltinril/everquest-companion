@@ -58,15 +58,15 @@ export function PasteZone({ label, busy, onPicture }: { label: string; busy: boo
       sx={{ display: 'block', width: '100%', textAlign: 'left', border: '1px dashed', borderColor: 'warning.main', borderRadius: 1, px: 1.5, py: 0.75 }}
       data-testid="gaps-shot-zone"
     >
-      <Stack direction="row" spacing={1} alignItems="center">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
         {busy && <CircularProgress size={14} />}
         <Typography variant="body2">{busy ? 'Reading…' : label}</Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           (snip: Win+Shift+S)
         </Typography>
       </Stack>
       {note !== null && (
-        <Typography variant="caption" color="warning.main" component="div">
+        <Typography variant="caption" sx={{ color: 'warning.main' }} component="div">
           {note}
         </Typography>
       )}
@@ -81,7 +81,7 @@ export function PasteZone({ label, busy, onPicture }: { label: string; busy: boo
 export function CheckChips({ checks }: { checks: readonly string[] }): JSX.Element | null {
   if (checks.length === 0) return null
   return (
-    <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap" data-testid="gaps-shot-checks">
+    <Stack direction="row" spacing={0.75} useFlexGap sx={{ flexWrap: 'wrap' }} data-testid="gaps-shot-checks">
       {checks.map((c) => (
         <Chip key={c} size="small" color="warning" variant="outlined" icon={<WarningAmberIcon />} label={c} sx={{ height: 'auto', py: 0.25, '& .MuiChip-label': { whiteSpace: 'normal' } }} />
       ))}
@@ -104,7 +104,7 @@ export function Line({ children, warn = false }: { children: ReactNode; warn?: b
 export function KeptPicture({ path }: { path: string | null }): JSX.Element | null {
   if (path === null) return null
   return (
-    <Stack direction="row" spacing={1} alignItems="center" data-testid="gaps-shot-kept-picture">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} data-testid="gaps-shot-kept-picture">
       <Line>Picture saved to {path}.</Line>
       <Button size="small" onClick={() => void window.eq.shotSavedFile('show', path).catch(() => false)}>
         Open folder
@@ -138,7 +138,7 @@ export function WrongItem({ note, png, onUse, onDiscard }: { note: string; png?:
   const url = usePictureUrl(png)
   return (
     <Stack spacing={0.5} data-testid="gaps-shot-wrong-item">
-      <Stack direction="row" spacing={1} alignItems="center">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
         <Line warn>{note}</Line>
         <Button size="small" onClick={onUse}>
           Use it anyway

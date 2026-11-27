@@ -63,11 +63,11 @@ export function GrantsSection({ detail }: { detail: SpellDetail }): JSX.Element 
   if (grants.length === 0) return null
   return (
     <Box data-testid="spell-grants-section">
-      <Typography variant="overline" color="text.secondary">
+      <Typography variant="overline" sx={{ color: 'text.secondary' }}>
         Grants
         {detail.grantsLevel !== undefined && ` · at level ${String(detail.grantsLevel)}`}
       </Typography>
-      <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap" sx={{ mt: 0.5 }}>
+      <Stack direction="row" spacing={0.75} useFlexGap sx={{ flexWrap: 'wrap', mt: 0.5 }}>
         {grants.map((g, i) => (
           <Tooltip
             // The wiki's own line, verbatim, on the hover - so the derived figure can always be
@@ -150,8 +150,8 @@ export function UpgradeSection({ detail }: { detail: SpellDetail }): JSX.Element
   const confidence = payoff.confidence
   return (
     <Box data-testid="spell-upgrade-section" data-category={detail.upgradeCategory}>
-      <Stack direction="row" spacing={1} alignItems="baseline">
-        <Typography variant="overline" color="text.secondary">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline' }}>
+        <Typography variant="overline" sx={{ color: 'text.secondary' }}>
           Upgrades · {UPGRADE_CATEGORY_LABEL[detail.upgradeCategory]}
         </Typography>
         {confidence !== undefined && (
@@ -192,7 +192,7 @@ export function UpgradeSection({ detail }: { detail: SpellDetail }): JSX.Element
           ))}
         </TableBody>
       </Table>
-      <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
         {/* The rates in force, so the table is checkable rather than magic. */}
         cast -{String(rates.cast * 100)}% · mana -{String(rates.mana * 100)}% a tier
         {rates.duration !== null && ` · duration +${String(rates.duration * 100)}%`}

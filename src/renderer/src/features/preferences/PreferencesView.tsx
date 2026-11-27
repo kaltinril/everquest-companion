@@ -500,7 +500,7 @@ function PreferencesPane({ section }: { section: string | null }): JSX.Element {
           <PrefSearch query={query} onQuery={setQuery} />
 
           {searching && matches.length === 0 && (
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               No preferences match “{query.trim()}”.
             </Typography>
           )}

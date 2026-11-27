@@ -139,7 +139,7 @@ function MaterialSearch({ onAdd }: { onAdd: (m: GapRecipeMaterial) => void }): J
 
 function MaterialRow({ m, onChange, onRemove }: { m: GapRecipeMaterial; onChange: (patch: Partial<GapRecipeMaterial>) => void; onRemove: () => void }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" data-testid="gaps-recipe-material">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} data-testid="gaps-recipe-material">
       <TextField
         variant="standard"
         size="small"
@@ -150,7 +150,7 @@ function MaterialRow({ m, onChange, onRemove }: { m: GapRecipeMaterial; onChange
         slotProps={{ htmlInput: { 'aria-label': `How many ${m.name}`, inputMode: 'numeric', style: { textAlign: 'right' } } }}
         sx={{ width: 36, flexShrink: 0 }}
       />
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         x
       </Typography>
       <MaterialIcon iconId={m.iconId} />
@@ -187,7 +187,7 @@ function CombineFields({ draft, help, onChange }: { draft: GapRecipe; help: GapR
   const trade = tradeOption(help, draft.tradeskill)
   const trades = trade === undefined || help.trades.includes(trade) ? help.trades : [trade, ...help.trades]
   return (
-    <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" alignItems="center">
+    <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', alignItems: 'center' }}>
       <TextField select size="small" label="Tradeskill" value={trade ?? ''} onChange={(e) => onChange({ ...draft, tradeskill: e.target.value })} sx={{ width: 160 }} data-testid="gaps-recipe-trade">
         {trades.map((t) => (
           <MenuItem key={t} value={t}>
@@ -230,7 +230,7 @@ function GuideOffers({ draft, guide, onAdd }: { draft: GapRecipe; guide: readonl
   if (offers.length === 0) return null
   return (
     <Tooltip title="A community guide names these. Click one to add it.">
-      <Stack direction="row" spacing={0.5} useFlexGap flexWrap="wrap" data-testid="gaps-recipe-guide">
+      <Stack direction="row" spacing={0.5} useFlexGap sx={{ flexWrap: 'wrap' }} data-testid="gaps-recipe-guide">
         {offers.map((m) => (
           <Chip key={m.name} size="small" variant="outlined" icon={<AddIcon />} label={m.qty === undefined ? m.name : `${String(m.qty)} x ${m.name}`} onClick={() => onAdd(m)} />
         ))}
@@ -249,7 +249,7 @@ export default function GapRecipePanel({ row }: { row: GapRow }): JSX.Element {
         Recipe
       </Typography>
       <CombineFields draft={draft} help={help} onChange={setDraft} />
-      <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" alignItems="center">
+      <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', alignItems: 'center' }}>
         <MaterialSearch onAdd={add} />
         <GuideOffers draft={draft} guide={help.guide} onAdd={add} />
       </Stack>

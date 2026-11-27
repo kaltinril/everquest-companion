@@ -157,8 +157,7 @@ function PickerSearchBar({ p, scope }: { p: PickerState; scope: CombatScope }): 
     <Stack
       direction="row"
       spacing={0.75}
-      alignItems="center"
-      sx={{ px: 1, py: 0.5, borderBottom: '1px solid', borderColor: 'divider', flexShrink: 0 }}
+      sx={{ alignItems: 'center', px: 1, py: 0.5, borderBottom: '1px solid', borderColor: 'divider', flexShrink: 0 }}
     >
       <SearchIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
       <InputBase

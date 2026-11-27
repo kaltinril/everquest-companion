@@ -74,7 +74,7 @@ export function useLoadoutClasses(): LoadoutClassesState {
 /** The picker and its offer chip - the Spellbook's pair, in this tab's words. */
 export default function LoadoutClasses({ state }: { state: LoadoutClassesState }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap" sx={{ mb: 1.5 }}>
+    <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap', mb: 1.5 }}>
       <ChipMultiSelect
         options={CLASS_ABBRS}
         value={state.combo.resolved}

@@ -70,7 +70,7 @@ export function CloseToTraySetting(): JSX.Element {
           </Typography>
         }
       />
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {prefs.enabled
           ? 'Closing the window keeps the companion and its overlays running. Click the tray icon to bring the window back; right-click it to quit.'
           : 'Closing the window quits the companion and closes its overlays.'}

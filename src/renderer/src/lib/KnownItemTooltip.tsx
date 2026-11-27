@@ -358,7 +358,7 @@ function KnownItemCard({
         compact
       />
       {loading && !data && (
-        <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mt: 0.5 }}>
+        <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', mt: 0.5 }}>
           <CircularProgress size={11} sx={{ color: EQ_ITEM_COLORS.label }} />
           <Typography sx={{ color: EQ_ITEM_COLORS.label, fontSize: 11 }}>Looking up…</Typography>
         </Stack>

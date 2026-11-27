@@ -250,13 +250,13 @@ export function DpsCard({ snap, onOpenCombat }: DpsCardProps): JSX.Element {
         <QuietNote>No fights yet - engage something and it’ll appear here.</QuietNote>
       ) : (
         <>
-          <Typography variant="caption" color="text.secondary" data-testid="overview-dps-label" noWrap>
+          <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="overview-dps-label" noWrap>
             {head.label}
           </Typography>
           <Typography variant="h4" sx={{ color: 'primary.main', lineHeight: 1.15 }} data-testid="overview-dps-value">
             {formatRate(body.view.dps)}
           </Typography>
-          <Typography variant="caption" color="text.secondary" sx={{ mb: 0.75 }} data-testid="overview-dps-support">
+          <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.75 }} data-testid="overview-dps-support">
             {/* total · the headline's own clock · active-time DPS: the secondary stat, never the
                 headline (law 7). */}
             {supportLine(body.view, seg.durationSec)}

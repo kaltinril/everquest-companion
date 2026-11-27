@@ -52,7 +52,7 @@ export function MeterScopeSetting(): JSX.Element {
           </ToggleButton>
         ))}
       </ToggleButtonGroup>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {SCOPE_HINT[scope]}.
         {scope === 'group'
           ? ' Until the log gives the app a group signal there is no roster to filter by, so Group shows everyone and the meters say so (“Group (no roster yet)”).'

@@ -158,7 +158,7 @@ function FactionPicker({ route, picked, dumpLoaded, onPick }: PickerProps): JSX.
         <MenuItem key={choice.key} value={choice.key} data-testid="tradeskill-faction-option" data-faction={choice.key}>
           <Box sx={{ minWidth: 0 }}>
             <Typography variant="body2">{choice.name}</Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
               {choiceFacts(choice, dumpLoaded)}
             </Typography>
           </Box>
@@ -193,7 +193,7 @@ function ReadingNotes({ notes }: { notes: readonly string[] }): JSX.Element {
       </Box>
       {open &&
         notes.map((note) => (
-          <Typography key={note} variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-faction-caveat">
+          <Typography key={note} variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-faction-caveat">
             {note}
           </Typography>
         ))}
@@ -207,9 +207,9 @@ function Head({ route, dumpLoaded, readAt, onPick }: HeadProps): JSX.Element | n
   if (picked === null) return null
   return (
     <Box>
-      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.5, mb: 0.5 }}>
+      <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 0.5, mb: 0.5 }}>
         <FactionPicker route={route} picked={picked} dumpLoaded={dumpLoaded} onPick={onPick} />
-        <Typography variant="body2" color="text.secondary" data-testid="tradeskill-faction-picked">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="tradeskill-faction-picked">
           {choiceFacts(picked, dumpLoaded)}
         </Typography>
         <Typography variant="body2" data-testid="tradeskill-faction-open">
@@ -231,7 +231,7 @@ function Head({ route, dumpLoaded, readAt, onPick }: HeadProps): JSX.Element | n
 function MoreChanges({ more, all, onToggle }: { more: number; all: boolean; onToggle: () => void }): JSX.Element | null {
   if (more === 0) return null
   return (
-    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-faction-more" data-open={all}>
+    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-faction-more" data-open={all}>
       <CellLink text={all ? FEWER_CHANGES_LABEL : moreChangesLabel(more)} onOpen={onToggle} />
     </Typography>
   )
@@ -241,7 +241,7 @@ function MoreChanges({ more, all, onToggle }: { more: number; all: boolean; onTo
 function Changes({ label, changes, id }: { label: string; changes: readonly FactionChange[]; id: string }): JSX.Element | null {
   if (changes.length === 0) return null
   return (
-    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid={`tradeskill-faction-${id}`}>
+    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid={`tradeskill-faction-${id}`}>
       {label}{' '}
       {changes.map((change, i) => (
         <Box key={change.name} component="span" sx={{ fontWeight: change.picked ? 700 : 400 }} data-testid="tradeskill-faction-change" data-up={change.up} data-picked={change.picked}>
@@ -259,7 +259,7 @@ function Changes({ label, changes, id }: { label: string; changes: readonly Fact
 /** The quest: its wiki page, who takes the turn-in, where, and from what level, as far as the page says. */
 function QuestLine({ turnIn }: { turnIn: TurnIn }): JSX.Element {
   return (
-    <Typography variant="caption" color="text.primary" sx={{ display: 'block' }} data-testid="tradeskill-faction-quest-line">
+    <Typography variant="caption" sx={{ color: 'text.primary', display: 'block' }} data-testid="tradeskill-faction-quest-line">
       Quest:{' '}
       <a href={wikiPageUrl(turnIn.page)} target="_blank" rel="noreferrer" title={QUEST_LINK_TIP} style={{ color: 'inherit' }} onClick={keepRow} data-testid="tradeskill-faction-quest">
         {turnIn.quest}
@@ -297,7 +297,7 @@ interface RowProps {
 function RowHead({ step, shopping, onShop }: Omit<RowProps, 'onOpenRecipe'>): JSX.Element {
   const { turnIn, recipe } = step
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0, flexWrap: 'wrap', rowGap: 0.25 }}>
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', minWidth: 0, flexWrap: 'wrap', rowGap: 0.25 }}>
       {/* The name opens its Loot page; the click stops here so it does not also open the recipe. */}
       <Box component="span" sx={{ minWidth: 0 }} onClick={keepRow}>
         <ItemLabel name={step.name} bold />
@@ -391,7 +391,7 @@ function RowList({ route, shop, onShop, onOpenRecipe }: RowListProps): JSX.Eleme
     <Paper variant="outlined" sx={PANE_SX} data-testid="tradeskill-faction-list">
       <Typography variant="subtitle2">Turn-ins{route.picked === null ? '' : ` that raise ${route.picked.name}`}</Typography>
       {route.empty !== '' && (
-        <Typography variant="body2" color="text.secondary" sx={{ py: 2 }} data-testid="tradeskill-faction-empty">
+        <Typography variant="body2" sx={{ color: 'text.secondary', py: 2 }} data-testid="tradeskill-faction-empty">
           {route.empty}
         </Typography>
       )}
@@ -431,7 +431,7 @@ export function FactionRoute({ tradeskill, level, facts, eraOnly, heldOnly, onOp
       <Head route={route} dumpLoaded={standings !== null} readAt={readAt} onPick={setAsked} />
       {route.picked === null && (
         // No turn-in of this tradeskill raises a faction: the goal says so, with the tradeskills that have some.
-        <Typography variant="body2" color="text.secondary" sx={{ py: 2 }} data-testid="tradeskill-faction-none">
+        <Typography variant="body2" sx={{ color: 'text.secondary', py: 2 }} data-testid="tradeskill-faction-none">
           {route.empty}
         </Typography>
       )}

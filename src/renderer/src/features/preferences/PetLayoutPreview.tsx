@@ -45,7 +45,7 @@ export function PetLayoutPreview({ layout }: { layout: PetLayout }): JSX.Element
   const panel = groupedPanel(meterPanel(SAMPLE, layout === 'nested', null), layout === 'grouped')
   return (
     <Box data-testid="pref-pet-layout-preview" sx={{ maxWidth: 380, pointerEvents: 'none' }}>
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 0.5 }}>
         Example
       </Typography>
       <MeterRows panel={panel} activeSec={60} procs={[]} setDrill={null} />

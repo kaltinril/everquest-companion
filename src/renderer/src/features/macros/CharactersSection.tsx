@@ -60,7 +60,7 @@ function listStatus(game: GameFilesState): string {
 
 function NoCharacters({ game }: { game: GameFilesState }): JSX.Element {
   return (
-    <Stack spacing={1} alignItems="flex-start">
+    <Stack spacing={1} sx={{ alignItems: 'flex-start' }}>
       <Quiet testid="macro-files-status">{listStatus(game)}</Quiet>
       {game.reply !== null && (
         <Button size="small" variant="outlined" onClick={game.reload} disabled={game.reading} data-testid="macro-files-reload">
@@ -82,7 +82,7 @@ interface PageRowProps {
 /** "Page 2" to "Page 10", each with how many of its buttons are filled. */
 function PageRow({ tabs, page, onPage, children }: PageRowProps): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
       <Tabs
         value={page}
         variant="scrollable"

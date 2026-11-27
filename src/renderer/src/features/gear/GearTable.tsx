@@ -355,7 +355,7 @@ const GearLine = memo(function GearLine({
             costs, so it is a fixed target on this surface too. The `Stack` was always what let the
             name share this cell with the era chip, and the FIXED_ROW contract above is what keeps
             all three one clipped line rather than two. */}
-        <Stack direction="row" spacing={0.5} alignItems="center" sx={{ flexWrap: 'nowrap', minWidth: 0 }}>
+        <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', flexWrap: 'nowrap', minWidth: 0 }}>
           {/* THE ITEM'S OWN ICON (fork decision, kaltinril 2026-08-15), off the PERMANENT image cache — the same
               `eqimg://` door the ItemWindow draws through (imageCache.ts: bundled art, then disk,
               then ONE polite fetch stored forever), so a windowed scroll costs no wiki traffic. A

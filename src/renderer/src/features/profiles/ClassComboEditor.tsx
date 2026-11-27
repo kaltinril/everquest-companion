@@ -66,11 +66,11 @@ function EditorBody({ interval, onClose }: { interval: ComboInterval; onClose: (
       <DialogTitle sx={{ pb: 1 }}>Set the loadout for this time range</DialogTitle>
       <DialogContent>
         <Stack spacing={1.5}>
-          <Typography variant="caption" color="text.secondary" data-testid="combo-editor-span">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="combo-editor-span">
             {spanText(interval)}
           </Typography>
           <ClassPicker picked={picked} onToggle={toggle} />
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             {picked.length === 0
               ? 'Pick 1 to 3 classes.'
               : `${picked.map(classDisplayName).join(' / ')} - ${picked.length} of ${MAX_COMBO_SLOTS} slots.`}

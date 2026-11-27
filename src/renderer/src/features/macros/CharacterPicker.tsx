@@ -48,7 +48,7 @@ function PickedPanel({ store, group, picked, onSelect }: PanelProps): JSX.Elemen
     >
       <NameLines group={group} caption={several ? group.server : loadoutsCaption(group)} />
       {several && (
-        <Stack direction="row" spacing={0.5} useFlexGap flexWrap="wrap" sx={{ pt: 0.5, pb: 0.25 }} data-testid="macro-loadouts">
+        <Stack direction="row" spacing={0.5} useFlexGap sx={{ flexWrap: 'wrap', pt: 0.5, pb: 0.25 }} data-testid="macro-loadouts">
           {group.loadouts.map((f) => {
             const on = f === picked
             return (
@@ -97,13 +97,13 @@ function macrosText(count: number): string {
 function LoadoutLine({ store, file }: { store: MacroStore; file: CharacterFileMacros }): JSX.Element {
   const set = chosenSet(store.library, characterFileKey(file))
   return (
-    <Stack direction="row" spacing={2} alignItems="center" useFlexGap flexWrap="wrap" data-testid="macro-loadout-detail">
-      <Typography variant="body2" color="text.secondary">
+    <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap data-testid="macro-loadout-detail">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
         Loadout {file.loadout}: {macrosText(file.macros.length)} in the game, file changed {formatDateTime(file.mtimeMs)}
       </Typography>
       {set !== null && (
         <Tooltip title="Page 1 is the game's own, so 108 buttons are yours.">
-          <Typography variant="body2" color="text.secondary" tabIndex={0} data-testid="macro-buttons-used">
+          <Typography variant="body2" sx={{ color: 'text.secondary' }} tabIndex={0} data-testid="macro-buttons-used">
             {usedText(usedButtons(store.library, set))}
           </Typography>
         </Tooltip>
@@ -128,7 +128,7 @@ export function CharacterPicker({ store, files, picked, onSelect }: PickerProps)
   const groups = groupCharacters(files)
   return (
     <Stack spacing={1} sx={{ flexShrink: 0 }}>
-      <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" alignItems="flex-start" data-testid="macro-files">
+      <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', alignItems: 'flex-start' }} data-testid="macro-files">
         {groups.map((group) =>
           group.loadouts.includes(picked) ? (
             <PickedPanel key={group.key} store={store} group={group} picked={picked} onSelect={onSelect} />

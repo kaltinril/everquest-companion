@@ -124,7 +124,7 @@ function TradeskillToggle({
         <Switch size="small" checked={showTradeskill} onChange={(e) => onToggleTradeskill(e.target.checked)} />
       }
       label={
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           show tradeskill{hiddenTradeskill > 0 ? ` (${hiddenTradeskill})` : ''}
         </Typography>
       }
@@ -159,9 +159,9 @@ export function NotablePickupsStrip({
         bgcolor: 'action.hover'
       }}
     >
-      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
         <AutoStoriesIcon fontSize="small" sx={{ color: 'secondary.main' }} />
-        <Typography variant="caption" color="text.secondary" sx={{ mr: 0.5 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', mr: 0.5 }}>
           Notable pickups
         </Typography>
         {notable.slice(0, 8).map((n) => (

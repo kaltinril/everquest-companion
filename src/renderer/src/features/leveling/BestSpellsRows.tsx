@@ -163,17 +163,15 @@ export const SpellRow = memo(function SpellRow({
           <Stack
             direction="row"
             spacing={0.5}
-            alignItems="baseline"
-            flexWrap="wrap"
             useFlexGap
-            sx={{ minWidth: 0 }}
+            sx={{ alignItems: 'baseline', flexWrap: 'wrap', minWidth: 0 }}
           >
             <SpellTooltip name={row.name}>
               <Typography variant="caption" sx={{ fontSize: 11, fontWeight: 600 }} noWrap>
                 {row.name}
               </Typography>
             </SpellTooltip>
-            <Typography variant="caption" color="text.disabled" sx={{ fontSize: 9.5 }} noWrap>
+            <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: 9.5 }} noWrap>
               L{row.gainedAt}
             </Typography>
             <RankChip name={row.name} ranks={ranks} />

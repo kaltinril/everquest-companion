@@ -74,12 +74,12 @@ function useWrapSize(ref: React.RefObject<HTMLDivElement | null>): WrapSize {
 function TimelineToolbar({ tl, vp }: { tl: TimelineView; vp: TimelineViewport }): React.JSX.Element {
   const { view, span, zoomedIn } = vp
   return (
-    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+    <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
       <Typography variant="subtitle1" noWrap>
         {tl.name} · timeline
       </Typography>
-      <Stack direction="row" alignItems="center" spacing={0.5}>
-        <Typography variant="caption" color="text.secondary" sx={{ mr: 0.5 }}>
+      <Stack direction="row" sx={{ alignItems: 'center' }} spacing={0.5}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', mr: 0.5 }}>
           {zoomedIn ? `${fmtDur(view.start)}-${fmtDur(view.end)} of ` : ''}
           {fmtDur(tl.durationMs)} · {tl.lanes.length} lanes ·{' '}
           {/* The count after "of" is the fight's TRUE instant count (totalCount), so a ring
@@ -234,7 +234,7 @@ function CombatTimelineInner({ tl }: { tl: TimelineView }): React.JSX.Element {
           />
         </Box>
       </Box>
-      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', mt: 0.5 }}>
         Scroll to zoom around the cursor · Shift+scroll or drag to pan · hollow red = miss/resist
       </Typography>
     </Paper>

@@ -144,7 +144,7 @@ export function TextSizeSetting(): JSX.Element {
         testid="pref-text-size"
       />
 
-      <Typography variant="caption" color="text.secondary" data-testid="pref-text-size-note">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="pref-text-size-note">
         This sizes the app window only, meters and numbers included, and it stays this way next time
         you open the app. The floating overlays are below.
       </Typography>

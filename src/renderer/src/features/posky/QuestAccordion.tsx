@@ -76,11 +76,11 @@ function ProgressBar({ q }: { q: QuestProgress }): JSX.Element {
   const color = pct === 0 ? 'inherit' : pct >= 100 ? 'success' : 'primary'
   return (
     <Box sx={{ minWidth: 160 }}>
-      <Stack direction="row" justifyContent="space-between">
-        <Typography variant="caption" color="text.secondary">
+      <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {q.haveCount}/{q.needCount} items
         </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {pct}%
         </Typography>
       </Stack>
@@ -143,15 +143,15 @@ function SharedItemsSection({
 }): JSX.Element {
   return (
     <Box sx={{ mb: 1 }}>
-      <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mb: 0.5 }}>
+      <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', mb: 0.5 }}>
         <LinkIcon sx={{ fontSize: 15, color: 'text.secondary' }} />
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Shared items - other Sky quests contending for these drops
         </Typography>
       </Stack>
       <Stack spacing={0.5}>
         {shared.map((si) => (
-          <Stack key={si.key} direction="row" spacing={0.75} alignItems="center" flexWrap="wrap" useFlexGap>
+          <Stack key={si.key} direction="row" spacing={0.75} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
             <SkyItemCard name={si.name}>
               <Typography variant="caption" sx={{ fontWeight: 600, minWidth: 150 }}>
                 {si.name}
@@ -192,11 +192,11 @@ function QuestSummaryRow({
   onOpenLoot?: (item: string) => void
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={2} alignItems="center">
+    <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
       {/* Star + ignore lead every row, always visible — the quest-level
           controls the user could not find when the only star lived on an
           item row inside the expanded panel. */}
-      <Stack direction="row" alignItems="center" sx={{ minWidth: 48 }}>
+      <Stack direction="row" sx={{ alignItems: 'center', minWidth: 48 }}>
         <QuestStarButton favorited={favorited} onToggle={onToggleFavorite} />
         <QuestIgnoreButton ignored={false} onToggle={onToggleIgnore} />
       </Stack>
@@ -204,7 +204,7 @@ function QuestSummaryRow({
       <Box sx={{ minWidth: 220 }}>
         <Typography variant="subtitle2">{q.name}</Typography>
         {q.reward && (
-          <Typography variant="caption" color="primary.main">
+          <Typography variant="caption" sx={{ color: 'primary.main' }}>
             {/* The reward hover, back as a card (JOS-181). No `row`: a reward is not one of the
                 quest's required items, so this tab knows no dropper for it — the card is the item
                 window plus whatever the item DB says it is for, which is the whole question here.
@@ -213,7 +213,7 @@ function QuestSummaryRow({
           </Typography>
         )}
         {q.giver && (
-          <Typography variant="caption" color="text.secondary" display="block">
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
             Turn in → {q.giver}
           </Typography>
         )}
@@ -261,7 +261,7 @@ function QuestItemChips({
 }): JSX.Element {
   return (
     // Indent tracks the header's leading columns (buttons + class chip).
-    <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap sx={{ pl: '164px' }}>
+    <Stack direction="row" spacing={0.5} useFlexGap sx={{ flexWrap: 'wrap', pl: '164px' }}>
       {[...q.items]
         .sort((a, b) => Number(isFavorite(b.name)) - Number(isFavorite(a.name)))
         .map((it) => {
@@ -320,7 +320,7 @@ function QuestDetailsToolbar({
   onUndoTurnIn?: () => void
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={2} sx={{ mb: 1 }} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flexWrap: 'wrap', mb: 1 }} useFlexGap>
       {q.rune && <Chip size="small" label={`Rune: ${q.rune}`} />}
       {q.giver && <Chip size="small" label={`Giver: ${q.giver}`} />}
       {wikiHref && (
@@ -463,7 +463,7 @@ function QuestAccordionRow({
           onUndoTurnIn={onUndoTurnIn && (() => onUndoTurnIn(q.key))}
         />
         {q.rewardStats && (
-          <Typography variant="caption" color="text.secondary" component="pre" sx={{ whiteSpace: 'pre-wrap', mb: 1 }}>
+          <Typography variant="caption" component="pre" sx={{ color: 'text.secondary', whiteSpace: 'pre-wrap', mb: 1 }}>
             {q.rewardStats}
           </Typography>
         )}

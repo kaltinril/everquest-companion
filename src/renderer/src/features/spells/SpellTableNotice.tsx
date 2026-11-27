@@ -64,7 +64,7 @@ function MissingNotice({ notice }: { notice: Extract<Notice, { kind: 'missing' |
 function NoticeLine({ notice }: { notice: Notice }): JSX.Element {
   if (notice.kind !== 'fallback') return <MissingNotice notice={notice} />
   return (
-    <Typography variant="caption" color="text.secondary" component="div" data-testid="spell-table-fallback" sx={{ mb: 0.5 }}>
+    <Typography variant="caption" component="div" data-testid="spell-table-fallback" sx={{ color: 'text.secondary', mb: 0.5 }}>
       Spell data is read from {notice.file} (no spells_us.txt in your EverQuest folder).
     </Typography>
   )

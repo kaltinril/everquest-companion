@@ -15,20 +15,20 @@ import type { SetPick } from './AaRowDetail'
 
 function Sum({ terms, total, totalLabel }: { terms: readonly AaCapTerm[]; total: number; totalLabel: string }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1.25} alignItems="flex-end" flexWrap="wrap" useFlexGap data-testid="aa-cap-sum">
+    <Stack direction="row" spacing={1.25} sx={{ alignItems: 'flex-end', flexWrap: 'wrap' }} useFlexGap data-testid="aa-cap-sum">
       {terms.map((t, i) => (
         <Fragment key={t.label}>
-          {i > 0 && <Typography color="text.disabled">+</Typography>}
+          {i > 0 && <Typography sx={{ color: 'text.disabled' }}>+</Typography>}
           <Box>
             <Typography variant="h6" sx={{ lineHeight: 1.1 }}>{t.n}</Typography>
-            <Typography variant="caption" color="text.secondary">{t.label}</Typography>
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t.label}</Typography>
           </Box>
         </Fragment>
       ))}
-      <Typography color="text.disabled">=</Typography>
+      <Typography sx={{ color: 'text.disabled' }}>=</Typography>
       <Box>
-        <Typography variant="h6" sx={{ lineHeight: 1.1 }} color="warning.main">{total}</Typography>
-        <Typography variant="caption" color="text.secondary">{totalLabel}</Typography>
+        <Typography variant="h6" sx={{ color: 'warning.main', lineHeight: 1.1 }}>{total}</Typography>
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>{totalLabel}</Typography>
       </Box>
     </Stack>
   )
@@ -53,13 +53,13 @@ function CapBlock({ board, ranked, reincarnations, classes, races }: CapProps): 
   const unlocks = next.unlocks.length === 0 ? '' : `; ${next.unlocks.join(', ')} unlock`
   return (
     <Paper variant="outlined" sx={{ p: 1.5, mb: 1.5 }} data-testid="aa-cap">
-      <Typography variant="overline" color="text.secondary">Your stat cap</Typography>
+      <Typography variant="overline" sx={{ color: 'text.secondary' }}>Your stat cap</Typography>
       <Sum terms={cap.terms} total={cap.total} totalLabel={cap.soft ? 'soft cap' : 'hard cap'} />
-      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75 }}>
+      <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.75 }}>
         {cap.soft ? `Past ${String(cap.total)} a point counts a fifth. ` : 'No reincarnation in your log, so the cap is hard. '}
-        <Link component="button" variant="body2" color="success.main" onClick={() => nav.go('bis')}>Best in slot uses this cap</Link>
+        <Link component="button" variant="body2" sx={{ color: 'success.main' }} onClick={() => nav.go('bis')}>Best in slot uses this cap</Link>
       </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }} data-testid="aa-next-rebirth">
+      <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }} data-testid="aa-next-rebirth">
         {`Next reincarnation: +${String(next.raise)} ${kunark ? 'from Dec 8' : 'before Dec 8'}`}
         {next.raceAdd > 0 ? ` and +${String(next.raceAdd)} as ${race}` : ''}
         {` → ${String(next.total)}${unlocks}. `}
@@ -71,12 +71,12 @@ function CapBlock({ board, ranked, reincarnations, classes, races }: CapProps): 
             <Chip size="small" label="Before Dec 8 · +10" color={kunark ? 'default' : 'warning'} onClick={() => setKunark(false)} />
             <Chip size="small" label="From Dec 8 (Kunark) · +11" color={kunark ? 'warning' : 'default'} onClick={() => setKunark(true)} />
           </Stack>
-          <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+          <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'wrap' }} useFlexGap>
             {races.map((r) => (
               <Chip key={r.race} size="small" variant={r.race === race ? 'filled' : 'outlined'} color={r.race === race ? 'warning' : 'default'} label={r.rank > 0 ? `${r.race} ${String(r.rank)}/3` : r.race} onClick={() => setRace(r.race)} />
             ))}
           </Stack>
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             {next.raceGives === null ? `${race} is at rank 3.` : `${race} ${String(next.raceRank)} → ${String(next.raceRank + 1)}: ${next.raceGives}`}
           </Typography>
         </Stack>
@@ -106,12 +106,12 @@ export function AaSpecial(p: AaSpecialProps): JSX.Element {
       {!searching && <CapBlock board={p.board} ranked={p.ranked} reincarnations={p.reincarnations} classes={p.classes} races={layout.races} />}
       <AaList groups={layout.started.length === 0 ? [] : [{ title: 'Started', kind: 'mine', rows: layout.started }]} classes={p.classes} setPick={p.setPick} empty={searching ? 'Nothing started matches.' : 'No Special line started yet.'} />
       {comp !== null && !searching && (
-        <Typography variant="body2" color="text.secondary" sx={{ px: 1, py: 1 }} data-testid="aa-completionist">
+        <Typography variant="body2" sx={{ color: 'text.secondary', px: 1, py: 1 }} data-testid="aa-completionist">
           {`Completionist ${String(comp.r.rank)}/${String(comp.max)}: every class line at rank 3 (${String(layout.classDone)} of ${String(layout.classTotal)} now${layout.classDoneNext > layout.classDone ? `, ${String(layout.classDoneNext)} after your next reincarnation` : ''}).`}
         </Typography>
       )}
       {notStarted > 0 && (
-        <Link component="button" variant="body2" color="text.secondary" onClick={() => setRest(!rest)} sx={{ px: 1 }} aria-expanded={open} data-testid="aa-not-started">
+        <Link component="button" variant="body2" onClick={() => setRest(!rest)} sx={{ color: 'text.secondary', px: 1 }} aria-expanded={open} data-testid="aa-not-started">
           {`${open ? '▾' : '▸'} ${String(layout.classLines.length)} class lines and ${String(layout.raceLines.length)} race lines not started`}
         </Link>
       )}

@@ -45,13 +45,13 @@ function CellBody({ cell }: { cell: GridButton }): JSX.Element {
     const line = firstLine(macro)
     return (
       <>
-        <Stack direction="row" spacing={0.5} alignItems="center" sx={{ minWidth: 0 }}>
+        <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', minWidth: 0 }}>
           <ColorMark color={macro.color} />
           <Typography variant="body2" noWrap sx={{ fontWeight: 600 }}>
             {macro.name === '' ? 'Unnamed' : macro.name}
           </Typography>
         </Stack>
-        <Typography variant="caption" color="text.secondary" noWrap component="div" sx={MONO_SX}>
+        <Typography variant="caption" noWrap component="div" sx={{ color: 'text.secondary', ...MONO_SX }}>
           {line === '' ? 'no commands yet' : line}
         </Typography>
       </>
@@ -59,13 +59,13 @@ function CellBody({ cell }: { cell: GridButton }): JSX.Element {
   }
   if (cell.mark === 'removed' && game !== null) {
     return (
-      <Typography variant="body2" color="text.disabled" noWrap sx={{ textDecoration: 'line-through' }}>
+      <Typography variant="body2" noWrap sx={{ color: 'text.disabled', textDecoration: 'line-through' }}>
         {game.name}
       </Typography>
     )
   }
   return (
-    <Typography variant="body2" color="text.secondary">
+    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
       Empty
     </Typography>
   )
@@ -98,11 +98,11 @@ function HotbarMark(): JSX.Element {
 function CellTop({ cell, check, onBar }: { cell: GridButton; check: boolean | null; onBar: boolean }): JSX.Element {
   const { mark } = cell
   return (
-    <Stack direction="row" spacing={0.5} alignItems="center" justifyContent="space-between" sx={{ minHeight: 24 }}>
-      <Typography variant="caption" color="text.secondary">
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', justifyContent: 'space-between', minHeight: 24 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {cell.button}
       </Typography>
-      <Stack direction="row" spacing={0.5} alignItems="center">
+      <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
         {onBar && <HotbarMark />}
         {mark !== null && <Chip size="small" variant="outlined" color={MARK_COLOR[mark]} label={mark} data-testid="macro-slot-mark" sx={{ height: 20 }} />}
         {check !== null && cell.macro !== null && <CellCheck check={check} />}
@@ -162,7 +162,7 @@ function Cell({ cell, picked, lifted, target, clash, check, onBar, onPick, drag 
       <CellTop cell={cell} check={check} onBar={onBar} />
       <CellBody cell={cell} />
       {clash && (
-        <Typography variant="caption" color="warning.main" noWrap component="div" data-testid="macro-slot-clash">
+        <Typography variant="caption" sx={{ color: 'warning.main' }} noWrap component="div" data-testid="macro-slot-clash">
           Changed in game too
         </Typography>
       )}

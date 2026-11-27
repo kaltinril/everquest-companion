@@ -27,7 +27,7 @@ export function HideDetailButton({ onHide }: { onHide: () => void }): JSX.Elemen
 export function HiddenDetail({ name, onShow }: { name: string; onShow: () => void }): JSX.Element {
   return (
     <Paper variant="outlined" sx={{ px: 2, py: 0.75 }} data-testid="bazaar-detail-hidden">
-      <Stack direction="row" spacing={1.5} alignItems="center">
+      <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
         <Typography variant="body2" sx={{ fontWeight: 600 }}>
           {name}
         </Typography>

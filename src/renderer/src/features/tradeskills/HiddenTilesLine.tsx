@@ -19,8 +19,8 @@ interface HiddenTilesLineProps {
 export function HiddenTilesLine({ tiles, onShow, onShowAll }: HiddenTilesLineProps): JSX.Element | null {
   if (tiles.length === 0) return null
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap" useFlexGap sx={{ mt: 1.5 }} data-testid="tradeskills-hidden-line">
-      <Typography variant="caption" color="text.secondary">
+    <Stack direction="row" spacing={0.75} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap', mt: 1.5 }} data-testid="tradeskills-hidden-line">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {HIDDEN_LINE_LABEL}
       </Typography>
       {tiles.map((tile) => (

@@ -65,7 +65,7 @@ export function KnowledgeBadge({ name, isPosky }: { name: string; isPosky: boole
   const flags = badgeFlags(m, isPosky)
   if (!m.lore && !flags.showQuest && !flags.showTradeskill) return null
   return (
-    <Stack direction="row" spacing={0.5} alignItems="center" component="span">
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }} component="span">
       {m.lore && <Chip size="small" color="warning" variant="outlined" label="LORE" sx={{ height: 18, fontSize: 10 }} />}
       {flags.showQuest && (
         <Chip size="small" color="secondary" variant="outlined" label="quest" sx={{ height: 18, fontSize: 10 }} />

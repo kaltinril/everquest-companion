@@ -76,7 +76,7 @@ function Breadcrumb({
       >
         Loot
       </Link>
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', minWidth: 0 }}>
         <Typography data-testid="loot-detail-title" noWrap sx={{ color: EQ_ITEM_COLORS.name, minWidth: 0 }}>
           {item}
         </Typography>
@@ -93,7 +93,7 @@ export function ItemDetailPane(props: ItemDetailPaneProps): JSX.Element {
   const backLabel = origin ? `Back to ${origin}` : 'Back to the loot list'
   return (
     <Stack spacing={1.5} data-testid="loot-detail" sx={{ height: '100%', minHeight: 0 }}>
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0, flexShrink: 0 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', minWidth: 0, flexShrink: 0 }}>
         <IconButton size="small" data-testid="loot-back" aria-label={backLabel} onClick={onBack}>
           <ArrowBackIcon fontSize="small" />
         </IconButton>

@@ -60,8 +60,8 @@ function RankPicker({ b, setPick }: { b: AaBoardRow; setPick: SetPick }): JSX.El
   if (b.r.row.removed !== undefined) return null
   const settled = settledBy(b)
   return (
-    <Stack direction="row" spacing={1} alignItems="center">
-      <Typography variant="caption" color="text.secondary">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Your rank
       </Typography>
       <Select
@@ -82,7 +82,7 @@ function RankPicker({ b, setPick }: { b: AaBoardRow; setPick: SetPick }): JSX.El
         ))}
       </Select>
       {settled !== null && (
-        <Typography variant="caption" color="text.disabled" data-testid="aa-rank-settled">
+        <Typography variant="caption" sx={{ color: 'text.disabled' }} data-testid="aa-rank-settled">
           {settled}
         </Typography>
       )}
@@ -132,21 +132,21 @@ export function AaRowDetail({ b, classes, setPick }: { b: AaBoardRow; classes: r
     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr auto' }, gap: 2, px: 1.5, py: 1.25, bgcolor: 'action.hover' }} data-testid="aa-row-detail">
       <Stack spacing={0.75} sx={{ minWidth: 0 }}>
         <Typography variant="body2">{body === '' ? b.effect.label : body}</Typography>
-        {b.r.row.hk !== undefined && <Typography variant="caption" color="text.secondary">{`Rank 3 hotkey: ${b.r.row.hk}`}</Typography>}
-        {act !== null && <Typography variant="caption" color="text.secondary">{`Activated: refresh ${act.refresh}, ability timer ${String(act.timer)}.`}</Typography>}
-        {req !== null && <Typography variant="caption" color="text.secondary">{`Requires ${req}.`}</Typography>}
-        {by !== null && <Typography variant="caption" color="text.secondary">{by}</Typography>}
-        {b.r.wikiName !== null && <Typography variant="caption" color="text.secondary">{`The wiki calls this ${b.r.wikiName}.`}</Typography>}
+        {b.r.row.hk !== undefined && <Typography variant="caption" sx={{ color: 'text.secondary' }}>{`Rank 3 hotkey: ${b.r.row.hk}`}</Typography>}
+        {act !== null && <Typography variant="caption" sx={{ color: 'text.secondary' }}>{`Activated: refresh ${act.refresh}, ability timer ${String(act.timer)}.`}</Typography>}
+        {req !== null && <Typography variant="caption" sx={{ color: 'text.secondary' }}>{`Requires ${req}.`}</Typography>}
+        {by !== null && <Typography variant="caption" sx={{ color: 'text.secondary' }}>{by}</Typography>}
+        {b.r.wikiName !== null && <Typography variant="caption" sx={{ color: 'text.secondary' }}>{`The wiki calls this ${b.r.wikiName}.`}</Typography>}
         {marks.map((m) => (
-          <Typography key={m} variant="caption" color="info.main">
+          <Typography key={m} variant="caption" sx={{ color: 'info.main' }}>
             {m}
           </Typography>
         ))}
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {sourceLine(b, classes)}
         </Typography>
         <RankPicker b={b} setPick={setPick} />
-        <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
+        <Stack direction="row" spacing={0.75} sx={{ flexWrap: 'wrap' }} useFlexGap>
           {aaLinks(b.r.row, b.r.key).map((l) => (
             <Chip key={l.label} size="small" variant="outlined" color="success" label={l.label} onClick={() => followAaLink(nav, l.to)} data-testid="aa-link" />
           ))}

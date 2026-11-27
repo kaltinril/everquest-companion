@@ -117,7 +117,6 @@ const MobResultRow = memo(function MobResultRow({
     <Stack
       direction="row"
       spacing={1}
-      alignItems="center"
       role="button"
       tabIndex={0}
       data-testid="mobs-result-row"
@@ -126,6 +125,7 @@ const MobResultRow = memo(function MobResultRow({
         if (e.key === 'Enter' || e.key === ' ') onOpen({ mob: entry.name, entry })
       }}
       sx={{
+        alignItems: 'center',
         height: RESULT_ROW_HEIGHT,
         boxSizing: 'border-box',
         py: 0,
@@ -140,11 +140,11 @@ const MobResultRow = memo(function MobResultRow({
         {entry.name}
       </Typography>
       {entry.level && (
-        <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', flexShrink: 0 }}>
           Lvl {entry.level}
         </Typography>
       )}
-      <Typography variant="caption" color="text.secondary" noWrap sx={{ minWidth: 0 }}>
+      <Typography variant="caption" noWrap sx={{ color: 'text.secondary', minWidth: 0 }}>
         {(entry.zones ?? []).map((z, i) => {
           const stem = onOpenMapZone === undefined ? null : dropZoneTarget(z)
           return (
@@ -230,7 +230,7 @@ function ZoneRoster({
       <Typography variant="subtitle2" sx={{ color: 'primary.main', flexShrink: 0 }}>
         In {zone}{' '}
         {rows.length > 0 && (
-          <Typography component="span" variant="caption" color="text.secondary">
+          <Typography component="span" variant="caption" sx={{ color: 'text.secondary' }}>
             - {rows.length} in the catalog
           </Typography>
         )}
@@ -249,8 +249,7 @@ function ZoneRoster({
         <Typography
           data-testid="mobs-zone-empty"
           variant="body2"
-          color="text.disabled"
-          sx={{ p: 1 }}
+          sx={{ color: 'text.disabled', p: 1 }}
         >
           The catalog lists no mobs for {zone}.
         </Typography>
@@ -284,7 +283,7 @@ function NoZoneYet({ hasConsidered }: { hasConsidered: boolean }): JSX.Element {
           ? 'Zone into somewhere and this becomes an overview of what lives there. Until then, search the catalog by name or zone.'
           : `Your zone, cons and kills show up here as you play - a roster of whatever you're standing in. Meanwhile, search ${MOB_CATALOG.length.toLocaleString()} creatures by name or zone: levels, zones and full drop tables, all offline.`}
       </Typography>
-      <Typography variant="caption" color="text.disabled">
+      <Typography variant="caption" sx={{ color: 'text.disabled' }}>
         Anything you <code>/con</code> in game shows up here too.
       </Typography>
     </Box>
@@ -469,7 +468,7 @@ export default function MobsView({
         <Paper variant="outlined" sx={{ p: 1, flexGrow: 1, minHeight: 0, overflow: 'auto' }}>
           {hits.length > 0 ? (
             <>
-              <Typography variant="caption" color="text.secondary" sx={{ px: 0.75 }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', px: 0.75 }}>
                 {hits.length} of {MOB_CATALOG.length} mobs
               </Typography>
               {hits.map((h) => (
@@ -478,7 +477,7 @@ export default function MobsView({
               ))}
             </>
           ) : (
-            <Typography variant="body2" color="text.disabled" sx={{ p: 1 }}>
+            <Typography variant="body2" sx={{ color: 'text.disabled', p: 1 }}>
               No mob in the catalog matches “{deferred.trim()}”.
             </Typography>
           )}

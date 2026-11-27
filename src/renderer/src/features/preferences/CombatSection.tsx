@@ -86,7 +86,7 @@ function PetLayoutSetting(): JSX.Element {
           </ToggleButton>
         ))}
       </ToggleButtonGroup>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {LAYOUT_HINT[layout]}
       </Typography>
       <PetLayoutPreview layout={layout} />
@@ -116,7 +116,7 @@ function SelfNameSetting(): JSX.Element {
         }
         label={<Typography variant="body2">Show my character name instead of “You”</Typography>}
       />
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {on
           ? 'Your row on the damage meters reads “your character’s name (You)”. Timeline, healing and alerts still say “You”.'
           : 'Your row on the damage meters reads “You”.'}

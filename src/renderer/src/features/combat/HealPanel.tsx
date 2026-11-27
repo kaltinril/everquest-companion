@@ -186,7 +186,7 @@ function EnemyHealedLine({ enemy }: { enemy: { total: number; healers: HealSourc
 /** The drill breadcrumb — one level deep, because the heal model has exactly two (see healRows). */
 function HealCrumb({ name, setDrill }: { name: string; setDrill: (d: Drill | null) => void }): JSX.Element {
   return (
-    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.75, flexShrink: 0 }}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 0.75, flexShrink: 0 }}>
       <Button
         size="small"
         data-testid="heal-drill-back"
@@ -200,7 +200,7 @@ function HealCrumb({ name, setDrill }: { name: string; setDrill: (d: Drill | nul
         <Link component="button" underline="hover" color="inherit" onClick={() => setDrill(null)} sx={{ fontSize: 12 }}>
           All
         </Link>
-        <Typography variant="caption" color="text.primary">
+        <Typography variant="caption" sx={{ color: 'text.primary' }}>
           {name}
         </Typography>
       </Breadcrumbs>

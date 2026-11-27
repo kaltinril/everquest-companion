@@ -44,7 +44,7 @@ function VolumeControls({
 }): JSX.Element {
   return (
     <>
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 240 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', minWidth: 240 }}>
         {prefs.muted ? <VolumeOffIcon color="disabled" /> : <VolumeUpIcon color="primary" />}
         <Typography variant="body2" sx={{ width: 90 }}>
           Global volume
@@ -59,7 +59,7 @@ function VolumeControls({
           onChangeCommitted={(_e, v) => onPrefsCommit({ ...prefs, globalVolume: v })}
           sx={{ width: 140 }}
         />
-        <Typography variant="caption" color="text.secondary" sx={{ width: 34 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', width: 34 }}>
           {Math.round(prefs.globalVolume * 100)}%
         </Typography>
       </Stack>
@@ -150,7 +150,7 @@ export default function AlertsToolbar({
 }): JSX.Element {
   return (
     <Paper variant="outlined" sx={{ p: 1.5 }}>
-      <Stack direction="row" spacing={3} alignItems="center" flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={3} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
         <VolumeControls
           prefs={prefs}
           onPrefsDrag={onPrefsDrag}

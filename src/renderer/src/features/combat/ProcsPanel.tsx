@@ -37,7 +37,7 @@ function ProcRow({ row }: { row: ProcListRow }): React.JSX.Element {
       <Typography variant="caption" noWrap sx={{ flexGrow: 1, minWidth: 0 }}>
         {row.ambiguous ? `~ ${row.name}` : row.name}
       </Typography>
-      <Typography variant="caption" color="text.secondary" noWrap sx={{ width: 62, textAlign: 'right', flexShrink: 0 }}>
+      <Typography variant="caption" noWrap sx={{ color: 'text.secondary', width: 62, textAlign: 'right', flexShrink: 0 }}>
         {row.ppm}
       </Typography>
       <Typography variant="caption" noWrap sx={{ width: 48, textAlign: 'right', flexShrink: 0 }}>
@@ -61,8 +61,8 @@ export function ProcsCard({ seg }: { seg: SegmentView }): React.JSX.Element {
       title="Procs"
       right={
         rows.length === 0 ? undefined : (
-          <Stack direction="row" spacing={0.75} alignItems="baseline" sx={{ minWidth: 0 }}>
-            <Typography variant="caption" color="text.secondary" noWrap>
+          <Stack direction="row" spacing={0.75} sx={{ alignItems: 'baseline', minWidth: 0 }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>
               {summary.header}
             </Typography>
             <CopyButton getText={() => formatProcsText(seg)} title="Copy this proc list as text" />

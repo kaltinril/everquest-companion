@@ -123,8 +123,8 @@ export function LootSourceToggle({
   setSource: (v: LootSource) => void
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center">
-      <Typography variant="caption" color="text.secondary">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Data source (dev)
       </Typography>
       <ToggleButtonGroup
@@ -179,7 +179,7 @@ export function LootToolbar({
   onReload
 }: LootToolbarProps): JSX.Element {
   return (
-    <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
       {/* IT SEARCHES WHAT YOU OWN, NOT ONLY WHAT YOU LOOTED (JOS-160) — the label says "looted"
           because that is what the ledger under it is, but a query also reaches the items only your
           `/outputfile inventory` export knows about (useLootRows / ownedItems.ts). */}
@@ -264,7 +264,7 @@ function LootRateLine({ rates }: { rates: WindowLootRates | null }): JSX.Element
   return (
     // Native `title`, no popper — the JOS-127 rule this file's header states: nothing interactive
     // may mount over the toolbar sitting directly above this line.
-    <Typography variant="body2" color="text.secondary" data-testid="loot-rates" title={LOOT_RATE_TITLE}>
+    <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="loot-rates" title={LOOT_RATE_TITLE}>
       {text}
     </Typography>
   )
@@ -300,7 +300,7 @@ export function LootSummary({
     // page, and letting them be two children of the view's `spacing={2}` column would put a 16px
     // gutter between a sentence and its own footnote.
     <Box>
-      <Typography variant="body2" color="text.secondary" data-testid="loot-summary">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="loot-summary">
         {eventCount.toLocaleString()} loot events
         {slice.id === 'all' ? '' : ` in ${slice.caption} of ${totalCount.toLocaleString()} all time`} ·{' '}
         {uniqueCount.toLocaleString()} unique items · click a row for mob/zone/drop-rate breakdown ·{' '}

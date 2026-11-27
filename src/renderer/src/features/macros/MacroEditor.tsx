@@ -65,9 +65,9 @@ export function LibraryActions({ store, macro, onSelect, onPlace }: LibraryActio
     })
   }
   return (
-    <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between" useFlexGap flexWrap="wrap">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }} useFlexGap>
       <Typography variant="subtitle1">Edit macro</Typography>
-      <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+      <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
         <Button
           size="small"
           variant="outlined"
@@ -123,7 +123,7 @@ function NameAndColor({ macro, patch, warnings, focusName }: { macro: Macro; pat
           input: {
             endAdornment: (
               <InputAdornment position="end">
-                <Typography variant="caption" color="text.secondary" data-testid="macro-name-count">
+                <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="macro-name-count">
                   {macro.name.length}/{NAME_MAX}
                 </Typography>
               </InputAdornment>
@@ -164,8 +164,8 @@ function LineField({ index, value, onChange, known, onCursor }: LineFieldProps):
   const n = String(index + 1)
   const htmlInput = { 'aria-label': `Line ${n}`, spellCheck: false, style: MONO_SX, 'data-testid': `macro-line-${n}` }
   return (
-    <Stack direction="row" spacing={1} alignItems="flex-start">
-      <Typography variant="body2" color="text.secondary" sx={{ width: 14, pt: 1, textAlign: 'right' }}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'flex-start' }}>
+      <Typography variant="body2" sx={{ color: 'text.secondary', width: 14, pt: 1, textAlign: 'right' }}>
         {n}
       </Typography>
       <Box sx={{ flexGrow: 1, minWidth: 0 }}>
@@ -186,7 +186,7 @@ function LineField({ index, value, onChange, known, onCursor }: LineFieldProps):
             input: {
               endAdornment: (
                 <InputAdornment position="end">
-                  <Typography variant="caption" color="text.secondary" data-testid={`macro-line-count-${n}`}>
+                  <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid={`macro-line-count-${n}`}>
                     {value.length}/{LINE_MAX}
                   </Typography>
                 </InputAdornment>
@@ -226,11 +226,11 @@ function CommandLines({ macro, patch, warnings }: { macro: Macro; patch: Patch; 
   }
   return (
     <Stack spacing={0.75}>
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
         Commands, one per line, run top to bottom
       </Typography>
       {tooMany !== undefined && (
-        <Typography variant="caption" color="warning.main" data-testid="macro-lines-warning">
+        <Typography variant="caption" sx={{ color: 'warning.main' }} data-testid="macro-lines-warning">
           {tooMany}
         </Typography>
       )}
@@ -267,10 +267,10 @@ function TagPicker({ store, macro }: { store: MacroStore; macro: Macro }): JSX.E
   }
   return (
     <Stack spacing={0.75}>
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
         Tags (only this app sees them)
       </Typography>
-      <Stack direction="row" spacing={0.5} useFlexGap flexWrap="wrap">
+      <Stack direction="row" spacing={0.5} useFlexGap sx={{ flexWrap: 'wrap' }}>
         {tagList(store.library).map(({ tag }) => {
           const on = macro.tags.includes(tag)
           return (

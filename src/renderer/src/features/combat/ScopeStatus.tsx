@@ -68,7 +68,7 @@ import {
 /** One member row: name, provenance, and the remove that hides it. */
 function MemberRow({ m, onRemove }: { m: RosterMember; onRemove: (name: string) => void }): React.JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ py: 0.25 }}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', py: 0.25 }}>
       <Typography
         variant="body2"
         sx={{ flexGrow: 1, minWidth: 0, color: m.stale ? 'text.disabled' : 'text.primary' }}
@@ -109,7 +109,7 @@ function AddMember({ onAdd }: { onAdd: (name: string) => void }): React.JSX.Elem
     setText('')
   }
   return (
-    <Stack direction="row" spacing={0.5} alignItems="center" sx={{ mt: 0.75 }}>
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', mt: 0.75 }}>
       <TextField
         size="small"
         variant="outlined"

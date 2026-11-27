@@ -45,7 +45,7 @@ function wholeList(win: WindowedRows, count: number): WindowedRows {
 /** The never-run state. It names what the tab is FOR; the line above it names the command. */
 function NoDump(): JSX.Element {
   return (
-    <Stack alignItems="center" justifyContent="center" spacing={1.5} sx={{ py: 6, color: 'text.secondary' }}>
+    <Stack spacing={1.5} sx={{ alignItems: 'center', justifyContent: 'center', py: 6, color: 'text.secondary' }}>
       <HandshakeIcon sx={{ fontSize: 44, opacity: 0.6 }} />
       <Typography variant="body2" data-testid="factions-empty" sx={{ maxWidth: 460, textAlign: 'center' }}>
         Type <code>/outputfile faction</code> in game and this becomes your real standing with
@@ -113,9 +113,8 @@ export default function FactionsView(props: FactionsViewProps): JSX.Element {
             {c.rows.length === 0 && (
               <Typography
                 variant="body2"
-                color="text.secondary"
                 data-testid="factions-no-match"
-                sx={{ py: 4, textAlign: 'center' }}
+                sx={{ color: 'text.secondary', py: 4, textAlign: 'center' }}
               >
                 No faction matches that.
               </Typography>

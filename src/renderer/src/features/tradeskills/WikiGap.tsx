@@ -60,7 +60,7 @@ export function WikiGapLine({ recipe, note }: { recipe: BookRecipe; note?: GapNo
   const fill = guideTrivialText(guides, recipe)
   const said = note ?? gapNote(guides, recipe)
   return (
-    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-wiki-gap" data-guide={said === 'guide'}>
+    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-wiki-gap" data-guide={said === 'guide'}>
       {wikiGapText(gap, said)} <WikiPageLink recipe={recipe} />
       {fill !== '' && ` ${fill}`}
     </Typography>
@@ -75,7 +75,7 @@ export function GuideDifferences({ recipe }: { recipe: BookRecipe }): JSX.Elemen
   return (
     <>
       {differences.map((difference) => (
-        <Typography key={difference.guideId} variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.25 }} data-testid="tradeskill-guide-differs">
+        <Typography key={difference.guideId} variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }} data-testid="tradeskill-guide-differs">
           {guideDifferenceText(difference)}
         </Typography>
       ))}

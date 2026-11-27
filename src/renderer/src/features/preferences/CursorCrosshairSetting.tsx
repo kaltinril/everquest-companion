@@ -26,7 +26,7 @@ function CrosshairColor({ value, onChange }: { value: string; onChange: OnChange
     <Stack sx={{ minWidth: 120 }}>
       <Typography
         variant="caption"
-        color="text.secondary"
+        sx={{ color: 'text.secondary' }}
         component="label"
         htmlFor={CROSSHAIR_COLOR_INPUT_ID}
       >
@@ -60,7 +60,7 @@ export function CrosshairRow({
 }): JSX.Element {
   return (
     <Stack spacing={0.5} data-testid="pref-cursor-crosshair">
-      <Stack direction="row" spacing={3} alignItems="center" flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={3} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
         <FormControlLabel
           sx={{ minWidth: 180 }}
           control={
@@ -74,7 +74,7 @@ export function CrosshairRow({
           label={<Typography variant="body2">Crosshair lines</Typography>}
         />
         <Stack sx={{ minWidth: 180 }}>
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             Line weight ({prefs.crosshairWeightPx}px)
           </Typography>
           <Slider
@@ -90,7 +90,7 @@ export function CrosshairRow({
         </Stack>
         <CrosshairColor value={prefs.crosshairColorHex} onChange={onChange} />
       </Stack>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         One line straight up and down and one straight across, through the tip of your pointer,
         each spanning the whole EverQuest window (the whole screen when the game is fullscreen).
         They follow the pointer itself, not the shape&apos;s offset.

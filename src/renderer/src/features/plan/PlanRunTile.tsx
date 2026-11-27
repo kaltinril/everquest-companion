@@ -134,7 +134,7 @@ function slotWord(slot: string): string {
 function SlotChip({ slot }: { slot: GearTarget['slot'] }): JSX.Element | null {
   if (slot === undefined) return null
   return (
-    <Typography variant="caption" color="text.secondary" data-testid="plan-target-slot" sx={{ flexShrink: 0 }}>
+    <Typography variant="caption" data-testid="plan-target-slot" sx={{ color: 'text.secondary', flexShrink: 0 }}>
       {slotWord(slot)}
     </Typography>
   )
@@ -164,7 +164,7 @@ function WitnessLine({ target, onOpenMob }: { target: GearTarget; onOpenMob?: ((
   const mobLinked =
     onOpenMob !== undefined && target.quest === undefined && target.plus === null && !isCommonMob(target.mob)
   return (
-    <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block', minWidth: 0, pl: 4.5 }}>
+    <Typography variant="caption" noWrap sx={{ color: 'text.secondary', display: 'block', minWidth: 0, pl: 4.5 }}>
       {mobLinked ? (
         <>
           <CellLink text={target.mob} onOpen={() => { onOpenMob(mobTargetOf(target)) }} />
@@ -226,7 +226,7 @@ function TargetRow({
       title={`${target.name} - ${witnessText(target)}`}
       sx={{ minWidth: 0, py: 0.25, pl: 1 }}
     >
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'nowrap', minWidth: 0 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'nowrap', minWidth: 0 }}>
         {target.iconId !== undefined && (
           <Box
             component="img"
@@ -337,13 +337,12 @@ export default function PlanRunTile({ run, compare, onOpenLoot, onOpenMapZone, o
           It is also the FOLD CONTROL: a real <button> element, so the keyboard and a screen reader
           reach it the same way the pointer does, with the MUI button reset undone by `sx` because a
           heading that looked like a button would shout on a page of eight of them. */}
-      <Stack direction="row" spacing={0.5} alignItems="center" sx={{ flexWrap: 'nowrap', minWidth: 0 }}>
+      <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', flexWrap: 'nowrap', minWidth: 0 }}>
         <Stack
           component="button"
           type="button"
           direction="row"
           spacing={1}
-          alignItems="center"
           data-testid="plan-run-head"
           aria-expanded={!collapsed}
           title={collapsed ? 'Show what is worth getting here' : 'Fold this trip down to its heading'}
@@ -351,6 +350,7 @@ export default function PlanRunTile({ run, compare, onOpenLoot, onOpenMapZone, o
             setCollapsed((v) => !v)
           }}
           sx={{
+            alignItems: 'center',
             flexWrap: 'nowrap',
             minWidth: 0,
             flexGrow: 1,
@@ -370,11 +370,11 @@ export default function PlanRunTile({ run, compare, onOpenLoot, onOpenMapZone, o
           ) : (
             <ExpandMoreIcon fontSize="small" sx={{ flexShrink: 0, opacity: 0.7 }} />
           )}
-          <Typography variant="body2" fontWeight={600} noWrap sx={{ minWidth: 0 }}>
+          <Typography variant="body2" noWrap sx={{ fontWeight: 600, minWidth: 0 }}>
             {runLabel(run)}
           </Typography>
           <BandChip band={run.band} plus={run.plus} />
-          <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', flexShrink: 0 }}>
             {run.targets.length}
           </Typography>
         </Stack>

@@ -143,7 +143,7 @@ function SourceRow({
 
 function SectionHead({ title, era }: { title: string; era?: EraSubject }): JSX.Element {
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mb: 0.5 }}>
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', mb: 0.5 }}>
       <Typography variant="subtitle2">{title}</Typography>
       <DbChip />
       {era && <EraChip subject={era} outOnly />}
@@ -167,7 +167,7 @@ function DropsFromColumn({
     <Box sx={{ flex: 1, minWidth: 0 }}>
       <SectionHead title="Drops from" era={era} />
       {sources.length === 0 && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           The mob catalog and this item’s page name no mob for it.
         </Typography>
       )}
@@ -177,7 +177,7 @@ function DropsFromColumn({
         ))}
       </Box>
       {sources.length > shown.length && (
-        <Typography variant="caption" color="text.disabled">
+        <Typography variant="caption" sx={{ color: 'text.disabled' }}>
           +{sources.length - shown.length} more of {sources.length}
         </Typography>
       )}
@@ -197,7 +197,7 @@ function DbZonesColumn({
     <Box sx={{ flex: 1, minWidth: 0 }}>
       <SectionHead title="Zones" />
       {zones.length === 0 && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           No zone is stated for any known source.
         </Typography>
       )}
@@ -213,7 +213,7 @@ function DbZonesColumn({
         ))}
       </Box>
       {zones.length > shown.length && (
-        <Typography variant="caption" color="text.disabled">
+        <Typography variant="caption" sx={{ color: 'text.disabled' }}>
           +{zones.length - shown.length} more
         </Typography>
       )}

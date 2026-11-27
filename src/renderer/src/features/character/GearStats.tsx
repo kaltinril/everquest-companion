@@ -27,8 +27,8 @@ const signed = (n: number): string => (n > 0 ? `+${String(n)}` : String(n))
 
 function Row({ label, value }: { label: string; value: string }): JSX.Element {
   return (
-    <Stack direction="row" justifyContent="space-between" alignItems="baseline" sx={{ gap: 1 }}>
-      <Typography variant="caption" color="text.secondary" sx={{ minWidth: 0 }}>
+    <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'baseline', gap: 1 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', minWidth: 0 }}>
         {label}
       </Typography>
       <Typography variant="caption" sx={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
@@ -52,7 +52,7 @@ function StatRows({ rows }: { rows: readonly GearStat[] }): JSX.Element | null {
 export default function GearStats({ totals }: { totals: GearTotals }): JSX.Element {
   return (
     <Paper variant="outlined" sx={{ p: 1.25 }} data-testid="character-gear-stats">
-      <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 0.75 }}>
+      <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', mb: 0.75 }}>
         <Typography variant="subtitle2">Stats from gear</Typography>
         <Chip size="small" variant="outlined" label="with +N" sx={{ height: 18, fontSize: 10 }} />
       </Stack>
@@ -71,7 +71,7 @@ export default function GearStats({ totals }: { totals: GearTotals }): JSX.Eleme
       </Box>
 
       {/* A count, not a caveat: it says how much of your gear these numbers actually cover. */}
-      <Typography variant="caption" color="text.disabled" sx={{ display: 'block', mt: 0.75 }}>
+      <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block', mt: 0.75 }}>
         {totals.counted} of {totals.counted + totals.unknown} worn items
         {totals.unknown > 0 ? ` · ${String(totals.unknown)} not in the item database` : ''}
       </Typography>

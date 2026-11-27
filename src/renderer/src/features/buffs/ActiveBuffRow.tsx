@@ -47,7 +47,7 @@ function PermanentBar({ source }: { source: ActiveBuff['permanentSource'] }): JS
         value={100}
         sx={{ height: 8, borderRadius: 1, '& .MuiLinearProgress-bar': { bgcolor: 'warning.main' } }}
       />
-      <Typography variant="caption" color="warning.main">
+      <Typography variant="caption" sx={{ color: 'warning.main' }}>
         {source === 'illusion-aa' ? 'permanent · illusion AA' : 'permanent'}
       </Typography>
     </>
@@ -59,7 +59,7 @@ function UnknownBar(): JSX.Element {
   return (
     <>
       <LinearProgress variant="indeterminate" sx={{ height: 8, borderRadius: 1, opacity: 0.5 }} />
-      <Typography variant="caption" color="text.disabled">
+      <Typography variant="caption" sx={{ color: 'text.disabled' }}>
         unknown duration
       </Typography>
     </>
@@ -103,12 +103,12 @@ function EstimateBar({
           }
         }}
       />
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
+      <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="caption" color={overdue ? 'warning.main' : 'text.secondary'}>
           {overdue ? 'past estimate' : left}
           {!overdue && spread != null && spread > 1000 ? ` (± ${fmtDuration(spread)})` : ''}
         </Typography>
-        <Stack direction="row" spacing={0.5} alignItems="center">
+        <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
           {source && (
             <Tooltip title={estimatorSourceTitle(source)}>
               <Chip
@@ -119,7 +119,7 @@ function EstimateBar({
               />
             </Tooltip>
           )}
-          <Typography variant="caption" color="text.disabled">
+          <Typography variant="caption" sx={{ color: 'text.disabled' }}>
             n={buff.n}
           </Typography>
         </Stack>
@@ -165,7 +165,7 @@ export const ActiveRow = memo(function ActiveRow({ buff, elapsedSec }: { buff: A
         borderLeftColor: classAccent(buff.cls)
       }}
     >
-      <Stack direction="row" alignItems="baseline" spacing={1}>
+      <Stack direction="row" sx={{ alignItems: 'baseline' }} spacing={1}>
         {/* THE BOX, FIRST ON THE ROW (JOS-168): "you would check a box on the card for each
             buff/debuff after casting". It keys on the SPELL LINE, so this box and the one on the
             same spell's stats row are one box, and unchecking it removes the bar from the timer
@@ -185,7 +185,7 @@ export const ActiveRow = memo(function ActiveRow({ buff, elapsedSec }: { buff: A
             all speak — and the numeral the cast line spelled is a separate fact about this
             instance. Absent whenever the cast line named no rank. */}
         {rank != null && (
-          <Typography variant="caption" color="text.secondary" data-testid="active-buff-rank">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="active-buff-rank">
             {rank}
           </Typography>
         )}
@@ -214,7 +214,7 @@ export const ActiveRow = memo(function ActiveRow({ buff, elapsedSec }: { buff: A
         <Box sx={{ flexGrow: 1 }} />
         {/* One line, never squeezed: a long spell name wraps by itself and this stays whole (it
             used to break "8s elapsed" in two and make the card taller than its neighbours). */}
-        <Typography variant="caption" color="text.secondary" data-testid="buff-elapsed" sx={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+        <Typography variant="caption" data-testid="buff-elapsed" sx={{ color: 'text.secondary', whiteSpace: 'nowrap', flexShrink: 0 }}>
           {fmtElapsed(elapsed)} elapsed
         </Typography>
       </Stack>

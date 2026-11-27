@@ -17,7 +17,7 @@ export function ArchivedFightPane({ fight }: { fight: SegmentSummary }): React.J
         <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
           {fight.name}
         </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {[fight.zone, when].filter(Boolean).join(' · ')}
         </Typography>
         <Typography variant="body2">
@@ -25,7 +25,7 @@ export function ArchivedFightPane({ fight }: { fight: SegmentSummary }): React.J
           {activeNote} · {fmt(fight.total)} · {fmtDur(fight.durationSec)}
           {fight.enemyHealTotal > 0 ? ` · +${fmt(fight.enemyHealTotal)} enemy heal` : ''}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           This fight is from an archived log, so only its summary is kept here. The full breakdown is
           in the archive {fight.archive ? <strong>{fight.archive}</strong> : 'it was moved to'}.
         </Typography>

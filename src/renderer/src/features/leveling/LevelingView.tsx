@@ -91,7 +91,7 @@ function AaOverTimePanel({
   return (
     <Paper variant="outlined" sx={{ p: 2 }}>
       <Typography variant="subtitle2">AA gained over time</Typography>
-      <Typography variant="caption" color="text.secondary" gutterBottom display="block">
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} gutterBottom>
         cumulative gain lines - the final value can run ahead of the{' '}
         {aaEarned.toLocaleString()} earned headline
       </Typography>
@@ -135,7 +135,7 @@ function LevelOverTimePanel({
   return (
     <Paper variant="outlined" sx={{ p: 2 }}>
       <Typography variant="subtitle2">Level over time</Typography>
-      <Typography variant="caption" color="text.secondary" gutterBottom display="block">
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} gutterBottom>
         the curve is your last level-up plus every percentage the game has stated since; a{' '}
         <Box component="span" sx={{ color: SWAP_COLOR }}>shaded span</Box> is experience the log did not state
         {swaps > 0 ? ', and a dashed break is a class swap - the level is re-reported for the new loadout, not lost' : ''}
@@ -633,7 +633,7 @@ export default function LevelingView({
             />
           ) : (
             <LogReadInline module="leveling" served={snap !== null} sx={{ p: 2 }}>
-              <Typography color="text.secondary" sx={{ p: 2 }} data-testid="leveling-empty">
+              <Typography sx={{ color: 'text.secondary', p: 2 }} data-testid="leveling-empty">
                 No level-ups or AA gains found in this character&apos;s log yet. They&apos;ll appear here live as you play.
               </Typography>
             </LogReadInline>

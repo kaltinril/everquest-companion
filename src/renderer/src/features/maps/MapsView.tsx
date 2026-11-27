@@ -199,7 +199,7 @@ function MapsHeader({
 }): JSX.Element {
   return (
     <Stack spacing={0.5} data-testid="maps-header" sx={{ flexShrink: 0 }}>
-      <Stack direction="row" spacing={1} alignItems="center" flexWrap="nowrap" useFlexGap sx={{ minWidth: 0 }}>
+      <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: 'center', flexWrap: 'nowrap', minWidth: 0 }}>
         <MapIcon sx={{ fontSize: 18, color: 'text.disabled', flexShrink: 0 }} />
         <Typography variant="h6" noWrap sx={{ mr: 0.5, flexShrink: 0 }}>
           {title}
@@ -244,7 +244,7 @@ function MapsHeader({
           )}
         </Box>
       </Stack>
-      <Typography variant="caption" color="text.disabled">
+      <Typography variant="caption" sx={{ color: 'text.disabled' }}>
         The log states the zone you entered and nothing else positional - so there is no automatic
         “you are here”. Type <code>/loc</code> in game and paste the line into the toolbar to mark
         where you are; the mark stays with this zone until you replace or clear it.
@@ -286,9 +286,9 @@ function MapsEmpty({
       data-testid="maps-empty"
       sx={{ flexGrow: 1, minHeight: 0, overflow: 'auto', p: 2 }}
     >
-      <Stack spacing={1.5} alignItems="flex-start">
+      <Stack spacing={1.5} sx={{ alignItems: 'flex-start' }}>
         {travel}
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           {zones.length === 0
             ? 'No map files were found in your EverQuest folder. The game ships them under maps\\ - set your install folder in Preferences if this looks wrong.'
             : unmapped
@@ -296,7 +296,7 @@ function MapsEmpty({
               : 'Pick a zone above to open its map.'}
         </Typography>
         {zone != null && error != null && (
-          <Typography variant="body2" color="text.secondary" data-testid="maps-error">
+          <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="maps-error">
             {error}
           </Typography>
         )}
@@ -337,11 +337,10 @@ function MapCredits({ data, reserve }: { data: MapData | null; reserve: boolean 
     <Tooltip title={line}>
       <Typography
         variant="caption"
-        color="text.secondary"
         noWrap
         data-testid="maps-credits"
         {...(blank ? { 'aria-hidden': true, 'data-reserved': 'true' } : {})}
-        sx={{ flexShrink: 0, ...(blank ? { visibility: 'hidden' } : {}) }}
+        sx={{ color: 'text.secondary', flexShrink: 0, ...(blank ? { visibility: 'hidden' } : {}) }}
       >
         {/* A NO-BREAK space, spelled OUT rather than typed: an ordinary space collapses to
             nothing and the reserved line would be zero pixels tall, which is the bug rather

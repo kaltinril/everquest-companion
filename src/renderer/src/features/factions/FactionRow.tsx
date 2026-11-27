@@ -93,7 +93,7 @@ function QuestCounts({ work }: { work: RowDerived['work'] }): JSX.Element | null
   return (
     <>
       {raiseCount > 0 && (
-        <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+        <Typography component="span" variant="caption" sx={{ color: 'text.secondary', ml: 1 }}>
           {raiseCount} quest{raiseCount === 1 ? '' : 's'}
         </Typography>
       )}

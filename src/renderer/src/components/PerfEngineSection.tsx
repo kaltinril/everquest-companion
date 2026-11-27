@@ -42,8 +42,8 @@ import type { PerfBudget, PerfServeSource } from '@shared/dataServer/protocol.ge
  *  files sharing a four-line presentational helper is not a dependency worth having. */
 function Fact({ label, value }: { label: string; value: string }): JSX.Element {
   return (
-    <Stack direction="row" justifyContent="space-between" spacing={2}>
-      <Typography variant="caption" color="text.secondary">
+    <Stack direction="row" sx={{ justifyContent: 'space-between' }} spacing={2}>
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {label}
       </Typography>
       <Typography variant="caption" sx={{ fontVariantNumeric: 'tabular-nums' }}>
@@ -157,8 +157,8 @@ function BudgetRow({ budget }: { budget: PerfBudget }): JSX.Element {
       : `${budget.measured ?? 'not measured'} · ${budget.verdict}`
   return (
     <Tooltip title={`${budget.limit}. ${budget.note}`} placement="left">
-      <Stack direction="row" justifyContent="space-between" spacing={2}>
-        <Typography variant="caption" color="text.secondary">
+      <Stack direction="row" sx={{ justifyContent: 'space-between' }} spacing={2}>
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {budget.label}
         </Typography>
         <Typography
@@ -206,7 +206,7 @@ function ClockRow({ sample }: { sample: EnginePerfSample }): JSX.Element | null 
   if (line === null) return null
   if (!line.warning) return <Fact label="clock" value={line.text} />
   return (
-    <Typography variant="caption" color="error.main" data-testid="perf-engine-clock-warning">
+    <Typography variant="caption" sx={{ color: 'error.main' }} data-testid="perf-engine-clock-warning">
       {line.text}
     </Typography>
   )
@@ -234,7 +234,7 @@ export default function PerfEngineSection({
   return (
     <Stack spacing={0.25} data-testid="perf-engine">
       <Divider />
-      <Typography variant="caption" color="text.secondary" sx={{ pt: 0.5 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', pt: 0.5 }}>
         data-server engine
       </Typography>
       <ProcessRow sample={sample} />

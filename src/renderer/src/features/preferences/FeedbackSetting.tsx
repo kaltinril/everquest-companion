@@ -15,7 +15,7 @@ export function FeedbackSetting(): JSX.Element {
         Found a problem or have an idea? Open an issue on this project&apos;s GitHub page and say
         what you saw.
       </Typography>
-      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }} useFlexGap>
         <Button
           size="small"
           variant="contained"
@@ -39,7 +39,7 @@ export function FeedbackSetting(): JSX.Element {
           See open issues
         </Button>
       </Stack>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Opens github.com in your browser. Posting needs a free GitHub account.
       </Typography>
     </Stack>

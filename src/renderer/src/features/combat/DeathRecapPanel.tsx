@@ -15,11 +15,11 @@ const CAPTION_SX = { fontWeight: 700, letterSpacing: '0.06em', textTransform: 'u
 
 function Heading({ left, right }: { left: string; right: string }): React.JSX.Element {
   return (
-    <Stack direction="row" justifyContent="space-between" alignItems="baseline" spacing={1} sx={{ mt: 1, mb: 0.5 }}>
+    <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between', alignItems: 'baseline', mt: 1, mb: 0.5 }}>
       <Typography variant="caption" noWrap sx={CAPTION_SX}>
         {left}
       </Typography>
-      <Typography variant="caption" color="text.secondary" noWrap>
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>
         {right}
       </Typography>
     </Stack>
@@ -37,13 +37,13 @@ function OneDeath({ d }: { d: DeathRecapSummary }): React.JSX.Element {
           Killing blow: {kb.ability} {fmt(kb.amount)} from {kb.source}
         </Typography>
       )}
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 0.5 }}>
         Last {d.windowSec}s: {fmt(d.taken)} taken · {fmt(d.healed)} healed
       </Typography>
       {d.sources.map((s) => (
         <Box key={s.source} data-testid="death-recap-source">
           <Bar color={KIND_COLOR.enemy} pct={top > 0 ? (s.total / top) * 100 : 0} name={s.source} right={fmt(s.total)} />
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', pl: 1, mt: '-2px', mb: '3px' }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', pl: 1, mt: '-2px', mb: '3px' }}>
             {s.abilities.map((a) => `${a.ability} ${fmt(a.total)} (${a.hits})`).join(' · ')}
           </Typography>
         </Box>

@@ -57,11 +57,11 @@ function RowPicture({ row }: { row: GapRow }): JSX.Element | null {
   return (
     <Box sx={{ flex: '0 1 420px', maxWidth: '100%', minWidth: 0 }} data-testid="gaps-row-picture">
       {pictures.length > 1 && (
-        <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.5} data-testid="gaps-row-picture-steps">
+        <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'center' }} spacing={0.5} data-testid="gaps-row-picture-steps">
           <IconButton size="small" aria-label="Previous picture" onClick={() => step(-1)} data-testid="gaps-row-picture-prev">
             <ChevronLeftIcon fontSize="small" />
           </IconButton>
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             {shown.label} ({String(pictures.indexOf(shown) + 1)}/{String(pictures.length)})
           </Typography>
           <IconButton size="small" aria-label="Next picture" onClick={() => step(1)} data-testid="gaps-row-picture-next">
@@ -86,7 +86,7 @@ function RowPicture({ row }: { row: GapRow }): JSX.Element | null {
 function PictureLoading(): JSX.Element {
   return (
     <Box sx={{ flex: '0 1 420px', maxWidth: '100%', minWidth: 0, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', border: 1, borderColor: 'divider', borderRadius: 1 }} data-testid="gaps-row-picture-loading">
-      <Typography variant="body2" color="text.secondary">Loading picture…</Typography>
+      <Typography variant="body2" sx={{ color: 'text.secondary' }}>Loading picture…</Typography>
     </Box>
   )
 }

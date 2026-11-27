@@ -115,11 +115,9 @@ export function PrefStepper({
   return (
     <Stack
       direction="row"
-      alignItems="center"
-      justifyContent="center"
       spacing={0.5}
       data-testid={testid}
-      sx={{ flexShrink: 0, width: PREF_STEPPER_W }}
+      sx={{ alignItems: 'center', justifyContent: 'center', flexShrink: 0, width: PREF_STEPPER_W }}
     >
       <IconButton
         size="small"

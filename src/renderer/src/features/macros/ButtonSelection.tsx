@@ -108,7 +108,7 @@ function PlaceResult({ plan, onHotbar, testid }: { plan: PlacePlan | null; onHot
         {planText(plan)}
       </Typography>
       {onHotbar !== null && (
-        <Typography variant="body2" color="warning.main" data-testid={`${testid}-hotbar`}>
+        <Typography variant="body2" sx={{ color: 'warning.main' }} data-testid={`${testid}-hotbar`}>
           {onHotbar}
         </Typography>
       )}
@@ -213,7 +213,7 @@ function TagDialog({ store, set, selected, onClose }: Pick<GroupProps, 'store' |
             sx={{ mt: 1 }}
             slotProps={{ htmlInput: { 'data-testid': 'macro-group-tag-name' } }}
           />
-          <Stack direction="row" spacing={0.5} useFlexGap flexWrap="wrap">
+          <Stack direction="row" spacing={0.5} useFlexGap sx={{ flexWrap: 'wrap' }}>
             {tagList(store.library).map((t) => (
               <Chip
                 key={t.tag}
@@ -292,7 +292,7 @@ export function SelectionBar({ store, file, files, set, page, selection, selecte
   )
   return (
     <Paper variant="outlined" sx={{ px: 1.5, py: 0.75 }} data-testid="macro-select-bar">
-      <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
         <Typography variant="body2" sx={{ fontWeight: 600 }} data-testid="macro-select-count">
           {buttonsText(selected.length)} selected
         </Typography>

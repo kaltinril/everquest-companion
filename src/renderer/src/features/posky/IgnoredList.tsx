@@ -26,14 +26,14 @@ export function IgnoredList({
 }): JSX.Element {
   if (quests.length === 0) {
     return (
-      <Typography color="text.secondary">
+      <Typography sx={{ color: 'text.secondary' }}>
         No ignored quests - hide one with the eye icon on its row and it lands here.
       </Typography>
     )
   }
   return (
     <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+      <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
         {quests.length} quest{quests.length === 1 ? '' : 's'} hidden from the list, filters and counts.
       </Typography>
       <Stack spacing={0.5}>
@@ -42,8 +42,7 @@ export function IgnoredList({
             key={q.key}
             direction="row"
             spacing={2}
-            alignItems="center"
-            sx={{ px: 1, py: 0.5, borderRadius: 1, '&:hover': { bgcolor: 'action.hover' } }}
+            sx={{ alignItems: 'center', px: 1, py: 0.5, borderRadius: 1, '&:hover': { bgcolor: 'action.hover' } }}
           >
             <QuestIgnoreButton ignored onToggle={() => onUnignore(q.key)} />
             <Chip label={q.className} size="small" color="secondary" variant="outlined" sx={{ minWidth: 92 }} />
@@ -52,7 +51,7 @@ export function IgnoredList({
             </Typography>
             {q.reward && (
               <SkyItemCard name={q.reward} stats={q.rewardStats}>
-                <Typography variant="caption" color="primary.main">
+                <Typography variant="caption" sx={{ color: 'primary.main' }}>
                   → {q.reward}
                 </Typography>
               </SkyItemCard>

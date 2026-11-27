@@ -43,9 +43,9 @@ function HeldWords({ name, held }: { name: string; held: HeldState }): JSX.Eleme
 function GearEntry({ line, held }: { line: SkillGearLine<GearViewRow>; held: HeldState }): JSX.Element {
   const slots = skillGearSlots(line.row)
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center" sx={{ minWidth: 0 }} data-testid="tradeskill-gear-item">
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', minWidth: 0 }} data-testid="tradeskill-gear-item">
       <ItemLabel name={line.row.name} />
-      <Typography variant="caption" color="text.secondary" noWrap data-testid="tradeskill-gear-mod">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap data-testid="tradeskill-gear-mod">
         {skillGearModText(line.mod)}
         {slots !== '' && ` · ${slots}`}
       </Typography>
@@ -64,13 +64,13 @@ export function SkillGearPanel({ tradeskill, held, eraOnly }: { tradeskill: Trad
   const hidden = skillGearHiddenText(found.eraHidden)
   return (
     <Paper variant="outlined" sx={{ px: 1.5, py: 0.75, flexShrink: 0 }} data-testid="tradeskill-gear">
-      <Stack direction="row" alignItems="center" sx={{ flexWrap: 'wrap', columnGap: 2.5, rowGap: 0.5 }}>
+      <Stack direction="row" sx={{ alignItems: 'center', flexWrap: 'wrap', columnGap: 2.5, rowGap: 0.5 }}>
         <Typography variant="subtitle2">{SKILL_GEAR_HEADING}</Typography>
         {found.lines.map((line) => (
           <GearEntry key={line.row.key} line={line} held={held} />
         ))}
         {hidden !== null && (
-          <Typography variant="caption" color="text.secondary" data-testid="tradeskill-gear-era-hidden">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="tradeskill-gear-era-hidden">
             {hidden}
           </Typography>
         )}

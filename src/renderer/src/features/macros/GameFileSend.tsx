@@ -92,12 +92,12 @@ function ReviewTable({ changed, clashes, onBars }: { changed: SlotDiff[]; clashe
                 <TableCell sx={{ fontWeight: 600 }}>
                   {d.set?.name ?? d.file?.name ?? ''}
                   {clash && (
-                    <Typography variant="caption" color="warning.main" component="div" data-testid="macro-diff-clash">
+                    <Typography variant="caption" sx={{ color: 'warning.main' }} component="div" data-testid="macro-diff-clash">
                       Changed in game too{d.file === null ? '' : `: the game has ${d.file.name}`}
                     </Typography>
                   )}
                   {onBar && (
-                    <Typography variant="caption" color="warning.main" component="div" data-testid="macro-diff-hotbar">
+                    <Typography variant="caption" sx={{ color: 'warning.main' }} component="div" data-testid="macro-diff-hotbar">
                       On a hotbar
                     </Typography>
                   )}
@@ -151,7 +151,7 @@ function SendToGame({ file, changes, clashes, writer }: SendProps): JSX.Element 
         </Tooltip>
       )}
       {blocked !== null && (
-        <Typography variant="body2" color="warning.main" data-testid="macro-send-blocked">
+        <Typography variant="body2" sx={{ color: 'warning.main' }} data-testid="macro-send-blocked">
           {blocked.text}
         </Typography>
       )}
@@ -203,7 +203,7 @@ interface CopyProps {
 
 function CopyEntry({ copy, label, writer, onRestore }: CopyProps): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between" data-testid={`macro-backup-${copy.kind}`}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', justifyContent: 'space-between' }} data-testid={`macro-backup-${copy.kind}`}>
       <Typography variant="body2">
         {label}, {copyDate(copy)}
       </Typography>
@@ -298,7 +298,7 @@ export function GameBar({ file, changes, clashes, writer, game }: BarProps): JSX
     <Stack spacing={1} sx={{ flexShrink: 0, pt: 1 }} data-testid="macro-game-bar">
       <Outcome writer={writer} />
       <Paper variant="outlined" sx={{ px: 1.5, py: 0.75 }}>
-        <Stack direction="row" spacing={1.5} alignItems="center" useFlexGap flexWrap="wrap">
+        <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
           <Typography variant="body2" color={matches ? 'text.secondary' : 'warning.main'} sx={{ fontWeight: 600 }} data-testid="macro-game-status">
             {matches ? 'Matches the game.' : changesText(changes.total)}
           </Typography>

@@ -34,7 +34,7 @@ function PageTitleCaption({ row }: { row: GapRow }): JSX.Element | null {
   const title = otherPageTitle(row)
   if (title === undefined) return null
   return (
-    <Typography variant="caption" color="text.secondary" component="span" sx={{ ml: 1, fontWeight: 400 }} data-testid="gaps-page-title">
+    <Typography variant="caption" component="span" sx={{ color: 'text.secondary', ml: 1, fontWeight: 400 }} data-testid="gaps-page-title">
       (wiki page: {title})
     </Typography>
   )
@@ -43,7 +43,7 @@ function PageTitleCaption({ row }: { row: GapRow }): JSX.Element | null {
 /** Beside the name: the one known name within reach, linked to its page so the owner can fix it. */
 export function SuggestCaption({ s }: { s: GapSuggest }): JSX.Element {
   return (
-    <Typography variant="caption" color="text.secondary" component="span" sx={{ ml: 1, fontWeight: 400 }} data-testid="gaps-suggest">
+    <Typography variant="caption" component="span" sx={{ color: 'text.secondary', ml: 1, fontWeight: 400 }} data-testid="gaps-suggest">
       Probably{' '}
       <Box
         component="a"
@@ -100,7 +100,7 @@ function NeedsHint({ need }: { need: string }): JSX.Element | null {
   if (need === '') return null
   return (
     <Tooltip title="Capture these in game and the row turns Ready.">
-      <Typography variant="caption" color="text.secondary" component="span" sx={{ ml: 1, fontWeight: 400 }} data-testid="gaps-needs">
+      <Typography variant="caption" component="span" sx={{ color: 'text.secondary', ml: 1, fontWeight: 400 }} data-testid="gaps-needs">
         needs: {need}
       </Typography>
     </Tooltip>

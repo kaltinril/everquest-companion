@@ -69,7 +69,7 @@ export function VersionSetting({
   onWhatsNew: () => void
 }): JSX.Element {
   return (
-    <Stack direction="row" alignItems="baseline" spacing={1.5}>
+    <Stack direction="row" sx={{ alignItems: 'baseline' }} spacing={1.5}>
       <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
         {version ? `v${version}` : '-'}
       </Typography>
@@ -98,7 +98,7 @@ function UpdateHeadline({
         color={chip.color === 'default' ? undefined : chip.color}
         label={busy ? 'checking' : chip.label}
       />
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Last checked: {status.checkedAt ? formatDateTime(status.checkedAt) : 'never'}
       </Typography>
     </Box>
@@ -121,7 +121,7 @@ function UpdateProgress({
         value={status.percent ?? 0}
         sx={{ borderRadius: 1 }}
       />
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {status.version ? `v${status.version} - ` : ''}
         {status.percent ?? 0}%
       </Typography>
@@ -142,7 +142,7 @@ function UpdateProgress({
 function UpdateError({ status }: { status: UpdateStatus }): JSX.Element | null {
   if (status.state !== 'error' || !status.message) return null
   return (
-    <Typography variant="caption" color="warning.main" sx={{ wordBreak: 'break-word' }}>
+    <Typography variant="caption" sx={{ color: 'warning.main', wordBreak: 'break-word' }}>
       {status.message}
     </Typography>
   )
@@ -225,7 +225,7 @@ function AutoUpdateSwitch({
         }
         label={<Typography variant="body2">Update automatically</Typography>}
       />
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {autoUpdateCaption(off, version, ui)}
       </Typography>
     </Stack>

@@ -45,7 +45,7 @@ export function BarOf({ bar }: { bar: LevelBar }): JSX.Element | null {
   const of = barOfText(bar)
   if (of === '') return null
   return (
-    <Typography variant="caption" color="text.secondary" data-testid="tradeskill-bar-of">
+    <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="tradeskill-bar-of">
       {of}
     </Typography>
   )
@@ -57,7 +57,7 @@ export function CapNote({ bar }: { bar: LevelBar }): JSX.Element | null {
   if (bar.liftedBy !== null) {
     return (
       <Tooltip title={LIFTED_TIP}>
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-cap-lifted">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-cap-lifted">
           {liftedNote(bar.liftedBy)}
         </Typography>
       </Tooltip>
@@ -66,7 +66,7 @@ export function CapNote({ bar }: { bar: LevelBar }): JSX.Element | null {
   if (bar.cappedBy === null) return null
   return (
     <Tooltip title={capTip(bar.cappedBy)}>
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} data-testid="tradeskill-cap-note">
+      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="tradeskill-cap-note">
         {CAP_NOTE}
       </Typography>
     </Tooltip>

@@ -217,13 +217,13 @@ function StepperRow({
   children: JSX.Element | JSX.Element[]
 }): JSX.Element {
   return (
-    <Stack direction="row" alignItems="center" spacing={1}>
-      <Stack direction="row" alignItems="baseline" spacing={0.75} sx={{ flexGrow: 1, minWidth: 0 }}>
+    <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+      <Stack direction="row" spacing={0.75} sx={{ alignItems: 'baseline', flexGrow: 1, minWidth: 0 }}>
         <Typography variant="body2" sx={{ opacity: dim === true ? 0.7 : 1 }} noWrap>
           {label}
         </Typography>
         {tag !== undefined && (
-          <Typography variant="caption" color="text.disabled" sx={{ flexShrink: 0 }}>
+          <Typography variant="caption" sx={{ color: 'text.disabled', flexShrink: 0 }}>
             {tag}
           </Typography>
         )}
@@ -300,7 +300,7 @@ function OverlayRow({
         {/* TWO COLUMNS UNDER TWO HEADERS (owner, 2026-08-17). The steppers sit `COLUMN_GAP` apart
             so the header row above can name each column without the labels running together, and
             their faces are the plain − / + because the header is the label — see PrefStepper. */}
-        <Stack direction="row" alignItems="center" spacing={COLUMN_GAP}>
+        <Stack direction="row" sx={{ alignItems: 'center' }} spacing={COLUMN_GAP}>
           <PrefStepper
             kind="size"
             plain
@@ -337,15 +337,14 @@ const COLUMN_GAP = 3
  */
 function ColumnHeaders(): JSX.Element {
   return (
-    <Stack direction="row" alignItems="center" spacing={1} data-testid="pref-overlay-columns">
+    <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1} data-testid="pref-overlay-columns">
       <Box sx={{ flexGrow: 1, minWidth: 0 }} />
       <Stack direction="row" spacing={COLUMN_GAP}>
         {(['Text size', 'Opacity'] as const).map((h) => (
           <Typography
             key={h}
             variant="caption"
-            color="text.secondary"
-            sx={{ width: PREF_STEPPER_W, textAlign: 'center', flexShrink: 0 }}
+            sx={{ color: 'text.secondary', width: PREF_STEPPER_W, textAlign: 'center', flexShrink: 0 }}
           >
             {h}
           </Typography>
@@ -384,7 +383,7 @@ function PerOverlayRows({
         return (
           <Box key={kind}>
             {kind === OVERLAY_STRIP_KINDS[0] && (
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', pt: 1, pb: 0.5 }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', pt: 1, pb: 0.5 }}>
                 These appear by themselves when something happens.
               </Typography>
             )}
@@ -456,7 +455,7 @@ export function OverlaysAppearanceSetting(): JSX.Element {
           }
           label={<Typography variant="body2">Independent per overlay</Typography>}
         />
-        <Typography variant="caption" color="text.secondary" data-testid="pref-overlay-independent-note">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="pref-overlay-independent-note">
           {independent
             ? 'Each overlay keeps its own text size and transparency.'
             : 'All overlays share one text size and one transparency.'}

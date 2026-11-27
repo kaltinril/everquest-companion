@@ -86,7 +86,7 @@ function ChartHeaderStats({
   if (!tl || !series || !chart) return null
   const note = approxNote(tl)
   return (
-    <Stack direction="row" spacing={0.75} alignItems="baseline" sx={{ minWidth: 0 }}>
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'baseline', minWidth: 0 }}>
       {note && <ApproxChip shown={note.shown} raw={note.of} truncated={note.truncated} />}
       {chart.outLine !== null && (
         <Tooltip title={peakTitle(series)}>
@@ -254,9 +254,9 @@ function MarkerTicks({ markers }: { markers: readonly PlacedMarker[] }): React.J
  *  right edge that ticked at its own rate. */
 function ChartAxis({ chart }: { chart: DpsChart }): React.JSX.Element {
   return (
-    <Stack direction="row" justifyContent="space-between" sx={{ mt: 0.25, flexShrink: 0 }}>
+    <Stack direction="row" sx={{ justifyContent: 'space-between', mt: 0.25, flexShrink: 0 }}>
       {[0, 1, 2, 3].map((k) => (
-        <Typography key={k} variant="caption" color="text.disabled">
+        <Typography key={k} variant="caption" sx={{ color: 'text.disabled' }}>
           {fmtDur((chart.t0 + ((chart.t1 - chart.t0) * k) / 3) / 1000)}
         </Typography>
       ))}
@@ -295,9 +295,7 @@ function ChartLegend({
     <Stack
       direction="row"
       spacing={1.25}
-      alignItems="center"
-      sx={{ mt: 0.25, flexShrink: 0 }}
-      flexWrap="wrap"
+      sx={{ alignItems: 'center', flexWrap: 'wrap', mt: 0.25, flexShrink: 0 }}
       useFlexGap
     >
       {/* The headline curve's label names exactly what it sums, so a grouped fight's line is
@@ -312,7 +310,7 @@ function ChartLegend({
         .filter((k) => markers.some(({ m }) => m.kind === k))
         .map((k) => entry(k, MARKER_COLOR[k], MARKER_WORD[k]))}
       <Box sx={{ flexGrow: 1 }} />
-      <Typography variant="caption" color="text.disabled" noWrap>
+      <Typography variant="caption" sx={{ color: 'text.disabled' }} noWrap>
         {Math.round(series.smoothMs / 1000)}s rolling
         {chart.scrolling ? ' · last 2:00' : ''}
       </Typography>
@@ -356,7 +354,7 @@ function Legend({
         data-hidden={hidden ? '1' : '0'}
         sx={{ borderRadius: 1, px: 0.25, opacity: hidden ? 0.55 : 1 }}
       >
-        <Stack direction="row" spacing={0.5} alignItems="center">
+        <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
           <Box
             sx={{
               width: 10,

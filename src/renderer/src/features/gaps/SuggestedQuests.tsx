@@ -33,9 +33,9 @@ function ThreadCard({ thread, nameClash, onAccept }: CardProps): JSX.Element {
   const steps = threadDisplaySteps(thread)
   return (
     <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 1, mb: 1 }} data-testid="thread-card">
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 0.5 }}>
         <TextField size="small" label="Quest name" value={name} onChange={(e) => setName(e.target.value)} error={blocked} sx={{ minWidth: 280 }} slotProps={{ htmlInput: { 'data-testid': 'thread-name' } }} />
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {thread.zone ?? ''} · {steps.length} steps
         </Typography>
         <Tooltip title="Make this chain a quest you can copy to the wiki.">
@@ -58,7 +58,7 @@ function ThreadCard({ thread, nameClash, onAccept }: CardProps): JSX.Element {
               {threadStepLabel(s)}
             </Typography>
             {threadStepWhy(s) !== '' && (
-              <Typography variant="caption" color="text.secondary" component="span" sx={{ ml: 1 }}>
+              <Typography variant="caption" component="span" sx={{ color: 'text.secondary', ml: 1 }}>
                 ← {threadStepWhy(s)}
               </Typography>
             )}
@@ -83,7 +83,7 @@ export function SuggestedQuests({ query, zone }: { query: string; zone: string |
   const hidden = scope.threads.length - shown.length
   if (shown.length === 0)
     return (
-      <Typography variant="body2" color="text.secondary" data-testid="suggested-quests-hidden">
+      <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="suggested-quests-hidden">
         {hidden} suggested {hidden === 1 ? 'quest' : 'quests'} hidden by Zone I'm in or the search.
       </Typography>
     )

@@ -76,23 +76,23 @@ function wornName(worn: WornCell): string {
 
 function Line({ label, name, score }: { label: string; name: string; score?: number }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="baseline">
+    <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between', alignItems: 'baseline' }}>
       <Typography variant="caption" sx={{ minWidth: 0 }}>
         <Box component="span" sx={{ color: 'text.secondary' }}>{label} </Box>
         <Box component="span" sx={{ fontWeight: 600 }}>{name}</Box>
       </Typography>
-      {score !== undefined && <Typography variant="caption" color="primary.main" sx={{ fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{score.toFixed(1)}</Typography>}
+      {score !== undefined && <Typography variant="caption" sx={{ color: 'primary.main', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{score.toFixed(1)}</Typography>}
     </Stack>
   )
 }
 
 function WornPart({ worn, score, same }: { worn: WornCell | undefined; score: number | undefined; same: boolean }): JSX.Element {
-  if (worn === undefined) return <Typography variant="caption" color="text.secondary">Nothing worn here (from your last /outputfile inventory).</Typography>
+  if (worn === undefined) return <Typography variant="caption" sx={{ color: 'text.secondary' }}>Nothing worn here (from your last /outputfile inventory).</Typography>
   return (
     <>
       <Line label="Worn:" name={wornName(worn)} score={score} />
-      {worn.row === undefined && <Typography variant="caption" color="text.secondary">The item data does not know the worn item, so it cannot be scored.</Typography>}
-      {same && <Typography variant="caption" color="success.main">You already wear this item here.</Typography>}
+      {worn.row === undefined && <Typography variant="caption" sx={{ color: 'text.secondary' }}>The item data does not know the worn item, so it cannot be scored.</Typography>}
+      {same && <Typography variant="caption" sx={{ color: 'success.main' }}>You already wear this item here.</Typography>}
     </>
   )
 }
@@ -130,7 +130,7 @@ export default function BisCompare(props: BisCompareProps): JSX.Element {
       <WornPart worn={worn} score={m.wornScore?.score} same={m.same} />
       {m.rows.length > 0 && !m.same && <CompareTable rows={m.rows} head={(props.label ?? 'Best:').replace(/:$/, '')} />}
       {m.notes.map((n) => (
-        <Typography key={n} variant="caption" color="text.secondary">{n}</Typography>
+        <Typography key={n} variant="caption" sx={{ color: 'text.secondary' }}>{n}</Typography>
       ))}
       {pick !== undefined && (
         <Typography variant="caption" sx={{ borderTop: 1, borderColor: 'divider', pt: 0.25 }}>
@@ -139,7 +139,7 @@ export default function BisCompare(props: BisCompareProps): JSX.Element {
         </Typography>
       )}
       {m.budget !== undefined && <Typography variant="caption" color={TONE_COLOUR[m.budget.tone]}>{m.budget.text}</Typography>}
-      <Typography variant="caption" color="text.disabled">{plusNote(props.plus, worn)}</Typography>
+      <Typography variant="caption" sx={{ color: 'text.disabled' }}>{plusNote(props.plus, worn)}</Typography>
     </Stack>
   )
 }

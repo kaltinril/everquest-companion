@@ -61,7 +61,7 @@ export function OverlaySnapSetting(): JSX.Element {
         }
         label={<Typography variant="body2">Snap overlays into line while you drag them</Typography>}
       />
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {prefs.enabled
           ? `Dragging an overlay within ${SNAP_DISTANCE_PX} pixels of another overlay, this app's window, or the edge of your screen lines it up exactly - edge to edge, or flush with it. Keep dragging and it lets go.`
           : 'Off. Overlays go exactly where you drop them, with nothing pulling them into line.'}

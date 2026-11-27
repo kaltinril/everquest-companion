@@ -123,7 +123,7 @@ export default function MapZoneAdvice({ onPick }: { onPick?: (zone: string) => v
     >
       <MapZoneAdviceBar query={query} onChange={setQuery} count={rows.length} />
       {rows.length === 0 ? (
-        <Typography variant="body2" color="text.disabled" data-testid="zone-advice-empty" sx={{ p: 2 }}>
+        <Typography variant="body2" data-testid="zone-advice-empty" sx={{ color: 'text.disabled', p: 2 }}>
           {emptyText(query.goal, level, wishlist.entries.length > 0, narrowed)}
         </Typography>
       ) : (

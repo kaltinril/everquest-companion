@@ -94,7 +94,7 @@ function SharedNameSwitch({ row }: { row: RespawnRow }): JSX.Element {
         }
         label={<Typography variant="body2">Several mobs share this name</Typography>}
       />
-      <Typography variant="caption" color="text.secondary" component="div" sx={{ ml: 4 }}>
+      <Typography variant="caption" component="div" sx={{ color: 'text.secondary', ml: 4 }}>
         Gaps under 10 minutes are ignored; the lowest above them counts.
       </Typography>
     </Box>
@@ -110,20 +110,20 @@ function ParseLine({ text }: { text: string }): JSX.Element {
   const parsed = parseRespawnDuration(text)
   if (parsed.ok) {
     return (
-      <Typography variant="caption" color="success.main" data-testid="respawn-edit-reading">
+      <Typography variant="caption" sx={{ color: 'success.main' }} data-testid="respawn-edit-reading">
         = {fmtDuration(parsed.sec * 1000)}
       </Typography>
     )
   }
   if (parsed.reason === 'empty') {
     return (
-      <Typography variant="caption" color="text.secondary" data-testid="respawn-edit-reading">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="respawn-edit-reading">
         {RESPAWN_INPUT_HELP}
       </Typography>
     )
   }
   return (
-    <Typography variant="caption" color="error.main" data-testid="respawn-edit-error">
+    <Typography variant="caption" sx={{ color: 'error.main' }} data-testid="respawn-edit-error">
       {parsed.reason === 'range' ? RESPAWN_INPUT_RANGE : RESPAWN_INPUT_UNREADABLE}
     </Typography>
   )
@@ -140,7 +140,7 @@ function ParseLine({ text }: { text: string }): JSX.Element {
 function WikiLine({ row, page }: { row: RespawnRow; page?: string }): JSX.Element {
   const url = wikiPageUrl(page)
   return (
-    <Typography variant="caption" color="text.secondary" data-testid="respawn-edit-wiki">
+    <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="respawn-edit-wiki">
       {row.wikiText === undefined ? 'The wiki states no respawn for this mob.' : `The wiki says "${row.wikiText}".`}
       {url !== undefined && (
         <>
@@ -158,7 +158,7 @@ function WikiLine({ row, page }: { row: RespawnRow; page?: string }): JSX.Elemen
 function CalculatedLine({ row }: { row: RespawnRow }): JSX.Element {
   const calc = respawnCalculated(row)
   return (
-    <Typography variant="caption" color="text.secondary" data-testid="respawn-edit-calculated">
+    <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="respawn-edit-calculated">
       Calculated: {respawnDurationText(calc, fmtDuration)} · {respawnSourceLabel(calc)}
     </Typography>
   )
@@ -208,7 +208,7 @@ export function RespawnEditDialog({
         <Typography variant="subtitle1" component="div">
           {row.display}
         </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {row.zone.length > 0 ? row.zone : 'unknown zone'} · {respawnDurationText(row, fmtDuration)} ·{' '}
           {respawnSourceLabel(row)}
         </Typography>
@@ -242,7 +242,7 @@ export function RespawnEditDialog({
               <ParseLine text={draft} />
             </Box>
             {!respawnOverridden(row) && (
-              <Typography variant="caption" color="text.secondary" component="div" data-testid="respawn-edit-save-note">
+              <Typography variant="caption" sx={{ color: 'text.secondary' }} component="div" data-testid="respawn-edit-save-note">
                 {RESPAWN_SAVE_NOTE}
               </Typography>
             )}

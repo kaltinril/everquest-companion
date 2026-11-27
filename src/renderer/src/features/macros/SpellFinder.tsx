@@ -81,7 +81,7 @@ function FinderBody({ canInsert, onPick, onClose }: FinderProps & { onClose: () 
   const rows = found !== null && found.text === text.trim() ? found.rows : []
   return (
     <Stack spacing={0.75} data-testid="macro-spell-finder">
-      <Stack direction="row" spacing={1} alignItems="center">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
         <SearchField
           query={text}
           onChange={setText}

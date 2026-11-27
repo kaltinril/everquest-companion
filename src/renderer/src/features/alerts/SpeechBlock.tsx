@@ -170,9 +170,9 @@ const ALL_ALWAYS_PLAY_TITLE =
  */
 function AudioActionRow({ form, allAlwaysPlay }: { form: SpeechForm; allAlwaysPlay: boolean }): JSX.Element {
   return (
-    <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
       <Box sx={{ minWidth: 200 }}>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           When this fires…
         </Typography>
         <Select
@@ -268,17 +268,17 @@ function CaptureHint({
   return (
     <Box data-testid="alert-speech-captures">
       {autoLine !== null && (
-        <Typography variant="caption" color="text.secondary" display="block" data-testid="alert-speech-auto-tokens">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} data-testid="alert-speech-auto-tokens">
           {autoLine}
         </Typography>
       )}
       {captureNames.length > 0 && (
-        <Typography variant="caption" color="text.secondary" display="block">
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
           {`This alert’s pattern captures: ${tokenList(captureNames)} - write one in the phrase to speak it.`}
         </Typography>
       )}
       {unknown.length > 0 && (
-        <Typography variant="caption" color="warning.main" display="block">
+        <Typography variant="caption" sx={{ color: 'warning.main', display: 'block' }}>
           {`${tokenList(unknown)} ${unknown.length === 1 ? 'is not' : 'are not'} filled in by this alert - spoken as written.`}
         </Typography>
       )}
@@ -302,7 +302,7 @@ function SaysRow({
   return (
     <Stack spacing={1}>
       <Box>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Say…
         </Typography>
         <Select
@@ -340,7 +340,7 @@ function SaysRow({
           that no log line said (world-model law 1). The literal `{player}` is exactly what the
           user will hear if the capture is ever missing, and `CaptureHint` above is where they
           learn that the pattern really does declare it. */}
-      <Typography variant="caption" color="text.secondary" data-testid="alert-speech-preview">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="alert-speech-preview">
         {preview ? `Speaks: “${preview}”` : 'Speaks nothing - give the alert a name or a phrase.'}
       </Typography>
     </Stack>
@@ -363,7 +363,7 @@ function VoiceRow({ name, form }: { name: string; form: SpeechForm }): JSX.Eleme
   const prefs = currentVoicePrefs()
   const preview = previewTextFor(name, form)
   return (
-    <Stack direction="row" spacing={1.5} alignItems="flex-end" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={1.5} sx={{ alignItems: 'flex-end', flexWrap: 'wrap' }} useFlexGap>
       <Button
         size="small"
         startIcon={<PlayArrowIcon />}
@@ -421,9 +421,9 @@ export default function SpeechBlock({
   const speaks = form.audio !== 'sound'
   return (
     <Box data-testid="alert-speech-block">
-      <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mb: 0.5 }}>
+      <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', mb: 0.5 }}>
         <VolumeUpIcon fontSize="small" sx={{ color: 'text.secondary' }} />
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Voice
         </Typography>
       </Stack>

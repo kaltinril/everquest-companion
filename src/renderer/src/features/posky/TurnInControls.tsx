@@ -186,8 +186,8 @@ export function TurnInCounter({
 }): JSX.Element {
   const countSource = useCountSource()
   return (
-    <Stack direction="row" spacing={0.5} alignItems="center">
-      <Typography variant="caption" color="text.secondary" data-testid="posky-turnin-count">
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="posky-turnin-count">
         {q.turnIns > 0 ? turnInBadgeLabel(q.turnIns) : 'Not turned in yet'}
       </Typography>
       <UndoTurnIn q={q} onUndo={onUndoTurnIn} />

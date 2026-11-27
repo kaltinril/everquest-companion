@@ -125,7 +125,7 @@ function CopyList({ onCopy, disabled, copied }: { onCopy: () => void; disabled: 
   return (
     <>
       {copied !== null && (
-        <Typography variant="caption" color="success.main">
+        <Typography variant="caption" sx={{ color: 'success.main' }}>
           Copied {copied} rows
         </Typography>
       )}
@@ -165,11 +165,11 @@ function DomainToggle({
     >
       {GAP_DOMAINS.map((d) => (
         <ToggleButton key={d} value={d} sx={{ textTransform: 'none', px: 1.5 }}>
-          <Stack alignItems="flex-start">
+          <Stack sx={{ alignItems: 'flex-start' }}>
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
               {GAP_DOMAIN_LABELS[d]}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               {d === 'item' && heldOnly !== null ? heldCaption(snap.rows, zone, hidden, heldOnly) : jobCaption(snap, d, { zone, hidden }, CHIP_CONTEXT)}
             </Typography>
           </Stack>
@@ -198,7 +198,7 @@ function ShownLine({
   // A few words (owner, 2026-10-21: "we just hit them with so much text to read"); the why in the tooltip.
   return (
     <Tooltip title="The engine lists the most mentioned names; Show done brings done rows back.">
-      <Typography variant="caption" color="text.secondary" data-testid="gaps-shown">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="gaps-shown">
         Showing {visible} of {held} {GAP_SHOWN_NOUN[domain]}
         {mine}
         {zone !== null ? `, in ${zone}` : ''}
@@ -231,7 +231,7 @@ function GapsWaiting(): JSX.Element {
   const line = useTabLine(GAPS_MODULE_ID, false)
   if (line?.kind !== 'waiting') return <CircularProgress size={20} />
   return (
-    <Typography variant="body2" color="text.secondary" data-testid="log-read-inline">
+    <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="log-read-inline">
       {tabLineText(line)}
     </Typography>
   )
@@ -274,14 +274,14 @@ export default function GapsView(): JSX.Element {
     <QuestScopes extras={sightings} forced={forced}>
     <Stack spacing={2} data-testid="gaps-view" sx={{ height: '100%', minHeight: 0 }}>
       <Tooltip title={CLICK_HINT}>
-        <Typography variant="body2" color="text.secondary" sx={{ alignSelf: 'flex-start' }}>
+        <Typography variant="body2" sx={{ color: 'text.secondary', alignSelf: 'flex-start' }}>
           {GAP_DOMAIN_HELP[domain]}
         </Typography>
       </Tooltip>
       {/* Two rows (owner, 2026-10-20: "put search and all the values after that on the next row
           instead of next to the tabs"): the domains alone, then what narrows them, Copy list last. */}
       <DomainToggle snap={snap} domain={domain} zone={zone} onPick={setDomain} hidden={hiddenRow} heldOnly={mine.pick === 'off' ? null : { index: holding, where: mine.pick }} />
-      <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
         <TextField
           size="small"
           label="Search"

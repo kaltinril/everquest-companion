@@ -46,8 +46,8 @@ export default function SpellRankSlider({ rank, onChange }: SpellRankSliderProps
   const base = rank <= 0
   return (
     <Stack spacing={0} sx={{ mb: 0.5 }} data-testid="best-spells-rank">
-      <Stack direction="row" spacing={1} alignItems="baseline" sx={{ minWidth: 0 }}>
-        <Typography variant="caption" color="text.secondary" sx={{ fontSize: 10, flexShrink: 0 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', minWidth: 0 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 10, flexShrink: 0 }}>
           Simulate rank
         </Typography>
         <Tooltip title="Every row is read at the higher of the rank you have been observed casting and this one, so a spell you already own at a better rank is never pulled down. Damage and healing move with it; mana and cast time are the base figures.">

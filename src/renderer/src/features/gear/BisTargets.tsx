@@ -59,7 +59,7 @@ function Toolbar({ prefs, setPrefs, setup, statCap: inForce }: Omit<BisTargetsPr
   // Only a number the player changed is kept, so the cap follows the next reincarnation by itself.
   const kept = statCap === inForce.value ? LEGENDS_STAT_CAP : statCap
   return (
-    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap data-testid="bis-targets-bar">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap data-testid="bis-targets-bar">
       <Button size="small" variant={prefs.targets ? 'contained' : 'outlined'} onClick={() => setPrefs({ ...prefs, targets: !prefs.targets })} data-testid="bis-targets-toggle">
         {prefs.targets ? 'Hide targets' : 'Set targets'}
       </Button>
@@ -83,7 +83,7 @@ function Toolbar({ prefs, setPrefs, setup, statCap: inForce }: Omit<BisTargetsPr
           <Button size="small" color="warning" onClick={() => set(Object.fromEntries(Object.keys(prefs.caps).map((c) => [c, undefined])))} data-testid="bis-targets-clear">
             Clear targets
           </Button>
-          <Typography variant="caption" color="text.secondary" sx={{ flexBasis: '100%' }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', flexBasis: '100%' }}>
             A target stops a stat counting once the loadout reaches it, so the sheet spends the remaining slots on your other stats. Attributes stop counting at {statCapCaption(inForce)}, STA inside HP and INT/WIS inside Mana too; a target you set wins.
           </Typography>
         </>

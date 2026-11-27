@@ -11,13 +11,13 @@ export const seenAs = (kinds: readonly string[]): { shown: string[]; more: numbe
 export default function SeenAsChips({ kinds }: { kinds: readonly string[] }): JSX.Element {
   const { shown, more } = seenAs(kinds)
   return (
-    <Stack direction="row" spacing={0.5} alignItems="center" sx={{ flexWrap: 'nowrap' }}>
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', flexWrap: 'nowrap' }}>
       {shown.map((k) => (
         <Chip key={k} label={k} size="small" variant="outlined" />
       ))}
       {more > 0 && (
         <Tooltip title={kinds.join(', ')}>
-          <Typography variant="caption" color="text.secondary" component="span" data-testid="gaps-seen-more">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }} component="span" data-testid="gaps-seen-more">
             +{more}
           </Typography>
         </Tooltip>

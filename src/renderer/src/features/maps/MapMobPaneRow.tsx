@@ -150,7 +150,7 @@ export function WithRowActions({
   return (
     <ListItem disablePadding sx={{ height: PANE_ROW_HEIGHT, '&:hover .row-acts, & .row-acts:focus-within': { opacity: 1 } }}>
       <Box sx={{ flexGrow: 1, minWidth: 0, display: 'flex' }}>{children}</Box>
-      <Stack direction="row" alignItems="center" className="row-acts" sx={{ flexShrink: 0, opacity: 0.45, pr: 0.5 }}>
+      <Stack direction="row" className="row-acts" sx={{ alignItems: 'center', flexShrink: 0, opacity: 0.45, pr: 0.5 }}>
           {target != null && (
             <Tooltip title="Copy the /waypoint command for this spot">
               <IconButton size="small" data-testid="maps-pane-copy" onClick={() => { actions.onCopy(target, row.name) }}>

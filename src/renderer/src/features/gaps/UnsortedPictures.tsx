@@ -17,13 +17,13 @@ function Row({ popup }: { popup: QuestPopup }): JSX.Element {
   const [picks, setPicks] = useState<RouteHit[]>([])
   const first = popup.paragraphs.at(0)?.text ?? ''
   return (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ py: 0.5 }} data-testid="unsorted-picture">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', py: 0.5 }} data-testid="unsorted-picture">
       {popup.thumb !== undefined && <Box component="img" src={popup.thumb} alt="" sx={{ width: 48, height: 36, objectFit: 'cover', borderRadius: 0.5 }} />}
       <Box sx={{ flex: 1, minWidth: 0 }}>
         <Typography variant="body2" noWrap>
           {popup.title}
         </Typography>
-        <Typography variant="caption" color="text.secondary" noWrap component="div">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap component="div">
           {first}
         </Typography>
       </Box>
@@ -70,7 +70,7 @@ function Row({ popup }: { popup: QuestPopup }): JSX.Element {
 /** An inbox picture no reader took: its name, and a way back into the inbox. */
 function FailedRow({ name }: { name: string }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ py: 0.5 }} data-testid="failed-picture">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', py: 0.5 }} data-testid="failed-picture">
       <Typography variant="body2" noWrap sx={{ flex: 1, minWidth: 0 }}>
         {name}
       </Typography>
@@ -92,7 +92,7 @@ export function UnsortedLine(): JSX.Element | null {
   if (n === 0 && failed === 0) return null
   const parts = [n > 0 ? `${String(n)} picture${n === 1 ? '' : 's'} matched no quest.` : '', failed > 0 ? `${String(failed)} could not be read.` : '']
   return (
-    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }} data-testid="unsorted-line">
+    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }} data-testid="unsorted-line">
       {parts.filter((p) => p !== '').join(' ')}{' '}
       <Button size="small" onClick={openUnsorted}>
         Open

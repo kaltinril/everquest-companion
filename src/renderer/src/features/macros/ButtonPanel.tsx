@@ -48,7 +48,7 @@ function MoveForm({ store, file, set, cell, page, pages, onMoved, onCancel }: Mo
     onMoved(toPage, target)
   }
   return (
-    <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap" data-testid="macro-move-form">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap data-testid="macro-move-form">
       <TextField
         select
         size="small"
@@ -91,7 +91,7 @@ function MoveForm({ store, file, set, cell, page, pages, onMoved, onCancel }: Mo
       </Button>
       {holder !== null && !here && <Quiet testid="macro-move-swap">{holder.name === '' ? 'A macro' : holder.name} is there: the two swap.</Quiet>}
       {onHotbar !== null && (
-        <Typography variant="body2" color="warning.main" data-testid="macro-move-hotbar">
+        <Typography variant="body2" sx={{ color: 'warning.main' }} data-testid="macro-move-hotbar">
           {onHotbar}
         </Typography>
       )}
@@ -111,8 +111,8 @@ function AlsoOn({ store, set, cell, macro }: Picked & { macro: Macro }): JSX.Ele
     ui.notify('This button has its own copy now')
   }
   return (
-    <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
-      <Typography variant="body2" color="text.secondary" data-testid="macro-also-on">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
+      <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="macro-also-on">
         Also on: {elsewhere.join(', ')}. An edit changes it there too.
       </Typography>
       <Button size="small" variant="outlined" onClick={ownCopy} data-testid="macro-own-copy">
@@ -142,7 +142,7 @@ function FilledPane({ store, file, files, set, cell, page, macro, pages, focusNa
   if (mode === 'replace') {
     return (
       <Stack spacing={1.5} data-testid="macro-panel-replace">
-        <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography variant="subtitle1">Replace {where}</Typography>
           <Button size="small" onClick={edit} data-testid="macro-replace-cancel">
             Cancel
@@ -164,7 +164,7 @@ function FilledPane({ store, file, files, set, cell, page, macro, pages, focusNa
       <Typography variant="subtitle1" data-testid="macro-panel-where">
         Page {page}, button {cell.button}
       </Typography>
-      <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+      <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
         <Button
           size="small"
           variant="outlined"
@@ -227,11 +227,11 @@ function EmptyPane({ store, files, set, cell, page, onFresh }: Picked & { files:
         Add to page {page}, button {cell.button}
       </Typography>
       {cell.game !== null && <Quiet testid="macro-panel-game">The game still has {cell.game.name} here until you send.</Quiet>}
-      <Stack direction="row" spacing={1} alignItems="center">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
         <Button size="small" variant="contained" onClick={create} data-testid="macro-slot-new">
           New macro
         </Button>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           or pick one of yours:
         </Typography>
       </Stack>

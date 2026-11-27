@@ -49,7 +49,7 @@ function ItemRow({ item, endDay, picked, iconId, wished, chip, onPick, onOpenLoo
     <TableRow hover selected={picked} onClick={() => onPick(item.key)} sx={{ cursor: 'pointer', height: ROW_HEIGHT }} data-testid={`bazaar-row-${item.key}`}>
       <TableCell sx={{ fontWeight: picked ? 700 : 400 }}>
         {/* A bounded box, so a long name or a two-sided watch chip cannot push the last columns off the list. */}
-        <Stack direction="row" spacing={0.75} alignItems="center" sx={{ flexWrap: 'nowrap', minWidth: 0, maxWidth: ITEM_CELL_MAX }}>
+        <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', flexWrap: 'nowrap', minWidth: 0, maxWidth: ITEM_CELL_MAX }}>
           <ItemIcon iconId={iconId} />
           <ItemName item={item} onOpenLoot={onOpenLoot} />
           {item.combined !== undefined && (

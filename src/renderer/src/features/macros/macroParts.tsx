@@ -42,7 +42,7 @@ export function TwoPane({ left, right }: { left: ReactNode; right: ReactNode }):
 
 export function Quiet({ children, testid }: { children: ReactNode; testid?: string }): JSX.Element {
   return (
-    <Typography variant="body2" color="text.secondary" data-testid={testid}>
+    <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid={testid}>
       {children}
     </Typography>
   )
@@ -65,8 +65,8 @@ export function MacroRow({ macro, selected, onPick, testid, toCheck = 0, showTag
   const line = firstLine(macro)
   return (
     <ListItemButton selected={selected} onClick={onPick} data-testid={testid} sx={{ display: 'block', borderRadius: 1, py: 0.75 }}>
-      <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
-        <Stack direction="row" spacing={0.5} alignItems="center" sx={{ minWidth: 0 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+        <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', minWidth: 0 }}>
           <ColorMark color={macro.color} />
           <Typography variant="body2" noWrap sx={{ fontWeight: 600 }}>
             {macro.name === '' ? 'Unnamed' : macro.name}
@@ -74,16 +74,16 @@ export function MacroRow({ macro, selected, onPick, testid, toCheck = 0, showTag
         </Stack>
         {toCheck > 0 && <Chip size="small" color="warning" variant="outlined" label={`${String(toCheck)} to check`} data-testid="macro-row-to-check" />}
       </Stack>
-      <Typography variant="body2" color="text.secondary" noWrap sx={MONO_SX}>
+      <Typography variant="body2" noWrap sx={{ color: 'text.secondary', ...MONO_SX }}>
         {line === '' ? 'no commands yet' : line}
       </Typography>
       {where !== undefined && (
-        <Typography variant="caption" color="text.secondary" noWrap component="div" data-testid="macro-row-where">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap component="div" data-testid="macro-row-where">
           {where}
         </Typography>
       )}
       {showTags && macro.tags.length > 0 && (
-        <Stack direction="row" spacing={0.5} useFlexGap flexWrap="wrap" sx={{ mt: 0.5 }}>
+        <Stack direction="row" spacing={0.5} useFlexGap sx={{ flexWrap: 'wrap', mt: 0.5 }}>
           {macro.tags.map((tag) => (
             <Chip key={tag} size="small" variant="outlined" label={tag} />
           ))}
@@ -105,7 +105,7 @@ interface TagFilterProps {
 export function TagFilter({ store, tags, onTags, usedOnly = false }: TagFilterProps): JSX.Element {
   const list = usedOnly ? usedTagList(store.library) : tagList(store.library)
   return (
-    <Stack direction="row" spacing={0.5} useFlexGap flexWrap="wrap" data-testid="macros-tag-filters">
+    <Stack direction="row" spacing={0.5} useFlexGap sx={{ flexWrap: 'wrap' }} data-testid="macros-tag-filters">
       {list.map(({ tag, count }) => {
         const on = tags.includes(tag)
         return (

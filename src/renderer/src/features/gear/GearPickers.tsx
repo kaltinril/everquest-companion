@@ -92,7 +92,7 @@ export default function GearPicker<T extends string>({
           disabled={chosen === null}
           onClick={() => onChange(null)}
         >
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             {resetLabel}
           </Typography>
         </MenuItem>

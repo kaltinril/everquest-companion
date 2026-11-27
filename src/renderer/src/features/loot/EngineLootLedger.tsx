@@ -108,7 +108,7 @@ function knowledgeKey(row: Row): string {
  *  what arrived — the window is 50 and the ledger is usually longer. */
 function EngineSummary({ shown, total }: { shown: number; total: number }): JSX.Element {
   return (
-    <Typography variant="body2" color="text.secondary" data-testid="loot-summary">
+    <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="loot-summary">
       {shown.toLocaleString()} loot events served of {total.toLocaleString()} · newest first, from
       the engine&apos;s <code>loot.ledger</code> view · rows are rendered exactly as served
     </Typography>

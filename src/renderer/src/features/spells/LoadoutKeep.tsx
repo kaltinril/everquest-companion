@@ -59,7 +59,7 @@ export default function LoadoutKeep({ keep, rankOf, pool, gems }: LoadoutKeepPro
             data-caster={g.caster}
             sx={{ borderLeft: 2, borderColor: paint, pl: 1 }}
           >
-            <Stack direction="row" spacing={1} alignItems="baseline">
+            <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline' }}>
               <Typography variant="subtitle2" sx={{ color: paint }}>
                 {g.caster} ({String(g.rows.length)})
               </Typography>

@@ -214,7 +214,7 @@ function TabTable({
       data-desc={String(sort.desc)}
     >
       {data.shown.length === 0 && data.outOfEra.length === 0 ? (
-        <Typography variant="caption" color="text.disabled" display="block" data-testid="best-spells-empty">
+        <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block' }} data-testid="best-spells-empty">
           nothing this loadout owns yet
         </Typography>
       ) : (
@@ -272,9 +272,8 @@ function QuietMarker({
     <Tooltip title={title}>
       <Typography
         variant="caption"
-        color="text.disabled"
         data-testid={testid}
-        sx={{ textDecoration: 'underline dotted', cursor: 'help' }}
+        sx={{ color: 'text.disabled', textDecoration: 'underline dotted', cursor: 'help' }}
       >
         {text}
       </Typography>
@@ -300,7 +299,7 @@ function ReadoutHeader({
   onLevel: (next: number | null) => void
 }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap sx={{ mb: 0.5 }}>
+    <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap', mb: 0.5 }}>
       <Typography variant="subtitle2">Best at</Typography>
       {/* THE SAME ARROWS THE UNLOCK PANEL HAS (owner ask 2026-08-23) — a second handle on the ONE
           lifted level, so stepping here re-ranks this table and moves the panel next door in the
@@ -310,7 +309,7 @@ function ReadoutHeader({
           figures with no crits, AA or resist in them (recast IS in them since JOS-444, and worn
           FOCUS since JOS-452, which draws its own marker beside this one when it applied).
           Said once per surface, never on a row (AGENTS.md, the caveat diet). */}
-      <Typography variant="caption" color="text.disabled" data-testid="best-spells-directional">
+      <Typography variant="caption" sx={{ color: 'text.disabled' }} data-testid="best-spells-directional">
         directional
       </Typography>
       {/* THE AOE TAB'S ASSUMPTION, MADE VISIBLE (JOS-449, owner ruling: the figures assume max

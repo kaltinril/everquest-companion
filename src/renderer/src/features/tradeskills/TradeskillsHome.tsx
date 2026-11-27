@@ -48,7 +48,7 @@ import { useHiddenTiles } from './tradeskillMemory'
 function TileLevel({ bar }: { bar: LevelBar }): JSX.Element | null {
   if (bar.level === null) return null
   return (
-    <Stack direction="row" spacing={0.5} alignItems="baseline" sx={{ flexShrink: 0 }}>
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'baseline', flexShrink: 0 }}>
       <Typography variant="h6" color="primary" data-testid="tradeskill-tile-level">
         {bar.level}
       </Typography>
@@ -62,15 +62,15 @@ function TileNext({ tile, onOpenRecipe }: { tile: TradeskillTile; onOpenRecipe: 
   if (tile.recipes === 0) return null
   if (tile.next === null) {
     return (
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         No recipe above your level.
       </Typography>
     )
   }
   const next = tile.next
   return (
-    <Stack direction="row" spacing={0.75} alignItems="baseline" sx={{ minWidth: 0 }} data-testid="tradeskill-tile-next">
-      <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'baseline', minWidth: 0 }} data-testid="tradeskill-tile-next">
+      <Typography variant="caption" sx={{ color: 'text.secondary', flexShrink: 0 }}>
         Next:
       </Typography>
       <Typography variant="body2" component="span" sx={{ minWidth: 0, display: 'flex' }}>
@@ -81,7 +81,7 @@ function TileNext({ tile, onOpenRecipe }: { tile: TradeskillTile; onOpenRecipe: 
           }}
         />
       </Typography>
-      <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', flexShrink: 0 }}>
         trivial {next.trivial}
       </Typography>
     </Stack>
@@ -107,7 +107,7 @@ function Tile({ tile, rows, rank, onOpen, onOpenRecipe }: TileProps): JSX.Elemen
         }}
         sx={{ px: 1.5, pt: 1.25, pb: 0.5 }}
       >
-        <Stack direction="row" justifyContent="space-between" alignItems="baseline" spacing={1}>
+        <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'baseline' }} spacing={1}>
           <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
             {tile.tradeskill}
           </Typography>
@@ -116,7 +116,7 @@ function Tile({ tile, rows, rank, onOpen, onOpenRecipe }: TileProps): JSX.Elemen
         <Box sx={{ my: 0.5 }}>
           <SkillBar bar={bar} />
         </Box>
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
           {tileRecipesText(tile.recipes)}
         </Typography>
         <CapNote bar={bar} />
@@ -152,16 +152,16 @@ function UnseenTile({ tile, served, onOpen, onHide }: UnseenTileProps): JSX.Elem
           }}
           sx={{ px: 1.5, py: 1.25, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'flex-start' }}
         >
-          <Stack direction="row" justifyContent="space-between" alignItems="baseline" spacing={1}>
+          <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'baseline' }} spacing={1}>
             <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
               {tile.tradeskill}
             </Typography>
-            <Stack direction="row" spacing={0.5} alignItems="baseline" sx={{ flexShrink: 0 }}>
-              <Typography variant="body2" color="text.secondary" data-testid="tradeskill-tile-not-in-log">
+            <Stack direction="row" spacing={0.5} sx={{ alignItems: 'baseline', flexShrink: 0 }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="tradeskill-tile-not-in-log">
                 {face.level}
               </Typography>
               {face.of !== '' && (
-                <Typography variant="caption" color="text.secondary" data-testid="tradeskill-bar-of">
+                <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="tradeskill-bar-of">
                   {face.of}
                 </Typography>
               )}
@@ -170,7 +170,7 @@ function UnseenTile({ tile, served, onOpen, onHide }: UnseenTileProps): JSX.Elem
           <Box sx={{ my: 0.5 }}>
             <SkillBar bar={levelBar([], tile.tradeskill)} label={face.label} />
           </Box>
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
             {tileRecipesText(tile.recipes)}
           </Typography>
         </CardActionArea>
@@ -197,7 +197,7 @@ function SourcesLine({ guides }: { guides: GuideIndex }): JSX.Element {
   const scrapedAt = useBookScrapedAt()
   const parts = sourceParts(scrapedAt, guides.payload.stamps ?? [])
   return (
-    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1.5 }} data-testid="tradeskills-sources">
+    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 1.5 }} data-testid="tradeskills-sources">
       {SOURCES_LABEL} {parts.join(' · ')}
     </Typography>
   )
@@ -229,7 +229,7 @@ export function TradeskillsHome({ index, onOpen, onOpenRecipe, onPlan, planner }
       <HomePickUp facts={facts} onOpen={onOpen} onOpenRecipe={onOpenRecipe} />
       {planner}
       <HomeWished facts={facts} onPlan={onPlan} />
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }} data-testid="tradeskills-doors-line">
+      <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }} data-testid="tradeskills-doors-line">
         {doorsLine(doors, levels.served)}
       </Typography>
       {/* Until the engine serves the skills module no level is known: the line says what the app waits on. */}

@@ -179,7 +179,7 @@ const Row = memo(function Row(p: RowProps): JSX.Element {
         slotProps={{ primary: { variant: 'body2', noWrap: true }, secondary: { variant: 'caption', noWrap: true } }}
       />
       {level !== undefined && level !== '' && (
-        <Typography variant="caption" color="text.disabled" sx={{ flexShrink: 0 }}>
+        <Typography variant="caption" sx={{ color: 'text.disabled', flexShrink: 0 }}>
           {level}
         </Typography>
       )}
@@ -220,11 +220,11 @@ function CrawlChip({ crawl }: { crawl: CrawlMode }): JSX.Element {
 /** The heading that names an AUTHORITY. Every list in this pane sits under exactly one. */
 function SectionHead({ title, note }: { title: string; note: string }): JSX.Element {
   return (
-    <Stack direction="row" spacing={0.75} alignItems="baseline" sx={{ px: 1 }}>
-      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'baseline', px: 1 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
         {title}
       </Typography>
-      <Typography variant="caption" color="text.disabled" noWrap>
+      <Typography variant="caption" sx={{ color: 'text.disabled' }} noWrap>
         {note}
       </Typography>
     </Stack>
@@ -303,7 +303,7 @@ function Section({
           <div style={{ height: win.bottomPad }} />
         </div>
       ) : (
-        <Typography variant="caption" color="text.disabled" sx={{ px: 1, pb: 0.5 }}>
+        <Typography variant="caption" sx={{ color: 'text.disabled', px: 1, pb: 0.5 }}>
           {empty}
         </Typography>
       )}
@@ -355,7 +355,7 @@ function HitRow({
       {/* A search is a lookup: an out-of-era mob stays in the list and says so (crossZone.ts). */}
       <MobEraChip mob={row} />
       {row.level !== undefined && row.level !== '' && (
-        <Typography variant="caption" color="text.disabled" sx={{ flexShrink: 0, pt: 0.25 }}>
+        <Typography variant="caption" sx={{ color: 'text.disabled', flexShrink: 0, pt: 0.25 }}>
           {row.level}
         </Typography>
       )}
@@ -406,7 +406,7 @@ function HitSection({
           ))}
         </List>
       ) : (
-        <Typography variant="caption" color="text.disabled" sx={{ px: 1, pb: 0.5 }}>
+        <Typography variant="caption" sx={{ color: 'text.disabled', px: 1, pb: 0.5 }}>
           Nothing anywhere else answers to that.
         </Typography>
       )}
@@ -434,7 +434,7 @@ export default memo(function MapMobPane(props: MapMobPaneProps): JSX.Element {
       }}
     >
       <Box sx={{ p: 1, pb: 0.75, flexShrink: 0 }}>
-        <Stack direction="row" spacing={0.5} alignItems="center">
+        <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
           <TextField
             size="small"
             fullWidth
@@ -451,7 +451,7 @@ export default memo(function MapMobPane(props: MapMobPaneProps): JSX.Element {
             </IconButton>
           </Tooltip>
         </Stack>
-        <Stack direction="row" spacing={0.5} sx={{ mt: 0.75 }} flexWrap="wrap" useFlexGap>
+        <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'wrap', mt: 0.75 }} useFlexGap>
           <Tooltip
             title={`${String(counts.located)} of ${String(counts.mobs)} named mobs here state a position`}
           >

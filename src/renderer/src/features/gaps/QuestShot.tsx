@@ -68,7 +68,7 @@ export function keepJournal(read: { lines: string[]; shades?: number[] }, places
 /** One kept picture: its thumbnail and a chip that removes it. */
 function Kept({ thumb, label, onRemove, testId }: { thumb: string | undefined; label: string; onRemove: () => void; testId: string }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" data-testid={testId}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} data-testid={testId}>
       {thumb !== undefined && <Box component="img" src={thumb} alt="" sx={{ height: 48, borderRadius: 0.5, border: 1, borderColor: 'divider' }} />}
       <Chip size="small" color="success" label={label} onDelete={onRemove} title="Remove this picture's reading" />
     </Stack>
@@ -129,7 +129,7 @@ export default function QuestShot({ row }: { row: GapRow }): JSX.Element {
     <Stack spacing={0.75} data-testid="gaps-shot">
       <PasteZone label="Click here and paste the Quest Journal or a popup window (as many as you like)" busy={busy} onPicture={onPicture} />
       {failed !== null && (
-        <Typography variant="body2" color="error.main" data-testid="gaps-shot-error">
+        <Typography variant="body2" sx={{ color: 'error.main' }} data-testid="gaps-shot-error">
           ERROR: unable to read image. {failed}
         </Typography>
       )}

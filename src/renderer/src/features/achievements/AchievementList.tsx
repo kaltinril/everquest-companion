@@ -63,7 +63,7 @@ function Show({
 
 function Controls(props: ListBundle): JSX.Element {
   return (
-    <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" useFlexGap sx={{ pb: 0.5 }}>
+    <Stack direction="row" spacing={1.5} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap', pb: 0.5 }}>
       <TextField
         size="small"
         placeholder="Search achievements and what they require"
@@ -74,8 +74,8 @@ function Controls(props: ListBundle): JSX.Element {
         sx={{ flex: '1 1 220px' }}
         slotProps={{ htmlInput: { 'data-testid': 'achievements-search' } }}
       />
-      <Stack direction="row" spacing={1} alignItems="center">
-        <Typography variant="caption" color="text.secondary">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Show
         </Typography>
         <Show label="Open" checked={props.open} onChange={props.onOpen} testId="achievements-show-open" />
@@ -134,9 +134,8 @@ function OpenOnlyNote(): JSX.Element {
   return (
     <Typography
       variant="caption"
-      color="text.secondary"
       data-testid="achievements-open-only"
-      sx={{ display: 'block', pb: 0.5 }}
+      sx={{ color: 'text.secondary', display: 'block', pb: 0.5 }}
     >
       This file lists open achievements only. To list the finished ones too, tick Complete in the
       game&apos;s Achievements window and press Output To File.
@@ -149,9 +148,9 @@ function Heading({ category }: { category: string }): JSX.Element {
   return (
     <Typography
       variant="overline"
-      color="text.secondary"
       data-testid="achievements-section"
       sx={{
+        color: 'text.secondary',
         display: 'block',
         position: 'sticky',
         top: 0,
@@ -242,7 +241,7 @@ function Rows({ rows, ctx }: { rows: ListRow[]; ctx: RowContext }): JSX.Element 
       })}
       <Box style={{ height: win.bottomPad }} />
       {rows.length === 0 && (
-        <Typography variant="body2" color="text.secondary" sx={{ py: 3, textAlign: 'center' }}>
+        <Typography variant="body2" sx={{ color: 'text.secondary', py: 3, textAlign: 'center' }}>
           No achievement matches that.
         </Typography>
       )}

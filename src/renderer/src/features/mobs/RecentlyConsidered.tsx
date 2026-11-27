@@ -99,7 +99,7 @@ function DropsLine({ drops }: { drops: RowDrops }): JSX.Element | null {
   const shown = drops.all.slice(0, CONSIDER_DROPS_SHOWN)
   if (shown.length === 0) return null
   return (
-    <Typography variant="caption" color="text.secondary" noWrap sx={{ minWidth: 0 }}>
+    <Typography variant="caption" noWrap sx={{ color: 'text.secondary', minWidth: 0 }}>
       drops:{' '}
       {shown.map((item, i) => {
         const mine = drops.countByKey.get(item.toLowerCase())
@@ -142,7 +142,7 @@ function ConsiderRowView({ r, onOpen }: { r: ConsiderRow; onOpen: (r: ConsiderRo
   const quests = k?.quests ?? []
 
   return (
-    <Stack direction="row" spacing={1} alignItems="baseline" sx={{ py: 0.25, minWidth: 0 }}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', py: 0.25, minWidth: 0 }}>
       <Tooltip title={`${CONSIDER_FACTION_LABEL[r.faction]} - click to open its page`}>
         <Typography
           variant="body2"
@@ -163,7 +163,7 @@ function ConsiderRowView({ r, onOpen }: { r: ConsiderRow; onOpen: (r: ConsiderRo
         </Typography>
       </Tooltip>
       {r.level != null && (
-        <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', flexShrink: 0 }}>
           Lvl {r.level}
         </Typography>
       )}
@@ -186,7 +186,7 @@ function ConsiderRowView({ r, onOpen }: { r: ConsiderRow; onOpen: (r: ConsiderRo
       {/* WHEN, coarsely — "conned 12m ago" answers "was that this camp or this morning?" far
           better than a wall clock does. The exact local time is one hover away. */}
       <Tooltip title={formatDateTime(r.ts)}>
-        <Typography variant="caption" color="text.disabled" sx={{ flexShrink: 0 }}>
+        <Typography variant="caption" sx={{ color: 'text.disabled', flexShrink: 0 }}>
           {r.cons > 1 && `×${r.cons} · `}
           conned {formatAge(r.ts)}
         </Typography>
@@ -209,7 +209,7 @@ export function RecentlyConsidered({
     <Paper variant="outlined" sx={{ p: 1, flexShrink: 0 }}>
       <Typography variant="subtitle2" sx={{ color: 'primary.main', mb: 0.5 }}>
         Recently considered{' '}
-        <Typography component="span" variant="caption" color="text.secondary">
+        <Typography component="span" variant="caption" sx={{ color: 'text.secondary' }}>
           ({newestFirst.length})
         </Typography>
       </Typography>

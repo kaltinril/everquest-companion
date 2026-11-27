@@ -54,7 +54,7 @@ function CounterChips({
         <Chip key={name} size="small" variant="outlined" label={name} sx={CHIP_SX} />
       ))}
       {distinct.length > NAMED && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           +{String(distinct.length - NAMED)} more
         </Typography>
       )}
@@ -70,7 +70,7 @@ function Killed({ name, kills }: { name: string; kills: KillMap }): JSX.Element 
   const k = killsFor(kills, name)
   if (k === undefined || k.count === 0) {
     return (
-      <Typography variant="caption" color="text.disabled" data-testid="slayer-mob-kills">
+      <Typography variant="caption" sx={{ color: 'text.disabled' }} data-testid="slayer-mob-kills">
         never killed
       </Typography>
     )
@@ -99,11 +99,9 @@ function MobLine({ mob, bundle }: { mob: PlanMob; bundle: ZoneListBundle }): JSX
     <Stack
       direction="row"
       spacing={0.75}
-      alignItems="center"
-      flexWrap="wrap"
       useFlexGap
       data-testid="slayer-mob"
-      sx={{ py: 0.25 }}
+      sx={{ alignItems: 'center', flexWrap: 'wrap', py: 0.25 }}
     >
       {onOpenMob === undefined ? (
         <Typography variant="body2">{mob.name}</Typography>
@@ -120,11 +118,11 @@ function MobLine({ mob, bundle }: { mob: PlanMob; bundle: ZoneListBundle }): JSX
         </Link>
       )}
       {mob.level !== '' && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           level {mob.level}
         </Typography>
       )}
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {String(mob.spawns)} {mob.spawns === 1 ? 'spawn' : 'spawns'}
       </Typography>
       <Killed name={mob.name} kills={bundle.kills} />
@@ -144,7 +142,7 @@ function ZoneRow({ zone, bundle }: { zone: PlanZone; bundle: ZoneListBundle }): 
   const of = bundle.picked > 0 ? ` of ${String(bundle.picked)}` : ''
   return (
     <Box data-testid="slayer-zone" sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
-      <Stack direction="row" spacing={0.75} alignItems="center" sx={{ py: 0.5 }}>
+      <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', py: 0.5 }}>
         <IconButton
           size="small"
           aria-label={open ? `Hide the mobs in ${zone.name}` : `Show the mobs in ${zone.name}`}
@@ -155,7 +153,7 @@ function ZoneRow({ zone, bundle }: { zone: PlanZone; bundle: ZoneListBundle }): 
           {open ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
         </IconButton>
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap" useFlexGap>
+          <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
             <Typography variant="body2" sx={{ fontWeight: 600 }} data-testid="slayer-zone-name">
               {zone.name}
             </Typography>
@@ -165,17 +163,17 @@ function ZoneRow({ zone, bundle }: { zone: PlanZone; bundle: ZoneListBundle }): 
               label={`${String(zone.targets.length)}${of}`}
               sx={CHIP_SX}
             />
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               {String(zone.spawns)} spawns
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               {levelText(zone)}
             </Typography>
-            <Typography variant="caption" color="text.secondary" data-testid="slayer-zone-killed">
+            <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="slayer-zone-killed">
               {String(killedIn(zone, bundle.kills))} of {String(zone.mobs.length)} killed before
             </Typography>
           </Stack>
-          <Stack direction="row" spacing={0.5} alignItems="center" flexWrap="wrap" useFlexGap>
+          <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
             <CounterChips ids={zone.targets} names={bundle.names} />
           </Stack>
         </Box>
@@ -207,7 +205,7 @@ function ZoneRow({ zone, bundle }: { zone: PlanZone; bundle: ZoneListBundle }): 
 
 function PlanControls(props: ZoneListBundle): JSX.Element {
   return (
-    <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" useFlexGap sx={{ pb: 0.5 }}>
+    <Stack direction="row" spacing={1.5} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap', pb: 0.5 }}>
       <TextField
         size="small"
         type="number"
@@ -249,8 +247,8 @@ function PlanControls(props: ZoneListBundle): JSX.Element {
           label={<Typography variant="caption">No faction hits</Typography>}
         />
       </Tooltip>
-      <Stack direction="row" spacing={1} alignItems="center">
-        <Typography variant="caption" color="text.secondary">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           Sort
         </Typography>
         <ToggleButtonGroup
@@ -295,7 +293,7 @@ export default function ZoneList(props: ZoneListBundle): JSX.Element {
           <ZoneRow key={zone.key} zone={zone} bundle={props} />
         ))}
         {zones.length === 0 && (
-          <Typography variant="body2" color="text.secondary" sx={{ py: 3, textAlign: 'center' }}>
+          <Typography variant="body2" sx={{ color: 'text.secondary', py: 3, textAlign: 'center' }}>
             No known zone has these creatures at this level.
           </Typography>
         )}

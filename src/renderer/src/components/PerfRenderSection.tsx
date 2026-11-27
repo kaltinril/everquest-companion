@@ -49,8 +49,8 @@ const CAVEAT =
  *  reason stated there: a four-line presentational helper is not a dependency worth having. */
 function Fact({ label, value }: { label: string; value: string }): JSX.Element {
   return (
-    <Stack direction="row" justifyContent="space-between" spacing={2}>
-      <Typography variant="caption" color="text.secondary">
+    <Stack direction="row" sx={{ justifyContent: 'space-between' }} spacing={2}>
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         {label}
       </Typography>
       <Typography variant="caption" sx={{ fontVariantNumeric: 'tabular-nums' }}>
@@ -101,7 +101,7 @@ export default function PerfRenderSection({ open }: { open: boolean }): JSX.Elem
     <Stack spacing={0.25} data-testid="perf-render">
       <Divider />
       <Tooltip title={CAVEAT} placement="left">
-        <Typography variant="caption" color="text.secondary" sx={{ pt: 0.5 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', pt: 0.5 }}>
           render commits (dev, this window)
         </Typography>
       </Tooltip>

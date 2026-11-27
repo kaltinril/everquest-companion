@@ -39,9 +39,9 @@ export type RouterDoors = Omit<TradeskillDoors, 'onPlanRecipe'>
 /** The shared Current era toggle (`eq.planner.era`), drawn the Wish list's way, and what it hides here. */
 function EraBar({ eraOnly, setEraOnly, hidden }: { eraOnly: boolean; setEraOnly: (v: boolean) => void; hidden: number }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ flexShrink: 0 }}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexShrink: 0 }}>
       {hidden > 0 && (
-        <Typography variant="caption" color="text.secondary" data-testid="tradeskills-era-hidden">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="tradeskills-era-hidden">
           {hidden} out of era, hidden
         </Typography>
       )}
@@ -218,12 +218,12 @@ function TradeskillsView({ doors, nav, arrival }: { doors: RouterDoors; nav: Nav
   return (
     <DoorsProvider value={allDoors}>
       <Box data-testid="tradeskills-view" sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 2, minHeight: 0 }}>
-        <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
+        <Stack direction="row" spacing={2} sx={{ alignItems: 'center', mb: 1 }}>
           <BackToOrigin nav={nav} />
           <Typography variant="h6">Tradeskills</Typography>
           {/* On Home only: what the section draws on, in one line that gives way before the title does. */}
           {ready && open === null && !planOpen && (
-            <Typography variant="body2" color="text.secondary" noWrap sx={{ minWidth: 0 }} data-testid="tradeskills-subtitle">
+            <Typography variant="body2" noWrap sx={{ color: 'text.secondary', minWidth: 0 }} data-testid="tradeskills-subtitle">
               {HOME_SUBTITLE}
             </Typography>
           )}

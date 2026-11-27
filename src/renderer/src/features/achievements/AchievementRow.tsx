@@ -102,7 +102,7 @@ function Title({ achievement, ids, ctx }: Shown): JSX.Element {
   const zone = namedZone(achievement.name)
   const optional = ids.length > 0 && ids.every((id) => ctx.picks.rows.get(id)?.required === false)
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center">
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center' }}>
       <Typography
         variant="body2"
         noWrap
@@ -140,7 +140,7 @@ function Figures({ achievement, ids, ctx }: Shown): JSX.Element {
         {progressText(achievement)}
       </Typography>
       {row !== undefined && (
-        <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block' }}>
+        <Typography variant="caption" noWrap sx={{ color: 'text.secondary', display: 'block' }}>
           {achievement.done ? '' : `${row.left.toLocaleString('en-US')} left · `}
           {reachText(row.zones)}
         </Typography>
@@ -186,7 +186,7 @@ function AchievementRow(props: RowProps): JSX.Element {
       data-done={achievement.done ? 'true' : 'false'}
       sx={{ borderBottom: '1px solid', borderColor: 'divider', py: 0.5 }}
     >
-      <Stack direction="row" spacing={0.5} alignItems="center" sx={{ height: HEAD_HEIGHT }}>
+      <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', height: HEAD_HEIGHT }}>
         <Box sx={{ width: CARET_WIDTH, flexShrink: 0 }}>
           {many && (
             <Caret

@@ -112,8 +112,8 @@ function Suggestions({ group }: { group: LoadoutGroup }): JSX.Element | null {
   const { party, setParty, suggestions, colorOf } = group
   if (suggestions.length === 0 || party.length >= MAX_PARTY_MEMBERS) return null
   return (
-    <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap" sx={{ mt: 1 }}>
-      <Typography variant="caption" color="text.secondary">
+    <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap', mt: 1 }}>
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         In your group, from /who:
       </Typography>
       {suggestions.map((s) => (
@@ -152,7 +152,7 @@ function AddRow({ group, onDone }: { group: LoadoutGroup; onDone: () => void }):
     onDone()
   }
   return (
-    <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap" sx={{ mt: 1 }}>
+    <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap', mt: 1 }}>
       <TextField
         size="small"
         label="Name"
@@ -197,12 +197,12 @@ export default function LoadoutParty({ group }: { group: LoadoutGroup }): JSX.El
   const [adding, setAdding] = useState(false)
   return (
     <Box data-testid="loadout-party">
-      <Stack direction="row" spacing={1} alignItems="center" useFlexGap flexWrap="wrap">
-        <Typography variant="overline" color="text.secondary">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
+        <Typography variant="overline" sx={{ color: 'text.secondary' }}>
           Group
         </Typography>
         {party.length === 0 ? (
-          <Typography variant="caption" color="text.secondary" data-testid="loadout-party-empty">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="loadout-party-empty">
             Add who you are grouped with and the set is picked from their buffs as well as yours.
           </Typography>
         ) : (

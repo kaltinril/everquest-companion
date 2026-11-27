@@ -294,14 +294,14 @@ function DefaultPackRow({
   const chosen = defaultPackId ? packs.find((p) => p.id === defaultPackId) : undefined
   if (!defaultPackId) {
     return (
-      <Typography variant="caption" color="text.secondary" data-testid="pack-default-row">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="pack-default-row">
         Default pack: the one this app ships. Star any installed pack to make it yours instead.
       </Typography>
     )
   }
   if (chosen) {
     return (
-      <Typography variant="caption" color="text.secondary" data-testid="pack-default-row">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="pack-default-row">
         Default pack: {chosen.name}. New and suggested alerts use it.
       </Typography>
     )
@@ -370,7 +370,7 @@ export default function SoundPacksDialog({
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <Box sx={{ flexGrow: 1 }}>Sound pack registry</Box>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {registry.packs.length} packs
         </Typography>
         <IconButton
@@ -425,14 +425,14 @@ export default function SoundPacksDialog({
                 />
               ))}
               {!registry.loading && filtered.length === 0 && (
-                <Typography variant="body2" color="text.secondary" sx={{ p: 1 }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', p: 1 }}>
                   {registry.packs.length === 0 ? 'No packs available.' : 'No packs match your search.'}
                 </Typography>
               )}
             </Stack>
           </Box>
 
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             Packs from openpeon.com (PeonPing/og-packs) - game-audio packs are typically
             CC-BY-NC; personal use.
           </Typography>

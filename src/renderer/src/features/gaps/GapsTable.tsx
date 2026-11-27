@@ -173,7 +173,7 @@ function DetailsPane({ row, actions }: { row: GapRow; actions: PaneActions }): J
   const hide = hideWords(row)
   return (
     <Paper variant="outlined" sx={{ px: 1.5, py: 0.5, flexShrink: 0, maxHeight: '40vh', overflow: 'auto' }} data-testid="gaps-details-pane">
-      <Stack direction="row" spacing={1} alignItems="center">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
         <Typography variant="subtitle2">{shownName(row)}</Typography>
         <GapRowButtons row={row} pageText={actions.pageText} isDone={isDone} onDone={actions.onDone} />
         {hide !== undefined && (
@@ -187,20 +187,20 @@ function DetailsPane({ row, actions }: { row: GapRow; actions: PaneActions }): J
       {/* The text, and the row's picture beside it when wide, under it when narrow (RowPicture.tsx). */}
       <WithRowPicture row={row}>
         {seen !== undefined && (
-          <Typography variant="caption" color="text.secondary" component="div" data-testid="gaps-seen-by">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }} component="div" data-testid="gaps-seen-by">
             Seen by: {seen.join(', ')}.
           </Typography>
         )}
-        <Typography variant="caption" color="text.secondary" component="div" data-testid="gaps-seen-as">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }} component="div" data-testid="gaps-seen-as">
           Seen as: {row.kinds.join(', ')}.
         </Typography>
         {held.map((h) => (
-          <Typography key={h.who ?? ''} variant="body2" color="success.main" component="div" data-testid="gaps-held-line">
+          <Typography key={h.who ?? ''} variant="body2" sx={{ color: 'success.main' }} component="div" data-testid="gaps-held-line">
             {gapJob(row) === 'update' ? heldWhere(h) : heldLine(h)}
           </Typography>
         ))}
         {row.suggest !== undefined && (
-          <Typography variant="body2" color="text.secondary" component="div" data-testid="gaps-suggest-line">
+          <Typography variant="body2" sx={{ color: 'text.secondary' }} component="div" data-testid="gaps-suggest-line">
             <SuggestCaption s={row.suggest} />
           </Typography>
         )}
@@ -225,7 +225,7 @@ function DetailsPane({ row, actions }: { row: GapRow; actions: PaneActions }): J
           </PageFixNote>
         )}
         {needed.length > 0 && (
-          <Typography variant="caption" color="text.secondary" data-testid="gaps-needed">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="gaps-needed">
             Still needed for the page: {needed.join(', ')}.
           </Typography>
         )}
@@ -318,7 +318,7 @@ function GroupRow({
           {folded ? '▸' : '▾'}
         </Box>
         {zone ? entry.zone : entry.mob}
-        <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+        <Typography component="span" variant="caption" sx={{ color: 'text.secondary', ml: 1 }}>
           {entry.n} missing
         </Typography>
         {zone && <ZoneMapButton zone={entry.zone} />}
@@ -391,7 +391,7 @@ export default function GapsTable({
   const win = useWindowedRows({ count: shown.length, rowHeight: ROW_HEIGHT, scrollRef })
   if (entries.length === 0) {
     return (
-      <Typography variant="body2" color="text.secondary" sx={{ py: 2 }} data-testid="gaps-empty">
+      <Typography variant="body2" sx={{ color: 'text.secondary', py: 2 }} data-testid="gaps-empty">
         {hiddenByFilter
           ? 'No unknown names match the search or the filters.'
           : "Nothing here: every name the log mentioned in this domain is in the app's data."}

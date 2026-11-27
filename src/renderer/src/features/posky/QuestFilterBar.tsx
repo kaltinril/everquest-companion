@@ -401,7 +401,6 @@ const DumpNotCounted = memo(function DumpNotCounted(): JSX.Element {
   return (
     <Typography
       variant="caption"
-      color="text.disabled"
       data-testid="posky-inventory-ignored"
       // A BLOCK, and the same compressed line-height the quiet freshness line uses (OutputFileLine's
       // `QUIET`). Both halves were measured by the e2e rather than guessed: MUI's caption is an
@@ -409,7 +408,7 @@ const DumpNotCounted = memo(function DumpNotCounted(): JSX.Element {
       // its line box — so the default rendering started 5px below the dropdown's edge and ended 4px
       // INSIDE the counts row, which is the one thing this slot is not allowed to do. As a block at
       // 1.2 the element's box IS the line box: flush to the edge above it, 14px tall, inside the gap.
-      sx={{ display: 'block', lineHeight: 1.2 }}
+      sx={{ color: 'text.disabled', display: 'block', lineHeight: 1.2 }}
     >
       Inventory export loaded but not counted - switch to Both to include it.
     </Typography>
@@ -540,7 +539,7 @@ export default function QuestFilterBar({
   inventoryLoadedAt
 }: QuestFilterBarProps): JSX.Element {
   return (
-    <Stack direction="row" spacing={2} flexWrap="wrap" alignItems="center" useFlexGap>
+    <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', alignItems: 'center' }} useFlexGap>
       <QuestPickers
         classes={classes}
         facets={list.facets}

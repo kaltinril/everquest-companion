@@ -43,10 +43,9 @@ export function ZoneScopeBar({ testId }: ZoneScopeBarProps): JSX.Element {
     <Stack
       direction="row"
       spacing={1.5}
-      alignItems="center"
       data-testid={testId}
       data-scope={scope}
-      sx={{ flexWrap: 'wrap', rowGap: 1 }}
+      sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 1 }}
       useFlexGap
     >
       <ToggleButtonGroup

@@ -57,7 +57,6 @@ function ModifierSlot({
     <Stack
       direction="row"
       spacing={0.25}
-      alignItems="baseline"
       data-testid={`stance-slot-${slot}`}
       title={tip ?? `Modifier ${slot} - ${slot === 1 ? 'combat stance' : 'invocation'}: ${value}`}
       sx={{
@@ -65,6 +64,7 @@ function ModifierSlot({
         // runs out of room, and the value below ellipsizes rather than pushing the line into
         // a second row (the header's height is the thing that must not move — see the header
         // Paper). The title always carries the full value, so nothing is lost.
+        alignItems: 'baseline',
         minWidth: 0,
         px: 0.5,
         py: '1px',
@@ -164,7 +164,7 @@ function hasCoat(coat: BladeCoatState | undefined): boolean {
 function HeadlineStat({ seg }: { seg: SegmentView | null }): React.JSX.Element | null {
   if (!seg) return null
   return (
-    <Stack data-testid="headline-stat" direction="row" spacing={0.75} alignItems="baseline" sx={{ flexShrink: 0 }}>
+    <Stack data-testid="headline-stat" direction="row" spacing={0.75} sx={{ alignItems: 'baseline', flexShrink: 0 }}>
       <Typography
         noWrap
         sx={{
@@ -220,15 +220,15 @@ function SubjectLine({
   now: number
 }): React.JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0 }}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', minWidth: 0 }}>
       {/* The subject unit: scope + selector share one bordered affordance, so the pair reads
           as "which list, and which row of it" rather than as two independent controls. It is
           capped so the caret stays next to the fight name; long names ellipsize. */}
       <Stack
         direction="row"
         spacing={0.5}
-        alignItems="center"
         sx={{
+          alignItems: 'center',
           minWidth: 0,
           maxWidth: 'min(560px, 55%)',
           border: '1px solid',
@@ -361,7 +361,7 @@ function DirectionFilter({
  */
 function InCombatDot(): React.JSX.Element {
   return (
-    <Stack direction="row" spacing={0.5} alignItems="center" title="In combat" sx={{ flexShrink: 0 }}>
+    <Stack direction="row" spacing={0.5} title="In combat" sx={{ alignItems: 'center', flexShrink: 0 }}>
       <CircleIcon sx={{ fontSize: 8, color: 'success.main' }} />
       <Typography variant="caption" noWrap sx={{ color: 'text.secondary', display: { xs: 'none', lg: 'block' } }}>
         in combat
@@ -390,7 +390,7 @@ function PassiveStatus({ snap }: { snap: CombatSnapshot | null }): React.JSX.Ele
   return (
     <>
       <Divider orientation="vertical" flexItem sx={{ my: 0.25 }} />
-      <Stack direction="row" spacing={0.5} alignItems="center" sx={{ minWidth: 0, overflow: 'hidden' }}>
+      <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', minWidth: 0, overflow: 'hidden' }}>
         {snap?.stance && <StanceReadout stance={snap.stance} poison={snap.poison} />}
         {snap?.inCombat && <InCombatDot />}
       </Stack>
@@ -467,7 +467,7 @@ export function CombatHeader(p: CombatHeaderProps): React.JSX.Element {
           BELOW md it wraps. Only a zoomed window is that narrow (125% text size on the 900px
           minimum window lays out at 720px), and the scope buttons cannot shrink, so one row cut
           them and the roster button off at the header's edge. A taller bar beats a lost control. */}
-      <Stack direction="row" spacing={0.5} alignItems="center" flexWrap={{ xs: 'wrap', md: 'nowrap' }} useFlexGap sx={{ mt: 0.5, minWidth: 0 }}>
+      <Stack direction="row" spacing={0.5} useFlexGap sx={{ alignItems: 'center', flexWrap: { xs: 'wrap', md: 'nowrap' }, mt: 0.5, minWidth: 0 }}>
         <ViewSwitch view={p.view} setView={p.setView} noTimeline={p.noTimeline} />
 
         {p.view === 'dash' && <DirectionFilter mode={p.mode} setMode={p.setMode} />}

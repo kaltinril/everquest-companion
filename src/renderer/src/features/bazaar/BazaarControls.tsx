@@ -220,7 +220,7 @@ function WindowControls({ state, set }: Props): JSX.Element {
       />
       {state.combineTiers && (
         <Box sx={{ width: 190, px: 1 }} data-testid="bazaar-price-tier">
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             Price at +{state.priceTier}
           </Typography>
           <Slider
@@ -267,7 +267,7 @@ function ListControls({ state, set, onExport }: Props & { onExport: () => void }
 
 export default function BazaarControls({ state, set, quests, onExport }: Props & { quests: QuestOptions; onExport: () => void }): JSX.Element {
   return (
-    <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={2} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
       <FilterControls state={state} set={set} quests={quests} />
       <WindowControls state={state} set={set} />
       <ListControls state={state} set={set} onExport={onExport} />

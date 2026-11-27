@@ -273,7 +273,7 @@ export default function EffectFilterBar({
 }: EffectFilterBarProps): JSX.Element {
   const [axis, setAxis] = groupBy
   return (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'nowrap', mb: 1 }}>
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'nowrap', mb: 1 }}>
       <ItemNarrowing focus={focus} setFocus={setFocus} />
       <ToggleButtonGroup
         exclusive

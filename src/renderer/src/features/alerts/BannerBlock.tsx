@@ -110,8 +110,8 @@ function swatchLabel(c: AlertBannerColor): string {
 /** The one swatch row. Six buttons, no picker — the argument is in shared/alertBanner.ts. */
 function ColorRow({ value, onChange }: { value: AlertBannerColor; onChange: (c: AlertBannerColor) => void }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" data-testid="alert-banner-colors">
-      <Typography variant="caption" color="text.secondary">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} data-testid="alert-banner-colors">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         Colour
       </Typography>
       {ALERT_BANNER_COLORS.map((c) => (
@@ -144,9 +144,8 @@ function OverlayOffNote({ onOpenPrefs }: { onOpenPrefs?: () => void }): JSX.Elem
   return (
     <Typography
       variant="caption"
-      color="text.secondary"
       data-testid="alert-banner-off-note"
-      sx={{ display: 'block', lineHeight: 1.4 }}
+      sx={{ color: 'text.secondary', display: 'block', lineHeight: 1.4 }}
     >
       Turn on the Alert banner overlay to show alerts on screen.
       {onOpenPrefs && (
@@ -213,7 +212,7 @@ export default function BannerBlock({
             onChange={(e) => form.setBannerText(e.target.value.slice(0, MAX_BANNER_CHARS))}
             slotProps={{ inputLabel: { shrink: true } }}
           />
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             Leave it empty and the banner shows the alert&apos;s name. The pattern&apos;s capture
             tokens resolve here as they do in the spoken phrase.
           </Typography>

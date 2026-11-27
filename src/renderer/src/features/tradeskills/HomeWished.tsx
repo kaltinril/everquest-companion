@@ -39,7 +39,7 @@ function WishedRow({ wished, onPlan }: { wished: WishedCraft; onPlan: OpenPlan }
   const heldText = wishedHeldText(wished)
   return (
     <Box sx={{ py: 0.5, borderTop: 1, borderColor: 'divider', minWidth: 0 }} data-testid="tradeskills-wished-row">
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 0.25, minWidth: 0 }}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 0.25, minWidth: 0 }}>
         {/* The name opens the plan for it. */}
         <Box sx={{ minWidth: 0, display: 'flex' }} data-testid="tradeskills-wished-plan">
           <ItemLabel
@@ -51,17 +51,17 @@ function WishedRow({ wished, onPlan }: { wished: WishedCraft; onPlan: OpenPlan }
           />
         </Box>
         <EraChip subject={wished.recipe} />
-        <Typography variant="body2" color="text.secondary" data-testid="tradeskills-wished-skill">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="tradeskills-wished-skill">
           {wishedSkillText(wished)}
         </Typography>
         {heldText !== '' && (
-          <Typography variant="body2" color="success.main" data-testid="tradeskills-wished-held">
+          <Typography variant="body2" sx={{ color: 'success.main' }} data-testid="tradeskills-wished-held">
             {heldText}
           </Typography>
         )}
       </Stack>
       <Tooltip title={GATHER_NOTE}>
-        <Typography variant="body2" color="text.secondary" data-testid="tradeskills-wished-materials">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }} data-testid="tradeskills-wished-materials">
           {wishedMaterialsText(wished)}
         </Typography>
       </Tooltip>
@@ -81,11 +81,11 @@ export function HomeWished({ facts, onPlan }: { facts: HomeFacts; onPlan: OpenPl
   if (rows.length === 0) return null
   return (
     <Paper variant="outlined" sx={{ p: 1.5, mb: 1.5 }} data-testid="tradeskills-wished">
-      <Stack direction="row" spacing={1.5} alignItems="baseline" sx={{ flexWrap: 'wrap', rowGap: 0.5, mb: 0.5 }}>
+      <Stack direction="row" spacing={1.5} sx={{ alignItems: 'baseline', flexWrap: 'wrap', rowGap: 0.5, mb: 0.5 }}>
         <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
           {WISHED_HEADING}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           {WISHED_SUBTITLE}
         </Typography>
       </Stack>

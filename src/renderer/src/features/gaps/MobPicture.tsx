@@ -34,7 +34,7 @@ function AutoSave(): JSX.Element {
       })
       .catch(() => undefined)
   return (
-    <Stack direction="row" spacing={1} alignItems="center" data-testid="gaps-shot-autosave">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} data-testid="gaps-shot-autosave">
       <Line>Save automatically to: {dir ?? 'Off (asks where, starting in the last folder)'}</Line>
       <Button size="small" onClick={() => act('pick')}>
         {dir === null ? 'Choose folder…' : 'Change'}
@@ -53,7 +53,7 @@ function SavedLine({ path, file, name, check, onDelete, onKeep }: { path: string
   if (check === 'deleted') return <Line>Deleted {path}.</Line>
   return (
     <Stack spacing={0.25}>
-      <Stack direction="row" spacing={1} alignItems="center">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
         <Line>Saved to {path}.</Line>
         <Button size="small" onClick={() => void window.eq.shotSavedFile('show', path)}>
           Open folder
@@ -64,7 +64,7 @@ function SavedLine({ path, file, name, check, onDelete, onKeep }: { path: string
       </Stack>
       {check === 'checking' && <Line>Looking for {name} in the picture…</Line>}
       {check === 'missing' && (
-        <Stack direction="row" spacing={1} alignItems="center" data-testid="gaps-shot-name-missing">
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} data-testid="gaps-shot-name-missing">
           <Line warn>Couldn&apos;t find {name} in this picture.</Line>
           <Button size="small" onClick={onKeep}>
             Keep it
@@ -81,7 +81,7 @@ function SavedLine({ path, file, name, check, onDelete, onKeep }: { path: string
 /** A picture held before this paste (saved earlier, or put in the folder by hand): where, Open folder, Upload. */
 function HeldLine({ path, file }: { path: string; file: string }): JSX.Element {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" data-testid="gaps-shot-held">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} data-testid="gaps-shot-held">
       <Line>Already saved: {path}.</Line>
       <Button size="small" onClick={() => void window.eq.shotSavedFile('show', path).catch(() => false)}>
         Open folder
@@ -95,11 +95,11 @@ function HeldLine({ path, file }: { path: string; file: string }): JSX.Element {
 
 /** What a save came to, short of saved. */
 function NotSaved({ result, onReplace, onCancel }: { result: PictureSave; onReplace: () => void; onCancel: () => void }): JSX.Element | null {
-  if (result.status === 'blank') return <Typography variant="body2" color="error.main">ERROR: this picture is blank</Typography>
-  if (result.status === 'error') return <Typography variant="body2" color="error.main">ERROR: {result.message}</Typography>
+  if (result.status === 'blank') return <Typography variant="body2" sx={{ color: 'error.main' }}>ERROR: this picture is blank</Typography>
+  if (result.status === 'error') return <Typography variant="body2" sx={{ color: 'error.main' }}>ERROR: {result.message}</Typography>
   if (result.status !== 'exists') return null
   return (
-    <Stack direction="row" spacing={1} alignItems="center" data-testid="gaps-shot-exists">
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} data-testid="gaps-shot-exists">
       <Line warn>{result.path} already exists.</Line>
       <Button size="small" onClick={onReplace}>
         Replace

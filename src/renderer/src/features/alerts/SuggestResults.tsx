@@ -226,7 +226,7 @@ export default function SuggestResults({
           illusionCreated={illusion ? existingIds.has(illusion.def.id) : false}
         />
         {empty && (
-          <Typography variant="body2" color="text.secondary" sx={{ p: 1 }}>
+          <Typography variant="body2" sx={{ color: 'text.secondary', p: 1 }}>
             Nothing matches “{query}”.
           </Typography>
         )}

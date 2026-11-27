@@ -65,7 +65,7 @@ export function WhatsNewDevRow(): JSX.Element {
 
   return (
     <Stack spacing={0.5} data-testid="whats-new-dev">
-      <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap" useFlexGap>
+      <Stack direction="row" sx={{ alignItems: 'center', flexWrap: 'wrap' }} spacing={1} useFlexGap>
         {VARIANTS.map((v) => (
           <Button
             key={v.id}
@@ -95,7 +95,7 @@ export function WhatsNewDevRow(): JSX.Element {
           sx={{ height: 18, fontSize: 10, '& .MuiChip-label': { px: 0.75 } }}
         />
       </Stack>
-      <Typography variant="caption" color="text.secondary" data-testid="whats-new-dev-note">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="whats-new-dev-note">
         {applied === null
           ? 'Simulate arriving from an older build - the notes above and the strip along the bottom follow immediately.'
           : variantNote(applied)}

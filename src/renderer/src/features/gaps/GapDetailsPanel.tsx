@@ -20,7 +20,7 @@ function SalesCaveat({ details }: { details: GapDetails }): JSX.Element | null {
   const prices = derivedPrices(details)
   if (prices === null) return null
   return (
-    <Typography variant="caption" color="warning.main" sx={{ pl: 8 }} data-testid="gaps-sales-caveat">
+    <Typography variant="caption" sx={{ color: 'warning.main', pl: 8 }} data-testid="gaps-sales-caveat">
       Instant sale pays less than a vendor. Vendor value (the game&apos;s Value line) ≈ {formatCoin(prices.vendorValue)}.
     </Typography>
   )
@@ -36,7 +36,7 @@ function MerchantOffers({ details }: { details: GapDetails }): JSX.Element | nul
   const estimate = derivedPrices(details)?.vendorValue
   return (
     <Stack spacing={0.25} data-testid="gaps-offers">
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
         merchant offers{estimate === undefined ? '' : ` (Value estimate ≈ ${formatCoin(estimate)})`}
       </Typography>
       {[...offers].reverse().map((o) => (
@@ -51,15 +51,15 @@ function MerchantOffers({ details }: { details: GapDetails }): JSX.Element | nul
 function TallyChips({ label, tally }: { label: string; tally: GapTally }): JSX.Element {
   const more = tally.distinct - tally.entries.length
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap" useFlexGap>
-      <Typography variant="caption" color="text.secondary" sx={{ minWidth: 64 }}>
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
+      <Typography variant="caption" sx={{ color: 'text.secondary', minWidth: 64 }}>
         {label}
       </Typography>
       {tally.entries.map((e) => (
         <Chip key={e.name} label={`${e.name} · ${e.n}`} size="small" />
       ))}
       {more > 0 && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           +{more} more
         </Typography>
       )}
@@ -91,7 +91,7 @@ export default function GapDetailsPanel({ row }: { row: GapRow }): JSX.Element {
       <RowMapLinks row={row} />
       {/* Who gave it, who took it, its quest (owner, 2026-10-22: who it is turned in to). */}
       {lines.map((l) => (
-        <Typography key={l} variant="body2" color="info.main" data-testid="gaps-quest-line">
+        <Typography key={l} variant="body2" sx={{ color: 'info.main' }} data-testid="gaps-quest-line">
           {l}
         </Typography>
       ))}
