@@ -79,7 +79,7 @@ mod tests {
 
     #[test]
     fn the_anchor_is_local_midnight_on_launch_day() {
-        let la = Clock::new(eqlog::Tz::America__Los_Angeles);
+        let la = Clock::new(eqlog::Tz::get("America/Los_Angeles").unwrap());
         // 2026-07-28 00:00 PDT is 07:00Z.
         assert_eq!(launch_ms(&la), 1785222000000);
         let utc = Clock::new(eqlog::Tz::UTC);

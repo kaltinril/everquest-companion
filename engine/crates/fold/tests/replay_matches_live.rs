@@ -13,7 +13,11 @@ use serde_json::{json, Value};
 /// Each line as the parser's event, in its JSON spelling.
 fn parsed(lines: &[&str]) -> Vec<String> {
     let me = Some("Primitive".to_string());
-    let parser = Parser::new(Clock::new(Tz::America__Los_Angeles), None, me);
+    let parser = Parser::new(
+        Clock::new(Tz::get("America/Los_Angeles").unwrap()),
+        None,
+        me,
+    );
     let mut out = Vec::new();
     for (seq, raw) in lines.iter().enumerate() {
         let mut ev = Ev::new();

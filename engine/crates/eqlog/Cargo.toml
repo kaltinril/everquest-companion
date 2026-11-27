@@ -17,6 +17,15 @@ aho-corasick = "1.1"
 # The line splitter's and line-terminator test's byte search (scan.rs, parse/mod.rs); already in
 # the lockfile as a dependency of `regex`, so no new crate is vendored.
 memchr = "2"
-chrono = { version = "0.4", default-features = false, features = ["std"] }
-chrono-tz = "0.10"
+# Local wall clock -> instant (timestamp.rs). The zone database is jiff's BUNDLED copy on every
+# platform (`tzdb-bundle-always`, no `tzdb-zoneinfo`), as the compiled-in chrono-tz tables were: one
+# set of zone names and rules wherever the engine runs. `tz-fat` fills the slim bundled data out
+# with explicit transitions when a zone loads, so a lookup is a search rather than a POSIX-rule
+# evaluation. No `tz-system`: the host zone is still named by iana-time-zone below, as before.
+jiff = { version = "1", default-features = false, features = [
+  "std",
+  "tz-fat",
+  "tzdb-bundle-always",
+  "perf-inline",
+] }
 iana-time-zone = "0.1"

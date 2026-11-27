@@ -35,15 +35,16 @@ pub mod stems;
 pub mod tail;
 pub mod taxonomy;
 pub mod timestamp;
+pub mod tz;
 
-/// Re-exported so a consumer names the zone type through this crate rather than pinning its own
-/// `chrono-tz` version — two tz databases in one process is a way for two answers to appear.
-pub use chrono_tz::Tz;
 pub use parse::Parser;
 pub use timestamp::{
     host_timezone, platform_timezone, resolve_zone, Civil, Clock, ResolvedZone, Zone, ZoneHint,
     ZoneSource,
 };
+/// This crate's own zone type over jiff, so a consumer names zones through this crate rather than
+/// pinning its own date library: two tz databases in one process are a way for two answers to show.
+pub use tz::{Tz, UnknownZone};
 
 /// Build the parser the app builds: the effective spell DB installed, and the tailed character's
 /// name known.
@@ -51,7 +52,7 @@ pub use timestamp::{
 /// The character name must be installed before the fold — the self-`/who` rule and the pet-leader
 /// carve-out both decline every line until it is set. The catalog is the process's one copy
 /// (`spelldb::shared`), so a second parser does not pay the 386 ms build again.
-pub fn parser_for(character: &str, tz: chrono_tz::Tz) -> Parser {
+pub fn parser_for(character: &str, tz: Tz) -> Parser {
     Parser::new(
         Clock::new(tz),
         Some(spelldb::shared()),
@@ -91,7 +92,7 @@ mod tests {
 
     fn bare() -> Parser {
         Parser::new(
-            Clock::new(chrono_tz::America::Los_Angeles),
+            Clock::new(crate::Tz::get("America/Los_Angeles").unwrap()),
             None,
             Some("Primitive".to_string()),
         )
@@ -407,7 +408,7 @@ mod tests {
 
     #[test]
     fn the_spell_db_puts_a_candidate_list_on_a_landing() {
-        let p = parser_for("Primitive", chrono_tz::America::Los_Angeles);
+        let p = parser_for("Primitive", crate::Tz::get("America/Los_Angeles").unwrap());
         let out = parse_one(
             &p,
             "[Wed Aug 19 16:21:54 2026] A thunder spirit princess staggers.",
@@ -421,7 +422,7 @@ mod tests {
     /// and land as a buffApply; the self landing used to match nothing at all.
     #[test]
     fn the_resist_family_prints_the_sentences_the_corrections_say() {
-        let p = parser_for("Primitive", chrono_tz::America::Los_Angeles);
+        let p = parser_for("Primitive", crate::Tz::get("America/Los_Angeles").unwrap());
         let out = parse_one(&p, "[Fri Aug 21 20:41:47 2026] Your fire resistance fades.");
         assert!(out.starts_with(r#"{"kind":"buffWearOff","#), "{out}");
         assert!(out.contains(r#""spell":"Resist Fire""#), "{out}");

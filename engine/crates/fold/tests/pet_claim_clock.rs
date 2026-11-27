@@ -12,7 +12,7 @@ use serde_json::{json, Value};
 
 fn fold(lines: &[&str]) -> CombatEngine {
     let parser = Parser::new(
-        Clock::new(Tz::America__Los_Angeles),
+        Clock::new(Tz::get("America/Los_Angeles").unwrap()),
         None,
         Some("Drywrought".to_string()),
     );

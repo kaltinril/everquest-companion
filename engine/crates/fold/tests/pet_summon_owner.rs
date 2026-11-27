@@ -32,7 +32,7 @@ impl RosterSource for Group {
 /// Fold `lines` with Malkil and Kamas in the group.
 fn fold(lines: &[&str]) -> Vec<(String, String, i64)> {
     let parser = Parser::new(
-        Clock::new(Tz::America__Los_Angeles),
+        Clock::new(Tz::get("America/Los_Angeles").unwrap()),
         None,
         Some("Drywrought".to_string()),
     );

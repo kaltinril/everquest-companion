@@ -133,7 +133,7 @@ mod tests {
     use protocol::generated::ViewDescriptor;
 
     fn clock() -> eqlog::Clock {
-        eqlog::Clock::new(eqlog::Tz::America__Los_Angeles)
+        eqlog::Clock::new(eqlog::Tz::get("America/Los_Angeles").unwrap())
     }
 
     /// A fold fed hand-written events. `launch_ms` is `i64::MAX` so the rebirth boundary never

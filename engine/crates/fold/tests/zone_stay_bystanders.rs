@@ -11,7 +11,11 @@ use fold::event::Event;
 use serde_json::{json, Value};
 
 fn fold(lines: &[&str]) -> CombatEngine {
-    let parser = Parser::new(Clock::new(Tz::America__Los_Angeles), None, None);
+    let parser = Parser::new(
+        Clock::new(Tz::get("America/Los_Angeles").unwrap()),
+        None,
+        None,
+    );
     let mut engine = CombatEngine::new();
     engine.set_player_name("Primitive");
     for (seq, raw) in lines.iter().enumerate() {

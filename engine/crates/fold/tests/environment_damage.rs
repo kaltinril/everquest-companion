@@ -20,7 +20,11 @@ impl Run {
         let mut engine = CombatEngine::new();
         engine.set_player_name("Primitive");
         Run {
-            parser: Parser::new(Clock::new(Tz::America__Los_Angeles), None, None),
+            parser: Parser::new(
+                Clock::new(Tz::get("America/Los_Angeles").unwrap()),
+                None,
+                None,
+            ),
             engine,
             seq: 0,
         }
@@ -47,7 +51,11 @@ impl Run {
 
 /// The instant a line is stamped with.
 fn ts_of(raw: &str) -> i64 {
-    let p = Parser::new(Clock::new(Tz::America__Los_Angeles), None, None);
+    let p = Parser::new(
+        Clock::new(Tz::get("America/Los_Angeles").unwrap()),
+        None,
+        None,
+    );
     let mut ev = Ev::new();
     assert!(p.parse_event(raw, 0, &mut ev));
     let v: Value = serde_json::from_str(ev.finish()).unwrap();
@@ -101,7 +109,11 @@ const CRAWLER: [&str; 11] = [
 
 #[test]
 fn the_line_parses_as_damage_to_you_with_no_attacker() {
-    let p = Parser::new(Clock::new(Tz::America__Los_Angeles), None, None);
+    let p = Parser::new(
+        Clock::new(Tz::get("America/Los_Angeles").unwrap()),
+        None,
+        None,
+    );
     for (raw, amount) in [
         (BURNING[0], 10),
         (

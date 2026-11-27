@@ -8,7 +8,7 @@ use serde_json::Value;
 
 fn parsed(text: &str) -> Value {
     let p = Parser::new(
-        Clock::new(chrono_tz::America::Los_Angeles),
+        Clock::new(eqlog::Tz::get("America/Los_Angeles").unwrap()),
         None,
         Some("Drywrought".to_string()),
     );

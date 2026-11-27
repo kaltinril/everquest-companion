@@ -104,7 +104,7 @@ mod tests {
     use protocol::Cell;
 
     fn clock() -> eqlog::Clock {
-        eqlog::Clock::new(eqlog::Tz::America__Los_Angeles)
+        eqlog::Clock::new(eqlog::Tz::get("America/Los_Angeles").unwrap())
     }
 
     fn folded(lines: &[&str]) -> fold::Fold {
