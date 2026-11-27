@@ -161,8 +161,10 @@ function exploreCaveats(found: Explored): string[] {
   return [`${recipes} nothing in the data to set them apart. They are on the Recipes tab.`]
 }
 
-function exploreEmpty(ctx: RouteCtx, found: Explored): string {
+/** Why Explore lists nothing. Past the top trivial it looked at no recipe, so it says where the data ends. */
+function exploreEmpty(ctx: RouteCtx, found: Explored, top: number | null): string {
   if (!ctx.facts.craft.served) return 'Your log is still being read: what you have made is not known yet.'
+  if (found.total === 0 && (top === null || found.floor > top)) return ladderEmpty(ctx, top)
   if (found.total === 0) return `Your log shows you have made every ${ctx.tradeskill} recipe the wiki rates from trivial ${String(found.floor)} up.`
   return found.groups.length === 0 ? 'Nothing in the data sets the recipes you have not made apart from each other.' : ''
 }
@@ -200,7 +202,7 @@ function heldRoute(ctx: RouteCtx, goal: HeldGoal, top: number | null): Built {
   return { ...built, empty: past ? ladderEmpty(ctx, top) : heldEmptyText(ctx) }
 }
 
-function exploreRoute(ctx: RouteCtx): Built {
+function exploreRoute(ctx: RouteCtx, top: number | null): Built {
   const found = explore(ctx)
   const drewGuide = found.groups.some((group) => group.id === 'guide')
   return {
@@ -208,7 +210,7 @@ function exploreRoute(ctx: RouteCtx): Built {
     basis: found.total === 0 ? BASIS.explore : exploreBasis(found),
     caveats: exploreCaveats(found),
     credits: drewGuide ? [GUIDE_REASONS_CREDIT] : [],
-    empty: exploreEmpty(ctx, found)
+    empty: exploreEmpty(ctx, found, top)
   }
 }
 
@@ -227,7 +229,7 @@ export function buildRoute(facts: RouteFacts, ask: RouteAsk): Route {
   const builders: Record<BookGoal, () => Built> = {
     cheapest: () => cheapestRoute(ctx, top),
     fastest: () => fastestRoute(ctx, top),
-    explore: () => exploreRoute(ctx),
+    explore: () => exploreRoute(ctx, top),
     guide: () => guideRoute(ctx, ask.level)
   }
   const held = ask.heldOnly === true && isHeldGoal(ask.goal) ? ask.goal : null

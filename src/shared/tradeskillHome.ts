@@ -113,9 +113,14 @@ export function pickUp(ask: PickUpAsk): PickUp | null {
 
 export const PICK_UP_HEADING = 'Pick up where you left off'
 
-/** Why this tradeskill: "You last combined here on Sep 12, 2026." `when` is that date, already formatted. */
-export function pickUpWhyText(pick: Pick<PickUp, 'lastCombine'>, when: string): string {
-  return pick.lastCombine === null ? 'Your highest tradeskill. Your log shows no combine yet.' : `You last combined here on ${when}.`
+/**
+ * Why this tradeskill: "You last combined here on Sep 12, 2026." `when` is that date, already
+ * formatted. With a run but no combine placed in a tradeskill, the log did show combines, so it
+ * is not said to show none.
+ */
+export function pickUpWhyText(pick: Pick<PickUp, 'lastCombine' | 'lastRun'>, when: string): string {
+  if (pick.lastCombine !== null) return `You last combined here on ${when}.`
+  return pick.lastRun === null ? 'Your highest tradeskill. Your log shows no combine yet.' : 'Your highest tradeskill.'
 }
 
 /** What the held materials cover of the next recipe; '' when that cannot be counted. */

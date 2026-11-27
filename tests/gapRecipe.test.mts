@@ -12,6 +12,7 @@ import { gapJob } from '../src/shared/gapJob'
 import { needsWords, openNeeds } from '../src/shared/gapReady'
 import {
   RECIPE_NEED,
+  RECIPE_TRADE_NEED,
   addMaterial,
   changeMaterial,
   containerOptions,
@@ -265,4 +266,28 @@ test('a page that exists without materials is an Update row whose Copy says wher
     "On Picnic Basket, replace | playercrafted = with:\n\n|playercrafted = \n\n* [[Tailoring]] (Trivial: 76)\n** '''Yield: Picnic Basket''' x1\n** In [[Large Sewing Kit]]:\n:: {{SmIcon|572}} 2 x [[Woven Mandrake]] - Crafted\n:: {{SmIcon|1034}} 1 x [[Steel Boning]] - Crafted, Bought\n"
   )
   assert.deepEqual(combinedNames([combine('B'), combine('A'), combine('B')]), ['A', 'B'])
+})
+
+test('with no tradeskill known, Copy on an existing page writes no blank | playercrafted and says to pick the tradeskill first', () => {
+  // Audit 2026-11-27 tradeskills-3: no skill-up in the log and none named on the page (Plain Rock).
+  const [r] = recipeRows([{ name: 'Plain Rock', page: 'Plain Rock' }], [combine('Plain Rock')], [])
+  assert.ok(r.recipeUpdate)
+  const typed = { ...r, edit: { recipe: { container: 'Mixing Bowl', materials: [{ name: 'Silk', qty: 1 }] } } }
+  for (const [label, at] of [['nothing typed', r], ['materials and a container typed', typed]] as const) {
+    const copy = wikiPageText(at, [], {})
+    assert.doesNotMatch(copy, /playercrafted =/, label)
+    assert.equal(copy, "On Plain Rock, pick the recipe's tradeskill first: Copy writes | playercrafted once it is known.\n", label)
+  }
+  // The tradeskill is the only thing missing: the need names it.
+  assert.deepEqual(stillNeeded(typed, [], {}, {}), [RECIPE_TRADE_NEED])
+  assert.equal(needsWords(openNeeds(typed, stillNeeded(typed, [], {}, {}), { pictures: {} })), 'recipe tradeskill')
+  // Nothing typed yet: the need is the recipe, as before.
+  assert.deepEqual(stillNeeded(r, [], {}, {}), [RECIPE_NEED])
+  // A note still goes to the page notes, as before.
+  const noted = { ...typed, edit: { recipe: { ...typed.edit.recipe, notes: 'Summer only.' } } }
+  assert.equal(wikiPageText(noted, [], {}), "On Plain Rock, pick the recipe's tradeskill first: Copy writes | playercrafted once it is known.\n\nAdd to | notes =\n\nSummer only.\n")
+  // Once picked, Copy writes the field whole.
+  const picked = { ...typed, edit: { recipe: { ...typed.edit.recipe, tradeskill: 'Baking' } } }
+  assert.deepEqual(stillNeeded(picked, [], {}, {}), [])
+  assert.match(wikiPageText(picked, [], {}), /^On Plain Rock, replace \| playercrafted = with:\n\n\|playercrafted = \n\n\* \[\[Baking\]\]/)
 })
