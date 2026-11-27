@@ -126,6 +126,7 @@ import {
 } from './logReadState'
 import { SERVABLE, type Readiness } from './readShim'
 import type { ReadyEngine } from './supervisor'
+import { OWN_CONNECTION_HEALTH_DEADLINE_MS } from './engineProtocol'
 import type { ParamsFor, RequestOp, ResultFor } from '../../shared/dataServer/ops'
 import type { CharacterRef } from '../../shared/types'
 
@@ -853,7 +854,8 @@ export async function ownConnectionHealth(token: string): Promise<void> {
   if (l?.engine.token !== token || l.client.state !== 'ready') {
     throw new EngineError('unavailable', 'the app has no open connection to this launch')
   }
-  await l.client.request('session.health', {})
+  // Its own deadline, past the watch's wait: the ordinary 15 s would cut the watch's 20 s short.
+  await l.client.request('session.health', {}, OWN_CONNECTION_HEALTH_DEADLINE_MS)
 }
 
 /**
