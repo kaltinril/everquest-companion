@@ -50,6 +50,10 @@ export interface AaRanked {
   unlisted: boolean
   /** A one-rank AA the list printed and nothing else in the log settles: held or not, unknown. */
   unknown?: true
+  /** The `/alt list` run decided the rank (or a purchase after it did): no pick is read. */
+  listed?: true
+  /** The rank the player's own lines show: a pick below it is not read. */
+  usedRank?: number
 }
 
 /** What the log says of one row besides its purchase lines (shared/aaList.ts). */
@@ -95,13 +99,13 @@ export function aaKey(row: AaTableRow): string {
 
 const clamp = (n: number, max: number): number => Math.max(0, Math.min(max, Math.floor(n)))
 
-type Held = Pick<AaRanked, 'rank' | 'source'> & { unknown?: true }
+type Held = Pick<AaRanked, 'rank' | 'source' | 'unknown' | 'listed' | 'usedRank'>
 
 /** Below the list: what the player's own lines show, else the pick, else the purchase lines. */
 function heldBelowList(pick: number | undefined, logRank: number | null, ev: AaEvidence, max: number): Held {
   const lower: Held | null = pick !== undefined ? { rank: clamp(pick, max), source: 'pick' } : logRank !== null && logRank > 0 ? { rank: logRank, source: 'log' } : null
   // A pick or purchase above what the lines show still counts; below it, the lines win.
-  if (ev.activated !== undefined) return lower !== null && lower.rank >= ev.activated ? lower : { rank: ev.activated, source: 'activated' }
+  if (ev.activated !== undefined) return { ...(lower !== null && lower.rank >= ev.activated ? lower : { rank: ev.activated, source: 'activated' }), usedRank: ev.activated }
   if (lower !== null) return lower
   return ev.printed === true ? { rank: 0, source: 'none', unknown: true } : { rank: 0, source: 'none' }
 }
@@ -110,7 +114,7 @@ function heldBelowList(pick: number | undefined, logRank: number | null, ev: AaE
 function heldByList(ev: AaEvidence): Held | null {
   if (ev.list === undefined) return null
   const after = ev.after ?? 0
-  return after > ev.list ? { rank: after, source: 'log' } : { rank: ev.list, source: 'list' }
+  return after > ev.list ? { rank: after, source: 'log', listed: true } : { rank: ev.list, source: 'list', listed: true }
 }
 
 /** THE LOG WINS on the top rank: the wiki's count, or a purchase's or a cast's numeral above it. */
@@ -280,4 +284,9 @@ export function withAaPick(all: AaPicksByCharacter, who: string, key: string, ra
   const mine = Object.fromEntries(rank === null ? others : [...others, [key, rank]])
   const rest = Object.entries(all).filter(([w]) => w !== who)
   return Object.fromEntries(Object.keys(mine).length === 0 ? rest : [...rest, [who, mine]])
+}
+
+/** Whether the order of proof reads a pick of `n` on this row: never under the list, never below a use line. */
+export function aaPickHeard(r: AaRanked, n: number): boolean {
+  return r.listed !== true && n >= (r.usedRank ?? 0)
 }

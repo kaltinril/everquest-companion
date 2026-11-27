@@ -8,7 +8,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { AA_SPELL_NAMES, aaBlockRank, aaListRead, aaRowListRank, type AaActivation, type AaListBlock, type AaListRun } from '../src/shared/aaList'
-import { aaKey, rankAasFrom, type AaLogInput, type AaPicks, type AaRanked } from '../src/shared/aaRanks'
+import { aaKey, aaPickHeard, rankAasFrom, type AaLogInput, type AaPicks, type AaRanked } from '../src/shared/aaRanks'
 import { withGranted } from '../src/shared/aaGranted'
 import { aaBoard, aaCantTell, aaLeft } from '../src/shared/aaBoard'
 import { aaRecommend } from '../src/shared/aaRecommend'
@@ -243,4 +243,26 @@ test('mergeLeveling: a name stays castOnly only when every segment saw it only a
   assert.deepEqual(mergeLeveling(bare, bare)?.aaActivations, [{ name: 'Divine Aura', first: 1, last: 2, castOnly: true }])
   assert.deepEqual(mergeLeveling(bare, proved)?.aaActivations, [{ name: 'Divine Aura', first: 1, last: 6 }])
   assert.deepEqual(mergeLeveling(proved, bare)?.aaActivations, [{ name: 'Divine Aura', first: 1, last: 6 }])
+})
+
+test('THE RANK PICKER offers only the picks the order of proof reads: none under a list a purchase beat, none below a use line', () => {
+  const at = (hm: string): number => Date.parse(`2026-11-25T${hm}`)
+  const fury = (pct: number, cost: number): AaListBlock => ({ id: 40, name: 'Combat Fury', description: `with all skills by ${String(pct)}%.`, cost })
+  const stale: AaListRun = { ts: at('15:44:21'), zoneBefore: at('15:30:00'), blocks: [fury(2, 2), fury(3, 3)] }
+  const bought = [1, 2, 3].map((k) => spend('Combat Fury', k, at('15:42:00') + k))
+  const cases: [string, Partial<AaLogInput>, AaPicks][] = [
+    ['list 2/4 beaten by a later purchase of rank 3', { list: stale, spends: bought }, {}],
+    ['the list alone', { list: FRESH }, {}],
+    ['seen used at rank 2 of 4', { activations: [{ ...act('Combat Fury'), rank: 2 }] }, {}],
+    ['a pick of 3 above a use at rank 2', { activations: [{ ...act('Combat Fury'), rank: 2 }] }, { 'Combat Fury': 3 }],
+    ['purchase lines only', { spends: bought }, {}]
+  ]
+  for (const [name, input, picks] of cases) {
+    const shown = row(ranks(input, picks, ['ENC', 'WAR']), 'Combat Fury')
+    for (let n = 0; n <= shown.max; n++) {
+      const after = row(ranks(input, { ...picks, 'Combat Fury': n }, ['ENC', 'WAR']), 'Combat Fury')
+      assert.equal(aaPickHeard(shown, n), after.source === 'pick' && after.rank === n, `${name}: pick ${String(n)}`)
+    }
+  }
+  assert.equal(row(ranks({ list: stale, spends: bought }), 'Combat Fury').source, 'log')
 })
