@@ -3470,6 +3470,61 @@ what a later change must know. Each fix has a unit test that failed before it.
 - Not changed: at launch the overlay first draws the last session's stored payload until the feed
   writes.
 
+## Bug hunt 2026-11-27: the rules its fixes left in force
+
+Findings and verdicts: `audits/2026-11-27-bug-hunt-and-duplicates.md`. Each rule below has a unit
+test that failed before the fix.
+
+- Tradeskills, Pick up: `pickUpWhyText` takes `lastCombine` and `lastRun`. "Your log shows no
+  combine yet." only when both are null; a run with no combine placed in a tradeskill reads "Your
+  highest tradeskill." alone.
+- Tradeskills, Explore: `exploreRoute`/`exploreEmpty` take the route's `topTrivial`. Total 0 and
+  (top null or floor > top) gives `ladderEmpty(ctx, top)`, as Cheapest and Fastest do. The "made
+  every ... from trivial N up" sentence only for floor <= top with every rated recipe made.
+- Gaps recipe Copy: `recipeAddText` with `recipeTrade(row)` undefined returns "On <page>, pick the
+  recipe's tradeskill first ..." plus any notes block; it never writes `replace | playercrafted =`
+  with a blank value (pasted, that erases the page's facts). `RECIPE_TRADE_NEED` only on a
+  recipeUpdate row whose container and counted materials are stated (`combineStated`). A New-page
+  row with no tradeskill still says "recipe" (READY test).
+- AA spell-name collisions (aa-1): fold `leveling_aa.rs` publishes `castOnly: true` on an
+  `aaActivations` entry whose every line so far was a castBegin with no numeral; an aaActivate,
+  aaOwned, Finishing Blow line or ranked cast clears it (and announces). `shared/aaList.ts`
+  `AA_SPELL_NAMES` (divine aura, stoicism, rampage) is pinned against `src/main/data/spells.json`
+  by `tests/aaList.test.mts`: regenerate it when that test goes red after a data refresh.
+  `aaActivatedRows` skips a castOnly entry with one of those names; `mergeLeveling` keeps castOnly
+  only when both sides have it. Archive segments from before the field keep the old behaviour until
+  refolded.
+- AA picker (aa-2): `AaRanked.listed` (from `heldByList`, on 'list' and on 'log' when a purchase
+  beat the list) and `AaRanked.usedRank`. `aaPickHeard(r, n)` in `shared/aaRanks.ts` is the one
+  rule: picker disabled when listed (caption "from /alt list"), items below usedRank disabled.
+- AA one per key (aa-3): `aaOnePerKey` (`shared/aaBoard.ts`) in `aaLeft`, `aaSpent`, `aaTabCount`,
+  `aaRecommend` and `aaPlanDelta`, after their usable/buyable filter. `aaPlanDelta` compares rows by
+  `r.key`, not by object (the own and planned boards are ranked apart; `withGranted` makes new
+  objects). Lists and the search count still show both Quick Evacuation rows; it is the only key two
+  rows share.
+- AA jump (aa-4): `aaJumpView` gives `AaView.jump` the scope and maxLevel; unchanged when
+  `aaTabGroups` already shows the row, else maxLevel cleared if the row is past it, then scope
+  'all' if still hidden.
+- BiS bow rule now lives in FOUR places that must agree: the search's bow variant (`bisSearch.ts`),
+  `bisCaps` `bowRuleHolds`, `withArrow`, and `buildBisSheet`'s AMMO readback. `withArrow` runs after
+  the exact search and again after `solveWithCaps` (the arrow priced with `cappedValue`, never a
+  candidate of the pass). With no arrow admitted, AMMO is read off its own list, so card, totals,
+  filled and total agree; `arrowForBow` is set only on a real arrow. Open neighbour (review nit): a
+  caps pass that moves a bow in while AMMO holds a non-arrow item.
+- BiS Level box (`BisView.LevelInput`, `bisPrefs.typedLevel`): local text; empty or non-numeric
+  stores nothing and shows the stored level again on blur; a number is stored through `clampLevel`.
+- Macros (`src/main/ipc/macros.ts`): only ENOENT starts an empty library. Any other read failure
+  is logged, rejects `macrosLoad`, leaves `loaded` false; a save before a good load reads first and
+  writes nothing if that read fails. The player sees the tab's "could not be loaded" line.
+- Click-through item card (`lib/KnownItemTooltip.tsx` `NEVER_UPWARD`): flip off, preventOverflow
+  `{ mainAxis: true, altAxis: false, padding: 8 }`, the same as `GearCompareCard` (JOS-344); for a
+  bottom placement mainAxis is horizontal. The cards stay separate; `tests/clickThroughCardAxes.test.mts`
+  pins that their pairs agree.
+- Reading log, own-connection second opinion: runs under `OWN_CONNECTION_HEALTH_DEADLINE_MS` =
+  `ENGINE_OWN_CONNECTION_TIMEOUT_MS` + 5 s (`engineProtocol.ts`), passed as the optional third
+  argument of `EngineClient.request`. The supervisor's 20 s timer is the only bound on the ask;
+  `REQUEST_DEADLINE_MS` (15 s) applies to every other request.
+
 ## Chart readout: drawn on body (2026-11-20)
 
 - `lib/ChartTooltip.tsx` draws its card with `createPortal` on `document.body`, `position: fixed`,
