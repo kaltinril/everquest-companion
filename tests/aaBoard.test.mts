@@ -256,7 +256,22 @@ test('QUICK EVACUATION (a Druid and a Wizard row) is one AA for a DRU/WIZ combo:
     const recs = aaRecommend(board, 40)
     assert.equal(recs.items.filter((i) => i.b.r.key === 'Quick Evacuation').length, 1)
     assert.deepEqual([recs.used, recs.total], [aaRecommend(once, 40).used, aaRecommend(once, 40).total])
+    // Planning DRU/WIZ from the owner's WAR/SHM/MNK: the plan header's adds and points count it once.
+    const planned = aaBoard(ranked(picks, dw), { classes: dw, own: false })
+    const plannedOnce = planned.filter((b) => !(b.r.key === 'Quick Evacuation' && b.r.row.class === 'Wizard'))
+    const ownBoard = aaBoard(ranked(picks), own)
+    assert.deepEqual(aaPlanDelta(planned, ownBoard), aaPlanDelta(plannedOnce, ownBoard))
+    // Planning WIZ from a Druid: the Wizard row is the AA the Druid already has, so it is neither added nor dropped.
+    const wiz = aaBoard(ranked(picks, ['WIZ']), { classes: ['WIZ'], own: false })
+    const dru = aaBoard(ranked(picks, ['DRU']), { classes: ['DRU'], own: true })
+    const noQe = (brd: readonly AaBoardRow[]): AaBoardRow[] => brd.filter((b) => b.r.key !== 'Quick Evacuation')
+    assert.deepEqual(aaPlanDelta(wiz, dru), aaPlanDelta(noQe(wiz), noQe(dru)))
   }
+})
+
+test('THE PLAN compares rows by AA, not by object: the same combo ranked twice adds and drops nothing', () => {
+  // The app ranks the own board and a planned board separately (free ranks differ by class), so a row can be a new object.
+  assert.deepEqual(aaPlanDelta(aaBoard(ranked(), own), aaBoard(ranked(), own)), { adds: 0, points: 0, unknown: false, drops: 0 })
 })
 
 test('A JUMP to a row the level filter or the scope hides widens just enough to show it; a shown row leaves both alone', () => {

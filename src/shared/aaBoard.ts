@@ -255,13 +255,17 @@ export interface AaPlanDelta {
   drops: number
 }
 
-/** What planning another combo changes against the character's own. */
+/**
+ * What planning another combo changes against the character's own. Rows are compared by key, one AA a
+ * key: the two boards are ranked apart (a free rank makes a new row object), and Quick Evacuation's
+ * Druid and Wizard rows are one AA, so a DRU/WIZ plan adds it once and a Druid planning Wizard keeps it.
+ */
 export function aaPlanDelta(planned: readonly AaBoardRow[], own: readonly AaBoardRow[]): AaPlanDelta {
-  const ownUsable = new Set(own.filter((b) => b.usable).map((b) => b.r))
-  const added = planned.filter((b) => b.usable && !ownUsable.has(b.r) && b.cost !== null)
+  const ownUsable = new Set(own.filter((b) => b.usable).map((b) => b.r.key))
+  const added = aaOnePerKey(planned.filter((b) => b.usable && !ownUsable.has(b.r.key) && b.cost !== null))
   const sum = aaCostSum(added.map((b) => b.cost))
-  const plannedUsable = new Set(planned.filter((b) => b.usable).map((b) => b.r))
-  return { adds: added.length, points: sum.total - sum.spent, unknown: sum.unknown, drops: [...ownUsable].filter((r) => !plannedUsable.has(r)).length }
+  const plannedUsable = new Set(planned.filter((b) => b.usable).map((b) => b.r.key))
+  return { adds: added.length, points: sum.total - sum.spent, unknown: sum.unknown, drops: [...ownUsable].filter((k) => !plannedUsable.has(k)).length }
 }
 
 /** The groups in "what it does" order, each with its rows; empty groups left out. */
