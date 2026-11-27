@@ -136,7 +136,7 @@ function Figures({ achievement, ids, ctx }: Shown): JSX.Element {
   const row = ids.length === 1 ? ctx.picks.rows.get(ids[0]) : undefined
   return (
     <Box sx={{ textAlign: 'right', minWidth: 96, flexShrink: 0, pr: 1 }}>
-      <Typography variant="body2" color={achievement.done ? 'text.secondary' : 'text.primary'}>
+      <Typography variant="body2" sx={{ color: achievement.done ? 'text.secondary' : 'text.primary' }}>
         {progressText(achievement)}
       </Typography>
       {row !== undefined && (

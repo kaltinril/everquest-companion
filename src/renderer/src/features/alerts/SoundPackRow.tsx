@@ -74,7 +74,7 @@ function PackProgress({
   const isError = prog.phase === 'error' && prog.retryable !== true
   return (
     <Box sx={{ mt: 0.75 }}>
-      <Typography variant="caption" color={isError ? 'error' : 'text.secondary'}>
+      <Typography variant="caption" sx={{ color: isError ? 'error.main' : 'text.secondary' }}>
         {phaseLabel(prog)}
       </Typography>
       {installing && (

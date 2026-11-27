@@ -30,7 +30,7 @@ const LEVEL_TIP = 'The level the wiki gives for rank 1. The wiki can be wrong: f
 function LevelCell({ b }: { b: AaBoardRow }): JSX.Element {
   const level = b.r.row.section === 'special' ? '-' : (aaStartLevel(b) ?? '?')
   return (
-    <Typography variant="caption" color={b.usable ? 'text.secondary' : 'text.disabled'} data-testid="aa-level">
+    <Typography variant="caption" sx={{ color: b.usable ? 'text.secondary' : 'text.disabled' }} data-testid="aa-level">
       {String(level)}
     </Typography>
   )
@@ -136,7 +136,7 @@ function RankCell({ b }: { b: AaBoardRow }): JSX.Element {
 function EffectCell({ b }: { b: AaBoardRow }): JSX.Element {
   const line = aaEffectLine(b.effect, b.usable ? b.r.rank : 0, b.max)
   return (
-    <Typography variant="caption" color={b.usable ? 'text.secondary' : 'text.disabled'} noWrap>
+    <Typography variant="caption" sx={{ color: b.usable ? 'text.secondary' : 'text.disabled' }} noWrap>
       {line.label}
       {line.now !== null && (
         <Box component="b" sx={{ ml: 0.75, color: 'text.primary' }}>
@@ -220,7 +220,7 @@ export function AaList({ groups, classes, setPick, showClass = false, sort, setS
       {(sort === undefined ? groups : aaSortGroups(groups, sort)).map((g) => (
         <Fragment key={`${g.kind}:${g.title ?? ''}`}>
           {g.title !== null && (
-            <Typography variant="overline" component="div" color={g.kind === 'mine' ? 'text.secondary' : 'text.disabled'} sx={{ px: 1, pt: 1.25, lineHeight: 1.6 }}>
+            <Typography variant="overline" component="div" sx={{ color: g.kind === 'mine' ? 'text.secondary' : 'text.disabled', px: 1, pt: 1.25, lineHeight: 1.6 }}>
               {g.title}
             </Typography>
           )}

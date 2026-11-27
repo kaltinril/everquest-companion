@@ -367,8 +367,7 @@ function Legend({
           />
           <Typography
             variant="caption"
-            color={hidden ? 'text.disabled' : 'text.secondary'}
-            sx={{ textDecoration: hidden ? 'line-through' : undefined }}
+            sx={{ color: hidden ? 'text.disabled' : 'text.secondary', textDecoration: hidden ? 'line-through' : undefined }}
           >
             {label}
           </Typography>

@@ -51,7 +51,7 @@ export function useAaFacts(): AaFacts {
 function BoughtWords({ line, text }: { line: AaLine; text: string }): JSX.Element | null {
   if (text === '') return null
   const words = (
-    <Typography variant="caption" color={line.bought ? 'success.main' : 'text.secondary'} noWrap data-testid="tradeskill-aa-bought">
+    <Typography variant="caption" sx={{ color: line.bought ? 'success.main' : 'text.secondary' }} noWrap data-testid="tradeskill-aa-bought">
       {text}
     </Typography>
   )

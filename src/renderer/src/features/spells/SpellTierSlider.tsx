@@ -73,8 +73,7 @@ export default function SpellTierSlider({
       <Typography
         variant="caption"
         data-testid={`${testId}-label`}
-        color={tier > 0 ? 'primary.main' : 'text.secondary'}
-        sx={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}
+        sx={{ color: tier > 0 ? 'primary.main' : 'text.secondary', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}
       >
         {tierLabel(tier)}
       </Typography>

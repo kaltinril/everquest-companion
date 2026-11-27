@@ -195,7 +195,7 @@ function LineField({ index, value, onChange, known, onCursor }: LineFieldProps):
           }}
         />
         {hint.text !== '' && (
-          <Typography variant="caption" color={hint.warning ? 'warning.main' : 'text.secondary'} data-testid={`macro-line-hint-${n}`}>
+          <Typography variant="caption" sx={{ color: hint.warning ? 'warning.main' : 'text.secondary' }} data-testid={`macro-line-hint-${n}`}>
             {hint.text}
           </Typography>
         )}

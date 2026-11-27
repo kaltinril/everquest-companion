@@ -206,8 +206,7 @@ const SpellRow = memo(function SpellRow({ row }: { row: SpellbookRow }): JSX.Ele
             <Typography
               variant="body1"
               noWrap
-              sx={{ fontWeight: 600 }}
-              color={era ? 'warning.main' : undefined}
+              sx={{ color: era ? 'warning.main' : undefined, fontWeight: 600 }}
               title={era ? 'the wiki places this spell out of era' : undefined}
               data-testid={era ? 'spellbook-out-of-era' : undefined}
             >

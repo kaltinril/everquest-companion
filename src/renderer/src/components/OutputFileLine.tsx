@@ -101,10 +101,9 @@ function Stamp({
   return (
     <Typography
       variant="caption"
-      color={warn ? 'warning.main' : 'text.disabled'}
       title={clock(at)}
       data-testid={testId}
-      sx={{ flexShrink: 0 }}
+      sx={{ color: warn ? 'warning.main' : 'text.disabled', flexShrink: 0 }}
     >
       {label}
     </Typography>

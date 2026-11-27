@@ -104,7 +104,7 @@ function PlaceResult({ plan, onHotbar, testid }: { plan: PlacePlan | null; onHot
   if (plan === null) return null
   return (
     <>
-      <Typography variant="body2" color={plan.left > 0 ? 'warning.main' : 'text.primary'} data-testid={`${testid}-plan`}>
+      <Typography variant="body2" sx={{ color: plan.left > 0 ? 'warning.main' : 'text.primary' }} data-testid={`${testid}-plan`}>
         {planText(plan)}
       </Typography>
       {onHotbar !== null && (

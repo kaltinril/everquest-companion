@@ -180,7 +180,7 @@ function FilterSwitch({
         />
       }
       label={label}
-      slotProps={{ typography: { variant: 'caption', color: 'text.secondary' } }}
+      slotProps={{ typography: { variant: 'caption', sx: { color: 'text.secondary' } } }}
     />
   )
 }

@@ -110,8 +110,7 @@ export function Have({ ingredient, line }: { ingredient: BookIngredient; line?: 
       <Typography
         variant="body2"
         align="right"
-        color={enough ? 'success.main' : 'text.secondary'}
-        sx={line === undefined ? undefined : { lineHeight: `${String(line)}px` }}
+        sx={{ color: enough ? 'success.main' : 'text.secondary', lineHeight: line === undefined ? undefined : `${String(line)}px` }}
         data-testid="tradeskill-material-have"
       >
         {have.count}

@@ -45,7 +45,7 @@ export function Card({ title, extra, children, testId }: { title: string; extra?
 function Figure({ value, label, amber = false, title }: { value: string; label: string; amber?: boolean; title?: string }): JSX.Element {
   const body = (
     <Box>
-      <Typography variant="h5" sx={{ lineHeight: 1.1, fontWeight: 600 }} color={amber ? 'warning.main' : 'text.primary'}>
+      <Typography variant="h5" sx={{ color: amber ? 'warning.main' : 'text.primary', lineHeight: 1.1, fontWeight: 600 }}>
         {value}
       </Typography>
       <Typography variant="caption" sx={{ color: 'text.secondary' }}>

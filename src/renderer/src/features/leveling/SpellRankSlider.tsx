@@ -55,8 +55,7 @@ export default function SpellRankSlider({ rank, onChange }: SpellRankSliderProps
             variant="caption"
             data-testid="best-spells-rank-label"
             data-rank={String(rank)}
-            color={base ? 'text.disabled' : 'primary.main'}
-            sx={{ fontSize: 10, ml: 'auto', whiteSpace: 'nowrap' }}
+            sx={{ color: base ? 'text.disabled' : 'primary.main', fontSize: 10, ml: 'auto', whiteSpace: 'nowrap' }}
           >
             {rankSimulationLabel(rank)}
           </Typography>

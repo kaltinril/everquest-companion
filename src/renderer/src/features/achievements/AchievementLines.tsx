@@ -93,7 +93,7 @@ function LineText({
   const { onOpenMob } = ctx
   if (mobs.length === 0 || onOpenMob === undefined) {
     return (
-      <Typography variant="body2" color={component.done ? 'text.secondary' : 'text.primary'}>
+      <Typography variant="body2" sx={{ color: component.done ? 'text.secondary' : 'text.primary' }}>
         {text}
       </Typography>
     )

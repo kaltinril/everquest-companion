@@ -122,7 +122,7 @@ function LineRow({ line }: { line: ShoppingLine }): JSX.Element {
       <Typography variant="body2" align="right" data-testid="tradeskill-shopping-need">
         {line.need}
       </Typography>
-      <Typography variant="body2" align="right" color={line.short === 0 ? 'success.main' : 'text.secondary'} data-testid="tradeskill-shopping-have">
+      <Typography variant="body2" align="right" sx={{ color: line.short === 0 ? 'success.main' : 'text.secondary' }} data-testid="tradeskill-shopping-have">
         {line.have ?? ''}
       </Typography>
       <Typography variant="body2" align="right" sx={{ fontWeight: line.short > 0 ? 700 : 400 }} data-testid="tradeskill-shopping-buy">
@@ -199,7 +199,7 @@ function CopyList({ list }: { list: ShoppingList }): JSX.Element {
         Copy list
       </Button>
       {state !== 'idle' && (
-        <Typography variant="caption" color={state === 'copied' ? 'success.main' : 'warning.main'} role="status" data-testid="tradeskill-shopping-copied" data-state={state}>
+        <Typography variant="caption" sx={{ color: state === 'copied' ? 'success.main' : 'warning.main' }} role="status" data-testid="tradeskill-shopping-copied" data-state={state}>
           {COPY_NOTE[state]}
         </Typography>
       )}

@@ -59,7 +59,7 @@ function NextLine({ pick, onOpenRecipe }: { pick: PickUp; onOpenRecipe: OpenReci
         trivial {next.trivial}
       </Typography>
       {heldText !== '' && (
-        <Typography variant="body2" color={pick.canMake === 0 ? 'text.secondary' : 'success.main'} data-testid="tradeskills-pickup-held">
+        <Typography variant="body2" sx={{ color: pick.canMake === 0 ? 'text.secondary' : 'success.main' }} data-testid="tradeskills-pickup-held">
           {heldText}
         </Typography>
       )}

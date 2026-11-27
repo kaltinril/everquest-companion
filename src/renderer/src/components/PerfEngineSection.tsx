@@ -163,8 +163,7 @@ function BudgetRow({ budget }: { budget: PerfBudget }): JSX.Element {
         </Typography>
         <Typography
           variant="caption"
-          color={budget.verdict === 'fail' ? 'error.main' : 'text.primary'}
-          sx={{ fontVariantNumeric: 'tabular-nums' }}
+          sx={{ color: budget.verdict === 'fail' ? 'error.main' : 'text.primary', fontVariantNumeric: 'tabular-nums' }}
         >
           {value}
         </Typography>

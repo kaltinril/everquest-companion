@@ -91,7 +91,7 @@ export function CheckChips({ checks }: { checks: readonly string[] }): JSX.Eleme
 
 export function Line({ children, warn = false }: { children: ReactNode; warn?: boolean }): JSX.Element {
   return (
-    <Typography variant="caption" color={warn ? 'warning.main' : 'text.secondary'} component="div">
+    <Typography variant="caption" sx={{ color: warn ? 'warning.main' : 'text.secondary' }} component="div">
       {children}
     </Typography>
   )

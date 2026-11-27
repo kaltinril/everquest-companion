@@ -83,8 +83,7 @@ export default function UpgradeSlider({ state, onChange, testId = 'gear', wrap =
       <Typography
         variant="caption"
         data-testid={`${testId}-upgrade-label`}
-        color={base ? 'text.secondary' : 'primary.main'}
-        sx={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums', minWidth: 132 }}
+        sx={{ color: base ? 'text.secondary' : 'primary.main', flexShrink: 0, fontVariantNumeric: 'tabular-nums', minWidth: 132 }}
         title="What the table is showing: every stat scaled to this upgrade state, the way the item window reads it."
       >
         Tier {state.full}

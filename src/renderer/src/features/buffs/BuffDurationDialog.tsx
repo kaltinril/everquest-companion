@@ -62,7 +62,7 @@ function TypedReading({ draft, typed }: { draft: string; typed: number | null })
   return (
     <Typography
       variant="caption"
-      color={typed === null && !empty ? 'error.main' : 'text.secondary'}
+      sx={{ color: typed === null && !empty ? 'error.main' : 'text.secondary' }}
       data-testid="buff-duration-reading"
     >
       {typed !== null

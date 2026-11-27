@@ -105,7 +105,7 @@ function LeafRow({ line }: { line: GatherLine }): JSX.Element {
       <Typography {...NUM} sx={{ color: 'text.secondary' }} data-testid="tradeskill-plan-gather-have">
         {line.have ?? ''}
       </Typography>
-      <Typography {...NUM} color={line.toGet === 0 ? 'success.main' : 'text.primary'} sx={{ fontWeight: 600 }} data-testid="tradeskill-plan-gather-toget">
+      <Typography {...NUM} sx={{ color: line.toGet === 0 ? 'success.main' : 'text.primary', fontWeight: 600 }} data-testid="tradeskill-plan-gather-toget">
         {line.toGet}
       </Typography>
       <Typography {...NUM} sx={{ color: 'text.secondary' }}>

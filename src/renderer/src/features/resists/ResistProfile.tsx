@@ -123,7 +123,7 @@ function AxisNotes({ row }: { row: MobResistAxis }): JSX.Element | null {
   return (
     <Typography
       variant="caption"
-      color={est.differsFromShipped ? 'warning.main' : 'text.disabled'}
+      sx={{ color: est.differsFromShipped ? 'warning.main' : 'text.disabled' }}
       data-testid={`resist-note-${row.axis}`}
     >
       {text}

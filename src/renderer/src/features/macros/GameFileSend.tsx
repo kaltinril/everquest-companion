@@ -299,7 +299,7 @@ export function GameBar({ file, changes, clashes, writer, game }: BarProps): JSX
       <Outcome writer={writer} />
       <Paper variant="outlined" sx={{ px: 1.5, py: 0.75 }}>
         <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
-          <Typography variant="body2" color={matches ? 'text.secondary' : 'warning.main'} sx={{ fontWeight: 600 }} data-testid="macro-game-status">
+          <Typography variant="body2" sx={{ color: matches ? 'text.secondary' : 'warning.main', fontWeight: 600 }} data-testid="macro-game-status">
             {matches ? 'Matches the game.' : changesText(changes.total)}
           </Typography>
           {!matches && <SendToGame file={file} changes={changes} clashes={clashes} writer={writer} />}

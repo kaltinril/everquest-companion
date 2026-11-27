@@ -47,7 +47,7 @@ function ThreadCard({ thread, nameClash, onAccept }: CardProps): JSX.Element {
         </Tooltip>
       </Stack>
       {clash !== undefined && (
-        <Typography variant="caption" component="div" color={blocked ? 'error' : 'warning.main'} sx={{ mb: 0.5 }} data-testid="thread-name-clash">
+        <Typography variant="caption" component="div" sx={{ color: blocked ? 'error.main' : 'warning.main', mb: 0.5 }} data-testid="thread-name-clash">
           {clashText(clash)}
         </Typography>
       )}

@@ -104,7 +104,7 @@ function EstimateBar({
         }}
       />
       <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="caption" color={overdue ? 'warning.main' : 'text.secondary'}>
+        <Typography variant="caption" sx={{ color: overdue ? 'warning.main' : 'text.secondary' }}>
           {overdue ? 'past estimate' : left}
           {!overdue && spread != null && spread > 1000 ? ` (± ${fmtDuration(spread)})` : ''}
         </Typography>

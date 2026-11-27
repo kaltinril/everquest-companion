@@ -33,7 +33,7 @@ function HeldWords({ name, held }: { name: string; held: HeldState }): JSX.Eleme
   if (held.index === null) return null
   const count = heldCount(held.index, name)
   return (
-    <Typography variant="caption" color={count > 0 ? 'success.main' : 'text.disabled'} noWrap data-testid="tradeskill-gear-held">
+    <Typography variant="caption" sx={{ color: count > 0 ? 'success.main' : 'text.disabled' }} noWrap data-testid="tradeskill-gear-held">
       {skillGearHeldText(count)}
     </Typography>
   )

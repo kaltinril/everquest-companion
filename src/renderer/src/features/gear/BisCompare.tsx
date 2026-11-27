@@ -138,7 +138,7 @@ export default function BisCompare(props: BisCompareProps): JSX.Element {
           {sourceText(pick.row)}
         </Typography>
       )}
-      {m.budget !== undefined && <Typography variant="caption" color={TONE_COLOUR[m.budget.tone]}>{m.budget.text}</Typography>}
+      {m.budget !== undefined && <Typography variant="caption" sx={{ color: TONE_COLOUR[m.budget.tone] }}>{m.budget.text}</Typography>}
       <Typography variant="caption" sx={{ color: 'text.disabled' }}>{plusNote(props.plus, worn)}</Typography>
     </Stack>
   )

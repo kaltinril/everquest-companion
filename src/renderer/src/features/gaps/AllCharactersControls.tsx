@@ -89,7 +89,7 @@ export function CharactersLine({ live, others, failed = false }: { live: string;
           <span key={c.character}>
             {', '}
             <Tooltip title={w.tip}>
-              <Typography component="span" variant="caption" color={w.stale ? 'warning.main' : 'text.secondary'}>
+              <Typography component="span" variant="caption" sx={{ color: w.stale ? 'warning.main' : 'text.secondary' }}>
                 {w.text}
               </Typography>
             </Tooltip>

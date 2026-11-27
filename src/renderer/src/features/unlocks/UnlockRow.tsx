@@ -145,7 +145,7 @@ function Need({ need, unlock, c }: { need: UnlockNeed; unlock: Unlock; c: Unlock
         <>
           <Typography
             variant="caption"
-            color={need.done ? 'success.main' : 'text.secondary'}
+            sx={{ color: need.done ? 'success.main' : 'text.secondary' }}
             data-testid="unlock-line"
           >
             {need.done ? '✓ ' : ''}
@@ -164,7 +164,7 @@ function Need({ need, unlock, c }: { need: UnlockNeed; unlock: Unlock; c: Unlock
       return (
         <Typography
           variant="caption"
-          color={need.done ? 'success.main' : 'text.secondary'}
+          sx={{ color: need.done ? 'success.main' : 'text.secondary' }}
           data-testid="unlock-line"
         >
           {need.done ? '✓ ' : ''}

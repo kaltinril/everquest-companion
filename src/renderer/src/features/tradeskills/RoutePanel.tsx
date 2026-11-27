@@ -150,7 +150,7 @@ function Basis({ route }: { route: Route }): JSX.Element {
 function StepLine({ text, id, color }: { text: string; id: string; color?: string }): JSX.Element | null {
   if (text === '') return null
   return (
-    <Typography variant="caption" color={color ?? 'text.secondary'} sx={{ display: 'block' }} data-testid={`tradeskill-route-${id}`}>
+    <Typography variant="caption" sx={{ color: color ?? 'text.secondary', display: 'block' }} data-testid={`tradeskill-route-${id}`}>
       {text}
     </Typography>
   )
