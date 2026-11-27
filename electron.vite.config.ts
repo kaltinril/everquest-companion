@@ -31,7 +31,7 @@ export default defineConfig({
         // import is converted at build time instead.
         exclude: ['electron-store', 'chokidar']
       },
-      rollupOptions: {
+      rolldownOptions: {
         // Main-process bundles. `index` is the app; the others are worker_threads,
         // and each is a separate entry for the same reason: `new Worker(path)` loads a FILE, so
         // rolling one into index.js would give the worker no file to load, and bundling it as a
@@ -74,7 +74,7 @@ export default defineConfig({
     build: {
       // Sourcemaps, for the reason spelled out on the main bundle above.
       sourcemap: true,
-      rollupOptions: {
+      rolldownOptions: {
         // Four preloads: the full app bridge (index), a minimal overlay bridge (overlay)
         // that exposes only the combat snapshot + overlay window controls (Task #52),
         // the receive-only cursor-ring bridge (cursor) — three methods, none of which can
@@ -123,7 +123,7 @@ export default defineConfig({
       // Sourcemaps, as above — and the renderer's are the ones that matter most, because its is
       // the bundle a minifier renames and re-lines most aggressively.
       sourcemap: true,
-      rollupOptions: {
+      rolldownOptions: {
         // Four HTML entries: the main app (index), the floating overlay meters (overlay,
         // Task #52), the cursor ring (cursor) — one <div> and no framework — and the tray
         // popover (tray, JOS-139), one static card with no MUI.
