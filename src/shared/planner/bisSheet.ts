@@ -24,7 +24,7 @@
 import type { ClassAbbr } from '../classCombo'
 import { isObtainable, isTemporary, type GearRow } from './gear'
 import { arrowRank, isArrow, isBow } from './bisArrows'
-import { improveUnderCaps, type CapCell, type CapRules, type FoldedCap } from './bisCaps'
+import { cappedValue, improveUnderCaps, type CapCell, type CapRules, type FoldedCap } from './bisCaps'
 import { searchLoadout, type SearchCandidate, type SearchCell } from './bisSearch'
 import { gearHandedness } from './roleWeights'
 import { HARD_STAT_CAPS, isAttribute, type Attribute, type StatCap, type StatCaps } from './statCaps'
@@ -333,7 +333,14 @@ function solveWithCaps(lists: readonly Scored[][], start: readonly number[], rul
   }))
   const choice = start.map((idx, i) => (idx < 0 ? -1 : pools[i].indexOf(lists[i][idx])))
   const total = improveUnderCaps(cells, choice, rules)
-  return { choice: choice.map((j, i) => (j < 0 ? -1 : lists[i].indexOf(pools[i][j]))), total }
+  const out = choice.map((j, i) => (j < 0 ? -1 : lists[i].indexOf(pools[i][j])))
+  // A bow the pass moved in keeps the bow rule too: its arrow goes in AMMO, priced under the caps.
+  const ammo = searchOrder().indexOf('AMMO')
+  const before = out[ammo]
+  withArrow(out, lists, arrow, [searchOrder().indexOf('RANGE'), ammo])
+  if (arrow === undefined || out[ammo] === before) return { choice: out, total }
+  const priced = cells.map((c, i) => (i === ammo && !c.list.includes(arrow) ? { ...c, list: [...c.list, arrow] } : c))
+  return { choice: out, total: cappedValue(priced, out.map((idx, i) => (idx < 0 ? -1 : priced[i].list.indexOf(lists[i][idx]))), rules) }
 }
 
 /** How far down a cell's list the runners-up are re-scored against the loadout's haste before the top five are kept. */
@@ -442,7 +449,7 @@ export function buildBisSheet(opts: BisOptions): BisSheet {
   const totals: Partial<Record<TierChip, number>> = {}
   const other = othersHaste(order.map((_, i) => (choice[i] >= 0 ? lists[i][choice[i]] : undefined)))
   order.forEach((cell, i) => {
-    const onArrows = bowUp && i === ammo
+    const onArrows = bowUp && i === ammo && arrows.length > 0
     const index = onArrows && choice[i] >= 0 ? arrows.indexOf(lists[i][choice[i]]) : choice[i]
     const read = readCell(cell, onArrows ? arrows : lists[i], index, { otherHaste: other[i], opts, ordered: onArrows })
     if (onArrows && read.pick !== undefined) read.arrowForBow = true

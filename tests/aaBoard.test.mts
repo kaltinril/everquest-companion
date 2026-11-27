@@ -5,7 +5,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { withGranted } from '../src/shared/aaGranted'
 import { rankAas, type AaPicks, type AaRanked } from '../src/shared/aaRanks'
-import { AA_WIKI_ORDER, aaBoard, aaComboMax, aaFit, aaLeft, aaPlanDelta, aaSearchGroups, aaSortGroups, aaStartLevel, aaTabCount, aaTabGroups, aaWithinLevel, type AaBoardRow, type AaCombo } from '../src/shared/aaBoard'
+import { AA_WIKI_ORDER, aaBoard, aaComboMax, aaFit, aaJumpView, aaLeft, aaPlanDelta, aaSearchGroups, aaSortGroups, aaSpent, aaStartLevel, aaTabCount, aaTabGroups, aaWithinLevel, type AaBoardRow, type AaCombo } from '../src/shared/aaBoard'
 import { aaNotForPoints, aaRecFit, aaRecommend } from '../src/shared/aaRecommend'
 import { aaSigned, aaStatTotals } from '../src/shared/aaStats'
 import { aaActivation, aaLinks } from '../src/shared/aaLinks'
@@ -240,4 +240,60 @@ test('LINKS: masteries to their workbench, stat AAs to Best in slot, activated A
   assert.ok(labels('Race Reincarnation: Half Elf').includes('Leveling · reincarnations'))
   assert.deepEqual(labels('Banestrike'), ['Slayer achievements'])
   assert.deepEqual(aaActivation('Ability Activation ID: 109 - Refresh Time: 0:10:00 - Ability Timer(s): 81. x'), { refresh: '10 min', timer: 81 })
+})
+
+test('QUICK EVACUATION (a Druid and a Wizard row) is one AA for a DRU/WIZ combo: left, spent, tab count and the plan count it once', () => {
+  const dw: ClassAbbr[] = ['DRU', 'WIZ']
+  const combo: AaCombo = { classes: dw, own: true }
+  for (const picks of [{}, { 'Quick Evacuation': 2 }] as AaPicks[]) {
+    const board = aaBoard(ranked(picks, dw), combo)
+    assert.equal(board.filter((b) => b.r.key === 'Quick Evacuation' && b.usable).length, 2, 'both rows stay listed')
+    // The same board with the Wizard twin taken out: what one AA should add up to.
+    const once = board.filter((b) => !(b.r.key === 'Quick Evacuation' && b.r.row.class === 'Wizard'))
+    assert.deepEqual(aaLeft(board), aaLeft(once))
+    assert.deepEqual(aaSpent(board), aaSpent(once))
+    assert.deepEqual(aaTabCount(board, 'class', { scope: 'usable', query: '', maxLevel: null }), aaTabCount(once, 'class', { scope: 'usable', query: '', maxLevel: null }))
+    const recs = aaRecommend(board, 40)
+    assert.equal(recs.items.filter((i) => i.b.r.key === 'Quick Evacuation').length, 1)
+    assert.deepEqual([recs.used, recs.total], [aaRecommend(once, 40).used, aaRecommend(once, 40).total])
+    // Planning DRU/WIZ from the owner's WAR/SHM/MNK: the plan header's adds and points count it once.
+    const planned = aaBoard(ranked(picks, dw), { classes: dw, own: false })
+    const plannedOnce = planned.filter((b) => !(b.r.key === 'Quick Evacuation' && b.r.row.class === 'Wizard'))
+    const ownBoard = aaBoard(ranked(picks), own)
+    assert.deepEqual(aaPlanDelta(planned, ownBoard), aaPlanDelta(plannedOnce, ownBoard))
+    // Planning WIZ from a Druid: the Wizard row is the AA the Druid already has, so it is neither added nor dropped.
+    const wiz = aaBoard(ranked(picks, ['WIZ']), { classes: ['WIZ'], own: false })
+    const dru = aaBoard(ranked(picks, ['DRU']), { classes: ['DRU'], own: true })
+    const noQe = (brd: readonly AaBoardRow[]): AaBoardRow[] => brd.filter((b) => b.r.key !== 'Quick Evacuation')
+    assert.deepEqual(aaPlanDelta(wiz, dru), aaPlanDelta(noQe(wiz), noQe(dru)))
+  }
+})
+
+test('THE PLAN compares rows by AA, not by object: the same combo ranked twice adds and drops nothing', () => {
+  // The app ranks the own board and a planned board separately (free ranks differ by class), so a row can be a new object.
+  assert.deepEqual(aaPlanDelta(aaBoard(ranked(), own), aaBoard(ranked(), own)), { adds: 0, points: 0, unknown: false, drops: 0 })
+})
+
+test('A JUMP to a row the level filter or the scope hides widens just enough to show it; a shown row leaves both alone', () => {
+  const board = aaBoard(ranked(), own)
+  const shows = (b: AaBoardRow, brd: readonly AaBoardRow[], classes: readonly ClassAbbr[], v: { scope: 'usable' | 'all'; maxLevel: number | null }): boolean =>
+    aaTabGroups(brd, b.r.row.section, classes, { ...v, query: '' }).some((g) => g.rows.some((x) => x.r.row === b.r.row && x.r.key === b.r.key))
+  // 'Up to level' 20, then a usable rank-1-at-50 row from the Spend card.
+  const late = board.find((b) => b.usable && b.r.row.section !== 'special' && (aaStartLevel(b) ?? 0) > 20)
+  assert.ok(late)
+  const v1 = aaJumpView(board, late, OWN, { scope: 'usable', maxLevel: 20 })
+  assert.deepEqual(v1, { scope: 'usable', maxLevel: null })
+  assert.ok(shows(late, board, OWN, v1))
+  // A row the filter keeps: nothing changes.
+  const early = board.find((b) => b.usable && b.r.row.section === 'general' && aaStartLevel(b) === 1)
+  assert.ok(early)
+  assert.deepEqual(aaJumpView(board, early, OWN, { scope: 'usable', maxLevel: 20 }), { scope: 'usable', maxLevel: 20 })
+  // Planning a Cleric: the own board's Warrior row (the Can't tell card) is 'other' there, so the scope opens.
+  const cleric: ClassAbbr[] = ['CLR']
+  const planned = aaBoard(ranked({}, cleric), { classes: cleric, own: false })
+  const war = board.find((b) => b.usable && b.r.row.section === 'class' && b.r.row.class === 'Warrior' && (aaStartLevel(b) ?? 99) <= 20)
+  assert.ok(war)
+  const v2 = aaJumpView(planned, war, cleric, { scope: 'usable', maxLevel: 20 })
+  assert.deepEqual(v2, { scope: 'all', maxLevel: 20 })
+  assert.ok(shows(war, planned, cleric, v2))
 })

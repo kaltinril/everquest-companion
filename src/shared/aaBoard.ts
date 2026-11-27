@@ -212,9 +212,15 @@ export interface AaTabCount {
   matches: number | null
 }
 
+/** The first row of each key: an AA two classes list (Quick Evacuation: Druid, Wizard) is one AA in a total. */
+export function aaOnePerKey(rows: readonly AaBoardRow[]): AaBoardRow[] {
+  const seen = new Set<string>()
+  return rows.filter((b) => !seen.has(b.r.key) && seen.add(b.r.key))
+}
+
 /** A sub-tab's count: maxed of usable (within the level filter; a row the log cannot settle left out), their points, and the search's matches. */
 export function aaTabCount(board: readonly AaBoardRow[], section: AaSection, { scope, query, maxLevel = null }: AaFilter): AaTabCount {
-  const mine = board.filter((b) => b.r.row.section === section && b.usable && b.r.unknown !== true && aaWithinLevel(b, maxLevel))
+  const mine = aaOnePerKey(board.filter((b) => b.r.row.section === section && b.usable && b.r.unknown !== true && aaWithinLevel(b, maxLevel)))
   const matches = query.trim() === '' ? null : board.filter((b) => b.r.row.section === section && (b.usable || scope === 'all') && shown(b, query, maxLevel)).length
   return { maxed: mine.filter((b) => b.r.rank >= b.max).length, of: mine.length, points: aaCostSum(mine.map((b) => b.cost)), matches }
 }
@@ -234,7 +240,7 @@ export function aaCantTell(board: readonly AaBoardRow[]): AaBoardRow[] {
 
 /** What the combo has left to buy. */
 export function aaLeft(board: readonly AaBoardRow[]): AaLeft {
-  const left = board.filter((b) => b.buyable)
+  const left = aaOnePerKey(board.filter((b) => b.buyable))
   const sum = aaCostSum(left.map((b) => b.cost))
   return { count: left.length, points: sum.total - sum.spent, unknown: sum.unknown }
 }
@@ -249,13 +255,17 @@ export interface AaPlanDelta {
   drops: number
 }
 
-/** What planning another combo changes against the character's own. */
+/**
+ * What planning another combo changes against the character's own. Rows are compared by key, one AA a
+ * key: the two boards are ranked apart (a free rank makes a new row object), and Quick Evacuation's
+ * Druid and Wizard rows are one AA, so a DRU/WIZ plan adds it once and a Druid planning Wizard keeps it.
+ */
 export function aaPlanDelta(planned: readonly AaBoardRow[], own: readonly AaBoardRow[]): AaPlanDelta {
-  const ownUsable = new Set(own.filter((b) => b.usable).map((b) => b.r))
-  const added = planned.filter((b) => b.usable && !ownUsable.has(b.r) && b.cost !== null)
+  const ownUsable = new Set(own.filter((b) => b.usable).map((b) => b.r.key))
+  const added = aaOnePerKey(planned.filter((b) => b.usable && !ownUsable.has(b.r.key) && b.cost !== null))
   const sum = aaCostSum(added.map((b) => b.cost))
-  const plannedUsable = new Set(planned.filter((b) => b.usable).map((b) => b.r))
-  return { adds: added.length, points: sum.total - sum.spent, unknown: sum.unknown, drops: [...ownUsable].filter((r) => !plannedUsable.has(r)).length }
+  const plannedUsable = new Set(planned.filter((b) => b.usable).map((b) => b.r.key))
+  return { adds: added.length, points: sum.total - sum.spent, unknown: sum.unknown, drops: [...ownUsable].filter((k) => !plannedUsable.has(k)).length }
 }
 
 /** The groups in "what it does" order, each with its rows; empty groups left out. */
@@ -270,7 +280,7 @@ export function aaSameClasses(a: readonly ClassAbbr[], b: readonly ClassAbbr[]):
 
 /** Points the usable rows' held ranks cost, at the corrected prices. */
 export function aaSpent(board: readonly AaBoardRow[]): AaCostSum {
-  return aaCostSum(board.filter((b) => b.usable).map((b) => b.cost))
+  return aaCostSum(aaOnePerKey(board.filter((b) => b.usable)).map((b) => b.cost))
 }
 
 /** Which of the classes bring a row: "Every class has it.", "From your Warrior and Monk.", "A Monk AA."; null for General and Special. */
@@ -280,4 +290,23 @@ export function aaBroughtBy(r: AaRanked, classes: readonly ClassAbbr[]): string 
   if (IN_EVERY_RUN.includes(r.row.name)) return 'Every class has it.'
   const who = classes.filter((c) => ARCHETYPE_BY_CLASS[c].includes(r.row.name)).map(classDisplayName)
   return who.length === 0 ? null : `From your ${who.join(' and ')}.`
+}
+
+export interface AaJumpView {
+  scope: AaScope
+  maxLevel: number | null
+}
+
+/**
+ * The scope and level filter a jump to row `b` (a Spend card, Recommendations or Can't tell entry) opens
+ * its sub-tab with: as they are while `board` shows the row there, else the level filter cleared when
+ * the row is past it, then all AAs when the scope still hides it. Special is not level-gated or scoped.
+ */
+export function aaJumpView(board: readonly AaBoardRow[], b: AaBoardRow, classes: readonly ClassAbbr[], view: AaJumpView): AaJumpView {
+  const { section } = b.r.row
+  const same = (x: AaBoardRow): boolean => x.r.row.section === section && x.r.row.class === b.r.row.class && x.r.key === b.r.key
+  const visible = (v: AaJumpView): boolean => aaTabGroups(board, section, classes, { ...v, query: '' }).some((g) => g.rows.some(same))
+  if (section === 'special' || visible(view)) return view
+  const level = aaWithinLevel(b, view.maxLevel) ? view : { ...view, maxLevel: null }
+  return visible(level) ? level : { ...level, scope: 'all' }
 }

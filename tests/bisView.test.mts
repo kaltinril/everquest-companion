@@ -8,7 +8,7 @@ import type { GearRow } from '../src/shared/planner/gear'
 import { CHIP_KEYS, boardToText, uniformBoard, type TierChip } from '../src/shared/planner/tierChips'
 import { defaultBoard } from '../src/shared/planner/tierDefaults'
 import { conversionsFor, deriveChips, type TierModel } from '../src/shared/planner/tierWeights'
-import { CAPPED_ATTRIBUTES, DEFAULT_BIS_PREFS, LEGENDS_STAT_CAP, activeSetup, tankResistTargets, withCaps, clampLevel, sanitizeBisPrefs, matchesSaved, sanitizeSaved, withCleared, withLoadedBoard, withPasted, withSavedBoard, withSplit } from '../src/renderer/src/features/gear/bisPrefs'
+import { CAPPED_ATTRIBUTES, DEFAULT_BIS_PREFS, LEGENDS_STAT_CAP, activeSetup, tankResistTargets, withCaps, clampLevel, typedLevel, sanitizeBisPrefs, matchesSaved, sanitizeSaved, withCleared, withLoadedBoard, withPasted, withSavedBoard, withSplit } from '../src/renderer/src/features/gear/bisPrefs'
 import { budgetText, chipHint, chipValueText, compareRows, hasteNote, loadoutTotals, ownedCopies, sourceText, termText, totalsRows } from '../src/renderer/src/features/gear/bisText'
 import { maxCharacterLevel } from '../src/shared/planner/statCaps'
 import { sortValue } from '../src/renderer/src/features/gear/gearFilter'
@@ -42,6 +42,19 @@ test('stored prefs: anything odd reads as its default; a board must name every c
   assert.equal(clampLevel(60, new Date(2026, 11, 8)), 55, 'and to 55 from its local launch day')
   assert.equal(clampLevel(53, new Date(2026, 11, 8)), 53)
   assert.equal(sanitizeBisPrefs({ level: 60 }).level, maxCharacterLevel(), 'clamped on load')
+})
+
+test('the Level box: emptied to retype, it keeps the stored level instead of putting 1 under the typing (audit 2026-11-27 gear-4)', () => {
+  const before = new Date(2026, 11, 7)
+  // What the box stores as the player clears 50 and types 4, then 5.
+  let level = 50
+  for (const text of ['5', '', '4', '45']) level = typedLevel(text, before) ?? level
+  assert.equal(level, 45)
+  assert.equal(typedLevel('', before), undefined, 'an empty box stores nothing')
+  assert.equal(typedLevel('  ', before), undefined)
+  assert.equal(typedLevel('4', before), 4)
+  assert.equal(typedLevel('99', before), 50, 'a number past the cap still comes down to it')
+  assert.equal(typedLevel('0', before), 1)
 })
 
 test('the board in force follows the classes until the player edits it', () => {

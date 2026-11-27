@@ -55,14 +55,21 @@ async function keepAside(path: string): Promise<boolean> {
   }
 }
 
-/** The library on disk. A file that is not one is kept aside and reads as an empty library. */
+/**
+ * The library on disk. A file that is not one is kept aside and reads as an empty library. A
+ * missing file is an empty library; any other failed read (a sharing lock, a denied read) throws
+ * and leaves the library not loaded, so the load fails and nothing is saved over the file.
+ */
 async function readLibraryFile(): Promise<MacroLibrary> {
   const path = libraryPath()
   let raw: string
   try {
     raw = await readFile(path, 'utf8')
-  } catch {
-    // Missing or unreadable: an empty library.
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException | null)?.code !== 'ENOENT') {
+      logWarn(`[macros] ${FILE} could not be read; it is left as it is`, err)
+      throw err
+    }
     loaded = true
     return emptyLibrary()
   }
@@ -76,7 +83,13 @@ async function readLibraryFile(): Promise<MacroLibrary> {
 
 async function writeLibrary(library: MacroLibrary): Promise<boolean> {
   // A save before any load still looks at the file first, so a damaged one is kept aside.
-  if (!loaded) await readLibraryFile()
+  if (!loaded) {
+    try {
+      await readLibraryFile()
+    } catch {
+      return false
+    }
+  }
   if (saveBlocked) return false
   try {
     await writeFileDurableAsync(app.getPath('userData'), libraryPath(), JSON.stringify(library))

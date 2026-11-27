@@ -7,7 +7,7 @@ import { aaBroughtBy, aaNotFor, type AaBoardRow } from '@shared/aaBoard'
 import { aaEffectBody, aaEffectValue, aaRequirementText } from '@shared/aaEffects'
 import { aaActivation, aaLinks } from '@shared/aaLinks'
 import { aaMarks, aaMarkTip, type AaField } from '@shared/aaOfficial'
-import { aaRankCosts } from '@shared/aaRanks'
+import { aaPickHeard, aaRankCosts } from '@shared/aaRanks'
 import type { ClassAbbr } from '@shared/classCombo'
 import { Tooltip } from '../../lib/Tooltip'
 import { followAaLink, useAaNav } from './aaNav'
@@ -50,7 +50,7 @@ function sourceLine(b: AaBoardRow, classes: readonly ClassAbbr[]): string {
 
 /** What settles the rank when the log does and a pick would not count (the order of proof, aaRanks.ts). */
 function settledBy(b: AaBoardRow): string | null {
-  if (b.r.source === 'list') return 'from /alt list'
+  if (b.r.source === 'list' || b.r.listed === true) return 'from /alt list'
   if (b.r.source === 'activated' && b.r.rank >= b.r.max) return 'seen used'
   return null
 }
@@ -76,7 +76,7 @@ function RankPicker({ b, setPick }: { b: AaBoardRow; setPick: SetPick }): JSX.El
         data-testid="aa-rank"
       >
         {Array.from({ length: b.r.max + 1 }, (_, n) => (
-          <MenuItem key={n} value={n} sx={{ fontSize: 12 }}>
+          <MenuItem key={n} value={n} disabled={!aaPickHeard(b.r, n)} sx={{ fontSize: 12 }}>
             {`${String(n)} / ${String(b.r.max)}`}
           </MenuItem>
         ))}

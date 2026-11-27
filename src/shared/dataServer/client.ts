@@ -133,7 +133,8 @@ export interface EngineClient {
   onOversize(listener: (note: OversizeNote) => void): () => void
   /** Take a (new) connection: re-hello, drop every window, re-subscribe everything. */
   attach(transport: Transport<ClientMessage, EngineMessage>): void
-  request<O extends RequestOp>(op: O, params: ParamsFor<O>): Promise<ResultFor<O>>
+  /** `deadlineMs`: how long this one request may go unanswered; `REQUEST_DEADLINE_MS` when omitted. */
+  request<O extends RequestOp>(op: O, params: ParamsFor<O>, deadlineMs?: number): Promise<ResultFor<O>>
   subscribe(descriptor: ViewDescriptor, listener: ViewListener): ViewHandle
   onState(listener: (state: ConnectionState) => void): () => void
   /** Fold progress, for the loading UI. Arrives on connection-wide epoch frames. */
@@ -356,27 +357,30 @@ function onHelloReply(s: ClientState, reply: HelloReply): void {
 async function request<O extends RequestOp>(
   s: ClientState,
   op: O,
-  params: ParamsFor<O>
+  params: ParamsFor<O>,
+  deadlineMs: number = REQUEST_DEADLINE_MS
 ): Promise<ResultFor<O>> {
   if (s.state === 'closed' || s.state === 'failed') {
     throw new EngineError('unavailable', `the connection is ${s.state}`)
   }
-  const result = await sendRequest(s, nextRequestId(s), op, params)
+  const result = await sendRequest(s, nextRequestId(s), { op, params, deadlineMs })
   // Narrowed by the registry: `onReply` refused anything the op does not own before resolving.
   return result as ResultFor<O>
 }
 
-/** The one place a request envelope is built, and the one place its id is registered. */
+/**
+ * The one place a request envelope is built, and the one place its id is registered. `deadlineMs`
+ * is how long it may go unanswered, `REQUEST_DEADLINE_MS` when omitted.
+ */
 function sendRequest<O extends RequestOp>(
   s: ClientState,
   id: RequestId,
-  op: O,
-  params: ParamsFor<O>
+  { op, params, deadlineMs = REQUEST_DEADLINE_MS }: { op: O; params: ParamsFor<O>; deadlineMs?: number }
 ): Promise<ReplyResult> {
   return new Promise<ReplyResult>((resolve, reject) => {
     const deadline = armDeadline(() => {
-      onDeadline(s, id, op)
-    })
+      onDeadline(s, id, op, deadlineMs)
+    }, deadlineMs)
     s.pending.set(id, { op, params, resolve, reject, deadline })
     // The registry above is what makes this cast true: `op` and `params` are drawn from the same
     // wire union this is asserting into, and TypeScript simply cannot see that through a generic.
@@ -394,13 +398,13 @@ function sendRequest<O extends RequestOp>(
  * caller decides what that means — `foldWait.ts` retries a bounded few times and keeps waiting,
  * because a folding engine is never given up on.
  */
-function onDeadline(s: ClientState, id: RequestId, op: RequestOp): void {
+function onDeadline(s: ClientState, id: RequestId, op: RequestOp, deadlineMs: number): void {
   // THROUGH THE SAME DOOR as a reply and an error reply, even though this one's timer has already
   // fired and clearing it is a no-op: one settlement path is what makes "the map and the timer go
   // together" a property of the code rather than a thing three functions have to remember.
   const pending = takePending(s, id)
   if (pending === undefined) return
-  s.debug(`${op} (request ${id}) went unanswered for ${REQUEST_DEADLINE_MS} ms - given up on`)
+  s.debug(`${op} (request ${id}) went unanswered for ${deadlineMs} ms - given up on`)
   pending.reject(new EngineError('timeout', `the engine did not answer ${op} in time`, id))
 }
 
@@ -487,7 +491,7 @@ function subscribe(
       s.subs.delete(sub.id)
       if (s.state !== 'ready') return
       const id = nextRequestId(s)
-      sendRequest(s, id, 'view.unsubscribe', { subscription: sub.id }).catch((error: unknown) => {
+      sendRequest(s, id, { op: 'view.unsubscribe', params: { subscription: sub.id } }).catch((error: unknown) => {
         s.debug(`unsubscribing ${sub.id} was refused: ${String(error)}`)
       })
     }
@@ -495,7 +499,7 @@ function subscribe(
 }
 
 function openOnWire(s: ClientState, sub: LiveSubscription): void {
-  sendRequest(s, sub.id, 'view.subscribe', sub.descriptor).catch((error: unknown) => {
+  sendRequest(s, sub.id, { op: 'view.subscribe', params: sub.descriptor }).catch((error: unknown) => {
     // A refused subscription is the view's own error — a bad source, a bad filter — and it belongs
     // where the view will read it rather than taking the connection down. It arrives one microtask
     // late, because it arrives on a promise.
@@ -579,8 +583,8 @@ export function createEngineClient(options: EngineClientOptions): EngineClient {
     attach: (transport): void => {
       attach(s, transport)
     },
-    request: <O extends RequestOp>(op: O, params: ParamsFor<O>): Promise<ResultFor<O>> =>
-      request(s, op, params),
+    request: <O extends RequestOp>(op: O, params: ParamsFor<O>, deadlineMs?: number): Promise<ResultFor<O>> =>
+      request(s, op, params, deadlineMs),
     subscribe: (descriptor, listener): ViewHandle => subscribe(s, descriptor, listener),
     onState: (listener): (() => void) => {
       s.stateListeners.add(listener)

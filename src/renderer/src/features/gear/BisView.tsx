@@ -7,7 +7,7 @@
 // "detected" chip), and the board is stored at `eq.gear.tiers`, where the Gear tab's BEST column
 // reads it too. Named boards are `eq.gear.tierLists`, picked in the Start from menu (BisStartFrom.tsx).
 
-import { useCallback, useDeferredValue, useMemo, type JSX } from 'react'
+import { useCallback, useDeferredValue, useEffect, useMemo, useState, type JSX } from 'react'
 import { Box, Chip, Stack, TextField, Typography } from '@mui/material'
 import { CLASS_ABBRS, type ClassAbbr } from '@shared/classCombo'
 import { ITEM_UPGRADE_BASE, type ItemUpgradeState } from '@shared/itemUpgrade'
@@ -29,7 +29,7 @@ import BisCells, { type BisWishes, type WornCell } from './BisCells'
 import BisTargets from './BisTargets'
 import { useReincarnationCap } from '../aa/useAaRanks'
 import BisStartFrom from './BisStartFrom'
-import { activeSetup, clampLevel, clampSpellHaste, withCleared, withPasted, withSplit, type BisPrefs } from './bisPrefs'
+import { activeSetup, clampSpellHaste, typedLevel, withCleared, withPasted, withSplit, type BisPrefs } from './bisPrefs'
 import { loadoutTotals, ownedCopies, totalsRows } from './bisText'
 import { useEraHidden, useGearClasses, useGearCompare, useGearIndex, useGearOwnership, useUpgradeState, type GearClasses, type GearCompareData } from './gearData'
 import { scaleAll } from './gearFilter'
@@ -79,6 +79,29 @@ function useBisWishes(): BisWishes {
   return { wished, onToggle: wishlist.ready ? onToggle : undefined }
 }
 
+/** The Level box: what is typed shows as typed; each number typed is stored (clamped); an emptied box keeps the stored level and shows it again on leaving. */
+function LevelInput({ level, onSet }: { level: number; onSet: (level: number) => void }): JSX.Element {
+  const [text, setText] = useState(String(level))
+  useEffect(() => setText(String(level)), [level])
+  const onChange = (value: string): void => {
+    setText(value)
+    const typed = typedLevel(value)
+    if (typed !== undefined) onSet(typed)
+  }
+  return (
+    <TextField
+      size="small"
+      type="number"
+      label="Level"
+      value={text}
+      onChange={(e) => onChange(e.target.value)}
+      onBlur={() => setText(String(level))}
+      sx={{ width: 90 }}
+      slotProps={{ htmlInput: { min: 1, max: maxCharacterLevel(), 'data-testid': 'bis-level' } }}
+    />
+  )
+}
+
 function Controls({ prefs, setPrefs, classes, setup }: { prefs: BisPrefs; setPrefs: (p: BisPrefs) => void; classes: GearClasses; setup: TierSetup }): JSX.Element {
   return (
     <Stack spacing={0.5}>
@@ -97,7 +120,7 @@ function Controls({ prefs, setPrefs, classes, setup }: { prefs: BisPrefs; setPre
         )}
         <BisStartFrom prefs={prefs} setPrefs={setPrefs} setup={setup} />
         <Chip size="small" variant="outlined" label="Reset board" title="Back to the preset's starting tiers" data-testid="bis-reset" onClick={() => setPrefs({ ...prefs, board: null, caps: {}, list: null })} />
-        <TextField size="small" type="number" label="Level" value={prefs.level} onChange={(e) => setPrefs({ ...prefs, level: clampLevel(Number(e.target.value)) })} sx={{ width: 90 }} slotProps={{ htmlInput: { min: 1, max: maxCharacterLevel(), 'data-testid': 'bis-level' } }} />
+        <LevelInput level={prefs.level} onSet={(level) => setPrefs({ ...prefs, level })} />
         <TextField
           size="small"
           type="number"

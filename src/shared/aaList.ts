@@ -44,6 +44,8 @@ export interface AaActivation {
   last: number
   /** The highest rank a line named (`Rampage II`); absent when none did. */
   rank?: number
+  /** Every line so far was a cast with no numeral (`You begin casting Divine Aura.`); absent otherwise. */
+  castOnly?: true
 }
 
 export interface AaListRead {
@@ -112,10 +114,21 @@ export function aaListRead(run: AaListRun, table: readonly AaTableRow[], keyOf: 
   return out
 }
 
+/**
+ * Folded AA names that are also spell names (src/main/data/spells.json; a test pins the list). A cast
+ * of one with no numeral is the spell (a Cleric's level-1 Divine Aura), not the AA: an AA's cast
+ * carries its numeral (`Divine Aura I`, MEASURED.md).
+ */
+export const AA_SPELL_NAMES: ReadonlySet<string> = new Set(['divine aura', 'stoicism', 'rampage'])
+
 /** By folded row name, the rank the player's own lines show them holding (at least 1; exact names only). */
 export function aaActivatedRows(acts: readonly AaActivation[], table: readonly AaTableRow[], keyOf: (row: AaTableRow) => string): Map<string, number> {
   const seen = new Map<string, number>()
-  for (const a of acts) seen.set(aaFold(a.name), Math.max(seen.get(aaFold(a.name)) ?? 1, a.rank ?? 1))
+  for (const a of acts) {
+    // A bare cast of a name a spell shares is the spell, not the AA.
+    if (a.castOnly === true && AA_SPELL_NAMES.has(aaFold(a.name))) continue
+    seen.set(aaFold(a.name), Math.max(seen.get(aaFold(a.name)) ?? 1, a.rank ?? 1))
+  }
   const out = new Map<string, number>()
   for (const row of table) {
     const rank = seen.get(aaFold(row.name)) ?? seen.get(aaFold(keyOf(row)))

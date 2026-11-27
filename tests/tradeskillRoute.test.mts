@@ -234,6 +234,21 @@ test('Explore under Hide trivial starts above the level; with it off it still re
   assert.ok(allSteps(route('explore')).some((s) => s.range.includes('at or under your level')), 'the switch off keeps them')
 })
 
+test('Explore at or past the top trivial says so, and says every recipe was made only when the log shows them made', () => {
+  // Audit 2026-11-27 tradeskills-2: past the top, Explore looks at no recipe, so the log showed none made.
+  const explore = (level: number, hideTrivial: boolean, facts: RouteFacts = ownerFacts(), tradeskill: 'Jewelcrafting' | 'Fishing' = 'Jewelcrafting'): Route =>
+    buildRoute(facts, { tradeskill, level, goal: 'explore', hideTrivial })
+  const past = 'Your level is at or past 295, the highest Jewelcrafting trivial the wiki holds.'
+  assert.equal(explore(295, true).empty, past)
+  assert.equal(explore(300, true).empty, past)
+  // With the switch off Explore reaches 20 under: at 316 it starts at 296, past the top too.
+  assert.equal(explore(316, false).empty, past)
+  assert.equal(explore(10, true, ownerFacts(), 'Fishing').empty, 'The wiki lists no Fishing recipe with a trivial, so there is nothing to route.')
+  // Under the top, with every recipe from the start up made, the log does show that.
+  const madeTiara = ownerFacts({ snap: ownerSnap({ items: [item('Platinum Blue Diamond Tiara', { made: 1, tradeskill: 'Jewelry Making' })] }) })
+  assert.equal(explore(290, true, madeTiara).empty, 'Your log shows you have made every Jewelcrafting recipe the wiki rates from trivial 291 up.')
+})
+
 test('Explore: an odd yield or a rare container is a group, a group is capped and counted, and nothing is said before the log is read', () => {
   const kit = (n: number): BookRecipe => recipe(`Plain Ring ${String(n).padStart(2, '0')}`, { trivial: 210 + n, container: "Jeweler's Kit", ingredients: [ing('Ruby', 1, ['Bought'])] })
   const extra = [

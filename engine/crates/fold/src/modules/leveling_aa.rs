@@ -19,6 +19,8 @@
 //! casting X II.` (`castBegin`, rank from the numeral); `You can use the ability X again in ...`,
 //! `You disable X.`, `Your X combat ability is interrupted.` (`aaOwned`); and `(Finishing Blow)` on
 //! the player's own melee hit. First and last stamp per name, and the highest rank a line named.
+//! A name seen only in casts with no numeral is marked `castOnly`: an AA's cast carries its numeral
+//! (`Divine Aura I`), a spell of the same name (a Cleric's level-1 Divine Aura) does not.
 
 use crate::event::{Event, Key, Kind};
 use eqlog::names::{spell_rank, strip_rank_tail};
@@ -119,6 +121,10 @@ pub struct AaActivation {
     /// The highest rank a line named (`Rampage II`); absent when none did.
     #[serde(skip_serializing_if = "Option::is_none")]
     rank: Option<i64>,
+    /// Every line so far was a cast with no numeral (`You begin casting Divine Aura.`): a spell may
+    /// share the name (the app drops these for its AA names that are spells). Published only while true.
+    #[serde(rename = "castOnly", skip_serializing_if = "std::ops::Not::not")]
+    cast_only: bool,
 }
 
 const FINISHING_BLOW: &str = "Finishing Blow";
@@ -152,19 +158,25 @@ pub fn fold_used(seen: &mut Vec<AaActivation>, ev: &Event) -> bool {
         return false;
     };
     let ts = ev.ts();
+    let bare = rank.is_none() && ev.kind_of() == Kind::CastBegin;
     if let Some(a) = seen.iter_mut().find(|a| a.name == name) {
         a.last = a.last.max(ts);
         let higher = rank > a.rank;
         if higher {
             a.rank = rank;
         }
-        return higher;
+        let proved = a.cast_only && !bare;
+        if proved {
+            a.cast_only = false;
+        }
+        return higher || proved;
     }
     seen.push(AaActivation {
         name,
         first: ts,
         last: ts,
         rank,
+        cast_only: bare,
     });
     true
 }
@@ -332,5 +344,42 @@ mod tests {
         assert!(!fold_used(&mut seen, &hit("Malkil")));
         assert!(fold_used(&mut seen, &hit("You")));
         assert_eq!(seen[0].name, "Finishing Blow");
+    }
+
+    #[test]
+    fn a_name_seen_only_in_a_bare_cast_is_cast_only_until_another_line_names_it() {
+        let mut seen = Vec::new();
+        let cast = |ts: i64, spell: &str| {
+            ev(&format!(
+                r#"{{"kind":"castBegin","seq":1,"ts":{ts},"raw":"c","spell":"{spell}"}}"#
+            ))
+        };
+        let act = |ts: i64, n: &str| {
+            ev(&format!(
+                r#"{{"kind":"aaActivate","seq":1,"ts":{ts},"raw":"a","name":"{n}"}}"#
+            ))
+        };
+        // A Cleric's level-1 spell: seen, but only as a cast with no numeral.
+        assert!(fold_used(&mut seen, &cast(1000, "Divine Aura")));
+        assert!(seen[0].cast_only);
+        assert!(!fold_used(&mut seen, &cast(2000, "Divine Aura")));
+        // `You activate Divine Aura.` proves it, and announces.
+        assert!(fold_used(&mut seen, &act(3000, "Divine Aura")));
+        assert!(!seen[0].cast_only);
+        // A bare cast after that does not take it back.
+        assert!(!fold_used(&mut seen, &cast(4000, "Divine Aura")));
+        assert!(!seen[0].cast_only);
+        // A ranked cast is never cast-only, and clears a bare one.
+        assert!(fold_used(&mut seen, &cast(5000, "Rampage I")));
+        assert!(!seen[1].cast_only);
+        assert!(fold_used(&mut seen, &cast(6000, "Stoicism")));
+        assert!(fold_used(&mut seen, &cast(7000, "Stoicism II")));
+        assert!(!seen[2].cast_only);
+        // Published as `castOnly`, only while true.
+        let json = serde_json::to_value(&seen).unwrap();
+        assert_eq!(json[0].get("castOnly"), None);
+        let mut bare = Vec::new();
+        fold_used(&mut bare, &cast(1, "Divine Aura"));
+        assert_eq!(serde_json::to_value(&bare).unwrap()[0]["castOnly"], true);
     }
 }

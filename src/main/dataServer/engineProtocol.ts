@@ -144,6 +144,14 @@ export const ENGINE_HEARD_FRESH_MS = 20_000
 export const ENGINE_OWN_CONNECTION_TIMEOUT_MS = 20_000
 
 /**
+ * The client deadline the own-connection `session.health` runs under. Longer than
+ * {@link ENGINE_OWN_CONNECTION_TIMEOUT_MS}, so the watch's own timer is the only bound on the ask:
+ * the ordinary request deadline (`REQUEST_DEADLINE_MS`, 15 s) would end it before its 20 s
+ * (2026-11-27 audit, logread-1).
+ */
+export const OWN_CONNECTION_HEALTH_DEADLINE_MS = ENGINE_OWN_CONNECTION_TIMEOUT_MS + 5_000
+
+/**
  * Once the log is live, how many failed beats in a row proof of life may forgive. An engine that
  * cannot accept a new connection also cannot serve a window's own connection, so past this the
  * launch is ended as before. While the log is still being read there is no cap: every forgiveness

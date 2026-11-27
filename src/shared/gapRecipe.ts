@@ -75,6 +75,9 @@ export interface GapRecipeHelp {
 /** The need a crafted item with no recipe shows until the player has stated one (shared/gapReady.ts). */
 export const RECIPE_NEED = 'recipe (pick its materials and container below)'
 
+/** The need on a page that exists when the recipe's tradeskill is the one thing missing: no log skill-up, no page, no pick. */
+export const RECIPE_TRADE_NEED = 'recipe tradeskill (pick it below first)'
+
 const text = (v: unknown): string | undefined => (typeof v === 'string' && v.trim() !== '' ? v.trim() : undefined)
 const count = (v: unknown): number | undefined => (typeof v === 'number' && Number.isInteger(v) && v > 0 ? v : undefined)
 
@@ -152,13 +155,23 @@ export function needsRecipe(row: GapRow): boolean {
 
 /** The player has stated the recipe: a tradeskill, a container, and materials each with a count. */
 export function recipeStated(row: GapRow): boolean {
+  return combineStated(row) && recipeTrade(row) !== undefined
+}
+
+/** A container, and materials each with a count: the recipe but its tradeskill. */
+function combineStated(row: GapRow): boolean {
   const recipe = fullRecipe(row)
   if (recipe?.container === undefined || recipe.materials.length === 0) return false
-  return recipeTrade(row) !== undefined && recipe.materials.every((m) => m.qty !== undefined)
+  return recipe.materials.every((m) => m.qty !== undefined)
 }
 
 /** What the row still needs of its recipe, for `stillNeeded`. */
-export const recipeNeed = (row: GapRow): string[] => (needsRecipe(row) && !recipeStated(row) ? [RECIPE_NEED] : [])
+export function recipeNeed(row: GapRow): string[] {
+  if (!needsRecipe(row) || recipeStated(row)) return []
+  // On a page that exists, Copy writes no field until the tradeskill is known (`recipeAddText`).
+  const tradeOnly = row.recipeUpdate !== undefined && recipeTrade(row) === undefined && combineStated(row)
+  return tradeOnly ? [RECIPE_TRADE_NEED] : [RECIPE_NEED]
+}
 
 function containerLinks(container: string): string {
   return container
@@ -206,13 +219,18 @@ export function withRecipeNotes(fields: [string, string][], notes: string | unde
   fields.splice(at < 0 ? fields.length : at, 0, ['notes', notes])
 }
 
-/** Copy for a page that exists: where the recipe goes, then the field whole, ready to paste. */
+/**
+ * Copy for a page that exists: where the recipe goes, then the field whole, ready to paste. With no
+ * tradeskill known it writes no field: a blank one pasted over the page would erase what it states.
+ */
 export function recipeAddText(row: GapRow): string {
   const page = row.recipeUpdate?.page ?? row.name
   const trade = recipeTrade(row)
-  const field = recipeField(row) ?? (trade === undefined ? '\n' : `\n\n* [[${trade}]]\n`)
   const notes = row.edit?.recipe?.notes
-  return `On ${page}, replace | playercrafted = with:\n\n|playercrafted = ${field}${notes === undefined ? '' : `\nAdd to | notes =\n\n${notes}\n`}`
+  const notesText = notes === undefined ? '' : `\nAdd to | notes =\n\n${notes}\n`
+  if (trade === undefined) return `On ${page}, pick the recipe's tradeskill first: Copy writes | playercrafted once it is known.\n${notesText}`
+  const field = recipeField(row) ?? `\n\n* [[${trade}]]\n`
+  return `On ${page}, replace | playercrafted = with:\n\n|playercrafted = ${field}${notesText}`
 }
 
 /** The chip's words for a page that exists and states no materials. */

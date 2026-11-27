@@ -85,6 +85,16 @@ export function clampLevel(n: number, now: Date = new Date()): number {
   return Number.isFinite(n) ? Math.min(maxCharacterLevel(now), Math.max(1, Math.round(n))) : DEFAULT_LEVEL
 }
 
+/**
+ * What the Level box stores for the text in it: the number, clamped as `clampLevel`; nothing while the
+ * box is empty (or not a number), so clearing it to retype keeps the stored level and does not put a 1
+ * under the digits typed next (audit 2026-11-27 gear-4).
+ */
+export function typedLevel(text: string, now: Date = new Date()): number | undefined {
+  const n = Number(text)
+  return text.trim() === '' || !Number.isFinite(n) ? undefined : clampLevel(n, now)
+}
+
 /** A spell haste percent, 0 to 100, whole; anything odd is 0. */
 export function clampSpellHaste(n: number): number {
   return Number.isFinite(n) ? Math.min(100, Math.max(0, Math.round(n))) : 0
