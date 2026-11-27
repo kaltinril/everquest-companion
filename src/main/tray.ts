@@ -166,6 +166,9 @@ function requestQuit(): void {
  * being two answers: both render the value the store just returned, never a remembered copy.
  */
 function buildMenu(prefs: CloseToTrayPrefs): Menu {
+  // buildFromTemplate is Electron's own factory and returns a real Menu; typescript-eslint 8.74's
+  // new rule only accepts values made with `new`, so it misreads a static factory as a forgery.
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-class-instance-assignment
   return Menu.buildFromTemplate([
     { label: 'Open EQ Legends Companion CE', click: restoreMainWindow },
     {
