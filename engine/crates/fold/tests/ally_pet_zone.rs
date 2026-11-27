@@ -14,7 +14,7 @@ use serde_json::Value;
 /// Folded as the live tail does, so the reading log is kept.
 fn fold(lines: &[&str]) -> Value {
     let parser = Parser::new(
-        Clock::new(Tz::America__Los_Angeles),
+        Clock::new(Tz::get("America/Los_Angeles").unwrap()),
         None,
         Some("Primitive".to_string()),
     );

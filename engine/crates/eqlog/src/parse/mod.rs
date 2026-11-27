@@ -327,7 +327,7 @@ mod tests {
     #[test]
     fn the_stamp_memo_answers_the_same_instant_for_a_repeated_stamp_and_moves_on_a_new_one() {
         let p = Parser::new(
-            Clock::new(chrono_tz::America::Los_Angeles),
+            Clock::new(crate::Tz::get("America/Los_Angeles").unwrap()),
             None,
             Some("Primitive".to_string()),
         );

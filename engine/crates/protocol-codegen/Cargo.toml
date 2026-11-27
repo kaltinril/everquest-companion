@@ -8,14 +8,15 @@ license.workspace = true
 publish.workspace = true
 
 [dependencies]
-prettyplease = "0.2"
+prettyplease = "0.3"
 # typify's public API takes a schemars 0.8 RootSchema, so the version here is not a free choice:
-# it must be the one typify links, or `add_root_schema` will not accept what we parse.
+# it must be the one typify links, or `add_root_schema` will not accept what we parse. Still 0.8 as
+# of typify 0.10.2 (2026-11-27): schemars 1.x waits for a typify that takes it.
 schemars = "0.8.22"
 serde_json = { workspace = true }
-sha2 = "0.10"
-syn = { version = "2", features = ["full", "parsing"] }
-typify = { version = "0.7", default-features = false }
+sha2 = "0.11"
+syn = { version = "3", features = ["full", "parsing"] }
+typify = { version = "0.10", default-features = false }
 
 [dev-dependencies]
 # DEV ONLY, and the direction matters: the generator does not depend on the crate it writes into.

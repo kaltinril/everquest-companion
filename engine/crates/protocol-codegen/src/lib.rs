@@ -135,7 +135,14 @@ pub fn schema_digest(files: &[SchemaSource]) -> String {
         hash.update(file.text.as_bytes());
         hash.update(b"\n");
     }
-    format!("{:x}", hash.finalize())
+    // sha2 0.11's digest is a `hybrid_array::Array`, which has no `LowerHex`; spell the hex out.
+    hash.finalize()
+        .iter()
+        .fold(String::with_capacity(64), |mut hex, byte| {
+            use std::fmt::Write as _;
+            let _ = write!(hex, "{byte:02x}");
+            hex
+        })
 }
 
 /// The single document typify reads: `$defs` merged across every source file under one fixed root.
@@ -246,10 +253,15 @@ pub fn render_types(bundle: &serde_json::Value) -> Result<String> {
     let root: schemars::schema::RootSchema = serde_json::from_value(bundle.clone())
         .map_err(|e| CodegenError::Schema(format!("bundle is not a JSON Schema document: {e}")))?;
     let mut settings = typify::TypeSpaceSettings::default();
-    settings.with_struct_builder(false);
-    // Ordered maps: `Cells` and `ViewFilter` are open objects, and a `HashMap` would re-serialize
-    // them in a per-process order, making a wire capture unreproducible and a golden a coin flip.
-    settings.with_map_type("::std::collections::BTreeMap");
+    // Since typify 0.10 the rendering settings live in typespace and are reached through this one
+    // hook. Ordered maps: `Cells` and `ViewFilter` are open objects, and a `HashMap` would
+    // re-serialize them in a per-process order, making a wire capture unreproducible and a golden a
+    // coin flip.
+    settings.map_typespace_settings(|rendering| {
+        rendering
+            .with_struct_builder(false)
+            .with_map_type(typify::typespace::settings::ContainerType::btree_map())
+    });
     // The two replacements are the same defect twice: typify lowers a multi-type schema to an
     // untagged enum whose number arm is `f64`, turning `184220` into `184220.0` on the way back out,
     // and both of these types carry counts.
@@ -273,7 +285,9 @@ pub fn render_types(bundle: &serde_json::Value) -> Result<String> {
     space
         .add_root_schema(root)
         .map_err(|e| CodegenError::Typify(e.to_string()))?;
-    let stream = space.to_stream();
+    let stream = space
+        .to_stream()
+        .map_err(|e| CodegenError::Typify(e.to_string()))?;
     let file: syn::File = syn::parse2(stream).map_err(|e| CodegenError::Syntax(format!("{e}")))?;
     Ok(prettyplease::unparse(&file))
 }

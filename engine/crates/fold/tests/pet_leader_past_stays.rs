@@ -26,7 +26,7 @@ impl RosterSource for Group {
 /// (kind, name, total) of every damage row in the stay `id`.
 fn stay(lines: &[&str], id: &str) -> Vec<(String, String, i64)> {
     let parser = Parser::new(
-        Clock::new(Tz::America__Los_Angeles),
+        Clock::new(Tz::get("America/Los_Angeles").unwrap()),
         None,
         Some("Drywrought".to_string()),
     );
