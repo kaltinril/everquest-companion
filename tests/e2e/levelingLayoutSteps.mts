@@ -477,14 +477,11 @@ interface CardWatch {
  * Start watching, from inside the page: how long each card made the pointer wait, and how many
  * were ever open at once.
  *
- * THE MEASUREMENT IS TAKEN IN THE PAGE BECAUSE THE HARNESS IS TOO SLOW TO TAKE IT (measured, and
- * it is why this step is shaped the way it is). A real `page.mouse.move` on this tab costs ~820ms
- * end to end under the runner's four-way parallelism — the CDP dispatch waits on a renderer that
- * is drawing two charts and tailing a live log — so a node-side "cross three names in 270ms" is
- * not a thing this harness can perform at all: the first attempt clocked 2728ms for three moves
- * and every row therefore dwelled long past ANY enter delay. Both timestamps below are the page's
- * own, so node's latency cannot enter the number: `__eqLastEnter` is stamped by a real
- * `pointerover` on a spell name, and the gap is measured to the first frame a card exists.
+ * THE MEASUREMENT IS TAKEN IN THE PAGE, so node's latency cannot enter the number: `__eqLastEnter`
+ * is stamped by a real `pointerover` on a spell name, and the gap is measured to the first frame a
+ * card exists. Until 2026-11-27 a real `page.mouse.move` cost ~900ms here, because the hidden
+ * window drew one frame a second (appWindow.mts FRAME_ARGS): three moves clocked 2.7 s and every
+ * row dwelled long past ANY enter delay. With the frame fix a move costs a few milliseconds.
  *
  * A POLL AND NOT A `MutationObserver`, for a harness reason worth writing down: this file runs
  * through tsx, and esbuild's `keepNames` wraps any function assigned to a NAMED binding in a
@@ -547,23 +544,25 @@ function stopCardWatch(page: Page): Promise<{ max: number; gaps: number[] }> {
  * WHY IT IS AN E2E CLAIM. There is no unit test of this: the behaviour is MUI's timer state, shared
  * across every tooltip in the app, driven by a real pointer. Only the running window has it.
  *
- * WHAT IS ASSERTED, AND WHY IT IS NOT A WALL-CLOCK COUNT. The ticket asked for "crossing three rows
- * quickly opens at most one card". The harness cannot cross quickly — see `startCardWatch` for the
- * measurement (~820ms per real pointer dispatch on this tab), which means every row in a node-driven
- * crossing dwells long past any enter delay and opens its card legitimately. So the claim is made on
- * the property that count was a proxy FOR: every card that opened made the pointer wait its full
- * quarter second first. With `enterNextDelay` left at its default that number is single digits, and
- * a crossing at any human speed opens a card per name; at 250 the same crossing opens none.
+ * WHAT IS ASSERTED. The ticket asked for "crossing three rows quickly opens at most one card", and
+ * since the frame fix (2026-11-27, appWindow.mts FRAME_ARGS) the harness can cross quickly: three
+ * moves 90ms apart take under 300ms. So that count is asserted as asked. Beside it, the property the
+ * count stood in for while the harness could not cross quickly (a move then cost ~900ms, so every
+ * row dwelled past any delay): every card that DID open made the pointer wait its full quarter
+ * second first. With `enterNextDelay` left at its default that number is single digits and the
+ * crossing opens a card per name; at 250 the same crossing opens none. If a crossing is ever slow
+ * again (a dwell past the enter floor), the count is not measurable and is noted, not asserted.
  *
- * THE CONTROL IS HALF THE CLAIM. A step that never saw a card would pass this vacuously and would
- * also be what a BROKEN card looks like, so the gaps have to be non-empty and the step ends by
- * resting on the last name and proving a card still opens there.
+ * THE CONTROL IS HALF THE CLAIM. A crossing that opens nothing would also be what a BROKEN card
+ * looks like, so the step ends by resting on the last name and proving a card still opens there.
  *
  * AND IT WAS PROVEN TO FAIL. Deleting `enterNextDelay` from `SpellTooltip` and re-running this spec
  * reads `enter gaps 255/4ms` — the FIRST card waits its `enterDelay` and the second opens on contact
  * in four milliseconds, which is MUI's app-global hysteresis measured in this app rather than quoted
  * from its docs. With the value in place the same run reads `259/259ms`. A test that cannot fail is
- * not a claim, so that number is written down here.
+ * not a claim, so that number is written down here. RE-PROVEN 2026-11-27 with the quick crossing:
+ * `enterNextDelay={0}` reads `3 card opening(s) in 277ms` and `enter gaps 6/5/5ms`, both checks
+ * red; with 250 the same crossing opens none and the resting control opens one.
  */
 async function checkHoverCrossing(page: Page): Promise<void> {
   const pts = await spellNamePoints(page, 3)
@@ -585,17 +584,19 @@ async function checkHoverCrossing(page: Page): Promise<void> {
   }
   const elapsed = Date.now() - began
   const { max, gaps } = await stopCardWatch(page)
-  // The instrument has to have seen something, or the assertion below is vacuous.
-  if (!check('crossing three spell names after one card had opened opens cards at all', gaps.length > 0, `${String(gaps.length)} card opening(s) seen in ${String(elapsed)}ms`)) {
-    return
+  // QUICK means no name was dwelled on as long as the enter floor, so no card had a fair claim.
+  if (elapsed / pts.length < ENTER_FLOOR_MS) {
+    check('crossing three spell names quickly, straight after a card closed, opens at most one card', gaps.length <= 1, `${String(gaps.length)} card opening(s) in ${String(elapsed)}ms`)
+  } else {
+    note(`the crossing took ${String(elapsed)}ms for 3 pointer moves, a dwell past the ${String(ENTER_FLOOR_MS)}ms floor, so "at most one card" is not measurable on this run`)
   }
   const instant = gaps.filter((g) => g < ENTER_FLOOR_MS)
   check(
     'crossing a spell name straight after a card closed still makes it WAIT — none opens on contact',
     instant.length === 0,
-    `enter gaps ${gaps.map(String).join('/')}ms against a ${String(ENTER_FLOOR_MS)}ms floor · ${String(max)} card(s) open at once`
+    `enter gaps ${gaps.length > 0 ? `${gaps.map(String).join('/')}ms` : 'none'} against a ${String(ENTER_FLOOR_MS)}ms floor · ${String(max)} card(s) open at once`
   )
-  note(`the crossing itself took ${String(elapsed)}ms of harness time for 3 real pointer moves — the gaps above are the PAGE's own clock, which is why that does not matter`)
+  note(`the crossing itself took ${String(elapsed)}ms of harness time for 3 real pointer moves — the gaps above are the PAGE's own clock`)
   // THE CONTROL: the pointer is still resting on the third name, so a card must arrive.
   const opened = await settleCount(page, SPELL_CARD, 1, { timeoutMs: 8_000 })
   check('…and the card still opens when the pointer STAYS on a name', opened > 0, `${String(opened)} card(s) after resting`)

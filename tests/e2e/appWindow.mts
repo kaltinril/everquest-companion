@@ -215,6 +215,29 @@ export function reapOrphanUserData(maxAgeMs = 86_400_000): number {
 const MUTE_ARGS = ['--mute-audio']
 
 /**
+ * THE HIDDEN WINDOW DRAWS AT FULL RATE (2026-11-27). Every window of this suite is `show:false`
+ * (EQ_E2E), and Chromium gives a window it never shows about ONE frame a second. Playwright's
+ * `mouse.move`, `hover` and `click` wait for the renderer's next frame, so each one cost 1 to 3 s
+ * and the suite was bound by its pointer actions rather than by the app: e.g. the leveling spec's
+ * three-move crossing took 2.7 s. Key presses and `evaluate` never waited and were always fast.
+ *
+ * `--disable-frame-rate-limit` lifts it. MEASURED in the hidden window (main window, a fixture
+ * launch, 2026-11-27): rAF 3 frames in 2 s before, 116 after; 10 `mouse.move`s 10.0 s before,
+ * 25 ms after; one `hover` 3.0 s before, 12 ms after; one `click` 2.0 s before, 45 ms after. Idle
+ * CPU unchanged (every process under 0.3%): frames are still only made when something asks.
+ *
+ * TRIED AND NOT KEPT, each measured with no change at all to the numbers above:
+ * `backgroundThrottling: false` (set per window), `--disable-renderer-backgrounding`,
+ * `--disable-background-timer-throttling`, `--disable-backgrounding-occluded-windows`,
+ * `--disable-features=CalculateNativeWinOcclusion`, `--disable-gpu-vsync`. The page already
+ * reports `visibilityState` 'visible' and its timers are not clamped; only the frame rate was.
+ *
+ * A launch argument for the same reason as MUTE_ARGS: the product is unchanged, under EQ_E2E too,
+ * and the switch is process-wide, so it covers every overlay this launch opens.
+ */
+const FRAME_ARGS = ['--disable-frame-rate-limit']
+
+/**
  * The second half of the same promise, belt and braces: mute every window's WebContents too.
  *
  * WHY BOTH. The switch is process-wide and is the one that cannot be missed, but it is a Chromium
@@ -352,7 +375,7 @@ export async function launchApp(
   Object.assign(env, opts.env ?? {})
   const app = await electron.launch({
     executablePath: electronBinary(),
-    args: [MAIN_ENTRY, ...MUTE_ARGS],
+    args: [MAIN_ENTRY, ...MUTE_ARGS, ...FRAME_ARGS],
     cwd: opts.cwd ?? ROOT,
     env,
     timeout: 60_000
