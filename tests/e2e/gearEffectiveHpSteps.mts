@@ -28,6 +28,8 @@
 import type { Page } from 'playwright-core'
 import { check, countOf, settle } from './appHarness.mjs'
 import { pickColumns, resetColumns } from './gearColumnSteps.mjs'
+// The active sort header, as the area-memory fingerprint reads it.
+import { sortedBy } from './areaMemorySteps.mjs'
 
 const COUNT = '[data-testid="gear-count"]'
 const SEARCH = '[data-testid="gear-search"] input'
@@ -95,6 +97,11 @@ async function stepPickable(page: Page): Promise<boolean> {
 /** 2. ITS HEADER SORTS, AND ITS CELLS STATE NUMBERS — the derived key reached the cell path. */
 async function stepSortable(page: Page): Promise<void> {
   await page.click(SORT_EFF_HP, { timeout: 15_000 })
+  // THE CLICK REACHED THE SORT: the header is the active one, highest first. The cells below were
+  // already filled before the click, so they alone cannot prove the sort ran (which order it
+  // produces is tests/gearEffectiveHp.test.mts).
+  const sorted = await settle(() => sortedBy(page), (v) => v === 'EFF_HP:desc', { timeoutMs: 15_000 })
+  check('clicking the EFF HP header makes it the active sort, highest first', sorted === 'EFF_HP:desc', sorted)
   const ready = await until(async () => (await statedCells(page)).length > 1, 15_000)
   check(
     'sorting by effective HP leaves rows on screen with sums to compare',

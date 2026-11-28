@@ -483,11 +483,17 @@ async function stepFacetsNarrow(page: Page): Promise<number | null> {
   await pick(page, BOSS, 'Spiroc')
   const boss = await settle(() => storedValue(page, BOSSES_KEY), (v) => v === '["The Spiroc Lord"]', { timeoutMs: 8_000 })
   check(`the boss pick is stored under ${BOSSES_KEY}`, boss === '["The Spiroc Lord"]', String(boss))
-  // The AND between the facets is a value of `filterByFacets` (tests/questFacets.test.mts, 'AND
-  // across the dimensions: one more chip always narrows'); here the narrowed count is only WAITED
-  // for, so the remount below has a settled number to come back to.
+  // The boss picker is its own control and key, so its narrowing is its own wiring check (and the
+  // settled count the remount below must come back to). The AND semantics behind it are
+  // `filterByFacets`'s (tests/questFacets.test.mts, 'AND across the dimensions: one more chip
+  // always narrows').
   const narrower = island ?? all
   const both = await settle(() => filteredCount(page), (n) => n !== null && n < narrower, { timeoutMs: 8_000 })
+  check(
+    'PICKING A BOSS NARROWS THE LIST',
+    both !== null && both > 0 && both < narrower,
+    `${String(island)} -> ${String(both)}`
+  )
 
   if (!(await awayAndBack(page))) return null
   check(

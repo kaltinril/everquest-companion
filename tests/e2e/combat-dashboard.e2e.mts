@@ -38,10 +38,10 @@
  * head row's "Last fight" wording (tests/combatScopeOptions.test.mts), the meter scope's row
  * counts (tests/meterScope.test.mts), the grouped pet layout's line count
  * (tests/combatPetGroups.test.mts), and the multi-attack readout's rounds wording
- * (tests/multiAttackRows.test.mts). The 2x2 grid is measured in four states (quiet, busy log,
- * the 900 px window, restored wide) and the header in four (quiet, timeline, 900, 720): the
- * picked-fight and after-search grid passes and the restored-wide header pass repeated a state
- * already measured.
+ * (tests/multiAttackRows.test.mts). The 2x2 grid is measured in five states (quiet, busy log,
+ * picked fight - the densest content - the 900 px window, restored wide) and the header in five
+ * (quiet, timeline, 900, 720, restored wide - its return under the 110px cap after 720). The
+ * after-search grid pass repeated a state already measured and was cut.
  *
  * On any failure: the relevant DOM + a screenshot land in tests/e2e/artifacts/ (gitignored).
  *
@@ -382,6 +382,9 @@ async function stepPickAFight(page: Page, snap: Snap): Promise<void> {
     )
     const dash3 = await rectOf(page, '[data-testid="combat-dashboard"]')
     check('…in a dashboard that still has height', !!dash3 && dash3.h >= 200, dash3 ? `${dash3.h}px` : 'absent')
+    // A finalized fight is the DENSEST case (full source list, full mob list, full ring), and the
+    // grid's whole claim is that growing content never breaks it (appHarness checkGrid).
+    await checkGrid(page, 'picked fight')
   } else {
     check(
       'the Fight-scope dropdown offers at least one finalized fight to select',
@@ -504,14 +507,15 @@ async function stepResponsive(app: ElectronApplication, page: Page): Promise<voi
     narrowOver.doc === 0 && narrowOver.content === 0,
     `document +${narrowOver.doc}px · content +${narrowOver.content}px`
   )
-  // Back to the wide layout — and it must come back as a clean 2x2. (The header at full width was
-  // measured in the quiet state; only the grid's return from the collapse is new here.)
+  // Back to the wide layout — and it must come back as a clean 2x2, with the header back under the
+  // two-line cap (110px) it was allowed to exceed at 720px.
   await win.evaluate((w, b) => {
     w.setMinimumSize(900, 600)
     w.setBounds(b)
   }, wide)
   await settleStable(() => panelBoxes(page), { timeoutMs: 15_000 })
   await checkGrid(page, 'restored wide')
+  await checkHeader(page, 'restored wide', true)
 }
 
 async function main(): Promise<void> {

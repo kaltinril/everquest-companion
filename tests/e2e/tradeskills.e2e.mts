@@ -183,8 +183,12 @@ async function stepHave(page: Page): Promise<void> {
   await page.click(`${tile('Brewing')} button`)
   await settle(() => textOf(page, sel('tradeskill-name')), (t) => t === 'Brewing', { timeoutMs: 15_000 })
   check('a tradeskill the log never showed opens from level 0, and says so', (await countOf(page, sel('tradeskill-level-unseen'))) === 1)
+  const before = (await rows(page)).length
   await page.fill(sel('tradeskill-search'), 'Griffenne Blood')
   const found = await settle(() => rows(page), (rs) => rs.length > 0 && rs.every((r) => r.text.includes('griffenne blood')), { timeoutMs: 15_000 })
+  // THE SEARCH BOX IS WIRED: typing reaches the table. Which lines a query keeps is
+  // tests/tradeskillBook.test.mts ('the search reads item and material names, ...').
+  check('typing in the workbench search narrows the recipe list', found.length > 0 && found.length < before, `${String(before)} -> ${String(found.length)} lines`)
   if (found.length === 0) {
     note('no Brewing recipe takes Griffenne Blood in this data: the Have check did not run')
     return

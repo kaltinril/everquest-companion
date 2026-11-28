@@ -424,7 +424,9 @@ export async function stepBestSpells(page: Page): Promise<void> {
       `${sorted.column} · ${byEff.slice(0, 3).join(' | ')}`
     )
     // The two answers are allowed to agree (a small loadout really can have one best spell by both
-    // measures), so a difference is a NOTE and the monotone above is the assertion.
+    // measures), so a difference is a NOTE. The assertion is that the click re-ranked the table on
+    // the per-mana column; that the column then descends is tests/bestSpells.test.mts ('every
+    // column ranks, and flipping the direction reverses it').
     if (byRank.join() === byEff.join()) note('the fastest and the most mana-efficient spell are the same here')
     // A SORT IS THE TAB'S OWN. Flipping this one must not disturb another, which is the state the
     // panel keeps per tab rather than per side.

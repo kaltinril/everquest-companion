@@ -1321,10 +1321,15 @@ where one exists.
   proves wiring; values are unit-tested over the function (WORKFLOW.md, Gate, "What belongs in
   e2e"). Every removal is listed by spec in the `e2e-trim` commit message with the unit test that
   pins it or the check it duplicated.
-- First pass 2026-11-27 (`e2e-trim`), 10 specs: ok checks 1302 -> 1091 (gear 185 -> 134,
-  combat-dashboard 256 -> 242, planner 130 -> 127, tradeskills-log 198 -> 136, tradeskills 74 -> 52,
-  leveling 210 -> 193, sky-filters 70 -> 54, text-size 80 -> 65, voice-alerts 79 -> 72,
-  mob-drops-era 20 -> 16). The 10 run together with the default runner (3 wide, BelowNormal, the
+- First pass 2026-11-27 (`e2e-trim`), 10 specs: ok checks 1302 -> 1110 after review (gear 185 ->
+  135, combat-dashboard 256 -> 257, planner 130 -> 127, tradeskills-log 198 -> 136, tradeskills 74
+  -> 53, leveling 210 -> 193, sky-filters 70 -> 55, text-size 80 -> 65, voice-alerts 79 -> 72,
+  mob-drops-era 20 -> 16 -> 17). combat-dashboard is up because its baseline skipped checks after
+  its red drill. The review restored five wiring checks the first pass had cut as values or
+  duplicates (boss picker narrows, EFF HP header becomes the active sort, the picked-fight grid
+  and restored-wide header passes, the drops card's folded count, the workbench search narrows):
+  a check is a duplicate only when the state it measures is the same, and a cut must not leave a
+  control with no check at all. The numbers below are from before that review. The 10 run together with the default runner (3 wide, BelowNormal, the
   owner using the PC): 336.9 s -> 256.0 s wall. Per-spec times under load are noise-dominated: the
   first three specs started carry a large start-up cost whichever they are (mob-drops-era took
   103.6 s in the first wave, 11.8 s alone). Alone (one at a time) after the trim: gear 43.3 s,

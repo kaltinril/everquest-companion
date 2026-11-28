@@ -194,6 +194,8 @@ async function stepMobPage(page: Page): Promise<void> {
     stat.startsWith(`${String(IN_ERA)} `) || stat.startsWith(`${String(IN_ERA)}\n`),
     stat
   )
+  // MobPage's own dropCountHint (not exported, no unit test): the card is wired to the folded count.
+  check('…and still states the folded ones beside it', stat.includes(`+${String(OUT_OF_ERA)} out of era`), stat)
 
   await page.click(PAGE_ERA_TOGGLE, { timeout: 15_000 })
   const all = await settle(() => countOf(page, DROP_ROW), (n) => n === LISTED, { timeoutMs: 10_000 })

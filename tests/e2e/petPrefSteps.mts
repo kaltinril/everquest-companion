@@ -216,8 +216,9 @@ function groupShape(page: Page): Promise<GroupShape[]> {
  * damage and a bound pet's, which is exactly a pair. Your pet sits on the line under you, over a
  * shared bar; every row ends in one total box; a pet's line drills into the pet. That grouping keeps
  * every source as one line and moves no damage is tests/combatPetGroups.test.mts (2026-11-27). The
- * Its own bar stop stays: it is where the Preferences example's separate layout is checked. It
- * leaves the layout as shipped.
+ * Its own bar stop stays because its snapshot (`totals`) is what tells the pair check below whether
+ * the fight has a You row and a pet row at all; the Preferences example's separate layout is
+ * already checked by the earlier pet-layout walk. It leaves the layout as shipped.
  */
 export async function stepPetGroupedLayout(page: Page): Promise<void> {
   await meterRows(page)
