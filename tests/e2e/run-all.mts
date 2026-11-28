@@ -11,16 +11,25 @@
  * are per run and per spec, so there is nothing left for two specs to fight over. `--serial`
  * stays for debugging, where interleaved output costs more than the wall clock saves.
  *
- *   npm run test:e2e                 every spec, up to min(4, cores/2) at a time
+ *   npm run test:e2e                 every spec, 3 at a time (EQ_E2E_CONCURRENCY overrides)
  *   npm run test:e2e -- leveling     only the specs whose file name contains 'leveling'
- *   npm run test:e2e -- --serial     one at a time, output straight through
+ *   npm run test:e2e -- --serial     one at a time, output straight through, no retry
+ *
+ * LONGEST FIRST: specs start in the order of their last measured wall time (`pastTimes`), so the
+ * four-minute specs are not the last ones started and the run does not end on one long spec
+ * running alone. A spec never timed goes first, then alphabetical among equals.
+ *
+ * EVERY FAILURE IS RUN AGAIN, ALONE (2026-11-27). After the parallel pass, each spec that failed
+ * is re-run once with nothing else running. Passed alone: "flaky under load", listed loudly in
+ * the summary and in summary.json, and the run still exits 0. Failed both times: "red", and the
+ * run exits 1. This replaces gating with `--serial`, which cost an hour for the same answer.
  *
  * Per-spec wall time is printed as a table and written to artifacts/<runId>/summary.json.
  * EQ_E2E_SPEC_TIMEOUT_MS overrides the 5-minute per-spec cap. The whole run is below normal priority.
  */
 import { spawn, spawnSync } from 'node:child_process'
-import { mkdirSync, readdirSync, writeFileSync } from 'node:fs'
-import { constants, cpus, setPriority } from 'node:os'
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { constants, setPriority } from 'node:os'
 import { basename, dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { reapOrphanUserData } from './appWindow.mjs'
@@ -37,11 +46,12 @@ const serial = argv.includes('--serial')
 const filters = argv.filter((a) => !a.startsWith('--'))
 
 /**
- * Half the cores, capped at 4. Each spec is a full Electron app replaying a large log, so the
- * limit is memory and disk, not CPU; leaving half the machine alone also keeps the sleeps the
- * specs still contain (docs/plans/e2e-parallel.md, wave E3) from losing their bets.
+ * THREE AT A TIME, overridable with EQ_E2E_CONCURRENCY (it was min(4, cores/2)). Each spec is a
+ * full Electron app plus its engine; three leaves the owner's desktop room at below-normal priority
+ * and keeps the engine's 10 s port announce clear of starvation (WORKFLOW.md, the CPU-starvation
+ * trap), and the alone-retry below catches what load still breaks.
  */
-const CONCURRENCY = serial ? 1 : Math.max(1, Math.min(4, Math.floor(cpus().length / 2)))
+const CONCURRENCY = serial ? 1 : Math.max(1, Number(process.env.EQ_E2E_CONCURRENCY ?? 3) || 3)
 
 interface Result {
   spec: string
@@ -50,14 +60,21 @@ interface Result {
   timedOut: boolean
 }
 
+/** A spec's verdict once the alone-retry has had its say. */
+type Verdict = 'ok' | 'flaky under load' | 'red'
+
 /** Kill the spec AND the Electron it launched — a bare kill leaves the app holding its dir. */
 function killTree(pid: number): void {
   if (process.platform === 'win32') spawnSync('taskkill', ['/pid', String(pid), '/T', '/F'])
   else process.kill(-pid, 'SIGKILL')
 }
 
-function runSpec(spec: string): Promise<Result> {
-  const name = spec.replace(/\.e2e\.mts$/, '')
+/**
+ * `attempt` 2 is the alone-retry: its evidence goes to `<spec>-retry/` so the first attempt's
+ * failure dumps, the ones worth reading, are not overwritten by the run that passed.
+ */
+function runSpec(spec: string, attempt = 1): Promise<Result> {
+  const name = spec.replace(/\.e2e\.mts$/, '') + (attempt > 1 ? '-retry' : '')
   // The default cap, unless this spec is one the default cannot honestly hold — see SPEC_TIMEOUT_MS.
   const capMs = SPEC_TIMEOUT_MS[basename(spec)] ?? TIMEOUT_MS
   const t0 = Date.now()
@@ -84,7 +101,8 @@ function runSpec(spec: string): Promise<Result> {
       const ms = Date.now() - t0
       if (!serial) {
         const text = out.join('')
-        console.log(`\n${'─'.repeat(70)}\n[e2e] ${spec} — ${(ms / 1000).toFixed(1)}s\n${text}`)
+        const label = attempt > 1 ? `${spec} (retry, alone)` : spec
+        console.log(`\n${'─'.repeat(70)}\n[e2e] ${label} — ${(ms / 1000).toFixed(1)}s\n${text}`)
         try {
           mkdirSync(join(RUN_DIR, name), { recursive: true })
           writeFileSync(join(RUN_DIR, name, 'output.log'), text, 'utf8')
@@ -172,7 +190,7 @@ const SOLO_SPECS: string[] = []
 // launch, so each is that run minus the other's steps and the default cap applies. Not yet timed.
 const SPEC_TIMEOUT_MS: Record<string, number> = {}
 
-/** Run at most CONCURRENCY specs at once, in discovery order — then the solo ones, alone. */
+/** Run at most CONCURRENCY specs at once, in the order given (longest first), then the solo ones alone. */
 async function runAll(specs: string[]): Promise<Result[]> {
   const solo = specs.filter((s) => SOLO_SPECS.includes(basename(s)))
   const packed = specs.filter((s) => !SOLO_SPECS.includes(basename(s)))
@@ -187,36 +205,105 @@ async function runAll(specs: string[]): Promise<Result[]> {
   return results
 }
 
-function report(results: Result[], wallMs: number): number {
-  const failed = results.filter((r) => r.status !== 0)
-  const rows = [...results].sort((a, b) => b.ms - a.ms)
+/**
+ * Re-run each failed spec ONCE, strictly one at a time, so "red only when it shares the machine"
+ * is told apart from "red". Skipped for `--serial` and a one-spec run, whose first attempt was
+ * already alone: running it again would call a plain flake "under load".
+ */
+async function retryAlone(first: Result[], ranAlone: boolean): Promise<Map<string, Result>> {
+  const retried = new Map<string, Result>()
+  const failed = first.filter((r) => r.status !== 0)
+  if (ranAlone || failed.length === 0) return retried
+  console.log(`\n[e2e] ${String(failed.length)} spec(s) failed in the parallel pass; running each again, alone`)
+  for (const r of failed) retried.set(r.spec, await runSpec(r.spec, 2))
+  return retried
+}
+
+function verdictOf(r: Result, retry: Result | undefined): Verdict {
+  if (r.status === 0) return 'ok'
+  return retry?.status === 0 ? 'flaky under load' : 'red'
+}
+
+/**
+ * LONGEST FIRST, from what the last runs measured. Reads the newest `summary.json` files in this
+ * tree's artifacts and, for a worktree under `<clone>/.claude/worktrees/`, the clone's as well (a
+ * fresh worktree has none, and the gate always runs in a fresh one). The newest time per spec
+ * wins. No times at all: alphabetical, as the runner always was.
+ */
+function pastTimes(): Map<string, number> {
+  const dirs = [join(ROOT, 'tests', 'e2e', 'artifacts')]
+  const parts = ROOT.split(/[\\/]/)
+  if (parts.at(-2) === 'worktrees' && parts.at(-3) === '.claude') {
+    dirs.push(join(ROOT, '..', '..', '..', 'tests', 'e2e', 'artifacts'))
+  }
+  const runs: { id: string; file: string }[] = []
+  for (const dir of dirs) {
+    if (!existsSync(dir)) continue
+    for (const id of readdirSync(dir)) runs.push({ id, file: join(dir, id, 'summary.json') })
+  }
+  runs.sort((a, b) => b.id.localeCompare(a.id))
+  const times = new Map<string, number>()
+  for (const run of runs.slice(0, 40)) {
+    for (const r of summaryRows(run.file)) if (!times.has(r.spec) && r.ms > 0) times.set(r.spec, r.ms)
+  }
+  return times
+}
+
+function summaryRows(file: string): Result[] {
+  try {
+    return (JSON.parse(readFileSync(file, 'utf8')) as { specs?: Result[] }).specs ?? []
+  } catch {
+    return [] // No summary (a killed run) or an older shape: the next run may have it.
+  }
+}
+
+/** Never timed first (it may be long), then longest first, then alphabetical. */
+function longestFirst(specs: string[], times: Map<string, number>): string[] {
+  const t = (s: string): number => times.get(s) ?? Number.POSITIVE_INFINITY
+  return [...specs].sort((a, b) => (t(a) === t(b) ? a.localeCompare(b) : t(b) - t(a)))
+}
+
+function report(results: Result[], retried: Map<string, Result>, wallMs: number): number {
+  const rows = [...results]
+    .sort((a, b) => b.ms - a.ms)
+    .map((r) => ({ ...r, verdict: verdictOf(r, retried.get(r.spec)), retryMs: retried.get(r.spec)?.ms }))
   const width = Math.max(...rows.map((r) => r.spec.length))
   console.log(`\n${'═'.repeat(70)}\n[e2e] run ${RUN_ID}`)
   for (const r of rows) {
-    const verdict = r.timedOut ? 'TIMEOUT' : r.status === 0 ? 'ok' : `exit ${String(r.status)}`
-    console.log(`  ${r.spec.padEnd(width)}  ${(r.ms / 1000).toFixed(1).padStart(7)}s  ${verdict}`)
+    const first = r.timedOut ? 'TIMEOUT' : r.status === 0 ? 'ok' : `exit ${String(r.status)}`
+    const then = r.retryMs === undefined ? '' : ` -> alone ${(r.retryMs / 1000).toFixed(1)}s: ${r.verdict.toUpperCase()}`
+    console.log(`  ${r.spec.padEnd(width)}  ${(r.ms / 1000).toFixed(1).padStart(7)}s  ${first}${then}`)
   }
+  const flaky = rows.filter((r) => r.verdict === 'flaky under load').map((r) => r.spec)
+  const red = rows.filter((r) => r.verdict === 'red').map((r) => r.spec)
   try {
     mkdirSync(RUN_DIR, { recursive: true })
     writeFileSync(
       join(RUN_DIR, 'summary.json'),
-      JSON.stringify({ runId: RUN_ID, concurrency: CONCURRENCY, wallMs, specs: rows }, null, 2),
+      JSON.stringify({ runId: RUN_ID, concurrency: CONCURRENCY, wallMs, flaky, red, specs: rows }, null, 2),
       'utf8'
     )
   } catch (err) {
     console.log(`[e2e] could not write summary.json — ${String(err)}`)
   }
-  const green = results.length - failed.length
+  // LOUD ON PURPOSE: a flake passes the run, so these lines are the only place it shows.
+  if (flaky.length > 0) {
+    console.log(`\n[e2e] FLAKY UNDER LOAD (failed in parallel, passed alone): ${flaky.join(', ')}`)
+  }
+  if (red.length > 0) console.log(`\n[e2e] RED (failed in parallel and again alone): ${red.join(', ')}`)
+  const green = results.length - red.length - flaky.length
   console.log(
-    `\n[e2e] ${String(green)}/${String(results.length)} specs green · ${(wallMs / 1000).toFixed(1)}s wall · artifacts/${RUN_ID}/`
+    `\n[e2e] ${String(green)}/${String(results.length)} specs green first time · ${String(flaky.length)} flaky under load · ${String(red.length)} red · ${(wallMs / 1000).toFixed(1)}s wall · artifacts/${RUN_ID}/`
   )
-  return failed.length
+  return red.length
 }
 
-const specs = readdirSync(here)
-  .filter((f) => f.endsWith('.e2e.mts'))
-  .filter((f) => filters.length === 0 || filters.some((needle) => f.includes(needle)))
-  .sort()
+const specs = longestFirst(
+  readdirSync(here)
+    .filter((f) => f.endsWith('.e2e.mts'))
+    .filter((f) => filters.length === 0 || filters.some((needle) => f.includes(needle))),
+  pastTimes()
+)
 
 if (specs.length === 0) {
   console.error(`[e2e] no spec matches ${filters.join(', ')}`)
@@ -243,9 +330,11 @@ buildIfStale()
 const reaped = reapOrphanUserData()
 if (reaped > 0) console.log(`[e2e] reaped ${String(reaped)} orphaned userData dir(s) older than 24h`)
 console.log(
-  `[e2e] ${String(specs.length)} spec(s), ${serial ? 'serial' : `${String(CONCURRENCY)} at a time`}, ${String(TIMEOUT_MS / 1000)}s cap each`
+  `[e2e] ${String(specs.length)} spec(s), ${serial ? 'serial' : `${String(CONCURRENCY)} at a time, longest first, failures retried alone`}, ${String(TIMEOUT_MS / 1000)}s cap each`
 )
 
 const started = Date.now()
-const failed = report(await runAll(specs), Date.now() - started)
-process.exit(failed === 0 ? 0 : 1)
+const first = await runAll(specs)
+const retried = await retryAlone(first, CONCURRENCY === 1 || specs.length === 1)
+const red = report(first, retried, Date.now() - started)
+process.exit(red === 0 ? 0 : 1)
