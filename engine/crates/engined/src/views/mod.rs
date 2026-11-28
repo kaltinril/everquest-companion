@@ -11,7 +11,7 @@
 //!    owns what a row of it looks like.
 //!
 //! A query field and a cell are different values even under the same name: the cell is what the
-//! pixel says (`"Aug 19, 04:21 PM"`), the field is the comparable value underneath it. Sources
+//! pixel says (`"Aug 19, 16:21"`), the field is the comparable value underneath it. Sources
 //! declare both and the two are looked up separately; a field with no cell, or a cell with no
 //! field, is intended.
 //!

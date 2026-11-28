@@ -400,7 +400,7 @@ counter the `loot` module bumps on every push and every clear, read through the 
 is a ceiling (~10 Hz, `views::SERVE_EVERY`), not a heartbeat: nothing is sent when nothing moved.
 
 **WHERE RULING 4 STOPS: numbers, not sentences.** `loot.ledger` renders its instant as
-`"Aug 19, 04:21 PM"` because that is what the pixel says, and six sources later that is still the
+`"Aug 19, 16:21"` because that is what the pixel says, and six sources later that is still the
 rule — with two named exceptions, both of which are the APP's own decision rather than a relaxation
 of the owner's. A value read against NOW is served as the INSTANT: a timer bar's remaining time
 changes every frame, so serving it as text would mean a diff per visible row per serve beat and it
