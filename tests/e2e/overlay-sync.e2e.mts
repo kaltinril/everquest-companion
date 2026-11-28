@@ -455,7 +455,9 @@ async function checkOverlayStillWorks(page: Page, overlay: Page, mode: string): 
   check(`${mode}: the reopened overlay's bridge is live and its open-state persisted`,
     (await overlayState(page)).fight === true)
   await setLocked(overlay, false)
-  check(`${mode}: it renders its selector`, (await countOf(overlay, TRIGGER)) === 1)
+  // SETTLED, not read once (2026-11-27): the overlay was just rebuilt, and the read used to land
+  // only after a slow unlock (one frame a second, appWindow.mts FRAME_ARGS) had given it time.
+  check(`${mode}: it renders its selector`, (await settleCount(overlay, TRIGGER, 1, { timeoutMs: 10_000 })) === 1)
   await setLocked(overlay, true)
   check(`${mode}: it locks, and the locked selector survives (ruling 3 holds in this mode too)`,
     (await countOf(overlay, TRIGGER)) === 1)

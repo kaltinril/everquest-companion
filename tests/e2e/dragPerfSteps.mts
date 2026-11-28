@@ -39,20 +39,20 @@
  *
  * THE MEASUREMENT IS PRINTED EVERY RUN (the JOS-283 rule), including the half that is not gated.
  *
- * It profiles rather than timing a wall clock on purpose: this window is never composited, so
- * `requestAnimationFrame` can be throttled to nothing and `backgroundThrottling` can stretch a
- * timer to a second (AGENTS.md records both traps). A CPU profile counts main-thread samples and
- * cares about neither.
+ * It profiles rather than timing a wall clock on purpose: this window is never shown, and until
+ * 2026-11-27 it drew about one frame a second (the harness now launches with
+ * `--disable-frame-rate-limit`, appWindow.mts FRAME_ARGS). A CPU profile counts main-thread samples
+ * and does not care how fast frames or the harness's round trips are.
  */
 import type { Page } from 'playwright-core'
 import { check, hoverAt, note } from './appHarness.mjs'
 
 /**
- * How many moves each sweep is made of. Each `mouse.move` costs about a second of round trip in a
- * never-composited window, so this is a budget as much as a sample size — and it is a sample size
- * that had to be RAISED: at 12 the hover control came back anywhere between 2.85 and 6.45 ms per
- * move depending on how loaded the machine was, which put a correctly-fixed run at 2.04 against a
- * 2x gate. Twenty is what the spec can afford.
+ * How many moves each sweep is made of. A sample size that had to be RAISED: at 12 the hover
+ * control came back anywhere between 2.85 and 6.45 ms per move depending on how loaded the machine
+ * was, which put a correctly-fixed run at 2.04 against a 2x gate. It was also a budget while each
+ * `mouse.move` cost about a second (the hidden window's one frame a second); since the frame fix
+ * (2026-11-27, appWindow.mts FRAME_ARGS) a move costs a few milliseconds, so it could be raised.
  */
 const MOVES = 20
 /**
