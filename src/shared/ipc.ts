@@ -1021,6 +1021,12 @@ export const IPC = {
   // to the ladder by the same normalizer the store reader and the window factory use.
   uiScaleSet: 'uiScale:set',
 
+  // ---- the Overview's card layout (shared/overviewLayout.ts) -------------------------------
+  // renderer -> main: the stored layout, normalized. Returns OverviewLayout.
+  overviewLayoutGet: 'overviewLayout:get',
+  // renderer -> main: store a layout. Returns what was stored, normalized.
+  overviewLayoutSet: 'overviewLayout:set',
+
   // ---- dev restart (JOS-61, JOS-63 — src/main/devRestart.ts) ----------------------------
   //
   // renderer -> main: restart the app. Hand-testing startup performance means restarting it

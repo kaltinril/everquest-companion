@@ -24,6 +24,7 @@ import type { RespawnAlertSetting } from '../shared/respawnAlert'
 import type { BazaarWatchlist } from '../shared/bazaarWatch'
 import type { SoundPackPrefs } from '../shared/soundPacks'
 import type { SettingsRecoveryNotice } from '../shared/settingsRecovery'
+import type { OverviewLayout } from '../shared/overviewLayout'
 import type { WindowBounds } from './store'
 
 /**
@@ -330,4 +331,10 @@ export interface StoreShape {
    * importing a friend's answer to that is not a setting anyone wanted.
    */
   uiScale?: number
+  /**
+   * Which Overview cards are shown, and in what order (shared/overviewLayout.ts). One per install,
+   * the same for every character (owner, 2026-11-27). Additive and optional: absent reads as the
+   * page before widgets existed. Not part of the shared settings profile.
+   */
+  overviewLayout?: OverviewLayout
 }

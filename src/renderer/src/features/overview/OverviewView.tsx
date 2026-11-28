@@ -3,9 +3,15 @@
 // snapshots + the combat engine's pull-snapshot; it owns no state of its own and is deliberately
 // not an EqModule (docs/plans/overview-tab.md §0).
 //
+// EVERY CARD IS A WIDGET (owner, 2026-11-27; docs/community/plans/2026-11-27-overview-widgets.md).
+// The player picks which cards show and in what order from "Customize" on the zone strip; one
+// layout per install, in the settings store (shared/overviewLayout.ts). The default is the page
+// as it was: Damage, Leveling, Target, the DPS curve, Recent drops, Recent kills.
+//
 // IT ROUTES, IT NEVER NAVIGATES. Every destination arrives as a callback from App.tsx, which is
 // what lets a card be added here without touching the router — each card owns its own hook and
-// asks for its own data, so a future MapCard or ClassComboCard is one file plus one grid cell.
+// asks for its own data (overviewWidgets.tsx), so a new card is one file plus one registry row,
+// and a card the player turned off subscribes to nothing.
 //
 // LAYOUT. `minmax(0, 1fr)` is the load-bearing part of the grid: it lets a track shrink BELOW its
 // content, so no card can dictate the grid's size (an intrinsic track is exactly how a growing
@@ -16,43 +22,39 @@
 // it lives on in Preferences → Profiles (the history + the correction editor) and in the boss
 // surfaces that read a kill's loadout. What it was not is a GLANCE: your three classes change a
 // few times a month, and a card restating them every second is the one thing on this page that
-// never answers "what is happening right now". Dropping it also gives the NOW rank three cards
-// instead of four, which is a better band at every width the grid offers.
+// never answers "what is happening right now".
 //
-// THREE REGIONS, NOT SEVEN CARDS (symmetry pass, 2026-08-03). The page is NOW (three peer cards),
-// then the curve, then HISTORY (two twin feeds) — so it is built as three region grids rather than
-// one flat grid the cards fall into in DOM order. That is what buys the two things a flat grid
-// cannot express: the NOW rank can carry its own column rule (1 → 2 → 4 across) and its own row
-// FLOOR, so its four cards are one height at every width; and the twin feeds keep a symmetric pair
-// of tracks no matter what the rank above them is doing. The regions are plain Boxes — the cards
-// still own the ONLY borders on the page (the de-nesting rule), and the two gap scales are the
-// whole visual hierarchy: 1.5 WITHIN a region, 2 BETWEEN them, which is what makes the full-width
-// curve read as the deliberate divider between "now" and "what already happened".
+// REGIONS, NOT A FLAT GRID (symmetry pass, 2026-08-03; kept for widgets, 2026-11-28). Each card
+// has a region kind (`overviewRegions`): RANK cards are peers (1 → 2 → 3 across, with a row
+// FLOOR so a row reads as one band), the DPS curve is WIDE (full width), and the two FEEDS are
+// twins in symmetric tracks. Consecutive cards of one kind share one region grid, so any subset
+// in any order keeps those rules, and the default order is exactly the three regions the page
+// had: NOW, the curve, HISTORY. The regions are plain Boxes — the cards still own the ONLY borders
+// on the page (the de-nesting rule), and the two gap scales are the whole visual hierarchy: 1.5
+// WITHIN a region, 2 BETWEEN them.
 //
 // HYDRATION IS A STATE (§4). During the startup replay every combat snapshot describes the PAST:
-// an hours-old fight is `current` and a mob you killed at lunch is `currentTarget`. So the NOW
-// row — zone, damage, target — renders a quiet placeholder until `hydrating` clears. `snap === null`
-// (the first pull still in flight) reads the same way, which is why the gate is
-// `snap?.hydrating ?? true`. The recent-drops card is NOT gated: it is a HISTORY surface whose
-// module snapshot is complete and correct during the replay.
+// an hours-old fight is `current` and a mob you killed at lunch is `currentTarget`. So every LIVE
+// region gives way to ONE quiet placeholder, drawn where the first of them was, until `hydrating`
+// clears (`overviewBlocks`). `snap === null` (the first pull still in flight) reads the same way,
+// which is why the gate is `snap?.hydrating ?? true`. The two feeds are NOT gated: they are
+// HISTORY surfaces whose module snapshots are complete and correct during the replay.
 
 import type { JSX } from 'react'
+import { useMemo } from 'react'
 import { Box, CircularProgress, Paper, Skeleton, Stack, Typography } from '@mui/material'
+import type { CombatSnapshot } from '@shared/combat'
+import { overviewBlocks, shownOverviewWidgets, type OverviewRegion } from '@shared/overviewLayout'
 import type { CombatFocus } from '../combat/combatFocus'
 import type { MobTarget } from '../mobs/mobTarget'
+import type { View } from '../../appViews'
 import { LogReadReport } from '../../components/LogReadReport'
-import { DpsCard } from './DpsCard'
-import { DpsCurveCard } from './DpsCurveCard'
-import { CurrentMobCard } from './CurrentMobCard'
-import { LevelingCard } from './LevelingCard'
-import { RecentDropsCard } from './RecentDropsCard'
-import { RecentKillsCard } from './RecentKillsCard'
+import { QuietNote } from '../combat/combatShared'
 import { ZoneStrip } from './ZoneStrip'
-import { useCurrentMob } from './useCurrentMob'
+import { OverviewCustomize } from './OverviewCustomize'
+import { OverviewWidget, type OverviewLinks } from './overviewWidgets'
 import { useOverviewCombat } from './useOverviewCombat'
-import { useOverviewLeveling } from './useOverviewLeveling'
-import { useRecentDrops } from './useRecentDrops'
-import { useRecentKills } from './useRecentKills'
+import { useOverviewLayout } from './useOverviewLayout'
 
 export interface OverviewViewProps {
   /** DPS card → "Open in Combat": jump to an explicit scope + selection. */
@@ -68,12 +70,14 @@ export interface OverviewViewProps {
   onOpenLoot: (item?: string) => void
   /** Leveling card → the Leveling tab: charts, the drag-selected range, AA. */
   onOpenLeveling: () => void
+  /** A plain tab switch, for the widgets whose tab takes no payload (Buffs, Timers). */
+  onOpenView: (v: View) => void
   /** which world this mount views (App's `viewKey`): a revisit of it paints the kept combat answer */
   world?: string
 }
 
 /**
- * The NOW rank's height FLOOR, and the reason its four cards read as peers.
+ * The RANK regions' height FLOOR, and the reason their cards read as peers.
  *
  * MEASURED, never guessed (the e2e harness dumps every card's box): the tallest natural card in
  * the rank is the DPS card at 303px — label, headline, supporting line, drill strip, five bars and
@@ -93,7 +97,7 @@ export interface OverviewViewProps {
 const NOW_ROW_MIN_PX = 304
 
 /**
- * The NOW row while the engine is still folding history. Same visual language as CombatView's
+ * The live regions while the engine is still folding history. Same visual language as CombatView's
  * `HydratingPanel` — state ("Reading log…"), never process — with its own testid so the e2e can
  * tell the two surfaces apart.
  */
@@ -114,32 +118,87 @@ function OverviewHydrating(): JSX.Element {
   )
 }
 
+/** A rank region: peers, 1 → 2 → 3 across, one row height. */
+const RANK_SX = {
+  display: 'grid',
+  gap: 1.5,
+  minWidth: 0,
+  gridTemplateColumns: {
+    xs: 'minmax(0, 1fr)',
+    md: 'repeat(2, minmax(0, 1fr))',
+    lg: 'repeat(3, minmax(0, 1fr))'
+  },
+  gridAutoRows: { xs: 'min-content', md: `minmax(${String(NOW_ROW_MIN_PX)}px, auto)` },
+  '& > *': { minWidth: 0, minHeight: 0 }
+} as const
+
+/** A feed region: twins, side by side on md and stacked on xs, in symmetric tracks of their own,
+ *  so the pair never inherits an odd column rule from a rank above it. */
+const FEED_SX = {
+  display: 'grid',
+  gap: 1.5,
+  minWidth: 0,
+  gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'repeat(2, minmax(0, 1fr))' },
+  '& > *': { minWidth: 0, minHeight: 0 }
+} as const
+
+function Region({
+  region,
+  first,
+  snap,
+  links
+}: {
+  region: OverviewRegion
+  /** the first rank region keeps the page's original `overview-now` testid */
+  first: boolean
+  snap: CombatSnapshot | null
+  links: OverviewLinks
+}): JSX.Element {
+  const cards = region.ids.map((id) => <OverviewWidget key={id} id={id} snap={snap} links={links} />)
+  // A wide card is a direct child of the page grid, full width, exactly as the curve always was.
+  if (region.kind === 'wide') return <>{cards}</>
+  return (
+    <Box
+      data-region={region.kind}
+      {...(first ? { 'data-testid': 'overview-now' } : {})}
+      sx={region.kind === 'rank' ? RANK_SX : FEED_SX}
+    >
+      {cards}
+    </Box>
+  )
+}
+
 export default function OverviewView({
   onOpenCombat,
   onOpenMob,
   onOpenLoot,
   onOpenLeveling,
+  onOpenView,
   world
 }: OverviewViewProps): JSX.Element {
   const snap = useOverviewCombat(world)
-  const mob = useCurrentMob(snap)
-  const rows = useRecentDrops()
-  const kills = useRecentKills()
-  // Its own module, its own hook: the leveling card asks for what it needs, exactly like every
-  // other card here, so nothing about it touches the combat snapshot.
-  const leveling = useOverviewLeveling()
   const hydrating = snap?.hydrating ?? true
+  const { layout, save } = useOverviewLayout()
+  const links = useMemo<OverviewLinks>(
+    () => ({ onOpenCombat, onOpenMob, onOpenLoot, onOpenLeveling, onOpenView }),
+    [onOpenCombat, onOpenMob, onOpenLoot, onOpenLeveling, onOpenView]
+  )
+  const blocks = useMemo(
+    () => (layout === null ? [] : overviewBlocks(shownOverviewWidgets(layout), hydrating)),
+    [layout, hydrating]
+  )
+  const firstRank = blocks.find((b) => b.kind === 'region' && b.region.kind === 'rank')
 
   return (
     <Stack spacing={1.5} sx={{ height: '100%', minHeight: 0, overflow: 'hidden' }}>
-      {!hydrating && <ZoneStrip />}
+      {!hydrating && <ZoneStrip right={<OverviewCustomize layout={layout} onSave={save} />} />}
       <Box
         data-testid="overview-grid"
         sx={{
           display: 'grid',
           // BETWEEN regions. The regions set their own, tighter gap between the cards inside
-          // them, and that difference is the only thing marking the three bands apart — no rule,
-          // no second border level, just the spacing scale doing the sectioning.
+          // them, and that difference is the only thing marking the bands apart — no rule, no
+          // second border level, just the spacing scale doing the sectioning.
           gap: 2,
           flexGrow: 1,
           minHeight: 0,
@@ -154,59 +213,16 @@ export default function OverviewView({
           '& > *': { minWidth: 0, minHeight: 0 }
         }}
       >
-        {hydrating ? (
-          <OverviewHydrating />
-        ) : (
-          <>
-            {/* THE NOW RANK — three peers, one height. 1 → 2 → 3 across: at md the pair-plus-one
-                keeps the two DENSE cards (the DPS breakdown, the target's drop list) from
-                sharing a row, and at lg the rank is one band read left to right — how fast you
-                are killing, how fast you are levelling, what you are killing. */}
-            <Box
-              data-testid="overview-now"
-              sx={{
-                display: 'grid',
-                gap: 1.5,
-                minWidth: 0,
-                gridTemplateColumns: {
-                  xs: 'minmax(0, 1fr)',
-                  md: 'repeat(2, minmax(0, 1fr))',
-                  lg: 'repeat(3, minmax(0, 1fr))'
-                },
-                gridAutoRows: { xs: 'min-content', md: `minmax(${String(NOW_ROW_MIN_PX)}px, auto)` },
-                '& > *': { minWidth: 0, minHeight: 0 }
-              }}
-            >
-              <DpsCard snap={snap} onOpenCombat={onOpenCombat} />
-              {/* Gated with the NOW row for the same reason the others are: its window is "the
-                  last hour of the log", and mid-replay that hour is an arbitrary point in your
-                  past. */}
-              <LevelingCard state={leveling} onOpenLeveling={onOpenLeveling} />
-              <CurrentMobCard state={mob} onOpenMob={onOpenMob} />
-            </Box>
-            {/* Full width, directly under the NOW rank and gated with it: the curve describes the
-                SAME fight the DPS card above names, so showing it while the replay still calls an
-                hours-old fight `current` would be the same lie the gate exists to prevent. */}
-            <DpsCurveCard snap={snap} />
-          </>
+        {blocks.map((b) =>
+          b.kind === 'hydrating' ? (
+            <OverviewHydrating key="hydrating" />
+          ) : (
+            <Region key={b.region.ids.join('|')} region={b.region} first={b === firstRank} snap={snap} links={links} />
+          )
         )}
-        {/* THE HISTORY BAND — two twins, side by side on md and stacked on xs, in symmetric
-            tracks of their own so the pair can never inherit an odd column rule from the rank
-            above. Neither is gated: both describe the past, and the module snapshots behind them
-            are complete during the replay. They share one fixed body height, so the pair reads as
-            one band. */}
-        <Box
-          sx={{
-            display: 'grid',
-            gap: 1.5,
-            minWidth: 0,
-            gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'repeat(2, minmax(0, 1fr))' },
-            '& > *': { minWidth: 0, minHeight: 0 }
-          }}
-        >
-          <RecentDropsCard rows={rows} onOpenLoot={onOpenLoot} />
-          <RecentKillsCard rows={kills} onOpenLeveling={onOpenLeveling} onOpenMob={onOpenMob} />
-        </Box>
+        {layout !== null && blocks.length === 0 && (
+          <QuietNote>No cards on Overview - pick some with Customize at the top right.</QuietNote>
+        )}
       </Box>
     </Stack>
   )

@@ -86,6 +86,8 @@ import { updatesBridge } from './updates'
 // The main window's text size (JOS-123), split out for the same file-mass reason. Its shapes are
 // a single number; the ladder and the normalizer live in shared/uiScale.ts.
 import { uiScaleBridge } from './uiScale'
+// …and the Overview's card layout (./overviewLayout.ts), likewise.
+import { overviewLayoutBridge } from './overviewLayout'
 // …and the overlay-snapping preference (./overlaySnap.ts), likewise (JOS-217).
 import { overlaySnapBridge } from './overlaySnap'
 // The dev-only restart button's one method (JOS-61), split out for the same file-mass reason.
@@ -203,6 +205,8 @@ const api = {
   ...alertFiresBridge,
   // …and the main window's text size (./uiScale.ts), likewise.
   ...uiScaleBridge,
+  // …and the Overview's card layout (./overviewLayout.ts), likewise.
+  ...overviewLayoutBridge,
   // …and the overlay-snapping switch (./overlaySnap.ts), likewise.
   ...overlaySnapBridge,
   // …and `restartApp` (./dev.ts), whose handler refuses in a packaged build.

@@ -19,14 +19,15 @@
 // this strip sits on the page background, which IS `background.default`, so that token would be
 // invisible here and `action.hover` would read brighter than the cards it introduces.)
 
-import type { JSX } from 'react'
+import type { JSX, ReactNode } from 'react'
 import { Box, Stack, Typography } from '@mui/material'
 import PlaceIcon from '@mui/icons-material/Place'
 import type { CharacterSnap } from '@shared/types'
 import { useModule } from '../../lib/useModule'
 import { FriendsOnline } from './FriendsOnline'
 
-export function ZoneStrip(): JSX.Element {
+/** `right`: a control at the strip's far end (the Overview's Customize). */
+export function ZoneStrip({ right }: { right?: ReactNode } = {}): JSX.Element {
   const who = useModule<CharacterSnap>('character')
   return (
     <Box sx={{ px: 1.25, py: 0.75, flexShrink: 0, borderRadius: 1, bgcolor: 'background.paper' }}>
@@ -42,6 +43,8 @@ export function ZoneStrip(): JSX.Element {
           </Typography>
         )}
         <FriendsOnline />
+        {right !== undefined && <Box sx={{ flexGrow: 1 }} />}
+        {right}
       </Stack>
     </Box>
   )
