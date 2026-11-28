@@ -3,7 +3,8 @@
 // list, so it lives in its own module with that gate.
 
 import { memo, useState } from 'react'
-import { Box, Chip, Collapse, Typography } from '@mui/material'
+import { Box, Collapse, Typography } from '@mui/material'
+import { TagChip } from '../../lib/TagChip'
 import { Bar, KIND_COLOR, RESIST_COLOR, SkillBar } from './combatShared'
 import { flattenSkills } from './dashboardData'
 import { formatNum as fmt, formatRate } from '../../lib/formatRate'
@@ -40,7 +41,7 @@ export function KindChip({ kind }: { kind: string }): React.JSX.Element | null {
   const tag = KIND_TAG[kind]
   if (tag === undefined) return null
   return (
-    <Chip label={tag} size="small" sx={{ ml: 0.5, height: 14, fontSize: 9, bgcolor: `${KIND_COLOR[kind] ?? '#888'}33` }} />
+    <TagChip label={tag} sx={{ ml: 0.5, bgcolor: `${KIND_COLOR[kind] ?? '#888'}33` }} />
   )
 }
 
@@ -139,10 +140,9 @@ export const EntityRow = memo(function EntityRow({
                   e.ambiguousTotal
                 )} dmg) are name-ambiguous: a same-named hostile twin exists, so this damage could belong to the twin rather than your pet.`}
               >
-                <Chip
+                <TagChip
                   label="~"
-                  size="small"
-                  sx={{ ml: 0.5, height: 14, fontSize: 10, fontWeight: 700, bgcolor: 'rgba(207,102,121,0.25)' }}
+                  sx={{ ml: 0.5, fontWeight: 700, bgcolor: 'rgba(207,102,121,0.25)' }}
                 />
               </Tooltip>
             )}

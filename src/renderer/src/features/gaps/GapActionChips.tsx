@@ -3,7 +3,8 @@
 
 import type { JSX, MouseEvent } from 'react'
 import { memo } from 'react'
-import { Chip, Stack } from '@mui/material'
+import { Stack } from '@mui/material'
+import { TagChip } from '../../lib/TagChip'
 import { Tooltip } from '../../lib/Tooltip'
 import { gapActions, type GapAction, type GapActionContext, type GapRow, type GapVerdict } from '@shared/gaps'
 
@@ -12,10 +13,10 @@ function ActionChip({ a }: { a: GapAction }): JSX.Element {
   const color = a.warn === true ? 'warning' : 'default'
   const chip =
     a.href === undefined ? (
-      <Chip size="small" variant="outlined" color={color} label={a.label} data-testid="gaps-action" />
+      <TagChip size="clickable" variant="outlined" color={color} label={a.label} data-testid="gaps-action" />
     ) : (
-      <Chip
-        size="small"
+      <TagChip
+        size="clickable"
         variant="outlined"
         color={color}
         clickable

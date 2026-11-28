@@ -15,7 +15,8 @@
 // 51.4 px because their chips wrapped). The collapsed work row is empty and 0 px tall.
 
 import { type JSX, memo } from 'react'
-import { Box, Checkbox, Chip, TableCell, TableRow, Typography } from '@mui/material'
+import { Box, Checkbox, TableCell, TableRow, Typography } from '@mui/material'
+import { TagChip } from '../../lib/TagChip'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import type { HeldCounts } from '@shared/types'
@@ -61,16 +62,13 @@ function RecentChip({ recent }: { recent: FactionRowVm['recent'] }): JSX.Element
   const when = new Date(recent.lastTs).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
   const net = recent.net === 0 ? '' : ` ${recent.net > 0 ? '+' : ''}${String(recent.net)}`
   return (
-    <Chip
-      size="small"
+    <TagChip
       variant="outlined"
       label={`${String(recent.hits)}x${net}`}
       title={`moved ${String(recent.hits)} times recently, net ${String(recent.net)}; last at ${when}`}
       data-testid="factions-recent"
       sx={{
         ml: 1,
-        height: 18,
-        fontSize: 11,
         color: recent.net < 0 ? 'error.main' : 'success.main',
         borderColor: 'currentColor'
       }}
@@ -127,14 +125,13 @@ function NameSignals({ derived, unlocks }: { derived: RowDerived; unlocks: reado
           already settled stays on the row wearing its check — a friend's Kerran still runs
           through Kerra Isle — and only a row with something PENDING keeps the loud color. */}
       {unlocks.length > 0 && (
-        <Chip
-          size="small"
+        <TagChip
           color={unlocks.some((u) => u.done === false) ? 'info' : undefined}
           variant="outlined"
           label={`unlocks ${unlocks.map(gateText).join(', ')}`}
           title="needed at maximum for these Race Unlock achievements (✓ = already settled on this character, ? = the achievements dump left it out)"
           data-testid="factions-unlocks"
-          sx={{ ml: 1, height: 20, fontSize: 11, maxWidth: 320 }}
+          sx={{ ml: 1, maxWidth: 320 }}
         />
       )}
       {derived.gear.length > 0 && (
@@ -150,14 +147,13 @@ function NameSignals({ derived, unlocks }: { derived: RowDerived; unlocks: reado
       )}
       {/* THE LOUD ONE: this faction's quests reward something on YOUR wishlist. */}
       {derived.wished.length > 0 && (
-        <Chip
-          size="small"
+        <TagChip
           color="warning"
           variant="outlined"
           label={`♥ ${derived.wished.join(', ')}`}
           title="on your wishlist"
           data-testid="factions-wishlist-hit"
-          sx={{ ml: 1, height: 20, fontSize: 11, fontWeight: 600, maxWidth: 320 }}
+          sx={{ ml: 1, fontWeight: 600, maxWidth: 320 }}
         />
       )}
     </>
@@ -241,10 +237,9 @@ function FactionRow({
         </TableCell>
         <IgnoreBox factionKey={row.key} marked={dontCare} links={links} />
         <TableCell sx={{ py: 0.5, width: 130, whiteSpace: 'nowrap' }}>
-          <Chip
-            size="small"
+          <TagChip
             label={row.label}
-            sx={{ height: 20, fontSize: 11, color: row.color, borderColor: row.color }}
+            sx={{ color: row.color, borderColor: row.color }}
             variant="outlined"
           />
         </TableCell>
