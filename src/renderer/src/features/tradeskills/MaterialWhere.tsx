@@ -27,18 +27,18 @@ export const MATERIAL_LINE = 24
 
 const LOG_TIP = 'From your own log.'
 
-/** Which source a line came from: the player's log, or a community guide. */
+/** Which source a line came from: the player's log, or a community guide. A span, since it sits inside a line's Typography (a p or span), where a div is invalid HTML. */
 export function SourceChip({ kind }: { kind: 'log' | 'guide' }): JSX.Element {
   if (kind === 'log') {
     return (
       <Tooltip title={LOG_TIP}>
-        <Chip size="small" variant="outlined" color="success" label="your log" sx={CHIP_SX} data-testid="tradeskill-source-log" />
+        <Chip component="span" size="small" variant="outlined" color="success" label="your log" sx={CHIP_SX} data-testid="tradeskill-source-log" />
       </Tooltip>
     )
   }
   return (
     <Tooltip title={GUIDE_TIP}>
-      <Chip size="small" variant="outlined" label="guide" sx={CHIP_SX} data-testid="tradeskill-source-guide" />
+      <Chip component="span" size="small" variant="outlined" label="guide" sx={CHIP_SX} data-testid="tradeskill-source-guide" />
     </Tooltip>
   )
 }
