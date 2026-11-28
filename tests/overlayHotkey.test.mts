@@ -1,11 +1,13 @@
-// The overlay recover hotkey (overlay polish; owner, 2026-10-29): its key rules
-// (shared/overlayHotkey.ts), that it is off until the player sets one, and that it is the only
-// system-wide key the app registers (the capture's "avoid C" ruling stands, shotCapture.test.mts).
+// The app's hotkeys: the overlay recover key (overlay polish; owner, 2026-10-29) and the cursor
+// overlay's on/off key (owner, 2026-11-27). Their key rules (shared/overlayHotkey.ts), that each is
+// off until the player sets one, and that main/hotkeys.ts is the only place the app registers a
+// system-wide key (the capture's "avoid C" ruling stands, shotCapture.test.mts). Per-action keys,
+// the clash refusal and the cursor flip: hotkeyBoard.test.mts.
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync, readdirSync } from 'node:fs'
-import { acceleratorOf, hotkeyProblem, makeRecoverHotkey, type RecoverHotkey } from '../src/shared/overlayHotkey.ts'
+import { acceleratorOf, hotkeyProblem, makeHotkey, type Hotkey } from '../src/shared/overlayHotkey.ts'
 
 const press = (code: string, mods: Partial<{ ctrlKey: boolean; altKey: boolean; shiftKey: boolean; metaKey: boolean }> = {}): string | undefined =>
   acceleratorOf({ ctrlKey: false, altKey: false, shiftKey: false, metaKey: false, code, ...mods })
@@ -28,10 +30,12 @@ test('the key needs Ctrl, Alt or Win: a key alone or with Shift is the game\'s',
 })
 
 test('off until the player sets one: nothing is registered at start but the saved key', () => {
-  const code = readFileSync(new URL('../src/main/overlayRecover.ts', import.meta.url), 'utf8')
+  const code = readFileSync(new URL('../src/main/hotkeys.ts', import.meta.url), 'utf8')
   const register = [...code.matchAll(/globalShortcut\.register\(/g)]
   assert.equal(register.length, 1, 'one register call, in the setter')
-  assert.ok(code.includes("load: () => settingsStore.get('overlayRecoverHotkey')"), 'the saved key is the one read at start')
+  assert.ok(code.includes('load: () => settingsStore.get(storeKey)'), 'the saved key is the one read at start')
+  assert.match(code, /recover: \{ storeKey: 'overlayRecoverHotkey'/, 'the recover key keeps its old store key')
+  assert.match(code, /storeKey: 'cursorToggleHotkey'/, 'the cursor key has its own')
   const fake = fakeKeys({ saved: undefined })
   fake.hotkey.start()
   assert.deepEqual(fake.calls, [], 'nothing saved: nothing is taken and nothing is written')
@@ -39,10 +43,10 @@ test('off until the player sets one: nothing is registered at start but the save
 })
 
 /** The system's keys and the settings store, as the key's owner sees them, with a call log. */
-function fakeKeys(opts: { saved: unknown; taken?: string[] }): { hotkey: RecoverHotkey; calls: string[]; taken: Set<string> } {
+function fakeKeys(opts: { saved: unknown; taken?: string[] }): { hotkey: Hotkey; calls: string[]; taken: Set<string> } {
   const calls: string[] = []
   const taken = new Set(opts.taken ?? [])
-  const hotkey = makeRecoverHotkey({
+  const hotkey = makeHotkey({
     register: (accel) => {
       calls.push(`register ${accel}`)
       return !taken.has(accel)
@@ -107,7 +111,7 @@ test('a key refused while the app runs leaves the old key working, and the answe
 })
 
 test('a register call that throws is a refusal, not a crash', () => {
-  const hotkey = makeRecoverHotkey({
+  const hotkey = makeHotkey({
     register: () => {
       throw new Error('bad accelerator')
     },
@@ -122,13 +126,14 @@ test('a register call that throws is a refusal, not a crash', () => {
 })
 
 test('Preferences shows the reason it is given when it opens', () => {
-  const code = readFileSync(new URL('../src/renderer/src/features/preferences/OverlayRecoverSetting.tsx', import.meta.url), 'utf8')
-  const get = code.slice(code.indexOf("overlayRecoverHotkey('get')"), code.indexOf('const set ='))
-  assert.match(get, /setHotkey\(r\.hotkey\)/)
-  assert.match(get, /setNote\(r\.message\)/)
+  const code = readFileSync(new URL('../src/renderer/src/features/preferences/HotkeyField.tsx', import.meta.url), 'utf8')
+  // Seeded from the pane's snapshot, which holds main's get answer for every action.
+  assert.match(code, /const seed = usePrefsSeed\(\)\.hotkeys\[action\]/)
+  assert.match(code, /useState\(seed\.message\)/)
+  assert.match(code, /\{note \?\? caption\}/)
 })
 
-test('the recover key is the only globalShortcut in the app', () => {
+test('main/hotkeys.ts is the only globalShortcut user in the app', () => {
   const under = (dir: URL): URL[] =>
     readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
       e.isDirectory() ? under(new URL(`${e.name}/`, dir)) : /\.tsx?$/.test(e.name) ? [new URL(e.name, dir)] : []
@@ -139,7 +144,7 @@ test('the recover key is the only globalShortcut in the app', () => {
       return /\bglobalShortcut\b/.test(code)
     })
   )
-  assert.deepEqual(users.map((u) => u.pathname.replace(/^.*\/src\//, 'src/')), ['src/main/overlayRecover.ts'])
+  assert.deepEqual(users.map((u) => u.pathname.replace(/^.*\/src\//, 'src/')), ['src/main/hotkeys.ts'])
 })
 
 test('a saved key that is off can be forgotten: the answer names it until it is gone', () => {
@@ -166,8 +171,9 @@ test('a key in force, or a new key taken over a saved one, names no saved key', 
 })
 
 test('Preferences offers to forget a saved key that is off', () => {
-  const code = readFileSync(new URL('../src/renderer/src/features/preferences/OverlayRecoverSetting.tsx', import.meta.url), 'utf8')
-  assert.equal(code.match(/setSavedOff\(r\.savedOff\)/g)?.length, 2, 'from the get answer and from the set answer')
+  const code = readFileSync(new URL('../src/renderer/src/features/preferences/HotkeyField.tsx', import.meta.url), 'utf8')
+  assert.match(code, /if \(e\.hotkeys\) setAnswer\(e\.hotkeys\[action\]\)/, 'every set answer moves the saved key too')
+  assert.match(code, /const \{ hotkey, savedOff \} = answer/)
   assert.match(code, /hotkey === null && savedOff !== undefined/)
   assert.match(code, /Forget \$\{savedOff\}/)
 })

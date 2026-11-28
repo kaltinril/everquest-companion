@@ -20,7 +20,7 @@ import type { CloseToTrayPrefs } from '../shared/closeToTray'
 import type { OverlayConfig, OverlayKind } from '../shared/types'
 import type { OverlayTextSizePrefs } from '../shared/overlayTextScale'
 import type { OverlayBgAlphaPrefs } from '../shared/overlayBgAlpha'
-import type { HotkeyAnswer } from '../shared/overlayHotkey'
+import type { HotkeyAction, HotkeySetReply, HotkeyState } from '../shared/overlayHotkey'
 import type { WhoResult } from '../shared/whoFriends'
 
 export const windowsApi = {
@@ -69,9 +69,11 @@ export const windowsApi = {
   raiseOverlays: (): Promise<OverlayKind[]> => ipcRenderer.invoke(IPC.overlayRaise),
   /** Every open overlay back on a screen that exists, then raised (main/overlayRecover.ts). */
   recoverOverlays: (): Promise<void> => ipcRenderer.invoke(IPC.overlayRecover),
-  /** Read ('get') or set ('set', null turns it off) the recover hotkey; resolves to what is in force. */
-  overlayRecoverHotkey: (action: 'get' | 'set', accel?: string | null): Promise<HotkeyAnswer> =>
-    ipcRenderer.invoke(IPC.overlayRecoverHotkey, action, accel),
+  /** Every action's hotkey as main holds it (main/hotkeys.ts). */
+  getHotkeys: (): Promise<HotkeyState> => ipcRenderer.invoke(IPC.hotkeysGet),
+  /** Set one action's hotkey (null turns it off); resolves to its answer and every key after it. */
+  setHotkey: (action: HotkeyAction, accel: string | null): Promise<HotkeySetReply> =>
+    ipcRenderer.invoke(IPC.hotkeySet, action, accel),
   /** The font families installed on this PC, for the overlay font pick (main/installedFonts.ts). */
   listFonts: (): Promise<string[]> => ipcRenderer.invoke(IPC.fontsList),
   // ---- friends online from /who (main/whoWatch.ts; shared/whoFriends.ts) ----

@@ -19,9 +19,13 @@
 // pointer, and picking a colour recolours it, instead of on the next restart.
 //
 // ONE BORDER: PreferencesView wraps each item in an outlined Paper, so this renders bare Stacks.
+//
+// THE ON/OFF KEY (owner, 2026-11-27). A hotkey flips the master switch from anywhere (set in
+// Preferences > Hotkeys, main/hotkeys.ts); the switch here follows main's push, and the line under
+// it says which key is in force, read-only, with a way to the Hotkeys section.
 
-import { type JSX, useCallback, useState } from 'react'
-import { FormControlLabel, MenuItem, Select, Slider, Stack, Switch, Typography } from '@mui/material'
+import { type JSX, useCallback, useEffect, useState } from 'react'
+import { Button, FormControlLabel, MenuItem, Select, Slider, Stack, Switch, Tooltip, Typography } from '@mui/material'
 import AdjustIcon from '@mui/icons-material/Adjust'
 import type { PrefSection } from './PreferencesView'
 import { recordPref, usePrefsSeed } from './prefsHydration'
@@ -41,6 +45,7 @@ import { CursorRingDemo } from './CursorRingDemo'
 import { CrosshairRow } from './CursorCrosshairSetting'
 import { TrailRow } from './CursorTrailSetting'
 import { PictureRow } from './CursorIconSetting'
+import { useHotkey } from './HotkeyField'
 
 /**
  * SEEDED from the pane's hydration snapshot, written back on every change; main's reply is
@@ -55,6 +60,8 @@ import { PictureRow } from './CursorIconSetting'
  */
 function useCursorRing(): [CursorRingPrefs, (patch: Partial<CursorRingPrefs>) => void] {
   const [prefs, setPrefs] = useState<CursorRingPrefs>(usePrefsSeed().cursorRing)
+  // The on/off hotkey flips `enabled` in main; App.tsx records it in the snapshot, this shows it.
+  useEffect(() => window.eq.onCursorRingChanged(setPrefs), [])
 
   const update = useCallback((patch: Partial<CursorRingPrefs>) => {
     setPrefs((cur) => ({ ...cur, ...patch }))
@@ -271,7 +278,26 @@ function ShapeSwitch({
   )
 }
 
-export function CursorRingSetting(): JSX.Element {
+/** Which key turns the overlay on and off, and the way to the Hotkeys section where it is set. */
+function ToggleKeyLine({ onHotkeys }: { onHotkeys: () => void }): JSX.Element {
+  const { hotkey, savedOff } = useHotkey('cursorToggle').answer
+  const text =
+    hotkey !== null ? `On/off key: ${hotkey}` : savedOff !== undefined ? `On/off key ${savedOff} is off right now` : 'No on/off key set'
+  return (
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} data-testid="pref-cursor-toggle-key">
+      <Typography variant="caption" sx={{ color: 'text.secondary' }} data-testid="pref-cursor-toggle-key-text">
+        {text}
+      </Typography>
+      <Tooltip title="Opens the Hotkeys section, where this key and the others are set.">
+        <Button size="small" onClick={onHotkeys} data-testid="pref-cursor-toggle-key-link">
+          {hotkey === null ? 'Set a key' : 'Change key'}
+        </Button>
+      </Tooltip>
+    </Stack>
+  )
+}
+
+export function CursorRingSetting({ onHotkeys }: { onHotkeys: () => void }): JSX.Element {
   const [prefs, update] = useCursorRing()
   return (
     <Stack spacing={2} data-testid="pref-cursor-ring">
@@ -292,6 +318,7 @@ export function CursorRingSetting(): JSX.Element {
             ? 'A shape, crosshair lines or a trail follow your pointer so you can find it on a busy screen. Your real cursor is untouched - the overlay never gets in the way of a click.'
             : 'Off. Nothing is drawn and nothing is tracked.'}
         </Typography>
+        <ToggleKeyLine onHotkeys={onHotkeys} />
       </Stack>
 
       <Stack direction="row" spacing={3} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
@@ -328,7 +355,7 @@ export function CursorRingSetting(): JSX.Element {
  * threshold. Co-locating costs nothing — the words somebody types to find this setting belong
  * with the setting.
  */
-export function cursorRingSection(): PrefSection {
+export function cursorRingSection(onHotkeys: () => void): PrefSection {
   return {
     id: 'cursor',
     label: 'Cursor overlay',
@@ -338,8 +365,8 @@ export function cursorRingSection(): PrefSection {
         id: 'cursor-ring',
         label: 'Cursor overlay',
         keywords:
-          'cursor overlay mouse pointer ring circle halo highlight find lost locate ultimate size thickness white color colour picker shape oval square rounded diamond dot target bullseye double offset position shift move nudge x y demo crosshair cross hair lines vertical horizontal weight aim trail particle particles sparkle sparkles effect length fade icon image picture upload custom my own draw drawing paint grid pixel art',
-        content: <CursorRingSetting />
+          'cursor overlay mouse pointer hotkey shortcut toggle on off ring circle halo highlight find lost locate ultimate size thickness white color colour picker shape oval square rounded diamond dot target bullseye double offset position shift move nudge x y demo crosshair cross hair lines vertical horizontal weight aim trail particle particles sparkle sparkles effect length fade icon image picture upload custom my own draw drawing paint grid pixel art',
+        content: <CursorRingSetting onHotkeys={onHotkeys} />
       }
     ]
   }

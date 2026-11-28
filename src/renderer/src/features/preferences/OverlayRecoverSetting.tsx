@@ -1,85 +1,38 @@
-// OverlayRecoverSetting — Preferences → Overlays: the hotkey that brings lost overlays back
-// (overlay polish; owner, 2026-10-29). Off until the player presses a key with Ctrl, Alt or Win
-// held (shared/overlayHotkey.ts); main takes it system-wide (main/overlayRecover.ts). The item names
-// itself here, as PerfSetting's does, because PreferencesView.tsx sits at its ceiling.
+// OverlayRecoverSetting — the hotkey that brings lost overlays back (overlay polish; owner,
+// 2026-10-29). Off until the player presses a key with Ctrl, Alt or Win held; the control and its
+// state are HotkeyField's, shared with every other app key. It is listed in Preferences → Overlays,
+// where it always was, AND in Preferences → Hotkeys (owner, 2026-11-27: "everything should be where
+// it is, but also in hotkeys"); both copies show one state. The item names itself here, as
+// PerfSetting's does, because PreferencesView.tsx sits at its ceiling.
 
-import { type JSX, useEffect, useState } from 'react'
-import { Button, Stack, TextField, Typography } from '@mui/material'
-import { acceleratorOf } from '@shared/overlayHotkey'
+import type { JSX } from 'react'
+import { Button } from '@mui/material'
+import { HotkeyField } from './HotkeyField'
 import type { PrefItem } from './PreferencesView'
 
-function OverlayRecoverSetting(): JSX.Element {
-  // undefined while main's answer is on its way.
-  const [hotkey, setHotkey] = useState<string | null | undefined>(undefined)
-  const [listening, setListening] = useState(false)
-  const [note, setNote] = useState<string | undefined>(undefined)
-  // A saved key that is off since start: the field reads Off, so "Turn off" would say nothing.
-  const [savedOff, setSavedOff] = useState<string | undefined>(undefined)
-  useEffect(() => {
-    void window.eq
-      .overlayRecoverHotkey('get')
-      .then((r) => {
-        setHotkey(r.hotkey)
-        // Why a saved key is off since the app started (shared/overlayHotkey.ts).
-        setNote(r.message)
-        setSavedOff(r.savedOff)
-      })
-      .catch(() => undefined)
-  }, [])
-  const set = (accel: string | null): void => {
-    void window.eq
-      .overlayRecoverHotkey('set', accel)
-      .then((r) => {
-        setHotkey(r.hotkey)
-        setNote(r.message)
-        setSavedOff(r.savedOff)
-      })
-      .catch(() => setNote('The hotkey could not be set.'))
-  }
-  const shown = listening ? 'Press a key with Ctrl, Alt or Win…' : hotkey === undefined ? '' : (hotkey ?? 'Off')
+/** The recover key's row. `testid` tells the two copies apart, since search can show both. */
+export function OverlayRecoverSetting({ testid }: { testid: string }): JSX.Element {
   return (
-    <Stack spacing={0.5} data-testid="pref-overlay-recover">
-      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-        <TextField
-          size="small"
-          label="Recover overlays hotkey"
-          value={shown}
-          onFocus={() => setListening(true)}
-          onBlur={() => setListening(false)}
-          onKeyDown={(e) => {
-            e.preventDefault()
-            const accel = acceleratorOf(e)
-            if (accel === undefined) return
-            setListening(false)
-            set(accel)
-          }}
-          slotProps={{ htmlInput: { readOnly: true, 'data-testid': 'pref-overlay-recover-key' } }}
-          sx={{ minWidth: 260 }}
-        />
-        {hotkey != null && (
-          <Button size="small" onClick={() => set(null)}>
-            Turn off
-          </Button>
-        )}
-        {hotkey === null && savedOff !== undefined && (
-          <Button size="small" onClick={() => set(null)} data-testid="pref-overlay-recover-forget">
-            {`Forget ${savedOff}`}
-          </Button>
-        )}
-        <Button size="small" onClick={() => void window.eq.recoverOverlays()}>
-          Recover now
-        </Button>
-      </Stack>
-      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-        {note ?? 'Brings every open overlay back onto a screen and in front, even from the game.'}
-      </Typography>
-    </Stack>
+    <HotkeyField
+      action="recover"
+      label="Recover overlays hotkey"
+      caption="Brings every open overlay back onto a screen and in front, even from the game."
+      testid={testid}
+    >
+      <Button size="small" onClick={() => void window.eq.recoverOverlays()}>
+        Recover now
+      </Button>
+    </HotkeyField>
   )
 }
+
+/** The words that find the recover key, in either section. */
+export const RECOVER_KEYWORDS =
+  'hotkey shortcut key recover lost missing off screen monitor bring back overlay overlays reset find'
 
 export const overlayRecoverItem: PrefItem = {
   id: 'overlay-recover',
   label: 'Recover lost overlays',
-  keywords: 'hotkey shortcut key recover lost missing off screen monitor bring back overlay overlays reset find',
-  content: <OverlayRecoverSetting />
+  keywords: RECOVER_KEYWORDS,
+  content: <OverlayRecoverSetting testid="pref-overlay-recover" />
 }

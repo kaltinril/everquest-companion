@@ -50,6 +50,7 @@ import { registerGapsCharactersIpc } from '../gapsCharacters'
 import { registerShotIpc } from './shotIpc'
 import { registerShotCaptureIpc } from './shotCapture'
 import { registerOverlayRecoverIpc } from '../overlayRecover'
+import { registerHotkeysIpc } from '../hotkeys'
 import { registerInstalledFontsIpc } from '../installedFonts'
 import { registerWhoWatchIpc } from '../whoWatch'
 import { registerGapQuestLiveIpc } from '../gapQuestLive'
@@ -129,6 +130,7 @@ export function registerIpc(): void {
   registerShotIpc()
   registerShotCaptureIpc()
   registerOverlayRecoverIpc()
+  registerHotkeysIpc()
   registerInstalledFontsIpc()
   registerWhoWatchIpc()
   registerGapQuestLiveIpc()

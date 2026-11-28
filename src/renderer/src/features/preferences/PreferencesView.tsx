@@ -55,6 +55,9 @@
 //             overlays (next overlay open). Lives in ./GraphicsSetting.tsx, descriptor and all.
 //   Cursor ring — the opt-in white halo that follows the mouse over the EQ window (off by
 //             default; size + thickness). Lives in ./CursorRingSetting.tsx.
+//   Hotkeys  — every app hotkey in one place (owner, 2026-11-27): the recover key (also still in
+//             Overlays) and the cursor overlay's on/off key. Last in Display, right under Cursor
+//             overlay, whose key line links here. Lives in ./HotkeysSetting.tsx.
 //   Voice    — spoken alerts (docs/plans/voice-alerts.md §2): engine tier, default voice +
 //             preview, speed and volume. There is no master switch — an alert's own output is
 //             what makes it speak (schema v8). Lives in ./VoiceSetting.tsx.
@@ -109,6 +112,8 @@ import { AlertBannerSetting } from './AlertBannerSetting'
 import { ConCardSetting } from './ConCardSetting'
 // Cursor ring: another descriptor that lives beside its own card, same ceiling, same answer.
 import { cursorRingSection } from './CursorRingSetting'
+// Hotkeys: every app key in one place (owner, 2026-11-27); descriptor beside its card, same reason.
+import { hotkeysSection } from './HotkeysSetting'
 // Performance is the one section whose DESCRIPTOR lives with its card rather than here: this
 // file sits at the 400-code-line factoring ceiling, and the section's own file is the honest
 // place for the label, icon and search keywords that name it. See ./PerfSetting.tsx.
@@ -271,10 +276,12 @@ interface SectionInputs {
   status: UpdateStatus
   /** Rail switch to the What's new section — the Version row's link (JOS-73). */
   onWhatsNew: () => void
+  /** Rail switch to any section, for a card that points at another (the cursor tab's key line). */
+  onSection: (id: string) => void
 }
 
 /** The whole settings table, in render order. Rebuilt only when its inputs change. */
-function buildSections({ version, status, onWhatsNew }: SectionInputs): PrefSection[] {
+function buildSections({ version, status, onWhatsNew, onSection }: SectionInputs): PrefSection[] {
   return [
     // GROUPED (owner, 2026-11-26): the rail draws a heading above the first section of each
     // group (./prefsRailGroups.ts), so this list is in group order. GAME: the install folder,
@@ -287,7 +294,10 @@ function buildSections({ version, status, onWhatsNew }: SectionInputs): PrefSect
     appearanceSection(),
     windowSection(),
     graphicsSection(),
-    cursorRingSection(),
+    cursorRingSection(() => onSection('hotkeys')),
+    // Last in Display, directly under the Cursor overlay tab that links to it, and just above the
+    // Overlays group whose recover key it also lists (owner, 2026-11-27).
+    hotkeysSection(),
     // OVERLAYS & ALERTS. Window used to sit right after Overlays because the close-to-tray switch
     // is a promise about them (JOS-139); its own label still says so.
     overlaysSection(),
@@ -455,8 +465,8 @@ function PreferencesPane({ section }: { section: string | null }): JSX.Element {
   }, [pick])
 
   const sections = useMemo(
-    () => buildSections({ version, status, onWhatsNew: openWhatsNew }),
-    [version, status, openWhatsNew]
+    () => buildSections({ version, status, onWhatsNew: openWhatsNew, onSection: pick }),
+    [version, status, openWhatsNew, pick]
   )
   const keys = useMemo(() => sectionKeys(sections), [sections])
   const q = normalizeQuery(deferred)

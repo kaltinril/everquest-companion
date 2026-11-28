@@ -167,8 +167,10 @@ export interface StoreShape {
    * `storeOverlaySnap.ts` because store.ts is at the 400-code-line ceiling.
    */
   overlaySnap?: OverlaySnapPrefs
-  /** The key that recovers lost overlays (shared/overlayHotkey.ts; main/overlayRecover.ts). Absent: off. */
+  /** The key that recovers lost overlays (shared/overlayHotkey.ts; main/hotkeys.ts). Absent: off. */
   overlayRecoverHotkey?: string
+  /** The key that turns the cursor overlay on and off (main/hotkeys.ts). Absent: off. */
+  cursorToggleHotkey?: string
   /**
    * The damaged-settings notice while the player has not closed it (shared/settingsRecovery.ts).
    * Additive and optional: absent means nothing to say, and an older build ignores the key.
