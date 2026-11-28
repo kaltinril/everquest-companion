@@ -150,3 +150,25 @@ export function localDayKey(ts: number): string {
   const day = String(d.getDate()).padStart(2, '0')
   return `${y}-${m}-${day}`
 }
+
+/**
+ * A short stamp, month name + day + 24h clock: e.g. "Aug 5, 20:26". The one shape for a moment
+ * shown in a dense row or a caption (Loot ledger "Last looted", the timeslice caption's two ends),
+ * so one tab never prints the same instant two ways (dup-ui-b-6). 24h like `formatTime`.
+ * The engine serves the same string for `loot.ledger`'s `at` cell (`display_time` in
+ * `engine/crates/engined/src/views/loot.rs`): change one and the other changes with it, or the
+ * Loot tab's App and Engine sources print different times (`engine-loot-view.e2e.mts`).
+ */
+export function formatShortStamp(ts: number): string {
+  return formatDateTime(ts, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })
+}
+
+/**
+ * The LOCAL wall time an `<input type="datetime-local">` speaks: `YYYY-MM-DDTHH:mm`, no zone.
+ * The date half is `localDayKey`; never `toISOString`, which would shift it by the offset.
+ */
+export function localInputValue(ts: number): string {
+  const d = new Date(ts)
+  const pad = (n: number): string => String(n).padStart(2, '0')
+  return `${localDayKey(ts)}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}

@@ -252,7 +252,7 @@ fn a_subscription_opened_before_the_attach_takes_its_rows_when_the_fold_lands() 
     // Render-ready: the cells are what the client puts on screen, off the fold, through the log's
     // own clock. Nothing here is a number the renderer would have to format.
     let head = &window.rows[0];
-    assert_eq!(*cell(head, "at"), protocol::Cell::text("Aug 19, 04:14 PM"));
+    assert_eq!(*cell(head, "at"), protocol::Cell::text("Aug 19, 16:14"));
     assert_eq!(*cell(head, "item"), protocol::Cell::text("Cloak of Flames"));
     assert_eq!(
         *cell(head, "from"),

@@ -5,7 +5,14 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { formatDate, formatDateTime, formatTime } from '../src/renderer/src/lib/formatDate'
+import {
+  formatDate,
+  formatDateTime,
+  formatShortStamp,
+  formatTime,
+  localDayKey,
+  localInputValue
+} from '../src/renderer/src/lib/formatDate'
 
 // A spread of instants: both sides of a DST change in the northern and southern hemispheres,
 // midnight and noon, a leap day, the epoch's neighbourhood, and a sub-second remainder.
@@ -90,5 +97,47 @@ test('a formatter built before the zone changed does not keep printing the old z
   } finally {
     if (before === undefined) delete process.env.TZ
     else process.env.TZ = before
+  }
+})
+
+// formatShortStamp (2026-11-27, dup-ui-b-6): the Loot rows and the timeslice caption print one
+// 24-hour shape, and the engine's `display_time` (views/loot.rs) prints the same string for the
+// same instant. The exact strings are en-US (the engine's fixed locale), so they are pinned only
+// when the runtime is en-US; the 24-hour claims hold in any locale.
+const EN_US = new Intl.DateTimeFormat().resolvedOptions().locale === 'en-US'
+
+function inZone<T>(tz: string, fn: () => T): T {
+  const before = process.env.TZ
+  process.env.TZ = tz
+  try {
+    return fn()
+  } finally {
+    if (before === undefined) delete process.env.TZ
+    else process.env.TZ = before
+  }
+}
+
+test('a short stamp is 24-hour, in the strings the engine serves for the same instants', { skip: !EN_US && 'runtime locale is not en-US' }, () => {
+  inZone('America/Los_Angeles', () => {
+    // The same instants the engine's `views::loot` tests pin.
+    assert.equal(formatShortStamp(1_787_181_707_000), 'Aug 19, 16:21')
+    assert.equal(formatShortStamp(new Date(2026, 7, 19, 0, 5).getTime()), 'Aug 19, 00:05')
+    assert.equal(formatShortStamp(new Date(2026, 7, 19, 12, 5).getTime()), 'Aug 19, 12:05')
+    assert.equal(formatShortStamp(new Date(2026, 7, 5, 20, 26).getTime()), 'Aug 5, 20:26')
+  })
+})
+
+test('a short stamp never carries a day period, and an unknown instant is empty', () => {
+  for (const ts of STAMPS) assert.doesNotMatch(formatShortStamp(ts), /AM|PM/)
+  assert.equal(formatShortStamp(0), '')
+})
+
+test('the datetime-local value is the LOCAL wall time, whatever the zone', () => {
+  for (const tz of ['America/Los_Angeles', 'Asia/Tokyo', 'UTC']) {
+    inZone(tz, () => {
+      const ts = new Date(2026, 0, 2, 3, 4, 59).getTime()
+      assert.equal(localInputValue(ts), '2026-01-02T03:04', tz)
+      assert.equal(localInputValue(ts).slice(0, 10), localDayKey(ts), tz)
+    })
   }
 })

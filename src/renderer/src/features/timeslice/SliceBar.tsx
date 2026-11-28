@@ -35,23 +35,7 @@ import { type JSX } from 'react'
 import { Button, MenuItem, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import { sliceLabel, type SliceId, type SliceRange, type Timeslice } from '@shared/timeslice'
 import type { SessionSegment } from '@shared/sessionSegments'
-import { formatDateTime } from '../../lib/formatDate'
-
-/** One shape for both ends, whatever the slice: `Aug 5, 18:00`. */
-function edge(ts: number): string {
-  return formatDateTime(ts, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })
-}
-
-/**
- * `<input type="datetime-local">` speaks LOCAL wall time with no zone, so the conversion has to
- * go through the local parts rather than through `toISOString` (which would shift the value by
- * the offset and hand the user back a different minute than they typed).
- */
-function toLocalInput(ts: number): string {
-  const d = new Date(ts)
-  const pad = (n: number): string => String(n).padStart(2, '0')
-  return `${String(d.getFullYear())}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
-}
+import { formatShortStamp, localInputValue } from '../../lib/formatDate'
 
 /** NaN for an incomplete value — the caller keeps the previous range rather than jumping to 1970. */
 function fromLocalInput(v: string): number {
@@ -85,7 +69,7 @@ function CustomRange({
       size="small"
       type="datetime-local"
       label={label}
-      value={toLocalInput(value)}
+      value={localInputValue(value)}
       data-testid={`${testId}-custom-${key === 't0' ? 'from' : 'to'}`}
       onChange={(e) => {
         const ts = fromLocalInput(e.target.value)
@@ -285,7 +269,7 @@ export function SliceCaption({
       sx={{ color: 'text.secondary', minWidth: 0 }}
       data-testid={`${testId}-window`}
     >
-      {edge(slice.range.t0)} → {edge(slice.range.t1)}
+      {formatShortStamp(slice.range.t0)} → {formatShortStamp(slice.range.t1)}
       {slice.zoneCaption ? ` · ${slice.zoneCaption}` : ''}
     </Typography>
   )

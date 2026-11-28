@@ -14,7 +14,8 @@
 //! a cell of `"-"` could not be told apart from an item genuinely called `-`, and it would cost this
 //! source the diff protocol's explicit-null clear.
 //!
-//! The timestamp is a fixed en-US pattern (`Aug 19, 04:21 PM`) rather than a locale call: a host
+//! The timestamp is a fixed en-US pattern (`Aug 19, 16:21`, 24-hour, the shape of the timeslice
+//! caption above the ledger and of the app's `formatShortStamp`) rather than a locale call: a host
 //! locale anywhere in the serve path makes the answer a property of the machine, and determinism is
 //! cacheability — the same rule that forbids `localeCompare` in the sort. The time ZONE is not a
 //! locale and is honoured, through the parser's own clock, so the string says the wall clock the
@@ -95,7 +96,10 @@ const MONTHS: [&str; 12] = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
 
-/// `Aug 19, 04:21 PM` — the en-US rendering of `fmtTime`'s options, through the parser's zone.
+/// `Aug 19, 16:21` — the en-US rendering of the app's `formatShortStamp` (`lib/formatDate.ts`:
+/// month short, day numeric, 24-hour `2-digit` clock), through the parser's zone. One shape for
+/// both sources, so the Loot tab prints the same string from the App and the Engine source, and
+/// the same one the timeslice caption above it prints (2026-11-27, dup-ui-b-6).
 ///
 /// A ts of 0 renders empty, matching `formatDate.ts`: a falsy ts is an unknown timestamp, and a
 /// stamp the parser could not read is 0.
@@ -110,16 +114,12 @@ pub(super) fn display_time(clock: &eqlog::Clock, ms: i64) -> String {
         .get(usize::try_from(t.month).unwrap_or(0).saturating_sub(1))
         .copied()
         .unwrap_or("???");
-    // 12-hour with a leading zero, as `hour: '2-digit'` renders for en-US: midnight and noon are
-    // 12, not 00.
-    let meridiem = if t.hour < 12 { "AM" } else { "PM" };
-    let hour12 = match t.hour % 12 {
-        0 => 12,
-        h => h,
-    };
+    // The day carries no leading zero (`day: 'numeric'`); the hour does (`hour: '2-digit'` with
+    // `hour12: false` is the h23 cycle for en-US: midnight is 00, never 24 and never 12).
     format!(
-        "{month} {day:02}, {hour12:02}:{minute:02} {meridiem}",
+        "{month} {day}, {hour:02}:{minute:02}",
         day = t.day,
+        hour = t.hour,
         minute = t.minute
     )
 }
@@ -159,7 +159,7 @@ mod tests {
         assert_eq!(built.len(), 1);
         let cells = &built[0].cells;
         assert_eq!(built[0].key, "loot:0");
-        assert_eq!(cells["at"], protocol::Cell::text("Aug 19, 04:21 PM"));
+        assert_eq!(cells["at"], protocol::Cell::text("Aug 19, 16:21"));
         assert_eq!(cells["item"], protocol::Cell::text("Cloak of Flames"));
         assert_eq!(cells["from"], protocol::Cell::text("a fire giant warlord"));
         assert_eq!(cells["zone"], protocol::Cell::text("Nagafen's Lair"));
@@ -210,15 +210,15 @@ mod tests {
     #[test]
     fn the_displayed_time_is_the_wall_clock_the_players_machine_would_show() {
         // The corpus's own first line, in the zone the goldens were recorded under.
-        assert_eq!(
-            display_time(&clock(), 1_787_181_707_000),
-            "Aug 19, 04:21 PM"
-        );
-        // Midnight and noon are 12, never 00.
+        assert_eq!(display_time(&clock(), 1_787_181_707_000), "Aug 19, 16:21");
+        // 24-hour: midnight is 00 and noon is 12, never 12 AM / 12 PM.
         let midnight = clock().parse_eq_timestamp("Wed Aug 19 00:05:00 2026");
-        assert_eq!(display_time(&clock(), midnight), "Aug 19, 12:05 AM");
+        assert_eq!(display_time(&clock(), midnight), "Aug 19, 00:05");
         let noon = clock().parse_eq_timestamp("Wed Aug 19 12:05:00 2026");
-        assert_eq!(display_time(&clock(), noon), "Aug 19, 12:05 PM");
+        assert_eq!(display_time(&clock(), noon), "Aug 19, 12:05");
+        // A one-digit day has no leading zero, as `day: 'numeric'` renders it.
+        let early = clock().parse_eq_timestamp("Wed Aug 05 20:26:00 2026");
+        assert_eq!(display_time(&clock(), early), "Aug 5, 20:26");
         // An unknown instant renders empty, matching `formatDate.ts`'s falsy-ts rule.
         assert_eq!(display_time(&clock(), 0), "");
     }
