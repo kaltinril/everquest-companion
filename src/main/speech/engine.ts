@@ -39,9 +39,10 @@
 // with ERR_DLOPEN_FAILED (the native module cannot be loaded on this machine at all), and
 // 'engine-failed' for everything else. The renderer renders those as different sentences.
 //
-// MEASURED, for the ERR_DLOPEN_FAILED case (2026-08-12, PE import tables of the shipped
-// binaries): `onnxruntime_binding.node` imports VCRUNTIME140.dll, VCRUNTIME140_1.dll and
-// MSVCP140.dll, and `onnxruntime.dll` imports those plus MSVCP140_1.dll. Electron ships none
+// MEASURED, for the ERR_DLOPEN_FAILED case (2026-08-12 on onnxruntime-node 1.20.1, again
+// 2026-11-27 on 1.31.1; PE import tables of the shipped binaries): `onnxruntime_binding.node`
+// imports VCRUNTIME140.dll, VCRUNTIME140_1.dll and MSVCP140.dll, and `onnxruntime.dll` imports
+// those plus MSVCP140_1.dll and, since 1.29, MSVCP140_ATOMIC_WAIT.dll. Electron ships none
 // of them (there is no vcruntime140*.dll anywhere in electron/dist), so the app is relying on
 // the machine having the Microsoft Visual C++ x64 redistributable — and a machine that has the
 // 2015 redist but not the 2019+ one has VCRUNTIME140.dll and NOT VCRUNTIME140_1.dll, which
@@ -115,11 +116,12 @@ export type SpeechWorkerReply =
  *
  * `intraOpNumThreads: 1` also settles the spin-waiting: at one thread onnxruntime runs the op on
  * the calling thread and never creates the pool, so there is no spinning to disable. That matters
- * because it CANNOT be disabled from here — the `session.intra_op.allow_spinning` config entry is
- * only reachable through `SessionOptions.extra`, which onnxruntime-node 1.20.1 does not read
- * (its own typings say "WebAssembly backend" only; the string `extra` does not appear in
- * `onnxruntime_binding.node`, and passing it measurably changed nothing). Setting it would have
- * been a comment pretending to be code.
+ * because it could not be disabled from here when this was measured — the
+ * `session.intra_op.allow_spinning` config entry is only reachable through `SessionOptions.extra`,
+ * which onnxruntime-node 1.20.1 did not read (the string `extra` did not appear in its
+ * `onnxruntime_binding.node`, and passing it measurably changed nothing). 1.31's binding does read
+ * `extra` (string values only), but at one intra-op thread there is still no pool to spin, so it
+ * stays unset.
  *
  * Composes with the process priority work: this pool's threads live in the main process and
  * inherit its priority class, so a below-normal main process makes a bounded burst politer still.
@@ -247,6 +249,14 @@ export function createSpeechEngine(opts: SpeechEngineOptions): SpeechEngine {
     let started: Worker
     try {
       mkdirSync(cacheDir, { recursive: true })
+      // ONNX RUNTIME'S TELEMETRY STAYS OFF. onnxruntime.dll 1.31 carries Microsoft's 1DS client and,
+      // left alone, opens an HTTPS connection to mobile.events.data.microsoft.com/OneCollector
+      // while it synthesizes (MEASURED 2026-11-27 under Electron's node: one connection per worker
+      // run; none with this set). A new network call needs the owner's word (RULES.md 15), and
+      // nothing here asked for one. The runtime reads it from the PROCESS environment when it
+      // starts, and a worker's own `process.env` is a copy native code never sees (Node's
+      // worker_threads docs), so it is set here, on main, before the thread.
+      process.env.ORT_DISABLE_TELEMETRY = '1'
       started = new Worker(opts.workerPath, { workerData: workerInit(opts.userData, cacheDir) })
     } catch (err) {
       fault = 'engine-failed'

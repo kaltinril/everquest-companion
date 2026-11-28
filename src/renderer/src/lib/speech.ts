@@ -307,7 +307,8 @@ export function speechSetupGap(engine: SpeechEngine, voices: readonly unknown[])
  *
  * The 'engine-unloadable' line NAMES A REMEDY, which no other note here does, and it is allowed
  * to because the remedy was measured rather than guessed: the shipped `onnxruntime_binding.node`
- * and `onnxruntime.dll` import VCRUNTIME140/VCRUNTIME140_1/MSVCP140 (PE import tables, 2026-08-12)
+ * and `onnxruntime.dll` import VCRUNTIME140/VCRUNTIME140_1/MSVCP140 (PE import tables, 2026-08-12;
+ * 1.31 adds MSVCP140_ATOMIC_WAIT)
  * and Electron ships none of them, so a PC without the Microsoft Visual C++ x64 runtime fails to
  * load the engine in exactly this way. It says "usually" because a dlopen can fail for other
  * reasons (an antivirus quarantine of the same files is the other realistic one) and this app

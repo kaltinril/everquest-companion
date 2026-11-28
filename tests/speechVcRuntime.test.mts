@@ -183,7 +183,7 @@ test('the binding roots cover dev, packaged and unpacked — unpacked FIRST', ()
     appPath: join('C:', 'app', 'resources', 'app.asar'),
     cwd: join('C:', 'checkout')
   })
-  const tail = join('node_modules', 'onnxruntime-node', 'bin', 'napi-v3', 'win32', 'x64')
+  const tail = join('node_modules', 'onnxruntime-node', 'bin', 'napi-v6', 'win32', 'x64')
   assert.deepEqual(roots, [
     join('C:', 'app', 'resources', 'app.asar.unpacked', tail),
     join('C:', 'app', 'resources', 'app.asar', tail),
@@ -257,13 +257,15 @@ test('a copy that is on neither path does NOT count as resolvable', () => {
 })
 
 test('the real pin names exactly the measured import closure', () => {
-  // Four files, no more: concrt140/vccorlib140/msvcp140_2 ride in the same payload and are
-  // imported by nothing this app loads. Adding one here is a decision, not a tidy-up.
+  // Five files, no more: concrt140/vccorlib140/msvcp140_2 ride in the same payload and are
+  // imported by nothing this app loads. Adding one here is a decision, not a tidy-up
+  // (msvcp140_atomic_wait was one: onnxruntime 1.31's onnxruntime.dll imports it).
   assert.deepEqual(VC_RUNTIME_FILES.map((f) => f.name), [
     'vcruntime140.dll',
     'vcruntime140_1.dll',
     'msvcp140.dll',
-    'msvcp140_1.dll'
+    'msvcp140_1.dll',
+    'msvcp140_atomic_wait.dll'
   ])
   // The URL is content-addressed: the digest is a path segment, which is what makes it
   // immutable rather than merely stable. A re-pin that loses this property is a regression.

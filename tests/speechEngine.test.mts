@@ -471,9 +471,9 @@ test('the inference session is bounded to one core — the game is on this box (
   const second = kokoroSessionOptions()
   assert.notEqual(options, second)
   assert.deepEqual(options, second)
-  // `session.intra_op.allow_spinning` is deliberately ABSENT: onnxruntime-node 1.20.1 does not
-  // read `SessionOptions.extra` at all (its typings say WebAssembly-only, and passing it changed
-  // nothing when measured). One intra-op thread means no pool, hence nothing to spin.
+  // `session.intra_op.allow_spinning` is deliberately ABSENT: onnxruntime-node 1.20.1 did not
+  // read `SessionOptions.extra` at all (passing it changed nothing when measured), and on 1.31,
+  // which does, one intra-op thread still means no pool, hence nothing to spin.
   assert.equal(options.extra, undefined)
 })
 

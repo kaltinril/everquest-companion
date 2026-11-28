@@ -43,11 +43,21 @@ files:
   # instead; `tests/symbolicate.test.mts` pins this line so it cannot be tidied away.
   - '!**/*.{o,obj,map,ts,tsx}'
   # onnxruntime-node ships PREBUILT binaries for every platform it supports in one npm
-  # package — 184 MB on disk, of which this Windows-x64-only app can use 33 MB. Without these
-  # excludes the installer carries macOS dylibs and Linux .so files it can never load. Keep
-  # the list in sync with `win.target.arch` above; a future arm64 target needs its line back.
-  - '!node_modules/onnxruntime-node/bin/napi-v3/{darwin,linux}/**'
-  - '!node_modules/onnxruntime-node/bin/napi-v3/win32/arm64/**'
+  # package — 1.31.1: 308 MB on disk under bin/napi-v6 (napi-v3 until 1.20.1), of which this
+  # Windows-x64-only app can use 69 MB. Without these excludes the installer carries macOS
+  # dylibs and Linux .so files it can never load. Keep the list in sync with `win.target.arch`
+  # above; a future arm64 target needs its line back.
+  - '!node_modules/onnxruntime-node/bin/napi-v6/{darwin,linux}/**'
+  - '!node_modules/onnxruntime-node/bin/napi-v6/win32/arm64/**'
+  # dxcompiler.dll (17.2 MB, new in 1.29+) is the DirectX shader compiler for onnxruntime's
+  # WebGPU execution provider. Kokoro runs on the CPU provider (speech/engine.ts names none), and
+  # onnxruntime.dll does not import it, statically or delay-loaded: it is LoadLibrary'd only when
+  # the WebGPU provider starts. MEASURED 2026-11-27 under Electron's node: the modules mapped
+  # during four real syntheses are onnxruntime.dll, the binding, the VC++ runtime, dxgi, dxcore
+  # and winhttp; no dxcompiler, no d3d12, no DirectML, and the wavs are byte-identical with the
+  # file removed. (Electron ships its own dxcompiler.dll, Dawn's 1.9 build, in the exe's
+  # directory, so even a stray bare-name load would find one.)
+  - '!node_modules/onnxruntime-node/bin/napi-v6/win32/x64/dxcompiler.dll'
   # tesseract.js (screenshot to wiki, src/main/shot/ocr.ts) ships six WASM cores, each twice (a
   # .wasm beside its loader, and again inlined as base64 in a .wasm.js), 44 MB in all. Under Node
   # 7.0.0 loads the FULL cores, `tesseract-core{-relaxedsimd,-simd,}.js`, never the -lstm ones:
@@ -76,7 +86,11 @@ files:
   # DLL looks free. It is not: onnxruntime.dll STATICALLY imports it, so the binding fails to
   # load at all and `speech:say` answers 'engine-not-installed' forever (verified: dist:dir
   # with the exclusion, then a real synthesis in the packed app — zero wavs produced). It has
-  # to ship. Do not re-litigate this without repeating that experiment.
+  # to ship. Do not re-litigate this without repeating that experiment. (A note for whoever
+  # does: the PE tables, read 2026-11-27, list DirectML.dll as a DELAY import of onnxruntime.dll
+  # in both 1.20.1 and 1.31.1, not a static one, and a 1.31.1 CPU synthesis under Electron's node
+  # never maps it; Windows also carries its own System32\DirectML.dll. The packed-app
+  # experiment has not been repeated on 1.31.)
 
 # THE ENGINE SHIPS (JOS-473, data-server phase 3). `engine/crates/engined` is a Rust process the
 # app supervises (src/main/dataServer/engineHost.ts); `npm run build:engine` produces the RELEASE
@@ -148,7 +162,7 @@ asarUnpack:
 # screenshot font atlas and, since 2026-11-27, discovery's registry reads, which JOS-184
 # had put on a third, native-reg), and this still stays false. It is the ABI question
 # that decides, not the presence of a .node file: onnxruntime-node ships PREBUILT
-# binaries under bin/napi-v3 and koffi in @koromix/koffi-<platform>, i.e. both target
+# binaries under bin/napi-v6 and koffi in @koromix/koffi-<platform>, i.e. both target
 # N-API, which is ABI-STABLE ACROSS NODE AND ELECTRON VERSIONS by definition. There is
 # nothing to rebuild — the shipped binary is the binary Electron loads. (Verified end to end: `npm run
 # dist:dir` + launching the packed app + a real synthesis, with ignore-scripts on and
