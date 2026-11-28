@@ -80,9 +80,30 @@ match what the owner checks while farming (buffs, respawns, motes, coin).
 - e2e checks the wiring only (a card mounts and shows engine data); the values stay unit-tested
   (WORKFLOW.md, Gate, 2026-11-27 ruling).
 
-## Questions for the owner (before Phase 1 is built)
+## The owner's answers (2026-11-27)
 
-1. Should the existing cards (Damage, Leveling, Target, DPS curve, drops, kills) be hideable too,
-   or always on?
-2. Per character, or the same Overview for every character?
-3. Is the first batch (buffs, respawns, motes, coin) the right start?
+1. **Every card is a widget, the existing ones included.** "they should be able to add widgets at
+   will and remove at will": Damage, Leveling, Target, the DPS curve, Recent drops and Recent kills
+   become widgets like the new ones. Default: today's six on, the new ones off, so the page looks
+   as it does now until the player changes it.
+2. **Per install, not per character** ("always the same for every character on that computer"):
+   one stored layout in the app's preferences.
+3. **First batch confirmed:** Buffs running out, Respawns here, Motes, Coin, plus the Customize
+   checklist.
+
+## Backlog: a one-line custom overlay (owner, 2026-11-27; do not build yet)
+
+> "a very very small 1 line overlay where they can just pick/chose the things they want to
+> include ... they can add like "show DPS" and a single line would appear, sort of like the XP
+> overlay is, but they chose what shows up there, maybe they don't care about motes or fragments
+> or AA leveling, so this would be a custom widget they can pull stats into."
+
+- One thin overlay window, one line high, like the XP overlay (`overlay/XpOverlay.tsx`).
+- The player picks which stats it shows and in what order. Candidates: DPS, XP per hour or time
+  to level, AA per hour, motes, fragments, coin per hour, kills per hour, the next respawn.
+- The same picker idea as the Overview widgets, but each stat is one short value. The two could
+  share one list of available stats (id, label, a hook that returns a short value), so a stat
+  added for one is available to both.
+- Per install, matching the Overview answer, unless the owner says otherwise when it is built.
+- Open when it is picked up: one overlay or several, per-stat formatting (terse like the overlay
+  meter rows), and whether it hides with the other overlays when EQ loses focus.

@@ -45,6 +45,10 @@ agreed work has a row in its `requirements/` file.
 
 ## Candidate work (owner to pick; the ones ruled above are queued)
 
+- Overview widgets (owner, 2026-11-27): Phase 1 (show/hide every card, per install, first batch
+  buffs, respawns, motes, coin) and the backlog one-line custom overlay. All in
+  `plans/2026-11-27-overview-widgets.md`; nothing built yet.
+
 - Count-pinned census tests (owner, 2026-10-28: "having random count tests is a bit dumb it forces us
   to update the test every time because counts change"): replace exact corpus counts with
   property checks or floors so a wiki delta stops turning tests red. Not urgent; a future change.
