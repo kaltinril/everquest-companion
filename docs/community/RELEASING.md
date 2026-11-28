@@ -112,8 +112,12 @@ step 4.
    every later release links to it). Then regenerate the in-app What's new list on the same branch,
    `node scripts/community/community-release-notes.mjs`, and commit
    `src/shared/communityReleaseNotes.ts` (the unit suite fails without it). Merge the branch into
-   `main_community`, and run the gate (`bash scripts/community/known-reds.sh` is the unit suite with only
-   the known reds allowed).
+   `main_community`, and run the full suite there (RULES.md rule 11; `agent/WORKFLOW.md`, Gate):
+   typecheck, lint, `bash scripts/community/known-reds.sh` (the unit suite with only the known reds
+   allowed; the list is empty since 2026-11-27, so the suite must be green; about 1.5 to 2
+   minutes), `cargo test --workspace` when an engine input changed since the last release
+   (`bash scripts/community/engine-changed.sh community-<previous>` prints yes), and
+   the e2e suite, `npm run test:e2e` (about 10 minutes; its one known red is in BRANCHES.md).
 2. **The owner says to release.** A release is public the moment it exists and may be mirrored or
    indexed, so this is always the owner's word. Once promoted (step 7) it reaches every install from
    test.20 on within hours.
@@ -121,7 +125,8 @@ step 4.
 4. **Tag and push the tag:** `git tag community-<version> main_community` and
    `git push origin community-<version>`.
 5. **The workflow** checks the tag names the `package.json` version; runs typecheck, lint and the
-   unit suite (only the known reds in `scripts/community/known-reds.txt` may fail, by name); builds
+   unit suite (only the known reds in `scripts/community/known-reds.txt` may fail, by name; none
+   are listed since 2026-11-27); builds
    the engine and the unsigned installer on a clean Windows runner; then runs
    `scripts/community/publish-release.sh --publish`, which checks the installer, its `test.yml` and
    `.blockmap`, the identity above, the asar (every runtime dependency `package.json` declares, and

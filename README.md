@@ -40,10 +40,13 @@ Everything is per-character: switch characters and the app re-reads that log.
 
 **What your log says**
 
-- **Overview:** the at-a-glance page the app opens on.
+- **Overview:** the at-a-glance page the app opens on. **Customize** picks its cards (damage,
+  leveling, target, DPS over time, recent drops and kills, buffs running out, respawns here, motes
+  and coin), and **Edit layout** lets you drag them into place and set each card from one to four
+  columns wide.
 - **Combat:** a live DPS meter with per-fight and per-zone numbers, fight history, a drill-down
-  into each attack and spell, procs per minute, and a timeline of the pull. Healing has its own
-  meters.
+  into each attack and spell, procs per minute, a timeline of the pull, and a death recap when
+  you die. Healing has its own meters.
 - **Loot:** a running history of what you looted, and what each item is for: which quests use
   it, what it turns in for, which recipes consume it.
 - **Bazaar:** what trade chat asks and offers, per item: price by day and by time of day, a
@@ -94,6 +97,11 @@ the title bar: damage and healing meters (the current fight or the whole zone), 
 timers, XP per hour, respawn countdowns, your next weapon swing, a mob card when you `/con`, the
 Plane of Sky quests you starred, map pins over the game's map, and the top of the Wiki Gaps list.
 Lock one and it becomes click-through. The same menu resets every overlay's position.
+
+A **cursor overlay** (in **Preferences**) marks your mouse pointer over the game with a shape,
+your own icon or drawing, crosshair lines or a trail. **Hotkeys** (in **Preferences**, off until
+you set them) bring every overlay back to the front, or turn the cursor overlay on and off while
+you play.
 
 **Your log file**
 
