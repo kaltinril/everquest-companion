@@ -16,7 +16,11 @@ list="scripts/community/known-reds.txt"
 out=$(mktemp)
 trap 'rm -f "$out"' EXIT
 
-npm test >"$out" 2>&1
+# Below normal priority, so the PC stays usable while every core runs tests (Git Bash's nice maps
+# niceness 10 to the Windows BelowNormal class, which the test workers inherit).
+lower=()
+command -v nice >/dev/null 2>&1 && lower=(nice -n 10)
+${lower[@]+"${lower[@]}"} npm test >"$out" 2>&1
 status=$?
 
 # node:test prints each failure as "✖ <name> (<n>ms)", then repeats them under "✖ failing tests:".

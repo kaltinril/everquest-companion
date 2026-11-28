@@ -26,6 +26,7 @@
 
 import { spawnSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
+import { constants, getPriority, setPriority } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { ENGINE_BIN_NAME } from '../src/main/dataServer/engineProtocol'
@@ -52,6 +53,33 @@ export function cargoBinary(): string {
 }
 
 /**
+ * Run `fn` with this process at below-normal priority, so a child it spawns inherits it (Windows
+ * hands BelowNormal down to children). A cargo build then yields to the game and to whoever is at
+ * the machine, and so does the sccache server if this build is the one that starts it: rustc runs
+ * under that server, not under cargo, at the priority the server was started with
+ * (docs/community/agent/WORKFLOW.md, "Shared build cache"). The old priority is put back after;
+ * a failed set or restore (Linux refuses an unprivileged raise) leaves the build running regardless.
+ */
+export function atBelowNormalPriority<T>(fn: () => T): T {
+  let before: number | null = null
+  try {
+    before = getPriority()
+    setPriority(constants.priority.PRIORITY_BELOW_NORMAL)
+  } catch {
+    before = null
+  }
+  try {
+    return fn()
+  } finally {
+    try {
+      if (before !== null) setPriority(before)
+    } catch {
+      // Staying lower than before costs this process nothing it needs.
+    }
+  }
+}
+
+/**
  * Build the release engine and hand back its path.
  *
  * NO STALENESS GATE, unlike the e2e one. That gate exists to save ~200 ms of cargo startup on a
@@ -63,10 +91,12 @@ export function cargoBinary(): string {
  * for why the second one is the whole point.
  */
 export function buildEngineRelease(): string {
-  const res = spawnSync(cargoBinary(), ['build', '--release', '-p', 'engined'], {
-    cwd: ENGINE_DIR,
-    stdio: 'inherit'
-  })
+  const res = atBelowNormalPriority(() =>
+    spawnSync(cargoBinary(), ['build', '--release', '-p', 'engined'], {
+      cwd: ENGINE_DIR,
+      stdio: 'inherit'
+    })
+  )
   if (res.error) throw new Error(`build:engine: could not run cargo — ${res.error.message}`)
   if (res.status !== 0) {
     throw new Error(`build:engine: cargo build --release -p engined failed (exit ${String(res.status)})`)

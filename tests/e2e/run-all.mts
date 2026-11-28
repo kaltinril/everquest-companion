@@ -16,11 +16,11 @@
  *   npm run test:e2e -- --serial     one at a time, output straight through
  *
  * Per-spec wall time is printed as a table and written to artifacts/<runId>/summary.json.
- * EQ_E2E_SPEC_TIMEOUT_MS overrides the 5-minute per-spec cap.
+ * EQ_E2E_SPEC_TIMEOUT_MS overrides the 5-minute per-spec cap. The whole run is below normal priority.
  */
 import { spawn, spawnSync } from 'node:child_process'
 import { mkdirSync, readdirSync, writeFileSync } from 'node:fs'
-import { cpus } from 'node:os'
+import { constants, cpus, setPriority } from 'node:os'
 import { basename, dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { reapOrphanUserData } from './appWindow.mjs'
@@ -221,6 +221,15 @@ const specs = readdirSync(here)
 if (specs.length === 0) {
   console.error(`[e2e] no spec matches ${filters.join(', ')}`)
   process.exit(1)
+}
+
+// BELOW NORMAL, the runner and everything it starts (Windows hands the class down to children:
+// the cargo and electron-vite builds, every spec, its Electron). The owner keeps using the machine
+// while a sweep runs; the engine already runs below normal on its own.
+try {
+  setPriority(constants.priority.PRIORITY_BELOW_NORMAL)
+} catch {
+  // A platform that refuses leaves the sweep at normal priority, which is how it always ran.
 }
 
 // Build ONCE here rather than letting four specs discover staleness at the same instant (each
