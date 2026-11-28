@@ -170,19 +170,24 @@ export function kokoroVoicesFor(availableIds: ReadonlySet<string>): SpeechVoice[
 // 2019+ one fails to load the engine with ERR_DLOPEN_FAILED. JOS-247 could only SAY so. This
 // pin is how provisioning fixes it.
 //
-// THE EXACT FILE SET WAS MEASURED, NOT ASSUMED (2026-08-13, PE import tables of the shipped
-// binaries plus the transitive closure of the DLLs below):
+// THE EXACT FILE SET WAS MEASURED, NOT ASSUMED (2026-08-13 on onnxruntime-node 1.20.1, again
+// 2026-11-27 on 1.31.1; PE import tables of the shipped binaries plus the transitive closure of
+// the DLLs below):
 //
 //   onnxruntime_binding.node → onnxruntime.dll, MSVCP140, VCRUNTIME140, VCRUNTIME140_1
-//   onnxruntime.dll          → MSVCP140, MSVCP140_1, VCRUNTIME140, VCRUNTIME140_1, DirectML…
+//   onnxruntime.dll          → MSVCP140, MSVCP140_1, MSVCP140_ATOMIC_WAIT (new in 1.29+),
+//                              VCRUNTIME140, VCRUNTIME140_1 (DirectML, d3d12, dxgi: delay-loaded)
 //   msvcp140.dll             → VCRUNTIME140, VCRUNTIME140_1
 //   msvcp140_1.dll           → MSVCP140, VCRUNTIME140
+//   msvcp140_atomic_wait.dll → MSVCP140, VCRUNTIME140, VCRUNTIME140_1
 //   vcruntime140_1.dll       → VCRUNTIME140
 //
-// The closure is these FOUR and nothing else (everything further out is `api-ms-win-crt-*`,
+// The closure is these FIVE and nothing else (everything further out is `api-ms-win-crt-*`,
 // i.e. the Universal CRT, which has been part of Windows since Windows 10). The same vsix
-// carries concrt140, vccorlib140, msvcp140_2, msvcp140_atomic_wait and vcruntime140_threads;
-// none of them is imported by anything this app loads, so none of them is fetched.
+// carries concrt140, vccorlib140, msvcp140_2 and vcruntime140_threads; none of them is imported
+// by anything this app loads, so none of them is fetched. msvcp140_atomic_wait joined with
+// onnxruntime 1.31: onnxruntime.dll imports it statically, so without it the binding does not
+// load on a machine that relies on this placement.
 //
 // WHERE THE BYTES COME FROM, AND WHY IT IS THIS AND NOT SOMETHING EASIER.
 //
@@ -250,10 +255,11 @@ export const VC_RUNTIME_FILES: readonly VcRuntimeFile[] = [
   vcFile('vcruntime140.dll', 'd5e4d9a3e835fa679450145d6a7d94e36573a509317111904d9b3712c30d9066', 124_544),
   vcFile('vcruntime140_1.dll', '1f2d41c4aa5db0bc33ebf7b66d72943a817d7ce6cbe880502a9403823633093f', 49_792),
   vcFile('msvcp140.dll', '0f885b509a685d2bbfa652fed26b5fb31d88fbdab0a978c641d1c7b8aa460aa9', 557_728),
-  vcFile('msvcp140_1.dll', 'bfad5aef4c63a669e3c140655cdfdf395b6c979b400a447bd5dcb65ed8826c3d', 35_952)
+  vcFile('msvcp140_1.dll', 'bfad5aef4c63a669e3c140655cdfdf395b6c979b400a447bd5dcb65ed8826c3d', 35_952),
+  vcFile('msvcp140_atomic_wait.dll', '640b2aefced484d0368eea5bdd06addd0658a3a70a49256e560d6923b404a479', 50_304)
 ]
 
-/** The archive those four come out of — downloaded by the same pinned machinery as the model. */
+/** The archive those five come out of — downloaded by the same pinned machinery as the model. */
 export const VC_REDIST_PAYLOAD: PinnedAsset = {
   name: 'Microsoft.VC.14.44.17.14.CRT.Redist.X64.base.vsix',
   url:

@@ -617,11 +617,17 @@ where one exists.
 - Held back, and why: MUI 9 drops the system props (`<Stack alignItems>`, `<Box display>`): 425
   sites over ~200 files, a `v9.0.0/system-props` codemod sweep of its own. TypeScript 7:
   typescript-eslint peers `typescript <6.1.0`. electron-store 12 (conf 16, a 2026-10-12 rewrite)
-  and chokidar 6 (2026-10-19): too new when looked at. onnxruntime-node stays 1.20.1: 1.31's
-  onnxruntime.dll carries Microsoft's 1DS telemetry client
-  (`mobile.events.data.microsoft.com/OneCollector`, a new network call: owner's word first);
-  1.29/1.30 move to `bin/napi-v6`, add dxcompiler/dxil (19.5 MB) and import
-  `MSVCP140_ATOMIC_WAIT.dll`, which `speech/pinned.ts` does not provision.
+  and chokidar 6 (2026-10-19): too new when looked at.
+- onnxruntime-node 1.31.1 (2026-11-27, from 1.20.1): binaries in `bin/napi-v6`; onnxruntime.dll
+  carries Microsoft's 1DS telemetry client and opens HTTPS to
+  `mobile.events.data.microsoft.com/OneCollector` during synthesis unless
+  `ORT_DISABLE_TELEMETRY=1` is in the PROCESS environment before the runtime starts
+  (`speech/engine.ts` sets it on main before the worker; a worker's `process.env` does not reach
+  native code). Measured with `Get-NetTCPConnection` on the synth process: one connection without
+  it, none with it. onnxruntime.dll imports `MSVCP140_ATOMIC_WAIT.dll`: `speech/pinned.ts`
+  provisions it as a fifth file. `dxcompiler.dll` (WebGPU provider only, never mapped on the CPU
+  path) is excluded in electron-builder.yml. Output wavs differ from 1.20.1 at the sample level
+  (same lengths within 0.1 s, 10 ms envelope correlation 0.90-0.98); the wav cache keeps old ones.
 - Lint kept as it was on ESLint 10: react-hooks 7's presets add the React Compiler rules (131
   findings), so the renderer block names only rules-of-hooks and exhaustive-deps;
   `no-useless-assignment` and `no-meaningless-void-operator` are off (54 and 11 idiom sites).

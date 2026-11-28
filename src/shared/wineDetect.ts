@@ -35,8 +35,9 @@
 //     spawning `reg.exe` — a blocking child process on the startup path of every launch on every
 //     machine, to answer a question that is 'no' for almost all of them, and the answer is needed
 //     SYNCHRONOUSLY at module scope before Electron is ready (safe mode is a before-`ready` flag).
-//     THAT PREMISE EXPIRED WITH JOS-184: `native-reg` is in the tree now and log/discovery.ts reads
-//     HKLM in-process in well under a millisecond, so this signal is available for the price of a
+//     THAT PREMISE EXPIRED WITH JOS-184: log/discovery.ts reads the registry in-process now (koffi
+//     into advapi32, log/winRegistry.ts; native-reg until 2026-11-27) and reads
+//     HKLM in well under a millisecond, so this signal is available for the price of a
 //     probe in main/wine.ts (this module stays pure and is fed by it). It is not here because the
 //     two signals below already answer every prefix anyone has reported, not because it cannot be
 //     done — it is the next rung if one ever defeats them, alongside the DOS-stub magic below.

@@ -2,7 +2,8 @@
 // a voice that downloads is a voice that plays (JOS-274, owner ruling 2026-08-13).
 //
 // THE STATE JOS-247 LEFT. The Kokoro tier's native module links against VCRUNTIME140,
-// VCRUNTIME140_1, MSVCP140 and MSVCP140_1; Electron ships none of them; a PC that has the 2015
+// VCRUNTIME140_1, MSVCP140 and MSVCP140_1 (and, since onnxruntime 1.31, MSVCP140_ATOMIC_WAIT:
+// pinned.ts lists the five); Electron ships none of them; a PC that has the 2015
 // redistributable but not the 2019+ one therefore fails `process.dlopen` with
 // ERR_DLOPEN_FAILED. JOS-247 taught the app to SAY that, in a sentence naming the runtime —
 // which is a correct answer that leaves the user to go and do something. This closes the loop:
@@ -94,7 +95,8 @@ const ONNX_BINDING_SUBPATH = join(
   'node_modules',
   'onnxruntime-node',
   'bin',
-  'napi-v3',
+  // napi-v6 since onnxruntime-node 1.29 (this app: 1.31.1); napi-v3 through 1.20.1.
+  'napi-v6',
   'win32',
   'x64'
 )

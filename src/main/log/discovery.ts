@@ -18,16 +18,17 @@
 // game lives at the public path — so discovery resolves via the drive sweep.
 //
 // NOTHING HERE SPAWNS A SUBPROCESS (JOS-184). The registry and drive-topology questions
-// are asked through `native-reg`, an in-process N-API binding to the Win32 registry API.
+// are asked in-process, straight through the Win32 registry API (advapi32 via koffi,
+// winRegistry.ts; native-reg until 2026-11-27).
 // They used to be `reg.exe query … /s` and `wmic logicaldisk`, and an unsigned app that
 // shells out to `reg`/`wmic` seconds after install is the exact behavioural signature AV
 // heuristics score on — discovery is what a friend's Defender/Norton sees this app do
 // FIRST. See the block comments on `registryInstallCandidates` and `fixedDrives`.
 
 import { existsSync, statSync } from 'fs'
-import type * as NativeReg from 'native-reg'
 import { join } from 'path'
 import { characterLogNames } from './characterLogs'
+import { loadWinRegistry, type Hkey, type WinRegistry } from './winRegistry'
 
 /** The canonical Daybreak install root on a default EQ Legends install. */
 export const EQ_ROOT =
@@ -472,30 +473,31 @@ export function keptRootIsGood(memo: DiscoveryMemo, hasLogs: (root: string) => b
 /**
  * THE REGISTRY BINDING, LOADED LAZILY AND ALLOWED TO BE ABSENT (JOS-184).
  *
- * `native-reg` is an N-API binding to the Win32 registry API — ABI-stable across Node and
- * Electron (so `npmRebuild` stays false, see electron-builder.yml) and shipped as a prebuilt
- * `.node` INSIDE the npm tarball, which is what makes it work under `.npmrc`'s
- * `ignore-scripts=true`. That last point is why it is this package and not the more obvious
- * `registry-js`: registry-js downloads its prebuild from an `install` script, which this repo
- * never runs.
+ * The reads go through koffi straight into advapi32 (winRegistry.ts): koffi is an N-API FFI
+ * engine, ABI-stable across Node and Electron (so `npmRebuild` stays false, see
+ * electron-builder.yml), whose prebuilt binary installs as a plain package, which is what makes it
+ * work under `.npmrc`'s `ignore-scripts=true`. Until 2026-11-27 this was `native-reg`, a
+ * registry-only binding chosen over `registry-js` for that same install-script reason; it was
+ * last published in 2022, and koffi was already in the tree for presence and the perf panel, so
+ * the same calls now go through it and one native dependency left the build.
  *
  * `require` at first use rather than a top-level `import`, and a swallowed failure, because
  * this module sits on the STARTUP path: config.ts imports it, and an import-time throw from a
- * missing or unloadable `.node` would stop the app from launching at all rather than costing us
- * one of three ways to find the install. With the binding absent, `registryInstallCandidates`
- * returns nothing and `fixedDrives` falls back to the A-Z sweep — the same degradation as a
- * machine with no Daybreak keys, which is most machines.
+ * missing or unloadable `.node` (or an advapi32 that will not map) would stop the app from
+ * launching at all rather than costing us one of three ways to find the install. With the binding
+ * absent, `registryInstallCandidates` returns nothing and `fixedDrives` falls back to the A-Z
+ * sweep — the same degradation as a machine with no Daybreak keys, which is most machines.
  */
-let registryModule: typeof NativeReg | null | undefined
+let registryModule: WinRegistry | null | undefined
 
-function registry(): typeof NativeReg | null {
+function registry(): WinRegistry | null {
   if (registryModule === undefined) {
     try {
       // Deferring the native load past module evaluation, and being able to CATCH it failing, is
-      // the whole point of this function; a static `import` can do neither. The main bundle is
-      // CJS (electron-vite), so this is the real require, not a shim.
-      // eslint-disable-next-line @typescript-eslint/no-require-imports -- see above
-      registryModule = require('native-reg') as typeof NativeReg
+      // the whole point of this function; a static `import` of koffi can do neither. The
+      // `require('koffi')` happens inside `loadWinRegistry`, so importing that module costs no
+      // native code until this first call.
+      registryModule = loadWinRegistry()
     } catch {
       registryModule = null
     }
@@ -617,7 +619,7 @@ const EQ_PATH_RE = /everquest/i
 /**
  * The roots probed for an install path, in the order they are asked — the same eight the eight
  * `reg query` subprocesses covered, spelled the same way. The hive is a TAG rather than a
- * `native-reg` constant so this table can exist without the binding being loaded.
+ * registry handle so this table can exist without the binding being loaded.
  */
 const INSTALL_PATH_KEYS: readonly { hive: 'HKLM' | 'HKCU'; path: string }[] = [
   { hive: 'HKLM', path: 'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall' },
@@ -664,11 +666,11 @@ export function eqInstallPathValue(value: unknown): string | null {
 }
 
 /** Open a key defensively — a missing key, a denied ACL and a malformed path are all `null`. */
-function openKey(reg: typeof NativeReg, parent: NativeReg.HKEY, path: string): NativeReg.HKEY | null {
+function openKey(reg: WinRegistry, parent: Hkey, path: string): Hkey | null {
   try {
     // KEY_READ plus the 64-bit view: every path above spells out WOW6432Node when it wants the
     // 32-bit one, which is what `reg.exe` from this (x64) process resolved to as well.
-    return reg.openKey(parent, path, reg.Access.READ | reg.Access.WOW64_64KEY)
+    return reg.openKey(parent, path, reg.KEY_READ | reg.KEY_WOW64_64KEY)
   } catch {
     return null
   }
@@ -676,8 +678,8 @@ function openKey(reg: typeof NativeReg, parent: NativeReg.HKEY, path: string): N
 
 /** Enumerate a key's value names, or null if the key cannot be opened/read. */
 function enumValueNames(
-  reg: typeof NativeReg,
-  parent: NativeReg.HKEY,
+  reg: WinRegistry,
+  parent: Hkey,
   path: string
 ): string[] | null {
   const key = openKey(reg, parent, path)
@@ -698,7 +700,7 @@ export function registryValueNames(hive: 'HKLM' | 'HKCU', path: string): string[
 }
 
 /** Enumerate a key's subkey names, or null if the key cannot be opened/read. */
-function enumKeyNames(reg: typeof NativeReg, parent: NativeReg.HKEY, path: string): string[] | null {
+function enumKeyNames(reg: WinRegistry, parent: Hkey, path: string): string[] | null {
   const key = openKey(reg, parent, path)
   if (!key) return null
   try {
@@ -712,7 +714,7 @@ function enumKeyNames(reg: typeof NativeReg, parent: NativeReg.HKEY, path: strin
 
 /** Shared state for one `registryInstallCandidates` sweep. */
 interface RegistrySweep {
-  reg: typeof NativeReg
+  reg: WinRegistry
   out: string[]
   visited: number
   deadline: number
@@ -722,13 +724,13 @@ interface RegistrySweep {
  * Collect install paths from `key` and (to `MAX_KEY_DEPTH`) its subkeys. Every registry call is
  * wrapped: a key we cannot read is simply not a source of candidates.
  */
-function collectInstallPaths(key: NativeReg.HKEY, depth: number, sweep: RegistrySweep): void {
+function collectInstallPaths(key: Hkey, depth: number, sweep: RegistrySweep): void {
   const reg = sweep.reg
   if (sweep.visited++ >= MAX_KEYS_VISITED || Date.now() >= sweep.deadline) return
   for (const name of INSTALL_PATH_VALUES) {
     let raw: unknown
     try {
-      raw = reg.getValue(key, null, name)
+      raw = reg.getString(key, name)
     } catch {
       continue
     }

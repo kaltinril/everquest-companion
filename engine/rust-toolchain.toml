@@ -7,6 +7,6 @@
 # same bytes. Bump it deliberately, run `npm run gen:protocol`, and commit the regenerated file
 # in the same change.
 [toolchain]
-channel = "1.99.0"
+channel = "1.100.1"
 components = ["rustfmt", "clippy"]
 profile = "minimal"
