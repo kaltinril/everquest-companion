@@ -37,6 +37,7 @@ import {
 } from './suggestions'
 import { classLevelChips, type ClassLevelChip } from './lineIntel'
 import { Tooltip } from '../../lib/Tooltip'
+import { formatAge } from '../../lib/formatDate'
 // The rich spell card (JOS-293). The row states what an ALERT can be built on; the card behind
 // the name states what the spell IS - the effect list, the cost, the duration, the rank it
 // replaces - which is the other half of "is this one worth an alert at all".
@@ -139,19 +140,6 @@ export const SUGGEST_ROW_ACTIONS_SX = {
   minWidth: 0
 } as const
 
-/** Coarse relative-time label for the usage tooltip's "last seen" (Task #45 recency hint). */
-export function relativeTime(ms: number): string {
-  const diff = Date.now() - ms
-  if (diff < 0) return 'just now'
-  const min = Math.round(diff / 60_000)
-  if (min < 1) return 'just now'
-  if (min < 60) return `${min}m ago`
-  const hr = Math.round(min / 60)
-  if (hr < 24) return `${hr}h ago`
-  const d = Math.round(hr / 24)
-  return `${d}d ago`
-}
-
 /** "ENC 16" — one class's entry level for this LINE. Yours is coloured; the DB fact is the same. */
 function LevelChip({ chip }: { chip: ClassLevelChip }): JSX.Element {
   const title = `${chip.cls} learns this spell line at level ${chip.level}${chip.yours ? ' - one of your classes' : ''}`
@@ -191,7 +179,7 @@ function LevelChips({ entry, resolved }: { entry: SpellCatalogEntry; resolved: C
 /** The "N×" badge, with its observed-count + last-seen tooltip. */
 function UsageChip({ entry }: { entry: SpellCatalogEntry }): JSX.Element {
   const title = entry.lastSeenMs
-    ? `Observed ${entry.usageCount}× · last seen ${relativeTime(entry.lastSeenMs)}`
+    ? `Observed ${entry.usageCount}× · last seen ${formatAge(entry.lastSeenMs)}`
     : `Observed ${entry.usageCount}× in your log`
   return (
     <Tooltip title={title}>
@@ -298,7 +286,7 @@ function SpellRow({
         )}
         <LevelChips entry={entry} resolved={ctx.resolved} />
         {rank?.lastCastMs != null && (
-          <Tooltip title={`You last cast ${rank.name} ${relativeTime(rank.lastCastMs)}`}>
+          <Tooltip title={`You last cast ${rank.name} ${formatAge(rank.lastCastMs)}`}>
             <Chip
               size="small"
               variant="outlined"

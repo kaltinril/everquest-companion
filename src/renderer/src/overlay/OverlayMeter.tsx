@@ -2,11 +2,11 @@ import { type JSX, useState } from 'react'
 import type { OverlayKind } from '@shared/types'
 import type { CombatSnapshot, PetSummonNudge, SegmentView } from '@shared/combat'
 import { formatRate } from '../lib/formatRate'
-import { formatTime } from '../lib/formatDate'
+import { formatAge, formatTime } from '../lib/formatDate'
 import { fmtDur } from '../features/combat/copyTable'
 import { LIVE_SELECTION, scopeOptions, type ScopeOption } from '../features/combat/dashboardData'
 import { useGlobalFight } from '../features/combat/useGlobalFight'
-import { relativeAge, type OverlaySelectRow } from './OverlaySelect'
+import { type OverlaySelectRow } from './OverlaySelect'
 import { OverlayHeader, type OverlayHeaderAction } from './OverlayHeader'
 import { useSessionMarks } from '../features/timeslice/useSessionMarks'
 import { MeterBars } from './meterBars'
@@ -35,7 +35,7 @@ const LIVE = LIVE_SELECTION
 function overlayTiming(o: ScopeOption, now: number): string {
   const bits: string[] = []
   if (o.startTs) bits.push(formatTime(o.startTs))
-  const age = relativeAge(o.startTs, now)
+  const age = formatAge(o.startTs, now, 'terse')
   if (age) bits.push(age)
   bits.push(o.durationSec > 0 ? fmtDur(o.durationSec) : o.live ? 'live' : '-')
   return bits.join(' · ')
