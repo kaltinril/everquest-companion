@@ -178,6 +178,38 @@ disagree, RULES.md wins; fix this file.
   `cargo test --workspace`, no e2e for an ordinary merge. The full suite runs before a release
   (RELEASING.md) or on the owner's word. The older bullets below are history; where they say
   "full gate", read the scoped gate, except for a release.
+- **How `npm test` runs (since 2026-11-27, `scripts/unitTests.mts`).** No longer one process per
+  file. Files with no shared-process hazard run POOLED: 4 processes, each importing its share of
+  the files one after another (a generated wrapper per pool), so a pool parses items/mobs/spells
+  once. The rest run ISOLATED, one process each, as before. Both go through node's own `run()`
+  and spec reporter: one summary, the same `✔`/`✖`/`ℹ` lines, so `known-reds.sh` is unchanged.
+  At most `--test-concurrency` processes at once (testGate's `auto`: min(10, cores)), the pools
+  and the longest files first (last run's per-file times in `node_modules/.cache/eqc-unit-times.json`;
+  a file never timed starts first). The runner lowers itself to BelowNormal; its test processes inherit it.
+  - The isolated-file rule: a file is isolated when its source matches one of `ISOLATION_RULES`
+    in `scripts/unitTests.mts` (`mock.timers`; a `process.env` write; any `globalThis`;
+    `child_process`/`worker_threads`; a top-level `before`/`after`/`beforeEach`/`afterEach`, which
+    would wrap every file in the pool; `process.on`/`exit`/`exitCode`/`chdir`; a bare `mock.*` not on
+    a test context), or is named in `scripts/unit-isolated.txt` with its reason (empty today).
+    `node --import tsx scripts/unitTests.mts --list` prints the pools and each isolated file with
+    the rule that caught it (68 of 723 files, 2026-11-27). `tests/unitTestsRunner.test.mts` pins
+    each rule.
+  - A file that throws while loading becomes a failing test named after the file
+    (`✖ tests\x.test.mts`), even after it registered tests. That is why `--test-isolation=none`
+    is NOT used: node drops such a throw silently once the file has registered one test (measured
+    on Node 24.19).
+  - A pooled file that fails but passes alone is a leak between files: confirm with
+    `EQC_UNIT_ISOLATE_ALL=1 npm test` (every file alone, the old way), then add a rule or a line
+    to `unit-isolated.txt`. Checked 2026-11-27: every pooled file in ONE process (reverse order),
+    in 3 pools and in 4: all green, the same counts as isolated.
+  - Measured 2026-11-27 (16 logical cores, BelowNormal, the owner using the PC, so noisy): at
+    10-wide 113/110/139 s before, 80/94/93 s after (`known-reds.sh`, 8 pools), 96 s with the
+    4 pools kept; at 4-wide 181 s before, 132 s after (4 pools). Counts identical: tests 7877,
+    pass 7873, fail 0, skipped 4. Four pools rather than eight: about the same wall (the OCR pole), half the catalog loads.
+  - THE FLOOR IS OCR, not the catalogs: `pasteRoute` alone takes 75 s (one test 30 s),
+    `shotScreenshots` ~60, `shotFontReader` ~50, `questPopup` ~45, `rowPaste` ~25, `shotCapture` ~15 under load; the
+    run ends when `pasteRoute` does. These six files are about 60% of all test time. Splitting
+    them into smaller files is the next lever; the runner already starts them first.
 - **Cargo tests only when an engine input changed** (2026-11-27): run
   `bash scripts/community/engine-changed.sh` in the work tree. `no` (the diff against
   `main_community`, plus uncommitted and untracked files, touches none of the paths in
@@ -278,6 +310,8 @@ disagree, RULES.md wins; fix this file.
   types only under tsx). A plain `C:/` path fails under ESM in an ad-hoc script; use `file:///`.
 - **Known unit flake:** `presenceWorker.test.mts` "THE WATCHER LOOKS AT THE WORLD ON ITS FIRST TICK"
   can fail under the full suite's load (2026-10-13) and passes alone; re-run before treating it as red.
+  It stays isolated under the pooled runner (it spawns), and was seen again 2026-11-27 with the game
+  running (passed alone).
 - **CPU starvation looks like a dead engine** (2026-10-28): with the machine at 100% (the full unit
   suite on every core, or another session's test runs), `engined` misses its 10 s port announce and its
   health probes, the app restarts it in a loop and shows "The data engine started but never answered";

@@ -1,0 +1,4 @@
+# Unit test files that run in their own process although no rule in scripts/unitTests.mts
+# ISOLATION_RULES matches them: a leak through shared module state a pattern cannot express.
+# One file name per line; the comment line above a group is the reason the runner prints.
+# Add a file here only after it failed pooled and passed alone (EQC_UNIT_ISOLATE_ALL=1 tells).
