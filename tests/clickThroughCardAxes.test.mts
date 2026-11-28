@@ -5,7 +5,8 @@
 // 'x'), so the card must clamp sideways and never move vertically: `{ mainAxis: true, altAxis: false,
 // padding: 8 }`, the pair the gear compare card measured (JOS-344). The item card had the pair
 // inverted, so a card near the window's right edge hung off screen and one near the bottom slid up
-// over its own row. The two cards stay separate; this pins only that their axes agree.
+// over its own row. The two cards stay separate; since the same day the mode is one file,
+// lib/clickThroughHover.ts, and this pins that file's pair and that neither card writes its own.
 //
 // The card modules import through the renderer's `@shared` alias, which the test runner does not
 // resolve, so the options are read from the source the way other renderer pins in this folder are.
@@ -25,13 +26,17 @@ function preventOverflowOptions(text: string): string[] {
 
 const MEASURED = '{ mainAxis: true, altAxis: false, padding: 8 }'
 
-test('the gear compare card keeps the measured pair (the reference this pins against)', () => {
-  assert.deepEqual(preventOverflowOptions(src('features/gear/GearCompareCard.tsx')), [MEASURED])
+// The mode lives in one file, lib/clickThroughHover.ts (audit 2026-11-27), and both cards import it.
+test('the shared click-through mode keeps the measured pair and never flips', () => {
+  const mode = src('lib/clickThroughHover.ts')
+  assert.deepEqual(preventOverflowOptions(mode), [MEASURED])
+  assert.match(mode, /\{ name: 'flip', enabled: false \}/)
 })
 
-test('the click-through item card clamps sideways and never moves vertically, like the compare card', () => {
-  const card = src('lib/KnownItemTooltip.tsx')
-  assert.deepEqual(preventOverflowOptions(card), [MEASURED])
-  // It still may not flip above its anchor.
-  assert.match(card, /\{ name: 'flip', enabled: false \}/)
+test('both click-through cards take the shared mode and write no modifiers of their own', () => {
+  for (const rel of ['features/gear/GearCompareCard.tsx', 'lib/KnownItemTooltip.tsx']) {
+    const text = src(rel)
+    assert.deepEqual(preventOverflowOptions(text), [], rel)
+    assert.match(text, /import \{ CLICK_THROUGH_POPPER, useCloseOnPointerDown \} from '[./]+(lib\/)?clickThroughHover'/, rel)
+  }
 })

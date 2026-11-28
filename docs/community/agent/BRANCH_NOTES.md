@@ -3516,10 +3516,13 @@ test that failed before the fix.
 - Macros (`src/main/ipc/macros.ts`): only ENOENT starts an empty library. Any other read failure
   is logged, rejects `macrosLoad`, leaves `loaded` false; a save before a good load reads first and
   writes nothing if that read fails. The player sees the tab's "could not be loaded" line.
-- Click-through item card (`lib/KnownItemTooltip.tsx` `NEVER_UPWARD`): flip off, preventOverflow
-  `{ mainAxis: true, altAxis: false, padding: 8 }`, the same as `GearCompareCard` (JOS-344); for a
-  bottom placement mainAxis is horizontal. The cards stay separate; `tests/clickThroughCardAxes.test.mts`
-  pins that their pairs agree.
+- Click-through mode (`lib/clickThroughHover.ts`, 2026-11-27): flip off, preventOverflow
+  `{ mainAxis: true, altAxis: false, padding: 8 }` (JOS-344; for a bottom placement mainAxis is
+  horizontal), `pointerEvents: 'none'`, close on capture-phase pointerdown. One copy, imported by
+  `KnownItemTooltip` (`clickThrough`) and `GearCompareCard` (`GearRowCompare`); the two cards stay
+  separate. `tests/clickThroughCardAxes.test.mts` pins the pair and that neither card writes its own.
+  The Best in slot slot hover (`BisCells`, `BisCompare`) is not in this mode: right-start and
+  interactive on purpose, scored at the slider, not base-vs-base (dup-ui-a-2: kept separate).
 - Reading log, own-connection second opinion: runs under `OWN_CONNECTION_HEALTH_DEADLINE_MS` =
   `ENGINE_OWN_CONNECTION_TIMEOUT_MS` + 5 s (`engineProtocol.ts`), passed as the optional third
   argument of `EngineClient.request`. The supervisor's 20 s timer is the only bound on the ask;

@@ -33,8 +33,9 @@
 // The old header says the reverse of both in prose ("for a right-placed popper the ALT axis is the
 // vertical one"); the prose was wrong, the code did what the prose said rather than what it meant,
 // and the anchor — a full-width `<TableRow>` whose right edge IS the window's right edge — turned
-// that into a card nobody could see. All three are stated as source-regex pins in
-// tests/gearCompare.test.mts now, so the next edit that flips one turns a unit test red.
+// that into a card nobody could see. The corrected modifiers live in lib/clickThroughHover.ts (since
+// the 2026-11-27 audit, shared with KnownItemTooltip's click-through card) and are source-regex pins
+// in tests/clickThroughCardAxes.test.mts, so the next edit that flips one turns a unit test red.
 //
 // ---------------------------------------------------------------------------
 // THE ANCHORING LAW THAT REPLACES IT (JOS-344) — three guarantees, all structural
@@ -73,6 +74,9 @@
 //   3. IT CLOSES ON POINTERDOWN, ANYWHERE, IN THE CAPTURE PHASE — so the pair is gone before the
 //      Select the user just aimed at opens its own option list over the same band.
 //
+// Guarantees 1 to 3 are written once, in lib/clickThroughHover.ts (audit 2026-11-27, dup-ui-b-3):
+// KnownItemTooltip's click-through card is the same mode for the same reason. The cards stay two.
+//
 // Plus the SpellCard leave discipline (JOS-293): `enterDelay` so dragging the pointer across thirty
 // dense rows opens nothing, and a short `leaveDelay` so it goes with the pointer.
 //
@@ -101,13 +105,14 @@
 //
 // EVERY WORD IS `gearCompare.ts`'s (pure, node-tested). This file owns where a line goes.
 
-import { type JSX, type ReactElement, useCallback, useEffect, useState } from 'react'
+import { type JSX, type ReactElement } from 'react'
 import type { GearRow } from '@shared/planner/gear'
 import { ITEM_MAX_TIER } from '@shared/itemStats'
 import { percentLabel } from '@shared/itemUpgrade'
 import { outputKind } from '@shared/outputs/kinds'
 import { CARD_LABEL, CARD_MONO, CARD_TEXT, LABEL_STYLE, MoreLine, TEXT_STYLE } from '../../lib/hoverCards'
 import { Tooltip } from '../../lib/Tooltip'
+import { CLICK_THROUGH_POPPER, useCloseOnPointerDown } from '../../lib/clickThroughHover'
 import {
   NO_BASE_CHANGE,
   arrowText,
@@ -374,56 +379,19 @@ export function GearComparePair({ row, data }: { row: GearRow; data: GearCompare
 }
 
 /**
- * The popper modifiers behind guarantee 1 — read the MEASUREMENT block in the header before
- * touching either of them, because the axis names do not mean what they sound like.
- *
- * For a `bottom`-based placement popper's `mainAxis` is the HORIZONTAL one and `altAxis` the
- * vertical (`getMainAxisFromPlacement` returns `'x'` for top/bottom and `'y'` for left/right). So
- * this pair of options says, in order: SLIDE SIDEWAYS to stay on screen, NEVER move vertically —
- * and `flip: false` says it may not jump above its anchor either. The 8px padding keeps a clamped
- * pair off the glass rather than flush against it.
- */
-const CLAMP_SIDEWAYS_NEVER_UPWARD = [
-  { name: 'flip', enabled: false },
-  { name: 'preventOverflow', options: { mainAxis: true, altAxis: false, padding: 8 } }
-]
-
-/**
  * The chrome, hoisted to module scope — the JOS-206 finding, which `MOB_CARD_SLOT_PROPS` states in
  * full: a fresh `slotProps` with a nested `sx` per render is real reconciliation cost across a list
  * of anchors, and this card hangs off EVERY mounted row of a windowed 6,766-row table.
  *
  * The tooltip contributes no padding, no background and no width cap — the pair draws its own two
- * surfaces and states its own ceiling. The popper's `pointerEvents: 'none'` is guarantee 2, written
- * out rather than inherited from `disableInteractive`.
+ * surfaces and states its own ceiling. The popper is the shared click-through mode
+ * (lib/clickThroughHover.ts, audit 2026-11-27): guarantees 1 and 2, the measured modifiers and
+ * `pointerEvents: 'none'`, in one copy with KnownItemTooltip's click-through card.
  */
 const COMPARE_SLOT_PROPS = {
-  popper: { modifiers: CLAMP_SIDEWAYS_NEVER_UPWARD, sx: { pointerEvents: 'none' } },
+  popper: CLICK_THROUGH_POPPER,
   tooltip: { sx: { p: 0, bgcolor: 'transparent', maxWidth: 'none' } }
 } as const
-
-/**
- * Guarantee 3: the pair is gone on the first pointerdown ANYWHERE, capture phase — before the
- * control the user aimed at opens its own list. Controlled state is the only way to say that, so
- * this card is controlled and MUI's own hover lifecycle drives `onOpen`/`onClose` as usual.
- */
-function useCloseOnPointerDown(): { open: boolean; onOpen: () => void; onClose: () => void } {
-  const [open, setOpen] = useState(false)
-  const onClose = useCallback(() => {
-    setOpen(false)
-  }, [])
-  const onOpen = useCallback(() => {
-    setOpen(true)
-  }, [])
-  useEffect(() => {
-    if (!open) return
-    window.addEventListener('pointerdown', onClose, true)
-    return () => {
-      window.removeEventListener('pointerdown', onClose, true)
-    }
-  }, [open, onClose])
-  return { open, onOpen, onClose }
-}
 
 export interface GearRowCompareProps {
   row: GearRow
@@ -445,6 +413,8 @@ export interface GearRowCompareProps {
  * must open none. `enterNextDelay` keeps that true after the first pair has opened.
  */
 export function GearRowCompare({ row, data, children }: GearRowCompareProps): JSX.Element {
+  // Guarantee 3: gone on the first pointerdown anywhere, capture phase (the shared mode's hook).
+  // Controlled state is the only way to say that; MUI's own hover lifecycle still drives onOpen/onClose.
   const controlled = useCloseOnPointerDown()
   return (
     <Tooltip
