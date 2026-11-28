@@ -85,9 +85,28 @@ Not taken, and why (re-check these, not the rest):
 - Deprecated transitive packages with no trusted swap in our hands: lodash.isequal (electron-updater
   6.8.11, latest), glob 7 / inflight / rimraf 2 / boolean (electron-builder 26.18, latest),
   whatwg-encoding (cheerio 1.2, latest).
-- onnxruntime-node 1.31 (minor, not major): onnxruntime.dll 14 -> 32 MB plus a new 18 MB
-  dxcompiler.dll, and the binaries moved from napi-v3 to napi-v6 (electron-builder.yml paths).
-- vite 8.4 (minor): a second rolldown copy beside electron-vite's.
-- Rust toolchain pin 1.99 (latest 1.100.1): minor; bump with `npm run gen:protocol`.
-- Known red outside known-reds.txt: engined `ingest::kept::tests::a_kept_key_never_holds_while_the_state_moves`
-  (pre-existing, in the 2026-11-27 bug-hunt audit). Fixed the same day (branch fix-reds).
+
+## Third pass: follow-ups (same day, branch deps-followup)
+
+Taken:
+- native-reg (last published 2022) removed: discovery's registry reads go through koffi
+  (`src/main/log/winRegistry.ts`, advapi32, same `KEY_READ | KEY_WOW64_64KEY`, no new permission).
+  Old and new read 1,413 keys / 40,488 values side by side on the owner's PC: 0 differences.
+- koffi 3.3.5 -> 3.3.8; vite 8.3.5 -> 8.4.0 (a second rolldown, 1.3 beside electron-vite's 1.2:
+  +25.5 MB dev `node_modules`, 0 shipped; goes when electron-vite moves); Rust pin 1.99 -> 1.100.1
+  (generated protocol byte-identical, clippy clean, workspace tests green).
+- onnxruntime-node 1.20.1 -> 1.31.1: Kokoro synthesis about 2x faster (whole 4-phrase run
+  11.2 s -> 5.7 s). It runs on the CPU provider, so `dxcompiler.dll` (17.2 MB, WebGPU provider
+  only, not imported) is excluded: shipped binaries 31.9 -> 48.3 MB (+16.4 MB). TRAPS:
+  - 1.31's onnxruntime.dll carries Microsoft's 1DS telemetry and opens an HTTPS connection to
+    `mobile.events.data.microsoft.com` while it synthesizes. `engine.ts` sets
+    `ORT_DISABLE_TELEMETRY=1` on MAIN before the worker starts (a worker's env never reaches
+    native code); measured: no socket with it set.
+  - onnxruntime.dll now imports `MSVCP140_ATOMIC_WAIT.dll`: a fifth app-local VC++ runtime file.
+    A PC whose cached runtime has only the old four fails as 'engine-unloadable' until it is
+    re-provisioned.
+
+Next (owner, 2026-11-27): phonemizer + onnxruntime move out of the installer into a voice pack
+downloaded with the model, published once on the fork's releases (and the Kokoro files mirrored
+there, same sha256 pins). Voice releases must never be GitHub's "latest": the updater reads
+`releases/latest/download/`. Fixed the same day (branch fix-reds).
