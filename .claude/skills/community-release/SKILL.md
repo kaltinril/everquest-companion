@@ -123,6 +123,19 @@ gh release edit "community-$v" --repo kaltinril/everquest-companion --latest
 Tell the owner the release URL (`https://github.com/kaltinril/everquest-companion/releases/latest`
 once promoted) and the run URL. Update the release memory.
 
+**Clean up the build and test data** (owner, 2026-11-27: "delete only on a release ... that's when
+you clean up the test data"). Once the release is out, in the main clone:
+
+1. `cd engine && nice -n 10 cargo clean --profile dev`: the debug `cargo test` builds (56 GB on
+   2026-11-27). The release `engined.exe` the dev app runs stays; the next `cargo test` rebuilds
+   debug in about a minute from the shared build cache.
+2. Delete `tests/e2e/artifacts/*` older than the release's own gate run.
+3. List `.claude/worktrees/*` folders that `git worktree list` does not register, and any
+   registered worktree whose branch is merged into `main_community`, with their sizes. Delete only
+   what this session made, or what the owner confirms; another session may still be using a
+   worktree. Unlink a `node_modules` junction before removing its worktree (WORKFLOW.md).
+4. Tell the owner how much space was freed.
+
 ## Fallback: publish from the owner's machine
 
 `npm run dist` in the main clone (never a junctioned worktree), then
