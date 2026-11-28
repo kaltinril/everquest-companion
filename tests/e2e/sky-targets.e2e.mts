@@ -176,7 +176,11 @@ async function stepIgnoreRemoves(page: Page): Promise<void> {
   await page.click(TAB_QUESTS, { timeout: 15_000 })
   await page.waitForSelector(COUNTS, { timeout: 15_000 })
   await page.fill(SEARCH, 'Test of Azarack', { timeout: 15_000 })
-  await page.waitForSelector(IGNORE, { timeout: 15_000 })
+  // WAIT FOR THE FILTER, NOT FOR A BUTTON (2026-11-27): every quest row has an Ignore button, so
+  // the first one on screen before the search lands belongs to some other quest. One quest has this
+  // name; clicking before the list narrowed to it ignored the wrong one. Hidden by the old one
+  // frame a second, which gave the filter time to land (appWindow.mts FRAME_ARGS).
+  await settle(() => countOf(page, IGNORE), (n) => n === 1, { timeoutMs: 15_000 })
   await page.click(IGNORE, { timeout: 15_000 })
   await page.fill(SEARCH, '', { timeout: 15_000 })
 

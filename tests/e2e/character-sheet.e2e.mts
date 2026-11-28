@@ -293,13 +293,21 @@ async function stepCarry(page: Page): Promise<void> {
   check('…and NO bank chip', (await countOf(page, chip('bank'))) === 0)
 }
 
-/** Type into the search box and wait for the count line to settle on a new reading. */
+/**
+ * Type into the search box and wait for the count line to settle on a new reading.
+ *
+ * NEW MEANS "NOT WHAT IT READ BEFORE THE TYPING", not "not the full ledger" (2026-11-27). The
+ * second search starts from the first one's `4 of 123`, which is already not the full count, so the
+ * old test accepted the stale line at once. It passed only while a hidden window drew one frame a
+ * second and `fill` took long enough for the count to catch up (appWindow.mts FRAME_ARGS).
+ */
 async function search(page: Page, term: string): Promise<string> {
+  const before = await carryCount(page)
   await page.fill(CARRY_SEARCH, term, { timeout: 15_000 })
   const want = term === '' ? `${String(CARRIED)} of ${String(CARRIED)}` : null
   return settle(
     () => carryCount(page),
-    (text) => (want === null ? text !== `${String(CARRIED)} of ${String(CARRIED)}` : text === want),
+    (text) => (want === null ? text !== before && text !== `${String(CARRIED)} of ${String(CARRIED)}` : text === want),
     { timeoutMs: 15_000, pollMs: 100 }
   )
 }
