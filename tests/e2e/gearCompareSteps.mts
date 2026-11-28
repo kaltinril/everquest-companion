@@ -63,9 +63,6 @@ import type { ElectronApplication, Page } from 'playwright-core'
 import { check, countOf, hoverAt, note, settle, settleGone, settleStable } from './appHarness.mjs'
 import { clearPicks, pickIn } from './gearFilterSteps.mjs'
 import type { GearRow } from '../../src/shared/planner/gear'
-// The card's own words, so the expectation is COMPUTED from the module under test's own spelling
-// rather than typed into this file (and a change to the spelling turns the unit test red first).
-import { NO_BASE_CHANGE } from '../../src/renderer/src/features/gear/gearCompare'
 
 const ROW = '[data-testid="gear-row"]'
 /** The three nodes the JOS-344 layout is made of — exported for the Exaltations side. */
@@ -74,6 +71,7 @@ export const ITEM_CARD = '[data-testid="gear-compare-card"]'
 export const EQUIPPED_CARD = '[data-testid="gear-compare-equipped-card"]'
 const SEARCH = '[data-testid="gear-search"] input'
 const SLOT_PICKER = '[data-testid="gear-slot"]'
+const COUNT = '[data-testid="gear-count"]'
 const ERA_TOGGLE = '[data-testid="gear-era-toggle"]'
 const WISH = '[data-testid="gear-wish"]'
 const NAME_LINK = '[data-testid="planner-donor-name"]'
@@ -84,6 +82,12 @@ const NARROW_W = 760
 const rowOf = (key: string): string => `${ROW}[data-item-key="${key}"]`
 
 const until = (fn: () => Promise<boolean>, ms: number): Promise<boolean> => settle(fn, (ok) => ok, { timeoutMs: ms })
+
+/** `"212 of 6,814 items"` → 212: the readout is the only place the filtered total is stated. */
+async function shownCount(page: Page): Promise<number> {
+  const text = await page.evaluate((s) => (document.querySelector(s) as HTMLElement | null)?.innerText ?? '', COUNT)
+  return Number((/[\d,]+/.exec(text)?.[0] ?? '0').replace(/,/g, ''))
+}
 
 /** One equipped cell of the open pair, as plain values a check can read. */
 interface CardCell {
@@ -381,12 +385,8 @@ function checkEquippedCard(card: PairRead): void {
     first?.name === 'Thelvorn, Blade of Light +5',
     first?.name ?? '(nothing)'
   )
-
-  check(
-    'base against base, the same item is no change — and the card says so in its own words',
-    (first?.delta ?? '').includes(NO_BASE_CHANGE),
-    `card says "${first?.delta ?? ''}" · wanted "${NO_BASE_CHANGE}"`
-  )
+  // BASE AGAINST BASE, the same item is `NO_BASE_CHANGE`: pinned in tests/gearCompareText.test.mts
+  // ('the card compares BASE TO BASE, and a merged worn copy is stated in the frame, not the math').
 }
 
 /**
@@ -447,7 +447,14 @@ async function stepStillClickable(page: Page, key: string): Promise<void> {
  */
 async function stepSecondHand(page: Page): Promise<void> {
   await page.fill(SEARCH, '', { timeout: 15_000 })
+  const all = await settleStable(() => shownCount(page), { timeoutMs: 15_000 })
   await pickIn(page, SLOT_PICKER, 'SECONDARY')
+  // THE SLOT PICKER'S WIRING, asserted here since 2026-11-27 because this step picks a slot anyway:
+  // the pick reaches the filter memo and the readout. WHICH rows several slots keep (a union) is
+  // pinned in tests/gearFilter.test.mts ('several slots are a UNION, and the union still ANDs with
+  // everything else').
+  const narrowed = await until(async () => (await shownCount(page)) < all, 15_000)
+  check('the slot filter narrows the table to one equipment slot', narrowed && (await shownCount(page)) > 0, `${String(all)} → ${String(await shownCount(page))}`)
   const listed = await until(async () => (await countOf(page, ROW)) > 0, 20_000)
   if (!check('the slot picker leaves secondary-hand rows on screen', listed)) {
     await clearPicks(page, SLOT_PICKER)

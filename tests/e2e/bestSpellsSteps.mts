@@ -31,11 +31,11 @@
 //     the order stays here, right after the simulator, because the search hands the box back empty
 //     and everything below is a claim about the ranked table.
 //
-// SHAPES AND ORDERINGS, NEVER TODAY'S NUMBERS. The loadout is whatever this machine's log inferred
-// and the figures come from the committed catalog, so the assertions are that the drawn column is
-// MONOTONE under its own sort and that pressing another header changes which monotone it is. A
-// wrong figure is the unit suite's job; a table that is not sorted by the column it says it is
-// sorted by is this step's.
+// WIRING, NEVER VALUES (owner, 2026-11-27). The loadout is whatever this machine's log inferred
+// and the figures come from the committed catalog, so the assertions are that each tab swaps in
+// its own table and that pressing a header reaches the table's sort. The order a column sorts in,
+// the column a tab opens on, the AOE-versus-DD reading and what a rank does to membership are the
+// unit suite's: tests/bestSpells.test.mts, tests/bestSpellsAoe.test.mts, tests/bestSpellsRank.test.mts.
 //
 // AND IT LEAVES THE TAB WHERE IT FOUND IT: the level is stepped once and stepped back, because the
 // steps around it make claims about the level the panel was left on.
@@ -155,21 +155,6 @@ function moreCount(page: Page): Promise<number> {
   }, `${SECTION} ${MORE}`)
 }
 
-/** Descending with nulls last — the model's rule, checked against what is actually drawn. */
-function descendingNullsLast(values: readonly (number | null)[]): boolean {
-  let seenNull = false
-  let prev = Number.POSITIVE_INFINITY
-  for (const v of values) {
-    if (v === null) {
-      seenNull = true
-      continue
-    }
-    if (seenNull || v > prev) return false
-    prev = v
-  }
-  return true
-}
-
 /** Press a column header and wait for the table to say it took. */
 async function sortBy(page: Page, column: string): Promise<void> {
   await page.click(`${SECTION} [data-testid="best-spells-sort"][data-column="${column}"]`, { timeout: 10_000 })
@@ -201,8 +186,10 @@ async function selectTab(page: Page, tab: string): Promise<void> {
 }
 
 /**
- * One tab, opened and read: it draws its own table, on its own rank column, descending, and the
- * count on its label is the whole table rather than the ten rows the disclosure leaves visible.
+ * One tab, opened and read: it draws its own table, and the count on its label is the whole table
+ * rather than the ten rows the disclosure leaves visible. Which column a tab opens on and that
+ * the drawn column descends with blanks last are values of the model, pinned by
+ * tests/bestSpells.test.mts (owner, 2026-11-27: e2e proves wiring).
  *
  * Returns how many rows are drawn, so the caller can skip a re-rank there is nothing to re-rank.
  */
@@ -211,12 +198,6 @@ async function checkTab(page: Page, tab: string): Promise<number> {
   const table = await tableOf(page)
   const sections = await countOf(page, SECTION)
   check(`the ${tab} tab draws ONE table and it is its own`, sections === 1 && table.tab === tab, `${String(sections)} sections, ${table.tab}`)
-  const rank = TAB_RANK[tab]
-  check(
-    `…opened ranked by ${rank}, best first`,
-    table.column === rank && table.desc === 'true',
-    `${table.column}/${table.desc}`
-  )
   const drawn = await rowNames(page)
   const more = await moreCount(page)
   check(
@@ -224,12 +205,7 @@ async function checkTab(page: Page, tab: string): Promise<number> {
     drawn.length + more === table.count,
     `${String(drawn.length)} + ${String(more)} vs ${String(table.count)}`
   )
-  if (drawn.length === 0) {
-    note(`this loadout owns no ${tab} spells at this level, which is an honest empty table`)
-    return 0
-  }
-  const values = await columnValues(page, rank)
-  check(`…and the drawn ${rank} column really descends, with any blank last`, descendingNullsLast(values), values.join(' '))
+  if (drawn.length === 0) note(`this loadout owns no ${tab} spells at this level, which is an honest empty table`)
   return drawn.length
 }
 
@@ -310,41 +286,8 @@ async function stepAoeAssumption(page: Page): Promise<void> {
   await selectTab(page, 'aoe')
   const drawn = await settle(() => countOf(page, AOE_MARK), (n) => n === 1, { timeoutMs: 8_000 })
   if (!check('…and IS drawn, exactly once, on the AOE tab', drawn === 1, String(drawn))) return
-  const text = await page.evaluate(
-    (s) => ((document.querySelector(s) as HTMLElement | null)?.innerText ?? '').trim(),
-    AOE_MARK
-  )
-  check(
-    '…stating the target count the figures assume, in words a player can read',
-    /^x\d+( to x\d+)? targets$/.test(text),
-    text
-  )
-
-  // THE TAB REALLY ANSWERS A DIFFERENT QUESTION. Whichever spell is in both tables must read HIGHER
-  // here: a max-target reading can never state less than a single-target one. Shapes, not numbers -
-  // the loadout is whatever this machine's log inferred.
-  const aoeRows = await rowNames(page)
-  if (aoeRows.length === 0) {
-    note('this loadout owns no area spells at this level, which is an honest empty AOE tab')
-  } else {
-    const aoeDamage = await columnValues(page, 'damage')
-    await selectTab(page, 'dd')
-    const ddNames = await rowNames(page)
-    const ddDamage = await columnValues(page, 'damage')
-    const shared = aoeRows
-      .map((name, i) => ({ name, aoe: aoeDamage[i], dd: ddDamage[ddNames.indexOf(name)] }))
-      .filter((r) => ddNames.includes(r.name) && r.aoe !== null && r.dd !== null)
-    if (shared.length === 0) {
-      note('no spell is drawn in both the AOE and DD tables here, so there is no pair to compare')
-    } else {
-      const bad = shared.filter((r) => (r.aoe ?? 0) < (r.dd ?? 0))
-      check(
-        `a spell in both tables reads HIGHER on AOE than on DD (${String(shared.length)} pairs)`,
-        bad.length === 0,
-        bad.map((r) => `${r.name} ${String(r.aoe)} < ${String(r.dd)}`).join(' | ')
-      )
-    }
-  }
+  // The words it states and that an AOE figure never reads below the same spell's DD figure are
+  // values of the model: tests/bestSpellsAoe.test.mts (owner, 2026-11-27: e2e proves wiring).
   await selectTab(page, opened)
 }
 
@@ -395,12 +338,7 @@ async function stepSimulate(page: Page): Promise<void> {
     { timeoutMs: 8_000 }
   )
   check(`simulating a rank RESTATES the ${damage.tab} table's damage column`, after !== before, `${before} -> ${after}`)
-  // The rows are the same rows: a rank changes figures, never membership. `+N more` is unmoved too.
-  check(
-    '…the same rows, re-read - a rank is not a filter',
-    (await rowNames(page)).length > 0 && (await tableOf(page)).count === damage.count,
-    `${String((await tableOf(page)).count)} vs ${String(damage.count)}`
-  )
+  // That a rank changes figures and never membership is tests/bestSpellsRank.test.mts.
 
   await driveRank(page, ['Home'])
   const back = await settle(() => simulationOf(page).then((s) => s.rank), (r) => r === '0', { timeoutMs: 8_000 })
@@ -477,13 +415,18 @@ export async function stepBestSpells(page: Page): Promise<void> {
     const byRank = await rowNames(page)
     await sortBy(page, perMana)
     const byEff = await rowNames(page)
+    // WIRING: the header click reaches the table's sort. That the column then descends with blanks
+    // last is tests/bestSpells.test.mts 'every column ranks, and flipping the direction reverses it'.
+    const sorted = await tableOf(page)
     check(
       `clicking the per-mana header re-ranks the ${widest.tab} table on that column`,
-      descendingNullsLast(await columnValues(page, perMana)),
-      byEff.slice(0, 3).join(' | ')
+      sorted.column === perMana,
+      `${sorted.column} · ${byEff.slice(0, 3).join(' | ')}`
     )
     // The two answers are allowed to agree (a small loadout really can have one best spell by both
-    // measures), so a difference is a NOTE and the monotone above is the assertion.
+    // measures), so a difference is a NOTE. The assertion is that the click re-ranked the table on
+    // the per-mana column; that the column then descends is tests/bestSpells.test.mts ('every
+    // column ranks, and flipping the direction reverses it').
     if (byRank.join() === byEff.join()) note('the fastest and the most mana-efficient spell are the same here')
     // A SORT IS THE TAB'S OWN. Flipping this one must not disturb another, which is the state the
     // panel keeps per tab rather than per side.

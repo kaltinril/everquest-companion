@@ -1315,6 +1315,50 @@ where one exists.
   11000 of 11674, respawnWiki 500 of 552) were left; a new floor uses the helper, never a hand number
   at the day's count. Rust corpus floors (`loot_from.rs`: items > 10,000, mobs > 5,000) have room.
 
+## Test hygiene: what e2e checks (owner ruling 2026-11-27)
+
+- 2026-11-27, owner: "we shouldn't be regression testing functions that produce values". E2E
+  proves wiring; values are unit-tested over the function (WORKFLOW.md, Gate, "What belongs in
+  e2e"). Every removal is listed by spec in the `e2e-trim` commit message with the unit test that
+  pins it or the check it duplicated.
+- First pass 2026-11-27 (`e2e-trim`), 10 specs: ok checks 1302 -> 1110 after review (gear 185 ->
+  135, combat-dashboard 256 -> 257, planner 130 -> 127, tradeskills-log 198 -> 136, tradeskills 74
+  -> 53, leveling 210 -> 193, sky-filters 70 -> 55, text-size 80 -> 65, voice-alerts 79 -> 72,
+  mob-drops-era 20 -> 16 -> 17). combat-dashboard is up because its baseline skipped checks after
+  its red drill. The review restored five wiring checks the first pass had cut as values or
+  duplicates (boss picker narrows, EFF HP header becomes the active sort, the picked-fight grid
+  and restored-wide header passes, the drops card's folded count, the workbench search narrows):
+  a check is a duplicate only when the state it measures is the same, and a cut must not leave a
+  control with no check at all. The numbers below are from before that review. The 10 run together with the default runner (3 wide, BelowNormal, the
+  owner using the PC): 336.9 s -> 256.0 s wall. Per-spec times under load are noise-dominated: the
+  first three specs started carry a large start-up cost whichever they are (mob-drops-era took
+  103.6 s in the first wave, 11.8 s alone). Alone (one at a time) after the trim: gear 43.3 s,
+  combat-dashboard 39.6, tradeskills-log 35.8, leveling 30.2, tradeskills 18.8, planner 12.8,
+  mob-drops-era 11.8, text-size 10.2. Full default run after the trim (the game and the dev app
+  open): 73 specs, 728.6 s wall against the morning's 581.6 s, because its first wave ran 100 to
+  140 s per spec for in- and out-of-scope specs alike (close-to-tray 98.5, alerts-search 98.7,
+  bis-sheet 141.7); in later waves combat-dashboard 51.8 (101.9 in the morning), planner 17.9
+  (66.4), sky-filters 19.3 (34.5), voice-alerts 18.4 (28.4). Red: sky-recent-sort (known); flaky
+  under load: engine-boots (known), sky-cleanup (out of scope, passed alone in 9.4 s).
+- Unit tests added for it: `tests/combatScopeOptions.test.mts` (the Fight/Overall selector rules,
+  new file), one in `gearFilter.test.mts` (Owned or looted), one in `levelingWindowScope.test.mts`
+  (a selection never counts more than its window).
+- Kept on purpose: one "data reaches the surface" check per surface; one wiring check per control
+  (a pick narrows the table); every geometry, remount, relaunch, IPC and pointer check. Sky filters
+  keep two tab round trips, one per storage hook (`useStoredFlag` boxes, `useStoredNames` facets).
+- combat-dashboard was red on `main_community` that day ("the You bar drills", "your pet sits on
+  the line under you"): a row with avoided swings carries its "N% hit" badge inside the name span,
+  so the spec's exact match on 'You' missed. Fixed in `petPrefSteps.mts` (each span's own text).
+- Open (gear, found by the trim): with every Gear toolbar control shown, the Owned toggle ends about
+  60 px past the content area at the 1280 px e2e window. The old spec hid the slot control before
+  its width checks and so never saw it; the trimmed `gearColumnSteps` keeps that hide, with the
+  measurement in a comment. Owner's call whether the toolbar should wrap.
+- Open: `gearCompareSteps.mts` notes that the two-slot dedupe is pinned in
+  `tests/gearCompare.test.mts`; no such file exists (only `gearCompareText.test.mts`).
+- Candidates not taken (not value checks, owner's call): leveling's three screenshot steps
+  (`stepChartShots`, `shootUnlockPanel`, `shootBestSpells`) assert nothing but resize and capture;
+  tradeskills `stepOpenInPlace` waits in 700 ms steps.
+
 ## Sky rune count (fork #2, requirements/sky-rune-count.md)
 
 - Count source `handins` ("Log only (loot minus hand-ins)"): `heldCounts.computeLogOnlyCounts` folds

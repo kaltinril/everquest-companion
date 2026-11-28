@@ -5,15 +5,17 @@
  * spec is at its line budget. It runs last, after the own-log steps.
  *
  * What it holds:
- *   - the workbench has a "Your route" tab with five goals, Cheapest first (the fifth, Faction,
- *     has its own steps: tradeskillFactionSteps.mts);
- *   - a route lists steps from the level up, each stretch starting where the one before ended,
- *     with exactly one marked as the next step, and states what it is ranked on;
- *   - nothing on the route reads as a chance or a forecast;
+ *   - the workbench has a "Your route" tab, and its route lists steps from the level the log
+ *     states (the Faction goal has its own steps: tradeskillFactionSteps.mts);
  *   - the shopping list is for the next step, its needs follow the number of combines, and
  *     "Copy list" says the text reached the clipboard;
- *   - the goal is remembered across a trip to another tab, the community route is credited, and
- *     a step opens its recipe on the recipes tab.
+ *   - each goal is one click away, the goal is remembered across a trip to another tab, and a
+ *     step opens its recipe on the recipes tab.
+ *
+ * What the routes ARE (the five goals and the default, contiguous stretches, the next mark, every
+ * why and basis line, credits, caveats, the no-forecast rule, the shopping total) is the unit
+ * suite's: tests/tradeskillRoute.test.mts and tests/tradeskillShopping.test.mts (owner,
+ * 2026-11-27: e2e proves wiring, not values).
  *
  * Every claim is a property of what is on screen, never a name or a count from the wiki data.
  *
@@ -80,28 +82,16 @@ async function setCombines(page: Page, n: number): Promise<void> {
   await page.fill(COMBINES, String(n))
 }
 
-/** The route itself: the goals, the steps from the level up, the next mark and the honest lines. */
+/**
+ * The route itself: steps listed from the level the log states. What the steps are, their order,
+ * the next mark, the why and basis lines and the no-forecast rule are tests/tradeskillRoute.test.mts.
+ */
 async function checkRoute(page: Page): Promise<string> {
-  check('the route tab has five goals', (await countOf(page, '[data-testid^="tradeskill-goal-"]')) === 5)
-  const goals = (await textOf(page, sel('tradeskill-goals'))).toLowerCase()
-  check('…Cheapest, Fastest, Explore, the community route and Faction', ['cheapest', 'fastest', 'explore', 'community route', 'faction'].every((g) => goals.includes(g)), goals)
-  check('Cheapest is the goal a workbench opens on', (await goalOf(page)) === 'cheapest')
   const steps = await settle(() => countOf(page, STEP), (n) => n > 0, { timeoutMs: 20_000 })
   check('the route lists steps', steps > 0)
-  check('…with exactly one marked as the next step', (await countOf(page, sel('tradeskill-route-next'))) === 1)
-  check('…the first one', await page.evaluate(([s, mark]) => document.querySelector(s)?.querySelector(mark) != null, [STEP, sel('tradeskill-route-next')] as const))
   const level = Number(await textOf(page, sel('tradeskill-level')))
   const ranges = await stretches(page)
   check('the first stretch starts at the level', ranges[0]?.[0] === level, JSON.stringify(ranges[0]))
-  check('…each stretch starts where the one before ended, going up', ranges.every(([from, to], i) => to > from && (i === 0 || from === ranges[i - 1]?.[1])), JSON.stringify(ranges))
-  check('the route says what it is ranked on', (await textOf(page, sel('tradeskill-route-basis'))).length > 20)
-  const text = await textOf(page, sel('tradeskill-route-list'))
-  check('no step reads as a chance or a forecast', !/%|chance|expected|estimate/i.test(text), text.slice(0, 200))
-  check('every step says why it was chosen', (await countOf(page, sel('tradeskill-route-why'))) === steps)
-  // Where the combine is done sits beside the name, for every step whose recipe names a container.
-  const where = await textOf(page, sel('tradeskill-route-container'))
-  if (where === '') note('no step of this route names a container: the line was not checked')
-  else check('a step says where its combine is done', /^in an? \S/.test(where), where)
   return textOf(page, FIRST_NAME)
 }
 
@@ -119,7 +109,6 @@ async function checkShopping(page: Page, first: string): Promise<void> {
   const three = await settle(() => needs(page), (n) => n[0] === (one[0] ?? 0) * 3 || n[0] === 1, { timeoutMs: 10_000 })
   // A tool the combine gives back is needed once whatever the number.
   check('the first material is needed three times over for three combines', three[0] === (one[0] ?? 0) * 3 || (one[0] === 1 && three[0] === 1), `${JSON.stringify(one)} then ${JSON.stringify(three)}`)
-  check('the list ends in a total, or in why there is none', (await textOf(page, sel('tradeskill-shopping-total'))).length > 0)
   await page.click(sel('tradeskill-shopping-copy'))
   const copied = await settle(() => page.evaluate((s) => document.querySelector<HTMLElement>(s)?.dataset.state ?? '', sel('tradeskill-shopping-copied')), (s) => s !== '', { timeoutMs: 8_000 })
   check('Copy list says the text reached the clipboard', copied === 'copied', copied)
@@ -128,14 +117,8 @@ async function checkShopping(page: Page, first: string): Promise<void> {
 /** The other goals, the memory of the pick, and a step opening its recipe. */
 async function checkGoals(page: Page): Promise<void> {
   check('Fastest is one click away', await pickGoal(page, 'fastest'))
-  const caveats = await page.evaluate((s) => [...document.querySelectorAll<HTMLElement>(s)].map((e) => e.innerText).join(' '), sel('tradeskill-route-caveat'))
-  check('…and says the failure rate is not measured', /not measured/i.test(caveats), caveats)
   check('the community route is a goal', await pickGoal(page, 'guide'))
-  const credit = await settle(() => textOf(page, sel('tradeskill-route-credit')), (t) => t !== '', { timeoutMs: 10_000 })
-  check('…credited to its author', /, by .+\(.+\)/.test(credit), credit)
   check('Explore is a goal', await pickGoal(page, 'explore'))
-  const listed = (await countOf(page, sel('tradeskill-route-heading'))) + (await countOf(page, sel('tradeskill-route-empty')))
-  check('…grouped under headings, or saying why it lists nothing', listed > 0)
 
   await page.click(sel('nav-skills'))
   await page.click(NAV)

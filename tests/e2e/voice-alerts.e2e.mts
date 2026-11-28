@@ -33,7 +33,9 @@
  * THE SILENCE IS THE POINT, not a convenience. `npm run test:e2e` runs beside the user's live
  * game with no window ever shown (AGENTS.md); a headless test that spoke out loud would be the
  * most intrusive thing in this repo. That is asserted here explicitly, so it cannot regress
- * quietly.
+ * quietly — ONCE, in `stepPreview`: `uttered` is set by `lib/speech.ts` from `isE2E` alone, whatever
+ * called it, so the seven later "stayed mute" readings (row ▶, Test, capture, {target}, the custom
+ * phrase twice, the voice step) re-read the same flag and were cut 2026-11-27.
  *
  * Run: `npm run test:e2e` (or `node --import tsx tests/e2e/voice-alerts.e2e.mts`).
  */
@@ -295,7 +297,6 @@ async function stepRowPicker(page: Page): Promise<void> {
     last.text === name,
     `spoke "${last.text}", expected "${name}"`
   )
-  check('…and this channel stayed mute while proving it', last.uttered === false, `uttered=${String(last.uttered)}`)
 }
 
 /**
@@ -424,7 +425,6 @@ async function stepFire(page: Page, name: string): Promise<void> {
     last.text === name,
     `spoke "${last.text}", expected "${name}"`
   )
-  check('…and still without uttering a sound in this channel', last.uttered === false, `uttered=${String(last.uttered)}`)
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -532,7 +532,6 @@ async function stepCaptureAlert(page: Page, log: { appendAt: (at: Date, ...m: re
   ) {
     return
   }
-  check('…and this channel stayed mute doing it', hit.uttered === false, `uttered=${String(hit.uttered)}`)
 }
 
 /**

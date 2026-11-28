@@ -286,12 +286,12 @@ async function typeQuery(page: Page, query: string): Promise<number> {
  *
  * WHAT THIS PROVES THAT tests/unlockSearch.test.mts CANNOT: that the dataset the renderer already
  * holds carries the search surface across the IPC, that the box swaps the panel's BODY rather than
- * a list inside it, that a result row draws its class chips WITH the level each class gets the
- * spell at, and that clearing the box gives the level view back exactly as it was.
+ * a list inside it, that result rows are drawn, and that clearing the box gives the level view
+ * back exactly as it was.
  *
- * GRAMMAR AND IDENTITIES, never today's rows: the chips are asserted to be CLR or SHM at 27 or 28
- * because that is what the query MEANS, and the permutation is asserted to return the same names
- * because order-free is the claim. The count is a floor.
+ * WHICH rows come back (each a CLR or SHM row at 27 or 28, on the chip) and that word order does
+ * not matter are values of the search, pinned by tests/unlockSearch.test.mts U4 and
+ * tests/spellSearch.test.mts S6b/S6d (owner, 2026-11-27: e2e proves wiring). The count is a floor.
  */
 export async function stepUnlockSearch(page: Page): Promise<void> {
   if (!check('the "New at this level" panel carries a search box', (await countOf(page, SEARCH)) === 1)) return
@@ -305,19 +305,9 @@ export async function stepUnlockSearch(page: Page): Promise<void> {
 
   const chips = await rowChips(page)
   check('…with real result rows', chips.length > 0, `${String(chips.length)} rows`)
-  const wanted = /^(CLR|SHM) (27|28)$/
-  const offenders = chips.filter((row) => !row.some((c) => wanted.test(c)))
-  check(
-    '…and every row is a cleric or shaman row at 27 or 28, stated ON the chip',
-    chips.length > 0 && offenders.length === 0,
-    offenders.length ? `${String(offenders.length)} rows without a CLR/SHM 27-28 chip: ${offenders[0].join(' ')}` : chips[0]?.join(' ')
-  )
-
-  // ORDER-FREE, on screen: the same words in a different order are the same answer.
-  const names = await page.evaluate((s) => Array.from(document.querySelectorAll(s)).map((e) => (e as HTMLElement).innerText), UNLOCK_ROW)
-  await typeQuery(page, 'shaman 27-28 cleric')
-  const flipped = await page.evaluate((s) => Array.from(document.querySelectorAll(s)).map((e) => (e as HTMLElement).innerText), UNLOCK_ROW)
-  check('…and the same words in any order are the same answer', flipped.join('|') === names.join('|'), `${String(names.length)} vs ${String(flipped.length)} rows`)
+  // WHICH rows the query returns (every one a CLR or SHM row at 27-28) and that word order does not
+  // matter are values of the search: tests/unlockSearch.test.mts U4 and tests/spellSearch.test.mts
+  // S6b/S6d (owner, 2026-11-27: e2e proves wiring).
 
   // CLEARING GIVES THE LEVEL VIEW BACK — the same level, the same rows, the stepper live again.
   await typeQuery(page, '')

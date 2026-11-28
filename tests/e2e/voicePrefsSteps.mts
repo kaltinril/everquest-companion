@@ -131,7 +131,6 @@ export async function stepVoiceFollowsPrefs(page: Page): Promise<void> {
     first?.voiceId === VOICE_A,
     `spoke with "${String(first?.voiceId)}"`
   )
-  check('…and this channel stayed mute doing it', first?.uttered === false, `uttered=${String(first?.uttered)}`)
 
   // THE REPORT, reproduced: change the preference and fire the SAME def again.
   const storedB = await useVoice(page, VOICE_B)

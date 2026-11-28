@@ -9,10 +9,13 @@
  *     the log show on the picked recipe, on its line and in the workbench's head;
  *   - the history tab lists the items combined, in place of the recipe book, and a row opens its
  *     recipe on the recipes tab;
- *   - the guides tab places the level on the leveling guide's route once, after the steps it has
- *     finished, credits the guide, and is the tab the workbench reopens on.
+ *   - the guides tab places the level the log raised on the leveling guide's route once, and is
+ *     the tab the workbench reopens on.
  *
  * Every claim is a property of what is on screen: the recipe is whichever one is marked next.
+ * The values behind the screen are the unit suite's (owner, 2026-11-27): the cost of a combine
+ * (tests/tradeskillMoney.test.mts), the done marks before the level and both guide credits
+ * (tests/tradeskillGuide.test.mts).
  *
  * Written on `workbench-data` (2026-11-20) and NOT yet run.
  */
@@ -88,8 +91,6 @@ export async function stepOwnLog(page: Page, log: Pick<FixtureLog, 'appendAt'>, 
   check('the recipe line states the same', line.includes('made 2, failed 1'), line)
   const paid = await page.evaluate((s) => [...document.querySelectorAll<HTMLElement>(s)].map((e) => e.innerText), `${PICKED} ${sel('tradeskill-material-paid')}`)
   check('each material says where it was last bought and for how much', paid.length === materials.length && paid.every((t) => t.includes('10.50 pp') && t.includes('Jeweler Anvo')), paid.join(' | '))
-  const cost = await textOf(page, sel('tradeskill-picked-cost'))
-  check('the cost of one combine is stated from those prices', /^your log\s*One combine costs \d+\.\d+ pp/.test(cost), cost)
   const sale = await textOf(page, sel('tradeskill-picked-sale'))
   check('…and what a merchant last paid for the result', sale.includes('30.00 pp') && sale.includes('Jeweler Anvo'), sale)
   check('the line carries the cost and the sale', (await textOf(page, `${ROW}.Mui-selected ${sel('tradeskill-row-cost')}`)).endsWith(' pp') && (await textOf(page, `${ROW}.Mui-selected ${sel('tradeskill-row-sells')}`)) === '30.00 pp')
@@ -122,7 +123,7 @@ export async function stepHistory(page: Page, item: string): Promise<void> {
   check('a history row opens its recipe on the recipes tab', back === item, back)
 }
 
-/** "From the guides": the route with the level placed on it, the credit, and the tab remembered. */
+/** "From the guides": the route with the level placed on it, and the tab remembered. */
 export async function stepGuides(page: Page, level: number): Promise<void> {
   await page.click(TAB('guides'))
   const steps = await settle(() => countOf(page, sel('tradeskill-guide-step')), (n) => n > 0, { timeoutMs: 15_000 })
@@ -131,24 +132,17 @@ export async function stepGuides(page: Page, level: number): Promise<void> {
     ([stepSel, markSel]) => {
       const all = [...document.querySelectorAll<HTMLElement>(`${stepSel}, ${markSel}`)]
       const mark = all.findIndex((e) => e.dataset.testid === 'tradeskill-guide-level')
-      return { mark: mark < 0 ? '' : (all[mark]?.innerText ?? ''), before: all.slice(0, Math.max(0, mark)).map((e) => e.dataset.state ?? ''), markers: all.filter((e) => e.dataset.testid === 'tradeskill-guide-level').length }
+      return { mark: mark < 0 ? '' : (all[mark]?.innerText ?? ''), markers: all.filter((e) => e.dataset.testid === 'tradeskill-guide-level').length }
     },
     [`${sel('tradeskill-guide-step')}:not(${sel('tradeskill-guide-alternates')} *)`, sel('tradeskill-guide-level')] as const
   )
   check('the level is placed on the route once', placed.markers === 1 && placed.mark.toLowerCase() === `your level: ${String(level + 1)}`, JSON.stringify(placed))
-  check('…after the steps it has finished', placed.before.every((s) => s === 'done'), placed.before.join(','))
-  const credit = await textOf(page, `${sel('tradeskill-guide')} ${sel('tradeskill-guide-credit')}`)
-  check('the guide is credited under its route', /, by .+\(.+\)/.test(credit), credit)
   await page.click(sel('nav-skills'))
   await page.click(NAV)
   const kept = await settle(() => countOf(page, sel('tradeskill-guide')), (n) => n === 1, { timeoutMs: 20_000 })
   check('leaving by the menu and coming back reopens the same tab', kept === 1)
   await page.click(TAB('recipes'))
   check('…and the recipes tab is one click away', (await settle(() => countOf(page, SCROLL), (n) => n === 1, { timeoutMs: 15_000 })) === 1)
-  // A material the recipe guide places is marked as the guide's, and then the panel credits it.
-  const marked = await countOf(page, `${PICKED} ${sel('tradeskill-material-guide')}`)
-  if (marked === 0) note('the recipe guide places none of the picked materials: the guide line and its credit were not checked')
-  else check('a guide line in the panel brings the guide credit with it', (await countOf(page, `${PICKED} ${sel('tradeskill-guide-credit')}`)) === 1)
   await stepGuideRowOpens(page)
 }
 

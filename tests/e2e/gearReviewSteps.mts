@@ -1,14 +1,16 @@
 /**
- * The Gear tab's 2026-08-25 review round, driven in a real window: a NUMERIC SEARCH TOKEN, the
- * DROP COLUMNS chip, and the double-click FIT that must not drift. A module rather than more of
+ * The Gear tab's 2026-08-25 review round, driven in a real window: the DROP COLUMNS chip and the
+ * double-click FIT that must not drift. A module rather than more of
  * `gear.e2e.mts`, the gearColumnSteps.mts precedent: that file is at the repo's 400-code-line
  * factoring ceiling, and everything these steps need is already standing in the host spec.
  *
  * WHAT NEEDS A REAL APP HERE, given the unit tests own the arithmetic:
  *
- *   * THE TOKEN reaches the table through the DEFERRED search and reads the SCALED vector - the
- *     unit test proves `ac>=20` keeps the right rows; what only a window can prove is that the
- *     rows the window MOUNTS all clear the line, blank cells included (absent fails every operator).
+ *   * THE NUMERIC TOKEN (`ac>=20`) was driven here until 2026-11-27. Which rows it keeps, blank
+ *     cells included, is a value of `parseGearQuery` and the threshold predicate, pinned in
+ *     `tests/gearQueryFilter.test.mts` ('parseGearQuery lifts threshold tokens out and leaves each
+ *     run of words as one needle', 'a threshold filters on the SCALED number, and absent fails every
+ *     operator (law 1)'); the search box's wiring is the host spec's search step (owner ruling).
  *   * THE CHIP toggles three sortable headers as ONE, and the table stays in percent mode either
  *     way for the derived column set (gearColumns.ts hands the trio's budget back, 2026-08-25).
  *   * THE FIT is a DOM measurement - a Range over text the ellipsis clips, a flex row's gaps, the
@@ -23,7 +25,6 @@ import { check, countOf, settle } from './appHarness.mjs'
 const TABLE = '[data-testid="gear-table"]'
 const COUNT = '[data-testid="gear-count"]'
 const SEARCH = '[data-testid="gear-search"] input'
-const AC_CELL = '[data-testid="gear-cell-AC"]'
 const DROPS_TOGGLE = '[data-testid="gear-drops-toggle"]'
 const ZONE_HEADER = '[data-testid="gear-sort-zone"]'
 const LEVEL_HEADER = '[data-testid="gear-sort-zoneLevel"]'
@@ -58,27 +59,7 @@ async function typeAndSettle(page: Page, value: string): Promise<number> {
   return last
 }
 
-/**
- * 1. A NUMERIC TOKEN narrows the table, and every mounted row clears the line it names.
- * Runs on an unnarrowed corpus with the columns derived (AC is a core column, so its cells are on
- * screen without the picker), and hands the box back empty.
- */
-export async function stepGearThreshold(page: Page): Promise<void> {
-  const all = await typeAndSettle(page, '')
-  const shown = await typeAndSettle(page, 'ac>=20')
-  check('`ac>=20` narrows the table', shown > 0 && shown < all, `${String(shown)} of ${String(all)} rows state 20+ AC`)
-  const cells = await page.evaluate((sel) => [...document.querySelectorAll(sel)].map((c) => (c as HTMLElement).innerText.trim()), AC_CELL)
-  const failing = cells.filter((t) => t === '' || Number(t) < 20)
-  check(
-    'every mounted AC cell reads 20 or more - no blank (absent fails the operator) and no 19',
-    cells.length > 0 && failing.length === 0,
-    failing.length === 0 ? `${String(cells.length)} cells checked` : `offending cells: ${failing.slice(0, 5).join(' | ')}`
-  )
-  await typeAndSettle(page, '')
-  check('…and clearing the token restores the whole corpus', (await shownCount(page)) === all)
-}
-
-/** 2. THE DROP COLUMNS CHIP takes the Zone / Level / Mob trio off as one, and puts it back as one. */
+/** 1. THE DROP COLUMNS CHIP takes the Zone / Level / Mob trio off as one, and puts it back as one. */
 export async function stepGearDropsToggle(page: Page): Promise<void> {
   const trio = async (): Promise<number> =>
     (await countOf(page, ZONE_HEADER)) + (await countOf(page, LEVEL_HEADER)) + (await countOf(page, MOB_HEADER))
@@ -99,7 +80,7 @@ function nameWidth(page: Page): Promise<number> {
 }
 
 /**
- * 3. DOUBLE-CLICK FITS THE ITEM COLUMN TO ITS CONTENT, AND A SECOND DOUBLE-CLICK LANDS ON THE
+ * 2. DOUBLE-CLICK FITS THE ITEM COLUMN TO ITS CONTENT, AND A SECOND DOUBLE-CLICK LANDS ON THE
  * SAME NUMBER. Runs with the box narrowed to Thelvorn so the widest mounted name is a known one,
  * and hands the widths back to the automatic layout (Alt+double-click) - the picker steps that
  * follow read `data-layout` and would misread a stored width map as their own doing.

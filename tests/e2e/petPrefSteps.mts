@@ -73,10 +73,22 @@ function ownAndPets(snap: Snap): { you: number; pets: number } | null {
  * A row's `textContent` runs its spans together ('1You229 · 10 dps'), so a word-boundary test for
  * 'You' cannot match: the rank digit and the Y are both word characters. Reading the spans is the
  * exact question anyway — one of them IS the entity's name, straight off its source row.
+ *
+ * The span's OWN text, not its `textContent`: a row whose swings were avoided carries its "94% hit"
+ * badge INSIDE the name span (EntityRow `StatBadges`), so the name span reads 'You94% hit' whole.
  */
 function youRowIndex(page: Page): Promise<number> {
   return page.$$eval(ROW, (rows) =>
-    rows.findIndex((r) => [...r.querySelectorAll('span')].some((s) => (s.textContent ?? '').trim() === 'You'))
+    rows.findIndex((r) =>
+      [...r.querySelectorAll('span')].some(
+        (s) =>
+          [...s.childNodes]
+            .filter((n) => n.nodeType === 3)
+            .map((n) => n.textContent ?? '')
+            .join('')
+            .trim() === 'You'
+      )
+    )
   )
 }
 
@@ -183,7 +195,16 @@ function groupShape(page: Page): Promise<GroupShape[]> {
         lines: lines.length,
         totals: r.querySelectorAll('[data-testid="meter-group-total"]').length,
         shared: r.querySelectorAll('[data-testid="meter-group-shared"]').length,
-        first: [...(lines[0]?.querySelectorAll('span') ?? [])].map((s) => (s.textContent ?? '').trim()).join('|')
+        // Each span's OWN text (youRowIndex says why: a hit badge can sit inside the name span).
+        first: [...(lines[0]?.querySelectorAll('span') ?? [])]
+          .map((s) =>
+            [...s.childNodes]
+              .filter((n) => n.nodeType === 3)
+              .map((n) => n.textContent ?? '')
+              .join('')
+              .trim()
+          )
+          .join('|')
       }
     })
   )
@@ -192,23 +213,23 @@ function groupShape(page: Page): Promise<GroupShape[]> {
 /**
  * THE THIRD PET LAYOUT, "With its owner" (Malkil, 2026-10-21; plans/2026-10-20-meter-pet-split.md),
  * walked through Preferences. Runs after step 16 for the same reason: the live fight carries YOUR
- * damage and a bound pet's, which is exactly a pair. Every source of the separate list must come
- * back as one LINE of the grouped list; your pet sits on the line under you, over a shared bar; every
- * row ends in one total box; a pet's line drills into the pet. It leaves the layout as shipped.
+ * damage and a bound pet's, which is exactly a pair. Your pet sits on the line under you, over a
+ * shared bar; every row ends in one total box; a pet's line drills into the pet. That grouping keeps
+ * every source as one line and moves no damage is tests/combatPetGroups.test.mts (2026-11-27). The
+ * Its own bar stop stays because its snapshot (`totals`) is what tells the pair check below whether
+ * the fight has a You row and a pet row at all; the Preferences example's separate layout is
+ * already checked by the earlier pet-layout walk. It leaves the layout as shipped.
  */
 export async function stepPetGroupedLayout(page: Page): Promise<void> {
   await meterRows(page)
   if (!check('the pet layout can be set to Its own bar', await setPetLayout(page, 'separate', 'nav-combat'))) return
   await page.waitForSelector('[data-testid="combat-dashboard"]', { timeout: 30_000 })
-  const sources = await settleStable(() => page.$$(ROW).then((r) => r.length), { timeoutMs: 10_000 })
   const totals = ownAndPets(await snapshot(page))
 
   if (!check('the pet layout can be set to With its owner', await setPetLayout(page, 'grouped', 'nav-combat'))) return
   const drawn = await settle(() => page.$$(GROUP_ROW).then((r) => r.length), (n) => n > 0, { timeoutMs: 30_000 })
   if (!check('With its owner draws grouped rows on the Combat tab', drawn > 0)) return
   const shape = JSON.parse(await settleStable(() => groupShape(page).then((s) => JSON.stringify(s)), { timeoutMs: 10_000 })) as GroupShape[]
-  const lines = shape.reduce((n, r) => n + r.lines, 0)
-  check('every source of the separate list is one line of the grouped list', lines === sources, `${String(lines)} lines, ${String(sources)} sources`)
   check('every row ends in exactly one total box', shape.every((r) => r.totals === 1))
   check('only a pair has the shared bar', shape.every((r) => r.shared === (r.lines > 1 ? 1 : 0)))
   await checkBoxColumn(page, 'the Combat tab')

@@ -22,10 +22,12 @@
  *   4. The per-kind values SURVIVE the switch going off and on — a claim about a store across two
  *      modes, watched the way a user would watch it.
  *
- * AND FOUR CLAIMS THIS TICKET ADDED, all of which are about what is ON SCREEN rather than what is
+ * AND THREE CLAIMS THIS TICKET ADDED, all of which are about what is ON SCREEN rather than what is
  * stored: exactly two shared steppers and NO list while synced; the twelve rows and NO shared
- * steppers while independent; a `closed` tag on a row whose window is not open; and no disabled
- * control anywhere in the section except a stepper at a clamp.
+ * steppers while independent; and a `closed` tag on a row whose window is not open. The fourth, no
+ * disabled control anywhere in the section except a stepper at a clamp, is a fact about the card's
+ * source and lives in tests/overlayIndependent.test.mts; the 5% grid walk is
+ * tests/overlayBgAlpha.test.mts (2026-11-27: e2e proves wiring, values are unit-tested).
  *
  * WHAT IS MEASURED IS THE PAINT ITSELF. The size is a CSS `zoom` on the content pane
  * (overlay/overlayScale.tsx) and the transparency is the body's own `rgba(14,17,21,a)`; both are
@@ -139,14 +141,6 @@ function readoutSettles(page: Page, selector: string, want: string): Promise<str
   return settle(() => readout(page, selector), (v) => v === want, { timeoutMs: 15_000 })
 }
 
-/** Whether a control is disabled, as the DOM states it. */
-function isDisabled(page: Page, selector: string): Promise<boolean> {
-  return page.evaluate(
-    (sel) => (document.querySelector(sel) as HTMLButtonElement | null)?.disabled === true,
-    selector
-  )
-}
-
 /** Press a window's own A− / A+ — the door `TextScaleStepper` writes through. */
 function pressWindowStepper(win: Page, textScale: number): Promise<unknown> {
   return win.evaluate(
@@ -202,25 +196,12 @@ export async function stepSyncedShape(page: Page): Promise<void> {
   const on = await page.evaluate((sel) => (document.querySelector(sel) as HTMLInputElement | null)?.checked, SWITCH)
   check('it ships OFF — one size and one transparency, as every fresh install has', on === false, String(on))
 
-  check('shared: the text size stepper is here', (await countOf(page, SIZE)) === 1)
+  // (The shared text size stepper is the ONE card counted above.)
   check('shared: the transparency stepper is here', (await countOf(page, ALPHA)) === 1)
   const rows = await countOf(page, ROWS)
   check('…and there is NO per-overlay list at all while they share one of each', rows === 0, `${String(rows)} row(s)`)
-
-  // THE OTHER HALF OF THE SAME RULE: nothing in the section is disabled except a stepper at a
-  // clamp. At the shipped 100% / 72% neither end is reached, so every button here is live.
-  const dead: string[] = []
-  for (const sel of [
-    '[data-testid="pref-text-size-minus"]',
-    '[data-testid="pref-text-size-plus"]',
-    '[data-testid="pref-overlay-text-size-minus"]',
-    SIZE_PLUS,
-    ALPHA_MINUS,
-    '[data-testid="pref-overlay-bg-alpha-plus"]'
-  ]) {
-    if (await isDisabled(page, sel)) dead.push(sel)
-  }
-  check('every stepper button on the page is live — none is disabled by a switch', dead.length === 0, dead.join(' '))
+  // THE OTHER HALF OF THE SAME RULE, nothing in the section disabled except a stepper at a clamp,
+  // is a fact about the card's source: tests/overlayIndependent.test.mts (2026-11-27).
 }
 
 /**
@@ -249,17 +230,7 @@ export async function stepIndependentShape(page: Page): Promise<void> {
   // The shared steppers are UNMOUNTED, not hidden. `SIZE` and `ALPHA` are the shared testids; the
   // rows carry `-<kind>` suffixes, so an exact-match count is exactly the right instrument.
   check('…and the two shared steppers are gone, not greyed out', (await countOf(page, SIZE)) === 0 && (await countOf(page, ALPHA)) === 0)
-
-  const live = await page.evaluate(
-    (kinds) =>
-      kinds.filter((k) => {
-        const btn = document.querySelector(`[data-testid="pref-overlay-text-size-${k}-plus"]`)
-        return (btn as HTMLButtonElement | null)?.disabled !== true
-      }),
-    listed
-  )
-  check('every row is LIVE — nothing here is rendered and dead', live.length === listed.length,
-    `${String(live.length)} of ${String(listed.length)}`)
+  // That no row is rendered disabled is the card's source: tests/overlayIndependent.test.mts.
 }
 
 /**
@@ -338,8 +309,8 @@ export async function stepSharedAlphaAppliesLive(page: Page, fight: Page, overal
   check('pressing − in Preferences makes the fight meter more see-through, live', Math.abs(f - rounded) < EPS,
     `${String(before)} -> ${String(f)}`)
   check('…and the zone meter with it — one transparency for all of them', Math.abs(o - rounded) < EPS, String(o))
-  check('…and it lands on the 5% grid rather than carrying the old offset', Math.abs((rounded * 100) % 5) < 0.001,
-    pct(rounded))
+  // (`want` above IS the grid snap; that `stepBgAlpha` snaps an off-grid value in the direction
+  // pressed is tests/overlayBgAlpha.test.mts.)
   check('…and Preferences prints what it just did', (await readout(page, ALPHA_VALUE)) === pct(rounded),
     await readout(page, ALPHA_VALUE))
 }
@@ -368,11 +339,8 @@ export async function stepWindowMovesShared(page: Page, fight: Page, overall: Pa
   check('a drag on the fight meter’s own bg slider repaints the zone meter too', Math.abs(oa - wantAlpha) < EPS, String(oa))
   const shownAlpha = await readoutSettles(page, ALPHA_VALUE, pct(wantAlpha))
   check('…and the shared readout agrees with the drag it did not make', shownAlpha === pct(wantAlpha), shownAlpha)
-  // AND IT IS STILL A CLEAN STEP FROM THERE. 50% is on the grid, so − goes to 45%: the readout
-  // shows the exact in-force value and the stepper walks from it, which is the ticket's rule.
-  await page.click(ALPHA_MINUS, { timeout: 15_000 })
-  const stepped = await alphaSettles(overall, 0.45)
-  check('…and a press from there steps a clean 5%, off a value a slider chose', Math.abs(stepped - 0.45) < EPS, String(stepped))
+  // That a press from an on-grid value a slider chose steps a clean 5% is `stepBgAlpha`, pinned in
+  // tests/overlayBgAlpha.test.mts; the press itself reaching the meters is proved above.
 }
 
 /**

@@ -3,8 +3,10 @@
  * reshaped by JOS-408).
  *
  * WHY IT IS AN E2E SPEC AND NOT A UNIT TEST. `tests/uiScale.test.mts` pins the ladder, the
- * normalizer, the stepper's rungs and the wiring as source. Every remaining claim is about a
- * WINDOW:
+ * normalizer, the stepper's rungs, its disabled ends and the wiring as source, and
+ * `tests/navMenu.test.mts` the left menu's ladders and their greyed ends (since 2026-11-27 this
+ * spec no longer walks either ladder to its ends: owner, e2e proves wiring). Every remaining claim
+ * is about a WINDOW:
  *
  *   1. "the control makes the app bigger" is a claim about a real webContents. The store write, the
  *      IPC handler and the `setZoomFactor` call could all be perfect and the window still not move;
@@ -63,7 +65,7 @@ import {
   stepWindowMovesShared
 } from './overlaysAppearanceSteps.mjs'
 import { launchOnFixture, stageFixture } from './logFixture.mjs'
-import { UI_SCALE_DEFAULT, UI_SCALE_MAX, UI_SCALE_MIN, uiScalePercent } from '../../src/shared/uiScale'
+import { UI_SCALE_DEFAULT, uiScalePercent } from '../../src/shared/uiScale'
 import {
   NAV_ROW_DEFAULT,
   NAV_ROW_STEPS,
@@ -133,26 +135,6 @@ async function press(page: Page, selector: string, times: number): Promise<void>
   }
 }
 
-/**
- * Press one end until it refuses, and hand back where it stopped.
- *
- * IT CHECKS `disabled` BEFORE EACH CLICK RATHER THAN CLICKING A FIXED NUMBER OF TIMES, and that is
- * the design under test rather than a convenience: the ladder's end is a DISABLED button, so a
- * spec that kept clicking would be asserting against a control the product deliberately made
- * unclickable — Playwright waits for `enabled` and times out. The cap is a runaway guard; a ladder
- * that never disabled its end would exhaust it and fail the claim below rather than loop forever.
- */
-async function pressToEnd(page: Page, selector: string): Promise<number> {
-  let pressed = 0
-  for (let i = 0; i < 8 && !(await isDisabled(page, selector)); i++) {
-    const before = await shownScale(page)
-    await page.click(selector, { timeout: 15_000 })
-    await settle(() => shownScale(page), (v) => v !== before, { timeoutMs: 15_000 }).catch(() => before)
-    pressed++
-  }
-  return pressed
-}
-
 async function openAppearance(page: Page): Promise<void> {
   await page.waitForSelector('[data-testid="nav-preferences"]', { timeout: 60_000 })
   await page.click('[data-testid="nav-preferences"]', { timeout: 30_000 })
@@ -164,15 +146,8 @@ async function openAppearance(page: Page): Promise<void> {
  *  is about the app window and the overlays are below. */
 async function stepCard(page: Page): Promise<void> {
   check('Preferences → Appearance has an in-app text size', (await countOf(page, PANE)) === 1)
-  const rail = await page.evaluate(
-    (sel) => (document.querySelector(sel) as HTMLElement | null)?.innerText.trim() ?? '',
-    RAIL
-  )
-  check('…and the rail row is called Appearance', rail === 'Appearance', rail)
-  // ONE control, not five. The whole page is steppers now (owner, 2026-08-17: "make the controls
-  // uniform - the +/- version of the control on the whole page").
-  const buttons = await countOf(page, `${PANE} button`)
-  check('it is ONE stepper — a minus and a plus, not a row of percentages', buttons === 2, `${String(buttons)} button(s)`)
+  // The rail row's name and the card being ONE stepper are source facts, pinned in
+  // tests/uiScale.test.mts (2026-11-27: e2e proves wiring, not what a component is built from).
   const shown = await shownScale(page)
   check(
     'a fresh install prints 100% — the default is unchanged for everybody who never chose',
@@ -272,19 +247,20 @@ async function stepNavMenu(page: Page): Promise<void> {
   })
   check('…and at that height the open menu fits the default window, with no scrollbar', fit !== null && fit.menu <= fit.drawer, JSON.stringify(fit))
 
+  // Which button greys at which stop is `navStepEnds`, pinned in tests/navMenu.test.mts; what only
+  // a window shows is the DRAWN row height and the fit.
   await pressNav(page, 'pref-nav-row', 'minus', rowMin)
   const short = await drawn(rowMin)
   check(`minus draws the rows ${navPx(rowMin)} tall at once, with no relaunch`, near(rowMin)(short), `${String(short)}px`)
-  check('…and it is disabled there, because the rows cannot get shorter', await isDisabled(page, navSel('pref-nav-row-minus')))
 
   await pressNav(page, 'pref-nav-row', 'plus', rowMax)
   const tall = await drawn(rowMax)
   check(`plus walks the ladder up to ${navPx(rowMax)} rows`, near(rowMax)(tall), `${String(tall)}px`)
-  check('…and it is disabled there', await isDisabled(page, navSel('pref-nav-row-plus')))
 
   // The largest text, in the tallest rows and then the shortest: the two fits that could fail.
-  await pressNav(page, 'pref-nav-text', 'plus', Math.max(...NAV_TEXT_STEPS))
-  check('the text size walks up to its top stop and is disabled there', await isDisabled(page, navSel('pref-nav-text-plus')))
+  const textTop = Math.max(...NAV_TEXT_STEPS)
+  const topText = await pressNav(page, 'pref-nav-text', 'plus', textTop)
+  check('the text size walks up to its top stop', topText === navPx(textTop), topText)
   const wide = await navMisfits(page, rowMax)
   check('at the largest text no menu row overflows or wraps', wide.length === 0, wide.join(', '))
   await pressNav(page, 'pref-nav-row', 'minus', rowMin)
@@ -375,35 +351,15 @@ async function stepSurvivesReload(page: Page, base: Zoom): Promise<void> {
 }
 
 /**
- * THE ENDS OF THE LADDER, AND THE ONLY DISABLED BUTTONS THE OWNER'S REVIEW ALLOWS.
+ * THE WAY BACK, through A−: two presses from the chosen 125% to 100%.
  *
- * "our first pass had enabled controls when they didn't do anything" — the answer everywhere else
- * in this section was to stop rendering the control. A stepper at its clamp is the one exception,
- * and it is a different statement: the button is there because the value can move in general, and
- * it is grey because it cannot move THIS way. So the claim is symmetrical — at the top, A+ is dead
- * and A− is live; at the bottom, the reverse — and it is measured at both ends.
+ * THE LADDER WALK TO BOTH ENDS WAS REMOVED (2026-11-27). Which rung a press lands on, that the ends
+ * are fixed points, and that the card disables a button only at a clamp are `stepUiScale` and the
+ * card's source, pinned in tests/uiScale.test.mts; and launch 1 already proved a press reaches the
+ * window. What stays is A− reaching the window and the store, the direction launch 1 never pressed.
  */
-async function stepEnds(page: Page): Promise<void> {
-  const up = await pressToEnd(page, PLUS)
-  const top = await shownScale(page)
-  check('A+ walks the ladder up and then REFUSES — it stops at the top rung', top === uiScalePercent(UI_SCALE_MAX),
-    `${String(up)} press(es) to ${top}`)
-  check('…and it is disabled there, because the value cannot move', await isDisabled(page, PLUS))
-  check('…while A− is still live, because it can', (await isDisabled(page, MINUS)) === false)
-
-  const down = await pressToEnd(page, MINUS)
-  const bottom = await shownScale(page)
-  check('A− does the same at the bottom', bottom === uiScalePercent(UI_SCALE_MIN), `${String(down)} press(es) to ${bottom}`)
-  check('…disabled there, with A+ live — the same rule, mirrored',
-    (await isDisabled(page, MINUS)) && !(await isDisabled(page, PLUS)))
-  // The whole ladder was walked in both directions, which is also the claim that the five rungs
-  // are still five: four presses from the top to the bottom.
-  check('…and the two walks covered the whole ladder', down === 4, `${String(down)} presses from top to bottom`)
-}
-
-/** Every way in is a way out: 100% must be reachable from anywhere on the ladder. */
 async function stepBackTo100(page: Page, base: Zoom): Promise<void> {
-  await press(page, PLUS, 1)
+  await press(page, MINUS, PRESSES_TO_CHOSEN)
   const back = await settle(
     () => zoomOf(page),
     (z) => Math.abs(z.dpr - base.dpr) < TOLERANCE,
@@ -485,9 +441,8 @@ async function main(): Promise<void> {
     // the section like any arriving user would.
     await stepSurvivesReload(page, base)
     await openAppearance(page)
-    // The ends first, then home: everything below runs at 100%, which is where the overlay steps'
-    // own clicking is most reliable and where a reader of a failure screenshot expects to be.
-    await stepEnds(page)
+    // Home first: everything below runs at 100%, which is where the overlay steps' own clicking is
+    // most reliable and where a reader of a failure screenshot expects to be.
     await stepBackTo100(page, base)
 
     // ---- THE OTHER HALF OF APPEARANCE (JOS-405, JOS-407, folded by JOS-408) ----

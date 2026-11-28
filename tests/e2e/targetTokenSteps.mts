@@ -169,7 +169,6 @@ export async function stepTargetToken(
     hit !== undefined,
     hit ? `spoke "${hit.text}"` : `never spoke "${EXPECTED}"`
   )
-  if (hit) check('…and this channel stayed mute doing it', hit.uttered === false, `uttered=${String(hit.uttered)}`)
 
   await assertHint(page)
 }

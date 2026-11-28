@@ -197,8 +197,8 @@ async function stepMount(page: Page): Promise<boolean> {
     () => false
   )
   if (!check('the nav drawer has a Gear row — the one door to all four gear tabs', hasRow)) return false
-  const rowLabel = (await textOf(page, NAV)).replace(/\s+/g, ' ').trim()
-  check('…and the row is called Gear, the area rather than the tab', rowLabel.includes('Gear'), `reads "${rowLabel}"`)
+  // The row's LABEL is asserted once, by gear.e2e.mts (`…and it is called Gear`); this spec only needs
+  // the row to be there to click (2026-11-27, duplicate removed).
   await page.click(NAV, { timeout: 15_000 })
 
   const hasTab = await page.waitForSelector(TAB, { timeout: 30_000 }).then(

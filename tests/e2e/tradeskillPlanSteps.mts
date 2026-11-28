@@ -7,15 +7,20 @@
  * What they hold:
  *   - Home draws the Make an item panel; its search finds the item a Home tile names as next, the
  *     result's name is the app's item link, and Plan opens the planner on it;
- *   - the plan names the item, lists the tradeskill it needs with the player's level, draws a way
- *     there for a skill that is short, and states no percentage anywhere (no chance is shown);
- *   - the count multiplies what to gather, and is remembered;
+ *   - the plan names the item, lists the tradeskill it needs with the player's level, and states
+ *     no percentage anywhere (no chance is shown);
+ *   - the count restates what to gather, and is remembered;
  *   - leaving by the menu and coming back reopens the plan; an item name opens its Loot page and
  *     Back returns to the plan;
  *   - "Plan this item" on a workbench's picked recipe opens the planner on that recipe's item,
  *     and its Back returns to that workbench;
  *   - where a "Show on map" link is drawn, it opens the Maps tab with a Back to Tradeskills, rings
  *     a pin when the zone's map is installed, and Back returns to the plan.
+ *
+ * What the plan COMPUTES is the unit suite's (owner, 2026-11-27: e2e proves wiring): the search's
+ * ranking and its empty state, where each skill stands and the way there, the multiplied needs,
+ * the guide credit and the make-or-buy rule are tests/tradeskillPlan.test.mts and
+ * tests/tradeskillPlanBuy.test.mts.
  *
  * Every claim is a property of what is on screen. The one name taken from the data, Fleeting
  * Quiver (the owner's own example), is searched for softly: when the data no longer holds it the
@@ -68,12 +73,10 @@ async function stepHomeSearch(page: Page): Promise<string> {
   await settle(() => countOf(page, HOME), (n) => n === 1, { timeoutMs: 15_000 })
   check('Home draws the Make an item panel', (await countOf(page, sel('tradeskill-plan-home'))) === 1)
   check('…with a count of the craftable items it searches', /\d[\d,]* craftable items/.test(await textOf(page, sel('tradeskill-plan-count'))))
-  check('…and no result until something is typed', (await countOf(page, RESULT)) === 0)
   const item = await textOf(page, `${sel('tradeskill-tile-Jewelcrafting')} ${NAME}`)
   await page.fill(SEARCH, item)
   const names = await settle(() => resultNames(page), (ns) => ns.includes(item), { timeoutMs: 15_000 })
   check('the search finds the item a tile names as next', names.includes(item), `${item} in ${names.slice(0, 5).join(' | ')}`)
-  check('…best match first', names[0] === item, names[0] ?? '')
   check("…each result's name is the app's item link", names.every((n) => n !== ''))
   await page.click(`${RESULT} >> nth=${String(Math.max(0, names.indexOf(item)))} >> ${sel('tradeskill-plan-pick')}`)
   const up = await settle(() => countOf(page, PLANNER), (n) => n === 1, { timeoutMs: 20_000 })
@@ -89,13 +92,6 @@ async function stepPlanPanels(page: Page): Promise<void> {
   check('…and where the player stands in each tradeskill it needs', skills > 0)
   const first = await textOf(page, `${sel('tradeskill-plan-skill')} ${sel('tradeskill-plan-skill-level')}`)
   check("…the item's own tradeskill first, with the log's level", /^Jewelcrafting: \d+$/.test(first), first)
-  const stand = await page.evaluate((s) => (document.querySelector(s) as HTMLElement | null)?.dataset.stand ?? '', sel('tradeskill-plan-skill'))
-  // The planned item is the recipe marked next: its trivial is above the level.
-  check('…short of the trivial', stand === 'short', stand)
-  const routes = await countOf(page, sel('tradeskill-plan-route'))
-  check('a skill that is short gets a way there', routes > 0)
-  const source = await textOf(page, sel('tradeskill-plan-route-source'))
-  check('…that says where its steps come from', /Route steps from .+, by .+|wiki recipes that go trivial/.test(source), source)
   const panel = await textOf(page, sel('tradeskill-plan-skills'))
   check('no success chance is stated', !panel.includes('%') && (await countOf(page, sel('tradeskill-plan-chance-note'))) === 1)
 }
@@ -103,16 +99,13 @@ async function stepPlanPanels(page: Page): Promise<void> {
 async function stepGather(page: Page, item: string): Promise<void> {
   const heading = await textOf(page, sel('tradeskill-plan-gather-heading'))
   check('What to gather names the count and the item', heading === `What to gather for 1 ${item}`, heading)
-  const one = await gatherNeeds(page)
-  if (one.length === 0) {
+  if ((await gatherNeeds(page)).length === 0) {
     note('the planned recipe lists no material: the count was not changed')
     return
   }
   await page.fill(sel('tradeskill-plan-count-input'), '3')
-  await settle(() => textOf(page, sel('tradeskill-plan-gather-heading')), (t) => t.includes('for 3 '), { timeoutMs: 15_000 })
-  const three = await gatherNeeds(page)
-  // A tool the combine gives back stays at one; every other need triples.
-  check('the count multiplies every need', three.length === one.length && three.every((n, i) => n === (one[i] ?? 0) * 3 || (n === 1 && one[i] === 1)), `${one.join(',')} -> ${three.join(',')}`)
+  const restated = await settle(() => textOf(page, sel('tradeskill-plan-gather-heading')), (t) => t.includes('for 3 '), { timeoutMs: 15_000 })
+  check('the count restates What to gather', restated === `What to gather for 3 ${item}`, restated)
   check('…and a failed combine is said not to be counted', (await textOf(page, sel('tradeskill-plan-gather-note'))).includes('not been measured'))
 }
 
@@ -175,12 +168,6 @@ async function stepQuiverAndMap(page: Page): Promise<void> {
   // Nesting moves the name only: Need sits in one column at every depth.
   const needs = await page.evaluate((row) => [...document.querySelectorAll(row)].map((r) => Math.round((r.children[1] as HTMLElement).getBoundingClientRect().left)), `${PLAN} ${sel('tradeskill-plan-node')}`)
   check('…and Need stays in one column at every depth', new Set(needs).size === 1, JSON.stringify(needs))
-  // The gap line says when the materials under it are the guide's (`data-guide`).
-  if ((await countOf(page, `${sel('tradeskill-plan-tree')} ${sel('tradeskill-wiki-gap')}[data-guide="true"]`)) > 0) {
-    check('materials taken from the guide carry its credit', (await countOf(page, sel('tradeskill-plan-guide-credit'))) === 1)
-  }
-  // A material with a recipe always shows it; "Bought" in its source words is all that says it is sold.
-  check('no material offers a make-or-get switch', (await page.locator(PLAN).getByText(/(Make|Get) it instead/).count()) === 0)
 
   const link = `${sel('tradeskill-plan-tree')} ${sel('tradeskill-map-link')} [role="button"]`
   if ((await countOf(page, link)) === 0) {

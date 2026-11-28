@@ -262,7 +262,6 @@ async function speaksTheMob(
     hit !== undefined,
     hit ? `spoke "${hit.text}"` : `never spoke "${expected}"`
   )
-  if (hit) check('…and this channel stayed mute doing it', hit.uttered === false, `uttered=${String(hit.uttered)}`)
 }
 
 /**

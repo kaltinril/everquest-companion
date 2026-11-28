@@ -393,6 +393,20 @@ test('the era verdict is INJECTED, and only applies while the toggle is on', () 
   assert.equal(matchesGear(CROWN, filters({ eraOnly: true }), {}), true, 'no verdict hides nothing')
 })
 
+test('Owned or looted keeps exactly the rows the join speaks for, and off it filters nothing', () => {
+  // The join's verdict is INJECTED (a live dump and the loot module answer it). Thelvorn stands for
+  // a row the dump names, the Club for one only the log saw looted; the Crown and the Cap are rows
+  // neither witness has seen, which the filter hides and which come straight back without it.
+  const handled = new Set([THELVORN.key, CLUB.key])
+  const deps = { ownedOrLooted: (r: GearRow) => handled.has(r.key) }
+  assert.deepEqual(names(filterGearRows(ALL, filters({ ownedOnly: true }), deps)), ['Thelvorn, Blade of Light', 'Wooden Club'])
+  assert.deepEqual(names(filterGearRows(ALL, filters({ ownedOnly: false }), deps)), names(ALL), 'off is no filter at all')
+  // It ANDs like every other filter: the slot pick narrows what the join kept.
+  assert.deepEqual(names(filterGearRows(ALL, filters({ ownedOnly: true, slots: ['SECONDARY'] }), deps)), ['Wooden Club'])
+  // NO ANSWER KEEPS NOTHING: a toggle that is on without a join is an empty table, never a no-op.
+  assert.deepEqual(filterGearRows(ALL, filters({ ownedOnly: true }), {}), [])
+})
+
 // =================================================================================
 // THE SORT — where "absent is not zero" lives now that the numeric filters are gone
 // =================================================================================
