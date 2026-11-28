@@ -65,8 +65,8 @@ export interface SpellbookToolbarProps {
    *
    * The SAME hook the Gear tab runs (`useFollowingClasses`), under this tab's own storage key. It
    * is passed in rather than called here because a toolbar that owned it would hold a second copy
-   * of the same key, and only one of the two would re-read storage after the other wrote it -
-   * `useBrowseClasses`' own mount-once rule.
+   * of the same key, and only one of the two would re-read storage after the other wrote it
+   * (`useRemembered` reads its key once, on mount).
    */
   classes: GearClasses
   /** How many rows survived, so the toolbar can say what it did. */

@@ -40,9 +40,8 @@ import { seedWishes, type WishEntry, type WishList } from '@shared/planner/wishl
 import type { MobTarget } from '../mobs/mobTarget'
 import { requestItemMarks, useItemMarksReader } from '../../lib/itemMarks'
 import { useMetVersion } from '../../lib/useMetInLog'
-import { useGearIndex } from '../gear/gearData'
+import { useFollowingClasses, useGearIndex } from '../gear/gearData'
 import { useRememberedSearch } from '../gear/useAreaMemory'
-import { useBrowseClasses } from '../planner/useBrowseClasses'
 import { CURRENT_ERA_LABEL, eraHides, indexDonors, useDonors, useEraOnly } from '../planner/plannerData'
 import { groupNeeds, type FarmNeed } from '../planner/plannerFarm'
 import { usePlannerProgress } from '../planner/plannerProgress'
@@ -186,9 +185,10 @@ export default function WishlistView({ onOpenLoot, onOpenMob, onOpenMapZone }: W
   const donorsState = useDonors()
   const gearState = useGearIndex()
   const progress = usePlannerProgress()
-  // The SAME class filter the effect browser uses (`eq.planner.classes`) — a wish outside it is
-  // chipped, never dropped, which is V2's rule about planned work and a wish is planned work.
-  const classes = useBrowseClasses()
+  // The SAME class filter the effect browser uses (`eq.planner.classPins`, this character's pin or
+  // live detection) — a wish outside it is chipped, never dropped, which is V2's rule about planned
+  // work and a wish is planned work. Read here, never written: the picker is on the Exaltations tab.
+  const classes = useFollowingClasses('eq.planner.classPins')
   // THE ERA TOGGLE ALREADY SURVIVED (JOS-329 checked rather than assumed): `useEraOnly` is the
   // shared `eq.planner.era` key and has been localStorage-backed since V4, so this tab's half of
   // the ticket was only ever the search box. It is on the SESSION tier — `gear/areaMemory.ts` has

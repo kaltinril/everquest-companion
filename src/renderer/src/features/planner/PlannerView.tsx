@@ -37,20 +37,18 @@
 // disagree chip when detection has something to offer, and the permanent `?`, which since JOS-51
 // is the ONLY way the rules card ever appears (V10).
 
-import { type JSX, useEffect, useMemo } from 'react'
+import { type JSX, useMemo } from 'react'
 import { Box, Chip, IconButton, Stack } from '@mui/material'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutlineOutlined'
-import { CLASS_ABBRS, MAX_COMBO_SLOTS, resolvedClasses, type ClassAbbr } from '@shared/classCombo'
+import { CLASS_ABBRS, MAX_COMBO_SLOTS, type ClassAbbr } from '@shared/classCombo'
 import { classDisplayName } from '@shared/spellLevels'
-import { useComboSnap } from '../profiles/ClassComboData'
 import { useWishlist } from '../wishlist/useWishlist'
 import { wishFromDonor } from '../wishlist/wishSearch'
 import ChipMultiSelect from '../../components/ChipMultiSelect'
 import EffectBrowser from './EffectBrowser'
-import { boundClasses, detectedOffer } from './plannerClasses'
 import type { DonorRow } from './plannerData'
 import RulesExplainer, { useExplainer } from './RulesExplainer'
-import { useBrowseClasses, type BrowseClassesApi } from './useBrowseClasses'
+import { useFollowingClasses, type GearClasses } from '../gear/gearData'
 
 /**
  * The browse's target classes — the SAME closed-list multi-select the Sky tracker filters with
@@ -64,7 +62,7 @@ import { useBrowseClasses, type BrowseClassesApi } from './useBrowseClasses'
  * that is never hit costs nothing and a window can always be narrower than the one it was measured
  * in.
  */
-function ClassFilter({ classes }: { classes: BrowseClassesApi }): JSX.Element {
+function ClassFilter({ classes }: { classes: GearClasses }): JSX.Element {
   // NO tooltip on this control (owner, 2026-08-05): a hover box over an input the user TYPES
   // into floats exactly where the dropdown opens and reads as the UI blocking itself. The
   // socketing-semantics explanation this used to carry belongs to the explainer card (W-G),
@@ -85,7 +83,7 @@ function ClassFilter({ classes }: { classes: BrowseClassesApi }): JSX.Element {
 }
 
 /**
- * THE DISAGREE CHIP (V2) — "detected: Paladin, Enchanter, Monk - apply". It says the CLASSES, not
+ * THE DISAGREE CHIP (V2) — "detected: Paladin, Enchanter, Monk". It says the CLASSES, not
  * the /who codes, since JOS-402: the control it sits beside picks by full name now, and a chip that
  * answered it in a second vocabulary would read as a different kind of thing.
  *
@@ -93,6 +91,9 @@ function ClassFilter({ classes }: { classes: BrowseClassesApi }): JSX.Element {
  * changes anything on its own: the whole point of the chip idiom here is that the app states what
  * it thinks and the click is the user's. Applying does NOT un-pin the filter either — accepting one
  * answer is not handing it back to inference.
+ *
+ * Since 2026-11-27 the label is the one every `useFollowingClasses` tab draws (it dropped its own
+ * " - apply"); the title is this tab's own, because there is no table here to "read".
  */
 function DetectedChip({ offer, onApply }: { offer: ClassAbbr[]; onApply: () => void }): JSX.Element {
   return (
@@ -104,8 +105,8 @@ function DetectedChip({ offer, onApply }: { offer: ClassAbbr[]; onApply: () => v
       color="warning"
       variant="outlined"
       data-testid="planner-detected-chip"
-      title="Use the combo detected from your log"
-      label={`detected: ${offer.map(classDisplayName).join(', ')} - apply`}
+      title="What the app currently infers this character is running. Click to browse exaltations for those classes; the pick is kept for this character."
+      label={`detected: ${offer.map(classDisplayName).join(', ')}`}
       onClick={onApply}
       sx={{ flexShrink: 0 }}
     />
@@ -122,28 +123,16 @@ export interface PlannerViewProps {
 }
 
 export default function PlannerView({ onOpenLoot }: PlannerViewProps = {}): JSX.Element {
-  const classes = useBrowseClasses()
-  const combo = useComboSnap()
+  // THE CLASS FILTER IS THE GEAR TAB'S HOOK UNDER THE BROWSE'S OWN KEY (2026-11-27; it was a
+  // machine-wide copy, `useBrowseClasses`): pinned per character with the old machine-wide pin as
+  // the '*' fallback, and live detection while following, so the Wish list reads the same answer
+  // without this tab having to be opened first to write it down.
+  const classes = useFollowingClasses('eq.planner.classPins')
   const explainer = useExplainer()
   // The wish list is mounted HERE only so the browse can add to it and mark what is already on it.
   // Coexisting mounts stopped mattering in JOS-346: the hook holds ONE document for the window, so
   // every surface is looking at the same object rather than at its own copy of it.
   const wishlist = useWishlist()
-
-  // What the app currently believes this character is running. An unresolved slot contributes
-  // nothing, so a half-known combo yields the classes it does know and nothing it doesn't (law 1).
-  const current = combo.current
-  const detected = useMemo(() => (current === null ? [] : resolvedClasses(current)), [current])
-
-  // THE BINDING (V2): a filter whose trio came from detection tracks detection. `boundClasses`
-  // returns null once they agree, so this settles after one write rather than looping.
-  const subject = { classes: classes.classes, classesProvenance: classes.provenance }
-  const bound = boundClasses(subject, detected)
-  const offer = detectedOffer(subject, detected)
-  const { adopt } = classes
-  useEffect(() => {
-    if (bound !== null) adopt(bound)
-  }, [bound, adopt])
 
   const wished = useMemo(
     () => new Set(wishlist.list.entries.map((e) => e.itemKey)),
@@ -172,7 +161,7 @@ export default function PlannerView({ onOpenLoot }: PlannerViewProps = {}): JSX.
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }} data-testid="planner-view">
       <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'nowrap', mb: 1.5 }}>
         <ClassFilter classes={classes} />
-        {offer !== null && <DetectedChip offer={offer} onApply={() => classes.adopt(offer)} />}
+        {classes.offer !== null && <DetectedChip offer={classes.offer} onApply={classes.adopt} />}
         <Box sx={{ flexGrow: 1, minWidth: 8 }} />
         <IconButton
           size="small"

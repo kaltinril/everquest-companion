@@ -47,6 +47,8 @@ import {
   DEFAULT_GEAR_FORM,
   MAX_REMEMBERED_GROUPS,
   MAX_REMEMBERED_SEARCH,
+  legacyBrowseClassPins,
+  readClassPins,
   sanitizeBrowseForm,
   sanitizeFlag,
   sanitizeGearClassPins,
@@ -110,9 +112,10 @@ test('the restart split is a table, and every key in it is on one of exactly two
   // Eleven fields arrived with JOS-329; the progression planner's two picks (`eq.plan.role`,
   // `eq.plan.reach`) made thirteen, its survivability dial makes fourteen, and the Spellbook's own
   // class trio (`eq.spells.classes`, 2026-09-10) makes fifteen, the Alt. Advancement tab's planned combo
-  // (`eq.aa.classes`, 2026-11-25) sixteen. The number is here so a key added
+  // (`eq.aa.classes`, 2026-11-25) sixteen, the Exaltations browser's per-character pins
+  // (`eq.planner.classPins`, 2026-11-27) seventeen. The number is here so a key added
   // without a row in `READERS` below fails TWICE — once on the count, once on the coverage sweep.
-  assert.equal(keys.length, 16, 'sixteen fields are stored — update this test when a seventeenth is')
+  assert.equal(keys.length, 17, 'seventeen fields are stored — update this test when an eighteenth is')
   for (const key of keys) {
     const tier = tierOf(key)
     assert.ok(tier === 'restart' || tier === 'session', `${key} is on an unknown tier ${tier}`)
@@ -194,6 +197,9 @@ const READERS: Reader[] = [
   // and only the surface differs. `useFollowingClasses` takes the key as its parameter.
   { key: 'eq.spells.classes', read: sanitizeGearClassPins, fallback: null },
   { key: 'eq.aa.classes', read: sanitizeGearClassPins, fallback: null },
+  // The Exaltations browser's pins (2026-11-27). Garbage in the NEW key sanitizes like the others;
+  // only an ABSENT key consults the old machine-wide pair (`readClassPins`, tested below).
+  { key: 'eq.planner.classPins', read: sanitizeGearClassPins, fallback: null },
   { key: 'eq.gear.upgrade', read: sanitizeUpgrade, fallback: ITEM_UPGRADE_BASE },
   { key: 'eq.gear.search', read: sanitizeSearch, fallback: '', legal: anyString },
   { key: 'eq.planner.filters', read: (r) => sanitizeBrowseForm(r, BROWSE_FALLBACK), fallback: BROWSE_FALLBACK },
@@ -475,6 +481,30 @@ test('the 2026-08-15 role widening did not evict a pick anybody already had stor
   assert.equal(sanitizePlanRole('1h'), 'balanced')
   assert.equal(sanitizePlanRole('dual-wield'), 'balanced')
   assert.equal(sanitizePlanRole('DoT'), 'balanced')
+})
+
+test('the Exaltations browser`s old machine-wide pin becomes the every-character fallback (2026-11-27)', () => {
+  // A PINNED old trio applies to every character until each re-picks.
+  assert.deepEqual(legacyBrowseClassPins('WAR,MNK,SHM', 'user'), { '*': ['WAR', 'MNK', 'SHM'] })
+  // Pinned to nothing is a real statement ("every class") and survives as one.
+  assert.deepEqual(legacyBrowseClassPins('', 'user'), { '*': [] })
+  assert.deepEqual(legacyBrowseClassPins(null, 'user'), { '*': [] })
+  // The same allowlist, dedupe and cap as every other stored trio: the file is user-editable.
+  assert.deepEqual(legacyBrowseClassPins(' PAL , nonsense,PAL,ENC,MNK,ROG', 'user'), { '*': ['PAL', 'ENC', 'MNK'] })
+  // A FOLLOWING old trio was only the last detection written down: no pin, detection runs live.
+  assert.equal(legacyBrowseClassPins('ROG,PAL,BER', 'detected'), null)
+  assert.equal(legacyBrowseClassPins('ROG,PAL,BER', null), null, 'absent provenance read as detected')
+  assert.equal(legacyBrowseClassPins(null, null), null, 'a fresh install has no pin')
+
+  const legacy = (): { '*': ['WAR'] } => ({ '*': ['WAR'] })
+  // The new key absent: the old pin is read.
+  assert.deepEqual(readClassPins('eq.planner.classPins', null, legacy), { '*': ['WAR'] })
+  // The new key written: the old pair is never consulted again, so a re-pick wins.
+  assert.deepEqual(readClassPins('eq.planner.classPins', { Twink: ['DRU'] }, legacy), { Twink: ['DRU'] })
+  assert.deepEqual(readClassPins('eq.planner.classPins', { '*': ['SHM'] }, legacy), { '*': ['SHM'] })
+  // No other surface inherits the Exaltations pin.
+  assert.equal(readClassPins('eq.gear.classes', null, legacy), null)
+  assert.equal(readClassPins('eq.spells.classes', null, legacy), null)
 })
 
 test('the `plan` view is LABELLED Recommended (owner, 2026-08-22) while its id and keys stay `plan`', () => {
