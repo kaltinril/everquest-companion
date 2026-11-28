@@ -3721,3 +3721,27 @@ test that failed before the fix.
   starts inherit BelowNormal; used by `build:engine` and `tests/e2e/build.mts`. `run-all.mts`
   lowers itself for the whole sweep. `known-reds.sh` runs `nice -n 10 npm test` when `nice`
   exists. Restore failures are ignored (Linux refuses an unprivileged raise).
+
+## Engine binary reuse and the cargo-test skip (2026-11-27, branch `engine-reuse`)
+
+- **A worktree copies the main clone's release `engined.exe` instead of building, only on proof**
+  (`scripts/engineStamp.mts`, used by `tests/e2e/build.mts` `buildEngineIfStale`). The stamp beside
+  each built binary lists the build's inputs as checkout-relative paths (cargo dep-info plus the
+  manifests, `Cargo.lock`, `rust-toolchain.toml`), one sha256 over their bytes, and the binary's
+  sha256. The old stamp hashed absolute paths, so no two checkouts could ever agree. WORKFLOW.md,
+  Gate, "Engine binary reuse" has the rule, the failure cases and the timings.
+- **Law: correctness beats speed.** Any doubt builds: no stamp, old format, a binary that does not
+  hash to its stamp, one differing or missing input, a copy that changed mid-way. Never a link. A
+  build writes no stamp when an input's mtime is after cargo started. Do not add a shortcut that
+  trusts mtimes or the commit id: a dirty tree or a by-hand `cargo build` defeats both.
+- **The main clone becomes a donor through `npm run build:engine`** (which now stamps), or
+  `start_companion.ps1`'s rebuild. Until it has run there once on the current engine code, worktrees
+  log "no readable stamp" and build as before.
+- **Gate:** `bash scripts/community/engine-changed.sh` prints yes or no from the diff against
+  `main_community` (plus uncommitted and untracked files) against
+  `scripts/community/engine-inputs.txt`; no means no `cargo test` (RULES.md rule 11). A new
+  `include_str!` outside the list fails `tests/engineStamp.test.mts`. Runtime reads by cargo tests
+  (`repo_root().join(...)`) are not checked by that test: a new one outside `engine/`, `protocol/`
+  and `tests/fixtures/` must be added to the list by hand.
+- `tests/e2e/build.mts` held raw NUL bytes in its old digest code, so git kept it CRLF in the index;
+  without them it is stored LF, and that commit shows the whole file as changed.

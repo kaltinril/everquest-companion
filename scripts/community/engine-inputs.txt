@@ -1,0 +1,23 @@
+# What the engine is built and tested from: a change to any of these means `cargo test` runs for the
+# merge (RULES.md rule 11; docs/community/agent/WORKFLOW.md, Gate). One path per line; a line ending
+# in / covers everything under it. Read by scripts/community/engine-changed.sh and checked by
+# tests/engineStamp.test.mts (every include_str!/include_bytes! target in engine/ must be covered).
+#
+# The release binary's own inputs are narrower and come from cargo's dep-info, not from this list
+# (scripts/engineStamp.mts).
+
+# Sources, manifests, Cargo.lock, rust-toolchain.toml. No build.rs exists.
+engine/
+# The data files the binary embeds with include_str!.
+src/main/data/spells.json
+src/main/data/messageOverlay.baseline.json
+src/main/data/classes.json
+src/main/data/respawns.json
+src/main/data/items.json
+src/renderer/src/data/eqlegends/bosses.json
+src/renderer/src/data/eqlegends/mobs.json
+src/renderer/src/data/eqlegends/posky.json
+src/renderer/src/data/eqlegends/quests.json
+# Read by the cargo tests only: the protocol schema and fixtures, and the shared log fixtures.
+protocol/
+tests/fixtures/

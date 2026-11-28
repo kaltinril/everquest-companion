@@ -30,6 +30,7 @@ import { constants, getPriority, setPriority } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { ENGINE_BIN_NAME } from '../src/main/dataServer/engineProtocol'
+import { writeEngineStamp } from './engineStamp.mjs'
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 export const ENGINE_DIR = join(ROOT, 'engine')
@@ -89,8 +90,12 @@ export function atBelowNormalPriority<T>(fn: () => T): T {
  *
  * Throws when cargo fails AND when cargo claims success with no binary on disk — see the header
  * for why the second one is the whole point.
+ *
+ * Stamps the binary after the build (`scripts/engineStamp.mts`): the stamp is what lets a worktree
+ * whose engine inputs match this checkout's copy this binary instead of compiling its own.
  */
 export function buildEngineRelease(): string {
+  const startedMs = Date.now()
   const res = atBelowNormalPriority(() =>
     spawnSync(cargoBinary(), ['build', '--release', '-p', 'engined'], {
       cwd: ENGINE_DIR,
@@ -103,6 +108,9 @@ export function buildEngineRelease(): string {
   }
   if (!existsSync(ENGINE_RELEASE_BIN)) {
     throw new Error(`build:engine: cargo reported success but ${ENGINE_RELEASE_BIN} is missing`)
+  }
+  if (!writeEngineStamp(ROOT, ENGINE_BIN_NAME, startedMs)) {
+    console.log('build:engine: no engine stamp written (an input changed during the build)')
   }
   return ENGINE_RELEASE_BIN
 }
