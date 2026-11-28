@@ -191,12 +191,14 @@ interface SortCtx {
 
 /** The number a column sorts on, most first (owner ask, 2026-10-13: sort by coin and the rest). */
 const SORT_VALUE: Partial<Record<ZoneSort, (c: SortCtx) => number>> = {
-  levelsTotal: ({ z }) => z.levelEquiv,
+  // -1 exactly where the cell prints the em-dash (levelsText, extraRates), so `unknownIn` keeps
+  // those rows last when the column is reversed.
+  levelsTotal: ({ z }) => (levelsText(z.levelEquiv, z.expSamples, z.expUnstated) === NONE ? -1 : z.levelEquiv),
   kills: ({ z }) => z.kills,
   killsPerHour: ({ z, read }) => pickRate(read, z.killsPerHourActive, z.killsPerHourWall) ?? -1,
   coin: ({ z }) => z.coinCopper,
   coinPerHour: ({ z, read }) => perShown(z.coinCopper, read),
-  coinPeak: ({ e }) => e?.peak.coin ?? 0,
+  coinPeak: ({ e }) => (e !== undefined && e.peak.coin > 0 ? e.peak.coin : -1),
   aa: ({ e, read }) => perShown(e?.aaPoints ?? 0, read),
   motes: ({ e, read }) => perShown(e?.motes ?? 0, read),
   deaths: ({ z }) => z.deaths
