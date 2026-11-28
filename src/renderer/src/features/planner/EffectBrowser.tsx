@@ -330,8 +330,9 @@ function filterWrites(ctx: {
 export interface EffectBrowserProps {
   /**
    * The class trio the browse is filtered for — R2's class half. It used to be the SELECTED SET's
-   * (`ExaltPlan.classes`); with the sets' switcher gone it is a machine-class browse preference
-   * (`useBrowseClasses`), and PlannerView owns it because the disagree chip lives in the toolbar.
+   * (`ExaltPlan.classes`); with the sets' switcher gone it is a browse preference, pinned per
+   * character since 2026-11-27 (`useFollowingClasses('eq.planner.classPins')`), and PlannerView
+   * owns it because the disagree chip lives in the toolbar.
    */
   classes: readonly ClassAbbr[]
   /** the item keys already on the wish list — `itemKey`, which is `DonorRow.key` */
