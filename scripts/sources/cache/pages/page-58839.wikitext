@@ -7,7 +7,7 @@
     <li>Pet Classes: [[Shadow Knight]] / [[Warrior]]</li>
     <li>Pet Level: 29</li>
     <li>Hit Points: 1946 (+1/tick)</li>
-    <li>Mana: 601 (+7/tick)</li>
+    <li>Mana: 601 (+58/tick)</li>
     </ul>
   </div>
   <div style="flex: 1;">
@@ -55,7 +55,6 @@
 |-
 |}
 == Abilities ==
-'''Needs to be Verified'''
 * [[Skill_Bash|Bash]]
 * [[Skill_Block|Block]]
 * [[Skill_Cleave|Cleave]]
@@ -66,13 +65,12 @@
 * [[Skill_Parry|Parry]]
 * [[Skill_Riposte|Riposte]]
 * [[Skill_Taunt|Taunt]]
-
 == Spell List ==
-'''Needs to be Verified'''
 * [[Cancelling of Life|<span class='itemeff'>Cancelling of Life</span>]]
 * [[Heat Blood|<span class='itemeff'>Heat Blood</span>]]
-* [[Engulfing Darkness|<span class='itemeff'>Engulfing Darkness</span>]]??
-* [[Lifespike|<span class='itemeff'>Lifedraw</span>]]??
+* [[Engulfing Darkness|<span class='itemeff'>Engulfing Darkness</span>]]
+* [[Lifedraw|<span class='itemeff'>Lifedraw</span>]]
+
 
 == Focus Items ==
 * None

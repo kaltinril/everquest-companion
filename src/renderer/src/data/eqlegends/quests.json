@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-11-26T04:54:21.559Z",
+  "scrapedAt": "2026-11-28T10:07:38.614Z",
   "source": "eqlwiki.com — Category:Quests + quest subcategories + recentchanges delta (scripts/scrape-delta.mts)",
   "quests": [
     {
@@ -26203,12 +26203,12 @@
         {
           "name": "Protectors of Pine",
           "up": true,
-          "amount": 15
+          "amount": 25
         },
         {
           "name": "Jaggedpine Treefolk",
           "up": true,
-          "amount": 5
+          "amount": 6
         },
         {
           "name": "Sabertooths of Blackburrow",

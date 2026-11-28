@@ -7,7 +7,7 @@
     <li>Pet Classes: [[Shadow Knight]] / [[Warrior]]</li>
     <li>Pet Level: 19</li>
     <li>Hit Points: 1130 (+1/tick)</li>
-    <li>Mana: 394 (+5/tick)</li>
+    <li>Mana: 394 (+38/tick)</li>
     </ul>
   </div>
   <div style="flex: 1;">
@@ -65,11 +65,11 @@
 * [[Skill_Parry|Parry]]
 * [[Skill_Riposte|Riposte]]
 * [[Skill_Taunt|Taunt]]
-
 == Spell List ==
-* [[Clinging Darkness|<span class='itemeff'>Clinging Darkness</span>]]
+* [[Cancelling of Life|<span class='itemeff'>Cancelling of Life</span>]]
 * [[Disease Cloud|<span class='itemeff'>Disease Cloud</span>]]
-* [[Lifespike|<span class='itemeff'>Lifedraw</span>]]??
+* [[Engulfing Darkness|<span class='itemeff'>Engulfing Darkness</span>]]
+* [[Lifedraw|<span class='itemeff'>Lifedraw</span>]]
 
 == Focus Items ==
 * None

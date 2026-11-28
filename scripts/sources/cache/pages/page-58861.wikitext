@@ -3,15 +3,15 @@
   <div style="flex: 1;">
     <ul>
     <li>Summoning Spell: [[Invoke Death]]</li>
-    <li>Pet Type: Dry Bones Skeleton</li>
+    <li>Pet Type: Pale Bones Skeleton</li>
     <li>Pet Classes: [[Shadow Knight]] / [[Warrior]]</li>
     <li>Pet Level: 41</li>
     <li>Hit Points: 4313 (+1/tick)</li>
-    <li>Mana: 851 (+10/tick)</li>
+    <li>Mana: 851 (+82/tick)</li>
     </ul>
   </div>
   <div style="flex: 1;">
-  [[File:extra_large_dry_bones_summon.png|left|x175px]]
+  [[File:large_pale_bones_summon.png|left|x175px]]
   </div>
 </div>
 <div style="display: flex;">

@@ -1,0 +1,18 @@
+{{Classic Era}}
+
+A planar armor set for [[Monk|Monks]]. It drops as part of [[Classic Planar Armor: Group 1|Group 1 Armor Sets]] in the [[Plane of Hate]] and [[Plane of Fear]]. There does not appear to be a named mob that always drops two pieces of this armor.
+
+For whatever reason, there does not appear to be a Shiverback-hide Head slot item.
+
+{{Gear Set
+|Shiverback-Hide Armbands
+|Shiverback-Hide Boots
+|Shiverback-Hide Gloves
+|Shiverback-Hide Jerkin
+|Shiverback-Hide Leggings
+|Shiverback-Hide Wristbands
+}}
+
+[[File:Shiverback-hide_Armor.jpg|thumb|[[Human]] in a Shiverback-hide set.]]
+
+[[Category:Armor Sets]]

@@ -1,0 +1,17 @@
+{{Classic Era}}
+
+Shadow Rage Armor is the planar armor set for [[Berserker|Berserkers]]. It drops as part of [[Classic Planar Armor: Group 1|Group 1 Armor Sets]] in the [[Plane of Hate]] and [[Plane of Fear]]. There does not appear to be a named mob that always drops two pieces of this armor.
+
+{{Gear Set
+|Shadow Rage Boots
+|Shadow Rage Gloves
+|Shadow Rage Helm
+|Shadow Rage Leggings
+|Shadow Rage Sleeves
+|Shadow Rage Tunic
+|Shadow Rage Wristguard
+}}
+
+[[File:Shadow_Rage_Armor.jpg|thumb|[[Human]] in Shadow Rage set.]]
+
+[[Category: Armor Sets]]

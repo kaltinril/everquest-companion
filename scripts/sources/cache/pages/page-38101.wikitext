@@ -2475,3 +2475,17 @@ Haunting_Corpse_Summon
 Summon_Dead_Summon
 Broken_Bow_Part_B
 Mithril-Runed_Tunic
+Gnoll_Head
+Shiverback-Hide_Armor
+File:Midnight_Clad_Armor.png
+Poacher's_Head_Quest_(Surefall_Glade)
+File:Medium_dry_bones_summon.png
+File:Large_dry_bones_summon.png
+File:Froglok_Warder_Leech.png
+File:HalfDarkElf_Warder_Bat.png
+File:Large_pale_bones_summon.png
+Blood_of_Pain
+Invoke_Death_Summon
+Cackling_Bones_Summon
+Malignant_Dead_Summon
+Invoke_Shadow_Summon

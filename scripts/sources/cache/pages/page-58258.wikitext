@@ -1,0 +1,23 @@
+{{Classic Era}}
+
+[[File:Midnight_Clad_Armor.png|thumb|[[Half Dark Elf]] in a Midnight Clad Armor set.|left]]
+
+Midnight Clad Armor is the planar armor set for both cloth and leather wearing classes; similar to how Lustrous Russet Armor is for both chain and plate classes. It drops as part of [[Classic Planar Armor: Group 2|Group 2 Armor Sets]] in the [[Plane of Hate]] and [[Plane of Fear]].  Additionally, [[Phoboplasm]]s in non-raid [[Plane of Fear]] instances can be farmed for this armor set.
+
+{{Gear Set
+|Midnight Clad Armbands
+|Midnight Clad Fistwraps
+|Midnight Clad Footwraps
+|Midnight Clad Headband
+|Midnight Clad Leggings
+|Midnight Clad Straps
+|Midnight Clad Wristbands
+}}
+
+[[File:Midnight_Clad_Armor.jpg|thumb|[[Human]] in a set of Midnight Clad.]]
+
+== Farming Midnight Clad Armor ==
+
+{{#lsth:Phoboplasm|Notes}}
+
+[[Category: Armor Sets]]

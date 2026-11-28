@@ -1,0 +1,15 @@
+Thorny Vine Armor is the planar armor set for [[Ranger|Rangers]]. It drops as part of [[Classic Planar Armor: Group 1|Group 1 Armor Sets]] in the [[Plane of Hate]] and [[Plane of Fear]]. There does not appear to be a named mob that always drops two pieces of this armor.
+
+{{Gear Set
+|Thorny Vine Boots
+|Thorny Vine Bracer
+|Thorny Vine Chestplate
+|Thorny Vine Gauntlets
+|Thorny Vine Greaves
+|Thorny Vine Helm
+|Thorny Vine Vambraces
+}}
+
+[[File:Thorny_Vine_Armor.jpg|thumb|[[Human]] in Thorny Vine set.]]
+
+[[Category:Armor Sets]]

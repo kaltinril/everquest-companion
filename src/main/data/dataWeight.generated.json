@@ -2,8 +2,8 @@
   "rows": [
     {
       "file": "src/main/data/items.json",
-      "bytes": 9035091,
-      "parseMs": 46.8,
+      "bytes": 9035596,
+      "parseMs": 53.8,
       "heapMb": 21.1
     },
     {
@@ -15,7 +15,7 @@
     {
       "file": "src/main/data/pageEra.json",
       "bytes": 237292,
-      "parseMs": 1.8,
+      "parseMs": 2.5,
       "heapMb": 0.7
     },
     {
@@ -27,19 +27,19 @@
     {
       "file": "src/main/data/spellLines.json",
       "bytes": 191765,
-      "parseMs": 0.5,
+      "parseMs": 0.6,
       "heapMb": 0.2
     },
     {
       "file": "src/main/data/spells.json",
       "bytes": 1128063,
-      "parseMs": 2.2,
+      "parseMs": 2.4,
       "heapMb": 1.1
     },
     {
       "file": "src/renderer/src/data/eqlegends/mobs.json",
       "bytes": 5701158,
-      "parseMs": 15.6,
+      "parseMs": 17.5,
       "heapMb": 8.6
     }
   ],
