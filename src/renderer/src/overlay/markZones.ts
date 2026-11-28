@@ -32,7 +32,11 @@ export function labelFlips(px: number, w: number, mark: { size: number; text: st
   return px + mark.size + labelWidth(mark.text, mark.font) > w
 }
 
-/** What a timer mark's label reads: the name and its clock. */
+/**
+ * What a timer mark's label reads: the name and its clock. The clock leads with seen ('UP') and
+ * stale ('due long ago' / 'awaiting next death') like the Timers tab (2026-11-27), so a label, and
+ * the hover zone sized from its length, can be much longer than a countdown.
+ */
 export function timerLabel(t: TimerPin, nowMs: number): string {
   return `${t.display} ${timerPinLabels(t, nowMs).clock}`
 }
