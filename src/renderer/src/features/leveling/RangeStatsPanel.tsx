@@ -90,6 +90,7 @@ import {
   type ZoneStatRow
 } from './rangeStatsRows'
 import { Tooltip } from '../../lib/Tooltip'
+import { StatTile } from '../../lib/StatTile'
 
 export interface RangeStatsPanelProps {
   stats: RangeStats
@@ -121,37 +122,6 @@ const ICON: Record<HeroStat['id'], JSX.Element> = {
   kills: <WhatshotIcon />,
   levels: <TrendingUpIcon />,
   range: <MilitaryTechIcon />
-}
-
-/**
- * The `HeroCard` idiom from LevelingView, at panel density (h5 rather than h4, tighter
- * padding): a colored left rule, the icon in the same hue, value / label / caption. It is a
- * local copy because `HeroCard` is private to LevelingView.tsx — see the report note; the
- * right fix is to lift that component into its own file and have both views import it.
- */
-function StatCard({ stat }: { stat: HeroStat }): JSX.Element {
-  const accent = ACCENT[stat.id]
-  return (
-    <Paper
-      variant="outlined"
-      sx={{ p: 1.25, flex: 1, minWidth: 150, borderLeft: `3px solid ${accent}`, display: 'flex', gap: 1 }}
-      data-testid="leveling-range-hero"
-      // A NATIVE title, never a popper (JOS-143), and only on the card that has one: the rate
-      // card's denominator is active time and JOS-249 says so on hover.
-      title={stat.title}
-    >
-      <Box sx={{ color: accent, display: 'flex', alignItems: 'center' }}>{ICON[stat.id]}</Box>
-      <Box sx={{ minWidth: 0 }}>
-        <Typography variant="h5" sx={{ lineHeight: 1.1, color: accent }} noWrap>
-          {stat.value}
-        </Typography>
-        <Typography variant="body2">{stat.label}</Typography>
-        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-          {stat.sub}
-        </Typography>
-      </Box>
-    </Paper>
-  )
 }
 
 const CHIP_SX = { height: 20 } as const
@@ -444,7 +414,19 @@ export function RangeStatsPanel({ stats, scope, zoneCaption, onClear }: RangeSta
       <HeaderRow stats={stats} scope={scope} zoneCaption={zoneCaption} onClear={onClear} />
       <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }} useFlexGap>
         {rangeHeroes(stats, basis).map((s) => (
-          <StatCard key={s.id} stat={s} />
+          <StatTile
+            key={s.id}
+            value={s.value}
+            label={s.label}
+            sub={s.sub}
+            icon={ICON[s.id]}
+            accent={ACCENT[s.id]}
+            testId="leveling-range-hero"
+            // A NATIVE title, never a popper (JOS-143), and only on the card that has one: the
+            // rate card's denominator is active time and JOS-249 says so on hover.
+            hover={s.title}
+            hoverMode="native"
+          />
         ))}
       </Stack>
       <ChipRow stats={stats} basis={basis} />

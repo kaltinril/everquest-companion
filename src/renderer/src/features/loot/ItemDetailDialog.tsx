@@ -9,7 +9,6 @@ import {
   DialogTitle,
   Divider,
   IconButton,
-  Paper,
   Stack,
   Typography
 } from '@mui/material'
@@ -22,6 +21,7 @@ import type { Timeslice } from '@shared/timeslice'
 import { isAcquisition } from '@shared/lootDisposition'
 import { chestOnlyNote, rewardChestNote, tallyDroppedBy } from '@shared/droppedBy'
 import { formatDate } from '../../lib/formatDate'
+import { StatTile } from '../../lib/StatTile'
 import { sourceItemKey } from '../../lib/itemSources'
 import { EQ_ITEM_COLORS } from '../../lib/ItemWindow'
 import { ObservedItemWindow } from '../../lib/ObservedItemWindow'
@@ -76,24 +76,6 @@ function useItemKnowledge(item: string, open: boolean): ItemKnowledgeState {
     }
   }, [item, open])
   return { data, loading }
-}
-
-function StatCard({ label, value, hint }: { label: string; value: string; hint?: string }): JSX.Element {
-  return (
-    <Paper variant="outlined" sx={{ p: 1.5, flex: 1, minWidth: 120 }}>
-      <Typography variant="h5" sx={{ color: 'primary.main', lineHeight: 1.1 }}>
-        {value}
-      </Typography>
-      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-        {label}
-      </Typography>
-      {hint && (
-        <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block' }}>
-          {hint}
-        </Typography>
-      )}
-    </Paper>
-  )
 }
 
 interface TimelineBins {
@@ -292,12 +274,22 @@ function ObservedColumn({
             time and that is fine — an item acquired before this log exists reads 0 looted and 3
             held, which is the true state of affairs and precisely what this page used to hide
             behind a bare "Times looted 0". */}
-        <StatCard label="Times looted" value={String(events.length)} />
+        <StatTile size="plain" label="Times looted" value={String(events.length)} />
         {owned !== undefined && owned > 0 && (
-          <StatCard label="In your inventory export" value={String(owned)} hint="from /outputfile inventory" />
+          <StatTile
+            size="plain"
+            label="In your inventory export"
+            value={String(owned)}
+            sub="from /outputfile inventory"
+          />
         )}
-        <StatCard label="Distinct mobs" value={String(agg.sources.length)} hint={rewardChestNote(agg.chest)} />
-        <StatCard label="Zones seen" value={String(agg.zones.length)} />
+        <StatTile
+          size="plain"
+          label="Distinct mobs"
+          value={String(agg.sources.length)}
+          sub={rewardChestNote(agg.chest)}
+        />
+        <StatTile size="plain" label="Zones seen" value={String(agg.zones.length)} />
       </Stack>
 
       {/* "What it's for" (Task #53) — quest knowledge. Local posky + cached wiki. */}
