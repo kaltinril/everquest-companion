@@ -21,15 +21,42 @@ disagree, RULES.md wins; fix this file.
   vite pre-bundle once made title-bar clicks, overlay checkboxes and the character picker
   silently do nothing with identical code (2026-08-25). If clicks do nothing and the renderer
   logs no error, suspect this first.
-- **cargo** lives at `$USERPROFILE/.cargo/bin`. In a fresh worktree set
-  `CARGO_TARGET_DIR=<another worktree>/engine/target` to reuse a warm build; delete a scratch
-  target dir when done (RULES.md rule 18).
-  TRAP (2026-10-29): only while no other session builds the engine. Cargo names a workspace
-  member's artifacts by its path inside the workspace, so every worktree's `fold` is the SAME
-  `libfold-<hash>` in a shared target dir; a parallel helper's build replaced it and `cargo test`
-  ran the new test files against the other tree's code (a feature's own tests read as if the
-  feature were missing, then passed again on the next rebuild). With parallel helpers, give each
-  engine change its own `CARGO_TARGET_DIR` under its worktree.
+- **cargo** lives at `$USERPROFILE/.cargo/bin`.
+- **Shared build cache (sccache, since 2026-11-27).** `%USERPROFILE%\.cargo\config.toml` holds
+  `[build] rustc-wrapper = "C:/Users/<user>/.cargo/bin/sccache.exe"`, so every cargo run on this
+  PC, in the main clone and every worktree, already open shells included, goes through sccache.
+  Nothing to set per worktree. sccache caches a crates.io dependency's compile by content (cache
+  `%LOCALAPPDATA%\Mozilla\sccache\cache`, 10 GiB cap) and copies it into the tree's own
+  `engine/target`; the engine's own crates still compile in every tree, so each tree keeps its own
+  `engined.exe` and two trees never share an artifact. Installed as the prebuilt
+  `sccache-v0.19.0-x86_64-pc-windows-msvc.zip` from mozilla/sccache's GitHub releases (sha256
+  checked), `sccache.exe` copied to `%USERPROFILE%\.cargo\bin`; never `cargo install` it (a long
+  compile). If `sccache.exe` is removed, delete the config line too, or every cargo build fails.
+  CI has neither and is unchanged. `sccache --show-stats` shows hits.
+  - What it saves, measured 2026-11-27 (fresh worktree, BelowNormal, 16 cores, toolchain 1.100.1):
+    debug `cargo test --workspace --no-run` 85 s cold, 69 to 75 s from a warm cache; release
+    `cargo build --release -p engined` 47 s cold, 37 s warm. About 77% of cacheable compiles hit
+    in a new tree (110 of 142); the misses are path-bound (crates.io crates whose build script
+    writes into the tree's `OUT_DIR`, and the release builds of our own crates). Not cacheable at
+    all: our crates in debug (incremental), build scripts (`bin`), proc-macros.
+  - Where the time really goes: our own crates are ~75% of a debug build's unit time (530 of 706
+    s; `fold`'s test target alone 37 s; ~60 test binaries each linked separately). The cache cannot
+    touch that.
+  - Disk is unchanged: 8.1 GB per tree (debug 7.8, release 0.35). 4 GB of debug is `.pdb`
+    debuginfo of 84 exes, 1.9 GB incremental. Measured, not adopted (owner's call):
+    `CARGO_PROFILE_DEV_DEBUG=line-tables-only` (or `[profile.dev] debug = "line-tables-only"` in
+    `engine/Cargo.toml`) gave debug 4.5 GB and 59 s, even with every dependency recompiled.
+  - TRAP: rustc runs under the sccache SERVER, not under cargo, at the priority the server was
+    started with; it idles out after 10 minutes. A BelowNormal cargo that starts it makes a
+    BelowNormal server (measured); a normal-priority cargo makes every later compile normal until
+    it idles out. `npm run build:engine` and the e2e build lower their own priority before cargo
+    (`atBelowNormalPriority`, `scripts/build-engine.mts`), so builds the repo starts keep it low.
+- **Never share a `CARGO_TARGET_DIR` between trees** (the old way to reuse a warm build; the
+  cache replaces it). TRAP (2026-10-29): Cargo names a workspace member's artifacts by its path
+  inside the workspace, so every worktree's `fold` is the SAME `libfold-<hash>` in a shared target
+  dir; a parallel helper's build replaced it and `cargo test` ran the new test files against the
+  other tree's code (a feature's own tests read as if the feature were missing, then passed again
+  on the next rebuild). A scratch target dir is deleted when done (RULES.md rule 18).
 - **Engine rebuild after merging engine changes:** `npm run build:engine` in the main clone. The
   dev app resolves `engine/target/release`, and runs a COPY at
   `%APPDATA%/everquest-companion-dev/engine-run/engined.exe`, so an open app never blocks a rebuild.
@@ -87,7 +114,9 @@ disagree, RULES.md wins; fix this file.
   tsc/eslint/tests run in place. Make the junction with PowerShell
   `New-Item -ItemType Junction -Path <wt>\node_modules -Target <clone>\node_modules` (Git Bash
   `mklink` mangles paths). Without it, a gate grep can false-pass: npm's tool-not-found text
-  contains no "error". Check real exit codes.
+  contains no "error". Check real exit codes. The engine needs no setup: its own `engine/target`
+  fills from the shared build cache on the first cargo run (Environment, "Shared build cache");
+  do not point `CARGO_TARGET_DIR` at another tree.
 - **A dependency change needs its own `node_modules`, and that one still leaks** (2026-11-27, MUI 7
   to 9). A worktree under `.claude/worktrees/` sits inside the main clone, so any module missing
   from the worktree's own install is resolved from the main clone's `node_modules` one level up, by
@@ -182,8 +211,8 @@ disagree, RULES.md wins; fix this file.
   which runs its own node.exe whatever `node` resolves to. Prepend `/c/Users/<user>/AppData/Roaming/nvm/v24.19.0`
   (the `/c/` form) and check `node -v` prints v24 before the gate; a `# pass` summary means Node 22 ran.
 - **The npm gate does not run the Rust suite.** For an engine change, and before a push, also run `cargo test --workspace` in
-  `engine/` on the merged tree (`CARGO_TARGET_DIR` = the main clone's `engine/target` reuses its
-  build). 2026-10-13 it found two reds the npm gate had passed for days: the module snapshot test
+  `engine/` on the merged tree, in that tree's own `engine/target` (the shared build cache supplies
+  the dependencies; a shared `CARGO_TARGET_DIR` is the trap under Environment). 2026-10-13 it found two reds the npm gate had passed for days: the module snapshot test
   (gaps-tab) and the pinned spell-category counts (catch_all x local-data-refresh).
 - **A shared `engine/target` remembers another checkout's paths.** Protocol tests built by a session
   whose checkout was later removed fail with `<that scratchpad>/protocol/fixtures: cannot find the
@@ -245,7 +274,9 @@ disagree, RULES.md wins; fix this file.
   does). `alert-dialog-focus`, `engine-boots` and `engine-absent` flake in parallel and pass alone
   (no `wmic` on this machine: `engineTable()` falls back to `tasklist`, and engines from specs
   running alongside count as new). Each worktree builds its own `engined.exe`: the engine embeds the
-  data files, so a shared binary cannot serve two trees.
+  data files, so a shared binary cannot serve two trees. Since 2026-11-27 its crates.io
+  dependencies come from the shared sccache cache (Environment), so only the engine's own crates
+  compile per tree.
   Measured 2026-11-19 (main_community after the issue sweep, 4 in parallel; the reds again one at a
   time; then the same specs on that morning's trunk in a detached worktree): 61/66 green and no new
   red. `engine-boots` flaked in parallel and passed alone; `voice-alerts` is red as before.
@@ -485,6 +516,10 @@ disagree, RULES.md wins; fix this file.
   `cmd //c 'start "" /belownormal ...'` and Windows put a "cannot find '\\'" dialog on the owner's
   screen mid-game). Use PowerShell: `$p = Start-Process <exe> -ArgumentList ... -WindowStyle Hidden
   -PassThru; $p.PriorityClass = 'BelowNormal'`. Say so in every brief that asks for low priority.
+  Already low by themselves (2026-11-27): the e2e runner (`run-all.mts` lowers itself, so the
+  builds, specs and their Electron inherit it), `known-reds.sh` (`nice -n 10 npm test`; Git Bash's
+  `nice` gives the Windows BelowNormal class), and the cargo builds of `npm run build:engine` and
+  the e2e harness. A hand-run `cargo test` is not: start it the PowerShell way above.
 
 - **A scratch Playwright probe of the e2e app** (`tests/e2e/appWindow.mts` `mainWindow`,
   `logFixture.mts` `stageFixture` + `appendAt` + `launchOnFixture`) is the way to watch a tab

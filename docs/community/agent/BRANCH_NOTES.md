@@ -3703,3 +3703,21 @@ test that failed before the fix.
   list the two new fields.
 - **Optional, not built:** "load current icon into the grid"; a trail colour of its own (today
   the shape's).
+
+## Shared build cache and low-priority builds (2026-11-27, branch `shared-cargo`)
+
+- **sccache as `rustc-wrapper`**, set once per PC in `%USERPROFILE%\.cargo\config.toml`, not in
+  the repo: an `engine/.cargo/config.toml` wrapper would fail every CI cargo run (no sccache
+  there). WORKFLOW.md, Environment, "Shared build cache" has the install, numbers and traps.
+- **Per-tree correctness is by construction:** each tree keeps its own `engine/target`; only
+  crates.io dependency compiles come from the cache, keyed by content. A shared
+  `CARGO_TARGET_DIR` was rejected: workspace members get the same artifact name in every tree
+  (the 2026-10-29 trap) and `target/release/engined.exe` would be last-writer-wins.
+- **Measured gain is modest** (debug 85 s to 69-75 s, release 47 s to 37 s, disk unchanged at
+  8.1 GB per tree): our own crates are ~75% of a debug build. The next lever is debuginfo
+  (`line-tables-only`: 4.5 GB, 59 s), not adopted, waiting on the owner.
+- **Below-normal priority:** `atBelowNormalPriority` (`scripts/build-engine.mts`) lowers the
+  process around its cargo `spawnSync` and restores it after, so cargo and an sccache server it
+  starts inherit BelowNormal; used by `build:engine` and `tests/e2e/build.mts`. `run-all.mts`
+  lowers itself for the whole sweep. `known-reds.sh` runs `nice -n 10 npm test` when `nice`
+  exists. Restore failures are ignored (Linux refuses an unprivileged raise).

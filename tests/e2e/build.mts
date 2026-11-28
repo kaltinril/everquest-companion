@@ -31,7 +31,7 @@ import { ENGINE_BIN_NAME } from '../../src/main/dataServer/engineProtocol'
 // because the SHIPPING build needs it too (JOS-473) — and a second copy here would not be untidy
 // so much as a machine where one of the two finds a toolchain and the other does not. The
 // dependency points this way on purpose: the harness leans on the build script, never the reverse.
-import { cargoBinary } from '../../scripts/build-engine.mts'
+import { atBelowNormalPriority, cargoBinary } from '../../scripts/build-engine.mts'
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 
@@ -237,10 +237,13 @@ export function buildEngineIfStale(): string {
     return ENGINE_BIN
   }
   console.log('build: cargo build --release -p engined (the engine binary is stale)…')
-  const res = spawnSync(cargoBinary(), ['build', '--release', '-p', 'engined'], {
-    cwd: join(ROOT, 'engine'),
-    stdio: 'inherit'
-  })
+  // Below normal, as `npm run build:engine` does: the owner keeps using the machine meanwhile.
+  const res = atBelowNormalPriority(() =>
+    spawnSync(cargoBinary(), ['build', '--release', '-p', 'engined'], {
+      cwd: join(ROOT, 'engine'),
+      stdio: 'inherit'
+    })
+  )
   if (res.error) throw new Error(`e2e: could not run cargo — ${res.error.message}`)
   if (res.status !== 0) {
     throw new Error(`cargo build --release -p engined failed (exit ${String(res.status)})`)
