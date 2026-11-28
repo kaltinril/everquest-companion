@@ -40,6 +40,8 @@ import { raisedFactionKeys } from './factionQuests'
 import { useDontCareFactions } from './useDontCareFactions'
 import { useFactionData, type FactionRowVm } from './useFactionRows'
 import { rulesOf } from '@shared/unlocks/unlockGraph'
+import { nextSort as nextColumnSort, namesUpNumbersDown, sanitizeColumnSort, TABLE_SORT_KEYS } from '@shared/tableSort'
+import { useSortPref } from '../../lib/useTableSort'
 
 /** The gear index's two maps, kept across visits (performance review 2026-10-20, finding 7): a
  *  ~5 ms walk of 6,963 rows that ran on every visit and every wishlist edit, for an index that is
@@ -53,11 +55,14 @@ function toggledSet(s: ReadonlySet<number>, id: number): ReadonlySet<number> {
   return next
 }
 
-/** A repeat click flips the direction; a new column starts at its natural reading — names
- *  ascending, everything numeric biggest-first. */
+/** The shared header rule: a repeat click flips the direction; a new column starts at its natural
+ *  reading — names ascending, everything numeric biggest-first. */
+const FACTION_NATURAL = namesUpNumbersDown<SortKey>(['name'])
 function nextSort(s: RowSort, key: SortKey): RowSort {
-  if (s.key === key) return { key, dir: s.dir === 'asc' ? 'desc' : 'asc' }
-  return { key, dir: key === 'name' ? 'asc' : 'desc' }
+  return nextColumnSort<SortKey>(s, key, FACTION_NATURAL)
+}
+function sanitizeFactionSort(raw: unknown): RowSort {
+  return sanitizeColumnSort<SortKey>(raw, ['name', 'regard', 'standing'], DEFAULT_SORT)
 }
 
 /** The row-filter STATE — the search, the toggles, and the race-chip reveal. `query` is the box's
@@ -226,7 +231,8 @@ export function useFactionsController(props: FactionsViewProps): FactionsControl
   const [repeatableOnly, setRepeatableOnly] = useState(false)
   const [cleanOnly, setCleanOnly] = useState(false)
   const dontCare = useDontCareFactions()
-  const [sort, setSort] = useState<RowSort>(DEFAULT_SORT)
+  // Remembered across tab switches and restarts (the shared table-sort store).
+  const [sort, setSort] = useSortPref<RowSort>(TABLE_SORT_KEYS.factions, sanitizeFactionSort)
   // A SET, not a single id: comparing two factions' work side by side is the ordinary reading
   // posture, and an accordion that closes one panel to open another forbids it.
   const [expanded, setExpanded] = useState<ReadonlySet<number>>(new Set())
@@ -236,9 +242,12 @@ export function useFactionsController(props: FactionsViewProps): FactionsControl
   const onCollapseAll = useCallback(() => {
     setExpanded(new Set())
   }, [])
-  const onSort = useCallback((key: SortKey) => {
-    setSort((s) => nextSort(s, key))
-  }, [])
+  const onSort = useCallback(
+    (key: SortKey) => {
+      setSort(nextSort(sort, key))
+    },
+    [sort, setSort]
+  )
   const onOpenZone = useCallback(
     (stem: ZoneShort) => {
       saveZoneSelection(onPick(stem))

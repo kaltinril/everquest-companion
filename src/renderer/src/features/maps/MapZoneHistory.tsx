@@ -21,6 +21,9 @@ import {
 } from '@mui/material'
 import type { ProgressionSnap } from '@shared/types'
 import {
+  DEFAULT_HISTORY_SORT,
+  HISTORY_SORT_KEYS,
+  historySortNatural,
   LEVEL_SPREAD,
   MIN_ACTIVE_MS,
   MIN_STRETCH_KILLS,
@@ -36,6 +39,12 @@ import { useStatedLevel } from '../leveling/useStatedLevel'
 import { useCreditedProgression } from '../leveling/useCreditedProgression'
 import { useLootHistory } from '../loot/useLootHistory'
 import { useComboIntervals } from '../profiles/ClassComboData'
+import { useSortPref } from '../../lib/useTableSort'
+import { nextSort, sanitizeColumnSort, TABLE_SORT_KEYS, type ColumnSort, type SortDir } from '@shared/tableSort'
+
+function sanitizeHistorySort(raw: unknown): ColumnSort<HistorySort> {
+  return sanitizeColumnSort(raw, HISTORY_SORT_KEYS, DEFAULT_HISTORY_SORT)
+}
 
 const GOALS: readonly { goal: HistoryGoal; label: string }[] = [
   { goal: 'levels', label: 'Leveling' },
@@ -84,12 +93,14 @@ function ZoneName({ row, onPick }: { row: ZoneHistoryRow; onPick?: (zone: string
 function HistoryTable({
   rows,
   sort,
+  dir,
   best,
   onSort,
   onPick
 }: {
   rows: readonly ZoneHistoryRow[]
   sort: HistorySort
+  dir: SortDir
   best: boolean
   onSort: (next: HistorySort) => void
   onPick?: (zone: string) => void
@@ -97,7 +108,7 @@ function HistoryTable({
   const label = (key: HistorySort, text: string): JSX.Element => (
     <TableSortLabel
       active={sort === key}
-      direction={key === 'zone' ? 'asc' : 'desc'}
+      direction={sort === key ? dir : historySortNatural(key)}
       onClick={() => {
         onSort(key)
       }}
@@ -161,7 +172,12 @@ export default function MapZoneHistory({ onPick }: { onPick?: (zone: string) => 
   const loot = useDeferredValue(useLootHistory())
   const loadouts = useDeferredValue(useComboIntervals())
   const [levelText, setLevelText] = useLevelField(live)
-  const [sort, setSort] = useState<HistorySort>('levels')
+  // The shared header rule (a second click reverses) and the shared remembered store.
+  const [sorted, setSorted] = useSortPref<ColumnSort<HistorySort>>(TABLE_SORT_KEYS.mapsZoneHistory, sanitizeHistorySort)
+  const sort = sorted.key
+  const setSort = (key: HistorySort): void => {
+    setSorted(nextSort(sorted, key, historySortNatural))
+  }
   const [search, setSearch] = useState('')
   const [best, setBest] = useState(false)
   const level = Number.parseInt(levelText, 10)
@@ -169,7 +185,7 @@ export default function MapZoneHistory({ onPick }: { onPick?: (zone: string) => 
     () => (Number.isFinite(level) && level > 0 ? zoneHistory({ snap, loot, level, loadouts }) : []),
     [snap, loot, level, loadouts]
   )
-  const rows = useMemo(() => rankHistory(all, sort, search, best), [all, sort, search, best])
+  const rows = useMemo(() => rankHistory(all, sorted, search, best), [all, sorted, search, best])
   return (
     <Paper
       variant="outlined"
@@ -192,7 +208,7 @@ export default function MapZoneHistory({ onPick }: { onPick?: (zone: string) => 
           exclusive
           value={sort}
           onChange={(_e, next: HistoryGoal | null) => {
-            if (next !== null) setSort(next)
+            if (next !== null) setSorted({ key: next, dir: historySortNatural(next) })
           }}
         >
           {GOALS.map((g) => (
@@ -242,7 +258,7 @@ export default function MapZoneHistory({ onPick }: { onPick?: (zone: string) => 
             : 'Type a level.'}
         </Typography>
       ) : (
-        <HistoryTable rows={rows} sort={sort} best={best} onSort={setSort} onPick={onPick} />
+        <HistoryTable rows={rows} sort={sort} dir={sorted.dir} best={best} onSort={setSort} onPick={onPick} />
       )}
     </Paper>
   )

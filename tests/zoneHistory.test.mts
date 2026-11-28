@@ -122,6 +122,16 @@ test('the plain columns sort too: zone by name, time and deaths most first', () 
   assert.deepEqual(rankHistory(rows, 'deaths').map((r) => r.zone), ['The Feerrott', 'Befallen'])
 })
 
+test('a second header click reverses the order; short visits stay last under a goal', () => {
+  const rows = zoneHistory({ snap: snap(), loot: LOOT, level: 25, spread: 10 })
+  assert.deepEqual(rankHistory(rows, { key: 'zone', dir: 'desc' }).map((r) => r.zone), ['The Feerrott', 'Befallen'])
+  assert.deepEqual(rankHistory(rows, { key: 'deaths', dir: 'asc' }).map((r) => r.zone), ['Befallen', 'The Feerrott'])
+  assert.deepEqual(rankHistory(rows, { key: 'coin', dir: 'desc' }).map((r) => r.zone), ['The Feerrott', 'Befallen'], 'the natural direction is the plain column')
+  assert.deepEqual(rankHistory(rows, { key: 'coin', dir: 'asc' }).map((r) => r.zone), ['Befallen', 'The Feerrott'])
+  const thin = rows.map((r) => (r.zone === 'Befallen' ? { ...r, activeMs: MIN_ACTIVE_MS - 1, enough: false } : r))
+  assert.deepEqual(rankHistory(thin, { key: 'coin', dir: 'asc' }).map((r) => r.zone), ['The Feerrott', 'Befallen'], 'a short visit ranks last reversed too')
+})
+
 test('the best stretch: fifteen minutes of hill giants outrank an evening of bandits', async () => {
   const { peakPerHour, PEAK_WINDOW_MS } = await import('../src/shared/zoneHistory')
   // Two hours of 10 pp every ten minutes, then 650 pp inside fifteen minutes.

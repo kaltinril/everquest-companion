@@ -139,6 +139,7 @@ import { useGearPrefs, type GearPrefs } from './useGearPrefs'
 import { useTierScoring } from './useBisData'
 import { sanitizeGearForm, sanitizeGearSort, type GearFormMemory } from './areaMemory'
 import { useRemembered, useRememberedSearch } from './useAreaMemory'
+import { nextSort as nextColumnSort, namesUpNumbersDown } from '@shared/tableSort'
 import {
   GEAR_CONTROLS,
   GEAR_CONTROL_LABEL,
@@ -188,13 +189,14 @@ function parseStateKey(key: string): ItemUpgradeState {
   return { full: Number(full), fraction: Number(fraction) }
 }
 
-/** Flip the direction when the same column is clicked again; a new column opens on its natural end. */
+/** The shared header rule (`@shared/tableSort`): flip the direction when the same column is clicked
+ *  again; a new column opens on its natural end.
+ *  Names read A→Z — the item's, the zone's and the mob's alike; every number reads best-first,
+ *  which for WEIGHT and DELAY is still "most" — this table states what an item HAS, and inverting
+ *  two columns' defaults would be a preference the user can express in one click anyway. */
+const GEAR_NATURAL = namesUpNumbersDown<GearSortKey>(['name', 'zone', 'mob'])
 function nextSort(sort: GearSort, key: GearSortKey): GearSort {
-  if (sort.key === key) return { key, dir: sort.dir === 'desc' ? 'asc' : 'desc' }
-  // Names read A→Z — the item's, the zone's and the mob's alike; every number reads best-first,
-  // which for WEIGHT and DELAY is still "most" — this table states what an item HAS, and inverting
-  // two columns' defaults would be a preference the user can express in one click anyway.
-  return { key, dir: key === 'name' || key === 'zone' || key === 'mob' ? 'asc' : 'desc' }
+  return nextColumnSort<GearSortKey>(sort, key, GEAR_NATURAL)
 }
 
 interface TableState {

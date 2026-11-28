@@ -3,13 +3,14 @@
 
 import { type JSX, Fragment, useEffect, useRef } from 'react'
 import { Box, TableSortLabel, Typography } from '@mui/material'
-import { aaNotFor, aaSortGroups, aaStartLevel, type AaBoardRow, type AaListGroup, type AaSort } from '@shared/aaBoard'
+import { AA_WIKI_ORDER, aaNotFor, aaSortGroups, aaStartLevel, type AaBoardRow, type AaListGroup, type AaSort } from '@shared/aaBoard'
 import { aaCostText } from '@shared/aaCost'
 import { aaEffectLine } from '@shared/aaEffects'
 import type { ClassAbbr } from '@shared/classCombo'
 import { Tooltip } from '../../lib/Tooltip'
 import { aaDomId, aaRowId, useAaNav } from './aaNav'
 import { AaRowDetail, Mark, type SetPick } from './AaRowDetail'
+import { nextSort } from '@shared/tableSort'
 
 /** Name · level · pips · rank · effect · points · next: the pips column is fixed so every row lines up. */
 const GRID = 'minmax(130px, 1.3fr) 44px 112px 84px minmax(120px, 2fr) 92px 72px'
@@ -42,10 +43,10 @@ function HeaderRow({ sort, setSort }: { sort?: AaSort; setSort?: (s: AaSort) => 
   const head = (key: 'name' | 'level', label: string): JSX.Element => {
     if (!sortable) return <span>{label}</span>
     const active = sort.key === key
+    // The shared header rule with the wiki's order as its source: up, down, back to the wiki's order
+    // (requirements/alt-advancement.md 2026-11-26).
     const next = (): void => {
-      if (!active) setSort({ key, dir: 'asc' })
-      else if (sort.dir === 'asc') setSort({ key, dir: 'desc' })
-      else setSort({ key: 'wiki', dir: 'asc' })
+      setSort(nextSort<AaSort['key']>(sort, key, () => 'asc', AA_WIKI_ORDER))
     }
     return (
       <TableSortLabel active={active} direction={active ? sort.dir : 'asc'} onClick={next} data-testid={`aa-sort-${key}`}>

@@ -31,7 +31,7 @@
 // Zone swatches come from `zoneBands.zoneColor`, the same function the chart strip uses, so a
 // row and its band are always the same hue.
 
-import { type JSX, useState } from 'react'
+import { type JSX } from 'react'
 import {
   Box,
   Chip,
@@ -85,11 +85,20 @@ import {
   unstatedCaption,
   witnessedText,
   zoneStatRows,
+  zoneSortNatural,
+  DEFAULT_ZONE_SORT,
+  ZONE_SORT_KEYS,
   type HeroStat,
   type ZoneSort,
   type ZoneStatRow
 } from './rangeStatsRows'
 import { Tooltip } from '../../lib/Tooltip'
+import { useSortPref } from '../../lib/useTableSort'
+import { nextSort, sanitizeColumnSort, TABLE_SORT_KEYS, type ColumnSort } from '@shared/tableSort'
+
+function sanitizeZoneSort(raw: unknown): ColumnSort<ZoneSort> {
+  return sanitizeColumnSort(raw, ZONE_SORT_KEYS, DEFAULT_ZONE_SORT)
+}
 
 export interface RangeStatsPanelProps {
   stats: RangeStats
@@ -289,8 +298,9 @@ function ZoneRow({ row }: { row: ZoneStatRow }): JSX.Element {
 const HEAD_SX = { ...CELL_SX, fontWeight: 700, whiteSpace: 'nowrap' } as const
 
 /**
- * Per-zone rows, sorted by levels/hr (the farming-efficiency question) with a secondary
- * toggle onto time.
+ * Per-zone rows, sorted by levels/hr (the farming-efficiency question) until a header is clicked:
+ * every column sorts, a second click reverses it, and the choice is remembered across restarts
+ * (`@shared/tableSort`, 2026-11-27).
  *
  * VERTICALLY IT IS AS TALL AS THE ZONES (JOS-289). It used to live in a `maxHeight: 240` box with
  * `overflow: auto` so it could not squeeze the charts above it; with the page scrolling there is
@@ -300,12 +310,19 @@ const HEAD_SX = { ...CELL_SX, fontWeight: 700, whiteSpace: 'nowrap' } as const
  * OWN container — never by pushing the page sideways. Hence `overflowX` alone, never `overflow`.
  */
 function ZoneTable({ stats, basis }: { stats: RangeStats; basis: RateBasis }): JSX.Element | null {
-  const [sort, setSort] = useState<ZoneSort>('levels')
+  // The shared header rule (a second click reverses) and the shared remembered store.
+  const [sort, setSort] = useSortPref<ColumnSort<ZoneSort>>(TABLE_SORT_KEYS.levelingZones, sanitizeZoneSort)
   const extras = useZoneExtras(stats)
   const rows = zoneStatRows(stats.zones, sort, basis, extras)
   if (rows.length === 0) return null
   const head = (key: ZoneSort, label: string): JSX.Element => (
-    <TableSortLabel active={sort === key} direction={key === 'zone' ? 'asc' : 'desc'} onClick={() => { setSort(key) }}>
+    <TableSortLabel
+      active={sort.key === key}
+      direction={sort.key === key ? sort.dir : zoneSortNatural(key)}
+      onClick={() => {
+        setSort(nextSort(sort, key, zoneSortNatural))
+      }}
+    >
       {label}
     </TableSortLabel>
   )

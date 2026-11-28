@@ -173,6 +173,18 @@ test('the time toggle is a real reorder, and ties fall back to span', () => {
   assert.deepEqual(ties.map((r) => r.zone), ['B', 'A'], 'equal rates: the longer stay leads')
 })
 
+test('a second header click reverses a column; an unknown rate stays last either way', () => {
+  const zones = [
+    zone({ zone: 'Befallen', levelsPerHourActive: 1.2, spanMs: 20 * MIN }),
+    zone({ zone: 'Najena', levelsPerHourActive: null, spanMs: 5 * HOUR }),
+    zone({ zone: "Nagafen's Lair", levelsPerHourActive: 3.4, spanMs: HOUR })
+  ]
+  assert.deepEqual(zoneStatRows(zones, { key: 'levels', dir: 'desc' }).map((r) => r.zone), ["Nagafen's Lair", 'Befallen', 'Najena'])
+  assert.deepEqual(zoneStatRows(zones, { key: 'levels', dir: 'asc' }).map((r) => r.zone), ['Befallen', "Nagafen's Lair", 'Najena'])
+  assert.deepEqual(zoneStatRows(zones, { key: 'time', dir: 'asc' }).map((r) => r.zone), ['Befallen', "Nagafen's Lair", 'Najena'])
+  assert.deepEqual(zoneStatRows(zones, { key: 'zone', dir: 'desc' }).map((r) => r.zone), ['Najena', "Nagafen's Lair", 'Befallen'])
+})
+
 test('sorting never mutates the caller’s array', () => {
   const zones = [zone({ zone: 'Befallen', levelsPerHourActive: 1 }), zone({ zone: 'Najena', levelsPerHourActive: 9 })]
   zoneStatRows(zones, 'levels')

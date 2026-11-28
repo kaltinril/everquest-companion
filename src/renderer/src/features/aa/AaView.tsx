@@ -31,6 +31,13 @@ import { AaSpecial } from './AaSpecial'
 import { AaSummary } from './AaSummary'
 import { AaNavContext, aaRowId, type AaNav } from './aaNav'
 import { useAaBoard, type AaBoardState } from './useAaBoard'
+import { useSortPref } from '../../lib/useTableSort'
+import { sanitizeColumnSort, TABLE_SORT_KEYS } from '@shared/tableSort'
+
+/** The stored AA sort read back; anything else is the wiki's order. */
+function sanitizeAaSort(raw: unknown): AaSort {
+  return sanitizeColumnSort<AaSort['key']>(raw, ['wiki', 'name', 'level'], AA_WIKI_ORDER)
+}
 
 type AaTabId = 'summary' | AaSection
 
@@ -259,7 +266,8 @@ function AaView({ onGo, onOpenTradeskill }: AaLinksProps): JSX.Element {
   const [scope, setScope] = useState<AaScope>('usable')
   const [query, setQuery] = useState('')
   const [maxLevel, setMaxLevel] = useState<number | null>(null)
-  const [sort, setSort] = useState<AaSort>(AA_WIKI_ORDER)
+  // Remembered across tab switches and restarts (the shared table-sort store).
+  const [sort, setSort] = useSortPref<AaSort>(TABLE_SORT_KEYS.aa, sanitizeAaSort)
   const [open, setOpen] = useState<string | null>(null)
   const toggle = useCallback((id: string) => setOpen((o) => (o === id ? null : id)), [])
   const jump = useCallback(
