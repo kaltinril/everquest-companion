@@ -9,13 +9,13 @@
 // and what was assumed on top of it.
 
 import { type JSX } from 'react'
-import { Box, Chip, Paper, Stack, Typography } from '@mui/material'
+import { Paper, Stack, Typography } from '@mui/material'
 import SpeedIcon from '@mui/icons-material/Speed'
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom'
 import ScienceIcon from '@mui/icons-material/Science'
 import type { AaPace } from '@shared/aaPace'
-import { Tooltip } from '../../lib/Tooltip'
+import { StatTile } from '../../lib/StatTile'
 import { aaPaceCaption, aaPaceTiles, type AaPaceTile } from './aaPaceRows'
 import { BASIS_TITLE } from './rangeStatsRows'
 import { useRateBasis } from '../timeslice/useRateBasis'
@@ -33,41 +33,6 @@ const ICON: Record<AaPaceTile['id'], JSX.Element> = {
   points: <AutoAwesomeIcon />,
   eta: <HourglassBottomIcon />,
   potion: <ScienceIcon />
-}
-
-function PaceTile({ tile }: { tile: AaPaceTile }): JSX.Element {
-  const accent = ACCENT[tile.id]
-  return (
-    <Tooltip title={tile.title}>
-      <Paper
-        variant="outlined"
-        sx={{ p: 1.25, flex: 1, minWidth: 150, borderLeft: `3px solid ${accent}`, display: 'flex', gap: 1 }}
-        data-testid={`leveling-aa-tile-${tile.id}`}
-      >
-        <Box sx={{ color: accent, display: 'flex', alignItems: 'center' }}>{ICON[tile.id]}</Box>
-        <Box sx={{ minWidth: 0 }}>
-          <Stack direction="row" spacing={0.5} sx={{ alignItems: 'baseline' }}>
-            <Typography variant="h5" sx={{ lineHeight: 1.1, color: accent }} noWrap>
-              {tile.value}
-            </Typography>
-            {tile.unit && (
-              <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>
-                {tile.unit}
-              </Typography>
-            )}
-          </Stack>
-          <Typography variant="body2" noWrap>
-            {tile.label}
-          </Typography>
-          {/* State, not process: the chip says the number is a model, and the tile's tooltip
-              says which part of it the log actually printed. */}
-          {tile.inferred && (
-            <Chip size="small" variant="outlined" label="inferred" sx={{ height: 18, mt: 0.25 }} />
-          )}
-        </Box>
-      </Paper>
-    </Tooltip>
-  )
 }
 
 export interface AaPacePanelProps {
@@ -98,7 +63,18 @@ export function AaPacePanel({ pace, windowLabel }: AaPacePanelProps): JSX.Elemen
       </Typography>
       <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', mt: 1 }}>
         {tiles.map((t) => (
-          <PaceTile key={t.id} tile={t} />
+          <StatTile
+            key={t.id}
+            value={t.value}
+            unit={t.unit}
+            label={t.label}
+            labelNoWrap
+            chip={t.inferred ? 'inferred' : undefined}
+            icon={ICON[t.id]}
+            accent={ACCENT[t.id]}
+            hover={t.title}
+            testId={`leveling-aa-tile-${t.id}`}
+          />
         ))}
       </Stack>
     </Paper>
