@@ -34,6 +34,10 @@
  * working once the level bar caps out — both rates together and, when the window states a
  * rhythm, an inferred wait wearing one word of label rather than a caveat sentence.
  *
+ * WIDGETS 2026-11-28 (overviewWidgetSteps.mts): the default page is the six cards, Customize opens
+ * the checklist, a card checked on mounts with engine data, and a second launch on the same
+ * userData reads the layout back.
+ *
  * Run: `npm run test:e2e` (this spec runs second).
  */
 import type { Page } from 'playwright-core'
@@ -55,12 +59,14 @@ import {
   waitHydrated,
   type Snap
 } from './appHarness.mjs'
-import { mainWindow } from './appWindow.mjs'
+import { mainWindow, makeUserData, removeUserData } from './appWindow.mjs'
 // The drill walk is the COMBAT tab's own, run against this card on purpose (JOS-105): the whole
 // claim is that the two surfaces are one meter, so they are asserted by one step.
 import { stepGlanceDrill } from './drill.mjs'
 import { PULL_DAMAGE, playPull } from './gameplay.mjs'
-import { launchOnFixture, type FixtureLog } from './logFixture.mjs'
+import { launchOnFixture, stageFixture, type FixtureLog } from './logFixture.mjs'
+// The widget steps (Customize, the new cards, the relaunch), beside this file for its length.
+import { stepCustomize, stepDefaultWidgets, stepLayoutSurvivesRelaunch } from './overviewWidgetSteps.mjs'
 
 const GRID = '[data-testid="overview-grid"]'
 const SEGMENT_SELECT = '[data-testid="segment-select"]'
@@ -563,10 +569,12 @@ async function stepLootLink(page: Page): Promise<void> {
 async function main(): Promise<void> {
   buildIfStale()
 
-  // Fresh userData is load-bearing for assertion 1 — see the file header. It is what a launch
-  // now IS: `launchApp()` mints a dir of its own and deletes it on close.
+  // Fresh userData is load-bearing for assertion 1 — see the file header. This spec owns its dir
+  // (and its staged log) because the widget layout is read back by a SECOND launch on it.
+  const userData = makeUserData()
+  const log = stageFixture('e2e-overview.log')
   console.log('launch: hidden Electron (EQ_E2E=1) against tests/fixtures/e2e-overview.log…')
-  const { app, close, log } = await launchOnFixture('e2e-overview.log')
+  const { app, close } = await launchOnFixture(log, { userData })
 
   let page: Page | null = null
   try {
@@ -579,6 +587,7 @@ async function main(): Promise<void> {
 
     await stepLanding(page)
     let snap = await stepHydration(page)
+    await stepDefaultWidgets(page)
     snap = await stepPlayAFight(page, log)
     await stepGridAndDps(page, snap)
     await stepHeadLabel(page, snap)
@@ -596,8 +605,12 @@ async function main(): Promise<void> {
     await stepDropsFeed(page)
     await stepLinkDown(page)
     await stepRoundTrip(page)
-    // Runs LAST: it navigates away from the Overview and stays on the Loot tab.
+    // It navigates away from the Overview and stays on the Loot tab.
     await stepLootLink(page)
+    // The widgets, back on the Overview. Last: it appends to the log and adds four cards.
+    await page.click('[data-testid="nav-overview"]', { timeout: 15_000 })
+    await page.waitForSelector(GRID, { timeout: 20_000 })
+    await stepCustomize(page, log)
 
     // 14. No renderer console errors across the whole run.
     check('no renderer console errors', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | '))
@@ -606,6 +619,13 @@ async function main(): Promise<void> {
     else await dumpArtifacts(page, 'overview-pass')
   } finally {
     await close()
+  }
+
+  try {
+    await stepLayoutSurvivesRelaunch(log, userData)
+  } finally {
+    await log.dispose()
+    await removeUserData(userData)
   }
 
   reportRun()

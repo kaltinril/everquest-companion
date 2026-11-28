@@ -3851,3 +3851,42 @@ test that failed before the fix.
   process (top-level `after(() => stopOcr())`); the run ends when `pasteRoute` does. Splitting
   those files (one OCR test per file, or a few) is the next lever; not done here because test files
   were being edited in parallel.
+
+## Overview widgets, Phase 1 (2026-11-28, branch `overview-widgets`; plans/2026-11-27-overview-widgets.md)
+
+- **Every card is a widget.** `src/shared/overviewLayout.ts` holds the catalog (`OVERVIEW_WIDGETS`:
+  id, checklist label, default on/off), the stored shape (every known id once, in order, with
+  `on`), and the region rules. `features/overview/overviewWidgets.tsx` maps an id to its component;
+  each widget calls its own hook there, so a card that is off subscribes to nothing. A new card is
+  one catalog row, one `REGION` entry and one registry row.
+- **Stored once per install** in the settings store, key `overviewLayout` (`src/main/ipc/
+  overviewLayout.ts`, bridge `getOverviewLayout`/`setOverviewLayout`), never localStorage (the
+  dev and the built app read different origins). Not in the shared settings profile.
+- **Law: reading a stored layout never changes a page by itself.** Unknown ids and repeats are
+  dropped; a known id the stored list does not name (a card added later) is appended OFF; nothing
+  stored is the default (the original six on, in order). `tests/overviewLayout.test.mts` pins it.
+- **Layout choice: regions kept, built from runs.** Each card has a region kind: `rank` (peers,
+  1/2/3 across, 304 px row floor), `wide` (the DPS curve, full width), `feed` (the two twin feeds).
+  Consecutive cards of one kind share one region grid (`overviewRegions`), so the default order is
+  exactly the old three regions and any other order keeps each kind's rules. The widget wrapper is
+  `display: contents` (it carries `data-overview-widget` for tests), so the card stays the grid
+  item. Measured: with the default layout every card's box matched main_community to the pixel
+  and the only differing pixels in a 1400x900 hidden-window capture were the new Customize button.
+- **Hydration:** every live region gives way to ONE "Reading log" placeholder where the first was;
+  the feeds still draw (`overviewBlocks`). Customize sits on the zone strip, so it is hidden while
+  the log is read, like the strip.
+- **The four new cards** (quick wins 1, 2, 5, 9), selectors in `src/shared/overviewCards.ts`,
+  values in `tests/overviewCards.test.mts`: Buffs running out (the Buffs overlay's surface and
+  allow-list, countdowns only, soonest first, 5 rows); Respawns here (the respawn rows of the exact
+  zone you stand in, stale ones left to the tab, `orderRespawnRows` order, `respawnClockLabel`
+  words); Motes (the session slice, `potentialRates`, by tier, and the zone-this-session slice);
+  Coin (the same slices, `rangeStats` coin after `attributeSales`). Rates use the shared rate basis
+  (`useScopeSelection`), like the XP overlay. Links: Buffs and Timers by a plain tab switch
+  (`onOpenView` = `routing.selectView`), Motes to Loot, Coin to Leveling.
+- **Session = the last login the log states** (`resolveSlice` 'session'); a log with no logout is
+  one session, so on a fixture or a never-camped log the rate divides by the whole record.
+- **e2e** (`overview.e2e.mts` + `overviewWidgetSteps.mts`): the default six in order, Customize
+  opens ten rows, the four new cards mount with engine data (a Valor cast, three motes appended),
+  and a second launch on the same userData reads the layout back.
+- **Open:** Phase 2 (widgets with saved filters), the other ten quick wins, drag to reorder (up and
+  down buttons only for now), and the one-line custom overlay in the plan's backlog.

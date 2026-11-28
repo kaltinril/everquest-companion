@@ -1,6 +1,8 @@
 # Overview widgets: a personal dashboard built from every tab
 
-Status: PLAN. Nothing is built yet. Owner ask, 2026-11-27:
+Status: Phase 1 BUILT 2026-11-28 (branch `overview-widgets`): every card a widget, the Customize
+checklist, and the first batch (quick wins 1, 2, 5, 9). Phase 2 and the other quick wins are not
+built. Owner ask, 2026-11-27:
 
 > "i think we need the overview section to get some love. we haven't really added anything we've
 > built since the original author. Perhaps we need overview to contain "widgets" from each of the
@@ -64,11 +66,25 @@ Plus the Phase 1 control itself, **S**: a Customize button with one checkbox per
 order). It is stored as one list in the app's preferences; new cards default off, so the page
 does not change for anyone until they pick.
 
-## Suggested first batch
+## Suggested first batch (built 2026-11-28)
 
 Cards 1, 2, 5 and 9, plus the Customize checklist. They answer "what is happening right now"
 (the page's own test, see the OverviewView header), they reuse hooks that already run, and they
 match what the owner checks while farming (buffs, respawns, motes, coin).
+
+## What Phase 1 built (2026-11-28)
+
+- Every card is a widget: the six existing cards and the four new ones (Buffs running out,
+  Respawns here, Motes, Coin) are in one catalog, `src/shared/overviewLayout.ts`.
+- "Customize" on the zone strip opens a checklist of every card, with up and down buttons for the
+  order and a Reset. Every change is saved at once.
+- One layout per install, in the settings store (`overviewLayout`). Default: the six on in their
+  old order, the four new ones off. Unknown ids are ignored; a card added later appears unchecked.
+- Layout: the region rules are kept (peers, the full-width curve, the twin feeds); consecutive
+  cards of one kind share a region, so the default page is pixel-identical to the old one.
+- Selectors: `src/shared/overviewCards.ts`, unit-tested; e2e checks the wiring only.
+- Not built: drag to reorder (buttons only), Phase 2, quick wins 3, 4, 6 to 8 and 10 to 14.
+  Details and the laws: agent/BRANCH_NOTES.md, "Overview widgets, Phase 1".
 
 ## Rules carried over
 

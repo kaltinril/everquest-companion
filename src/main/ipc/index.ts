@@ -45,6 +45,7 @@ import { registerShareIpc } from './share'
 import { registerSoundsIpc } from './sounds'
 import { registerSpeechIpc } from './speech'
 import { registerUiScaleIpc } from './uiScale'
+import { registerOverviewLayoutIpc } from './overviewLayout'
 import { registerGapVerdictsIpc } from './gapVerdicts'
 import { registerGapsCharactersIpc } from '../gapsCharacters'
 import { registerShotIpc } from './shotIpc'
@@ -125,6 +126,7 @@ export function registerIpc(): void {
   registerLogArchiveIpc()
   registerDropObsIpc()
   registerUiScaleIpc()
+  registerOverviewLayoutIpc()
   registerGapVerdictsIpc()
   registerGapsCharactersIpc()
   registerShotIpc()
