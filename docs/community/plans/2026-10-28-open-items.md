@@ -64,6 +64,19 @@ Status on 2026-11-28 (docs review; the sections below are left as written):
 
 ## Candidate work (owner to pick; the ones ruled above are queued)
 
+- 0.1.59 installer cuts (owner, 2026-11-28: "get 0.1.58 out there and we can surprise them with a
+  reduction in 0.1.59"). Queued with voice-pack (branch voice-pack, session everquest-companion-c4,
+  what is left in agent/VOICE_PACK.md). The owner's voice-pack answers: A no, the VC++ runtime
+  keeps coming from Microsoft; B yes, the pack auto-downloads for players who already use natural
+  voice (Windows-voice players download nothing). The cuts:
+  (1) downscale and re-encode the 32 boss portraits in resources/wiki-images at fetch time (4.9 MB;
+  four full-size PNGs are 2.8 MB; Raid Targets shows them small), re-encoding the local files
+  rather than re-reading the wiki;
+  (2) electronLanguages: [en-US] (about 7.5 MB of download);
+  (3) compression: maximum (about 9 MB).
+  Estimate after voice-pack plus these: about 120 MB (0.1.57: 149.3 MB; sizes per release in
+  audits/2026-11-27-deployment-size.md). Not started: a helper was stopped at the owner's
+  shutdown on 2026-11-28.
 - Overview widgets (owner, 2026-11-27): Phase 1 (show/hide every card, per install, first batch
   buffs, respawns, motes, coin) and the backlog one-line custom overlay. All in
   `plans/2026-11-27-overview-widgets.md`; nothing built yet.
