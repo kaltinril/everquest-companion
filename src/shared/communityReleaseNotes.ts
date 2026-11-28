@@ -28,6 +28,113 @@ export interface CommunityRelease {
 
 export const COMMUNITY_RELEASE_NOTES: readonly CommunityRelease[] = [
   {
+    "version": "0.1.58",
+    "date": "2026-11-28",
+    "title": "your own Overview, a cursor overlay on/off key, and a bug hunt",
+    "groups": [
+      {
+        "heading": "Overview",
+        "items": [
+          {
+            "text": "Customize: pick which cards show and in what order, the same for every character on this PC."
+          },
+          {
+            "text": "Four new cards (off until you turn them on): Buffs running out, Respawns here, Motes (this session, per hour, by tier and in this zone) and Coin (this session, per hour and in this zone)."
+          },
+          {
+            "text": "Edit layout: drag cards to move them, and make each one 1 to 4 columns wide. Reset puts the original page back."
+          }
+        ]
+      },
+      {
+        "heading": "Cursor overlay",
+        "items": [
+          {
+            "text": "New shapes (oval, square, rounded square, diamond, centre dot, target), an X/Y offset from the pointer, crosshair lines, and a trail with sparkles. All off by default."
+          },
+          {
+            "text": "Preferences has a new Hotkeys section: set a key that turns the whole cursor overlay on or off, even while you play. The Bring overlays back key is listed there too."
+          }
+        ]
+      },
+      {
+        "heading": "Alt. Adv.",
+        "items": [
+          {
+            "text": "Type /alt list in game once and the tab reads every rank you hold from it, plus the abilities your log shows you using."
+          },
+          {
+            "text": "Fixes: casting the spell Divine Aura, Stoicism or Rampage no longer marks the AA of that name as held; Quick Evacuation counts once for a Druid and Wizard combo; the rank picker only offers ranks that count; clicking a recommended AA opens its row even when a filter hid it."
+          }
+        ]
+      },
+      {
+        "heading": "Everywhere",
+        "items": [
+          {
+            "text": "Map timer pins say UP and \"due long ago\" like the Timers tab."
+          },
+          {
+            "text": "Loot times read 24-hour (\"Aug 5, 20:26\"), like the caption above them."
+          },
+          {
+            "text": "\"Time ago\" reads the same on every screen (\"70m ago\")."
+          },
+          {
+            "text": "The Combat pet/other tag is readable, and small tags are one size across Loot, Factions and Alerts."
+          },
+          {
+            "text": "The Leveling and Maps zone tables reverse on a second click, and several tables remember their sort across restarts."
+          },
+          {
+            "text": "Exaltations and the Wish list follow your current character's classes."
+          },
+          {
+            "text": "Preferences is grouped under Game, Display, Overlays & alerts and App, and the groups fold."
+          },
+          {
+            "text": "Natural voice is about twice as fast."
+          }
+        ]
+      },
+      {
+        "heading": "Fixes",
+        "items": [
+          {
+            "text": "Best in slot: a bow moved into Range gets its arrow in Ammo; clearing the Level box to retype no longer puts a 1 in front."
+          },
+          {
+            "text": "Tradeskills: Explore at the top trivial says where the wiki's recipes end; Pick up no longer contradicts the run it lists."
+          },
+          {
+            "text": "Wiki Gaps: recipe Copy asks you to pick the tradeskill instead of writing a blank one."
+          },
+          {
+            "text": "Macros: a macros.json the app cannot read is never saved over with an empty library."
+          },
+          {
+            "text": "Item cards near the window's right edge stay on screen."
+          },
+          {
+            "text": "Reading log: a busy engine gets its full 20 seconds before the log is read again."
+          },
+          {
+            "text": "Electron 45.5 with Chromium security fixes."
+          }
+        ]
+      },
+      {
+        "heading": "Data",
+        "items": [
+          {
+            "text": "Wiki pages refreshed to today (32 pages changed, 1 new item: Fragment of Grand Potential)."
+          }
+        ]
+      }
+    ],
+    "knownIssues": "On a few PCs where the app supplied an old Visual C++ runtime itself, natural voice stops after this update and shows the \"install the Visual C++ runtime\" message; run the voice download or repair once and it fetches the new files. The installer is about 16 MB larger this time. The Overview Motes and Coin \"per hour\" count from your last login line, so a log with no logout reads low. Best in slot does not weigh worn effects, procs or focus effects yet. Send my loot to the wiki has not been tried against the live wiki yet. When you join a group, only the person whose invite you accepted is known at once; others already in it show under Group once they talk in party or you buff them. A group-mate's mez does not hold a fight open (the log does not say who cast it). The Void motes tab skips Slime Blood of Cazic-Thule and estimates a drop's chance from the size of the mob's loot list. The archive recovery and the Put back copy have only been tested with simulated failures. The Macros Send has not yet been tried in game: keep the copy it makes until you have logged in and seen your macros. A \"(guessed)\" pet owner can be wrong until /pet who leader settles it. The healing meters still divide by the whole fight's length. A mob or item added to the wiki after this build shows no wiki details until the next build (or a Copy click in Wiki Gaps). Capture finds the game window only when it is titled \"EverQuest Legends\" or \"EverQuest\". The screenshot reader reads English only. The installer is not code-signed, so Windows shows \"Windows protected your PC\" the first time (More info, then Run anyway). Builds before test.20 do not update themselves; install one by hand once."
+  },
+  {
     "version": "0.1.57",
     "date": "2026-11-25",
     "title": "the Alt. Adv. tab, and Best in slot fixes",
