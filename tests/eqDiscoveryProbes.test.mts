@@ -3,7 +3,8 @@
 // Discovery answers two questions about the actual machine, and it used to answer both by SPAWNING:
 // eight `reg.exe query <hive> /s /f EverQuest /t REG_SZ` subprocesses whose stdout was regex-grepped
 // for install paths, and one `wmic logicaldisk get DeviceID,DriveType` for the drive letters to
-// sweep. Both now read IN-PROCESS through `native-reg`. That was an AV decision as much as a speed
+// sweep. Both now read IN-PROCESS (native-reg from JOS-184, koffi into advapi32 since 2026-11-27,
+// src/main/log/winRegistry.ts). That was an AV decision as much as a speed
 // one — "unsigned exe sweeps the uninstall registry and enumerates disks moments after install" is
 // the behavioural signature a heuristic engine scores — so what has to be pinned is that the ANSWER
 // did not change with the mechanism.
