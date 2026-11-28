@@ -1,7 +1,6 @@
 # Unit tests the community build fails ON PURPOSE, by exact name (scripts/community/known-reds.sh).
 # A release stops on any other failure, and on any of these passing again.
 #
-# The TEST build drops code signing and the official publisher, which two packaging tests pin for
-# the creator's official build:
-the sign hook is wired, and it is the one every shipped executable goes through
-nothing in the config narrows the signable set out from under the engine
+# EMPTY since 2026-11-27: the two packaging tests that pinned the creator's signed build (the fork
+# ships unsigned) now pin the fork's own config (tests/enginePackaging.test.mts), so the whole unit
+# suite is expected green. A name added here needs its reason on the line above it.

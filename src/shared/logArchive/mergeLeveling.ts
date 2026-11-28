@@ -5,8 +5,9 @@
 // read off every gain and every purchase, so a merge that dropped one would show it.
 //
 // The latest `/alt list` run is the newer one's (by its stamp, as either side may lack it); the
-// activations join by name, the earliest first sighting, the latest last one and the highest rank;
-// castOnly only when every side saw the name only as a bare cast.
+// activations join by name, the earliest first sighting and the highest rank; castOnly only when every
+// side saw the name only as a bare cast. A `last` stamp in a segment written before 2026-11-27 is
+// dropped: the engine no longer publishes one.
 
 import type { AaActivation, AaListRun } from '../aaList'
 import type { LevelingSnap } from '../types'
@@ -28,9 +29,8 @@ function joinActivations(older: readonly AaActivation[], newer: readonly AaActiv
   for (const a of [...older, ...newer]) {
     const had = byName.get(a.name)
     const rank = Math.max(had?.rank ?? 0, a.rank ?? 0)
-    const bare = had?.castOnly === true && a.castOnly === true ? { castOnly: true as const } : {}
-    const joined = had === undefined ? a : { name: a.name, first: Math.min(had.first, a.first), last: Math.max(had.last, a.last), ...bare }
-    byName.set(a.name, rank > 0 ? { ...joined, rank } : joined)
+    const bare = (had === undefined || had.castOnly === true) && a.castOnly === true ? { castOnly: true as const } : {}
+    byName.set(a.name, { name: a.name, first: Math.min(had?.first ?? a.first, a.first), ...(rank > 0 ? { rank } : {}), ...bare })
   }
   return [...byName.values()]
 }

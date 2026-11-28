@@ -654,7 +654,8 @@ paths inside settings).
   electron-builder.yml:206 turns resource editing off)** Options: leave as is | turn resource
   editing on without signing (signExecutable: false instead of signAndEditExecutable: false), as its
   own later release. Recommended: Its own later release, after the rename has landed: it changes the
-  build step and the known-reds list (tests/enginePackaging.test.mts:160-175), and needs its own
+  build step and the known-reds list (tests/enginePackaging.test.mts:160-175; since 2026-11-27 that
+  test accepts either flag and the list is empty), and needs its own
   build and install test.
 - **Publisher and copyright shown in Settings > Apps ("jmoyers", "Copyright 2026 Josh Moyers", from
   package.json:5 and electron-builder.yml:10)** Options: leave both | keep the copyright, change the
@@ -741,7 +742,8 @@ requests, which name this repo.
    leave it; stop keeping the lists; remove the code (large).
 9. **The two signing tests kept red on purpose** (`scripts/community/known-reds.txt`). Options: keep
    them red; make them describe this build's unsigned configuration and empty the list, so
-   `npm test` is green on the trunk.
+   `npm test` is green on the trunk. DONE 2026-11-27 (branch fix-reds): the second option; the
+   list is empty.
 10. **The publisher Windows shows.** `"author": "jmoyers"` in `package.json` is what Settings, Apps
     lists as the publisher. Options: leave it; name the project there (his copyright line stays
     either way; the licence requires it).

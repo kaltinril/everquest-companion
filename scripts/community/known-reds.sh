@@ -6,7 +6,8 @@
 #
 # THE KNOWN REDS are the TEST build's own doing, listed in scripts/community/known-reds.txt with the
 # reason for each. A new failure, a crash with no named failure, or a known red that stops failing
-# (the list should then shrink) all stop the release.
+# (the list should then shrink) all stop the release. The list may be empty (it is since
+# 2026-11-27): then any failure stops it.
 set -uo pipefail
 
 repo=$(git rev-parse --show-toplevel)
@@ -20,7 +21,7 @@ status=$?
 
 # node:test prints each failure as "✖ <name> (<n>ms)", then repeats them under "✖ failing tests:".
 failing=$(tr -d '\r' <"$out" | grep -E '^✖ ' | grep -v '^✖ failing tests:' | sed -E 's/ \([0-9.]+ms\)$//; s/^✖ //' | sort -u)
-known=$(tr -d '\r' <"$list" | grep -vE '^\s*(#|$)' | sort -u)
+known=$(tr -d '\r' <"$list" | grep -vE '^\s*(#|$)' | sort -u || true)
 
 grep -E 'ℹ (tests|pass|fail)' "$out"
 
@@ -43,4 +44,10 @@ if [ -n "$fixed" ]; then
   echo "$fixed" | sed 's/^/  /' >&2
   exit 1
 fi
-echo "unit suite: only the known reds failed ($(echo "$known" | wc -l | tr -d ' '))"
+# `echo ""` is one line to wc, so the names are counted instead: an empty list counts 0.
+count=$(printf '%s' "$known" | grep -c . || true)
+if [ "$count" -eq 0 ]; then
+  echo "unit suite: no failures (no known reds listed)"
+else
+  echo "unit suite: only the known reds failed ($count)"
+fi
