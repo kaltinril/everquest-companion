@@ -120,22 +120,35 @@ function cachedFormat(kind: FormatKind, d: Date, opts: Intl.DateTimeFormatOption
   return f.format(d)
 }
 
+/** How a coarse age is spelled. The RUNGS are the same for all three; only the words differ.
+ *  - short (default): "just now" / "12m ago" / "3h ago" / "2d ago"
+ *  - terse (overlay meter rows, no room): "now" / "12m" / "3h" / "2d"
+ *  - long (a sentence): "just now" / "12 minutes ago" / "3 hours ago" / "2 days ago" */
+export type AgeStyle = 'short' | 'terse' | 'long'
+
+const ageUnit = (n: number, unit: 'minute' | 'hour' | 'day', style: AgeStyle): string => {
+  if (style === 'long') return `${n.toLocaleString('en-US')} ${unit}${n === 1 ? '' : 's'} ago`
+  const u = unit === 'minute' ? 'm' : unit === 'hour' ? 'h' : 'd'
+  return style === 'terse' ? `${n}${u}` : `${n}${u} ago`
+}
+
 /**
- * Coarse, human relative age: "just now" / "12m ago" / "3h ago" / "2d ago".
- * `ts` 0/undefined ⇒ '' (unknown). Deliberately COARSE — this is ambient text
- * (the left-nav update chip's "checked …" line), not a precise timestamp; the
- * exact clock time lives in Preferences via formatDateTime. `now` is injectable
- * so the mapping is testable without faking the clock.
+ * Coarse, human relative age, THE app's one "time ago" ladder (2026-11-27, dup-ui-b-1): under 90 s
+ * is just now, then minutes under 90 min, hours under 36 h, then days. Every "... ago" label in the
+ * app (update chip, dump lines, Mobs considered, title-bar characters, Combat fight picker, alert
+ * wizard tooltips, the drop report card, the overlay meters) goes through this, so one event reads
+ * the same age everywhere. `ts` 0/undefined => '' (unknown). A future `ts` floors at just now.
+ * `now` is injectable so the mapping is testable without faking the clock.
  */
-export function formatAge(ts: number | undefined, now: number = Date.now()): string {
+export function formatAge(ts: number | undefined, now: number = Date.now(), style: AgeStyle = 'short'): string {
   if (!ts) return ''
   const secs = Math.max(0, (now - ts) / 1000)
-  if (secs < 90) return 'just now'
+  if (secs < 90) return style === 'terse' ? 'now' : 'just now'
   const mins = secs / 60
-  if (mins < 90) return `${Math.round(mins)}m ago`
+  if (mins < 90) return ageUnit(Math.round(mins), 'minute', style)
   const hrs = mins / 60
-  if (hrs < 36) return `${Math.round(hrs)}h ago`
-  return `${Math.round(hrs / 24)}d ago`
+  if (hrs < 36) return ageUnit(Math.round(hrs), 'hour', style)
+  return ageUnit(Math.round(hrs / 24), 'day', style)
 }
 
 /**

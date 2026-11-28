@@ -1,11 +1,11 @@
 import { type JSX, useMemo, useState } from 'react'
 import type { OverlayKind } from '@shared/types'
 import type { CombatSnapshot, SegmentView } from '@shared/combat'
-import { formatTime } from '../lib/formatDate'
+import { formatAge, formatTime } from '../lib/formatDate'
 import { fmtDur } from '../features/combat/copyTable'
 import { scopeOptions } from '../features/combat/dashboardData'
 import { useGlobalFight } from '../features/combat/useGlobalFight'
-import { relativeAge, type OverlaySelectRow } from './OverlaySelect'
+import { type OverlaySelectRow } from './OverlaySelect'
 import { OverlayHeader } from './OverlayHeader'
 import { HealBars } from './healBars'
 import { useMeterScope } from '../features/combat/useCombatPrefs'
@@ -110,7 +110,7 @@ function healSelectRows(snap: CombatSnapshot | null, isFight: boolean, now: numb
     value: o.value,
     label: o.label,
     rate: '',
-    timing: [o.startTs ? formatTime(o.startTs) : '', relativeAge(o.startTs, now), o.durationSec > 0 ? fmtDur(o.durationSec) : o.live ? 'live' : '-']
+    timing: [o.startTs ? formatTime(o.startTs) : '', formatAge(o.startTs, now, 'terse'), o.durationSec > 0 ? fmtDur(o.durationSec) : o.live ? 'live' : '-']
       .filter(Boolean)
       .join(' · '),
     live: o.live

@@ -17,6 +17,7 @@ import { OVERLAY_KIND_LABEL } from '@shared/overlayLabels'
 import { type OverlayReset, OverlayResetDialog, useOverlayReset } from './OverlayResetDialog'
 import PerfChip from './PerfChip'
 import { isDragSurfaceDoubleClick } from './titleBarDrag'
+import { formatAge } from '../lib/formatDate'
 
 /**
  * Frameless window title bar (Task #23). Replaces BOTH the OS chrome and the old
@@ -32,17 +33,6 @@ import { isDragSurfaceDoubleClick } from './titleBarDrag'
  */
 
 const BAR_HEIGHT = 40 // px — compact, matches the old `Toolbar variant="dense"`.
-
-function lastPlayed(ms?: number): string {
-  if (!ms) return ''
-  const secs = Math.max(0, (Date.now() - ms) / 1000)
-  if (secs < 90) return 'just now'
-  const mins = secs / 60
-  if (mins < 90) return `${Math.round(mins)}m ago`
-  const hrs = mins / 60
-  if (hrs < 36) return `${Math.round(hrs)}h ago`
-  return `${Math.round(hrs / 24)}d ago`
-}
 
 // A single Discord/VS-Code-style caption button: 46px-wide hover target, icon
 // centered, subtle hover fill; the close button hovers red.
@@ -371,7 +361,7 @@ function CharacterPicker({
                   {c.name} · {c.server}
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  last played {lastPlayed(c.lastPlayed)}
+                  last played {formatAge(c.lastPlayed)}
                 </Typography>
               </Box>
             </MenuItem>
