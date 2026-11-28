@@ -7,7 +7,7 @@
     <li>Pet Classes: [[Shadow Knight]] / [[Warrior]]</li>
     <li>Pet Level: 33</li>
     <li>Hit Points: 2281 (+1/tick)</li>
-    <li>Mana: 684 (+8/tick)</li>
+    <li>Mana: 684 (+66/tick)</li>
     </ul>
   </div>
   <div style="flex: 1;">
@@ -67,11 +67,10 @@
 * [[Skill_Taunt|Taunt]]
 
 == Spell List ==
-'''Needs to be Verified'''
-* [[Cancelling of Life|<span class='itemeff'>Cancelling of Life</span>]]
 * [[Heat Blood|<span class='itemeff'>Heat Blood</span>]]
-* [[Engulfing Darkness|<span class='itemeff'>Engulfing Darkness</span>]]??
-* [[Lifespike|<span class='itemeff'>Lifedraw</span>]]??
+* [[Engulfing Darkness|<span class='itemeff'>Engulfing Darkness</span>]]
+* [[Lifedraw|<span class='itemeff'>Lifedraw</span>]]
+* [[Negation of Life|<span class='itemeff'>Negation of Life</span>]]
 
 == Focus Items ==
 * None

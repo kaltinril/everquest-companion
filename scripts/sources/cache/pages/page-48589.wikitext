@@ -94,9 +94,14 @@ For more info see [[Skill_Baking#Baking_Leveling_Guide_.28Detailed.29|Baking Lev
   <td colspan="4"> 
    <p>162</p>
   </td>
- </tr>
-
- <tr> 
+ </tr><tr><td>[[Pinemyer Pasta]]</td><td>
+* 1 [[Noodles]]
+* 1 [[Spices]]
+* 1 [[Jug of Sauces]]
+</td><td>191</td></tr><tr><td>[[Pixie Powder Cinnesticks]]</td><td>
+* 3 [[Pixie Dust]]
+* 1 [[Cinnamon Sticks]]
+</td><td>202</td></tr><tr> 
   <td>[[Dragon Steak]]</td>
 <td> 
 * 1 [[Dragon Meat]]
@@ -107,7 +112,6 @@ For more info see [[Skill_Baking#Baking_Leveling_Guide_.28Detailed.29|Baking Lev
    <p>242</p>
   </td>
  </tr>
-
 
 </table>
 
@@ -743,13 +747,9 @@ Note: These recipes and trivials were taken from EQTraders near the end of Velio
                 <td>SV FIRE -1, SV COLD +2</td>
               </tr>
 
-
-
                 <td colspan="6"> 
                   <div align="center"><h3>Velious Recipes</h3></div>
                 </td>
-
-
 
               <tr> 
                 <td>{{:Beer Braised Mammoth}}</td>
@@ -808,8 +808,7 @@ Note: These recipes and trivials were taken from EQTraders near the end of Velio
                 <td>5</td>
                 <td>41</td>
                 <td>STR +2</td>
-              </tr>
-              <tr> 
+              </tr><tr><td>Noodles</td><td>[[Cup of Flour]], [[Water Flask]], Egg</td><td>mixing bowl</td><td>varies</td><td>31</td><td></td></tr><tr> 
                 <td>{{:Orange Flavored Cod}}</td>
                 <td>[[Cobalt Cod]], [[Jug of Oyster Sauces]], [[Kelp Garnish]], [[Emerald Orange]] ([[Skill Forage|foraged]])</td>
                 <td>spit/oven</td>
@@ -891,8 +890,7 @@ Note: These recipes and trivials were taken from EQTraders near the end of Velio
                 <td>2</td>
                 <td>75</td>
                 <td>SV MAGIC +3</td>
-              </tr>
-              <tr> 
+              </tr><tr><td>Pinemyer Pasta</td><td>[[Noodles]], [[Spices]], [[Jug of Sauces]]</td><td>spit/oven</td><td>1</td><td>191</td><td></td></tr><tr> 
                 <td>{{:Raptor Steaks}}</td>
                 <td>[[Raptor Meat]], [[Jug of Sauces]], [[Spices]]</td>
                 <td>spit/oven</td>
@@ -976,13 +974,11 @@ Note: These recipes and trivials were taken from EQTraders near the end of Velio
                 <td>STR +2, STA +1</td>
               </tr>
 
-
               <tr> 
                 <td colspan="6"> 
                   <div align="center"><h3>Quest Recipes</h3></div>
                 </td>
               </tr>
-
 
               <tr> 
                 <td>[[Uncooked Rat Ear Pie]]</td>
@@ -1259,7 +1255,7 @@ All people:
 * Go to Greater or Lesser Faydark
 * Buy or Forage [[Cinnamon Sticks]]
 * Hunt Pixies for Pixie dust
-* Make Pixie Powder Cinnesticks till trivial '''(>200)''': 3 Pixie Dust, 1 Cinnamon Stick (in a mixing bowl)
+* Make Pixie Powder Cinnesticks till trivial '''(202)''': 3 Pixie Dust, 1 Cinnamon Stick (in a mixing bowl)
 
 '''NOTE: [[A pixie jongleur]] gives you negative faction hits to: Guards of Qeynos (-30), Jaggedpine Treefolk (-30), Protectors of Pine (-30). QRG Protected Animals (-30).  Kill with a character that doesn't care about those faction hits or find a way to kill these pixies without getting a faction hit if this is a concern with you.  You will have to kill hundreds, maybe thousands to get enough pixie dusts to get to 202 skill! '''
 

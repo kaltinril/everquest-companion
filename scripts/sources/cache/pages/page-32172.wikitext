@@ -1,0 +1,17 @@
+{{Classic Era}}
+
+Blighted Armor is the planar armor set for [[Necromancer|Necromancers]]. It drops as part of [[Classic Planar Armor: Group 2|Group 2 Armor Sets]] in the [[Plane of Hate]] and [[Plane of Fear]]. There does not appear to be a named mob that always drops two pieces of this armor.
+
+{{Gear Set
+|Blighted Armband
+|Blighted Boots
+|Blighted Gloves
+|Blighted Robe
+|Blighted Skullcap
+|Blighted Sleeves
+|Blighted Trousers
+}}
+
+[[File:Blighted_Armor.jpg|thumb|[[Human]] in a set of Blighted.]]
+
+[[Category: Armor Sets]]

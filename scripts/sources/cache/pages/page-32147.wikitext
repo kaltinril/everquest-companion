@@ -1,0 +1,21 @@
+{{Classic Era}}
+
+[[File:Lustrous_Russet_Armor.png|thumb|[[Half Elf]] in a Lustrous Russet set.|left]]
+
+A planar armor set for chain and plate wearing classes; similar to how Midnight Armor is for cloth and leather classes. It drops as part of [[Classic Planar Armor: Group 1|Group 1 Armor Sets]] in the [[Plane of Fear]] and [[Plane of Hate]]. Additionally, this armor set can be farmed by hunting [[A Haunted Chest|haunted chests]] in non-raid instances of [[Plane of Hate]].
+
+{{Gear Set
+|Lustrous Russet Boots
+|Lustrous Russet Bracer
+|Lustrous Russet Breastplate
+|Lustrous Russet Gauntlets
+|Lustrous Russet Greaves
+|Lustrous Russet Helm
+|Lustrous Russet Vambraces
+}}
+
+== Farming Lustrous Russet Armor ==
+
+{{#lsth:A Haunted Chest|Notes}}
+
+[[Category: Armor Sets]]

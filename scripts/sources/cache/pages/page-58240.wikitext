@@ -1,0 +1,16 @@
+{{Classic Era}}
+A planar armor set for [[Beastlord|Beastlords]]. It drops as part of [[Classic Planar Armor: Group 1|Group 1 Armor Sets]] in the [[Plane of Hate]] and [[Plane of Fear]]. There does not appear to be a named mob that always drops two pieces of this armor.
+
+{{Gear Set
+|Anthemion Armbands
+|Anthemion Boots
+|Anthemion Gloves
+|Anthemion Jerkin
+|Anthemion Leggings
+|Anthemion Skullcap
+|Anthemion Wristguard
+}}
+
+[[File:Anthemion_Armor.jpg|thumb|[[Human]] in an Anthemion set.]]
+
+[[Category: Armor Sets]]

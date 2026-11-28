@@ -1,0 +1,16 @@
+{{Classic Era}}
+Ethereal Mist is a planar armor set for [[Cleric|Clerics]]. It drops as part of [[Classic Planar Armor: Group 1|Group 1 Armor Sets]] in the [[Plane of Hate]] and [[Plane of Fear]]. The named target that always drops two pieces of this armor is [[High Priest M`kari]] in the [[Plane of Hate]].
+
+{{Gear Set
+|Ethereal Mist Boots
+|Ethereal Mist Bracers
+|Ethereal Mist Chestplate
+|Ethereal Mist Gauntlets
+|Ethereal Mist Greaves
+|Ethereal Mist Helm
+|Ethereal Mist Vambraces
+}}
+
+[[File:Ethereal_Mist_Armor.jpg|thumb|[[Human]] in Ethereal Mist set.]]
+
+[[Category: Armor Sets]]

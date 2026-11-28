@@ -1066,7 +1066,7 @@ When used with [[Invoke Death]], the focus provides +10 STR/STA/AGI, which grant
 
 ===== Benefits =====
 
-* Bigger Pet Size?
+* Bigger Pet Size
 * +1 level (limited like the bonus levels from [[Spell Upgrade System|spell upgrades]])
 ** This level may unlock new spells that the pet can cast.
 * +10 STR, STA, and AGI

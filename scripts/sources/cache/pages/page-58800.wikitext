@@ -7,7 +7,7 @@
     <li>Pet Classes: [[Shadow Knight]] / [[Warrior]]</li>
     <li>Pet Level: 9</li>
     <li>Hit Points: 453 (+1/tick)</li>
-    <li>Mana: 186 (+4/tick)</li>
+    <li>Mana: 186 (+18/tick)</li>
     </ul>
   </div>
   <div style="flex: 1;">

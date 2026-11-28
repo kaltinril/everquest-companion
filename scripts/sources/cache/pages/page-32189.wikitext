@@ -1,0 +1,16 @@
+{{Classic Era}}
+Vermiculated Armor is the planar armor set for [[Druid|Druids]]. It drops as part of [[Classic Planar Armor: Group 1|Group 1 Armor Sets]] in the [[Plane of Hate]] and [[Plane of Fear]]. There does not appear to be a named mob that always drops two pieces of this armor.
+
+{{Gear Set
+|Vermiculated Armplates
+|Vermiculated Boots
+|Vermiculated Bracelet
+|Vermiculated Crown
+|Vermiculated Gloves
+|Vermiculated Leggings
+|Vermiculated Tunic
+}}
+
+[[File:Vermiculated_Armor.jpg|thumb|[[Human]] in a Vermiculated set.]]
+
+[[Category: Armor Sets]]

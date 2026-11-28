@@ -1,0 +1,15 @@
+{{Classic Era}}
+[[File:Indicolite_Armor.png|thumb|Indicolite Armor on a Male Dark Elf|left]]
+Indicolite Armor is the planar armor set for [[Warrior|Warriors]]. It drops as part of [[Classic Planar Armor: Group 2|Group 2 Armor Sets]] in the [[Plane of Hate]] and [[Plane of Fear]]. The named target that always drops two pieces of this armor is [[Grandmaster R`Tal]] in the [[Plane of Hate]].
+
+{{Gear Set
+|Indicolite Boots
+|Indicolite Bracer
+|Indicolite Breastplate
+|Indicolite Gauntlets
+|Indicolite Greaves
+|Indicolite Helm
+|Indicolite Vambraces
+}}
+
+[[Category:Armor Sets]]

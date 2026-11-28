@@ -1,0 +1,16 @@
+{{Classic Era}}
+Valorium Armor is the planar armor set for [[Paladin|Paladins]]. It drops as part of [[Classic Planar Armor: Group 1|Group 1 Armor Sets]] in the [[Plane of Hate]] and [[Plane of Fear]]. There does not appear to be a named mob that always drops two pieces of this armor.
+
+{{Gear Set
+|Valorium Boots
+|Valorium Bracers
+|Valorium Chestplate
+|Valorium Gauntlets
+|Valorium Greaves
+|Valorium Helmet
+|Valorium Vambraces
+}}
+
+[[File:Valorium_Armor.jpg|thumb|[[Human]] in a set of Valorium.]]
+
+[[Category:Armor Sets]]

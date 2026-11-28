@@ -1,0 +1,17 @@
+{{Classic Era}}
+
+Carmine Armor is the planar armor set for [[Wizard|Wizards]]. It drops as part of [[Classic Planar Armor: Group 2|Group 2 Armor Sets]] in the [[Plane of Hate]] and [[Plane of Fear]]. There does not appear to be a named mob that always drops two pieces of this armor.
+
+{{Gear Set
+|Carmine Boots
+|Carmine Gloves
+|Carmine Pants
+|Carmine Robe
+|Carmine Sleeves
+|Carmine Trinket
+|Carmine Turban
+}}
+
+[[File:Carmine_Armor.jpg|thumb|[[Human]] in a set of Carmine.]]
+
+[[Category: Armor Sets]]
