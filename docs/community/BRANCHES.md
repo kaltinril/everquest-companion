@@ -200,8 +200,12 @@ The rows are as written at retirement. `main` is now a frozen copy of the origin
 
 Failures that are not regressions, so the gate can tell a new red from an old one:
 
-- 2 `enginePackaging` signing assertions (the TEST build turns signing off on purpose;
-  `scripts/community/known-reds.txt`).
+- None, unit or engine, since 2026-11-27 (`scripts/community/known-reds.txt` is empty and
+  `known-reds.sh` passes only on a green suite). Until then: 2 `enginePackaging` signing
+  assertions that pinned the creator's signed build, now rewritten to pin the fork's unsigned
+  config; and engined's `ingest::kept::tests::a_kept_key_never_holds_while_the_state_moves`, a real
+  bug (leveling's AA `last` stamp moved without announcing, since e06f012cf), fixed in the engine.
+  The flakes in `agent/WORKFLOW.md` (Gate) still apply: re-run one alone before calling it red.
 
 A data top-up is not finished until the data-pinned tests are re-measured against it:
 wiki typos are corrected on the wiki and read back by a second delta run, and the fact pins,

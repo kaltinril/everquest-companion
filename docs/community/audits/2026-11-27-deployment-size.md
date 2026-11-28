@@ -90,4 +90,4 @@ Not taken, and why (re-check these, not the rest):
 - vite 8.4 (minor): a second rolldown copy beside electron-vite's.
 - Rust toolchain pin 1.99 (latest 1.100.1): minor; bump with `npm run gen:protocol`.
 - Known red outside known-reds.txt: engined `ingest::kept::tests::a_kept_key_never_holds_while_the_state_moves`
-  (pre-existing, in the 2026-11-27 bug-hunt audit).
+  (pre-existing, in the 2026-11-27 bug-hunt audit). Fixed the same day (branch fix-reds).

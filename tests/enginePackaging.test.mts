@@ -33,6 +33,13 @@
 //      one named beside it. It cannot prove a signature exists (that needs the AZURE_* secrets and
 //      therefore CI), and it does not pretend to: what it prevents is the config quietly ceasing
 //      to ask.
+//
+//      THE FORK SHIPS UNSIGNED (code signing is shelved, docs/community/RELEASING.md), so since
+//      2026-11-27 this half pins what the fork's config does instead of the creator's signed build,
+//      which two tests here asserted and the fork kept red on purpose (known-reds.txt). What stays
+//      pinned either way: signing is off in one stated place, no publisher name makes every update
+//      unacceptable, and nothing in the config would keep the engine out of the signed set if
+//      signing came back.
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
@@ -157,23 +164,38 @@ test('THE MATCHER IS A DIRECTORY — a file `from` would ship an UNSIGNED engine
   )
 })
 
-test('the sign hook is wired, and it is the one every shipped executable goes through', () => {
-  // `windowsSignToolManager.signFile` resolves `win.signtoolOptions.sign` and calls it even when no
-  // certificate is configured, which is what lets the hook self-skip locally and sign in CI.
-  assert.match(builderYml, /sign: scripts\/azure-sign\.cjs/)
-  assert.match(builderYml, /signAndEditExecutable: true/)
+/** Whether the Windows build signs the executables it copies. `createTransformerForExtraFiles`
+ *  returns null (copy unsigned) when either flag is false, and the exe is signed or not with it. */
+function signingOff(): boolean {
+  return /^\s+signAndEditExecutable: false$/m.test(builderYml) || /^\s+signExecutable: false$/m.test(builderYml)
+}
+
+test('THE FORK SHIPS UNSIGNED, said in one place, with no publisher name to reject its updates', () => {
+  // Code signing is shelved (docs/community/RELEASING.md): the community build turns it off in
+  // `win`, and the installer, the app exe and the engine are all copied unsigned.
+  assert.equal(signingOff(), true, 'the community build is unsigned: win.signAndEditExecutable (or signExecutable) is false')
+  // A `publisherName` makes electron-updater refuse any update not signed by that certificate, so
+  // on an unsigned build it would strand every install on its current version without a word.
+  // tests/communityIdentity.test.mts refuses it in the built app-update.yml; this is the source.
+  assert.equal(/^\s*publisherName:/m.test(builderYml), false, 'an unsigned build must not name a publisher')
 })
 
-test('nothing in the config narrows the signable set out from under the engine', () => {
-  // `shouldSignFile` signs `.exe` by DEFAULT — but `signExts`, if present, REPLACES that default,
-  // and `signExecutable: false` / `signAndEditExecutable: false` make
-  // `createTransformerForExtraFiles` return null so extra resources are copied unsigned. None of
-  // the three is set today; each would be a silent downgrade.
+test('IF SIGNING RETURNS it covers every shipped executable, the engine included', () => {
+  // Asserted while signing is off too, so turning it back on cannot inherit a config that leaves
+  // the engine out. `shouldSignFile` signs `.exe` by DEFAULT, but `signExts`, if present, REPLACES
+  // that default: the installer would still be signed and the engine not.
   assert.equal(/^\s*signExts:/m.test(builderYml), false, 'signExts would replace the .exe default')
-  assert.equal(/signExecutable: false/.test(builderYml), false)
-  assert.equal(/signAndEditExecutable: false/.test(builderYml), false)
-  // …and the file that gets signed has to be the extension `shouldSignFile` recognises.
+  // …and the engine has to be the extension `shouldSignFile` recognises, shipped as an extra
+  // resource (the directory shape is pinned above), which is what reaches the sign transformer.
   assert.match(engineMatcher().filter, /\.exe$/)
+  // A sign hook named in the config is a file in the repo: `windowsSignToolManager.signFile` calls
+  // it for every file it signs, so a dangling path would fail the first signed build.
+  const hook = /^\s+sign: (\S+)$/m.exec(builderYml)
+  if (hook) assert.ok(existsSync(join(ROOT, hook[1])), `the sign hook ${hook[1]} must exist`)
+  // With signing on, something has to do the signing: the hook, or azureSignOptions.
+  if (!signingOff()) {
+    assert.ok(hook !== null || /^\s+azureSignOptions:/m.test(builderYml), 'signing is on but nothing signs')
+  }
 })
 
 // =========================================================================================

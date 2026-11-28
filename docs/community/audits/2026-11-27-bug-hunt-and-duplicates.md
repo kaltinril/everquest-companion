@@ -358,7 +358,8 @@ before/after image (see "Prototypes").
   swapped into the candidate, so it predates this batch. Not in `known-reds.txt`. Likely cause, not
   verified: `fold_used` (2026-11-25, AA tab) moves an activation's `last` stamp on a repeat without
   moving the announce cursor. Needs a fix or an owner ruling before the next release (RELEASING.md
-  runs cargo).
+  runs cargo). FIXED the same day (branch fix-reds): confirmed by bisect (3fca0ae0b passes,
+  e06f012cf, which fed casts into the used set, fails); the engine no longer publishes `last`.
 
 ## Prototypes
 
