@@ -4,6 +4,25 @@ State at 2026-10-29: test.38 is published (`community-0.1.0-test.38`); `main_com
 `origin`. Fork #4 is closed. The owner's answers of 2026-10-29 are folded in below; each piece of
 agreed work has a row in its `requirements/` file.
 
+Status on 2026-11-28 (docs review; the sections below are left as written):
+
+- "Ruled 2026-10-29, work queued": all built. Map pins Slayer labels on hover, the `UNRELEASED`
+  gate removed, census tests as floors and properties, the competitor quick wins (death recap,
+  swing timer, heading arrow, crawl mode, recover-overlays hotkey, installed fonts, friends
+  online), the performance leftovers, the dependency majors (2026-10-29, and again 2026-11-27:
+  `audits/2026-11-27-deployment-size.md`). Each row's status is in its `requirements/` file.
+- Fork #2 (the log-only rune count) was built, then the issue was closed as can't fix (owner,
+  2026-11-22).
+- Candidate work now built: Overview widgets Phase 1, and the 4-column grid with widths and drag
+  and drop (2026-11-28, `plans/2026-11-27-overview-widgets.md`); the AA planner, as the Alt.
+  Advancement tab (2026-11-25, `requirements/alt-advancement.md`); the census-test change.
+- Still open from this file: the "Waiting on the owner" questions, the Linux build, the zone and
+  loot overlay ("not yet"), publishing to the wiki and sending observations (rule 15 sign-off),
+  a phone second screen, character sheet as a PNG (no sign of it in the code), the Overview
+  one-line custom overlay and
+  Phase 2, the Gaps-tab open points, and the next wiki delta before ~2027-01-16 (the last ran
+  2026-11-28).
+
 ## Waiting on the owner
 
 - Maps: the travel card (closest port, era, routes) floats over the map's top-left corner since

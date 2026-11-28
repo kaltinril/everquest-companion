@@ -101,10 +101,11 @@ and 4).
     equals the gated tree is not gated again. A change that touches an engine input
     (`bash scripts/community/engine-changed.sh` prints yes: `engine/`, the data files the engine
     embeds, `protocol/`, `tests/fixtures/`) runs the cargo tests of the crates it touches; one that
-    prints no skips `cargo test` entirely. The FULL suite (`npm test` via `known-reds.sh`, and `cargo test --workspace`
-    after an engine change) runs only before a release (RELEASING.md) or when the owner asks.
-    Known reds are listed in BRANCHES.md; anything not on that list is a regression and the merge
-    does not stand. A change to `electron`,
+    prints no skips `cargo test` entirely. The FULL suite (`npm test` via `known-reds.sh`, and
+    `cargo test --workspace` after an engine change) runs only before a release (RELEASING.md) or
+    when the owner asks.
+    Known reds are listed in BRANCHES.md (none, unit or engine, since 2026-11-27); anything not on
+    that list is a regression and the merge does not stand. A change to `electron`,
     `electron-builder`, `electron-vite` or `electron-builder.yml` also gets a real `npm run dist`.
     A change that touches only documentation (Markdown under `docs/`, `CLAUDE.md`, a README)
     merges without the gate, and no test may read those files, so a docs change never needs a

@@ -6,4 +6,4 @@ nothing listed here is removed or narrowed without the owner's word (RULES.md, r
 | Date | Asked by | The ask | Status |
 | --- | --- | --- | --- |
 | 2026-11-25 | owner | "can we go full open source license instead of this weird FSL-1.1-MIT?" | answered: only the copyright holder (Josh Moyers) can relicense his code; it becomes MIT two years after each version (about Aug-Sep 2028); a free community build is a permitted use today |
-| 2026-11-25 | owner | "do a side branch to get us as open source as possible in documentation/license so it's obvious that only his original code is sort of stuck in that weird license" | built on branch licensing-open, awaiting the owner's read |
+| 2026-11-25 | owner | "do a side branch to get us as open source as possible in documentation/license so it's obvious that only his original code is sort of stuck in that weird license" | built on branch licensing-open, awaiting the owner's read; on `main_community` since 2026-11-25 (LICENSING.md, the README and RELEASING.md say so); the owner's read is not recorded here (status checked 2026-11-28) |

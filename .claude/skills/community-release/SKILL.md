@@ -65,9 +65,13 @@ ids did not"). Never tidy them.
    to the notes means regenerating again.
 4. **Merge the work branch into `main_community`** from the main tree (`git merge --no-ff --no-edit`),
    then remove the worktree and the branch (RULES.md rule 18).
-5. **Gate locally:** `npm run typecheck`, `npm run lint`, `bash scripts/community/known-reds.sh`
-   (Node 24). The workflow runs the same, but a red found here costs minutes, not a CI run.
-   Restore `tsconfig.*.tsbuildinfo` afterwards.
+5. **Gate locally, the full suite** (RULES.md rule 11): `npm run typecheck`, `npm run lint`,
+   `bash scripts/community/known-reds.sh` (Node 24; the list is empty since 2026-11-27, so the unit
+   suite must be green). The workflow runs the same, but a red found here costs minutes, not a CI
+   run. Also, locally only: `cargo test --workspace` in `engine/` when an engine input changed since
+   the previous release (`bash scripts/community/engine-changed.sh community-<previous>` on
+   `main_community` prints yes), and `npm run test:e2e` (about 10 minutes; the known e2e
+   red is in BRANCHES.md). Restore `tsconfig.*.tsbuildinfo` afterwards.
 6. **Push** `main_community` to `origin` (never `upstream`).
 
 ## 2. The tag

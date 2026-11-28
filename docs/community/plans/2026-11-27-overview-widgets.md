@@ -2,7 +2,7 @@
 
 Status: Phase 1 BUILT 2026-11-28 (branch `overview-widgets`): every card a widget, the Customize
 checklist, and the first batch (quick wins 1, 2, 5, 9). The 4-column grid with card widths and
-drag and drop BUILT 2026-11-28 (branch `overview-grid`). Phase 2 and the other quick wins are not
+drag and drop BUILT 2026-11-28 (branch `overview-grid`). Both are merged into `main_community`. Phase 2 and the other quick wins are not
 built. Owner ask, 2026-11-27:
 
 > "i think we need the overview section to get some love. we haven't really added anything we've

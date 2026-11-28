@@ -47,10 +47,10 @@ disagree, RULES.md wins; fix this file.
   - Where the time really goes: our own crates are ~75% of a debug build's unit time (530 of 706
     s; `fold`'s test target alone 37 s; ~60 test binaries each linked separately). The cache cannot
     touch that.
-  - Disk is unchanged: 8.1 GB per tree (debug 7.8, release 0.35). 4 GB of debug is `.pdb`
-    debuginfo of 84 exes, 1.9 GB incremental. Measured, not adopted (owner's call):
-    `CARGO_PROFILE_DEV_DEBUG=line-tables-only` (or `[profile.dev] debug = "line-tables-only"` in
-    `engine/Cargo.toml`) gave debug 4.5 GB and 59 s, even with every dependency recompiled.
+  - Disk, measured before the lean debug info: 8.1 GB per tree (debug 7.8, release 0.35); 4 GB of
+    debug was `.pdb` debuginfo of 84 exes, 1.9 GB incremental. `line-tables-only` gave debug
+    4.5 GB and 59 s, even with every dependency recompiled; adopted 2026-11-27 on the owner's word
+    (the "Lean debug info" bullet above).
   - TRAP: rustc runs under the sccache SERVER, not under cargo, at the priority the server was
     started with; it idles out after 10 minutes. A BelowNormal cargo that starts it makes a
     BelowNormal server (measured); a normal-priority cargo makes every later compile normal until
@@ -65,6 +65,8 @@ disagree, RULES.md wins; fix this file.
 - **Engine rebuild after merging engine changes:** `npm run build:engine` in the main clone. The
   dev app resolves `engine/target/release`, and runs a COPY at
   `%APPDATA%/everquest-companion-dev/engine-run/engined.exe`, so an open app never blocks a rebuild.
+  The rebuild also writes the stamp that lets worktrees copy that binary (Gate, "Engine binary
+  reuse").
 - **The user's game log** is `<EQ install>/Logs/eqlog_<Character>_<server>.txt`. Its archived months are
   `<EQ install>/Logs/companion-archive/*.log.gz` (since 2026-10-07; `logArchiveDir()`); a live log can
   start weeks back after an archive, so read both. `%APPDATA%/everquest-companion-*/log-archive` is the
@@ -170,14 +172,27 @@ disagree, RULES.md wins; fix this file.
 
 - **THE STANDING RULE: SCOPED, NOT THE FULL SUITE** (owner, 2026-11-26, after two full-suite runs
   for a small cursor-ring change: "i want it to be as small of tests so we are not wasting my
-  time"). Every work branch gets: `npm run typecheck` (restore tsbuildinfo), `npm run lint` (or
-  `npx eslint <changed files>` for a small change), and only the affected unit test files on Node 24:
-  `grep -lE "<changed basenames, exported names>" tests/*.test.mts`, plus the tests that scan the
-  source tree when a file is added or removed. Run them with
-  `node --import tsx --test --test-concurrency=4 <files>`. No `known-reds.sh`, no
-  `cargo test --workspace`, no e2e for an ordinary merge. The full suite runs before a release
-  (RELEASING.md) or on the owner's word. The older bullets below are history; where they say
-  "full gate", read the scoped gate, except for a release.
+  time"; RULES.md rule 11). Every work branch gets, once, at the end:
+  - `npm run typecheck` (restore tsbuildinfo), `npm run lint` (or `npx eslint <changed files>` for
+    a small change). Never skipped: the test scripts run tests only, and a change that fails `tsc`
+    can pass them (2026-10-11, a class-rename fold typed as the rename's value).
+  - Only the affected unit test files, on Node 24: `grep -lE "<changed basenames, exported names>"
+    tests/*.test.mts`, plus the tests that scan the source tree when a file is added or removed.
+    Run them with `node --import tsx --test --test-concurrency=4 <files>`.
+  - Cargo only when `bash scripts/community/engine-changed.sh` prints yes, and then only the cargo
+    tests of the crates the change touches ("Cargo tests only when an engine input changed", below).
+  - No `known-reds.sh`, no `cargo test --workspace`, no e2e for an ordinary merge. A merge whose
+    tree equals the gated tree is not gated again.
+  - The FULL suite runs before a release (RELEASING.md) or on the owner's word:
+    `bash scripts/community/known-reds.sh` (the unit suite, about 1.5 to 2 minutes since
+    2026-11-27), `cargo test --workspace` when an engine input changed since the last release, and
+    e2e with the default runner (about 10 minutes since 2026-11-27, "Running e2e" below). One
+    exception takes e2e before its merge: a branch that changes the engine connection, main's
+    import order or a dialog a spec drives (Bug hunts, last bullet).
+  - Known reds: none, unit or engine, since 2026-11-27 (BRANCHES.md). Any unit or cargo failure is
+    a regression unless it is a flake listed below and passes alone.
+  - The older bullets below that quote earlier rulings are history; where they say "full gate",
+    read the scoped gate, except for a release.
 - **How `npm test` runs (since 2026-11-27, `scripts/unitTests.mts`).** No longer one process per
   file. Files with no shared-process hazard run POOLED: 4 processes, each importing its share of
   the files one after another (a generated wrapper per pool), so a pool parses items/mobs/spells
@@ -242,48 +257,47 @@ disagree, RULES.md wins; fix this file.
   (cargo 41 s; 322 MB); a `.rs` comment edit in the copying tree rebuilt (cargo 37 s), and after
   the revert the next run copied again. The fresh check costs about 70 ms per spec.
 - **Make all the changes, then gate once** (owner, 2026-10-21: "why run it on every change, make
-  all the changes, run it once"). While fixing, run only the focused test files for what changed;
-  the full gate runs once per work branch at the end, and the merged check once. Parallel agents share
-  the machine, so repeated full runs slow every one of them. Helper agents run only their focused
-  tests and hand back commits; the coordinating session runs the one full gate and the app check over
-  everything at the end (owner, 2026-10-23: "test at the end so we don't waste time waiting for
-  agents to test").
-- **Said a third time** (owner, 2026-11-20: "don't waste time building and testing so often ...
-  find a way to do that less often, perhaps at the end of a feature or multiple features"). What
-  went wrong that day: three helper briefs each told the helper to run the full gate, and a trunk
-  whose tree was identical to the gated branch tree was run through the full suite twice more.
-  Apply it this way:
+  all the changes, run it once"; 2026-10-23: "test at the end so we don't waste time waiting for
+  agents to test"; said a third time 2026-11-20: "don't waste time building and testing so often
+  ... find a way to do that less often, perhaps at the end of a feature or multiple features").
+  While fixing, run only the focused test files for what changed; the gate above runs once per work
+  branch, at the end. Parallel agents share the machine, so repeated runs slow every one of them.
+  What went wrong on 2026-11-20: three helper briefs each told the helper to run the full gate, and
+  a trunk whose tree was identical to the gated branch tree was run through the full suite twice
+  more. Apply it this way:
   - A helper's brief says: focused test files only, one typecheck and one lint at the end, no full
-    `npm test`, no `cargo test --workspace`, no e2e. It names the tests it expects to be affected.
-  - Branches that ship together are merged into ONE candidate branch; the full gate (and cargo,
-    when `engine/` changed) runs once on that candidate; the candidate is merged into the trunk
-    and the trunk's tree is compared with the gated tree (`git rev-parse <ref>^{tree}`). An
-    identical tree is not gated again.
+    `npm test`, no `cargo test --workspace`, no e2e, no `git stash`. It names the tests it expects
+    to be affected. The coordinating session runs the one gate and the app check over everything.
+  - Branches that ship together are merged into ONE candidate branch, gated once (cargo only when
+    `engine-changed.sh` prints yes); the candidate is merged into the trunk and the trunk's tree is
+    compared with the gated tree (`git rev-parse <ref>^{tree}`). An identical tree is not gated
+    again.
   - A passed check is not rerun unless code it covers changed.
-- **A gate scoped to what the change touches, on the owner's word** (owner, 2026-11-20, for the
-  feedback and analytics removal, with the game running: "lets skip a full test suite ...
-  specialized testing for areas that these changes would actually affect ... sky quest
-  calculations has nothing to do with removing analytics and feedback"). How it was done: typecheck,
-  lint, and the unit test files that name a changed or deleted source file plus the ones that scan
-  the source tree (`grep -lE "<changed basenames>" tests/*.test.mts`; `--test-concurrency=4` leaves
-  cores for the game). Said for that change; RULES.md rule 11 still asks for the full suite
-  otherwise, until the owner says the scoped gate is the standing rule.
-- `npm run typecheck`, then restore tsbuildinfo; `rm -rf node_modules/.cache/eslint && npm run
-  lint`; `npm test` (Node 24). On `main_community` use `bash scripts/community/known-reds.sh`
-  (the unit suite where only names in `scripts/community/known-reds.txt` may fail).
-  The gate script runs the tests ONLY: a change that fails `tsc` can pass it (2026-10-11, a
-  class-rename fold typed as the rename's value). Typecheck and lint the work branch too,
-  every time, before merging into `main_community`.
+- **How the scoped gate began** (owner, 2026-11-20, for the feedback and analytics removal, with the
+  game running: "lets skip a full test suite ... specialized testing for areas that these changes
+  would actually affect ... sky quest calculations has nothing to do with removing analytics and
+  feedback"). Said then for that one change; it became the standing rule on 2026-11-26 (first
+  bullet of this section, RULES.md rule 11). `--test-concurrency=4` leaves cores for the game.
+- **The full unit suite, when it runs** (a release, or the owner's word): `npm run typecheck`, then
+  restore tsbuildinfo; `rm -rf node_modules/.cache/eslint && npm run lint`;
+  `bash scripts/community/known-reds.sh` (Node 24): `npm test`, where only names in
+  `scripts/community/known-reds.txt` may fail. That list is empty since 2026-11-27, so any failure
+  stops it. It runs the tests ONLY, so typecheck and lint still run beside it.
 - **`npm test` under Node 22 fails 56 tests with `instanceof` errors** (a class loaded twice, "identical
   name but a different prototype", 6 cancelled) and prints TAP (`# pass`), while Node 24 passes them
   and prints spec (`ℹ pass`); known-reds.sh then stops "without naming a failing test". The trap
   (2026-11-10, an hour lost): a PATH entry in `C:/...` form, or the Program Files `npm` wrapper,
   which runs its own node.exe whatever `node` resolves to. Prepend `/c/Users/<user>/AppData/Roaming/nvm/v24.19.0`
   (the `/c/` form) and check `node -v` prints v24 before the gate; a `# pass` summary means Node 22 ran.
-- **The npm gate does not run the Rust suite.** For an engine change (`engine-changed.sh` prints yes; history below, the scoped rule above wins), also run `cargo test --workspace` in
-  `engine/` on the merged tree, in that tree's own `engine/target` (the shared build cache supplies
-  the dependencies; a shared `CARGO_TARGET_DIR` is the trap under Environment). 2026-10-13 it found two reds the npm gate had passed for days: the module snapshot test
-  (gaps-tab) and the pinned spell-category counts (catch_all x local-data-refresh).
+- **The npm suite does not run the Rust tests.** When `engine-changed.sh` prints yes, a work branch
+  runs the cargo tests of the crates it touches (`cargo test -p <crate>`); `cargo test --workspace`
+  runs on the merged tree before a release whose changes touched an engine input, or on the owner's
+  word. Either runs in that tree's own `engine/target` (the shared build cache supplies the
+  dependencies; a shared `CARGO_TARGET_DIR` is the trap under Environment). A hand-run cargo is
+  not lowered by itself: start it at BelowNormal (Agent tooling traps, `cmd start`). Why the
+  workspace run is kept for releases: 2026-10-13 it found two reds the npm gate had passed for
+  days, the module snapshot test (gaps-tab) and the pinned spell-category counts (catch_all x
+  local-data-refresh).
 - **A shared `engine/target` remembers another checkout's paths.** Protocol tests built by a session
   whose checkout was later removed fail with `<that scratchpad>/protocol/fixtures: cannot find the
   path`. `cargo clean -p protocol -p protocol-codegen`, then re-run (2026-10-13).
@@ -382,9 +396,14 @@ disagree, RULES.md wins; fix this file.
   leveling 25.9 (209.5). Times under load run up to 4x a spec's time alone (planner 14.9 s alone).
   68/73 green first time; flaky under load: overlay-sync, sky-targets (both fixed after),
   engine-boots (counts other specs' engines, below); red: sky-recent-sort (red on `main_community`
-  too), character-sheet (fixed after). No engine missed its port announce at 3-wide.
-- **Known e2e reds/flakes:** `respawn-timers.e2e.mts` fails one step ("never claims the mob is
-  standing there") on plain upstream main since 2026-08-17. `maps.e2e`, `engine-boots`,
+  too), character-sheet (fixed after). No engine missed its port announce at 3-wide. After the
+  e2e trim the same day: 73 specs in 728.6 s with the game and the dev app open (BRANCH_NOTES.md,
+  "Test hygiene: what e2e checks").
+- **Known e2e reds/flakes. Where it stands (2026-11-28, from the two full runs of 2026-11-27):**
+  red only `sky-recent-sort` (open, red on `main_community` too); flaky under load and green alone:
+  `engine-boots`, `sky-cleanup`. Everything else in this bullet is the history of each spec.
+  `respawn-timers.e2e.mts` failed one step ("never claims the mob is standing there") on plain
+  upstream main from 2026-08-17; green in both 2026-11-27 runs. `maps.e2e`, `engine-boots`,
   `engine-absent`, `sky-achievements`, `sky-reward-inference` can flake under parallel load; the
   runner retries them alone (above). `sky-recent-sort` is red on `main_community` (known before) and on the e2e-speed
   branch alike (2026-11-27: "a fresh install opens the Sky tab sorted by most recently looted —
@@ -661,9 +680,11 @@ disagree, RULES.md wins; fix this file.
 
 - **A scratch Playwright probe of the e2e app** (`tests/e2e/appWindow.mts` `mainWindow`,
   `logFixture.mts` `stageFixture` + `appendAt` + `launchOnFixture`) is the way to watch a tab
-  without a window on the owner's screen. The window is hidden: `requestAnimationFrame` never
-  fires (an `evaluate` awaiting it hangs forever), `page.screenshot` times out, and scroll events
-  land late (wait ~1.5 s, not 300 ms, before reading a re-windowed list). Every tab (Gaps,
+  without a window on the owner's screen. The window is hidden. Until 2026-11-27 it drew about one
+  frame a second, so `requestAnimationFrame` barely fired and scroll events landed late; since then
+  `launchApp` (which `launchOnFixture` calls) passes `--disable-frame-rate-limit` and a probe gets
+  full-rate frames (Gate, "The hidden-window frame trap"). `page.screenshot` still times out: take
+  pixels with `capturePage` (Gate, "Screenshots of the hidden app"). Every tab (Gaps,
   Factions included) is in every build. TRAP (2026-10-26, gone the same day): on a real log the app ran its own eqlwiki mob-lookup
   searches (7 in one probe). Since the owner's ruling below, the app reads the wiki only on a Copy
   click; still launch a probe with `NODE_USE_ENV_PROXY=1` and `HTTPS_PROXY=http://127.0.0.1:9`, so
@@ -711,5 +732,6 @@ disagree, RULES.md wins; fix this file.
   trunk's tree is the gated tree (`git rev-parse <ref>^{tree}`).
 - A branch that changes the connection to the engine, main's import order, or a dialog an e2e spec
   drives gets the e2e suite BEFORE the merge, in its own worktree: the run builds that tree's
-  `engined.exe` (release; measured 2026-11-19: 37 s and 0.36 GB under its `engine/target`, with
-  the cargo registry warm) and its `out-e2e`.
+  `out-e2e`, and copies the main clone's release `engined.exe` when every engine input matches,
+  else builds its own (Gate, "Engine binary reuse": 2026-11-27, a copying tree 37 s wall for
+  `engine-boots`, a building one 75 s with cargo 41 s).

@@ -28,10 +28,15 @@ The same steps for people and agents:
 3. **Write down the ask first.** A feature's requests go in `requirements/<feature-area>.md`
    before any code. Check every row before changing a feature.
 4. **Keep it small.** Change only what the feature needs and match the code around it.
-5. **Gate it:** `npm run typecheck`, `npm run lint`, `npm test` (and `cargo test --workspace` in
-   `engine/` for an engine change). Only the known reds listed in BRANCHES.md may fail.
-6. **Merge it:** close the dev app, merge the work branch into `main_community` from the main
-   folder, and run the gate again. Then remove the worktree and the work branch (rule 18).
+5. **Gate it, scoped to the change** (RULES.md rule 11): `npm run typecheck`, `npm run lint`, and
+   on Node 24 only the unit test files that touch what changed. Cargo tests only when
+   `bash scripts/community/engine-changed.sh` prints yes, and then only for the crates touched.
+   The full suite (`known-reds.sh`, `cargo test --workspace`, the e2e suite) runs before a
+   release. No unit or engine test is a known red since 2026-11-27, so any failure is a
+   regression (BRANCHES.md).
+6. **Merge it:** close the dev app and merge the work branch into `main_community` from the main
+   folder. A merge whose tree equals the gated tree is not gated again; one that brought in other
+   work is. Then remove the worktree and the work branch (rule 18).
 7. **Push after testing:** once the owner has tried it in the app, push `main_community` to
    `origin`. Never to `upstream`.
 8. **Record what you learned.** Rules, procedures and measured facts go in this directory, so
@@ -55,7 +60,8 @@ process is a change to that file in the same commit.
    and conflicts between branches that touched the same files. With the creator no longer active
    on the project and handing changes back no longer a goal, all of it is retired.
 2. **The original is a frozen reference, not something to track.** Its `main` has not moved since
-   2026-09-03 and the trunk is 3,706 commits past it, so no sync is routine work. `main` and the
+   2026-09-03 and the trunk is 4,685 commits past it (2026-11-28), so no sync is routine work.
+   `main` and the
    `upstream` remote stay, untouched, so the original can still be read.
 3. **Outside code stays untrusted.** Whatever comes from outside, a pull request on this repo or
    anything the owner asks for from the original, is read in full before it merges (RULES.md,
@@ -93,8 +99,9 @@ Relaunch after the merges with `node_modules/.vite` cleared.
 10 seconds of launch. Several parallel typecheck, test or cargo runs pinned the CPU at 100% and
 the engine missed that deadline three times (2026-10-01, the "data engine started but never
 answered" banner, nothing actually broken). While the owner has the app open, run build and test
-work at Idle priority (`(Get-Process -Id <pid>).PriorityClass = 'Idle'` on cargo, rustc and the
-test runners) or one job at a time.
+work at a low priority, one job at a time. Since 2026-11-27 the e2e runner, `known-reds.sh`,
+`npm test` and the engine builds the repo starts lower themselves to BelowNormal; a hand-run
+cargo does not (agent/WORKFLOW.md, Agent tooling traps).
 
 **Cut a test build.** Bump the version and write the tester notes as a commit on a work branch
 off `main_community`, merge it, then `npm run dist`. Read the previous build's notes first; they
@@ -110,8 +117,8 @@ owner's word only (rule 10).
 
 `jmoyers/everquest-companion` (git remote `upstream`) is a frozen reference, not something the
 fork tracks. The creator is no longer active on it: its last release is v1.16.0 (2026-09-04), the
-last commit on its `main` is 2026-09-03, and `main_community` is 3,706 commits past that and 0
-behind. Nothing is synced from it as routine work, nothing is offered to it, and nothing is ever
+last commit on its `main` is 2026-09-03, and `main_community` is 4,685 commits past that and 0
+behind (2026-11-28). Nothing is synced from it as routine work, nothing is offered to it, and nothing is ever
 pushed to it (RULES.md, rules 2, 4 and 9). The pull requests and issues the fork opened there
 earlier are left as they are.
 

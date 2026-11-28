@@ -3778,7 +3778,8 @@ test that failed before the fix.
   (the 2026-10-29 trap) and `target/release/engined.exe` would be last-writer-wins.
 - **Measured gain is modest** (debug 85 s to 69-75 s, release 47 s to 37 s, disk unchanged at
   8.1 GB per tree): our own crates are ~75% of a debug build. The next lever is debuginfo
-  (`line-tables-only`: 4.5 GB, 59 s), not adopted, waiting on the owner.
+  (`line-tables-only`: 4.5 GB, 59 s): adopted 2026-11-27 on the owner's word (branch `debug-lean`,
+  `engine/Cargo.toml` `[profile.dev]`; WORKFLOW.md, Environment, "Lean debug info").
 - **Below-normal priority:** `atBelowNormalPriority` (`scripts/build-engine.mts`) lowers the
   process around its cargo `spawnSync` and restores it after, so cargo and an sccache server it
   starts inherit BelowNormal; used by `build:engine` and `tests/e2e/build.mts`. `run-all.mts`

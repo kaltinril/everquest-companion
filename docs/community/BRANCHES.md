@@ -8,7 +8,7 @@ trunk: work goes on a short-lived branch in a temporary worktree off it and merg
 committed to again. The branches are kept, locally and on `origin`, for their history (rule 9).
 
 What stays live in this file is the last section, **Known reds on main_community**, which the gate
-reads.
+reads (since 2026-11-27 it lists no unit or engine red, and one e2e red).
 
 ## The last recipe (frozen 2026-10-26)
 
@@ -206,6 +206,12 @@ Failures that are not regressions, so the gate can tell a new red from an old on
   config; and engined's `ingest::kept::tests::a_kept_key_never_holds_while_the_state_moves`, a real
   bug (leveling's AA `last` stamp moved without announcing, since e06f012cf), fixed in the engine.
   The flakes in `agent/WORKFLOW.md` (Gate) still apply: re-run one alone before calling it red.
+- e2e (run before a release, not by the scoped gate): `sky-recent-sort` is red on `main_community`,
+  open since at least 2026-11-27 (the step "a fresh install opens the Sky tab sorted by most
+  recently looted" times out).
+  `engine-boots` and `sky-cleanup` can flake under parallel load and pass alone; the runner
+  retries each failed spec alone and reports it as flaky. The full list with its history is
+  `agent/WORKFLOW.md`, Gate, "Known e2e reds/flakes".
 
 A data top-up is not finished until the data-pinned tests are re-measured against it:
 wiki typos are corrected on the wiki and read back by a second delta run, and the fact pins,
