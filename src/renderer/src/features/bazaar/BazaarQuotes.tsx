@@ -2,7 +2,8 @@
 // offers one line each, newest first, as the engine quoted them. Under the picked item for its
 // tier, and on its own as the whole offers list the toolbar's Offers list button shows. Every
 // column sorts and a Who box narrows it to one person (owner ask, 2026-10-13; the order and the
-// filter are shared/bazaarQuotes.ts).
+// filter are shared/bazaarQuotes.ts). The header click is the app's shared rule and the sort is
+// remembered across tab switches and restarts, one key per list (shared/tableSort.ts, 2026-11-27).
 
 import { type JSX, useMemo, useState } from 'react'
 import { Autocomplete, Box, Stack, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, TextField, Typography } from '@mui/material'
@@ -20,6 +21,13 @@ import {
   type QuoteSortKey
 } from '@shared/bazaarQuotes'
 import { ASK_COLOR, OFFER_COLOR } from './BazaarChart'
+import { useSortPref } from '../../lib/useTableSort'
+import { nextSort, sanitizeColumnSort, TABLE_SORT_KEYS } from '@shared/tableSort'
+
+const QUOTE_KEYS: readonly QuoteSortKey[] = ['when', 'who', 'dir', 'item', 'price', 'msg']
+function sanitizeQuoteSort(raw: unknown): QuoteSort {
+  return sanitizeColumnSort(raw, QUOTE_KEYS, DEFAULT_QUOTE_SORT)
+}
 
 const DIR_LABEL = { sell: 'Selling', buy: 'Buying', trade: 'Trading' } as const
 /** Lines drawn at once; the CSV export carries every one. */
@@ -149,12 +157,12 @@ interface TierScale {
 }
 
 export default function BazaarQuotes({ quotes, title, withItem = false, maxHeight = 260, scale }: { quotes: readonly DayQuote[]; title: string; withItem?: boolean; maxHeight?: number; scale?: TierScale }): JSX.Element | null {
-  const [sort, setSort] = useState<QuoteSort>(DEFAULT_QUOTE_SORT)
+  const [sort, setSort] = useSortPref<QuoteSort>(withItem ? TABLE_SORT_KEYS.bazaarOffers : TABLE_SORT_KEYS.bazaarQuotes, sanitizeQuoteSort)
   const [who, setWho] = useState<string | null>(null)
   const ordered = useMemo(() => sortQuotes(quotesBy(quotes, who), sort), [quotes, who, sort])
   if (quotes.length === 0) return null
   const onSort = (key: QuoteSortKey): void => {
-    setSort((cur) => (cur.key === key ? { key, dir: cur.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: firstQuoteSortDir(key) }))
+    setSort(nextSort(sort, key, firstQuoteSortDir))
   }
   const shown = ordered.slice(0, SHOWN)
   return (
