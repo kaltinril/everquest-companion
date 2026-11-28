@@ -1,5 +1,6 @@
 import { type JSX, memo } from 'react'
-import { Box, Chip, Stack, TableCell, TableRow, Typography } from '@mui/material'
+import { Box, Stack, TableCell, TableRow, Typography } from '@mui/material'
+import { TagChip } from '../../lib/TagChip'
 import type { ItemKnowledge, LootDisposition, LootEvent } from '@shared/types'
 // The SERVED row's cells (JOS-484). A `Cell` is `string | number | boolean | null` and that is all
 // this file is allowed to know about one — see `EngineFlatRow` below.
@@ -48,17 +49,16 @@ function fmtTime(ts: number): string {
 // the only one the held counts subtract for.
 function DispositionChip({ disposition }: { disposition?: LootDisposition }): JSX.Element | null {
   if (!disposition) return null
-  const sx = { height: 18, fontSize: 11 } as const
   if (disposition === 'sold') {
-    return <Chip size="small" variant="outlined" color="default" label="sold" sx={{ ...sx, opacity: 0.7 }} />
+    return <TagChip variant="outlined" color="default" label="sold" sx={{ opacity: 0.7 }} />
   }
   if (disposition === 'destroyed') {
-    return <Chip size="small" variant="outlined" color="warning" label="destroyed" sx={sx} />
+    return <TagChip variant="outlined" color="warning" label="destroyed" />
   }
   if (disposition === 'combined') {
-    return <Chip size="small" variant="outlined" color="success" label="combined" sx={sx} />
+    return <TagChip variant="outlined" color="success" label="combined" />
   }
-  return <Chip size="small" variant="outlined" color="info" label={disposition} sx={sx} />
+  return <TagChip variant="outlined" color="info" label={disposition} />
 }
 
 /**
@@ -86,11 +86,10 @@ function DispositionChip({ disposition }: { disposition?: LootDisposition }): JS
 const InventoryEstimate = memo(function InventoryEstimate({ n }: { n: number }): JSX.Element {
   if (n <= 0) return <Box component="span" sx={{ color: 'text.disabled' }}>-</Box>
   return (
-    <Chip
-      size="small"
+    <TagChip
       variant="outlined"
       label={`~${n}`}
-      sx={{ height: 18, fontSize: 11, color: 'text.secondary' }}
+      sx={{ color: 'text.secondary' }}
     />
   )
 })
@@ -146,7 +145,7 @@ export const GroupedRow = memo(function GroupedRow({
               {g.item}
             </Box>
           </KnownItemTooltip>
-          {posky && <Chip size="small" color="primary" variant="outlined" label="PoSky" />}
+          {posky && <TagChip color="primary" variant="outlined" label="PoSky" />}
           <KnowledgeBadge name={g.item} isPosky={posky} />
           <DispositionChip disposition={g.disposition} />
         </Stack>
@@ -271,7 +270,7 @@ export const EngineFlatRow = memo(function EngineFlatRow({
               {count !== null && count > 1 ? `${String(count)} × ${item}` : item}
             </Box>
           </KnownItemTooltip>
-          {posky && <Chip size="small" color="primary" variant="outlined" label="PoSky" />}
+          {posky && <TagChip color="primary" variant="outlined" label="PoSky" />}
           <KnowledgeBadge name={item} isPosky={posky} />
           <DispositionChip disposition={asDisposition(disposition)} />
           {disposition === 'combined' && created !== null && (
@@ -316,7 +315,7 @@ export const FlatRow = memo(function FlatRow({
               {e.count && e.count > 1 ? `${e.count} × ${e.item}` : e.item}
             </Box>
           </KnownItemTooltip>
-          {posky && <Chip size="small" color="primary" variant="outlined" label="PoSky" />}
+          {posky && <TagChip color="primary" variant="outlined" label="PoSky" />}
           <KnowledgeBadge name={e.item} isPosky={posky} />
           <DispositionChip disposition={e.disposition} />
           {e.disposition === 'combined' && e.created && (

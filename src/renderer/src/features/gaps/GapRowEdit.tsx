@@ -3,7 +3,8 @@
 // "edited" chip. What an edit does to the row and to Copy is shared/gapEdits.ts.
 
 import { type JSX, type ReactNode, useState } from 'react'
-import { Button, Checkbox, Chip, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Stack, TextField } from '@mui/material'
+import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Stack, TextField } from '@mui/material'
+import { TagChip } from '../../lib/TagChip'
 import EditIcon from '@mui/icons-material/Edit'
 import { EDIT_FIELDS, editable, handEdited, type GapEdit } from '@shared/gapEdits'
 import type { GapRow } from '@shared/gaps'
@@ -82,7 +83,7 @@ export function EditedChip({ row }: { row: GapRow }): JSX.Element | null {
   if (!handEdited(row.edit)) return null
   return (
     <Tooltip title={`You edited this row; the log has it as ${row.name}.`}>
-      <Chip label="edited" size="small" variant="outlined" color="info" sx={{ ml: 1, height: 20 }} data-testid="gaps-edited" />
+      <TagChip size="clickable" label="edited" variant="outlined" color="info" sx={{ ml: 1, height: 20 }} data-testid="gaps-edited" />
     </Tooltip>
   )
 }

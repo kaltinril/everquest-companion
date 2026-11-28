@@ -5,7 +5,8 @@
 // "added by you", so it is never taken for a logged task.
 
 import { createContext, useContext, useState, type JSX, type ReactNode } from 'react'
-import { Autocomplete, Button, Checkbox, Chip, Dialog, DialogActions, DialogContent, DialogTitle, List, ListItemButton, ListItemIcon, ListItemText, TextField, Tooltip, Typography } from '@mui/material'
+import { Autocomplete, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, List, ListItemButton, ListItemIcon, ListItemText, TextField, Tooltip, Typography } from '@mui/material'
+import { TagChip } from '../../lib/TagChip'
 import AddCommentIcon from '@mui/icons-material/AddCommentOutlined'
 import LinkOffIcon from '@mui/icons-material/LinkOff'
 import type { GapRow } from '@shared/gaps'
@@ -133,7 +134,7 @@ export function ForcedChip({ row }: { row: GapRow }): JSX.Element | null {
   if (!isForcedRow(row)) return null
   return (
     <Tooltip title="You named this quest; the log printed no task for it.">
-      <Chip label="added by you" size="small" variant="outlined" sx={{ ml: 1, height: 20 }} data-testid="gaps-forced" />
+      <TagChip size="clickable" label="added by you" variant="outlined" sx={{ ml: 1, height: 20 }} data-testid="gaps-forced" />
     </Tooltip>
   )
 }

@@ -10,7 +10,8 @@
 // looking at has to stay on screen while you scroll through it.
 
 import type { JSX, ReactNode } from 'react'
-import { Box, Chip, IconButton, Stack, Typography } from '@mui/material'
+import { Box, IconButton, Stack, Typography } from '@mui/material'
+import { TagChip } from '../../lib/TagChip'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import CloseIcon from '@mui/icons-material/Close'
@@ -18,7 +19,6 @@ import type { AlertDef, SpellCatalogEntry } from '@shared/types'
 import type { PoisonSlowOffer } from '@shared/spellLines'
 import { poisonSlowAlertDefs } from '@shared/alertGroups'
 import SpellRow, {
-  ROW_CHIP_SX,
   SUGGEST_ROW_ACTIONS_SX,
   SUGGEST_ROW_FACTS_SX,
   SUGGEST_ROW_SX,
@@ -181,7 +181,7 @@ export function PoisonSlowRow({
         </Typography>
         {/* The neighbouring rows in this section carry a buff/debuff chip (`showType`); a slow
             landing on a mob is a debuff, and saying so keeps the column reading as one list. */}
-        <Chip size="small" label="debuff" color="error" variant="outlined" sx={ROW_CHIP_SX} />
+        <TagChip label="debuff" color="error" variant="outlined" />
         <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>
           {observedSlows(offer.count)} · last on {offer.lastTarget}
         </Typography>
@@ -219,15 +219,13 @@ export function IllusionAction({
   onCreate: () => void
 }): JSX.Element {
   return (
-    <Chip
-      size="small"
+    <TagChip
       variant={created ? 'filled' : 'outlined'}
       color={created ? 'success' : 'default'}
       clickable={!created}
       disabled={created}
       onClick={onCreate}
       label="When your illusion fades"
-      sx={{ height: 20, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }}
     />
   )
 }
