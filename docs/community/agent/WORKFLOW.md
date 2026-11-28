@@ -27,8 +27,9 @@ disagree, RULES.md wins; fix this file.
   PC, in the main clone and every worktree, already open shells included, goes through sccache.
   Nothing to set per worktree. sccache caches a crates.io dependency's compile by content (cache
   `%LOCALAPPDATA%\Mozilla\sccache\cache`, 10 GiB cap) and copies it into the tree's own
-  `engine/target`; the engine's own crates still compile in every tree, so each tree keeps its own
-  `engined.exe` and two trees never share an artifact. Installed as the prebuilt
+  `engine/target`; the engine's own crates still compile in every tree that runs cargo, and two
+  trees never share a target dir. (The e2e harness may COPY the main clone's release
+  `engined.exe` instead of running cargo at all: Gate, "Engine binary reuse".) Installed as the prebuilt
   `sccache-v0.19.0-x86_64-pc-windows-msvc.zip` from mozilla/sccache's GitHub releases (sha256
   checked), `sccache.exe` copied to `%USERPROFILE%\.cargo\bin`; never `cargo install` it (a long
   compile). If `sccache.exe` is removed, delete the config line too, or every cargo build fails.
@@ -116,7 +117,9 @@ disagree, RULES.md wins; fix this file.
   `mklink` mangles paths). Without it, a gate grep can false-pass: npm's tool-not-found text
   contains no "error". Check real exit codes. The engine needs no setup: its own `engine/target`
   fills from the shared build cache on the first cargo run (Environment, "Shared build cache");
-  do not point `CARGO_TARGET_DIR` at another tree.
+  do not point `CARGO_TARGET_DIR` at another tree. A branch that changes no engine input runs no
+  cargo at all: e2e copies the main clone's `engined.exe` (Gate, "Engine binary reuse") and the gate
+  skips `cargo test` (`bash scripts/community/engine-changed.sh` prints no).
 - **A dependency change needs its own `node_modules`, and that one still leaks** (2026-11-27, MUI 7
   to 9). A worktree under `.claude/worktrees/` sits inside the main clone, so any module missing
   from the worktree's own install is resolved from the main clone's `node_modules` one level up, by
@@ -171,6 +174,37 @@ disagree, RULES.md wins; fix this file.
   `cargo test --workspace`, no e2e for an ordinary merge. The full suite runs before a release
   (RELEASING.md) or on the owner's word. The older bullets below are history; where they say
   "full gate", read the scoped gate, except for a release.
+- **Cargo tests only when an engine input changed** (2026-11-27): run
+  `bash scripts/community/engine-changed.sh` in the work tree. `no` (the diff against
+  `main_community`, plus uncommitted and untracked files, touches none of the paths in
+  `scripts/community/engine-inputs.txt`) skips `cargo test` entirely. `yes` runs the cargo tests
+  of the crates the change touches (a data file: the crates that embed it), in that tree's own
+  `engine/target`. The list is `engine/`, the nine data files the binary `include_str!`s
+  (`src/main/data/{spells,messageOverlay.baseline,classes,respawns,items}.json`,
+  `src/renderer/src/data/eqlegends/{bosses,mobs,posky,quests}.json`), `protocol/` and
+  `tests/fixtures/` (read by the cargo tests). `tests/engineStamp.test.mts` fails when an
+  `include_str!` names a file the list misses. Do not guess from the file names: run the script.
+- **Engine binary reuse** (2026-11-27, `scripts/engineStamp.mts`): `tests/e2e/build.mts`
+  `buildEngineIfStale` keeps this tree's release `engined.exe` when its stamp proves it fresh, else
+  COPIES the main clone's (found with `git rev-parse --git-common-dir`; `EQ_ENGINE_DONOR=<checkout>`
+  names another) when that one's stamp proves the same inputs, else runs cargo. The proof:
+  `engine/target/release/.e2e-engine-stamp` (JSON) lists every input of the build as a
+  checkout-relative path (cargo's dep-info `engined.d`: the sources of engined and its path crates
+  and every `include_str!`'d data file; plus the workspace and crate `Cargo.toml`s, `Cargo.lock`,
+  `rust-toolchain.toml`; there is no `build.rs`), one sha256 over their bytes keyed by those
+  paths, and the sha256 of the binary. Reuse needs a readable v2 stamp, a donor binary that hashes
+  to it, the same digest over this tree's copies of the listed files, and a copy that still hashes
+  to it. Anything else builds: no stamp, the old bare-digest stamp, a binary rebuilt without a new
+  stamp, one changed or missing input, a copy that failed. Always a copy, never a link (the main
+  clone may rebuild while the tree runs); the stamp is written last. `npm run build:engine` and the
+  e2e build stamp what they build, and write no stamp when an input changed after cargo started.
+  Not in the proof, because one PC shares them: `%USERPROFILE%\.cargo\config.toml`, `RUSTFLAGS`.
+  The main clone is a donor only once `npm run build:engine` (or `start_companion.ps1`'s rebuild)
+  has run there on this code; until then a worktree logs "no readable stamp" and builds. Measured
+  2026-11-27 (`engine-boots` alone, 16 cores, BelowNormal, warm sccache): a fresh tree that copies
+  37 s wall (the copy and checks 0.4 s; 28 MB of `engine/target`); a fresh tree that builds 75 s
+  (cargo 41 s; 322 MB); a `.rs` comment edit in the copying tree rebuilt (cargo 37 s), and after
+  the revert the next run copied again. The fresh check costs about 70 ms per spec.
 - **Make all the changes, then gate once** (owner, 2026-10-21: "why run it on every change, make
   all the changes, run it once"). While fixing, run only the focused test files for what changed;
   the full gate runs once per work branch at the end, and the merged check once. Parallel agents share
@@ -210,7 +244,7 @@ disagree, RULES.md wins; fix this file.
   (2026-11-10, an hour lost): a PATH entry in `C:/...` form, or the Program Files `npm` wrapper,
   which runs its own node.exe whatever `node` resolves to. Prepend `/c/Users/<user>/AppData/Roaming/nvm/v24.19.0`
   (the `/c/` form) and check `node -v` prints v24 before the gate; a `# pass` summary means Node 22 ran.
-- **The npm gate does not run the Rust suite.** For an engine change, and before a push, also run `cargo test --workspace` in
+- **The npm gate does not run the Rust suite.** For an engine change (`engine-changed.sh` prints yes; history below, the scoped rule above wins), also run `cargo test --workspace` in
   `engine/` on the merged tree, in that tree's own `engine/target` (the shared build cache supplies
   the dependencies; a shared `CARGO_TARGET_DIR` is the trap under Environment). 2026-10-13 it found two reds the npm gate had passed for days: the module snapshot test
   (gaps-tab) and the pinned spell-category counts (catch_all x local-data-refresh).
@@ -273,10 +307,10 @@ disagree, RULES.md wins; fix this file.
   in `customPhraseSteps.mts` `rewordFromTheRow`; the spec never dismisses it, as alert-dialog-focus
   does). `alert-dialog-focus`, `engine-boots` and `engine-absent` flake in parallel and pass alone
   (no `wmic` on this machine: `engineTable()` falls back to `tasklist`, and engines from specs
-  running alongside count as new). Each worktree builds its own `engined.exe`: the engine embeds the
-  data files, so a shared binary cannot serve two trees. Since 2026-11-27 its crates.io
-  dependencies come from the shared sccache cache (Environment), so only the engine's own crates
-  compile per tree.
+  running alongside count as new). The engine embeds the data files, so a tree may run another
+  tree's `engined.exe` only when every engine input is byte-identical: the harness copies the main
+  clone's binary under exactly that proof and builds otherwise ("Engine binary reuse" above). When
+  it builds, the crates.io dependencies come from the shared sccache cache (Environment).
   Measured 2026-11-19 (main_community after the issue sweep, 4 in parallel; the reds again one at a
   time; then the same specs on that morning's trunk in a detached worktree): 61/66 green and no new
   red. `engine-boots` flaked in parallel and passed alone; `voice-alerts` is red as before.
@@ -308,7 +342,8 @@ disagree, RULES.md wins; fix this file.
   inject a style that turns CSS transitions and animations off, or MUI tab underlines and Grow
   poppers are caught part-way; (3) no named helper functions inside `evaluate` bodies (tsx's
   keepNames adds `__name()`, which throws there). A tree that changes only renderer code needs no
-  engine build: `EQ_ENGINE_BIN` (read under `EQ_E2E=1`) points it at another tree's `engined.exe`.
+  engine build: the harness copies the main clone's binary when the inputs match ("Engine binary
+  reuse"), and `EQ_ENGINE_BIN` (read under `EQ_E2E=1`) points a probe at another tree's `engined.exe`.
   Side-by-side images: headless Chromium from `playwright-core` with `executablePath` set to the
   newest `%LOCALAPPDATA%\ms-playwright\chromium_headless_shell-*` (the build playwright-core expects
   may not be installed).

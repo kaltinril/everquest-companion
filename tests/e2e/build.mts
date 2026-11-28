@@ -9,16 +9,7 @@
  */
 
 import { spawnSync } from 'node:child_process'
-import { createHash } from 'node:crypto'
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  readdirSync,
-  rmdirSync,
-  statSync,
-  writeFileSync
-} from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmdirSync, statSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -32,6 +23,12 @@ import { ENGINE_BIN_NAME } from '../../src/main/dataServer/engineProtocol'
 // so much as a machine where one of the two finds a toolchain and the other does not. The
 // dependency points this way on purpose: the harness leans on the build script, never the reverse.
 import { atBelowNormalPriority, cargoBinary } from '../../scripts/build-engine.mts'
+import {
+  donorRoot,
+  engineIsFresh,
+  reuseDonorEngine,
+  writeEngineStamp
+} from '../../scripts/engineStamp.mts'
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 
@@ -130,113 +127,52 @@ function isFresh(): boolean {
 /** The engine binary this checkout's Rust produces, and the one every spec runs against. */
 export const ENGINE_BIN = join(ROOT, 'engine', 'target', 'release', ENGINE_BIN_NAME)
 
-/** Cargo's own answer to "what did this binary come from" — written beside it on every build. */
-const ENGINE_DEP_INFO = join(ROOT, 'engine', 'target', 'release', 'engined.d')
-
-/** Where the digest of the inputs the CURRENT binary was built from is recorded. */
-const ENGINE_STAMP = join(ROOT, 'engine', 'target', 'release', '.e2e-engine-stamp')
-
-/**
- * Parse a cargo/GNU-make dep-info file into its input paths.
- *
- * Spaces inside a path are escaped `\ ` by the writer, so the split is on spaces NOT preceded by a
- * backslash — which matters on Windows only for a checkout under a directory like `Program Files`,
- * and is exactly the sort of machine-shaped difference a harness should not have opinions about.
- */
-function depInfoInputs(text: string): string[] {
-  const line = text.split(/\r?\n/).find((l) => l.includes(': '))
-  if (line === undefined) return []
-  return line
-    .slice(line.indexOf(': ') + 2)
-    .split(/(?<!\\) /)
-    .map((p) => p.replace(/\\ /g, ' ').trim())
-    .filter((p) => p !== '')
-}
+// ── WHICH BINARY IS FRESH, AND WHOSE (JOS-501; donor reuse 2026-11-27) ─────────────────
+//
+// The staleness question is answered BY CONTENT, never by mtime (`scripts/engineStamp.mts`). The old
+// mtime gate disagreed with cargo three ways: a checkout bumps mtimes without changing bytes (cargo
+// does nothing and the gate stayed "stale" forever); `include_str!`'d data files (`spells.json`,
+// `items.json`, `mobs.json` ...) live outside `engine/` and were invisible to it, which handed specs
+// an engine built from data the repo no longer holds; and the toolchain and manifests are inputs no
+// timestamp sees. Cargo's own dep-info names the input set, so the list cannot drift when someone
+// adds an embed: the `.rs` file that adds it is itself an input.
+//
+// A STAMP beside the binary records that set as paths relative to the checkout, one digest over
+// their bytes, and the binary's own sha256. Relative keys are what make a stamp portable: a worktree
+// whose engine inputs are byte-identical to the main clone's COPIES the main clone's binary and its
+// stamp instead of compiling (most branches change only TypeScript; a cold engine build costs
+// minutes on every core and ~8 GB of target). Anything short of proof (no stamp, an old-format stamp,
+// a binary that does not hash to its stamp, one differing input) builds as before. A wrong binary
+// would make every spec prove things about code this checkout does not contain.
 
 /**
- * THE INPUTS CARGO WOULD REBUILD FROM, AS CONTENT — the real staleness check (JOS-501).
+ * Make `engine/target/release/engined.exe` the binary this checkout's engine inputs produce: keep
+ * it when its stamp proves that, else copy the main clone's when ITS stamp proves the same inputs,
+ * else run cargo and stamp the result.
  *
- * The old gate compared the binary's mtime against the newest mtime under `engine/crates` plus the
- * three workspace manifests, and it DISAGREED WITH CARGO in three ways. Two of them were merely
- * wasteful; the third let specs prove things about the wrong binary, which is why this is a
- * correctness fix rather than a tidy-up:
- *
- *  1. **Cargo does not touch the binary's mtime on a no-op build.** So anything that bumps a `.rs`
- *     mtime without changing its content — a `git checkout`, a branch switch, a worktree add —
- *     left the gate permanently answering "stale", cargo doing nothing, and the mtime staying put.
- *     Every one of ~130 specs then paid a cargo invocation, forever.
- *  2. **`include_str!` inputs were invisible to it.** The engine embeds `spells.json`, `items.json`,
- *     `mobs.json`, `bosses.json`, `posky.json`, `quests.json`, `respawns.json`, `classes.json` and
- *     `messageOverlay.baseline.json` — NONE of which live under `engine/crates`. Editing any one of
- *     them changes the binary and left the gate saying "fresh". THIS is the mode that hands a spec
- *     an engine built from data the repo no longer contains.
- *  3. **mtime is not cargo's fingerprint.** Toolchain, profile and feature set are all inputs and
- *     none of them appeared in a timestamp comparison.
- *
- * All three dissolve by asking the two authorities instead of guessing. CARGO ITSELF names the input
- * set, in the dep-info file it writes beside the binary — 153 paths today, `include_str!`'d JSON
- * included — so the list cannot drift when someone adds an embed: the `.rs` file that adds it is
- * itself an input, so its content change forces the rebuild that rewrites the list. And the inputs
- * are compared BY CONTENT, so a touched-but-unchanged file is correctly no change at all.
- *
- * `rustc -V` is deliberately NOT spawned: `rust-toolchain.toml` pins an exact channel (`1.98.0`, and
- * the pin is load-bearing for the generated-protocol staleness test), so hashing that file's bytes
- * already answers "which compiler" without paying a process launch in every one of ~130 specs.
- *
- * Returns `null` when there is no dep-info to read — a checkout that has never built the engine,
- * where the only honest answer is to build.
- */
-function engineInputDigest(): string | null {
-  let inputs: string[]
-  try {
-    inputs = depInfoInputs(readFileSync(ENGINE_DEP_INFO, 'utf8'))
-  } catch {
-    return null
-  }
-  if (inputs.length === 0) return null
-  // The manifests and the toolchain pin are cargo's fingerprint rather than rustc's, so they are
-  // never in dep-info and are added here by name.
-  for (const name of ['Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml']) {
-    inputs.push(join(ROOT, 'engine', name))
-  }
-  for (const crate of readdirSync(join(ROOT, 'engine', 'crates'), { withFileTypes: true })) {
-    if (crate.isDirectory()) inputs.push(join(ROOT, 'engine', 'crates', crate.name, 'Cargo.toml'))
-  }
-  const h = createHash('sha256')
-  for (const path of [...new Set(inputs)].sort()) {
-    h.update(path.replace(/\\/g, '/'))
-    h.update(' ')
-    try {
-      h.update(readFileSync(path))
-    } catch {
-      // A named input that is gone IS a change, and hashing its absence records that.
-      h.update(' absent')
-    }
-    h.update(' ')
-  }
-  return h.digest('hex')
-}
-
-/**
- * Build `engined.exe` if the inputs cargo would rebuild from have changed since it was written.
- *
- * INCREMENTALITY IS STILL CARGO'S STORY, NOT OURS. This gate answers one question — "were the
- * current inputs the ones this binary came from?" — and hands the real decision to cargo, which then
- * does nothing at all when its own fingerprints agree. What the digest buys is skipping cargo's
- * startup on the overwhelmingly common no-op run, and (unlike the mtime gate it replaces) actually
- * being right about it.
+ * INCREMENTALITY IS STILL CARGO'S STORY, NOT OURS. When the gate says stale, cargo decides what to
+ * recompile from its own fingerprints.
  *
  * Returns the binary's path. Throws when the build fails or when the build claimed success and the
  * binary still is not there — a spec that silently ran against no engine would assert the ABSENCE
  * path and pass, which is the one failure this whole file exists to prevent.
  */
 export function buildEngineIfStale(): string {
-  const want = engineInputDigest()
-  if (want !== null && existsSync(ENGINE_BIN) && readStamp() === want) {
+  if (engineIsFresh(ROOT, ENGINE_BIN_NAME)) {
     console.log(`build: ${ENGINE_BIN} is fresh — reusing it`)
     return ENGINE_BIN
   }
+  const donor = donorRoot(ROOT)
+  if (donor !== null) {
+    const verdict = reuseDonorEngine(ROOT, donor, ENGINE_BIN_NAME)
+    if (verdict.reuse) {
+      console.log(`build: copied ${donor}'s engined (same engine inputs, stamp checked) — no cargo run`)
+      return ENGINE_BIN
+    }
+    console.log(`build: not reusing ${donor}'s engined: ${verdict.why}`)
+  }
   console.log('build: cargo build --release -p engined (the engine binary is stale)…')
+  const startedMs = Date.now()
   // Below normal, as `npm run build:engine` does: the owner keeps using the machine meanwhile.
   const res = atBelowNormalPriority(() =>
     spawnSync(cargoBinary(), ['build', '--release', '-p', 'engined'], {
@@ -251,20 +187,11 @@ export function buildEngineIfStale(): string {
   if (!existsSync(ENGINE_BIN)) {
     throw new Error(`e2e: cargo reported success but ${ENGINE_BIN} is missing`)
   }
-  // Re-read the digest AFTER the build: the dep-info this binary was actually produced from is the
-  // one to record, and it is the file cargo has just rewritten.
-  const built = engineInputDigest()
-  if (built !== null) writeFileSync(ENGINE_STAMP, built)
-  return ENGINE_BIN
-}
-
-/** The digest recorded when the binary beside it was built, or null when there is none. */
-function readStamp(): string | null {
-  try {
-    return readFileSync(ENGINE_STAMP, 'utf8').trim()
-  } catch {
-    return null
+  // Read AFTER the build: the dep-info cargo has just written is the input list of this binary.
+  if (!writeEngineStamp(ROOT, ENGINE_BIN_NAME, startedMs)) {
+    console.log('build: no engine stamp written (an input changed during the build); the next run builds again')
   }
+  return ENGINE_BIN
 }
 
 /** electron-vite's CLI entry, via its package manifest — `bin` is the field that names it, and
