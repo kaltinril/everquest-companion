@@ -3764,3 +3764,27 @@ test that failed before the fix.
   (re-proven red with `enterNextDelay={0}`).
 - Open: `sky-recent-sort` red (also on `main_community`); `engine-boots` flakes under load (counts
   other specs' engines); `page.screenshot` still times out on hidden windows.
+
+## Unit suite speed (2026-11-27, branch `unit-speed`)
+
+- **`npm test` pools most files** (`scripts/unitTests.mts`): 4 long-lived processes import their
+  share of the files in turn, so the catalogs load once per pool; files matching `ISOLATION_RULES`
+  (or named in `scripts/unit-isolated.txt`) run one process each, as before. One `run()` from
+  node:test, one spec stream: `known-reds.sh` and its `^✖ ` / `ℹ` parsing are unchanged, and a
+  planted pooled failure, a planted isolated failure and a planted load-time throw were each named
+  in its STOP list. WORKFLOW.md, Gate, "How `npm test` runs", has the rule, the checks and the times.
+- **Law: a load-time throw must fail by name.** The pool wrapper catches each file's import and
+  registers a failing test under the file's path. `--test-isolation=none` was rejected for this:
+  Node 24.19 imports every file first and drops a throw from a file that already registered a test.
+- **Law: a new hazard gets a rule, not a hand pick.** A pooled file red that is green alone
+  (`EQC_UNIT_ISOLATE_ALL=1`) is a leak: add a pattern to `ISOLATION_RULES` with its reason and a
+  sample in `tests/unitTestsRunner.test.mts`, or a line in `unit-isolated.txt` when no pattern fits.
+- **Measured:** 10-wide 113/110/139 s before, 80/94/93 s after (8 pools; 96 s with the 4 kept);
+  4-wide 181 s to 132 s; counts
+  identical (7877 tests, 7873 pass, 4 skipped). The audit's 4 min was a busy machine (one baseline
+  took 393 s while another job ran).
+- **Open: the OCR files are the floor.** `pasteRoute` (75 s alone), `shotScreenshots`,
+  `shotFontReader`, `questPopup`, `rowPaste`, `shotCapture` are ~60% of all test time and each one
+  process (top-level `after(() => stopOcr())`); the run ends when `pasteRoute` does. Splitting
+  those files (one OCR test per file, or a few) is the next lever; not done here because test files
+  were being edited in parallel.
