@@ -207,7 +207,9 @@ where one exists.
 - `/alt list` DATA FLOW: engine `eqlog/src/parse/aa_list.rs` (kind `aaList`: header `value`+`ability`,
   `text`, `cost`; first in the cascade) → `fold/src/modules/leveling_aa.rs` (latest run; a new run on
   a >2 s gap or the run's first id again, not on other repeats: a stale list repeats an id far apart;
-  `zoneBefore` = the last `zone` event before the run; the used set name/first/last/rank, fed by
+  `zoneBefore` = the last `zone` event before the run; the used set name/first/rank/castOnly (no `last`
+  stamp since 2026-11-27: a repeat announces nothing, so a field it moved went stale behind the cursor
+  and failed engined's kept-answer test), fed by
   `aaActivate`, `castBegin` (rank via `names::spell_rank`), `aaOwned` (reuse timer, `You disable X.`,
   `Your X combat ability is interrupted.`; classifier last in the cascade) and the player's own
   melee `damage` with `(Finishing Blow)` (raw-tail gate); only a new name or a higher rank announces;

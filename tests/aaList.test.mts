@@ -45,7 +45,7 @@ const row = (ranked: readonly AaRanked[], key: string): AaRanked => {
   assert.ok(r !== undefined, key)
   return r
 }
-const act = (name: string, ts = T + 1): AaActivation => ({ name, first: ts, last: ts })
+const act = (name: string, ts = T + 1): AaActivation => ({ name, first: ts })
 const spend = (ability: string, rank: number, ts: number, cost = 1): AASpendEvent => ({ ts, ability: `${ability} ${String(rank)}`, cost, rank })
 
 test('the fixtures are the real runs: 118 blocks maxed, Combat Fury in both', () => {
@@ -200,14 +200,17 @@ test('the list maps its names onto the rows: apostrophes and race rows', () => {
 
 test('mergeLeveling: the newer list run wins, activations join by name', () => {
   const base: LevelingSnap = { levels: [], aaGains: [], aaSpends: [], aaPotions: [] }
-  const older: LevelingSnap = { ...base, aaList: { ts: 5, blocks: [] }, aaActivations: [{ name: 'Quick Buff', first: 1, last: 4 }] }
-  const newer: LevelingSnap = { ...base, aaList: null, aaActivations: [{ name: 'Quick Buff', first: 8, last: 9 }, { ...act('Rampage', 7), rank: 2 }] }
+  const older: LevelingSnap = { ...base, aaList: { ts: 5, blocks: [] }, aaActivations: [{ name: 'Quick Buff', first: 1 }] }
+  const newer: LevelingSnap = { ...base, aaList: null, aaActivations: [{ name: 'Quick Buff', first: 8 }, { ...act('Rampage', 7), rank: 2 }] }
   const m = mergeLeveling(older, newer)
   assert.ok(m !== null)
   assert.equal(m.aaList?.ts, 5)
-  assert.deepEqual(m.aaActivations, [{ name: 'Quick Buff', first: 1, last: 9 }, { name: 'Rampage', first: 7, last: 7, rank: 2 }])
+  assert.deepEqual(m.aaActivations, [{ name: 'Quick Buff', first: 1 }, { name: 'Rampage', first: 7, rank: 2 }])
   const lower = mergeLeveling(newer, { ...base, aaActivations: [{ ...act('Rampage', 9), rank: 1 }] })
-  assert.deepEqual(lower?.aaActivations?.find((a) => a.name === 'Rampage'), { name: 'Rampage', first: 7, last: 9, rank: 2 })
+  assert.deepEqual(lower?.aaActivations?.find((a) => a.name === 'Rampage'), { name: 'Rampage', first: 7, rank: 2 })
+  // A segment written before 2026-11-27 carries a `last` stamp; the merge drops it.
+  const stamped = { ...base, aaActivations: [{ name: 'Quick Buff', first: 3, last: 4 }] }
+  assert.deepEqual(mergeLeveling(stamped, stamped)?.aaActivations, [{ name: 'Quick Buff', first: 3 }])
   const later = mergeLeveling(older, { ...base, aaList: { ts: 9, blocks: [] } })
   assert.equal(later?.aaList?.ts, 9)
   // A segment written before the fields reads as one without them.
@@ -238,11 +241,11 @@ test('A SPELL CAST with no numeral does not prove the AA of the same name; an ac
 
 test('mergeLeveling: a name stays castOnly only when every segment saw it only as a bare cast', () => {
   const base: LevelingSnap = { levels: [], aaGains: [], aaSpends: [], aaPotions: [] }
-  const bare: LevelingSnap = { ...base, aaActivations: [{ name: 'Divine Aura', first: 1, last: 2, castOnly: true }] }
-  const proved: LevelingSnap = { ...base, aaActivations: [{ name: 'Divine Aura', first: 5, last: 6 }] }
-  assert.deepEqual(mergeLeveling(bare, bare)?.aaActivations, [{ name: 'Divine Aura', first: 1, last: 2, castOnly: true }])
-  assert.deepEqual(mergeLeveling(bare, proved)?.aaActivations, [{ name: 'Divine Aura', first: 1, last: 6 }])
-  assert.deepEqual(mergeLeveling(proved, bare)?.aaActivations, [{ name: 'Divine Aura', first: 1, last: 6 }])
+  const bare: LevelingSnap = { ...base, aaActivations: [{ name: 'Divine Aura', first: 1, castOnly: true }] }
+  const proved: LevelingSnap = { ...base, aaActivations: [{ name: 'Divine Aura', first: 5 }] }
+  assert.deepEqual(mergeLeveling(bare, bare)?.aaActivations, [{ name: 'Divine Aura', first: 1, castOnly: true }])
+  assert.deepEqual(mergeLeveling(bare, proved)?.aaActivations, [{ name: 'Divine Aura', first: 1 }])
+  assert.deepEqual(mergeLeveling(proved, bare)?.aaActivations, [{ name: 'Divine Aura', first: 1 }])
 })
 
 test('THE RANK PICKER offers only the picks the order of proof reads: none under a list a purchase beat, none below a use line', () => {

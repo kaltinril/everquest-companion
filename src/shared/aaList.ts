@@ -37,11 +37,11 @@ export interface AaListRun {
   zoneBefore?: number | null
 }
 
-/** One name the log shows the player using. */
+/** One name the log shows the player using. No last stamp: the engine announces only a new name, a
+ *  higher rank or a proved bare cast, so a stamp every repeat moved would go stale behind its cursor. */
 export interface AaActivation {
   name: string
   first: number
-  last: number
   /** The highest rank a line named (`Rampage II`); absent when none did. */
   rank?: number
   /** Every line so far was a cast with no numeral (`You begin casting Divine Aura.`); absent otherwise. */

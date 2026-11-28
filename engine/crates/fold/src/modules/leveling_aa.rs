@@ -18,9 +18,14 @@
 //! names its AA table has; `Skull Bash` is a skill): `You activate X.` (`aaActivate`); `You begin
 //! casting X II.` (`castBegin`, rank from the numeral); `You can use the ability X again in ...`,
 //! `You disable X.`, `Your X combat ability is interrupted.` (`aaOwned`); and `(Finishing Blow)` on
-//! the player's own melee hit. First and last stamp per name, and the highest rank a line named.
+//! the player's own melee hit. The first stamp per name, and the highest rank a line named.
 //! A name seen only in casts with no numeral is marked `castOnly`: an AA's cast carries its numeral
 //! (`Divine Aura I`), a spell of the same name (a Cleric's level-1 Divine Aura) does not.
+//!
+//! No last stamp is published: a repeat announces nothing (Heroic Leap's reuse line, 20,000 in the
+//! owner's log, and every cast of a spell already seen), so a field a repeat moved would change the
+//! published state under an unmoved cursor. Clients and the engine's kept answer both trust that
+//! cursor; until 2026-11-27 a `last` stamp moved on every repeat and both served it stale.
 
 use crate::event::{Event, Key, Kind};
 use eqlog::names::{spell_rank, strip_rank_tail};
@@ -117,7 +122,6 @@ pub fn fold_list_line(run: &mut Option<AaListRun>, ev: &Event, zone: Option<i64>
 pub struct AaActivation {
     name: String,
     first: i64,
-    last: i64,
     /// The highest rank a line named (`Rampage II`); absent when none did.
     #[serde(skip_serializing_if = "Option::is_none")]
     rank: Option<i64>,
@@ -151,8 +155,9 @@ fn used(ev: &Event) -> Option<(String, Option<i64>)> {
 }
 
 /// Folds one line that may show the player using something. Returns true only for a name not seen
-/// before or a higher rank: a repeat moves `last` without announcing, so Heroic Leap's reuse line
-/// (20,000 in the owner's log) never refetches the whole history.
+/// before, a higher rank, or a bare cast proved by another line; nothing else changes the published
+/// entry, so a repeat (Heroic Leap's reuse line, 20,000 in the owner's log) never refetches the whole
+/// history and never moves the state behind the cursor's back.
 pub fn fold_used(seen: &mut Vec<AaActivation>, ev: &Event) -> bool {
     let Some((name, rank)) = used(ev).filter(|(n, _)| !n.is_empty()) else {
         return false;
@@ -160,7 +165,6 @@ pub fn fold_used(seen: &mut Vec<AaActivation>, ev: &Event) -> bool {
     let ts = ev.ts();
     let bare = rank.is_none() && ev.kind_of() == Kind::CastBegin;
     if let Some(a) = seen.iter_mut().find(|a| a.name == name) {
-        a.last = a.last.max(ts);
         let higher = rank > a.rank;
         if higher {
             a.rank = rank;
@@ -174,7 +178,6 @@ pub fn fold_used(seen: &mut Vec<AaActivation>, ev: &Event) -> bool {
     seen.push(AaActivation {
         name,
         first: ts,
-        last: ts,
         rank,
         cast_only: bare,
     });
@@ -274,7 +277,7 @@ mod tests {
     }
 
     #[test]
-    fn an_activation_is_new_once_and_then_only_moves_its_last_stamp() {
+    fn an_activation_is_new_once_and_then_changes_nothing() {
         let mut seen = Vec::new();
         let act = |ts: i64, n: &str| {
             ev(&format!(
@@ -284,7 +287,7 @@ mod tests {
         assert!(fold_used(&mut seen, &act(1000, "Quick Buff")));
         assert!(!fold_used(&mut seen, &act(9000, "Quick Buff")));
         assert!(fold_used(&mut seen, &act(9500, "Skull Bash")));
-        assert_eq!((seen[0].first, seen[0].last), (1000, 9000));
+        assert_eq!(seen[0].first, 1000);
         assert_eq!(seen.len(), 2);
     }
 
@@ -312,8 +315,8 @@ mod tests {
         assert!(fold_used(&mut seen, &cast(3000, "Rampage II")));
         assert!(!fold_used(&mut seen, &cast(4000, "Rampage I")));
         assert_eq!(
-            (seen[0].name.as_str(), seen[0].rank, seen[0].last),
-            ("Rampage", Some(2), 4000)
+            (seen[0].name.as_str(), seen[0].rank, seen[0].first),
+            ("Rampage", Some(2), 1000)
         );
         assert!(fold_used(&mut seen, &cast(5000, "Origin")));
         assert_eq!(seen[1].rank, None);
@@ -344,6 +347,45 @@ mod tests {
         assert!(!fold_used(&mut seen, &hit("Malkil")));
         assert!(fold_used(&mut seen, &hit("You")));
         assert_eq!(seen[0].name, "Finishing Blow");
+    }
+
+    /// The announce contract the engine's kept answer and every client rely on: a line that does not
+    /// announce leaves the published entries exactly as they were. A `last` stamp once moved on every
+    /// repeat without announcing, and the kept `leveling` answer went stale (2026-11-27).
+    #[test]
+    fn a_line_that_does_not_announce_leaves_the_published_entries_unchanged() {
+        let line = |kind: &str, field: &str, ts: i64, value: &str| {
+            ev(&format!(
+                r#"{{"kind":"{kind}","seq":1,"ts":{ts},"raw":"x","{field}":"{value}"}}"#
+            ))
+        };
+        let stream = [
+            ("castBegin", "spell", "Divine Aura"),
+            ("aaOwned", "name", "Heroic Leap"),
+            ("castBegin", "spell", "Rampage I"),
+            ("castBegin", "spell", "Divine Aura"),
+            ("aaOwned", "name", "Heroic Leap"),
+            ("aaActivate", "name", "Divine Aura"),
+            ("castBegin", "spell", "Rampage II"),
+            ("castBegin", "spell", "Rampage I"),
+            ("aaActivate", "name", "Heroic Leap"),
+            ("castBegin", "spell", "Divine Aura"),
+        ];
+        let mut seen = Vec::new();
+        let mut quiet = 0;
+        for (i, (kind, field, value)) in stream.iter().enumerate() {
+            let before = serde_json::to_value(&seen).unwrap();
+            let ts = 1000 * (i64::try_from(i).unwrap() + 1);
+            if !fold_used(&mut seen, &line(kind, field, ts, value)) {
+                quiet += 1;
+                assert_eq!(
+                    serde_json::to_value(&seen).unwrap(),
+                    before,
+                    "{kind} {value} at {ts} announced nothing but moved the published entries"
+                );
+            }
+        }
+        assert_eq!(quiet, 5, "the stream holds five repeats");
     }
 
     #[test]
