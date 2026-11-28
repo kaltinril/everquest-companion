@@ -28,11 +28,20 @@
  * log contains right now: the dashboard is present AND HAS HEIGHT (the regression), the
  * source meter has rows, the DPS-over-time, Procs and Damage-by-mob cards exist (JOS-37: the
  * dedicated You breakdown preview retired and Procs took its cell), the Fight/Overall
- * SCOPE filters the selector to exactly one scope's rows (Task #60 — a fight meter must never
- * wander into the zone aggregate), the header holds its two-rank shape (subject line, then
+ * SCOPE switch takes (Task #60), the header holds its two-rank shape (subject line, then
  * lens line) with the Timeline view offered only when the selection actually has an event
  * ring, and the combat log is a BOUNDED scrolling box.
  * Assertions are identities/floors — never "today's numbers" (AGENTS.md: frozen numbers rot).
+ *
+ * WHAT IT NO LONGER CHECKS (owner, 2026-11-27: e2e proves wiring; the values a pure function
+ * computes are unit-tested over the function): which rows each scope's dropdown may list and the
+ * head row's "Last fight" wording (tests/combatScopeOptions.test.mts), the meter scope's row
+ * counts (tests/meterScope.test.mts), the grouped pet layout's line count
+ * (tests/combatPetGroups.test.mts), and the multi-attack readout's rounds wording
+ * (tests/multiAttackRows.test.mts). The 2x2 grid is measured in four states (quiet, busy log,
+ * the 900 px window, restored wide) and the header in four (quiet, timeline, 900, 720): the
+ * picked-fight and after-search grid passes and the restored-wide header pass repeated a state
+ * already measured.
  *
  * On any failure: the relevant DOM + a screenshot land in tests/e2e/artifacts/ (gitignored).
  *
@@ -216,14 +225,9 @@ async function stepScopeAndSelector(page: Page, snapIn: Snap, shape: DashboardSh
     snap.selected === null || snap.selected.kind === 'fight',
     `selectedId=${snap.selectedId} kind=${snap.selected?.kind ?? 'none'}`
   )
-  const openFight = snap.segments.find((s) => s.kind === 'current')
-  if (openFight) {
-    note(`a fight is open (${openFight.name}) — the head row reads "Current fight (live)"`)
-  } else {
-    note('no fight is open — the head row must read "Last fight — …", not "live"')
-    const headText = await selectorText(page)
-    check('…and the selector says so instead of claiming live', /Last fight/.test(headText), headText.slice(0, 80))
-  }
+  // The head row's wording ("Current fight (live)" / "Last fight - X") and which rows each scope
+  // may list are `dashboardData.scopeOptions`' answers, pinned in tests/combatScopeOptions.test.mts
+  // (2026-11-27: values a pure function computes are unit-tested; this spec proves the wiring).
   // The CLOSED trigger states the subject only — label + timing. The dps rate moved to the
   // headline stat at the right edge of the same line, and printing the number twice on one
   // line was exactly the noise the redesign removed. Scope this to the trigger's own text:
@@ -241,22 +245,9 @@ async function stepScopeAndSelector(page: Page, snapIn: Snap, shape: DashboardSh
     `${Math.round(liveTotal)} dmg / ${rows} rows`
   )
 
-  // 6b. THE FILTER: opening the selector in Fight scope must list fights ONLY. A zone session
-  //     appearing here is how the meter used to wander into the overall aggregate.
-  const fightMenu = await openSelectorValues(page)
-  check(
-    'the Fight-scope dropdown excludes zone sessions',
-    fightMenu.length > 0 && !fightMenu.some((v) => v === 'zone' || /^zs\d+$/.test(v)),
-    `${fightMenu.length} rows: ${fightMenu.slice(0, 4).join(', ')}`
-  )
-  // …and Overall lists zone sessions ONLY (no fight ids).
+  // 6b. THE SCOPE SWITCH IS WIRED. What each scope's dropdown may list (fights only / zone
+  //     sessions only) is tests/combatScopeOptions.test.mts; here the toggle has to take.
   check('the Overall scope can be selected', await clickScope(page, 2))
-  const overallMenu = await openSelectorValues(page)
-  check(
-    'the Overall-scope dropdown lists only zone sessions',
-    overallMenu.length > 0 && overallMenu.every((v) => v === 'zone' || /^zs\d+$/.test(v)),
-    `${overallMenu.length} rows: ${overallMenu.slice(0, 4).join(', ')}`
-  )
 
   // 6c. TIMELINE AVAILABILITY. The timeline is drawn from a per-encounter EVENT RING, and a
   //     zone aggregate deliberately keeps none (AGENTS.md law 7: finalized zone sessions are
@@ -391,8 +382,6 @@ async function stepPickAFight(page: Page, snap: Snap): Promise<void> {
     )
     const dash3 = await rectOf(page, '[data-testid="combat-dashboard"]')
     check('…in a dashboard that still has height', !!dash3 && dash3.h >= 200, dash3 ? `${dash3.h}px` : 'absent')
-    // A finalized fight is the DENSEST case (full source list, full mob list, full ring).
-    await checkGrid(page, 'picked fight')
   } else {
     check(
       'the Fight-scope dropdown offers at least one finalized fight to select',
@@ -458,7 +447,6 @@ async function stepSearch(page: Page, snap: Snap): Promise<void> {
     const misses = await settleStable(() => listedValues(page), { timeoutMs: 10_000 })
     check('a query that matches nothing lists nothing (it never falls back to the full list)', misses.length === 0, `${misses.length} rows`)
     await closePicker(page)
-    await checkGrid(page, 'after search')
   } else {
     note('no finalized fight with damage in the snapshot — the search assertions need one')
   }
@@ -516,14 +504,14 @@ async function stepResponsive(app: ElectronApplication, page: Page): Promise<voi
     narrowOver.doc === 0 && narrowOver.content === 0,
     `document +${narrowOver.doc}px · content +${narrowOver.content}px`
   )
-  // Back to the wide layout — and it must come back as a clean 2x2.
+  // Back to the wide layout — and it must come back as a clean 2x2. (The header at full width was
+  // measured in the quiet state; only the grid's return from the collapse is new here.)
   await win.evaluate((w, b) => {
     w.setMinimumSize(900, 600)
     w.setBounds(b)
   }, wide)
   await settleStable(() => panelBoxes(page), { timeoutMs: 15_000 })
   await checkGrid(page, 'restored wide')
-  await checkHeader(page, 'restored wide', true)
 }
 
 async function main(): Promise<void> {

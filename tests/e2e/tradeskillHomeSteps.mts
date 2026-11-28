@@ -6,16 +6,16 @@
  * tradeskills-log.e2e.mts. It runs last.
  *
  * What it holds:
- *   - Home says what the section draws on, and every tile carries a level bar; a bar's fill is
- *     its own tile's level over the scale the tile states; a tradeskill the log never showed is
- *     a tile of the same grid reading "Not in log", with an empty bar and no next recipe;
+ *   - a not-in-log tile hides to the bottom line, the choice is stored, and it comes back;
  *   - "Pick up where you left off" names a tradeskill and its button opens that workbench, whose
- *     head carries the same bar;
+ *     head carries the level bar;
  *   - the picked recipe has the app's wish control; a wished item is listed on Home under
  *     "Working towards" by the app's item link, its link opens Make an item on that item, and
  *     the planner's head carries the same control, which takes the wish off again;
  *   - the sources line is words: no link on Home leaves for a host other than eqlwiki.com;
  *   - the Skills tab's "Open Tradeskills" button opens the section.
+ *
+ * What the tiles, bars and lines SAY is tests/tradeskillHome.test.mts (owner, 2026-11-27).
  *
  * Every claim is a property of what is on screen, never a name or a count from the wiki data.
  *
@@ -23,7 +23,6 @@
  */
 import type { Page } from 'playwright-core'
 import { check, countOf, note, settle, settleGone } from './appHarness.mjs'
-import { NOT_IN_LOG_TEXT } from '../../src/shared/tradeskillHome'
 
 const sel = (id: string): string => `[data-testid="${id}"]`
 const NAV = sel('nav-tradeskills')
@@ -32,7 +31,6 @@ const BENCH = sel('tradeskill-workbench')
 const PLANNER = sel('tradeskill-planner')
 const PICKED = sel('tradeskill-picked')
 const NAME = sel('planner-donor-name')
-const TILE = '[data-testid^="tradeskill-tile-"][data-tile="seen"]'
 const BAR = sel('tradeskill-bar')
 const PICKUP = sel('tradeskills-pickup')
 const WISHED_ROW = sel('tradeskills-wished-row')
@@ -54,29 +52,6 @@ async function goHome(page: Page): Promise<boolean> {
   await settle(async () => (await countOf(page, BENCH)) + (await countOf(page, HOME)), (n) => n > 0, { timeoutMs: 15_000 })
   if ((await countOf(page, BENCH)) > 0) await page.click(sel('tradeskill-home'))
   return (await settle(() => countOf(page, HOME), (n) => n === 1, { timeoutMs: 15_000 })) === 1
-}
-
-interface TileBar {
-  name: string
-  level: string
-  of: string
-  bars: number
-  fill: number
-}
-
-/** Each tile's level words and its bar, read off the page. */
-function tileBars(page: Page): Promise<TileBar[]> {
-  return page.evaluate(
-    ([tileSel, barSel]) =>
-      [...document.querySelectorAll<HTMLElement>(tileSel)].map((card) => ({
-        name: (card.dataset.testid ?? '').replace('tradeskill-tile-', ''),
-        level: card.querySelector('[data-testid="tradeskill-tile-level"]')?.textContent ?? '',
-        of: card.querySelector('[data-testid="tradeskill-bar-of"]')?.textContent ?? '',
-        bars: card.querySelectorAll(barSel).length,
-        fill: Number(card.querySelector<HTMLElement>(barSel)?.dataset.fill ?? 'NaN')
-      })),
-    [TILE, BAR] as const
-  )
 }
 
 interface UnseenPanel {
@@ -116,27 +91,13 @@ function foreignLinks(page: Page, selector: string): Promise<string[]> {
   )
 }
 
+/**
+ * Home's sources line is words: no link on Home leaves for another host. What Home's tiles, bars,
+ * scales, "Not in log" tiles, subtitle and sources line SAY is tests/tradeskillHome.test.mts
+ * (owner, 2026-11-27: e2e proves wiring); the level reaching a tile is tradeskills.e2e.mts.
+ */
 async function checkHome(page: Page): Promise<void> {
-  const subtitle = await textOf(page, sel('tradeskills-subtitle'))
-  check('Home says what the section draws on', /wiki/i.test(subtitle) && /guides/i.test(subtitle) && /log/i.test(subtitle), subtitle)
-  // The levels arrive with the engine's skills module: wait for one before reading any bar.
-  const tiles = await settle(() => tileBars(page), (ts) => ts.some((t) => t.level !== ''), { timeoutMs: 30_000 })
-  check('every tile carries one level bar', tiles.length > 0 && tiles.every((t) => t.bars === 1), tiles.filter((t) => t.bars !== 1).map((t) => t.name).join(', '))
-  const scaled = tiles.filter((t) => t.level !== '' && /^of \d+$/.test(t.of))
-  check('a tile with a level states its scale', scaled.length > 0, `${String(scaled.length)} of ${String(tiles.length)}`)
-  const off = scaled.filter((t) => Math.abs(t.fill - Math.min(1, Number(t.level) / Number(t.of.slice(3)))) > 0.002)
-  check("…and its bar is filled to that level's share of it", off.length === 0, off.map((t) => `${t.name} ${t.level} ${t.of} ${String(t.fill)}`).join(' | '))
-  check('a tile with a level is drawn only for a tradeskill the log has shown', tiles.every((t) => t.level !== ''), tiles.filter((t) => t.level === '').map((t) => t.name).join(', '))
-  const unseen = await unseenPanels(page)
-  if (unseen.length === 0) note('the log has shown every tradeskill: no "Not in log" tile is drawn and none was checked')
-  else {
-    const odd = unseen.filter((d) => !d.inGrid || d.words !== NOT_IN_LOG_TEXT || d.numbers !== 0 || d.buttons !== 2 || d.bars !== 1 || d.fill !== 0 || d.next !== 0)
-    check('a tradeskill the log never showed is a tile of the grid reading "Not in log", with an empty bar, no number and no next recipe', odd.length === 0, odd.map((d) => d.name).join(', '))
-  }
-  check('the old row of small buttons is gone', (await countOf(page, sel('tradeskills-unseen'))) === 0)
-  const sources = await textOf(page, sel('tradeskills-sources'))
-  check('the foot of Home names the sources', sources.startsWith('Sources:') && /wiki data/i.test(sources) && /your own log/i.test(sources), sources)
-  check('…as words: no link on Home leaves for another host', (await foreignLinks(page, HOME)).length === 0)
+  check('no link on Home leaves for another host', (await foreignLinks(page, HOME)).length === 0)
 }
 
 /** Hides one not-in-log tile, finds it on the bottom line, and brings it back, leaving Home as it was. */

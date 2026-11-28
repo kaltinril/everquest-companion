@@ -261,6 +261,21 @@ test('a committed selection WINS over the window, and clearing it falls straight
   assert.notDeepEqual(fallback.stats, narrowed.stats, 'the two scopes really are different readings')
 })
 
+// Moved here from leveling.e2e.mts (2026-11-27, owner: values are unit-tested, e2e proves wiring).
+test('a committed selection inside the window never counts MORE than the window it sits in', () => {
+  const { snap, lo, hi } = twoDaySnap()
+  const win = windowFor(lo, hi, 'h24')
+  const sel = { t0: T0 + DAY + 30 * MIN, t1: T0 + DAY + 90 * MIN }
+  const narrowed = scopedStats({ snap, win, bounds: { lo, hi }, id: 'h24', selection: sel })
+  const window = scopedStats({ snap, win, bounds: { lo, hi }, id: 'h24', selection: null })
+  assert.ok(narrowed.stats.kills > 0, 'the selection holds kills, so the comparison means something')
+  assert.ok(narrowed.stats.kills <= window.stats.kills)
+  assert.ok(narrowed.stats.durationMs < window.stats.durationMs)
+  assert.ok(narrowed.stats.activeMs <= window.stats.activeMs)
+  assert.ok(narrowed.stats.aaGainEvents <= window.stats.aaGainEvents)
+  assert.ok(narrowed.stats.levelEquiv <= window.stats.levelEquiv + 1e-9)
+})
+
 // JOS-454. A drag to the right edge of the chart lands in the TRAILING GUTTER — every scale
 // carries one (`chartWindow.TRAILING_FRAC`, 4% of the span) so the current level reads as a
 // plateau instead of a bare endpoint. Rule 2 clamps a WINDOW back to the record for exactly that

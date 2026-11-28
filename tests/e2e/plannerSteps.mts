@@ -368,7 +368,10 @@ export async function stepItemFilter(page: Page): Promise<void> {
     narrowed < before ? `${String(before)}px → ${String(narrowed)}px` : `empty state reads "${empty}"`
   )
 
-  for (const kind of ['worn', 'click', 'proc'] as const) {
+  // TWO kind tabs, not all three (2026-11-27): the JOS-210 defect was one shared change handler, so
+  // any switch would show it; Click was the same claim a third time. Proc comes last because every
+  // step after this one expects the Proc tab.
+  for (const kind of ['worn', 'proc'] as const) {
     await page.click(kindTab(kind), { timeout: 15_000 })
     const kept = await until(async () => (await countOf(page, ITEM_CHIP)) > 0, 10_000)
     if (!check(`the item filter survives the ${kind} tab (JOS-210)`, kept)) return

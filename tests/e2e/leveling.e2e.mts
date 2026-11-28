@@ -33,8 +33,9 @@
  *      hover still resolves a cursor, a drag still commits a range and a click still dismisses it,
  *      and `All` restores the exact window it started on;
  *   5c. and (JOS-75) the DASHBOARD NUMBERS move with it — the range panel's stated stretch, its
- *      readouts and the AA pace panel all re-derive on a window change, dominate correctly
- *      (a window inside another can never count more), and come back BYTE-IDENTICAL at `All`;
+ *      readouts and the AA pace panel all re-derive on a window change and come back
+ *      BYTE-IDENTICAL at `All` (that a narrower window or a selection never counts more is a value
+ *      of the scope derivation, pinned by tests/levelingWindowScope.test.mts since 2026-11-27);
  *   6. the "New at this level" panel is mounted with its stepper — and, once the combo module
  *      has resolved a loadout, draws real unlock rows for it (floors, never today's counts);
  *   6a. (JOS-391) and each spell row says what the spell is WORTH: compact damage/heal figures per
@@ -43,9 +44,9 @@
  *      the panel rather than footnoted per row. Step 6a lives in `unlockRowSteps.mts`;
  *   6c. (JOS-392) the spell a row says it REPLACES is a hover target of its own, and the card that
  *      opens is that spell's - carrying the figures main read for it;
- *   6d. (JOS-392) and typing `27-28 cleric shaman` turns the panel into the matching spells, each
- *      row's chips stating the level each class gets it at, in any word order - then clearing the
- *      box gives the level view back. Steps 6c/6d live in `unlockRowSteps.mts` too;
+ *   6d. (JOS-392) and typing `27-28 cleric shaman` turns the panel into result rows - then clearing
+ *      the box gives the level view back (which rows, and word order, are tests/unlockSearch.test.mts
+ *      and tests/spellSearch.test.mts). Steps 6c/6d live in `unlockRowSteps.mts` too;
  *   6e. (JOS-393) and a spell the wiki badges out of era is FOUND by that search and MARKED - the
  *      chip on the row, the same words on its card - while its in-era sibling one rung down the
  *      same ladder wears nothing;
@@ -283,13 +284,6 @@ async function dashboardReadout(page: Page): Promise<string> {
   return parts.join(' ¦ ').replace(/\s+/g, ' ').trim()
 }
 
-/** Credited kills as the panel's second hero card states them; null when it is not drawn. */
-function killsShown(page: Page): Promise<number | null> {
-  return page
-    .evaluate((s) => (Array.from(document.querySelectorAll(s))[1] as HTMLElement | undefined)?.innerText ?? '', HERO)
-    .then((t) => numIn(t))
-}
-
 /** A press-and-release with NO travel — the click gesture, which drops a committed selection. */
 async function clickChart(page: Page, sel: string): Promise<void> {
   await hoverAt(page, sel, 0.5, 0.5)
@@ -410,7 +404,6 @@ async function stepSelection(page: Page, chart: string): Promise<void> {
     return
   }
   const windowReadout = await dashboardReadout(page)
-  const windowKills = await killsShown(page)
 
   if (!check('the chart is reachable for a drag', await dragRange(page, chart))) return
   const narrowed = await settle(() => scopeOf(page), (s) => s === 'selection', { timeoutMs: 8000 })
@@ -425,15 +418,8 @@ async function stepSelection(page: Page, chart: string): Promise<void> {
   const zones = await countOf(page, ZONE_ROW)
   check('…with its hero stats', heroes > 0, `${String(heroes)} hero cards`)
   check('…and at least one per-zone row (a committed range is always fully covered by zones)', zones > 0, `${String(zones)} zone rows`)
-
-  // A selection is a NARROWER range on the same base, so it can never count more than the window
-  // that contains it. An identity, not today's number.
-  const selKills = await killsShown(page)
-  check(
-    'a selection inside the window can never count MORE kills than the window',
-    selKills !== null && windowKills !== null && selKills <= windowKills,
-    `selection ${String(selKills)} vs window ${String(windowKills)}`
-  )
+  // That a selection inside the window never counts MORE than the window is a value of the scope
+  // derivation: tests/levelingWindowScope.test.mts (owner, 2026-11-27: e2e proves wiring).
 
   await clickChart(page, chart)
   check(
@@ -451,17 +437,14 @@ async function stepSelection(page: Page, chart: string): Promise<void> {
 interface DashboardBaseline {
   readout: string
   range: string
-  kills: number | null
 }
 
 /**
  * 5c. THE NUMBERS FOLLOWED THE WINDOW (JOS-75) — asserted right after a switch to `narrow`.
  *
- * Two identities, so nothing here rots with the fixture: the panel states the NEW window's own
- * stretch rather than the full history's, and its counts are DOMINATED by the wide window's (a
- * stretch contained in another can never hold more of anything). A fixture whose every kill
- * happens to fall inside the narrow window makes the second reading a legitimate equality, and
- * that is `note`d rather than quietly passed off as proof.
+ * The panel states the NEW window's own stretch rather than the full history's, and the readout
+ * as a whole re-derived. That the narrow window's counts are DOMINATED by the wide one's is a
+ * value of the scope derivation, pinned by tests/levelingWindowScope.test.mts (owner, 2026-11-27).
  */
 async function stepScopedNumbers(page: Page, narrow: string, base: DashboardBaseline): Promise<void> {
   const range = await settle(() => textOf(page, PANEL_RANGE), (t) => t !== base.range, { timeoutMs: 8000 })
@@ -470,18 +453,6 @@ async function stepScopedNumbers(page: Page, narrow: string, base: DashboardBase
     range !== base.range,
     `${base.range} → ${range}`.replace(/\s+/g, ' ')
   )
-  const kills = await killsShown(page)
-  const known = kills !== null && base.kills !== null
-  check(
-    '…and its counts are DOMINATED by the wide window (a narrower stretch can never hold more)',
-    known && kills <= base.kills,
-    `${String(kills)} kills at ${narrow} vs ${String(base.kills)} at All`
-  )
-  if (known && kills === base.kills) {
-    note(
-      `every credited kill in this fixture falls inside the "${narrow}" window, so the kills readout is legitimately unchanged — the stated stretch above is what proves the re-derivation`
-    )
-  }
   check(
     '…and the dashboard as a whole re-derived rather than restating the full-history numbers',
     (await dashboardReadout(page)) !== base.readout
@@ -533,7 +504,6 @@ async function stepTimescale(page: Page, chart: string): Promise<void> {
   // The full-history dashboard, read BEFORE anything is touched — the state `All` must restore.
   const allReadout = await dashboardReadout(page)
   const allRange = await textOf(page, PANEL_RANGE)
-  const allKills = await killsShown(page)
 
   // A committed range from the WIDE window, so the switch has something to invalidate.
   if (!(await dragRange(page, chart))) return
@@ -549,7 +519,7 @@ async function stepTimescale(page: Page, chart: string): Promise<void> {
     `scope "${await scopeOf(page)}" after the switch`
   )
 
-  await stepScopedNumbers(page, narrow, { readout: allReadout, range: allRange, kills: allKills })
+  await stepScopedNumbers(page, narrow, { readout: allReadout, range: allRange })
 
   // Everything still on screen, and still agreeing about the new base.
   const box = await rectOf(page, chart)

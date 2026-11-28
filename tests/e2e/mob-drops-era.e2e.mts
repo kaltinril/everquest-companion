@@ -17,8 +17,10 @@
  * WHY IT CAN STATE EXACT NUMBERS where a live-log spec must state floors: nothing here is read off
  * the player's log. The drop table is the COMMITTED catalog (`data/eqlegends/mobs.json`) and the
  * era evidence is the COMMITTED item corpus (`main/data/items.json`), so 18 = 11 + 7 is a fact
- * about bytes in the repo. `tests/mobDropEra.test.mts` pins the same split without a browser; this
- * spec is about what a READER sees, which is the half a unit test cannot reach.
+ * about bytes in the repo. `tests/mobDropEra.test.mts` pins the same split without a browser, and
+ * since 2026-11-27 (owner: e2e proves wiring) it alone pins the "+7 out of era" wording and that an
+ * in-era row wears no chip; this spec is about what a READER sees: the fold reaching both surfaces,
+ * the disclosure, and the chip on a folded row.
  *
  * THE ONE THING IT READS FROM A LOG is the current-mob card's SUBJECT: the card follows
  * `currentTarget`, so the spec scripts a pull at Cazic Thule through the append driver, the same
@@ -121,11 +123,6 @@ async function stepCurrentMobCard(page: Page, log: FixtureLog): Promise<void> {
   // The drop list arrives an IPC round trip after the card mounts, so wait for the fold's own
   // affordance rather than for the clock. Its ABSENCE would be the bug, not a timing artifact.
   if (!check('the card offers the folded rows as a disclosure', await appears(page, CARD_ERA_TOGGLE, 20_000))) return
-  check(
-    `…which names how many there are ("+${String(OUT_OF_ERA)} out of era")`,
-    (await textOf(page, CARD_ERA_TOGGLE)) === `+${String(OUT_OF_ERA)} out of era`,
-    await textOf(page, CARD_ERA_TOGGLE)
-  )
   const collapsed = await textOf(page, MOB_CARD)
   check(
     'the rows it shows do NOT include the revamp table (the owner report)',
@@ -187,17 +184,7 @@ async function stepMobPage(page: Page): Promise<void> {
   if (!(await openMobPage(page))) return
   const shown = await settle(() => countOf(page, DROP_ROW), (n) => n === IN_ERA, { timeoutMs: 15_000 })
   check(`the page shows ${String(IN_ERA)} drops by default (it showed ${String(LISTED)})`, shown === IN_ERA, String(shown))
-  check(
-    'none of the shown rows is chipped — they are all in era',
-    (await countOf(page, ERA_CHIP)) === 0,
-    String(await countOf(page, ERA_CHIP))
-  )
   if (!check('the folded rows are offered as a disclosure', await appears(page, PAGE_ERA_TOGGLE))) return
-  check(
-    `…reading "+${String(OUT_OF_ERA)} out of era"`,
-    (await textOf(page, PAGE_ERA_TOGGLE)) === `+${String(OUT_OF_ERA)} out of era`,
-    await textOf(page, PAGE_ERA_TOGGLE)
-  )
 
   // The tally strip must agree with the list it heads, or the page states two answers to one
   // question — which is how the old count read 18 over a list of 18 unreachable-in-part rows.
@@ -207,7 +194,6 @@ async function stepMobPage(page: Page): Promise<void> {
     stat.startsWith(`${String(IN_ERA)} `) || stat.startsWith(`${String(IN_ERA)}\n`),
     stat
   )
-  check('…and still states the folded ones beside it', stat.includes(`+${String(OUT_OF_ERA)} out of era`), stat)
 
   await page.click(PAGE_ERA_TOGGLE, { timeout: 15_000 })
   const all = await settle(() => countOf(page, DROP_ROW), (n) => n === LISTED, { timeoutMs: 10_000 })

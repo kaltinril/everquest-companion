@@ -2,10 +2,12 @@
  * The Gear tab's CLASS filter and its WEAPON TYPE filter (JOS-302, the owner's first and third
  * asks). A module rather than more of `gear.e2e.mts`, the `gearSetSteps.mts` / `gearColumnSteps.mts`
  * precedent: everything these steps need is already standing in the host spec, and that file is at
- * the repo's 400-code-line factoring ceiling. The SLOT half of the ticket stayed in the host spec,
- * because it is that spec's own slot step growing multi-select semantics rather than a new subject.
+ * the repo's 400-code-line factoring ceiling. The SLOT half of the ticket has no step of its own any
+ * more: the slot picker's wiring is asserted where the comparison step picks SECONDARY
+ * (gearCompareSteps.mts), and the union is pinned in `tests/gearFilter.test.mts`.
  *
- * WHAT NEEDS A REAL APP HERE, given `tests/gearFilter.test.mts` owns both predicates without a DOM:
+ * WHAT NEEDS A REAL APP HERE, given `tests/gearFilter.test.mts` owns both predicates without a DOM
+ * (owner, 2026-11-27: e2e proves the wiring; which rows a pick keeps is a unit test's to state):
  *
  *   * THE CLASS PICKER IS FILLED BY DETECTION, not by the test. `useGearClasses` reads the combo
  *     module's live inference, so what is in that control at mount is a fact about the log the app
@@ -15,10 +17,10 @@
  *   * THE CHIP IS GONE FROM THE ROWS. `planner-mismatch-chip` is a shared component still drawn by
  *     two OTHER surfaces, so "we deleted it here" is a claim about a rendered table rather than
  *     about a module, and the only honest way to state it is to look at the table.
- *   * A CATEGORY IS A UNION, ON SCREEN. The identity is asserted over the corpus in
- *     `tests/gearIndex.test.mts`; what this adds is that the CONTROL produces it — picking
- *     "Two-handed" and picking its three member types by hand must leave the same count in the
- *     readout, through the real autocomplete, the real filter memo and the real windowed list.
+ *   * EACH PICKER REACHES THE TABLE. A pick narrows the readout through the real autocomplete, the
+ *     real filter memo and the real windowed list. A category being exactly the union of its
+ *     member types was asserted here as a count identity until 2026-11-27; it is pinned in
+ *     `tests/gearFilter.test.mts` ('a category is nothing but the UNION of its member types').
  *
  * IT ALSO LEAVES THE TAB CLEAN, on purpose and load-bearingly: the class step CLEARS the picker
  * before it returns. Every step after it in the host spec was written against an unfiltered corpus
@@ -28,18 +30,12 @@
 import type { Page } from 'playwright-core'
 import { check, countOf, note, settle } from './appHarness.mjs'
 
-const ROW = '[data-testid="gear-row"]'
 const COUNT = '[data-testid="gear-count"]'
 const SEARCH = '[data-testid="gear-search"] input'
 const CLASSES = '[data-testid="gear-classes"]'
 const WEAPON = '[data-testid="gear-weapon"]'
-const SLOT = '[data-testid="gear-slot"]'
 const ZONE = '[data-testid="gear-zone"]'
-const ZONE_CELL = '[data-testid="gear-cell-zone"]'
 const MISMATCH = '[data-testid="planner-mismatch-chip"]'
-
-/** Thelvorn, Blade of Light — PAL-only, PRIMARY, `Skill: 1H Slashing`. The whole fixture, in one row. */
-const THELVORN_KEY = 'thelvorn, blade of light'
 
 const until = (fn: () => Promise<boolean>, ms: number): Promise<boolean> => settle(fn, (ok) => ok, { timeoutMs: ms })
 
@@ -105,11 +101,6 @@ export async function clearPicks(page: Page, picker: string): Promise<void> {
   await page.keyboard.press('Escape')
 }
 
-/** Is the fixture row on screen right now? Asked with the search box already narrowed to it. */
-async function thelvornShown(page: Page): Promise<boolean> {
-  return (await countOf(page, `${ROW}[data-item-key="${THELVORN_KEY}"]`)) === 1
-}
-
 /**
  * THE OWNER'S FIRST ASK, and the one that overruled a stated law: picking classes REMOVES the rows
  * that do not fit instead of chipping them.
@@ -126,12 +117,15 @@ export async function stepGearClassFilter(page: Page): Promise<void> {
   const all = await settled(page)
   check('clearing the Classes picker returns the whole corpus', all > 0, `${String(all)} items`)
 
-  // A CLASS THE FIXTURE ROW CANNOT BE: Thelvorn's page states PAL and nothing else.
-  //
   // TYPED AS A WHOLE CLASS NAME since JOS-402: the control's options are still the /who codes and
   // still what the filter stores, but the words it offers and matches on are `Rogue` and `Paladin`
   // now, so a spec that typed `ROG` would filter the listbox to nothing and pick whatever was
   // highlighted. Typing what the user sees is also the only way this step proves the relabel.
+  //
+  // WHICH rows a class pick removes (Thelvorn is PAL-only, so it goes for a rogue and comes back for
+  // a paladin) is the pure predicate's business: tests/gearFilter.test.mts, 'the class picks REMOVE
+  // the rows they do not fit, and an unstated class list is never removed' (owner, 2026-11-27: e2e
+  // proves the wiring, the unit test the values). What stays here is that the control reaches it.
   await pickIn(page, CLASSES, 'Rogue')
   const narrowed = await until(async () => (await shownCount(page)) < all, 15_000)
   const shown = await shownCount(page)
@@ -140,81 +134,32 @@ export async function stepGearClassFilter(page: Page): Promise<void> {
     narrowed && shown > 0,
     `${String(all)} items → ${String(shown)} a rogue can use`
   )
-
-  await search(page, 'thelvorn')
-  check(
-    'a PAL-only weapon is GONE from a rogue`s table (the owner`s report, as an assertion)',
-    !(await thelvornShown(page)),
-    'the row is still listed while the class filter says Rogue'
-  )
   // THE DELETED CHIP. `planner-mismatch-chip` still exists and two other surfaces still draw it;
   // what must never happen again is a gear SEARCH row wearing one.
   check('…and no search row wears an off-filter chip any more', (await countOf(page, MISMATCH)) === 0)
-
-  // The class it CAN be, on the same search — so the narrowing is a filter and not a lost row.
-  await clearPicks(page, CLASSES)
-  await pickIn(page, CLASSES, 'Paladin')
-  const back = await until(() => thelvornShown(page), 15_000)
-  check('…and it comes straight back for the class whose page names it', back)
-  // THE WORDS ON THE CONTROL (JOS-402). The pick above went in as `Paladin`, so the chip the user is
-  // left holding must be the class, not the code — the same claim the Sky filter has always made.
+  // THE WORDS ON THE CONTROL (JOS-402). The pick went in as `Rogue`, so the chip the user is left
+  // holding must be the class, not the code — the same claim the Sky filter has always made.
   check(
     'the picked class wears its whole name, never the /who code',
-    (await chipsIn(page, CLASSES)).join() === 'Paladin',
+    (await chipsIn(page, CLASSES)).join() === 'Rogue',
     (await chipsIn(page, CLASSES)).join()
   )
 
   await clearPicks(page, CLASSES)
-  await search(page, '')
   const restored = await until(async () => (await shownCount(page)) === all, 15_000)
-  check('clearing the picker restores every row it was holding back', restored, `${String(await shownCount(page))} of ${String(all)}`)
   if (!restored) note('the steps below were written against an unfiltered corpus and may now be reading a narrowed one')
-}
-
-/**
- * THE OWNER'S SECOND ASK: the slot filter is a multi-select, and several slots are a UNION.
- *
- * One slot narrows; a SECOND slot WIDENS the result rather than replacing the first (*the table
- * shows rows matching ANY chosen slot*); clearing returns the full corpus. It then leaves exactly
- * PRIMARY picked and returns that count, because the host spec's threshold, sort and upgrade steps
- * were all written against a PRIMARY-narrowed table.
- *
- * THE CONTROL KEPT ITS `gear-slot` TESTID through the change from single-select to multi-select,
- * which is why JOS-297's control-visibility step needed no edit at all — it only ever asked whether
- * the control was on screen, and that question survives the shape change.
- */
-export async function stepGearSlotPicks(page: Page, all: number): Promise<number> {
-  await pickIn(page, SLOT, 'PRIMARY')
-  const narrowed = await until(async () => (await shownCount(page)) < all, 15_000)
-  const primaries = await shownCount(page)
-  check('the slot filter narrows the table to one equipment slot', narrowed, `${String(primaries)} primaries`)
-
-  await pickIn(page, SLOT, 'SECONDARY')
-  const union = await until(async () => (await shownCount(page)) > primaries, 15_000)
-  const both = await shownCount(page)
-  check(
-    'a SECOND slot is a UNION - the table shows rows matching ANY chosen slot, never both at once',
-    union && both < all,
-    `${String(primaries)} primaries → ${String(both)} primaries or secondaries, of ${String(all)}`
-  )
-
-  await clearPicks(page, SLOT)
-  const emptied = await until(async () => (await shownCount(page)) === all, 15_000)
-  check('…and clearing the picker returns the full corpus', emptied, `${String(await shownCount(page))} of ${String(all)}`)
-
-  await pickIn(page, SLOT, 'PRIMARY')
-  await until(async () => (await shownCount(page)) === primaries, 15_000)
-  return primaries
 }
 
 /**
  * THE ZONE PICKER (fork decision, kaltinril 2026-09-26): a pick keeps what drops in that ZONE,
  * however the wiki spelled it, and a second pick is a union.
  *
- * `tests/gearZoneFilter.test.mts` owns the predicate; what needs a real app is that the OPTIONS
- * arrive — they are derived from the index the window fetched, so an empty listbox is a failure
- * only a window can have — and that the rows the window mounts all name the zone that was picked.
- * Runs on an unnarrowed corpus with the drop columns drawn, and hands the picker back empty.
+ * `tests/gearZoneFilter.test.mts` owns the predicate, the label and the union ('a pick is a ZONE -
+ * the three spellings the corpus prints for Unrest are one pick', 'several zones are a UNION, and
+ * the union ANDs with everything else'); what needs a real app is that the OPTIONS arrive — they
+ * are derived from the index the window fetched, so an empty listbox is a failure only a window can
+ * have — and that a pick reaches the table. Runs on an unnarrowed corpus with the drop columns
+ * drawn, and hands the picker back empty.
  */
 export async function stepGearZonePicks(page: Page): Promise<void> {
   const all = await search(page, '')
@@ -223,35 +168,19 @@ export async function stepGearZonePicks(page: Page): Promise<void> {
   const narrowed = await until(async () => (await shownCount(page)) < all, 15_000)
   const unrest = await shownCount(page)
   check('picking a zone narrows the table to what drops there', narrowed && unrest > 0, `${String(all)} items → ${String(unrest)} from Unrest`)
-  check(
-    'the picked zone wears the zone table`s name, never the map stem',
-    (await chipsIn(page, ZONE)).join() === 'The Estate of Unrest',
-    (await chipsIn(page, ZONE)).join()
-  )
-  const cells = await page.evaluate((sel) => [...document.querySelectorAll(sel)].map((c) => c.getAttribute('title') ?? ''), ZONE_CELL)
-  const strangers = cells.filter((t) => !t.includes('Unrest'))
-  check(
-    'every mounted row names Unrest among its zones, in whichever spelling its page used',
-    cells.length > 0 && strangers.length === 0,
-    strangers.length === 0 ? `${String(cells.length)} rows checked` : `offending rows: ${strangers.slice(0, 5).join(' | ')}`
-  )
-
-  await pickIn(page, ZONE, 'Befallen')
-  const union = await until(async () => (await shownCount(page)) > unrest, 15_000)
-  const both = await shownCount(page)
-  check('a SECOND zone is a UNION, as a second slot is', union && both < all, `${String(unrest)} → ${String(both)}, of ${String(all)}`)
 
   await clearPicks(page, ZONE)
-  const cleared = await until(async () => (await shownCount(page)) === all, 15_000)
-  check('…and clearing the picker returns the whole corpus', cleared, `${String(await shownCount(page))} of ${String(all)}`)
+  await until(async () => (await shownCount(page)) === all, 15_000)
 }
 
 /**
  * THE OWNER'S THIRD ASK: weapon types, and categories that union several of them.
  *
- * THE UNION IS ASSERTED AS AN IDENTITY BETWEEN TWO COUNTS, never as a number — the corpus grows
- * (AGENTS.md, "frozen numbers rot"), and "Two-handed shows exactly what its three members show" is
- * true of any corpus while "Two-handed shows 442" is true of today's.
+ * WHICH rows a type or a category keeps is pinned in `tests/gearFilter.test.mts` ('the weapon filter
+ * keeps the kinds asked for, and nothing that is not a weapon', 'a category is nothing but the UNION
+ * of its member types', 'the weapon type ANDs with the slot and with the class picks'). This step
+ * keeps the one claim only a window can make: the control, fed by the real autocomplete, reaches the
+ * filter memo and the windowed list.
  */
 export async function stepGearWeaponTypes(page: Page): Promise<void> {
   const all = await search(page, '')
@@ -265,45 +194,8 @@ export async function stepGearWeaponTypes(page: Page): Promise<void> {
     narrowed && oneHandSlash > 0,
     `${String(all)} items → ${String(oneHandSlash)} 1H slashers`
   )
-  await search(page, 'thelvorn')
-  check('…and the corpus`s own `Skill: 1H Slashing` row is one of them', await thelvornShown(page))
-  await search(page, '')
-
-  // THE CATEGORY, twice: once as itself, once as its three members typed in by hand.
-  await clearPicks(page, WEAPON)
-  await pickIn(page, WEAPON, 'Two-handed')
-  await until(async () => (await shownCount(page)) < all, 15_000)
-  const category = await shownCount(page)
-  check('a category pick narrows the table too', category > 0 && category < all, `${String(category)} two-handers`)
-
-  await search(page, 'thelvorn')
-  check('…and a one-hander is not among them', !(await thelvornShown(page)))
-  await search(page, '')
-
-  await clearPicks(page, WEAPON)
-  for (const type of ['2H Slashing', '2H Blunt', '2H Piercing']) await pickIn(page, WEAPON, type)
-  const members = await settled(page)
-  check(
-    'A CATEGORY IS EXACTLY THE UNION OF ITS MEMBER TYPES - the same rows, picked two ways',
-    members === category,
-    `Two-handed showed ${String(category)}, its three types show ${String(members)}`
-  )
-
-  // IN ADDITION TO THE SLOT, which is the ticket's own words for how this composes.
-  await clearPicks(page, WEAPON)
-  await pickIn(page, WEAPON, 'One-handed')
-  const oneHand = await settled(page)
-  await pickIn(page, SLOT, 'SECONDARY')
-  const withSlot = await until(async () => (await shownCount(page)) < oneHand, 15_000)
-  check(
-    'the weapon type ANDs with the slot rather than replacing it',
-    withSlot && (await shownCount(page)) > 0,
-    `${String(oneHand)} one-handers → ${String(await shownCount(page))} that can go in the off hand`
-  )
 
   // Hand the tab back the way the steps below expect to find it.
-  await clearPicks(page, SLOT)
   await clearPicks(page, WEAPON)
-  const cleared = await until(async () => (await shownCount(page)) === all, 15_000)
-  check('clearing both pickers returns the whole corpus', cleared, `${String(await shownCount(page))} of ${String(all)}`)
+  await until(async () => (await shownCount(page)) === all, 15_000)
 }

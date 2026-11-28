@@ -4,25 +4,27 @@
  *
  * What it holds, on a fixture log given a Jewelry Making level and an inventory dump:
  *   - the nav row sits under Research, and the open menu still fits the default window;
- *   - Home draws a tile per tradeskill in one grid: the log's level for one the log has shown,
- *     "Not in log" and an empty bar for one it has not;
- *   - a tile opens its workbench, whose table opens on the recipe marked next: the first one
- *     above the level, with nothing above it in the list that is not at or under the level;
- *   - the panel shows that recipe's materials with the wiki's source words, and item names are
- *     the app's standard item link;
- *   - Hide trivial and the search take lines away; recipes with no trivial sit under their heading;
+ *   - Home shows the log's level on the Jewelcrafting tile;
+ *   - a tile opens its workbench, whose table scrolls to the recipe marked next, the one Home's
+ *     tile named; the panel lists its materials, and item names are the app's standard item link;
  *   - an item name opens its Loot page and Back returns to the same workbench;
  *   - leaving by the menu and coming back reopens the workbench;
  *   - Have reads the dump's tradeskill depot;
  *   - links IN: a tradeskill's name on the Skills tab opens its workbench with a Back to Skills,
  *     and the Loot page's crafted note opens the workbench on that item's own recipe;
- *   - "Gear that raises this skill" lists items with their mod, each the standard item link, and
+ *   - "Gear that raises this skill" lists items, each the standard item link, with whether the dump holds it, and
  *     its last link opens the Gear tab with the search box filled;
  *   - the player's own log, the routes, the planner and the rest: tradeskills-log.e2e.mts, the
  *     second half, with a launch of its own.
  *
  * Every claim about a recipe is a property of what is on screen, never a name or a count from the
  * wiki data, so a data refresh cannot turn it red.
+ *
+ * VALUES ARE THE UNIT SUITE'S (owner, 2026-11-27: e2e proves wiring). The ladder order, the next
+ * mark, Hide trivial, the unrated heading, the search and its empty line are pinned by
+ * tests/tradeskillBook.test.mts; the "Not in log" tile and its bar by tests/tradeskillHome.test.mts;
+ * the gear panel's order and words by tests/tradeskillGear.test.mts. The search box and Hide
+ * trivial are still driven here, by the Have and Loot steps.
  *
  * Run: `npm run test:e2e -- tradeskills` (both halves)
  */
@@ -31,8 +33,6 @@ import { buildIfStale, check, countOf, dumpArtifacts, failures, note, reportRun,
 import { mainWindow } from './appWindow.mjs'
 import { launchOnFixture } from './logFixture.mjs'
 import { E2E_LEVEL as LEVEL } from './tradeskillLogSteps.mjs'
-import { NOT_IN_LOG_TEXT } from '../../src/shared/tradeskillHome'
-import { TRADESKILLS } from '../../src/shared/tradeskills'
 
 const sel = (id: string): string => `[data-testid="${id}"]`
 const NAV = sel('nav-tradeskills')
@@ -100,26 +100,10 @@ async function stepHome(page: Page): Promise<string> {
   await page.click(NAV)
   const mounted = await settle(() => countOf(page, HOME), (n) => n === 1, { timeoutMs: 20_000 })
   check('the Tradeskills view opens on Home', mounted === 1 && (await countOf(page, VIEW)) === 1)
-  // `data-tile` says whether the log has shown the tradeskill: `seen` or `unseen`.
-  const doors = await settle(() => countOf(page, '[data-testid^="tradeskill-tile-"][data-tile]'), (n) => n === TRADESKILLS.length, { timeoutMs: 20_000 })
-  check('Home draws one door per tradeskill', doors === TRADESKILLS.length, `saw ${String(doors)}`)
   const level = await settle(() => textOf(page, `${tile('Jewelcrafting')} ${sel('tradeskill-tile-level')}`), (t) => t === String(LEVEL), { timeoutMs: 30_000 })
   check("the Jewelcrafting tile shows the log's Jewelry Making level", level === String(LEVEL), level)
-  const words = await textOf(page, `${sel('tradeskills-tiles')} > ${tile('Pottery')}[data-tile="unseen"] ${sel('tradeskill-tile-not-in-log')}`)
-  check('a tradeskill the log never showed is a tile of the grid reading "Not in log"', words === NOT_IN_LOG_TEXT, words)
-  check('…with its top', (await textOf(page, `${tile('Pottery')} ${sel('tradeskill-bar-of')}`)) === 'of 300')
-  check('…its door and its Hide button, an empty bar, no level number and no next recipe',
-    (await countOf(page, `${tile('Pottery')} button`)) === 2 &&
-      (await countOf(page, `${tile('Pottery')} ${sel('tradeskill-tile-hide')}`)) === 1 &&
-      (await countOf(page, `${tile('Pottery')} ${sel('tradeskill-bar')}[data-fill="0.000"]`)) === 1 &&
-      (await countOf(page, `${tile('Pottery')} ${sel('tradeskill-tile-level')}`)) === 0 &&
-      (await countOf(page, `${tile('Pottery')} ${sel('tradeskill-tile-next')}`)) === 0)
   check('the old row of small buttons is gone', (await countOf(page, sel('tradeskills-unseen'))) === 0)
-  const text = await textOf(page, tile('Jewelcrafting'))
-  check('the tile states its wiki recipes', /\d+ wiki recipes/.test(text), text)
-  const next = /trivial (\d+)/.exec(await textOf(page, `${tile('Jewelcrafting')} ${sel('tradeskill-tile-next')}`))
-  check('…and a next recipe above the level', next !== null && Number(next[1]) > LEVEL, next?.[0] ?? 'no next line')
-  const name = await textOf(page, `${tile('Jewelcrafting')} ${sel('planner-donor-name')}`)
+  const name = await settle(() => textOf(page, `${tile('Jewelcrafting')} ${sel('planner-donor-name')}`), (t) => t !== '', { timeoutMs: 15_000 })
   check("the next recipe's name is the app's item link", name !== '', name)
   return name
 }
@@ -136,82 +120,10 @@ async function stepWorkbench(page: Page, tileNext: string): Promise<void> {
   const next = seen[at]
   check('one recipe is marked next', seen.filter((r) => r.state === 'next').length === 1)
   check('the table opens on it', next?.inView === true)
-  check('…it is above the level', next !== undefined && next.trivial !== null && next.trivial > LEVEL, String(next?.trivial))
-  const before = seen.slice(0, Math.max(0, at))
-  check('…and every line before it is trivial: at or under the level', before.every((r) => r.state === 'trivial' && r.trivial !== null && r.trivial <= LEVEL))
-  check('the lines are ascending by trivial', seen.every((r, i) => i === 0 || r.trivial === null || (seen[i - 1]?.trivial ?? 0) <= r.trivial))
   check("…and it is the recipe Home's tile named", next?.item === tileNext, `${next?.item ?? ''} / ${tileNext}`)
-  const picked = await textOf(page, `${PICKED} ${sel('planner-donor-name')}`)
-  check('the panel shows the next recipe', picked === next?.item, picked)
   const materials = await countOf(page, `${PICKED} ${sel('tradeskill-material')}`)
   const noMaterials = await countOf(page, `${PICKED} ${sel('tradeskill-no-materials')}`)
-  check('…with its materials, or says the wiki lists none', materials > 0 || noMaterials === 1, `${String(materials)} materials`)
-  check('…and its facts line states the trivial', (await textOf(page, sel('tradeskill-picked-facts'))).includes(`trivial ${String(next?.trivial)}`))
-}
-
-/** The mounted lines as marks, the heading among them, in the table's own order. */
-function marks(page: Page): Promise<string[]> {
-  return page.evaluate(
-    (s) => [...document.querySelectorAll<HTMLElement>(s)].map((r) => (r.dataset.testid === 'tradeskill-unrated-heading' ? 'heading' : (r.dataset.state ?? ''))),
-    `${ROW}, ${sel('tradeskill-unrated-heading')}`
-  )
-}
-
-/**
- * Recipes with no trivial: at the end, under their own heading. Only the lines in view are
- * mounted, so the table is walked up from its end until the heading comes into view.
- */
-async function stepUnrated(page: Page): Promise<void> {
-  const scrollBy = (by: number): Promise<void> =>
-    page.evaluate(
-      ([s, px]) => {
-        const el = document.querySelector<HTMLElement>(s)
-        if (el === null) return
-        el.scrollTop = Math.max(0, Math.min(el.scrollHeight, el.scrollTop + px))
-        // Said at once: the hidden window delivers its own scroll event late.
-        el.dispatchEvent(new Event('scroll'))
-      },
-      [SCROLL, by] as const
-    )
-  await scrollBy(1_000_000)
-  // A scroll in the hidden window lands late: wait for the end of the list to mount.
-  const tail = await settle(() => rows(page), (rs) => rs.at(-1)?.state === 'unrated', { timeoutMs: 10_000 })
-  if (tail.at(-1)?.state !== 'unrated') {
-    note(`no recipe without a trivial is at the end of this list (last line: ${tail.at(-1)?.state ?? 'none'}): the unrated heading was not checked`)
-    return
-  }
-  check('recipes with no trivial are at the end, and state none', tail.filter((r) => r.state === 'unrated').every((r) => r.trivial === null))
-  let seen = await marks(page)
-  for (let i = 0; i < 20 && !seen.includes('heading'); i++) {
-    await scrollBy(-500)
-    seen = await settle(() => marks(page), (m) => m.includes('heading') || m[0] !== 'unrated', { timeoutMs: 1_500 })
-  }
-  const at = seen.indexOf('heading')
-  check('…under a heading that sets them apart', at >= 0 && seen.filter((m) => m === 'heading').length === 1, seen.join(','))
-  check('…every line after it has no trivial', seen.slice(at + 1).every((m) => m === 'unrated'))
-  check('…and no line before it lacks one', seen.slice(0, Math.max(0, at)).every((m) => m !== 'unrated'))
-}
-
-async function stepFilters(page: Page): Promise<void> {
-  const all = await textOf(page, sel('tradeskill-count'))
-  await page.click(sel('tradeskill-hide-trivial'))
-  const hidden = await settle(() => rows(page), (rs) => rs[0]?.state === 'next' && rs.every((r) => r.state !== 'trivial'), { timeoutMs: 15_000 })
-  check('Hide trivial takes the trivial lines away', hidden.length > 0 && hidden.every((r) => r.state !== 'trivial'))
-  check('…and the next recipe is now the first line', hidden[0]?.state === 'next', hidden[0]?.state)
-  const fewer = await textOf(page, sel('tradeskill-count'))
-  check('…and the count says how many are left', / of /.test(fewer) && fewer !== all, `${all} -> ${fewer}`)
-
-  await stepUnrated(page)
-
-  await page.fill(sel('tradeskill-search'), 'ruby')
-  const found = await settle(() => rows(page), (rs) => rs.length > 0 && rs.every((r) => r.text.includes('ruby')), { timeoutMs: 15_000 })
-  check('the search keeps recipes whose item or material matches', found.length > 0 && found.every((r) => r.text.includes('ruby')), `${String(found.length)} lines`)
-  await page.fill(sel('tradeskill-search'), 'zzzz no such thing')
-  const empty = await settle(() => textOf(page, sel('tradeskill-empty')), (t) => t !== '', { timeoutMs: 15_000 })
-  check('a search with no match says so', empty === 'No recipe or material matches the search.', empty)
-  await page.fill(sel('tradeskill-search'), '')
-  await page.click(sel('tradeskill-hide-trivial'))
-  await settle(() => rows(page), (rs) => rs.some((r) => r.state === 'trivial'), { timeoutMs: 15_000 })
+  check('the panel lists its materials, or says the wiki lists none', materials > 0 || noMaterials === 1, `${String(materials)} materials`)
 }
 
 async function stepLinks(page: Page): Promise<void> {
@@ -415,15 +327,12 @@ async function stepSkillGear(page: Page): Promise<void> {
     (s) =>
       [...document.querySelectorAll<HTMLElement>(s)].map((e) => ({
         name: e.querySelector('[data-testid="planner-donor-name"]')?.textContent ?? '',
-        mod: e.querySelector<HTMLElement>('[data-testid="tradeskill-gear-mod"]')?.innerText ?? '',
         held: e.querySelector<HTMLElement>('[data-testid="tradeskill-gear-held"]')?.innerText ?? ''
       })),
     `${panel} ${sel('tradeskill-gear-item')}`
   )
   check('"Gear that raises this skill" lists items', facts.length > 0, (await textOf(page, panel)).slice(0, 120))
   check("…each by the app's item link", facts.every((g) => g.name !== ''))
-  check('…with what it adds', facts.every((g) => /^\+\d/.test(g.mod)), facts.map((g) => g.mod).join(' | '))
-  check('…largest first', facts.every((g, i) => i === 0 || parseFloat(facts[i - 1]?.mod.slice(1) ?? '0') >= parseFloat(g.mod.slice(1))))
   check('…and whether the inventory dump holds it', facts.every((g) => g.held === 'not held' || /^you have \d+$/.test(g.held)), facts.map((g) => g.held).join(' | '))
   await page.click(`${sel('tradeskill-gear-open')} [role="button"]`)
   const onGear = await settle(() => navSelected(page, 'gear'), (on) => on, { timeoutMs: 20_000 })
@@ -454,7 +363,6 @@ async function main(): Promise<void> {
     await stepNav(page)
     const tileNext = await stepHome(page)
     await stepWorkbench(page, tileNext)
-    await stepFilters(page)
     await stepLinks(page)
     await stepFromSkills(page)
     await stepFromLoot(page)

@@ -36,8 +36,10 @@
  * looks like the app forgot rather than like a filter cleared. Their step DOES read the counts line
  * ("N of M quests") — not to pin which quests survive (questFacets.test.mts owns that against the
  * committed data) but because a filter whose state persists while its EFFECT does not would pass
- * every localStorage assertion in this file. So the step asserts the relations only: picking
- * narrows, a second dimension narrows again, and clearing restores the number it started from.
+ * every localStorage assertion in this file. So the step asserts that picking narrows and that the
+ * narrowing comes back after the remount. (The AND between the dimensions and "clearing restores
+ * everything" are `filterByFacets` values, pinned in tests/questFacets.test.mts and no longer
+ * re-checked here: owner ruling 2026-11-27, e2e proves wiring, unit tests prove values.)
  *
  * JOS-191 ADDS THE PAGE CAP to the same file, because it is the same subject read from the other
  * side: the thing the user asked for has to survive what the app does next. The cap was RESET BY
@@ -53,11 +55,15 @@
  * The milliseconds are deliberately not in here; they are a machine's number, and this file's job
  * is the promise that number rests on.
  *
- * JOS-207 ADDS THE SEARCH BOX to the facet steps, because it is now reading the facets' own data:
- * a boss name typed into the box has to find the same quests picking that boss does. That is an
- * equality between two controls rather than a count, which is exactly the kind of claim this file
- * is for — the counts stay out of it and live in tests/questSearch.test.mts. See
- * `stepSearchFindsBossesAndIslands`.
+ * JOS-207 ADDS THE SEARCH BOX to the facet steps, because it is now reading the facets' own data.
+ * Since 2026-11-27 only its wiring is here (a boss name typed into the box narrows the list); that
+ * typing a name finds the same quests as picking it is pinned in tests/questSearch.test.mts. See
+ * `stepSearchFindsBosses`.
+ *
+ * TAB ROUND TRIPS: two, one per storage hook — the two boxes ticked together (`useStoredFlag`) and
+ * the facet picks (`useStoredNames`). Three more, one per box state, re-proved the same hook and
+ * were cut 2026-11-27; the restart still carries the boxes across a new process in different
+ * states.
  *
  * WHY IT NEVER TAKES THE SCREEN: `EQ_E2E=1` (src/main/e2e.ts) shows no window, skips the
  * single-instance lock, and points `userData` at a throwaway temp dir minted per launch.
@@ -247,12 +253,6 @@ async function awayAndBack(page: Page): Promise<boolean> {
   return check('…and the Sky tab comes back', await openSky(page))
 }
 
-/** A tab round trip: away to the Overview, back to Sky, then read the box. */
-async function roundTrip(page: Page): Promise<boolean | null> {
-  if (!(await awayAndBack(page))) return null
-  return settle(() => boxState(page), (v) => v !== null, { timeoutMs: 8_000 })
-}
-
 /** A fresh install shows everything — the pref is absent, and absence is the default, not `false`. */
 async function stepDefault(page: Page): Promise<void> {
   check('a fresh install opens the Sky tab with "Hide completed" UNTICKED', (await boxState(page)) === false)
@@ -383,31 +383,30 @@ async function stepShowFewerPutsTheCapBack(page: Page): Promise<void> {
   check('…and the paging button is on offer again', (await countIn(page, SHOW_MORE)) === 1)
 }
 
-/** THE HEADLINE: tick it, leave the tab, come back — it is still ticked. */
+/**
+ * THE HEADLINE'S FIRST HALF: the tick is written under its key. The tab round trip that reads it
+ * back is `stepBoxesAreIndependent`'s, with both boxes ticked at once (2026-11-27 trim: every box
+ * goes through the same `useStoredFlag`, so one round trip with both keys set proves the remount
+ * read for each; a round trip per box re-proved the same hook).
+ */
 async function stepSticksAcrossTabs(page: Page): Promise<void> {
   const ticked = await setBox(page, true)
   if (!check('the box ticks when clicked', ticked === true, String(ticked))) return
   const stored = await settle(() => storedValue(page), (v) => v === '1', { timeoutMs: 8_000 })
   check(`the tick is stored under ${KEY}`, stored === '1', `stored ${String(stored)}`)
-
-  const after = await roundTrip(page)
-  check('HIDE COMPLETED SURVIVES LEAVING AND RETURNING TO THE SKY TAB', after === true, String(after))
 }
 
 /**
- * The other direction, and the reason this is a PREFERENCE rather than a latch: un-ticking has to
- * survive the same round trip. A "sticky" implementation that only ever remembered `true` (an
- * absent-means-default read paired with a write that skipped `false`) would pass the step above
- * and strand a user who changed their mind on the far side of one tab switch.
+ * The other direction, and the reason this is a PREFERENCE rather than a latch: the un-tick is
+ * WRITTEN. A "sticky" implementation that only ever remembered `true` (a write that skipped
+ * `false`) fails here. The READ of a stored '0' as unticked is proved after a new process in
+ * `stepSurvivesRestart` (the JOS-145 box crosses the restart unticked, through the same hook).
  */
 async function stepUntickSticksToo(page: Page): Promise<void> {
   const unticked = await setBox(page, false)
   if (!check('the box un-ticks when clicked again', unticked === false, String(unticked))) return
   const stored = await settle(() => storedValue(page), (v) => v === '0', { timeoutMs: 8_000 })
   check('…and the un-tick is stored too, not merely un-remembered', stored === '0', `stored ${String(stored)}`)
-
-  const after = await roundTrip(page)
-  check('…so the box comes back UNTICKED, the way it was left', after === false, String(after))
 }
 
 /**
@@ -438,14 +437,9 @@ async function stepBoxesAreIndependent(page: Page): Promise<void> {
     `completed box ${String(await boxState(page))} / stored ${String(await storedValue(page))}`
   )
 
-  if (!(await awayAndBack(page))) return
-  check(
-    'HIDE TURNED IN SURVIVES LEAVING AND RETURNING TO THE SKY TAB',
-    (await settle(() => boxState(page, TURNED_IN_BOX), (v) => v !== null, { timeoutMs: 8_000 })) === true
-  )
-  check('…and the box beside it is still the way it was left', (await boxState(page)) === false)
-
-  // Both at once, because "independent" has to survive them being on together.
+  // Both at once, because "independent" has to survive them being on together. This is the
+  // spec's ONE tab round trip for the boxes (the per-box trips were cut 2026-11-27, see
+  // `stepSticksAcrossTabs`); the boxes crossing in DIFFERENT states is `stepSurvivesRestart`'s.
   if (!check('the older box ticks alongside it', (await setBox(page, true)) === true)) return
   const pair = await settle(
     () => Promise.all([storedValue(page), storedValue(page, TURNED_IN_KEY)]),
@@ -489,13 +483,11 @@ async function stepFacetsNarrow(page: Page): Promise<number | null> {
   await pick(page, BOSS, 'Spiroc')
   const boss = await settle(() => storedValue(page, BOSSES_KEY), (v) => v === '["The Spiroc Lord"]', { timeoutMs: 8_000 })
   check(`the boss pick is stored under ${BOSSES_KEY}`, boss === '["The Spiroc Lord"]', String(boss))
+  // The AND between the facets is a value of `filterByFacets` (tests/questFacets.test.mts, 'AND
+  // across the dimensions: one more chip always narrows'); here the narrowed count is only WAITED
+  // for, so the remount below has a settled number to come back to.
   const narrower = island ?? all
   const both = await settle(() => filteredCount(page), (n) => n !== null && n < narrower, { timeoutMs: 8_000 })
-  check(
-    'A BOSS ON TOP OF THE ISLAND NARROWS AGAIN (the two facets are AND, not OR)',
-    both !== null && both > 0 && both < narrower,
-    `${String(island)} -> ${String(both)}`
-  )
 
   if (!(await awayAndBack(page))) return null
   check(
@@ -523,77 +515,36 @@ async function stepFacetsClear(page: Page, all: number): Promise<void> {
     { timeoutMs: 8_000 }
   )
   check('clearing both pickers empties both stored picks', stored.join('|') === '[]|[]', stored.join('|'))
-  const back = await settle(() => filteredCount(page), (n) => n === all, { timeoutMs: 8_000 })
-  check('CLEARING RESTORES EVERY QUEST THE OTHER FILTERS ALLOW', back === all, `${String(all)} -> ${String(back)}`)
+  // That empty picks filter nothing is `filterByFacets`'s value (tests/questFacets.test.mts, 'empty
+  // is NO FILTER, and hands back the caller's own array untouched'); the wait stays so the next
+  // step starts from the whole list.
+  await settle(() => filteredCount(page), (n) => n === all, { timeoutMs: 8_000 })
 }
 
 /**
- * THE JOS-207 ASK: the search box finds bosses and islands too.
+ * THE JOS-207 ASK: the search box finds bosses too — as WIRING only, since 2026-11-27.
  *
- * The owner's report was that typing a boss name into the Sky search box returned nothing, in an
- * app that already knew perfectly well which quests that boss stands in front of — the fact was
- * there, behind a dropdown, and the box did not read it. The fix routes the query through the same
- * `questBosses`/`questIslands` the pickers are built from, so there is one truth per quest rather
- * than two mappings that can drift.
+ * Which quests a boss name finds, and that typing a name equals picking it, are values of
+ * `filterByQuery`/`filterByFacets` over the committed data: tests/questSearch.test.mts 'where a
+ * boss name appears nowhere else, typing it and picking it give the same list', 'JOS-207 — typing
+ * an island finds the quests that name it' and '…and the same for every island offered'. The
+ * picker-vs-search equalities this step used to drive (four picks, four clears) re-checked those
+ * values through the UI. What stays is the one thing only the app shows: the box reaches the list.
+ * `Gorgalosk` appears in no quest name, reward or item name, so a narrowing here can only come
+ * from the boss facts the box now reads.
  *
- * WHY THE ASSERTION IS AN EQUALITY BETWEEN TWO CONTROLS rather than a count. Which quests a boss
- * stands in front of is committed data, and tests/questSearch.test.mts pins that without a browser
- * (sixteen for this boss, and not one of them findable by the three fields the box searched
- * before). What only a real app can say is that the two controls AGREE: picking the boss and
- * typing his name narrow the same list to the same size, through two different code paths that
- * would each look correct in isolation if they had drifted apart. `Gorgalosk` is the name chosen
- * precisely because it appears in no quest name, no reward and no item name in the whole file, so
- * the equality is exact rather than a superset — a name like "Spiroc" is also an item word, and
- * the box is right to answer with the union there.
- *
- * Starts and ends with every filter cleared, so `stepArmRestart` below still starts from the long
- * list it expects.
+ * Ends with the box cleared, so `stepArmRestart` below still starts from the long list it expects.
  */
-async function stepSearchFindsBossesAndIslands(page: Page, all: number): Promise<void> {
-  await pick(page, BOSS, BOSS_NAME)
-  const picked = await settle(() => filteredCount(page), (n) => n !== null && n < all, { timeoutMs: 8_000 })
-  if (
-    !check(
-      `picking ${BOSS_NAME} in the boss picker narrows the list`,
-      picked !== null && picked > 0 && picked < all,
-      `${String(all)} -> ${String(picked)}`
-    )
-  ) {
-    return
-  }
-  await clearPick(page, BOSS)
-  const cleared = await settle(() => filteredCount(page), (n) => n === all, { timeoutMs: 8_000 })
-  if (!check('…and clearing it restores the list before the search is asked', cleared === all, String(cleared))) {
-    return
-  }
-
+async function stepSearchFindsBosses(page: Page, all: number): Promise<void> {
   await page.fill(SEARCH, BOSS_NAME)
   const typed = await settle(() => filteredCount(page), (n) => n !== null && n < all, { timeoutMs: 15_000 })
   check(
-    `TYPING ${BOSS_NAME} INTO THE SEARCH BOX FINDS THE QUESTS HE STANDS IN FRONT OF`,
-    typed === picked,
-    `picker ${String(picked)} vs search ${String(typed)}`
+    `TYPING ${BOSS_NAME} INTO THE SEARCH BOX NARROWS THE LIST to the quests he stands in front of`,
+    typed !== null && typed > 0 && typed < all,
+    `${String(all)} -> ${String(typed)}`
   )
-
-  // The island half, by the same two-control equality. "Island 7" is stated by the item rows and
-  // by nothing else the box used to read, so this one is exact too.
   await page.fill(SEARCH, '')
   await settle(() => filteredCount(page), (n) => n === all, { timeoutMs: 15_000 })
-  await pick(page, ISLAND, 'Island 7')
-  const island = await settle(() => filteredCount(page), (n) => n !== null && n < all, { timeoutMs: 8_000 })
-  await clearPick(page, ISLAND)
-  await settle(() => filteredCount(page), (n) => n === all, { timeoutMs: 8_000 })
-  await page.fill(SEARCH, 'Island 7')
-  const searched = await settle(() => filteredCount(page), (n) => n !== null && n < all, { timeoutMs: 15_000 })
-  check(
-    'TYPING AN ISLAND FINDS THE QUESTS THAT NAME IT — same list as picking it',
-    searched === island && island !== null && island > 0,
-    `picker ${String(island)} vs search ${String(searched)}`
-  )
-
-  await page.fill(SEARCH, '')
-  const back = await settle(() => filteredCount(page), (n) => n === all, { timeoutMs: 15_000 })
-  check('clearing the search box restores every quest', back === all, `${String(all)} -> ${String(back)}`)
 }
 
 /**
@@ -683,9 +634,9 @@ async function main(): Promise<void> {
       const all = await stepFacetsNarrow(page)
       if (all !== null) {
         await stepFacetsClear(page, all)
-        // JOS-207 right after the facets, and deliberately: it asks whether the search box and
-        // those same pickers agree, so it wants the cleared list the step above just restored.
-        await stepSearchFindsBossesAndIslands(page, all)
+        // JOS-207 right after the facets: it measures the box's narrowing against the cleared
+        // list the step above just restored.
+        await stepSearchFindsBosses(page, all)
       }
       await stepArmRestart(page)
       if (failures.length) await dumpArtifacts(page, 'sky-filters-FAIL')

@@ -282,6 +282,23 @@ disagree, RULES.md wins; fix this file.
 - **Known engine flake:** `engined` `tests/combat.rs` live-meter tests (4 of 11) fail when `cargo test`
   runs alongside the unit suite (2026-10-28) and pass alone (`cargo test -p engined --test combat`);
   run cargo test on its own before treating them as red.
+- **What belongs in e2e, and what in a unit test** (owner, 2026-11-27: "we shouldn't be
+  regression testing functions that produce values"). An e2e spec proves WIRING: a screen mounts,
+  engine or log data reaches it, IPC and preferences round-trip, state survives a remount and a
+  relaunch, overlays, focus, pointer behaviour and geometry that need a real window. The VALUES a
+  pure function computes (sorting, filtering, formatting, rates, counts, rankings, labels) are
+  unit-tested over the function itself, in milliseconds, and never re-checked through the UI.
+  - A new e2e check that reads a value asks first: does a unit test over the function already pin
+    it? If not, write that unit test; the e2e check states only that the control reaches the list
+    (e.g. "picking a class narrows the table", not "every row left is usable by that class").
+  - Keep ONE "engine data reaches this surface" check per surface, even when its value checks go.
+  - A check repeated in several states stays only in states that change a real-window property
+    (window width, text size), not where only the content differs.
+  - Removing an e2e check: an L (value) check goes only when a named unit test pins the same
+    property (write it first if none does); a D (duplicate) check goes only while the check it
+    duplicates stays; the commit message lists every removal by spec, with the test that now pins
+    it or the check it duplicated. First pass 2026-11-27 (`e2e-trim`, 10 specs): BRANCH_NOTES.md,
+    "Test hygiene: what e2e checks".
 - **Running e2e (since 2026-11-27): the default runner, never `--serial`.** When e2e is called
   for (a release, the owner's word, a change to the harness), run `npm run test:e2e` as it is (Node
   24, `ELECTRON_RUN_AS_NODE` unset). It runs 3 specs at a time (`EQ_E2E_CONCURRENCY` overrides),

@@ -1,10 +1,10 @@
 /**
  * The gear area's Void motes tab (owner ask, 2026-11-18; a tab of its own since 2026-11-19, when the
  * list left the Gear tab), driven in a real window. A module rather than more of `gear.e2e.mts` (the
- * gearReviewSteps.mts precedent). The ranking itself is unit-tested (tests/voidMotes.test.mts); what
- * only a window can prove is the CHAIN: the tab opens the list, the list reads what the staged
- * `/outputfile inventory` dump says is worn, the week's plan is stated above it, and a pick
- * re-ranks it.
+ * gearReviewSteps.mts precedent). The ranking, the week's picks, the plan line, the source words and
+ * the three orders are unit-tested (tests/voidMotes.test.mts, tests/voidMotePlanWords.test.mts); what
+ * only a window can prove is the CHAIN: the tab opens the list and the list reads what the staged
+ * `/outputfile inventory` dump says is worn (owner, 2026-11-27: e2e proves the wiring, not values).
  *
  * Runs on the committed `Primitive_freeport-Inventory.txt`, which wears `Thelvorn, Blade of Light +5`,
  * and hands the window back on the Gear tab (its filters are remembered across the visit).
@@ -20,43 +20,26 @@ const PANEL = '[data-testid="gear-motes"]'
 const LIST = '[data-testid="gear-motes-list"]'
 const PLAN = '[data-testid="gear-motes-plan"]'
 const ROW = '[data-testid="gear-motes-row"]'
-const GAIN_ORDER = '[data-testid="gear-motes-order-gain"]'
-const RECOMMENDED_ORDER = '[data-testid="gear-motes-order-recommended"]'
 
 const until = (fn: () => Promise<boolean>, ms: number): Promise<boolean> => settle(fn, (ok) => ok, { timeoutMs: ms })
 
 interface MoteRowText {
   name: string
   tier: string
-  gain: number
   hours: string
-  source: string
-  pick: boolean
-  /** `pick`, `rare` or `early` (voidMotes.ts `MoteGate`) */
-  gate: string
 }
 
 /** Each row's cells by testid. No named helper inside `evaluate`: tsx wraps one in a `__name` call the page lacks. */
 async function rows(page: Page): Promise<MoteRowText[]> {
-  const ids = ['planner-donor-name', 'gear-motes-tier', 'gear-motes-gain', 'gear-motes-hours', 'gear-motes-source']
+  const ids = ['planner-donor-name', 'gear-motes-tier', 'gear-motes-hours']
   const read = await page.evaluate(
     ([sel, cellIds]) =>
-      [...document.querySelectorAll(sel)].map((row) => ({
-        cells: cellIds.map((id) => (row.querySelector(`[data-testid="${id}"]`) as HTMLElement | null)?.innerText.trim() ?? ''),
-        pick: row.getAttribute('data-pick') === 'true',
-        gate: row.getAttribute('data-gate') ?? ''
-      })),
+      [...document.querySelectorAll(sel)].map((row) =>
+        cellIds.map((id) => (row.querySelector(`[data-testid="${id}"]`) as HTMLElement | null)?.innerText.trim() ?? '')
+      ),
     [ROW, ids] as const
   )
-  return read.map(({ cells, pick, gate }) => ({
-    name: cells[0] ?? '',
-    tier: cells[1] ?? '',
-    gain: Number((cells[2] ?? '').replace('+', '')) || 0,
-    hours: cells[3] ?? '',
-    source: cells[4] ?? '',
-    pick,
-    gate
-  }))
+  return read.map((cells) => ({ name: cells[0] ?? '', tier: cells[1] ?? '', hours: cells[2] ?? '' }))
 }
 
 export async function stepGearVoidMotes(page: Page): Promise<void> {
@@ -78,25 +61,6 @@ export async function stepGearVoidMotes(page: Page): Promise<void> {
     sword?.tier.startsWith('+5→+') === true && /^[\d,.]+ h$/.test(sword.hours),
     sword === undefined ? 'no Thelvorn row' : `${sword.tier} · ${sword.hours}`
   )
-  check('every row states where copies come from', list.length > 0 && list.every((r) => r.source !== ''), list.map((r) => r.source).join(' | '))
-  // The week's motes go only on rows a mote belongs on yet: +7 or higher, or +5 and +6 when copies barely exist.
-  const picks = list.filter((r) => r.pick)
-  check(
-    'the picks are three rows at most, none of them a "not yet" row',
-    picks.length <= 3 && picks.every((r) => r.gate !== 'early' && r.gain > 0),
-    `${String(picks.length)} picks: ${picks.map((r) => `${r.name} (${r.gate})`).join(', ')}`
-  )
-  const plan = await page.evaluate((sel) => (document.querySelector(sel) as HTMLElement | null)?.innerText.trim() ?? '', PLAN)
-  check('the line above the list states the week', (picks.length > 0 && plan.startsWith('This week: ')) || (picks.length === 0 && plan.includes('hold')), plan)
-
-  await page.click(GAIN_ORDER, { timeout: 15_000 })
-  const sorted = await until(async () => {
-    const gains = (await rows(page)).map((r) => r.gain)
-    return gains.every((g, i) => i === 0 || (gains[i - 1] ?? 0) >= g)
-  }, 15_000)
-  check('Biggest gain re-ranks the list by the gain column', sorted, (await rows(page)).map((r) => String(r.gain)).join(' '))
-  await page.click(RECOMMENDED_ORDER, { timeout: 15_000 })
-
   await page.click(GEAR_TAB, { timeout: 15_000 })
   check('…and the Gear tab comes back without it', await until(async () => (await countOf(page, GEAR_VIEW)) === 1 && (await countOf(page, PANEL)) === 0, 15_000))
 }

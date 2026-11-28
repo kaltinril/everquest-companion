@@ -38,7 +38,6 @@ import {
   RETIRED_SCOPE_CHIP,
   SCOPE_LABEL_SEL,
   SCOPE_NOTE_SEL,
-  scopeFromPrefs,
   setMeterScope,
   type Scope
 } from './combatPrefsSteps.mjs'
@@ -243,15 +242,11 @@ export async function stepAbilityStats(page: Page): Promise<void> {
   check('…and clicking a stat-bearing ability expands its stats INLINE, beneath its own bar', opened, picked ?? 'none expanded')
   if (!opened) return
 
-  // 3. THE STATS ARE THE OWNER'S: crit is stated for every weapon swing; double/triple appear on
-  //    the ability that multi-attacked (the auto-attack Melee, where the fixture has one).
+  // 3. THE READOUT CARRIES THE ENGINE'S FIGURES: crit is stated for every weapon swing. How the
+  //    double/triple rows are worded (over the lane's own ROUNDS, law 11) is
+  //    tests/multiAttackRows.test.mts.
   const body = await textOf(page, STATS)
   check('…whose figures include the crit rate', /crit/i.test(body), body.slice(0, 160).replace(/\s+/g, ' '))
-  if (/double attack|triple attack|rounds/i.test(body)) {
-    check('…and the double/triple attack it lists is over its ROUNDS (law 11)', /rounds/i.test(body))
-  } else {
-    note('the expanded ability opened no attack rounds — its multi-attack section correctly renders nothing')
-  }
 
   // 4. THE OLD PANEL AND THE OLD LEVEL ARE GONE, everywhere on the page.
   check('the standalone multi-attack panel is gone', (await countOf(page, '[data-testid="multi-attack-panel"]')) === 0)
@@ -430,13 +425,9 @@ export async function stepMeterScope(page: Page): Promise<void> {
   // sentence now: no fallback wording, because nothing is being filtered.
   const first = await label()
   check('it defaults to Everyone', first === 'Everyone', first)
-  // …and the PREFERENCE agrees, on a profile that has never written the key: an absent value is
-  // Everyone, and the control has to say so too — the readout alone could not tell "chosen
-  // Everyone" from "defaulted to Everyone", and only one of those is the claim.
-  const chosen = await scopeFromPrefs(page, 'nav-combat')
-  await settleCount(page, '[data-testid="combat-dashboard"]', 1, { timeoutMs: 20_000 })
-  check('an absent preference resolves to Everyone in the control too', chosen === 'everyone', chosen)
-  const baseline = await settle(() => meterRows(page), (n) => n > 0, { timeoutMs: 15_000 })
+  // That an ABSENT key reads as Everyone (and the Preferences control, which reads the same
+  // `useMeterScope`, with it) is tests/combatPrefs.test.mts. Which rows Group and You keep is
+  // tests/meterScope.test.mts; this step proves the preference REACHES the tab (2026-11-27).
 
   // THE PREFERENCE APPLIES. Setting it two tabs away is the whole control now, and the CONDITION
   // each write produces is this surface's own next word.
@@ -460,19 +451,11 @@ export async function stepMeterScope(page: Page): Promise<void> {
   // Which of the two Group states this log leaves behind — the popover pairing at the end of this
   // step is the one that cares, and it now learns it HERE rather than from the opening readout.
   const noRoster = groupWord === 'Group (no roster yet)'
-  // The row count has to have STOPPED MOVING before it means anything: the panel is fed by a
-  // snapshot that arrives a beat after the remount, so a reading taken on the first frame is a
-  // reading of an empty meter (settleStable's argument, spelled with a floor).
-  const group = await settle(() => meterRows(page), (n) => n > 0, { timeoutMs: 15_000 })
-  // NARROWING NEVER WIDENS. Equal is legal and expected on the law-1 fallback, where Group renders
-  // as Everyone; more rows under Group than under Everyone would mean the filter added somebody.
-  check('Group shows no more than Everyone did', group <= baseline, `${group} vs ${baseline}`)
 
   check('…and so does choosing You', (await setTo('you', (t) => t === 'You')) === 'You', await label())
-  // NO SCOPE EVER HIDES YOU OR YOUR PETS. The rows here are yours and your pets' — they must
-  // survive every scope, and only a member row may ever go.
+  // The You scope still draws rows: the preference reached a meter that has data, not an empty one.
   const you = await settle(() => meterRows(page), (n) => n > 0, { timeoutMs: 15_000 })
-  check('You scope keeps your own rows — only a member is ever filtered', you >= 1 && you <= group, `${you} of ${group}`)
+  check('…and the meter under You still draws your rows', you >= 1, `${you} rows`)
 
   // PERSISTED: the choice survives leaving the tab and coming back, because it is a stored
   // preference and not component state.

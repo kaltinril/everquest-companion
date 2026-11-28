@@ -14,8 +14,15 @@
  *   * THE FIXED-HEIGHT CONTRACT. The windowing hook's every index assumes each row is exactly
  *     `ROW_HEIGHT`, and eighteen columns is precisely the situation in which a cell would wrap and
  *     desync it. So the rows are MEASURED, not trusted.
- *   * THE SORT ON A PICKED COLUMN, with the numbers read back at the plus-state the host spec left
- *     the global selector at — the picker must not have moved the arithmetic, only what is drawn.
+ *   * WHAT IT NO LONGER ASSERTS (owner, 2026-11-27: e2e proves wiring, unit tests prove values):
+ *     a picked column's sort order and absent-last rule (`tests/gearColumnPrefs.test.mts`, 'every
+ *     exposed key ranks BOTH ways, and an absent value sorts LAST either way'); the numbers re-read
+ *     beside the picked columns (the host spec's upgrade step reads the same cells at the same plus);
+ *     a hidden filter control going inert and keeping its value (`tests/gearColumnPrefs.test.mts`,
+ *     'a control that is not on screen is not filtering either - every field goes INERT', 'a HIDDEN
+ *     control keeps its stored value when the bar writes ...'); and the sorted column staying after
+ *     a reset (`tests/gearFilter.test.mts`, 'the columns are the core, plus whatever is being SORTED
+ *     on'). Taking a control off the toolbar is still proved, by the parked choice and the relaunch.
  *   * PERSISTENCE ACROSS A PROCESS. `localStorage` is a real file under the temp `userData` dir, so
  *     the second launch is what proves an EXPLICIT choice beat the derivation rather than merely
  *     agreeing with it: it asserts a column the derivation would always draw (AC, a core column) is
@@ -23,9 +30,6 @@
  */
 import type { Page } from 'playwright-core'
 import { check, countOf, note, settle } from './appHarness.mjs'
-import { scaleGearRow, gearRatio } from '../../src/shared/planner/gearScale'
-import type { GearRow } from '../../src/shared/planner/gear'
-import type { ItemUpgradeState } from '../../src/shared/itemUpgrade'
 
 const ROW = '[data-testid="gear-row"]'
 const TABLE = '[data-testid="gear-table"]'
@@ -46,9 +50,8 @@ const ROW_HEIGHT = 37
  * the whole point of the list.
  *
  * The seven attributes lead it because they are what the owner named: *ALL stats should be there
- * (STR, DEX, etc.)*. `WIS` and `DMG` are at the end for a different reason — the numbers step below
- * reads them off the fixture row, and PICKING them rather than leaning on a threshold to derive
- * them was the independence JOS-297 added. JOS-302 made it the only way there is.
+ * (STR, DEX, etc.)*. `WIS` and `DMG` close it so the width step measures a set the host spec's
+ * own columns do not already draw.
  */
 const PICK: readonly string[] = [
   'STR',
@@ -66,13 +69,6 @@ const PICK: readonly string[] = [
   'WIS',
   'DMG'
 ]
-
-export interface GearColumnFixture {
-  /** the same base row the host spec pins, so the expected numbers are computed and never typed */
-  row: GearRow
-  /** the plus-state the host spec left the GLOBAL selector at */
-  state: ItemUpgradeState
-}
 
 function until(fn: () => Promise<boolean>, ms: number): Promise<boolean> {
   return settle(fn, (ok) => ok, { timeoutMs: ms })
@@ -268,77 +264,7 @@ async function stepWidth(page: Page): Promise<void> {
 }
 
 /**
- * 3. SORTING BY A PICKED COLUMN, and the absent-last rule that goes with it.
- *
- * `STR` is a stat most of the corpus does not state, which is what makes it the right column to
- * prove the rule on: descending must rank the rows that STATE a strength, and must never rank a
- * silent row among them as though it read zero.
- */
-async function stepSortPicked(page: Page): Promise<void> {
-  await page.click('[data-testid="gear-sort-STR"]', { timeout: 15_000 })
-  const ready = await until(async () => {
-    const seen = await page.evaluate(() =>
-      [...document.querySelectorAll('[data-testid="gear-cell-STR"]')]
-        .map((c) => (c as HTMLElement).innerText.trim())
-        .filter((t) => t !== '').length
-    )
-    return seen > 1
-  }, 15_000)
-  if (!check('sorting by a picked stat leaves rows on screen that state it', ready)) return
-
-  const values = await page.evaluate(() =>
-    [...document.querySelectorAll('[data-testid="gear-cell-STR"]')].map((c) => (c as HTMLElement).innerText.trim())
-  )
-  const numbers = values.filter((t) => t !== '').map(Number)
-  check(
-    'a picked column ranks the visible rows highest first, like any other',
-    numbers.every((n, i) => i === 0 || (numbers[i - 1] ?? 0) >= n),
-    numbers.slice(0, 6).join(' ')
-  )
-  const firstBlank = values.indexOf('')
-  check(
-    'and a row stating no STR never outranks one that states it - absent is not zero',
-    firstBlank === -1 || values.slice(firstBlank).every((t) => t === ''),
-    `first blank at ${String(firstBlank)} of ${String(values.length)}`
-  )
-}
-
-/**
- * 4. THE NUMBERS ARE STILL `scaleGearRow`'s, AT THE PLUS-STATE THE SELECTOR IS AT.
- *
- * The picker changes what is DRAWN and nothing that is computed, so the cells must read exactly
- * what the host spec's upgrade step already proved they read — now beside twelve columns that were
- * not on screen when it did. The expectation is computed here rather than typed, the same discipline
- * the host spec keeps.
- */
-async function stepNumbersUnmoved(page: Page, fixture: GearColumnFixture): Promise<void> {
-  await typeAndSettle(page, fixture.row.name.split(',')[0] ?? fixture.row.name)
-  const scaled = scaleGearRow(fixture.row, fixture.state)
-  const want = {
-    dmg: String(scaled.stats.DMG),
-    wis: String(scaled.stats.WIS),
-    ratio: gearRatio(scaled.stats)?.toFixed(2) ?? ''
-  }
-  const got = {
-    dmg: await cellText(page, fixture.row.key, 'DMG'),
-    wis: await cellText(page, fixture.row.key, 'WIS'),
-    ratio: await cellText(page, fixture.row.key, 'RATIO')
-  }
-  check(
-    'a picked-wide table still states scaleGearRow`s answer at the selector`s plus - the picker draws, it does not compute',
-    got.dmg === want.dmg && got.wis === want.wis && got.ratio === want.ratio,
-    `screen ${got.dmg}/${got.wis}/${got.ratio} · scaleGearRow ${want.dmg}/${want.wis}/${want.ratio}`
-  )
-  // A column the item does not state is BLANK beside the ones it does — never a zero it never had.
-  check(
-    '…and a picked column this item states nothing for is blank, not a zero it never had',
-    (await cellText(page, fixture.row.key, 'STR')) === '',
-    `reads "${await cellText(page, fixture.row.key, 'STR')}"`
-  )
-}
-
-/**
- * 5. RESET GOES BACK TO THE DERIVED SEED — the state that has no stored key, made reachable.
+ * 3. RESET GOES BACK TO THE DERIVED SEED — the state that has no stored key, made reachable.
  *
  * And with it the width law reverses: the derived set has always fitted the percentage budget, so
  * the list stops overflowing. That is the continuity claim in `gearColumns.ts`, measured.
@@ -351,14 +277,6 @@ async function stepReset(page: Page): Promise<void> {
   check('resetting the picker returns the columns to following the sort', back)
   const gone = await until(async () => (await countOf(page, '[data-testid="gear-sort-CHA"]')) === 0, 10_000)
   check('…so a stat nothing is sorting on stops drawing a column', gone)
-  // AND THE ONE THE SORT IS ON SURVIVES THE RESET — which is the whole of the derivation now that
-  // the stat thresholds are gone (JOS-302). `stepSortPicked` above left the table ranked by STR, so
-  // STR is a DERIVED column here even though the explicit choice that first drew it is discarded.
-  check(
-    '…while the column the table is RANKED by stays, derived rather than chosen',
-    (await countOf(page, '[data-testid="gear-sort-STR"]')) === 1,
-    'the sort key is the derivation`s only source'
-  )
   const over = await overflowX(page)
   check(
     '…and the derived set fits the pane again, with no sideways scroll anywhere',
@@ -368,67 +286,21 @@ async function stepReset(page: Page): Promise<void> {
 }
 
 /**
- * 6. THE FILTER BAR IS CONFIGURABLE, AND A HIDDEN CONTROL STOPS FILTERING.
- *
- * The half that is easy to get wrong is not the hiding — it is what happens to the narrowing the
- * hidden control was applying. Leaving it on would hold rows back behind a control nobody can see,
- * which is the JOS-67 law's exact failure. So the count must GROW when the control goes and come
- * back down when it returns: the user's own value survives, it simply stops being applied.
- *
- * BOTH ARMS RUN ON THE SLOT PICKER NOW, and that is a JOS-302 consequence rather than a shortcut.
- * They used to be split — visibility on the slot select, inertness on the stat thresholds — because
- * the host spec's two thresholds (`wis 10`, `dmg 1`) already selected for weapons and every weapon
- * stating WIS 10+ happened to be PRIMARY, so dropping the slot filter moved the count by zero and
- * could never tell an inert filter from a live one. With the thresholds deleted, the host spec
- * leaves the slot picker holding PRIMARY over an otherwise unnarrowed corpus, and hiding it moves
- * the count by thousands. One control, both claims, and the measurement is in the message.
- */
-async function stepFilterPicker(page: Page): Promise<void> {
-  const narrowed = await typeAndSettle(page, '')
-  check(
-    'the host spec left one slot pick on for this step',
-    (await countOf(page, SLOT_SELECT)) === 1,
-    `${String(narrowed)} rows`
-  )
-
-  await pick(page, FILTERS_TOGGLE, 'gear-filters', ['slot'])
-  check('unpicking a filter takes its control off the toolbar', await until(async () => (await countOf(page, SLOT_SELECT)) === 0, 15_000))
-  const widened = await until(async () => (await shownCount(page)) > narrowed, 15_000)
-  check(
-    'a hidden control STOPS ITS FILTER - nobody may be held back by a pick they cannot see',
-    widened,
-    `${String(narrowed)} with the slot pick → ${String(await shownCount(page))} without its control`
-  )
-
-  await pick(page, FILTERS_TOGGLE, 'gear-filters', ['slot'])
-  check('…and picking it again puts it back', await until(async () => (await countOf(page, SLOT_SELECT)) === 1, 15_000))
-  const restored = await until(async () => (await shownCount(page)) === narrowed, 15_000)
-  check(
-    'putting the control back restores the value it was holding, unchanged',
-    restored,
-    `${String(await shownCount(page))} rows, wanted ${String(narrowed)}`
-  )
-}
-
-/**
- * THE WHOLE JOS-297 PASS. Run AFTER the host spec's upgrade step, so the global selector is already
- * at the owner's checkpoint and the numbers step below has a plus-state worth re-reading at.
+ * THE WHOLE JOS-297 PASS. Runs on an unnarrowed corpus (nothing in the host spec leaves a slot pick
+ * on before it any more, so the old hide-the-slot-control widening is gone with the steps that set it).
  *
  * IT LEAVES A CHOICE BEHIND ON PURPOSE: a column set that a derivation could never produce (CHA in,
  * the core AC out) and one hidden filter control, both for the relaunch step to find.
  */
-export async function stepGearColumns(page: Page, fixture: GearColumnFixture): Promise<void> {
-  await stepFilterPicker(page)
-
-  // OPEN THE CORPUS BACK UP, using the feature under test. The host spec left a PRIMARY slot pick
-  // on; hiding that control is the honest way to widen the table, because hiding it is DEFINED to
-  // make it inert. The derived seed is the core four either way now (JOS-302 cut the derivation to
-  // the sort key), so every column the picker adds below is unambiguously the picker's doing.
+export async function stepGearColumns(page: Page): Promise<void> {
+  // THE SLOT CONTROL IS HIDDEN FOR THE WIDTH STEPS, as it always was (it used to be hidden to widen a
+  // PRIMARY pick away). MEASURED 2026-11-27 when the pick went: with EVERY toolbar control on, the
+  // Owned toggle ends 60px past the content area at the e2e window (1280 wide) whatever the columns
+  // or the sort — a toolbar that does not wrap, reported as an app defect and not this step's
+  // subject. Hiding one control keeps these steps measuring the TABLE's width law.
   await pick(page, FILTERS_TOGGLE, 'gear-filters', ['slot'])
   if (!(await stepPick(page))) return
   await stepWidth(page)
-  await stepSortPicked(page)
-  await stepNumbersUnmoved(page, fixture)
   await stepReset(page)
   await pick(page, FILTERS_TOGGLE, 'gear-filters', ['slot'])
 

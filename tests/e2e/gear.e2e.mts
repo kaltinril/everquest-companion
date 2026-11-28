@@ -9,10 +9,8 @@
  * WHAT IT ASSERTS, against the REAL committed item corpus and through the REAL IPC: the nav row
  * mounts a table with no plan and no selection first (search is the WHOLE surface since JOS-325 —
  * owner ruling); the list is its own bounded scroller; the search box narrows it and finds a named
- * item; the era toggle actually holds rows back; a MULTI-SELECT slot filter and a weapon type
- * COMBINE; a header click sorts by ratio and the order is monotone; and — the one this phase exists
- * for — moving the GLOBAL plus-state selector makes the table state the numbers `scaleGearRow`
- * states at that state.
+ * item; the era toggle actually holds rows back; and — the one this phase exists for — moving the
+ * GLOBAL plus-state selector makes the table state the numbers `scaleGearRow` states at that state.
  *
  * AND SINCE JOS-302 IT ASSERTS THE THREE NARROWINGS THE OWNER ASKED FOR. The class picks REMOVE
  * rows rather than chipping them (and a search row no longer wears `planner-mismatch-chip` at all),
@@ -89,6 +87,23 @@
  * The one thing it deliberately does NOT assert is a row count: the corpus grows (AGENTS.md,
  * "frozen numbers rot"), so every count here is a floor or an identity.
  *
+ * WHAT IT NO LONGER ASSERTS, TAKE THREE (owner, 2026-11-27: "we shouldn't be regression testing
+ * functions that produce values"). This spec proves WIRING — the tab mounts, the corpus and the dump
+ * reach the table, each control reaches the filter, the selector reaches the cells, the IPC and
+ * storage round trips, the geometry of a real window. The VALUES the pure functions compute are
+ * pinned over the functions themselves, in milliseconds, and were removed from here:
+ *   - which rows a class, slot, weapon type, category or zone pick keeps, unions and ANDs:
+ *     `tests/gearFilter.test.mts`, `tests/gearZoneFilter.test.mts`;
+ *   - the numeric search token (`ac>=20`): `tests/gearQueryFilter.test.mts`;
+ *   - the ratio sort, a picked column's sort and absent-last: `tests/gearFilter.test.mts`,
+ *     `tests/gearColumnPrefs.test.mts`;
+ *   - Owned or looted hiding what neither witness saw: `tests/gearFilter.test.mts`;
+ *   - the effective-HP sum, rank, blank and slider re-rank: `tests/gearEffectiveHp.test.mts`;
+ *   - a hidden filter control going inert: `tests/gearColumnPrefs.test.mts`;
+ *   - the Void motes picks, plan line, source words and gain order: `tests/voidMotes.test.mts`.
+ * Each control keeps ONE check that it narrows the readout; the commit that removed them names the
+ * unit test for every family.
+ *
  * Run: `npm run test:e2e -- gear`.
  */
 import type { ElectronApplication, Page } from 'playwright-core'
@@ -110,16 +125,9 @@ import { launchOnFixture, stageFixture, type FixtureLog } from './logFixture.mjs
 // here, and this file is at the repo's 400-code-line factoring ceiling. `pickColumns`/`resetColumns`
 // come from it too: since JOS-302 deleted the stat thresholds, naming a column in the picker is the
 // only way to put one on the table, and the upgrade step below needs three of them.
-import {
-  cellText,
-  pickColumns,
-  resetColumns,
-  stepGearColumns,
-  stepGearColumnsRelaunched,
-  type GearColumnFixture
-} from './gearColumnSteps.mjs'
-// JOS-302's class, slot-union and weapon-type steps, likewise.
-import { clearPicks, pickIn, stepGearClassFilter, stepGearSlotPicks, stepGearWeaponTypes, stepGearZonePicks } from './gearFilterSteps.mjs'
+import { cellText, pickColumns, resetColumns, stepGearColumns, stepGearColumnsRelaunched } from './gearColumnSteps.mjs'
+// JOS-302's class and weapon-type steps, likewise, and the zone picker.
+import { stepGearClassFilter, stepGearWeaponTypes, stepGearZonePicks } from './gearFilterSteps.mjs'
 // JOS-336's EFFECTIVE HP step: pick the derived column, sort it, and move the slider under it.
 import { stepGearEffectiveHp } from './gearEffectiveHpSteps.mjs'
 // JOS-335's wish gesture — a module for the same reason, and it spans two tabs (its header argues
@@ -132,8 +140,8 @@ import { stepGearVoidMotes, stepGearVoidMotesNarrow } from './gearVoidMoteSteps.
 // JOS-329's away-and-back steps, shared with the planner and character specs — one module because
 // the claim is identical on every tab of the area and only the fingerprint differs.
 import { stepGearMemory, stepGearMemoryRelaunched } from './areaMemorySteps.mjs'
-// The 2026-08-25 review round: a numeric token, the Drop columns chip, and the fit that must not drift.
-import { stepGearColumnFit, stepGearDropsToggle, stepGearThreshold } from './gearReviewSteps.mjs'
+// The 2026-08-25 review round: the Drop columns chip, and the fit that must not drift.
+import { stepGearColumnFit, stepGearDropsToggle } from './gearReviewSteps.mjs'
 // Phase 0's scaler and phase 2's ratio, so the EXPECTED numbers are computed rather than typed.
 import { gearRatio, scaleGearRow } from '../../src/shared/planner/gearScale'
 import type { GearRow } from '../../src/shared/planner/gear'
@@ -156,10 +164,6 @@ const COUNT = '[data-testid="gear-count"]'
 const EMPTY = '[data-testid="gear-empty"]'
 const SEARCH = '[data-testid="gear-search"] input'
 const ERA_TOGGLE = '[data-testid="gear-era-toggle"]'
-// The slot picker's own selector moved to `gearFilterSteps.mts` with the step that drives it. It is
-// still `gear-slot` — a ChipMultiSelect wearing a single-select's testid, on purpose (JOS-302).
-const WEAPON_PICKER = '[data-testid="gear-weapon"]'
-const SORT_RATIO = '[data-testid="gear-sort-RATIO"]'
 const TIER_SLIDER = '[data-testid="gear-tier-slider"] input[type="range"]'
 const FRACTION_SLIDER = '[data-testid="gear-fraction-slider"] input[type="range"]'
 const UPGRADE_LABEL = '[data-testid="gear-upgrade-label"]'
@@ -211,13 +215,6 @@ const THELVORN_BASE: GearRow = {
 /** "Tier 2   3 / 4" — the owner screenshot every phase-0 number in this repo is verified against. */
 const CHECKPOINT: ItemUpgradeState = { full: 2, fraction: 3 }
 
-/**
- * WHAT JOS-297's STEPS ARE TOLD (gearColumnSteps.mts) — the same row again, plus the plus-state the
- * upgrade step leaves the global selector at, so the picker's own numbers assertion can compute its
- * expectation from `scaleGearRow` exactly as `expectedAt` does below.
- */
-const COLUMNS: GearColumnFixture = { row: THELVORN_BASE, state: CHECKPOINT }
-
 const until = (fn: () => Promise<boolean>, ms: number): Promise<boolean> => settle(fn, (ok) => ok, { timeoutMs: ms })
 
 const textOf = (page: Page, sel: string): Promise<string> =>
@@ -261,14 +258,17 @@ async function typeAndSettle(page: Page, sel: string, value: string): Promise<nu
 }
 
 /** 1. THE NAV ROW MOUNTS THE TABLE — with nothing selected first. That is the owner's ruling. */
-async function stepMount(page: Page): Promise<boolean> {
+async function stepMount(page: Page, firstLaunch = true): Promise<boolean> {
   const hasRow = await page.waitForSelector(NAV, { timeout: 60_000 }).then(
     () => true,
     () => false
   )
   if (!check('the nav drawer has a Gear row', hasRow)) return false
-  const label = (await textOf(page, NAV)).replace(/\s+/g, ' ').trim()
-  check('…and it is called Gear', label.includes('Gear'), `reads "${label}"`)
+  // The label once per spec: the relaunch re-reading it was a duplicate (2026-11-27).
+  if (firstLaunch) {
+    const label = (await textOf(page, NAV)).replace(/\s+/g, ' ').trim()
+    check('…and it is called Gear', label.includes('Gear'), `reads "${label}"`)
+  }
   await page.click(NAV, { timeout: 15_000 })
 
   // …and the area it opens offers Gear as its FIRST tab (JOS-324). See TAB above for why the spec
@@ -379,7 +379,7 @@ async function stepOwnedCells(page: Page, log: FixtureLog): Promise<void> {
 /**
  * 3c. THE OWNER'S CHECKBOX. Asserted as an IDENTITY and an INVARIANT, never as a number: the
  * corpus grows, so what is pinned is that the filter removes rows, keeps only rows the join can
- * say something about, and is fully reversible.
+ * say something about, and lets the LOG's witness through.
  */
 async function stepOwnedFilter(page: Page): Promise<void> {
   const all = await typeAndSettle(page, SEARCH, '')
@@ -408,18 +408,13 @@ async function stepOwnedFilter(page: Page): Promise<void> {
     (await countOf(page, `${ROW}[data-item-key="${LOOTED_KEY}"]`)) === 1
   )
 
-  // …and something neither witness has ever seen is gone, and comes back when the filter is off.
-  await typeAndSettle(page, SEARCH, 'fungus covered scale tunic')
-  const hiddenWhenOn = await countOf(page, ROW)
+  // That something neither witness has ever seen is hidden, and that turning the filter off gives the
+  // whole corpus back, is the predicate's value: tests/gearFilter.test.mts, 'Owned or looted keeps
+  // exactly the rows the join speaks for, and off it filters nothing'. The toggle goes back off here
+  // only because the steps below were written against the unfiltered corpus.
   await page.click(OWNED_TOGGLE, { timeout: 15_000 })
-  const backWhenOff = await until(async () => (await countOf(page, ROW)) > 0, 15_000)
-  check(
-    'an item neither the dump nor the log has seen is hidden by the filter and returns without it',
-    hiddenWhenOn === 0 && backWhenOff,
-    `${String(hiddenWhenOn)} rows with the filter on`
-  )
   await typeAndSettle(page, SEARCH, '')
-  check('…and turning it off restores the whole corpus', (await counts(page)).shown === all)
+  await until(async () => (await counts(page)).shown === all, 15_000)
 }
 
 /** 4. SEARCH NARROWS THE TABLE, and it finds an item by name. */
@@ -430,73 +425,6 @@ async function stepSearch(page: Page): Promise<boolean> {
   const found = await countOf(page, `${ROW}[data-item-key="${THELVORN_KEY}"]`)
   check('…to the item that was typed, keyed by the corpus join key', found === 1, `${String(found)} matching rows`)
   return found === 1
-}
-
-/**
- * 5. THE SLOT PICKER, AND A SECOND FILTER ON TOP OF IT.
- *
- * IT USED TO BE "a stat threshold and a slot filter combine", and the fourth owner ask (JOS-302)
- * deleted the threshold half outright — the typed-chip step, the "every surviving row states the
- * stat" step and the "the stat asked about gets a column" step with it. The replacement is the same
- * claim over controls that still exist: the slot picks AND with the weapon type, and the picker
- * (not a threshold) is what puts a stat on the table.
- *
- * The union half of the slot picker lives in `gearFilterSteps.stepGearSlotPicks` — a module for the
- * line budget, not because it is a different subject. It leaves exactly one slot picked, which is
- * the state the steps below were written against, and returns the count that narrowing produced.
- */
-async function stepFilters(page: Page): Promise<void> {
-  await typeAndSettle(page, SEARCH, '')
-  const all = (await counts(page)).shown
-  const afterSlot = await stepGearSlotPicks(page, all)
-
-  await pickIn(page, WEAPON_PICKER, 'One-handed')
-  const combined = await until(async () => (await counts(page)).shown < afterSlot, 15_000)
-  const afterBoth = (await counts(page)).shown
-  check(
-    'two filters COMBINE — slot AND weapon type, never one replacing the other',
-    combined && afterBoth > 0,
-    `${String(afterSlot)} primaries → ${String(afterBoth)} that are also one-handers, of ${String(all)}`
-  )
-  // …and the second one comes back off, leaving the PRIMARY narrowing the steps below expect.
-  await clearPicks(page, WEAPON_PICKER)
-  check(
-    '…and dropping the second leaves the first exactly as it was',
-    await until(async () => (await counts(page)).shown === afterSlot, 15_000),
-    `${String((await counts(page)).shown)} of ${String(afterSlot)}`
-  )
-}
-
-/** 6. SORTING BY RATIO IS MONOTONE, and it reads `gearRatio` rather than a second opinion. */
-async function stepSort(page: Page): Promise<void> {
-  await page.click(SORT_RATIO, { timeout: 15_000 })
-  const ratios = await until(async () => {
-    const values = await page.evaluate(() =>
-      [...document.querySelectorAll('[data-testid="gear-cell-RATIO"]')]
-        .map((c) => (c as HTMLElement).innerText.trim())
-        .filter((t) => t !== '')
-    )
-    return values.length > 1
-  }, 15_000)
-  if (!check('sorting by ratio leaves weapons on screen with ratios to compare', ratios)) return
-
-  const values = await page.evaluate(() =>
-    [...document.querySelectorAll('[data-testid="gear-cell-RATIO"]')].map((c) => (c as HTMLElement).innerText.trim())
-  )
-  const numbers = values.filter((t) => t !== '').map(Number)
-  const descending = numbers.every((n, i) => i === 0 || numbers[i - 1] >= n)
-  check(
-    'a ratio sort ranks the visible rows highest first',
-    descending,
-    numbers.slice(0, 5).map((n) => n.toFixed(2)).join(' ')
-  )
-  // …and NOTHING that lacks a ratio is ranked among them: an absent value sorts last, never as 0.
-  const firstBlank = values.indexOf('')
-  check(
-    'a row with no ratio never outranks one that has a ratio',
-    firstBlank === -1 || values.slice(firstBlank).every((t) => t === ''),
-    `first blank at ${String(firstBlank)} of ${String(values.length)}`
-  )
 }
 
 /** Focus a slider and drive it with the keyboard — the same path the control gives a user. */
@@ -560,14 +488,10 @@ async function stepUpgrade(page: Page): Promise<void> {
   const onScreen = (await countOf(page, `${ROW}[data-item-key="${THELVORN_KEY}"]`)) === 1
   if (!check('the upgrade step has its row, with the three columns it asked the picker for', onScreen)) return
 
-  const base = expectedAt({ full: 0, fraction: 0 })
-  const atBase = await screenAt(page)
-  check(
-    'at base the table states the corpus’s own numbers',
-    atBase.dmg === base.dmg && atBase.wis === base.wis,
-    `screen DMG ${atBase.dmg} WIS ${atBase.wis} ratio ${atBase.ratio}`
-  )
-
+  // The corpus's own numbers at base, and the ratio moving because the damage did and the delay did
+  // not, are values: tests/gearIndex.test.mts ('Thelvorn and the Crown arrive as the numbers
+  // tests/itemUpgrade pins') and tests/gearFilter.test.mts ('the table reproduces the owner screenshot
+  // at the checkpoint'). What stays is that the SELECTOR reaches the cells.
   await setCheckpoint(page)
 
   const want = expectedAt(CHECKPOINT)
@@ -577,12 +501,6 @@ async function stepUpgrade(page: Page): Promise<void> {
     'moving the global selector restates every displayed number at that plus — scaleGearRow’s answer, exactly',
     got.dmg === want.dmg && got.wis === want.wis && got.ratio === want.ratio,
     `screen ${got.dmg}/${got.wis}/${got.ratio} · scaleGearRow ${want.dmg}/${want.wis}/${want.ratio}`
-  )
-  // DELAY never scales, which is the whole reason the ratio moved — 0.77 at base, 0.96 here.
-  check(
-    '…and the ratio moved because the damage did and the delay did not',
-    want.ratio !== base.ratio,
-    `${base.ratio} → ${want.ratio}`
   )
   // HAND THE COLUMNS BACK TO THE DERIVATION. `stepGearColumns` below starts from whatever choice it
   // is handed and TOGGLES, so a list left here would silently un-pick two of the keys it picks.
@@ -628,29 +546,21 @@ async function steps(app: ElectronApplication, page: Page, log: FixtureLog): Pro
     // derived and no width stored; it hands the widths back to automatic, which every picker step
     // below reads `data-layout` against.
     await stepGearColumnFit(page)
-    // JOS-302's weapon-type step runs BEFORE the slot/threshold step, on a table nothing is
-    // narrowing: its whole subject is what one picker does to the whole corpus, and it hands the
-    // tab back with both of its pickers empty.
+    // JOS-302's weapon-type step runs on a table nothing is narrowing and hands it back with its
+    // picker empty.
     await stepGearWeaponTypes(page)
     // The zone picker (2026-09-26) runs on the same unnarrowed corpus and hands it back the same way.
     await stepGearZonePicks(page)
-    // The token and the chip run on the corpus the weapon step left unnarrowed, columns derived
-    // (AC is a core column); both hand the tab back exactly as they found it.
-    await stepGearThreshold(page)
+    // The chip runs on the corpus the weapon step left unnarrowed, columns derived; it hands the tab
+    // back exactly as it found it.
     await stepGearDropsToggle(page)
-    // JOS-336's EFFECTIVE HP step runs HERE, in the one seam that gives it what it needs: the
-    // weapon-type step clears both of its pickers and empties the search box, and nothing has
-    // touched the global selector yet — so the derived column is measured against the WHOLE corpus
-    // at base and then again at a plus it moves itself. It hands all three back the way it found
-    // them (selector at base, columns derived, box empty) for the steps below.
+    // JOS-336's EFFECTIVE HP step runs HERE, on the unnarrowed corpus with the selector at base; it
+    // hands the columns back derived and the box empty, and leaves the table sorted on EFF HP.
     await stepGearEffectiveHp(page)
-    await stepFilters(page)
-    await stepSort(page)
     await stepUpgrade(page)
-    // JOS-297 runs LAST of the first launch, and deliberately: it needs the global selector already
-    // at the checkpoint (so the picked columns can be re-read against `scaleGearRow` at a plus
-    // nobody is about to move), and it parks a column choice for the second launch to find.
-    await stepGearColumns(page, COLUMNS)
+    // JOS-297 runs LAST of the first launch, and deliberately: it parks a column choice for the
+    // second launch to find.
+    await stepGearColumns(page)
     // …and JOS-329 runs after IT, for two reasons. It MOVES the global selector (a Tier 1 label on
     // the far side of a module switch is the whole point of the overridden law), which every step
     // above reads; and the choice JOS-297 just parked is untouched by it, because the columns
@@ -708,7 +618,7 @@ async function main(): Promise<void> {
   try {
     const page = await mainWindow(second.app)
     watch(page, consoleErrors)
-    const up = await stepMount(page)
+    const up = await stepMount(page, false)
     if (up) {
       await stepGearColumnsRelaunched(page)
       // THE RESTART HALF OF JOS-329's SPLIT, and the only place it can be proved: a structural pick
