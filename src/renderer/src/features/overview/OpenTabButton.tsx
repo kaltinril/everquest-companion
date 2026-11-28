@@ -13,7 +13,8 @@ export function OpenTabButton({ label, testId, onOpen }: { label: string; testId
       endIcon={<OpenInNewIcon sx={{ fontSize: 14 }} />}
       onClick={onOpen}
       // The DPS card's line box, so every card in a rank starts its body on one baseline.
-      sx={{ minWidth: 0, py: 0, px: 0.75, lineHeight: 1.4 }}
+      // One line even in a one-column card: the title gives way (it ellipsizes), not the link.
+      sx={{ minWidth: 0, py: 0, px: 0.75, lineHeight: 1.4, whiteSpace: 'nowrap', flexShrink: 0 }}
     >
       {label}
     </Button>

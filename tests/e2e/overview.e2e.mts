@@ -36,7 +36,9 @@
  *
  * WIDGETS 2026-11-28 (overviewWidgetSteps.mts): the default page is the six cards, Customize opens
  * the checklist, a card checked on mounts with engine data, and a second launch on the same
- * userData reads the layout back.
+ * userData reads the layout back. GRID 2026-11-28: Edit layout puts a handle and a width control
+ * on every card, a width changes the span, a drag and the "later" button move a card, Esc ends it,
+ * and the relaunch reads the order and the widths back.
  *
  * Run: `npm run test:e2e` (this spec runs second).
  */
@@ -66,7 +68,7 @@ import { stepGlanceDrill } from './drill.mjs'
 import { PULL_DAMAGE, playPull } from './gameplay.mjs'
 import { launchOnFixture, stageFixture, type FixtureLog } from './logFixture.mjs'
 // The widget steps (Customize, the new cards, the relaunch), beside this file for its length.
-import { stepCustomize, stepDefaultWidgets, stepLayoutSurvivesRelaunch } from './overviewWidgetSteps.mjs'
+import { stepCustomize, stepDefaultWidgets, stepEditLayout, stepLayoutSurvivesRelaunch } from './overviewWidgetSteps.mjs'
 
 const GRID = '[data-testid="overview-grid"]'
 const SEGMENT_SELECT = '[data-testid="segment-select"]'
@@ -577,6 +579,8 @@ async function main(): Promise<void> {
   const { app, close } = await launchOnFixture(log, { userData })
 
   let page: Page | null = null
+  // The order Edit layout leaves, read back by the relaunch.
+  let order: string[] = []
   try {
     page = await mainWindow(app)
     const consoleErrors: string[] = []
@@ -611,6 +615,7 @@ async function main(): Promise<void> {
     await page.click('[data-testid="nav-overview"]', { timeout: 15_000 })
     await page.waitForSelector(GRID, { timeout: 20_000 })
     await stepCustomize(page, log)
+    order = await stepEditLayout(page)
 
     // 14. No renderer console errors across the whole run.
     check('no renderer console errors', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | '))
@@ -622,7 +627,7 @@ async function main(): Promise<void> {
   }
 
   try {
-    await stepLayoutSurvivesRelaunch(log, userData)
+    await stepLayoutSurvivesRelaunch(log, userData, order)
   } finally {
     await log.dispose()
     await removeUserData(userData)

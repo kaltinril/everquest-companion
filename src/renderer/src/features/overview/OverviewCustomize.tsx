@@ -103,7 +103,7 @@ export function OverviewCustomize({ layout, onSave }: { layout: OverviewLayout |
               setOpen(true)
             }}
             // The strip's own line box, so adding the button does not make the strip taller.
-            sx={{ minWidth: 0, py: 0, px: 0.75, lineHeight: 1.4, flexShrink: 0 }}
+            sx={{ minWidth: 0, py: 0, px: 0.75, lineHeight: 1.4, flexShrink: 0, whiteSpace: 'nowrap' }}
           >
             Customize
           </Button>

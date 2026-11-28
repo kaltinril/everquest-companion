@@ -3855,26 +3855,47 @@ test that failed before the fix.
 ## Overview widgets, Phase 1 (2026-11-28, branch `overview-widgets`; plans/2026-11-27-overview-widgets.md)
 
 - **Every card is a widget.** `src/shared/overviewLayout.ts` holds the catalog (`OVERVIEW_WIDGETS`:
-  id, checklist label, default on/off), the stored shape (every known id once, in order, with
-  `on`), and the region rules. `features/overview/overviewWidgets.tsx` maps an id to its component;
-  each widget calls its own hook there, so a card that is off subscribes to nothing. A new card is
-  one catalog row, one `REGION` entry and one registry row.
+  id, checklist label, default on/off, default and minimum width, live or feed), the stored shape
+  (every known id once, in order, with `on` and `width`) and the grid maths.
+  `features/overview/overviewWidgets.tsx` maps an id to its component; each widget calls its own
+  hook there, so a card that is off subscribes to nothing. A new card is one catalog row and one
+  registry row.
 - **Stored once per install** in the settings store, key `overviewLayout` (`src/main/ipc/
   overviewLayout.ts`, bridge `getOverviewLayout`/`setOverviewLayout`), never localStorage (the
   dev and the built app read different origins). Not in the shared settings profile.
 - **Law: reading a stored layout never changes a page by itself.** Unknown ids and repeats are
   dropped; a known id the stored list does not name (a card added later) is appended OFF; nothing
   stored is the default (the original six on, in order). `tests/overviewLayout.test.mts` pins it.
-- **Layout choice: regions kept, built from runs.** Each card has a region kind: `rank` (peers,
-  1/2/3 across, 304 px row floor), `wide` (the DPS curve, full width), `feed` (the two twin feeds).
-  Consecutive cards of one kind share one region grid (`overviewRegions`), so the default order is
-  exactly the old three regions and any other order keeps each kind's rules. The widget wrapper is
-  `display: contents` (it carries `data-overview-widget` for tests), so the card stays the grid
-  item. Measured: with the default layout every card's box matched main_community to the pixel
-  and the only differing pixels in a 1400x900 hidden-window capture were the new Customize button.
-- **Hydration:** every live region gives way to ONE "Reading log" placeholder where the first was;
-  the feeds still draw (`overviewBlocks`). Customize sits on the zone strip, so it is hidden while
-  the log is read, like the strip.
+- **Layout: one 4-column grid (2026-11-28, branch `overview-grid`; replaced the regions).** Each
+  card spans its stored width, 1 to 4 (`gridColumn: span N` on the widget wrapper, which is a real
+  box now, not `display: contents`; the card inside grows to the row height). Plain row flow,
+  never `dense`: the page shows the stored order, and a card too wide for the rest of a row starts
+  the next one (a hole is left). A row is as tall as its tallest card; no 304 px floor. Defaults:
+  Damage 1, Leveling 2, Target 1, curve 4, feeds 2, new cards 1. Minimums: curve 2, feeds 2.
+- **Stored shape v2** `{ version: 2, widgets: [{ id, on, width }] }`. No `version` = Phase 1:
+  on/off and order kept, default widths (a width field there is ignored). A width is clamped to the
+  card's minimum and 4; junk reads as the default. Later versions are read best effort.
+- **Responsive columns are display only** (`overviewColumnsFor`, `overviewDisplaySpan`): 4 from
+  940 px of Overview width, 2 from 600, else 1; the span is the width cut to the columns. Width is
+  measured on the view root (not the grid, whose scrollbar would make it oscillate at a threshold)
+  with a layout-effect read, a ResizeObserver and the window resize event. The grid carries
+  `data-columns`, each card `data-span`.
+- **Edit layout** (`OverviewEditBar.tsx`, `useOverviewGrid.ts`): a toggle beside Customize ("Done"
+  while on). Each card wears a bar: drag handle, name, earlier/later buttons
+  (`moveOverviewWidgetAmongShown`: step past the next SHOWN card), the 1 2 3 4 width control. Card
+  bodies take no pointer events in the mode. Off, nothing is drawn and nothing can be dragged. Esc
+  cancels a drag in flight, then ends the mode; unmount and a log re-read (hydrating) end it too.
+- **Drag = pointer events + pointer capture on the handle**, no library (none in package.json; none
+  added). Each move hit-tests the cards' rects with `overviewDropSlot` (card under the pointer or
+  the nearest; left half before, right half after) and drops a slot that would not change the shown
+  order (`overviewDropChanges`). Release saves `moveOverviewWidgetTo` (take out, insert beside the
+  target, so off cards keep their places). A 4 px marker sits in the gap; the dragged card is dimmed
+  and its name follows the pointer. A pointer held within 40 px of the grid's top or bottom scrolls
+  it (50 ms timer). TRAP for e2e: a handle below the grid's fold has an off-screen centre; the spec
+  drags two first-row cards.
+- **Hydration:** every live card gives way to ONE full-width "Reading log" placeholder where the
+  first was; the feeds still draw (`overviewBlocks`). Customize and Edit layout sit on the zone
+  strip, so they are hidden while the log is read, like the strip.
 - **The four new cards** (quick wins 1, 2, 5, 9), selectors in `src/shared/overviewCards.ts`,
   values in `tests/overviewCards.test.mts`: Buffs running out (the Buffs overlay's surface and
   allow-list, countdowns only, soonest first, 5 rows); Respawns here (the respawn rows of the exact
@@ -3886,7 +3907,10 @@ test that failed before the fix.
 - **Session = the last login the log states** (`resolveSlice` 'session'); a log with no logout is
   one session, so on a fixture or a never-camped log the rate divides by the whole record.
 - **e2e** (`overview.e2e.mts` + `overviewWidgetSteps.mts`): the default six in order, Customize
-  opens ten rows, the four new cards mount with engine data (a Valor cast, three motes appended),
-  and a second launch on the same userData reads the layout back.
-- **Open:** Phase 2 (widgets with saved filters), the other ten quick wins, drag to reorder (up and
-  down buttons only for now), and the one-line custom overlay in the plan's backlog.
+  opens ten rows, the four new cards mount with engine data (a Valor cast, three motes appended);
+  Edit layout shows ten handles and ten width controls, Leveling at width 1 spans one column, a
+  mouse drag of Target onto Damage's left edge shows the marker and moves it first, "later" moves
+  it back one, Esc removes the handles; a second launch on the same userData reads the order and
+  Leveling's width back.
+- **Open:** Phase 2 (widgets with saved filters), the other ten quick wins, and the one-line custom
+  overlay in the plan's backlog.

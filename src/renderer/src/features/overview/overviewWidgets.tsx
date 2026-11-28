@@ -24,6 +24,7 @@ import { useCurrentMob } from './useCurrentMob'
 import { useOverviewLeveling } from './useOverviewLeveling'
 import { useRecentDrops } from './useRecentDrops'
 import { useRecentKills } from './useRecentKills'
+import { DropMarker, OverviewEditBar, type OverviewEditProps } from './OverviewEditBar'
 
 /** Every destination a card links to. They arrive from App.tsx: a card routes, it never navigates. */
 export interface OverviewLinks {
@@ -69,16 +70,45 @@ const WIDGETS: Readonly<Record<OverviewWidgetId, (p: WidgetProps) => JSX.Element
   coin: ({ links }) => <CoinCard onOpenLeveling={links.onOpenLeveling} />
 }
 
+interface OverviewWidgetProps extends WidgetProps {
+  id: OverviewWidgetId
+  /** Columns it spans on screen: the stored width cut to the columns the page has. */
+  span: number
+  /** Edit layout's bar and drag state; null outside the mode. */
+  edit: OverviewEditProps | null
+}
+
 /**
- * One card. The wrapper is `display: contents`: it carries the widget id for tests and tools but
- * draws no box, so the card itself stays the grid item and the region's rules apply to it as
- * they did before widgets existed.
+ * One card: the grid item. It spans its columns, and the card inside grows to the row's height
+ * (a row is as tall as its tallest card). In Edit layout it wears the edit bar above the card, the
+ * card itself takes no clicks (so a drag never opens a tab), and the drop marker shows on the
+ * side the dragged card would land.
  */
-export function OverviewWidget({ id, snap, links }: WidgetProps & { id: OverviewWidgetId }): JSX.Element {
+export function OverviewWidget({ id, span, edit, snap, links }: OverviewWidgetProps): JSX.Element {
   const Card = WIDGETS[id]
+  const dragging = edit?.drag.drag
+  const marker = dragging?.slot?.id === id ? dragging.slot.side : null
   return (
-    <Box data-overview-widget={id} sx={{ display: 'contents' }}>
-      <Card snap={snap} links={links} />
+    <Box
+      data-overview-widget={id}
+      data-span={span}
+      sx={{
+        gridColumn: `span ${String(span)}`,
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        minWidth: 0,
+        minHeight: 0,
+        opacity: dragging?.id === id ? 0.45 : 1,
+        '& > [data-card]': { flexGrow: 1, minHeight: 0, display: 'flex', flexDirection: 'column' },
+        '& > [data-card] > *': { flexGrow: 1, minWidth: 0 }
+      }}
+    >
+      {edit && <OverviewEditBar id={id} edit={edit} />}
+      <Box data-card sx={edit ? { pointerEvents: 'none', userSelect: 'none' } : undefined}>
+        <Card snap={snap} links={links} />
+      </Box>
+      {marker && <DropMarker side={marker} />}
     </Box>
   )
 }

@@ -1,7 +1,8 @@
 # Overview widgets: a personal dashboard built from every tab
 
 Status: Phase 1 BUILT 2026-11-28 (branch `overview-widgets`): every card a widget, the Customize
-checklist, and the first batch (quick wins 1, 2, 5, 9). Phase 2 and the other quick wins are not
+checklist, and the first batch (quick wins 1, 2, 5, 9). The 4-column grid with card widths and
+drag and drop BUILT 2026-11-28 (branch `overview-grid`). Phase 2 and the other quick wins are not
 built. Owner ask, 2026-11-27:
 
 > "i think we need the overview section to get some love. we haven't really added anything we've
@@ -80,11 +81,46 @@ match what the owner checks while farming (buffs, respawns, motes, coin).
   order and a Reset. Every change is saved at once.
 - One layout per install, in the settings store (`overviewLayout`). Default: the six on in their
   old order, the four new ones off. Unknown ids are ignored; a card added later appears unchecked.
-- Layout: the region rules are kept (peers, the full-width curve, the twin feeds); consecutive
-  cards of one kind share a region, so the default page is pixel-identical to the old one.
+- Layout (first cut, replaced the same day by the grid below): the region rules were kept (peers,
+  the full-width curve, the twin feeds), so the default page was pixel-identical to the old one.
 - Selectors: `src/shared/overviewCards.ts`, unit-tested; e2e checks the wiring only.
-- Not built: drag to reorder (buttons only), Phase 2, quick wins 3, 4, 6 to 8 and 10 to 14.
+- Not built: Phase 2, quick wins 3, 4, 6 to 8 and 10 to 14.
   Details and the laws: agent/BRANCH_NOTES.md, "Overview widgets, Phase 1".
+
+### The grid, widths and drag and drop (2026-11-28, branch `overview-grid`)
+
+Owner, after seeing Phase 1: "i think someone should be able to drag/drop to place them. they
+should be able to chose the width of the panels 1, 2, 3, or 4 units wide. for instance motes
+doesn't need to be that big, so it could be smaller, imagine splitting the image size here up into
+4 with the padding/borders".
+
+- One 4-column grid (`minmax(0, 1fr)` columns, 12 px gap). Each card spans 1 to 4 columns. Cards
+  flow left to right in the stored order: plain row flow, never `dense`, so a card too wide for
+  the rest of a row starts the next one and the page always shows the order the player set. A row
+  is as tall as its tallest card; the 304 px NOW-row floor and the three regions are gone.
+- Default widths: Damage 1, Leveling 2, Target 1, DPS over time 4, Recent drops 2, Recent kills 2,
+  and Buffs running out, Respawns here, Motes, Coin 1. So the default page is one row of Damage,
+  Leveling (double) and Target, the curve, then the two feeds.
+- Minimum widths: DPS over time 2, Recent drops 2, Recent kills 2 (at one column of a 1280 px
+  window, about 245 px, the curve's labels crowd together and feed rows cut names to a few letters).
+  Every other card goes down to 1.
+- Stored shape v2: `{ version: 2, widgets: [{ id, on, width }] }`. A Phase 1 layout (no version)
+  keeps its on/off and order and takes the default widths; a junk width reads as the default, and a
+  width is always clamped to the card's minimum and 4.
+- Responsive, display only: 4 columns from 940 px of Overview width (the default 1280 px window
+  gives 1016), 2 from 600 (the 900 px minimum window gives about 640), else 1. A card's span is its
+  width cut to the columns there are; the stored width never changes with the window.
+- "Edit layout" beside Customize on the zone strip (it reads "Done" while on). Each card then
+  wears a bar: a drag handle, its name, earlier and later buttons (the keyboard way to move it; they
+  step past the next shown card), and a 1 2 3 4 width control (widths under the minimum disabled).
+  The cards take no clicks in the mode, so a drag never opens a tab. Dragging shows the card dimmed,
+  its name by the pointer and a bar in the gap where it would land; a release saves at once. Esc
+  cancels a drag in flight, then ends the mode; leaving the tab or a log re-read ends it too.
+- Drag: pointer events with pointer capture on the handle (no drag library in package.json, none
+  added). The drop slot (the card under the pointer or the nearest; left half before, right half
+  after) and the reorder are pure functions in `overviewLayout.ts`. Held near the grid's top or
+  bottom edge, a drag scrolls it.
+- Customize keeps add, remove, order and Reset; Reset restores the default widths as well.
 
 ## Rules carried over
 
