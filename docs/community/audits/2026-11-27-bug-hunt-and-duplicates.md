@@ -365,7 +365,8 @@ before/after image (see "Prototypes").
 Eight UI-affecting duplicate items, each built as one shared version on its own branch off
 `main_community` (one commit, subject "PROTOTYPE, do not merge: ..."), captured before and after in
 the hidden e2e app, and shown to the owner on a private review page (claude.ai artifact
-`9G8fxa7xLBckSbz52FtpCj`). None is merged; every branch waits on the owner's word. The agents'
+`9G8fxa7xLBckSbz52FtpCj`). No prototype branch is merged as built; what was taken is under
+"Prototype outcomes" below. The agents'
 recommendations, from what the images showed:
 
 | Branch | Items | What changes for the player | Recommendation |
@@ -381,3 +382,39 @@ recommendations, from what the images showed:
 
 - How the images were taken (no window on screen): `agent/WORKFLOW.md`, Gate, "Screenshots of the
   hidden app".
+
+## Prototype outcomes (owner: do the agents' recommendations, 2026-11-27)
+
+The owner's word on the review page: "lets do all the agent's recommendations". Each item was
+rebuilt as one clean commit on its own `dup-1127-*` branch off `main_community` (no PROTOTYPE
+wording), with the prototype's open points settled, and the eight were merged as one candidate,
+`dupes-1127`. The four "owner's call" items took the default the review page offered: C per
+character, E keeps AA's third click, G keeps the Gaps chips' size, H 24-hour. The `proto-1127-*`
+branches are superseded by these merges; they are kept as they are and are never merged.
+
+| Item | Taken | Left out | What the player sees |
+| --- | --- | --- | --- |
+| A hover cards (dup-ui-a-2, dup-ui-b-3) | Kept separate. Only the shared click-through mode: `lib/clickThroughHover.ts` (modifiers, no pointer events, close on capture-phase pointerdown), used by `KnownItemTooltip` and `GearCompareCard`; `BisCompare.tsx` header now says both items are scored at the slider's +N | The BiS slot hover as the Gear pair, and the prototype's extra/held/testId props | Nothing: 4 hidden-window captures byte-identical |
+| B respawn labels (dup-ui-a-3) | Map timer pins and the Map pins overlay use the Timers tab's order and words (seen, then stale, then due); seen and stale hover ages through the Timers tab's `fmtDuration` (minutes past an hour); a seen pin does not take the just-due pulse | The countdown and "respawn due (... ago)" hover text keep `formatRespawnDuration` ("1m 5s" beside "1m 05s"): out of scope | Pin clock reads UP, "due long ago" or "awaiting next death" instead of a countdown, "due" or "?"; hovers say "UP, seen 18s ago (a combat line)" and "due long ago (killed 5h 01m ago)"; overlay labels the same; colours unchanged |
+| C class filter (dup-ui-a-5) | Exaltations and the Wish list run `useFollowingClasses('eq.planner.classPins')`: per character, live detection while following; the old machine-wide pin is read once as the `'*'` fallback (`legacyBrowseClassPins`, only while the new key is absent); `useBrowseClasses.ts` deleted | The old `eq.planner.classes` / `classesFrom` keys stay in storage, unread once the new key is written | The Exaltations filter is remembered per character; a loadout change shows at once while following; the "detected: ..." chip drops " - apply" and has its own hover |
+| D stat tiles (dup-ui-a-6) | One `lib/StatTile.tsx` (densities hero, panel, plain) for the Leveling heroes, range cards, AA pace tiles, Loot and Mobs tiles | The prototype's 4 px shorter hero row: the hero density keeps its inline caption | Nothing: 19 hidden-window captures byte-identical, hovers unchanged |
+| E table headers (dup-ui-a-7) | `shared/tableSort.ts` (`nextSort`, `sanitizeColumnSort`, `TABLE_SORT_KEYS`) and `lib/useTableSort.ts` (`useSortPref`); AA keeps up, down, back to the wiki's order through the `source` argument; Gear's `nextSort` calls the shared rule | Gear keeps its own store (`eq.gear.sort`, JOS-329); Loot, Gaps, Sky quests, Spellbook and Maps advice keep their own click rules | Leveling range zones and Maps "Your best zones" reverse on a second click, dashes (and short visits under a goal) stay last; AA, Factions, Bazaar Who's offering and Offers list, and both zone tables remember their sort across tab switches and restarts |
+| F time ago (dup-ui-b-1) | `lib/formatDate.formatAge` is the only ladder (just now under 90 s, minutes under 90 min, hours under 36 h, then days), styles short, terse (overlay meters), long (drop report); four local copies removed | Nothing | Fight picker and alert tooltips read "70m ago" for 60 to 89 min, "just now" under 90 s; alert tooltips read hours to 35 h; overlay meter rows switch at 90 s and 90 min (words unchanged); drop report card: "just now" to 89 s, days from 36 h |
+| G chips (dup-ui-b-9) | `lib/TagChip.tsx`: size `tag` (18 px, 11 px text) for Combat, Loot, Factions and Alerts; size `clickable` (MUI's small chip as it comes) for Gaps, which keeps its own heights | The Leveling unlock list, `SeenAsChips` and `KnowledgeBadge` are not on it; Gaps chips are not shrunk | Combat kind and ~ tags 14 to 18 px with 11 px text; Loot chips about 2 px narrower; Factions chips 20 to 18 px; Alerts template and illusion chips 20 to 18 px, rows slightly shorter; Gaps byte-identical |
+| H clock and date (dup-ui-b-6) | 24-hour. `formatShortStamp` ("Aug 5, 20:26") for Loot rows and the slice caption; engine `views/loot.rs` `display_time` prints the same string; `localInputValue` for the custom range; Log archive dates through `formatDate`; `engine-loot-view` e2e checks the 24-hour shape | Nothing | Loot time column reads "Aug 2, 17:31" where it read "Aug 02, 05:31 PM", the Engine source the same; progression.recent's `at` cell is 24-hour too (no screen reads it) |
+
+- Merging: one conflict each in `RangeStatsPanel.tsx` (D and E: both imports kept) and
+  `SpellSuggestionRow.tsx` (F and G: `formatAge` on a `TagChip`); `lootRows.tsx` (G and H) and
+  `formatDate.ts` (F and H) merged clean. One change on the candidate: the Exaltations "detected"
+  chip's hover now reads in the other tabs' words, within the 15-word tooltip rule.
+- Gate on the candidate, run once, full (unit suite, cargo and the serial e2e suite, for a
+  batch that changes the engine): typecheck green; lint green on the merged tree; `known-reds.sh` on Node 24: 7861 tests,
+  7855 pass, 2 fail, both known reds; `cargo test --workspace`: 1397 pass, 1 fail (engined
+  `ingest::kept::tests::a_kept_key_never_holds_while_the_state_moves`, the red already listed
+  above); e2e serially: 72 of 73 green.
+- `sky-recent-sort.e2e` is red, and red the same on a clean `main_community` worktree (73ee3a1a6),
+  so the batch did not cause it (no Sky file is in the batch). Its first check reads the Sort
+  control's value as empty and the next click times out on
+  `div.MuiFormControl-root:has(> label:text-is("Sort")) div[role="combobox"]`: the selector no longer
+  finds the Sky tab's Sort `TextField`. Likely cause, not verified: the MUI 9 upgrade changed that
+  control's DOM. Not fixed here.

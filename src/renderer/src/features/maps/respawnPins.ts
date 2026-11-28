@@ -28,9 +28,17 @@
 import type { MobEntry } from '@shared/types'
 import type { ZoneShort } from '@shared/maps'
 import type { RespawnRow } from '@shared/respawn'
-import { formatRespawnDuration, respawnReading, respawnZoneKey } from '../../../../shared/respawn'
+import {
+  RESPAWN_AWAITING_LABEL,
+  RESPAWN_LONG_DUE_LABEL,
+  formatRespawnDuration,
+  respawnReading,
+  respawnSeenLabel,
+  respawnZoneKey
+} from '../../../../shared/respawn'
 import { ZONES, zoneShortName } from '../../../../shared/zones'
 import { mobKey } from '../../../../shared/mobKey'
+import { fmtDuration } from '../buffs/format'
 import { mobsInZone } from '../mobs/mobZone'
 import { mobPins, type MobPin } from './mobPins'
 
@@ -118,9 +126,23 @@ export interface TimerPinLabels {
  * a timer pin wears all the time (the fork's ask, kaltinril, 2026-08-18: the time until it
  * spawns, on the mob): "due" when it is, "?" when the clock only knows when it started — a
  * duration would be a guess, and the hover already says why.
+ *
+ * SEEN AND STALE COME FIRST, IN THE TIMERS TAB'S WORDS (2026-11-27, dup-ui-a-3): the order and
+ * the clock words are `respawnClockLabel`'s, so the map never counts down a mob the log has named
+ * since the kill ("UP"), nor says "due" about a kill hours old ("due long ago", or "awaiting next
+ * death" where there was never an estimate). The ages in those two hovers are written with the
+ * Timers tab's own formatter (`fmtDuration`: "34m 05s", "5h 12m"), so a stale age is rounded to
+ * the minute past an hour rather than reading "killed 5h 34s ago".
  */
 export function timerPinLabels(t: TimerPin, nowMs: number): TimerPinLabels {
   const r = respawnReading(t.row, nowMs)
+  if (r.seen) {
+    return { text: `${t.display} - UP, ${respawnSeenLabel(t.row, nowMs, fmtDuration)}`, clock: 'UP' }
+  }
+  if (r.stale) {
+    const word = t.row.estimateMs === undefined ? RESPAWN_AWAITING_LABEL : RESPAWN_LONG_DUE_LABEL
+    return { text: `${t.display} - ${word} (killed ${fmtDuration(r.elapsedMs)} ago)`, clock: word }
+  }
   if (r.due) {
     const over = r.overdueMs > 0 ? ` (${formatRespawnDuration(r.overdueMs / 1000)} ago)` : ''
     return { text: `${t.display} - respawn due${over}`, clock: 'due' }
@@ -144,8 +166,15 @@ export function placeableTimerPins(timers: readonly TimerPin[]): TimerPin[] {
 /** How long a timer that has just come due keeps pulsing on the Map pins overlay. */
 export const JUST_DUE_MS = 15_000
 
-/** Has this clock come due within the last `JUST_DUE_MS`? The overlay pulses it (owner, 2026-10-13). */
+/**
+ * Has this clock come due within the last `JUST_DUE_MS`? The overlay pulses it (owner, 2026-10-13).
+ *
+ * A SEEN PIN DOES NOT PULSE (2026-11-27): the Timers tab ranks seen over due (its row tone and
+ * `respawnClockLabel` both check seen first), so a seen row never wears the due look there, and
+ * the pin now reads "UP", not "due". Pulsing it would announce a clock running out on a mob the
+ * log already named. A stale pin cannot be just due (stale is overdue past the 30-minute linger).
+ */
 export function justDue(t: TimerPin, nowMs: number): boolean {
   const r = respawnReading(t.row, nowMs)
-  return r.due && r.overdueMs <= JUST_DUE_MS
+  return r.due && !r.seen && r.overdueMs <= JUST_DUE_MS
 }

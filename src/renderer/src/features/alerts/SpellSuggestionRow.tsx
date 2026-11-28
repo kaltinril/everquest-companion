@@ -22,7 +22,8 @@
 // in "From your fights", which mixes both — that section passes `showType`.
 
 import { memo, useMemo, type JSX } from 'react'
-import { Box, Chip, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
+import { TagChip } from '../../lib/TagChip'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import type { SpellCatalogEntry } from '@shared/types'
 import type { ClassAbbr } from '@shared/classCombo'
@@ -37,6 +38,7 @@ import {
 } from './suggestions'
 import { classLevelChips, type ClassLevelChip } from './lineIntel'
 import { Tooltip } from '../../lib/Tooltip'
+import { formatAge } from '../../lib/formatDate'
 // The rich spell card (JOS-293). The row states what an ALERT can be built on; the card behind
 // the name states what the spell IS - the effect list, the cost, the duration, the rank it
 // replaces - which is the other half of "is this one worth an alert at all".
@@ -58,24 +60,8 @@ export interface RowContext {
 const MAX_LEVEL_CHIPS = 2
 
 /**
- * Shared geometry for the row's small chips — the whole point of the redesign is density.
- * EXPORTED because the poison-slow offer is a row in the same list (SuggestSections.tsx): its
- * chips have to be the same 18px objects, not a second opinion about density.
- */
-export const ROW_CHIP_SX = {
-  height: 18,
-  // A CHIP IS A FACT, NOT A SPRING (JOS-190). Left to the default `flex-shrink: 1` these squeezed
-  // below their own labels the moment the facts group ran out of room, and — the group being an
-  // un-clipped nowrap flex box — kept drawing past its edge and over the template chips beside it.
-  // They hold their size now; what gives is the NAME, which ellipsizes, and then the row wraps.
-  flexShrink: 0,
-  '& .MuiChip-label': { px: 0.6, fontSize: '0.68rem' }
-} as const
-const CHIP_SX = ROW_CHIP_SX
-
-/**
  * The row shell every suggestion line wears: facts on the left, one-click chips on the right,
- * hover-highlighted. Exported for the same reason as ROW_CHIP_SX — "the offer is just another
+ * hover-highlighted. Exported so the poison-slow offer (SuggestSections.tsx) wears it — "the offer is just another
  * row" is a claim that only holds if it is literally the same box.
  *
  * IT WRAPS (JOS-190, GitHub issue 22). It used to be `nowrap` on the compact-bar contract
@@ -109,7 +95,7 @@ export const SUGGEST_ROW_SX = {
  * It is the group that gives — `flexGrow: 1` so it owns the free space, `minWidth: 0` so the name
  * may ellipsize — and it CLIPS (`overflow: hidden`), which is the half the compact-bar contract
  * was missing: a shrinkable group whose overflow is visible does not shrink, it overprints its
- * neighbour. Its chips hold their width (ROW_CHIP_SX), so the name is what shortens.
+ * neighbour. Its chips hold their width (TagChip), so the name is what shortens.
  */
 export const SUGGEST_ROW_FACTS_SX = {
   display: 'flex',
@@ -139,30 +125,15 @@ export const SUGGEST_ROW_ACTIONS_SX = {
   minWidth: 0
 } as const
 
-/** Coarse relative-time label for the usage tooltip's "last seen" (Task #45 recency hint). */
-export function relativeTime(ms: number): string {
-  const diff = Date.now() - ms
-  if (diff < 0) return 'just now'
-  const min = Math.round(diff / 60_000)
-  if (min < 1) return 'just now'
-  if (min < 60) return `${min}m ago`
-  const hr = Math.round(min / 60)
-  if (hr < 24) return `${hr}h ago`
-  const d = Math.round(hr / 24)
-  return `${d}d ago`
-}
-
 /** "ENC 16" — one class's entry level for this LINE. Yours is coloured; the DB fact is the same. */
 function LevelChip({ chip }: { chip: ClassLevelChip }): JSX.Element {
   const title = `${chip.cls} learns this spell line at level ${chip.level}${chip.yours ? ' - one of your classes' : ''}`
   return (
     <Tooltip title={title}>
-      <Chip
-        size="small"
+      <TagChip
         variant="outlined"
         color={chip.yours ? 'primary' : 'default'}
         label={`${chip.cls} ${chip.level}`}
-        sx={CHIP_SX}
       />
     </Tooltip>
   )
@@ -181,7 +152,7 @@ function LevelChips({ entry, resolved }: { entry: SpellCatalogEntry; resolved: C
       ))}
       {hidden.length > 0 && (
         <Tooltip title={hidden.map((c) => `${c.cls} ${c.level}`).join(' · ')}>
-          <Chip size="small" variant="outlined" label={`+${hidden.length}`} sx={CHIP_SX} />
+          <TagChip variant="outlined" label={`+${hidden.length}`} />
         </Tooltip>
       )}
     </>
@@ -191,11 +162,11 @@ function LevelChips({ entry, resolved }: { entry: SpellCatalogEntry; resolved: C
 /** The "N×" badge, with its observed-count + last-seen tooltip. */
 function UsageChip({ entry }: { entry: SpellCatalogEntry }): JSX.Element {
   const title = entry.lastSeenMs
-    ? `Observed ${entry.usageCount}× · last seen ${relativeTime(entry.lastSeenMs)}`
+    ? `Observed ${entry.usageCount}× · last seen ${formatAge(entry.lastSeenMs)}`
     : `Observed ${entry.usageCount}× in your log`
   return (
     <Tooltip title={title}>
-      <Chip size="small" color="primary" label={`${entry.usageCount}×`} sx={CHIP_SX} />
+      <TagChip color="primary" label={`${entry.usageCount}×`} />
     </Tooltip>
   )
 }
@@ -224,21 +195,18 @@ export function TemplateChip({
   created: boolean
   onClick: () => void
 }): JSX.Element {
-  const sx = { height: 20, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }
   if (created) {
     return (
-      <Chip
-        size="small"
+      <TagChip
         icon={<CheckCircleIcon />}
         color="success"
         variant="filled"
         label={label}
         disabled
-        sx={sx}
       />
     )
   }
-  return <Chip size="small" variant="outlined" clickable onClick={onClick} label={label} sx={sx} />
+  return <TagChip variant="outlined" clickable onClick={onClick} label={label} />
 }
 
 /** A single dense spell row: name, class levels, recency/usage, one-click template chips. */
@@ -288,23 +256,19 @@ function SpellRow({
           </Typography>
         </SpellTooltip>
         {showType && (
-          <Chip
-            size="small"
+          <TagChip
             label={isDebuff ? 'debuff' : 'buff'}
             color={isDebuff ? 'error' : 'success'}
             variant="outlined"
-            sx={CHIP_SX}
           />
         )}
         <LevelChips entry={entry} resolved={ctx.resolved} />
         {rank?.lastCastMs != null && (
-          <Tooltip title={`You last cast ${rank.name} ${relativeTime(rank.lastCastMs)}`}>
-            <Chip
-              size="small"
+          <Tooltip title={`You last cast ${rank.name} ${formatAge(rank.lastCastMs)}`}>
+            <TagChip
               variant="outlined"
               color="primary"
               label={rank.suffixed ? rank.name : 'recent'}
-              sx={CHIP_SX}
             />
           </Tooltip>
         )}

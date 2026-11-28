@@ -90,7 +90,8 @@ test('time left rounds up to whole minutes at 100 reports per 30 s', () => {
 
 test('ago: seconds read as just now, then minutes, hours, days', () => {
   assert.equal(ago(NOW - 30_000, NOW), 'just now')
-  assert.equal(ago(NOW - 60_000, NOW), '1 minute ago')
+  assert.equal(ago(NOW - 60_000, NOW), 'just now')
+  assert.equal(ago(NOW - 120_000, NOW), '2 minutes ago')
   assert.equal(ago(NOW - 3 * 3600_000, NOW), '3 hours ago')
   assert.equal(ago(NOW - 72 * 3600_000, NOW), '3 days ago')
 })

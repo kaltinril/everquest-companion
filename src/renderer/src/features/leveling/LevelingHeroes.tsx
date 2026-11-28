@@ -9,53 +9,11 @@
 // because that is the difference between a level and a level that has since been overtaken.
 
 import { type JSX } from 'react'
-import { Box, Paper, Stack, Typography } from '@mui/material'
+import { Stack } from '@mui/material'
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech'
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import BoltIcon from '@mui/icons-material/Bolt'
-import { Tooltip } from '../../lib/Tooltip'
-
-function HeroCard({
-  icon,
-  value,
-  label,
-  sub,
-  accent,
-  /** Hover sentence for the whole card. Only the level card has one to say. */
-  title,
-  /** Only the cards an assertion needs to READ carry one (the AA ledger's footer must equal
-   *  the AA-points-spent figure, and e2e proves that across the two components). */
-  testId
-}: {
-  icon: JSX.Element
-  value: string
-  label: string
-  sub?: string
-  accent: string
-  title?: string
-  testId?: string
-}): JSX.Element {
-  const card = (
-    <Paper
-      variant="outlined"
-      sx={{ p: 2, flex: 1, minWidth: 160, borderLeft: `3px solid ${accent}`, display: 'flex', gap: 1.5 }}
-    >
-      <Box sx={{ color: accent, display: 'flex', alignItems: 'center' }}>{icon}</Box>
-      <Box>
-        <Typography variant="h4" sx={{ lineHeight: 1, color: accent }} data-testid={testId}>
-          {value}
-        </Typography>
-        <Typography variant="body2">{label}</Typography>
-        {sub && (
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            {sub}
-          </Typography>
-        )}
-      </Box>
-    </Paper>
-  )
-  return title ? <Tooltip title={title}>{card}</Tooltip> : card
-}
+import { StatTile } from '../../lib/StatTile'
 
 export interface LevelingHeroesProps {
   currentLevel: number | null
@@ -86,11 +44,12 @@ export function LevelingHeroes({
 }: LevelingHeroesProps): JSX.Element {
   return (
     <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap' }} useFlexGap>
-      <HeroCard
+      <StatTile
+        size="hero"
         icon={<MilitaryTechIcon fontSize="large" />}
         value={currentLevel != null ? String(currentLevel) : '-'}
         label="Character level"
-        title={levelTitle || undefined}
+        hover={levelTitle || undefined}
         // THE CUE RIDES THE CAPTION, NOT THE LABEL (measured, JOS-192). The caption is already a
         // list of qualifiers about the level-up record and has a line to spare; the LABEL is the
         // card's one-line name, and appending to it wrapped the tallest hero card by a line at
@@ -104,9 +63,10 @@ export function LevelingHeroes({
             : 'no level-ups in log')
         }
         accent="#d9b25f"
-        testId="leveling-hero-level"
+        valueTestId="leveling-hero-level"
       />
-      <HeroCard
+      <StatTile
+        size="hero"
         icon={<AutoAwesomeIcon fontSize="large" />}
         value={aaEarned ? aaEarned.toLocaleString() : '-'}
         label="AA points earned"
@@ -116,15 +76,17 @@ export function LevelingHeroes({
       {/* `boughtCount` counts paid (ability, RANK) steps, not abilities — 91 of them across 50
           abilities on the real log. The caption read "abilities allocated" until the AA ledger
           grouped the ranks into ladders and made the two visibly different numbers. */}
-      <HeroCard
+      <StatTile
+        size="hero"
         icon={<AutoAwesomeIcon fontSize="large" />}
         value={aaSpent ? aaSpent.toLocaleString() : '-'}
         label="AA points spent"
         sub={`${boughtCount} ranks allocated`}
-        testId="leveling-hero-aa-spent"
+        valueTestId="leveling-hero-aa-spent"
         accent="#b07fd0"
       />
-      <HeroCard
+      <StatTile
+        size="hero"
         icon={<BoltIcon fontSize="large" />}
         value={aaUnspent != null ? aaUnspent.toLocaleString() : '-'}
         label="AA unspent"

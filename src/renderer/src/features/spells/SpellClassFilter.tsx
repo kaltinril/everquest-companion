@@ -32,7 +32,7 @@ import { useFollowingClasses, type GearClasses } from '../gear/gearData'
  *
  * Call it ONCE per view and pass the result down: a second call in the same view would hold a
  * second copy of the key, and only one of the two would re-read storage after the other wrote it
- * (`useBrowseClasses`' own mount-once rule). The Spells views mount one at a time, so each tab
+ * (`useRemembered` reads its key once, on mount). The Spells views mount one at a time, so each tab
  * reads the key fresh when it opens.
  */
 export function useSpellClasses(): GearClasses {

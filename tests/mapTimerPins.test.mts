@@ -8,7 +8,9 @@
 //      pane's articled-commons filter — a watch on `a froglok knight` is an explicit clock.
 //   3. POSITION: no stated coordinates ⇒ a row with NO pins (returned, so a surface can count
 //      it honestly); a multi-zone page ⇒ the same, mobRows' ambiguity rule restated.
-//   4. TEXT: an elapsed estimate reads "due", never "up"; no estimate admits it.
+//   4. TEXT: an elapsed estimate reads "due", never "up"; no estimate admits it. A seen row reads
+//      "UP" and a stale one "due long ago" / "awaiting next death", the Timers tab's words, and a
+//      seen pin does not pulse (2026-11-27).
 //   5. THE CATALOG SIDE IS KEYED ON THE STEM ALONE. The join used to take the stem AND a long
 //      zone name, and the surface paired the drawn map with the zone being opened — two places
 //      for the length of a fetch. `timerZone` derives the name from the stem, so the pair
@@ -117,6 +119,28 @@ test('the always-on clock label: the duration alone, "due", and "?" when nothing
   assert.equal(timerPinLabels(untimed, base + 120_000).clock, '?')
 })
 
+test('the pin leads with seen (UP) and stale, in the Timers tab words (2026-11-27)', () => {
+  const base = 1_000_000
+  const seen = { ...timerPinRows([row('Fippy Darkpaw', { estimateMs: 600_000, seenTs: base + 60_000, seenVia: 'combat' })], QH)[0] }
+  assert.equal(timerPinLabels(seen, base + 70_000).clock, 'UP')
+  assert.equal(timerPinLabels(seen, base + 70_000).text, 'Fippy Darkpaw - UP, seen 10s ago (a combat line)')
+  // Seen outranks due, as on the Timers tab: past the estimate the pin still reads UP.
+  assert.equal(timerPinLabels(seen, base + 700_000).clock, 'UP')
+  const timed = { ...timerPinRows([row('Fippy Darkpaw', { estimateMs: 60_000 })], QH)[0] }
+  const late = base + 60_000 + 31 * 60_000
+  assert.equal(timerPinLabels(timed, late).clock, 'due long ago')
+  assert.equal(timerPinLabels(timed, late).text, 'Fippy Darkpaw - due long ago (killed 32m 00s ago)')
+  // The age is the Timers tab's fmtDuration: past an hour it stops at minutes, never "5h 34s".
+  const hours = base + 5 * 3_600_000 + 34_000
+  assert.equal(timerPinLabels(timed, hours).text, 'Fippy Darkpaw - due long ago (killed 5h 00m ago)')
+  const untimed = { ...timerPinRows([row('Fippy Darkpaw')], QH)[0] }
+  assert.equal(timerPinLabels(untimed, base + 31 * 60_000).clock, 'awaiting next death')
+  assert.equal(
+    timerPinLabels(untimed, base + 31 * 60_000).text,
+    'Fippy Darkpaw - awaiting next death (killed 31m 00s ago)'
+  )
+})
+
 test('the catalog side is keyed on the stem alone — the zone table names the bestiary, not a caller', () => {
   // The bug this pins: the DRAWN map is Qeynos Hills, the zone being opened is elsewhere. The
   // old two-argument join could be handed that pair; this one cannot, and the rows of the drawn
@@ -141,6 +165,13 @@ test('a clock pulses from the moment it comes due, for JUST_DUE_MS, and never be
   assert.equal(justDue(t, 60_000), true)
   assert.equal(justDue(t, 60_000 + JUST_DUE_MS), true)
   assert.equal(justDue(t, 60_000 + JUST_DUE_MS + 1), false)
+})
+
+test('a seen pin does not pulse: the Timers tab ranks seen over due (2026-11-27)', () => {
+  const row = { id: 'r', key: 'k', display: 'Mob', zone: 'z', baseTs: 0, basis: 'death', estimateMs: 60_000, source: 'observed', seenTs: 30_000, seenVia: 'combat' } as unknown as Parameters<typeof justDue>[0]['row']
+  const t = { id: 'r', display: 'Mob', row, pins: [] }
+  assert.equal(justDue(t, 60_000), false)
+  assert.equal(justDue(t, 60_000 + JUST_DUE_MS), false)
 })
 
 test('on the map you stand in, only your instance tier’s clock wins a pin (owner, 2026-11-03)', () => {

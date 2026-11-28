@@ -1,8 +1,11 @@
 // gear/BisCompare.tsx — THE HOVER ON A SLOT (owner, 2026-11-24: *"On hover of a slot, show the comparison
 // between the recommended BiS item and the worn item. Along with the source (location/mob/crafted) to
 // obtain it."*). Both items are scored the same way the card is (`cellScore`: this cell, haste counted
-// only above what the other slots give), the worn one at +0 (the base-vs-base law). The stat budget
-// estimate lives here too, worded as our own estimate that ranks nothing.
+// only above what the other slots give), BOTH at the slider's +N: BisView's `useWorn` scales the worn
+// row to the slider state the candidates use (owner, 2026-11-24: "apples to apples"), and the last line
+// says so, naming the worn copy's real tier when it differs. This is NOT the Gear compare pair's
+// base-vs-base frame (GearCompareCard.tsx); the two hovers stay separate (audit 2026-11-27, dup-ui-a-2).
+// The stat budget estimate lives here too, worded as our own estimate that ranks nothing.
 
 import { type JSX } from 'react'
 import { Box, Stack, Typography } from '@mui/material'

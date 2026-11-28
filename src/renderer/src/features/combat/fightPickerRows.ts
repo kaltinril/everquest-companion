@@ -2,7 +2,7 @@
 // browse list and an all-time search hit both collapse to that one shape, and what the closed
 // trigger states. No JSX, no MUI (FightPicker.tsx renders these; FightPickerRows.tsx draws one).
 
-import { formatDate, formatTime } from '../../lib/formatDate'
+import { formatAge, formatDate, formatTime } from '../../lib/formatDate'
 import { formatRate } from '../../lib/formatRate'
 import { fmtDur } from './copyText'
 import type { CombatScope, ScopeOption, ScopeOptions } from './dashboardData'
@@ -64,27 +64,11 @@ export interface SearchState {
   corpus: number
 }
 
-/**
- * Coarse, live-updating relative age for a selector row (Task #54 disambiguation timing):
- * 'just now' / '2m ago' / '3h ago' / '2d ago'. Kept intentionally coarse so five same-named
- * giant pulls are tellable apart by start clock + age + duration.
- */
-export function relativeAge(ts: number, now: number): string {
-  if (!ts) return ''
-  const secs = Math.max(0, (now - ts) / 1000)
-  if (secs < 45) return 'just now'
-  const mins = secs / 60
-  if (mins < 60) return `${Math.round(mins)}m ago`
-  const hrs = mins / 60
-  if (hrs < 36) return `${Math.round(hrs)}h ago`
-  return `${Math.round(hrs / 24)}d ago`
-}
-
 /** The disambiguation timing suffix for a selector row: 'start clock · age · duration'. */
 export function timingLabel(startTs: number, durationSec: number, now: number): string {
   const bits: string[] = []
   if (startTs) bits.push(`${formatDate(startTs)} ${formatTime(startTs)}`)
-  const age = relativeAge(startTs, now)
+  const age = formatAge(startTs, now)
   if (age) bits.push(age)
   bits.push(fmtDur(durationSec))
   return bits.join(' · ')

@@ -14,6 +14,7 @@ import { type JSX, useCallback, useEffect, useState } from 'react'
 import { Alert, Box, Button, FormControlLabel, Stack, Switch, Typography } from '@mui/material'
 import type { LogArchiveReply, LogArchiveStatus, SegmentRow } from '@shared/logArchive/panel'
 import { AUTO_ARCHIVE_BYTES } from '@shared/logArchive/preflight'
+import { formatDate } from '../../lib/formatDate'
 
 function fmtBytes(n: number): string {
   if (n >= 1024 ** 3) return `${(n / 1024 ** 3).toFixed(1)} GB`
@@ -22,7 +23,7 @@ function fmtBytes(n: number): string {
 }
 
 function fmtDay(ms: number | null): string {
-  return ms === null ? 'never' : new Date(ms).toLocaleDateString()
+  return ms === null ? 'never' : formatDate(ms)
 }
 
 /** Two-step button: the first click shows what will happen, the second does it. */

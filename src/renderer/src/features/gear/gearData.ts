@@ -47,7 +47,7 @@ import { sourceIndex } from '../planner/sourceIndex'
 import { sameClasses } from '../planner/plannerClasses'
 import { gearOwnershipMap, ownershipFor, type GearOwnershipMap } from './gearOwnership'
 // JOS-329: the two pieces of state below survive a tab switch now — see each one's own comment.
-import { sanitizeGearClassPins, sanitizeUpgrade, type GearClassPins } from './areaMemory'
+import { legacyBrowseClassPins, readClassPins, sanitizeUpgrade, type GearClassPins } from './areaMemory'
 import { useRemembered } from './useAreaMemory'
 import type { ZoneShort } from '@shared/maps'
 import { gearZoneOptions } from './gearZones'
@@ -435,8 +435,8 @@ export function useUpgradeState(): {
  * `detected` is the default: the table reads for whatever the app currently believes this
  * character is running, and a loadout switch rewrites it silently and correctly, because nobody
  * has said otherwise yet. The moment the user edits the selection it PINS (`user`), and detection
- * may never overwrite it again — it can only offer, which is what `detectedOffer` is for on the
- * exaltation board and what the toolbar's "detected: …" chip does here.
+ * may never overwrite it again — it can only offer, which is what the toolbar's "detected: …" chip
+ * does here and on every other tab that runs this hook.
  *
  * WHAT IT DOES TO THE TABLE CHANGED ON 2026-08-13 (owner ruling, JOS-302). It used to enforce
  * nothing: a row outside the filter was hidden only while a companion "Usable by these" toggle was
@@ -458,11 +458,12 @@ export function useUpgradeState(): {
  * (the key is absent for the first). `sanitizeGearClasses` owns that distinction and the closed
  * allowlist; this hook only decides what to write.
  *
- * IT IS DELIBERATELY *NOT* SHARED WITH `eq.planner.classes`, the Exaltations browser's own trio.
+ * IT IS DELIBERATELY *NOT* SHARED WITH `eq.planner.classPins`, the Exaltations browser's own pins.
  * Two surfaces, two questions: the browse filter is "who am I collecting exaltations for" and this
  * one is "who am I reading the gear table for", and JOS-302 made this one NARROW the corpus while
  * that one still only lights chips. Folding them onto one key would make a click on either tab
- * silently re-filter the other.
+ * silently re-filter the other. Since 2026-11-27 the browse runs this same hook under its own key
+ * (it had a machine-wide copy of it, `useBrowseClasses`): the SHAPE is shared, the state is not.
  */
 export interface GearClasses {
   /** the classes the filter is reading for */
@@ -477,6 +478,19 @@ export interface GearClasses {
   set: (next: ClassAbbr[]) => void
   /** take the detected trio and stay pinned to it (the offer chip) */
   adopt: () => void
+}
+
+/**
+ * The Exaltations browser's old machine-wide pin, read from storage for `legacyBrowseClassPins`
+ * (areaMemory.ts states the migration). Only called while `eq.planner.classPins` is absent.
+ */
+function readLegacyBrowsePin(): GearClassPins | null {
+  try {
+    const store = window.localStorage
+    return legacyBrowseClassPins(store.getItem('eq.planner.classes'), store.getItem('eq.planner.classesFrom'))
+  } catch {
+    return null
+  }
 }
 
 export function useGearClasses(): GearClasses {
@@ -496,15 +510,17 @@ export function useGearClasses(): GearClasses {
  *
  * THE KEY IS THE PARAMETER, AND THAT IS THE WHOLE POINT OF PASSING IT. The shape is shared; the
  * STATE deliberately is not, which is the ruling this hook's own header already makes about
- * `eq.planner.classes` and applies unchanged to `eq.spells.classes`. Two surfaces asking two
+ * `eq.planner.classPins` and applies unchanged to `eq.spells.classes`. Two surfaces asking two
  * questions must not answer each other: narrowing the gear table to your Warrior should not also
  * hide every Shaman spell in the Spellbook.
  */
-export function useFollowingClasses(key: 'eq.gear.classes' | 'eq.spells.classes' | 'eq.aa.classes'): GearClasses {
+export function useFollowingClasses(
+  key: 'eq.gear.classes' | 'eq.spells.classes' | 'eq.aa.classes' | 'eq.planner.classPins'
+): GearClasses {
   const combo = useComboSnap()
   const current = combo.current
   // An unresolved slot contributes nothing, so a half-known combo yields the classes it does know
-  // and nothing it does not (law 1) — the same read PlannerView makes.
+  // and nothing it does not (law 1).
   const detected = useMemo(() => (current === null ? [] : resolvedClasses(current)), [current])
   // THE PIN IS PER CHARACTER (fork ask, kaltinril 2026-09-04): a twink druid and a WAR/MNK/SHM
   // main each keep their own, keyed by name, so a character switch stops resetting the trio by
@@ -514,8 +530,14 @@ export function useFollowingClasses(key: 'eq.gear.classes' | 'eq.spells.classes'
   // CALLER'S key, so each tab keeps its own set of per-character pins. Both halves of that matter -
   // a character switch must not reset either tab, and a pick on one tab must not re-filter the
   // other.
+  //
+  // THE EXALTATIONS KEY CARRIES A MIGRATION (2026-11-27): until its first write, the browse's old
+  // machine-wide pin reads as the `'*'` fallback, so it applies to every character until each one
+  // picks its own (`legacyBrowseClassPins`).
   const me = useModule<CharacterSnap>('character')?.character?.name ?? '*'
-  const [pins, setPins] = useRemembered<GearClassPins | null>(key, sanitizeGearClassPins)
+  const [pins, setPins] = useRemembered<GearClassPins | null>(key, (raw) =>
+    readClassPins(key, raw, readLegacyBrowsePin)
+  )
   const pinned = pins === null ? null : (pins[me] ?? pins['*'] ?? null)
 
   const set = useCallback(
@@ -525,7 +547,7 @@ export function useFollowingClasses(key: 'eq.gear.classes' | 'eq.spells.classes'
     [pins, setPins, me]
   )
   // ADOPTING THE OFFER PINS, and always did: taking today's detection is accepting one answer, not
-  // handing the filter back to inference forever (the `useBrowseClasses.adopt` rule, stated there).
+  // handing the filter back to inference forever (V2's rule, `plannerClasses.ts`).
   const adopt = useCallback(() => {
     setPins({ ...(pins ?? {}), [me]: detected })
   }, [pins, detected, setPins, me])

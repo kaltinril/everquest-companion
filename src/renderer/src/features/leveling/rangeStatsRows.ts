@@ -51,6 +51,7 @@ import { zoneIdKey } from '../../../../shared/zoneScope'
 import { formatAaRate, formatKillRate, formatLevelRate, formatPlatRate, formatPointRate } from '../../lib/formatRate'
 import { fmtDuration } from './levelChartGeometry'
 import { zoneColor } from './zoneBands'
+import type { ColumnSort, SortDir } from '../../../../shared/tableSort'
 
 /** Every unknown prints as this. Rule 1: an em-dash, never a zero. */
 export const NONE = '-'
@@ -69,6 +70,16 @@ export type ZoneSort =
   | 'aa'
   | 'motes'
   | 'deaths'
+
+/** Every column of the per-zone table, for the remembered sort's sanitizer. */
+export const ZONE_SORT_KEYS: readonly ZoneSort[] = ['levels', 'time', 'zone', 'levelsTotal', 'kills', 'killsPerHour', 'coin', 'coinPerHour', 'coinPeak', 'aa', 'motes', 'deaths']
+
+/** A column's first click: the zone name reads A→Z; every number reads most-first. */
+export function zoneSortNatural(sort: ZoneSort): SortDir {
+  return sort === 'zone' ? 'asc' : 'desc'
+}
+
+export const DEFAULT_ZONE_SORT: ColumnSort<ZoneSort> = { key: 'levels', dir: 'desc' }
 
 export interface ZoneStatRow {
   /** React key + stable identity: the row's raw zone name, which `rangeStats` already made
@@ -180,12 +191,14 @@ interface SortCtx {
 
 /** The number a column sorts on, most first (owner ask, 2026-10-13: sort by coin and the rest). */
 const SORT_VALUE: Partial<Record<ZoneSort, (c: SortCtx) => number>> = {
-  levelsTotal: ({ z }) => z.levelEquiv,
+  // -1 exactly where the cell prints the em-dash (levelsText, extraRates), so `unknownIn` keeps
+  // those rows last when the column is reversed.
+  levelsTotal: ({ z }) => (levelsText(z.levelEquiv, z.expSamples, z.expUnstated) === NONE ? -1 : z.levelEquiv),
   kills: ({ z }) => z.kills,
   killsPerHour: ({ z, read }) => pickRate(read, z.killsPerHourActive, z.killsPerHourWall) ?? -1,
   coin: ({ z }) => z.coinCopper,
   coinPerHour: ({ z, read }) => perShown(z.coinCopper, read),
-  coinPeak: ({ e }) => e?.peak.coin ?? 0,
+  coinPeak: ({ e }) => (e !== undefined && e.peak.coin > 0 ? e.peak.coin : -1),
   aa: ({ e, read }) => perShown(e?.aaPoints ?? 0, read),
   motes: ({ e, read }) => perShown(e?.motes ?? 0, read),
   deaths: ({ z }) => z.deaths
@@ -202,6 +215,19 @@ function comparator(
   const value = (z: ZoneRangeRow): number =>
     SORT_VALUE[sort]?.({ z, e: extras.get(zoneIdKey(z.zone)), read: zoneRead(z, basis) }) ?? 0
   return (a, b) => value(b) - value(a) || byLevels(a, b)
+}
+
+/** Whether a row's value in this column is unknown (it prints the em-dash): such rows sort last in
+ *  BOTH directions, so a reversed column never puts a dash above a number. */
+function unknownIn(
+  sort: ZoneSort,
+  extras: ReadonlyMap<string, ZoneExtra>,
+  basis: RateBasis
+): (z: ZoneRangeRow) => boolean {
+  if (sort === 'levels') return (z) => z.levelsPerHourActive == null
+  const of = SORT_VALUE[sort]
+  if (of === undefined) return () => false
+  return (z) => of({ z, e: extras.get(zoneIdKey(z.zone)), read: zoneRead(z, basis) }) < 0
 }
 
 /** A zone row's own spans, in the shape `basisRead` takes: its wall clock is its `spanMs`. */
@@ -266,15 +292,27 @@ function extraRates(
  * flipping the displayed hour re-words the table without reshuffling it under the reader's cursor.
  * A per-hour column the reader picked (kills, pp, AA, motes per hour) sorts on the hour it shows
  * (review, 2026-10-13): ordering a column by numbers it does not print reads as a broken sort.
+ *
+ * `by` is a column (read on its natural end) or a column and direction: a direction against the
+ * column's natural one is the second click on its header, and reverses the order, ties too (the
+ * shared header rule, `shared/tableSort.ts`, 2026-11-27). A row whose value is unknown stays last.
  */
 export function zoneStatRows(
   zones: readonly ZoneRangeRow[],
-  sort: ZoneSort = 'levels',
+  by: ZoneSort | ColumnSort<ZoneSort> = 'levels',
   basis: RateBasis = RATE_BASIS_DEFAULT,
   extras: ReadonlyMap<string, ZoneExtra> = new Map()
 ): ZoneStatRow[] {
+  const sort = typeof by === 'string' ? by : by.key
+  const natural = comparator(sort, extras, basis)
+  const reversed = typeof by !== 'string' && by.dir !== zoneSortNatural(sort)
+  const unknown = reversed ? unknownIn(sort, extras, basis) : null
+  const cmp =
+    unknown === null
+      ? natural
+      : (a: ZoneRangeRow, b: ZoneRangeRow): number => Number(unknown(a)) - Number(unknown(b)) || natural(b, a)
   // eslint-disable-next-line eqc/no-domain-munging -- JOS-459 cutover ledger item 3: no served view source answers this yet, so the renderer still derives ZoneRangeRow. Becomes a view descriptor when the source lands.
-  return [...zones].sort(comparator(sort, extras, basis)).map((z) => shapeZone(z, basis, extras))
+  return [...zones].sort(cmp).map((z) => shapeZone(z, basis, extras))
 }
 
 /** The kills card's caption. The pet half is INFERRED — pet binding is learned from the

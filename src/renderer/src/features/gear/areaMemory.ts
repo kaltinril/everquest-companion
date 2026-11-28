@@ -95,9 +95,11 @@ export type MemoryTier = 'restart' | 'session'
  * WHAT IS DELIBERATELY NOT HERE, because it already persists and this ticket does not rebuild it:
  * `eq.gear.columns` / `eq.gear.controls` (JOS-297, useGearPrefs.ts), `eq.gear.tab` (JOS-324,
  * appViews.ts), `eq.planner.era` / `eq.planner.nonequip` / `eq.planner.groupBy.<socket>`
- * (plannerData.ts), `eq.planner.classes` / `eq.planner.classesFrom` (useBrowseClasses.ts) and
- * `eq.character.carryLane` (CarryAll.tsx). All nine are already on the restart tier and already
- * validated on load; re-homing them here would be churn that changes nothing a user can see.
+ * (plannerData.ts) and `eq.character.carryLane` (CarryAll.tsx). All of them are already on the
+ * restart tier and already validated on load; re-homing them here would be churn that changes
+ * nothing a user can see. (`eq.planner.classes` / `eq.planner.classesFrom` were on that list until
+ * 2026-11-27; the Exaltations class filter now lives under `eq.planner.classPins` below, and the two
+ * old keys are only read once, by `legacyBrowseClassPins`.)
  */
 export const AREA_FORM_TIER = {
   // ---- the Gear tab ----
@@ -115,6 +117,13 @@ export const AREA_FORM_TIER = {
   'eq.planner.item': 'session',
   'eq.planner.open': 'session',
   'eq.planner.search': 'session',
+  /**
+   * The Exaltations browser's (and the Wish list's) PINNED class trio per character, or absent
+   * while it follows detection - `useFollowingClasses`' shape, since 2026-11-27. Replaces the one
+   * machine-wide `eq.planner.classes` / `eq.planner.classesFrom` pair, which reads once as the
+   * `'*'` fallback (`legacyBrowseClassPins`) until this key is first written.
+   */
+  'eq.planner.classPins': 'restart',
   // ---- the Recommended tab (view id `plan`) ----
   // BOTH ARE PICKS, so both are restart-scoped by THE RULE above — "what you CHOSE is
   // restart-scoped". Neither is typed, neither is a narrowing you poke out of a list: the role is a
@@ -136,7 +145,7 @@ export const AREA_FORM_TIER = {
    * The Spellbook's PINNED class trio, or absent while the filter is still following detection.
    *
    * ITS OWN KEY, not the Gear tab's, and that is the same ruling `useGearClasses` already makes
-   * about `eq.planner.classes`: two surfaces, two questions. "Who am I reading the gear table for"
+   * about `eq.planner.classPins`: two surfaces, two questions. "Who am I reading the gear table for"
    * and "whose spells am I looking at" are different, and one key would make a click on either tab
    * silently re-filter the other. The SHAPE is shared (`useFollowingClasses`) - the state is not.
    */
@@ -303,8 +312,9 @@ export function sanitizeGearSort(raw: unknown): GearSort {
  *
  * So: `null` here means FOLLOWING (the key is removed rather than written), and `{ classes: [...] }`
  * means PINNED to that list — including `{ classes: [] }`. The closed allowlist and the
- * `MAX_COMBO_SLOTS` cap are `useBrowseClasses`' own, applied here for the same reason it applies
- * them: `localStorage` is a file the user can edit and this build is the only thing checking it.
+ * `MAX_COMBO_SLOTS` cap are the ones a stored exaltation plan gets (`src/main/planner/validate.ts`),
+ * applied here because `localStorage` is a file the user can edit and this build is the only thing
+ * checking it.
  */
 // It sanitises ONE trio. `sanitizeGearClassPins` is what the two stored keys actually go through
 // (the Gear tab's and, since 2026-09-10, the Spellbook's), and it calls this per character.
@@ -336,6 +346,40 @@ export function sanitizeGearClassPins(raw: unknown): GearClassPins | null {
     if (Array.isArray(list)) out[who] = sanitizeList<ClassAbbr>(list, CLASS_ABBRS, MAX_COMBO_SLOTS)
   }
   return Object.keys(out).length > 0 ? out : null
+}
+
+/**
+ * THE EXALTATIONS BROWSER'S OLD MACHINE-WIDE PIN, READ ONCE AS THE `'*'` FALLBACK (2026-11-27).
+ *
+ * Until then the browse (and the Wish list beside it) kept ONE trio for the whole machine: a comma
+ * string under `eq.planner.classes` and its provenance (`user` or `detected`) under
+ * `eq.planner.classesFrom`. Both now run `useFollowingClasses` under `eq.planner.classPins`, the
+ * per-character map the 2026-09-04 ask gave the Gear tab. So nobody's standing pin resets on the
+ * upgrade, a PINNED old trio (including a pinned-empty one, "every class") becomes the every-
+ * character `'*'` fallback; each character keeps it until it picks its own. A FOLLOWING old trio
+ * was only the last detection written down, so it reads as no pin at all and detection runs live.
+ *
+ * Pure: the caller reads the two raw strings (gearData `useFollowingClasses`), and only while the
+ * new key is still absent.
+ */
+export function legacyBrowseClassPins(classes: string | null, from: string | null): GearClassPins | null {
+  if (from !== 'user') return null
+  const list = (classes ?? '').split(',').map((t) => t.trim()).filter((t) => t !== '')
+  return { '*': sanitizeList<ClassAbbr>(list, CLASS_ABBRS, MAX_COMBO_SLOTS) }
+}
+
+/**
+ * What `useFollowingClasses` reads its pins through: the stored map, or, for the Exaltations key
+ * only and only while that key is ABSENT (`raw` null), the old machine-wide pin. Once the new key
+ * has been written the old pair is never consulted again, so a later re-pick always wins.
+ */
+export function readClassPins(
+  key: AreaFormKey,
+  raw: unknown,
+  readLegacy: () => GearClassPins | null
+): GearClassPins | null {
+  if (raw === null && key === 'eq.planner.classPins') return readLegacy()
+  return sanitizeGearClassPins(raw)
 }
 
 /**

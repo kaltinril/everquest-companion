@@ -173,6 +173,42 @@ test('the time toggle is a real reorder, and ties fall back to span', () => {
   assert.deepEqual(ties.map((r) => r.zone), ['B', 'A'], 'equal rates: the longer stay leads')
 })
 
+test('a second header click reverses a column; an unknown rate stays last either way', () => {
+  const zones = [
+    zone({ zone: 'Befallen', levelsPerHourActive: 1.2, spanMs: 20 * MIN }),
+    zone({ zone: 'Najena', levelsPerHourActive: null, spanMs: 5 * HOUR }),
+    zone({ zone: "Nagafen's Lair", levelsPerHourActive: 3.4, spanMs: HOUR })
+  ]
+  assert.deepEqual(zoneStatRows(zones, { key: 'levels', dir: 'desc' }).map((r) => r.zone), ["Nagafen's Lair", 'Befallen', 'Najena'])
+  assert.deepEqual(zoneStatRows(zones, { key: 'levels', dir: 'asc' }).map((r) => r.zone), ['Befallen', "Nagafen's Lair", 'Najena'])
+  assert.deepEqual(zoneStatRows(zones, { key: 'time', dir: 'asc' }).map((r) => r.zone), ['Befallen', "Nagafen's Lair", 'Najena'])
+  assert.deepEqual(zoneStatRows(zones, { key: 'zone', dir: 'desc' }).map((r) => r.zone), ['Najena', "Nagafen's Lair", 'Befallen'])
+})
+
+test('a reversed Levels or Peak pp/hr column keeps its em-dash rows last too', () => {
+  const zones = [
+    zone({ zone: 'Unstated', levelEquiv: 0, expSamples: 3, expUnstated: 3 }),
+    zone({ zone: 'Low', levelEquiv: 0.5, expSamples: 2, expUnstated: 0 }),
+    zone({ zone: 'High', levelEquiv: 2, expSamples: 2, expUnstated: 0 })
+  ]
+  for (const dir of ['desc', 'asc'] as const) {
+    const rows = zoneStatRows(zones, { key: 'levelsTotal', dir })
+    assert.equal(rows.at(-1)?.zone, 'Unstated', `levels total ${dir}: the dash row is last`)
+    assert.equal(rows.at(-1)?.levels, NONE)
+  }
+  const peak = (coin: number) => ({ levels: 0, aa: 0, coin, motes: 0, kills: 0 })
+  const extras = new Map([
+    ['unstated', { zone: 'Unstated', aaPoints: 0, motes: 0, peak: peak(0) }],
+    ['low', { zone: 'Low', aaPoints: 0, motes: 0, peak: peak(5_000) }],
+    ['high', { zone: 'High', aaPoints: 0, motes: 0, peak: peak(9_000) }]
+  ])
+  for (const dir of ['desc', 'asc'] as const) {
+    const rows = zoneStatRows(zones, { key: 'coinPeak', dir }, 'elapsed', extras)
+    assert.equal(rows.at(-1)?.zone, 'Unstated', `peak pp/hr ${dir}: the dash row is last`)
+    assert.equal(rows.at(-1)?.coinPeak, NONE)
+  }
+})
+
 test('sorting never mutates the caller’s array', () => {
   const zones = [zone({ zone: 'Befallen', levelsPerHourActive: 1 }), zone({ zone: 'Najena', levelsPerHourActive: 9 })]
   zoneStatRows(zones, 'levels')

@@ -23,6 +23,7 @@ import type { LootEvent } from './types'
 import { isMote } from './xpOverlay'
 import { zoneIdKey } from './zoneScope'
 import { zoneShortName } from './zones'
+import type { ColumnSort, SortDir } from './tableSort'
 
 /** How far either side of the chosen level a stretch may be and still count. */
 export const LEVEL_SPREAD = 3
@@ -435,6 +436,16 @@ export type HistorySort = HistoryGoal | 'zone' | 'time' | 'deaths'
 
 const isGoal = (s: HistorySort): s is HistoryGoal => s !== 'zone' && s !== 'time' && s !== 'deaths'
 
+/** Every column the table sorts by, for the remembered sort's sanitizer. */
+export const HISTORY_SORT_KEYS: readonly HistorySort[] = ['levels', 'aa', 'coin', 'motes', 'kills', 'zone', 'time', 'deaths']
+
+/** A column's first click: the zone name A→Z, every number most-first. */
+export function historySortNatural(sort: HistorySort): SortDir {
+  return sort === 'zone' ? 'asc' : 'desc'
+}
+
+export const DEFAULT_HISTORY_SORT: ColumnSort<HistorySort> = { key: 'levels', dir: 'desc' }
+
 function plainOrder(sort: Exclude<HistorySort, HistoryGoal>): (a: ZoneHistoryRow, b: ZoneHistoryRow) => number {
   if (sort === 'zone') return (a, b) => a.zone.localeCompare(b.zone)
   if (sort === 'time') return (a, b) => b.activeMs - a.activeMs
@@ -444,18 +455,31 @@ function plainOrder(sort: Exclude<HistorySort, HistoryGoal>): (a: ZoneHistoryRow
 /**
  * The zones in order, a search narrowing by name. By a goal: the ranked ones (enough time) by the
  * goal's rate, then the rest by time spent. By a plain column: that column alone.
+ *
+ * `by` is a column (read on its natural end) or a column and direction: a direction against the
+ * column's natural one is the second click on its header and reverses the order (the shared header
+ * rule, `shared/tableSort.ts`, 2026-11-27). Under a goal the dimmed under-time zones, and a zone
+ * whose rate is unknown, stay last either way.
  */
 export function rankHistory(
   rows: readonly ZoneHistoryRow[],
-  sort: HistorySort,
+  by: HistorySort | ColumnSort<HistorySort>,
   search = '',
   best = false
 ): ZoneHistoryRow[] {
+  const sort = typeof by === 'string' ? by : by.key
+  const s = typeof by !== 'string' && by.dir !== historySortNatural(sort) ? -1 : 1
   const words = search.trim().toLowerCase().split(/\s+/).filter(Boolean)
   const kept = rows.filter((r) => words.every((w) => r.zone.toLowerCase().includes(w)))
-  if (!isGoal(sort)) return kept.sort(plainOrder(sort))
+  if (!isGoal(sort)) {
+    const order = plainOrder(sort)
+    return kept.sort((a, b) => s * order(a, b))
+  }
   const rate = (r: ZoneHistoryRow): number => (r.enough ? (goalRate(r, sort, best) ?? -1) : -1)
   return kept.sort(
-    (a, b) => Number(b.enough) - Number(a.enough) || rate(b) - rate(a) || b.activeMs - a.activeMs
+    (a, b) =>
+      Number(b.enough) - Number(a.enough) ||
+      Number(rate(a) < 0) - Number(rate(b) < 0) ||
+      s * (rate(b) - rate(a) || b.activeMs - a.activeMs)
   )
 }

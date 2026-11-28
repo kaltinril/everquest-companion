@@ -1,10 +1,11 @@
 import { type JSX, memo } from 'react'
-import { Box, Chip, Stack, TableCell, TableRow, Typography } from '@mui/material'
+import { Box, Stack, TableCell, TableRow, Typography } from '@mui/material'
+import { TagChip } from '../../lib/TagChip'
 import type { ItemKnowledge, LootDisposition, LootEvent } from '@shared/types'
 // The SERVED row's cells (JOS-484). A `Cell` is `string | number | boolean | null` and that is all
 // this file is allowed to know about one — see `EngineFlatRow` below.
 import type { Cells } from '@shared/dataServer/protocol.generated'
-import { formatDateTime } from '../../lib/formatDate'
+import { formatShortStamp } from '../../lib/formatDate'
 import { KnownItemTooltip } from '../../lib/KnownItemTooltip'
 import { ItemIcon } from '../../lib/ItemIcon'
 import type { InventoryRow } from '../inventory/reconcile'
@@ -36,10 +37,6 @@ const FIXED_ROW = {
   }
 } as const
 
-function fmtTime(ts: number): string {
-  return formatDateTime(ts, { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' })
-}
-
 // A subtle disposition chip (Tasks #40/#47): where a looted-and-routed item went.
 // Dense, low-emphasis — no chip for ordinary kept loot. Kept storage (currency/hoard/
 // depot) reads info-blue; 'sold' (gone) is dimmed; 'combined' (merged into an upgrade)
@@ -48,17 +45,16 @@ function fmtTime(ts: number): string {
 // the only one the held counts subtract for.
 function DispositionChip({ disposition }: { disposition?: LootDisposition }): JSX.Element | null {
   if (!disposition) return null
-  const sx = { height: 18, fontSize: 11 } as const
   if (disposition === 'sold') {
-    return <Chip size="small" variant="outlined" color="default" label="sold" sx={{ ...sx, opacity: 0.7 }} />
+    return <TagChip variant="outlined" color="default" label="sold" sx={{ opacity: 0.7 }} />
   }
   if (disposition === 'destroyed') {
-    return <Chip size="small" variant="outlined" color="warning" label="destroyed" sx={sx} />
+    return <TagChip variant="outlined" color="warning" label="destroyed" />
   }
   if (disposition === 'combined') {
-    return <Chip size="small" variant="outlined" color="success" label="combined" sx={sx} />
+    return <TagChip variant="outlined" color="success" label="combined" />
   }
-  return <Chip size="small" variant="outlined" color="info" label={disposition} sx={sx} />
+  return <TagChip variant="outlined" color="info" label={disposition} />
 }
 
 /**
@@ -86,11 +82,10 @@ function DispositionChip({ disposition }: { disposition?: LootDisposition }): JS
 const InventoryEstimate = memo(function InventoryEstimate({ n }: { n: number }): JSX.Element {
   if (n <= 0) return <Box component="span" sx={{ color: 'text.disabled' }}>-</Box>
   return (
-    <Chip
-      size="small"
+    <TagChip
       variant="outlined"
       label={`~${n}`}
-      sx={{ height: 18, fontSize: 11, color: 'text.secondary' }}
+      sx={{ color: 'text.secondary' }}
     />
   )
 })
@@ -146,7 +141,7 @@ export const GroupedRow = memo(function GroupedRow({
               {g.item}
             </Box>
           </KnownItemTooltip>
-          {posky && <Chip size="small" color="primary" variant="outlined" label="PoSky" />}
+          {posky && <TagChip color="primary" variant="outlined" label="PoSky" />}
           <KnowledgeBadge name={g.item} isPosky={posky} />
           <DispositionChip disposition={g.disposition} />
         </Stack>
@@ -161,7 +156,7 @@ export const GroupedRow = memo(function GroupedRow({
       <TableCell align="right" sx={{ color: 'text.secondary' }}>
         {g.zoneCount || '-'}
       </TableCell>
-      <TableCell sx={{ color: 'text.secondary' }}>{g.invOnly ? '-' : fmtTime(g.last)}</TableCell>
+      <TableCell sx={{ color: 'text.secondary' }}>{g.invOnly ? '-' : formatShortStamp(g.last)}</TableCell>
     </TableRow>
   )
 })
@@ -170,7 +165,7 @@ export const GroupedRow = memo(function GroupedRow({
 // THE SAME ROW, SERVED (JOS-484) — `loot.ledger`'s cells, drawn VERBATIM.
 // ============================================================================
 //
-// `FlatRow` above draws a `LootEvent`: it formats the instant (`fmtTime`), reads `source`, reads
+// `FlatRow` above draws a `LootEvent`: it formats the instant (`formatShortStamp`), reads `source`, reads
 // `zone`. `EngineFlatRow` draws a `{key, cells}` row the engine already made render-ready, and the
 // difference between the two is the whole point of owner ruling 4 — every derivation `FlatRow` does
 // happened engine-side before this row was sent, and this component may not redo any of it.
@@ -261,7 +256,7 @@ export const EngineFlatRow = memo(function EngineFlatRow({
     >
       {/* ALREADY A STRING when it arrives — `at` is served as the prose the ledger draws, and the
           instant it was drawn from is a query FIELD with no cell. This is the cell ruling 4 is
-          easiest to see in: there is no `fmtTime` here and there cannot be one. */}
+          easiest to see in: there is no `formatShortStamp` here and there cannot be one. */}
       <TableCell sx={{ color: 'text.secondary' }}>{text(cells, 'at') ?? ''}</TableCell>
       <TableCell>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
@@ -271,7 +266,7 @@ export const EngineFlatRow = memo(function EngineFlatRow({
               {count !== null && count > 1 ? `${String(count)} × ${item}` : item}
             </Box>
           </KnownItemTooltip>
-          {posky && <Chip size="small" color="primary" variant="outlined" label="PoSky" />}
+          {posky && <TagChip color="primary" variant="outlined" label="PoSky" />}
           <KnowledgeBadge name={item} isPosky={posky} />
           <DispositionChip disposition={asDisposition(disposition)} />
           {disposition === 'combined' && created !== null && (
@@ -306,7 +301,7 @@ export const FlatRow = memo(function FlatRow({
       sx={{ ...FIXED_ROW, cursor: 'pointer' }}
       onClick={() => onSelect(e.item)}
     >
-      <TableCell sx={{ color: 'text.secondary' }}>{fmtTime(e.ts)}</TableCell>
+      <TableCell sx={{ color: 'text.secondary' }}>{formatShortStamp(e.ts)}</TableCell>
       <TableCell>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           {/* The click-through card, same reason as GroupedRow above. */}
@@ -316,7 +311,7 @@ export const FlatRow = memo(function FlatRow({
               {e.count && e.count > 1 ? `${e.count} × ${e.item}` : e.item}
             </Box>
           </KnownItemTooltip>
-          {posky && <Chip size="small" color="primary" variant="outlined" label="PoSky" />}
+          {posky && <TagChip color="primary" variant="outlined" label="PoSky" />}
           <KnowledgeBadge name={e.item} isPosky={posky} />
           <DispositionChip disposition={e.disposition} />
           {e.disposition === 'combined' && e.created && (

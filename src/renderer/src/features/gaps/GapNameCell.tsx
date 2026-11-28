@@ -9,7 +9,8 @@
 // reasons clip. The whole name is on the name's hover and in the details pane.
 
 import { type JSX } from 'react'
-import { Box, Chip, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
+import { TagChip } from '../../lib/TagChip'
 import { charactersOff, factionOf, onMobPage, type GapActionContext, type GapRow, type GapSuggest, type GapVerdict } from '@shared/gaps'
 import { otherPageTitle } from '@shared/gapImages'
 import { heldChipLabel, heldTitle, type GapHeld } from '@shared/gapHeld'
@@ -68,7 +69,7 @@ function HeldChip({ held }: { held: readonly GapHeld[] }): JSX.Element {
   // No +0 copy held: the Update tag's colour, and the tier in the label (owner, 2026-10-25).
   return (
     <Tooltip title={heldTitle(held)}>
-      <Chip label={heldChipLabel(held)} size="small" color={heldPlain(held) ? 'success' : JOB_COLOR.update} variant="outlined" sx={{ ml: 1 }} data-testid="gaps-held" />
+      <TagChip size="clickable" label={heldChipLabel(held)} color={heldPlain(held) ? 'success' : JOB_COLOR.update} variant="outlined" sx={{ ml: 1 }} data-testid="gaps-held" />
     </Tooltip>
   )
 }
@@ -80,7 +81,7 @@ function HeldChip({ held }: { held: readonly GapHeld[] }): JSX.Element {
 function JobChip({ job, why = [] }: { job: GapJob; why?: readonly string[] }): JSX.Element {
   return (
     <Tooltip title={why.length > 0 ? why.join(' ') : GAP_JOB_TIP[job]}>
-      <Chip label={GAP_JOB_LABEL[job]} size="small" color={JOB_COLOR[job]} variant="outlined" sx={{ mr: 1, height: 20 }} data-testid={`gaps-job-${job}`} />
+      <TagChip size="clickable" label={GAP_JOB_LABEL[job]} color={JOB_COLOR[job]} variant="outlined" sx={{ mr: 1, height: 20 }} data-testid={`gaps-job-${job}`} />
     </Tooltip>
   )
 }
@@ -90,7 +91,7 @@ function ReadyChip({ need }: { need: string }): JSX.Element | null {
   if (need !== '') return null
   return (
     <Tooltip title="Nothing left to capture in game: copy the page and post it.">
-      <Chip label="Ready" size="small" color="success" sx={{ mr: 1, height: 20 }} data-testid="gaps-ready" />
+      <TagChip size="clickable" label="Ready" color="success" sx={{ mr: 1, height: 20 }} data-testid="gaps-ready" />
     </Tooltip>
   )
 }
@@ -154,7 +155,7 @@ export function GapNameCell({ row, verdict, need, chipContext, held, depth }: Ga
         <EditedChip row={row} />
         {row.suggest !== undefined && <SuggestCaption s={row.suggest} />}
         <PageTitleCaption row={row} />
-        {row.maybePlayer === true && <Chip label="may be a player" size="small" color="warning" variant="outlined" sx={{ ml: 1 }} data-testid="gaps-maybe-player" />}
+        {row.maybePlayer === true && <TagChip size="clickable" label="may be a player" color="warning" variant="outlined" sx={{ ml: 1 }} data-testid="gaps-maybe-player" />}
         {held !== undefined && held.length > 0 && <HeldChip held={held} />}
       </Box>
     </Box>

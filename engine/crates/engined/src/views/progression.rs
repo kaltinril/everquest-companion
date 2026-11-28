@@ -149,7 +149,7 @@ mod tests {
         assert_eq!(window[0].cells["label"], Cell::text("+2 AA"));
         assert_eq!(window[1].cells["label"], Cell::text("Level 52"));
         // The instant is drawn, and the comparable one is the field underneath it.
-        assert_eq!(window[1].cells["at"], Cell::text("Aug 19, 04:21 PM"));
+        assert_eq!(window[1].cells["at"], Cell::text("Aug 19, 16:21"));
     }
 
     #[test]

@@ -31,7 +31,7 @@
 // Zone swatches come from `zoneBands.zoneColor`, the same function the chart strip uses, so a
 // row and its band are always the same hue.
 
-import { type JSX, useState } from 'react'
+import { type JSX } from 'react'
 import {
   Box,
   Chip,
@@ -85,11 +85,21 @@ import {
   unstatedCaption,
   witnessedText,
   zoneStatRows,
+  zoneSortNatural,
+  DEFAULT_ZONE_SORT,
+  ZONE_SORT_KEYS,
   type HeroStat,
   type ZoneSort,
   type ZoneStatRow
 } from './rangeStatsRows'
 import { Tooltip } from '../../lib/Tooltip'
+import { StatTile } from '../../lib/StatTile'
+import { useSortPref } from '../../lib/useTableSort'
+import { nextSort, sanitizeColumnSort, TABLE_SORT_KEYS, type ColumnSort } from '@shared/tableSort'
+
+function sanitizeZoneSort(raw: unknown): ColumnSort<ZoneSort> {
+  return sanitizeColumnSort(raw, ZONE_SORT_KEYS, DEFAULT_ZONE_SORT)
+}
 
 export interface RangeStatsPanelProps {
   stats: RangeStats
@@ -121,37 +131,6 @@ const ICON: Record<HeroStat['id'], JSX.Element> = {
   kills: <WhatshotIcon />,
   levels: <TrendingUpIcon />,
   range: <MilitaryTechIcon />
-}
-
-/**
- * The `HeroCard` idiom from LevelingView, at panel density (h5 rather than h4, tighter
- * padding): a colored left rule, the icon in the same hue, value / label / caption. It is a
- * local copy because `HeroCard` is private to LevelingView.tsx — see the report note; the
- * right fix is to lift that component into its own file and have both views import it.
- */
-function StatCard({ stat }: { stat: HeroStat }): JSX.Element {
-  const accent = ACCENT[stat.id]
-  return (
-    <Paper
-      variant="outlined"
-      sx={{ p: 1.25, flex: 1, minWidth: 150, borderLeft: `3px solid ${accent}`, display: 'flex', gap: 1 }}
-      data-testid="leveling-range-hero"
-      // A NATIVE title, never a popper (JOS-143), and only on the card that has one: the rate
-      // card's denominator is active time and JOS-249 says so on hover.
-      title={stat.title}
-    >
-      <Box sx={{ color: accent, display: 'flex', alignItems: 'center' }}>{ICON[stat.id]}</Box>
-      <Box sx={{ minWidth: 0 }}>
-        <Typography variant="h5" sx={{ lineHeight: 1.1, color: accent }} noWrap>
-          {stat.value}
-        </Typography>
-        <Typography variant="body2">{stat.label}</Typography>
-        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-          {stat.sub}
-        </Typography>
-      </Box>
-    </Paper>
-  )
 }
 
 const CHIP_SX = { height: 20 } as const
@@ -289,8 +268,9 @@ function ZoneRow({ row }: { row: ZoneStatRow }): JSX.Element {
 const HEAD_SX = { ...CELL_SX, fontWeight: 700, whiteSpace: 'nowrap' } as const
 
 /**
- * Per-zone rows, sorted by levels/hr (the farming-efficiency question) with a secondary
- * toggle onto time.
+ * Per-zone rows, sorted by levels/hr (the farming-efficiency question) until a header is clicked:
+ * every column sorts, a second click reverses it, and the choice is remembered across restarts
+ * (`@shared/tableSort`, 2026-11-27).
  *
  * VERTICALLY IT IS AS TALL AS THE ZONES (JOS-289). It used to live in a `maxHeight: 240` box with
  * `overflow: auto` so it could not squeeze the charts above it; with the page scrolling there is
@@ -300,12 +280,19 @@ const HEAD_SX = { ...CELL_SX, fontWeight: 700, whiteSpace: 'nowrap' } as const
  * OWN container — never by pushing the page sideways. Hence `overflowX` alone, never `overflow`.
  */
 function ZoneTable({ stats, basis }: { stats: RangeStats; basis: RateBasis }): JSX.Element | null {
-  const [sort, setSort] = useState<ZoneSort>('levels')
+  // The shared header rule (a second click reverses) and the shared remembered store.
+  const [sort, setSort] = useSortPref<ColumnSort<ZoneSort>>(TABLE_SORT_KEYS.levelingZones, sanitizeZoneSort)
   const extras = useZoneExtras(stats)
   const rows = zoneStatRows(stats.zones, sort, basis, extras)
   if (rows.length === 0) return null
   const head = (key: ZoneSort, label: string): JSX.Element => (
-    <TableSortLabel active={sort === key} direction={key === 'zone' ? 'asc' : 'desc'} onClick={() => { setSort(key) }}>
+    <TableSortLabel
+      active={sort.key === key}
+      direction={sort.key === key ? sort.dir : zoneSortNatural(key)}
+      onClick={() => {
+        setSort(nextSort(sort, key, zoneSortNatural))
+      }}
+    >
       {label}
     </TableSortLabel>
   )
@@ -444,7 +431,19 @@ export function RangeStatsPanel({ stats, scope, zoneCaption, onClear }: RangeSta
       <HeaderRow stats={stats} scope={scope} zoneCaption={zoneCaption} onClear={onClear} />
       <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }} useFlexGap>
         {rangeHeroes(stats, basis).map((s) => (
-          <StatCard key={s.id} stat={s} />
+          <StatTile
+            key={s.id}
+            value={s.value}
+            label={s.label}
+            sub={s.sub}
+            icon={ICON[s.id]}
+            accent={ACCENT[s.id]}
+            testId="leveling-range-hero"
+            // A NATIVE title, never a popper (JOS-143), and only on the card that has one: the
+            // rate card's denominator is active time and JOS-249 says so on hover.
+            hover={s.title}
+            hoverMode="native"
+          />
         ))}
       </Stack>
       <ChipRow stats={stats} basis={basis} />

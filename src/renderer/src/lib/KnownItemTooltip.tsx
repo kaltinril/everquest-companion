@@ -43,6 +43,8 @@
 //      decision, and this one is the whole defect.
 //   3. it CLOSES ON POINTERDOWN, anywhere, in the capture phase — so the card is gone before the
 //      control the user just aimed at opens its own list, rather than floating over the options.
+// All three are written once in lib/clickThroughHover.ts (since the 2026-11-27 audit), shared with
+// the gear compare pair, which needs the same mode for the same reason.
 // The mode is opt-in per call site because the interactive outer card is a real feature elsewhere
 // (it is how you hover a quest REWARD name inside the card); what makes it structural is that a
 // surface under a toolbar mounts the card through one wrapper that always passes it, and
@@ -52,7 +54,7 @@
 // `window.eq`. The overlay bundle has no such bridge (and stays MUI-free) — the overlay gets
 // the tradeskill FILTER, not this card.
 
-import { type JSX, type ReactNode, useCallback, useEffect, useState, type ReactElement } from 'react'
+import { type JSX, type ReactNode, useEffect, useState, type ReactElement } from 'react'
 import { Box, CircularProgress, Stack, Typography } from '@mui/material'
 import type { ItemKnowledge, ItemRecipeUse } from '@shared/types'
 import { tradeskillOf } from '@shared/tradeskills'
@@ -62,7 +64,8 @@ import { EQ_ITEM_COLORS } from './ItemWindow'
 import { ObservedItemWindow } from './ObservedItemWindow'
 import { questUseOutcomes, questUseWhere } from './itemKnowledgeView'
 import { nameUpgrade } from '../features/loot/itemUpgradeSim'
-import { Tooltip, type TooltipProps } from './Tooltip'
+import { Tooltip } from './Tooltip'
+import { CLICK_THROUGH_POPPER, useCloseOnPointerDown } from './clickThroughHover'
 import { useTradeskillLink } from './tradeskillLink'
 
 /** How many quest uses / recipes the card lists before collapsing to "+N more". */
@@ -377,19 +380,9 @@ function KnownItemCard({
   )
 }
 
-/**
- * The popper modifiers that make a click-through card unable to reach the toolbar above it
- * (header, point 1). `flip` is DISABLED: it is what would move a bottom-placed card to the top when
- * it runs out of room. For a `bottom` placement `preventOverflow`'s `mainAxis` is the HORIZONTAL one
- * and `altAxis` the vertical (`getMainAxisFromPlacement` gives 'x'), so the pair below slides the
- * card sideways to stay on screen and never moves it vertically: the measured pair
- * `features/gear/GearCompareCard.tsx` uses (JOS-344; tests/clickThroughCardAxes.test.mts pins both).
- * The card's top edge is always its anchor's bottom edge, and the anchor is always below the toolbar.
- */
-const NEVER_UPWARD = [
-  { name: 'flip', enabled: false },
-  { name: 'preventOverflow', options: { mainAxis: true, altAxis: false, padding: 8 } }
-]
+// The click-through mode's popper (opens below, slides sideways only, no pointer events) and its
+// close-on-pointerdown state are lib/clickThroughHover.ts (audit 2026-11-27, dup-ui-b-3): one copy,
+// shared with the gear compare pair (features/gear/GearCompareCard.tsx). This card owns only its chrome.
 
 /**
  * THE CARD'S CHROME IS A CONSTANT, SO IT IS DECLARED ONCE (JOS-206).
@@ -401,14 +394,7 @@ const NEVER_UPWARD = [
  * values it had never seen before, worth roughly 8 ms per character. Nothing here depends on props,
  * so hoisting is behaviour-preserving by inspection and pays off on every surface that draws this
  * card, not only the one that reported the stall.
- *
- * The click-through popper's two guarantees still read together (header, points 1 and 2): it cannot
- * be moved above its anchor, and it cannot be hit. `disableInteractive` already leaves MUI's popper
- * at `pointer-events: none`; this repeats it because that is a library default and this is the
- * defect the whole mode exists for.
  */
-const CLICK_THROUGH_POPPER = { modifiers: NEVER_UPWARD, sx: { pointerEvents: 'none' } } as const
-
 const CARD_SURFACE = {
   sx: {
     bgcolor: EQ_ITEM_COLORS.bg,
@@ -454,33 +440,6 @@ export interface KnownItemTooltipProps {
   children: ReactElement
 }
 
-/**
- * The click-through card's open state, which it has to hold itself for one reason: it CLOSES ON
- * POINTERDOWN, anywhere. Capture phase, so nothing downstream can swallow the event first, and
- * `pointerdown` rather than `click` so the card is gone before the control the user just aimed at
- * opens its own option list over the same band.
- *
- * Returns nothing at all when inactive — an ordinary card stays UNCONTROLLED, which is MUI's own
- * hover/focus/touch behaviour and not something worth reimplementing to share one code path.
- */
-function useClickThroughControl(active: boolean): Partial<Pick<TooltipProps, 'open' | 'onOpen' | 'onClose'>> {
-  const [open, setOpen] = useState(false)
-  const close = useCallback(() => {
-    setOpen(false)
-  }, [])
-  const show = useCallback(() => {
-    setOpen(true)
-  }, [])
-  useEffect(() => {
-    if (!active || !open) return
-    window.addEventListener('pointerdown', close, true)
-    return () => {
-      window.removeEventListener('pointerdown', close, true)
-    }
-  }, [active, open, close])
-  return active ? { open, onOpen: show, onClose: close } : {}
-}
-
 /** Hover an item name → its EQ-style window plus what it's for. See the header for nesting. */
 export function KnownItemTooltip({
   name,
@@ -492,7 +451,7 @@ export function KnownItemTooltip({
   children
 }: KnownItemTooltipProps): JSX.Element {
   const nested = depth > 0
-  const controlled = useClickThroughControl(clickThrough)
+  const controlled = useCloseOnPointerDown(clickThrough)
   return (
     <Tooltip
       {...controlled}

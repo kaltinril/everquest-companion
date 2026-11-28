@@ -41,7 +41,7 @@
 // page failed to mention.
 
 import { type JSX, useEffect, useState } from 'react'
-import { Box, Chip, Divider, Paper, Stack, Typography } from '@mui/material'
+import { Box, Chip, Divider, Stack, Typography } from '@mui/material'
 import type { KillMap, MobEntry, MobKnowledge, MobQuestUse } from '@shared/types'
 import type { ZoneShort } from '@shared/maps'
 import { killsFor } from '@shared/kills'
@@ -50,6 +50,7 @@ import { questWikiUrl, wikiPageUrl } from '@shared/wiki'
 import { formatDate, formatDateTime } from '../../lib/formatDate'
 import { tierStyle } from '../../lib/tierChip'
 import { CellLink } from '../../lib/CellLink'
+import { StatTile } from '../../lib/StatTile'
 import { dropZoneTarget } from '../gear/dropLinks'
 import { useMetVersion } from '../../lib/useMetInLog'
 import { outOfEraLabel } from './dropEra'
@@ -134,35 +135,6 @@ function pinIdentity(fetched: MobKnowledge, pinned: MobKnowledge): MobKnowledge 
     data.dropsWiki = fetched.dropsWiki
   }
   return data
-}
-
-function StatCard({
-  label,
-  value,
-  hint,
-  testId
-}: {
-  label: string
-  value: string
-  hint?: string
-  /** The two cards a spec reads: Kills (the number JOS-350 was about) and Known drops (JOS-377). */
-  testId?: string
-}): JSX.Element {
-  return (
-    <Paper variant="outlined" data-testid={testId} sx={{ p: 1.5, flex: 1, minWidth: 110 }}>
-      <Typography variant="h5" sx={{ color: 'primary.main', lineHeight: 1.1 }}>
-        {value}
-      </Typography>
-      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-        {label}
-      </Typography>
-      {hint && (
-        <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block' }}>
-          {hint}
-        </Typography>
-      )}
-    </Paper>
-  )
 }
 
 /** The con-coloured headline plus everything the log line already said about identity. */
@@ -250,20 +222,26 @@ function MobStats({
 }): JSX.Element {
   return (
     <Stack direction="row" spacing={1.5} useFlexGap sx={{ flexWrap: 'wrap', mb: 2, mt: con ? 0 : 1.5 }}>
-      <StatCard
+      {/* The two tiles a spec reads carry a test id: Kills (the number JOS-350 was about) and
+          Known drops (JOS-377). This page's tiles are 110 px wide at the least, Loot's 120. */}
+      <StatTile
+        size="plain"
+        minWidth={110}
         label="Known drops"
         testId="mob-stat-drops"
         value={String(wikiCount)}
-        hint={dropCountHint(outCount, page)}
+        sub={dropCountHint(outCount, page)}
       />
-      <StatCard label="Looted by you" value={String(seenCount)} hint="distinct items" />
-      <StatCard
+      <StatTile size="plain" minWidth={110} label="Looted by you" value={String(seenCount)} sub="distinct items" />
+      <StatTile
+        size="plain"
+        minWidth={110}
         label="Kills"
         testId="mob-stat-kills"
         value={String(kill?.count ?? 0)}
-        hint={kill?.lastTs ? `last ${formatDate(kill.lastTs)}` : undefined}
+        sub={kill?.lastTs ? `last ${formatDate(kill.lastTs)}` : undefined}
       />
-      {con?.cons != null && <StatCard label="Considered" value={`${con.cons}×`} />}
+      {con?.cons != null && <StatTile size="plain" minWidth={110} label="Considered" value={`${con.cons}×`} />}
     </Stack>
   )
 }

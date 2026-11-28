@@ -120,22 +120,35 @@ function cachedFormat(kind: FormatKind, d: Date, opts: Intl.DateTimeFormatOption
   return f.format(d)
 }
 
+/** How a coarse age is spelled. The RUNGS are the same for all three; only the words differ.
+ *  - short (default): "just now" / "12m ago" / "3h ago" / "2d ago"
+ *  - terse (overlay meter rows, no room): "now" / "12m" / "3h" / "2d"
+ *  - long (a sentence): "just now" / "12 minutes ago" / "3 hours ago" / "2 days ago" */
+export type AgeStyle = 'short' | 'terse' | 'long'
+
+const ageUnit = (n: number, unit: 'minute' | 'hour' | 'day', style: AgeStyle): string => {
+  if (style === 'long') return `${n.toLocaleString('en-US')} ${unit}${n === 1 ? '' : 's'} ago`
+  const u = unit === 'minute' ? 'm' : unit === 'hour' ? 'h' : 'd'
+  return style === 'terse' ? `${n}${u}` : `${n}${u} ago`
+}
+
 /**
- * Coarse, human relative age: "just now" / "12m ago" / "3h ago" / "2d ago".
- * `ts` 0/undefined ⇒ '' (unknown). Deliberately COARSE — this is ambient text
- * (the left-nav update chip's "checked …" line), not a precise timestamp; the
- * exact clock time lives in Preferences via formatDateTime. `now` is injectable
- * so the mapping is testable without faking the clock.
+ * Coarse, human relative age, THE app's one "time ago" ladder (2026-11-27, dup-ui-b-1): under 90 s
+ * is just now, then minutes under 90 min, hours under 36 h, then days. Every "... ago" label in the
+ * app (update chip, dump lines, Mobs considered, title-bar characters, Combat fight picker, alert
+ * wizard tooltips, the drop report card, the overlay meters) goes through this, so one event reads
+ * the same age everywhere. `ts` 0/undefined => '' (unknown). A future `ts` floors at just now.
+ * `now` is injectable so the mapping is testable without faking the clock.
  */
-export function formatAge(ts: number | undefined, now: number = Date.now()): string {
+export function formatAge(ts: number | undefined, now: number = Date.now(), style: AgeStyle = 'short'): string {
   if (!ts) return ''
   const secs = Math.max(0, (now - ts) / 1000)
-  if (secs < 90) return 'just now'
+  if (secs < 90) return style === 'terse' ? 'now' : 'just now'
   const mins = secs / 60
-  if (mins < 90) return `${Math.round(mins)}m ago`
+  if (mins < 90) return ageUnit(Math.round(mins), 'minute', style)
   const hrs = mins / 60
-  if (hrs < 36) return `${Math.round(hrs)}h ago`
-  return `${Math.round(hrs / 24)}d ago`
+  if (hrs < 36) return ageUnit(Math.round(hrs), 'hour', style)
+  return ageUnit(Math.round(hrs / 24), 'day', style)
 }
 
 /**
@@ -149,4 +162,26 @@ export function localDayKey(ts: number): string {
   const m = String(d.getMonth() + 1).padStart(2, '0')
   const day = String(d.getDate()).padStart(2, '0')
   return `${y}-${m}-${day}`
+}
+
+/**
+ * A short stamp, month name + day + 24h clock: e.g. "Aug 5, 20:26". The one shape for a moment
+ * shown in a dense row or a caption (Loot ledger "Last looted", the timeslice caption's two ends),
+ * so one tab never prints the same instant two ways (dup-ui-b-6). 24h like `formatTime`.
+ * The engine serves the same string for `loot.ledger`'s `at` cell (`display_time` in
+ * `engine/crates/engined/src/views/loot.rs`): change one and the other changes with it, or the
+ * Loot tab's App and Engine sources print different times (`engine-loot-view.e2e.mts`).
+ */
+export function formatShortStamp(ts: number): string {
+  return formatDateTime(ts, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })
+}
+
+/**
+ * The LOCAL wall time an `<input type="datetime-local">` speaks: `YYYY-MM-DDTHH:mm`, no zone.
+ * The date half is `localDayKey`; never `toISOString`, which would shift it by the offset.
+ */
+export function localInputValue(ts: number): string {
+  const d = new Date(ts)
+  const pad = (n: number): string => String(n).padStart(2, '0')
+  return `${localDayKey(ts)}T${pad(d.getHours())}:${pad(d.getMinutes())}`
 }

@@ -5,6 +5,7 @@
 // is left and roughly how long it takes, and a plain reason when something stops.
 
 import type { DropObsStatus } from '@shared/dropObs'
+import { formatAge } from '../../lib/formatDate'
 
 /** The wiki takes at most 100 reports a batch and the app sends one batch every 30 s (main/dropObs/drain.ts). */
 const PER_BATCH = 100
@@ -45,13 +46,7 @@ export function timeLeft(left: number): string {
 
 /** `just now`, `5 minutes ago`, `3 hours ago`, `2 days ago`. */
 export function ago(at: number, now: number): string {
-  const s = Math.max(0, Math.round((now - at) / 1000))
-  if (s < 60) return 'just now'
-  const m = Math.round(s / 60)
-  if (m < 60) return `${plural(m, 'minute', 'minutes')} ago`
-  const h = Math.round(m / 60)
-  if (h < 48) return `${plural(h, 'hour', 'hours')} ago`
-  return `${plural(Math.round(h / 24), 'day', 'days')} ago`
+  return formatAge(at, now, 'long')
 }
 
 export type ProgressTone = 'info' | 'busy' | 'done' | 'warn'

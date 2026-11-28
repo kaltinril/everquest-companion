@@ -84,6 +84,9 @@ const MIN_ROWS = 8
  *  cadence, so this is several attempts rather than one. */
 const CONNECT_BUDGET_MS = 90_000
 
+/** A loot time as both sources draw it: month short, day without a leading zero, 24-hour clock. */
+const SHORT_STAMP = /^[A-Z][a-z]{2} \d{1,2}, \d{2}:\d{2}$/
+
 /** One rendered ledger: every row's cells, in the order the table drew them. */
 type Ledger = string[][]
 
@@ -210,6 +213,15 @@ function stepRowsAgree(app: Ledger, engine: Ledger): void {
     firstDiff < 0
       ? `first row: ${JSON.stringify(app[0])}`
       : `row ${String(firstDiff)} differs — app ${JSON.stringify(app[firstDiff])} vs engine ${JSON.stringify(engine[firstDiff])}`
+  )
+  // THE SHAPE OF THE TIME, asserted on both readings (2026-11-27, dup-ui-b-6): 24-hour, numeric day,
+  // the timeslice caption's `Aug 5, 20:26` (`formatShortStamp` app-side, `display_time` engine-side).
+  // Equality alone would still pass if both sides went back to `Aug 05, 08:26 PM` together.
+  const offShape = [...app, ...engine].find((row) => !SHORT_STAMP.test(row[0] ?? ''))
+  check(
+    `every loot time reads 24-hour, in the caption's shape ("Aug 5, 20:26"), from both worlds`,
+    offShape === undefined,
+    offShape === undefined ? `first: ${JSON.stringify(app[0]?.[0])}` : `off-shape row: ${JSON.stringify(offShape)}`
   )
   if (firstDiff < 0) {
     // THE EVIDENCE, printed rather than merely asserted: the ticket asks for the row equality
