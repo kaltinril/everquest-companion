@@ -3745,3 +3745,22 @@ test that failed before the fix.
   and `tests/fixtures/` must be added to the list by hand.
 - `tests/e2e/build.mts` held raw NUL bytes in its old digest code, so git kept it CRLF in the index;
   without them it is stored LF, and that commit shows the whole file as changed.
+
+## E2E suite speed (2026-11-27, branch `e2e-speed`)
+
+- **The suite was bound by pointer actions, not the app.** Hidden (`show:false`) windows drew about
+  one frame a second; each Playwright `mouse.move`/`hover`/`click` waited a frame (1 to 3 s).
+  `--disable-frame-rate-limit` as a HARNESS launch argument (`tests/e2e/appWindow.mts` FRAME_ARGS)
+  fixes it with no product change; the backgrounding/occlusion switches and `backgroundThrottling`
+  were measured and do nothing here. WORKFLOW.md, Gate, has the numbers.
+- **Runner** (`tests/e2e/run-all.mts`): 3 at a time (`EQ_E2E_CONCURRENCY`), longest first from past
+  `summary.json` files (a worktree also reads the main clone's), every failure retried once alone:
+  `flaky under load` (exit 0, listed) or `red` (exit 1). `--serial` is for debugging only.
+- **Measured:** 73 specs in 581.6 s at 3-wide (59 min serial, ~14 min 4-wide before); leveling
+  211.5 s to 28.5 s alone.
+- **Law for new steps:** wait on the condition, never on the action's duration. Three steps that
+  read too early were exposed by the speed and fixed (character-sheet, sky-targets, overlay-sync).
+  The leveling crossing step now asserts "a quick crossing opens at most one card" directly
+  (re-proven red with `enterNextDelay={0}`).
+- Open: `sky-recent-sort` red (also on `main_community`); `engine-boots` flakes under load (counts
+  other specs' engines); `page.screenshot` still times out on hidden windows.

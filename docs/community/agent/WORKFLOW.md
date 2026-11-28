@@ -282,10 +282,58 @@ disagree, RULES.md wins; fix this file.
 - **Known engine flake:** `engined` `tests/combat.rs` live-meter tests (4 of 11) fail when `cargo test`
   runs alongside the unit suite (2026-10-28) and pass alone (`cargo test -p engined --test combat`);
   run cargo test on its own before treating them as red.
+- **Running e2e (since 2026-11-27): the default runner, never `--serial`.** When e2e is called
+  for (a release, the owner's word, a change to the harness), run `npm run test:e2e` as it is (Node
+  24, `ELECTRON_RUN_AS_NODE` unset). It runs 3 specs at a time (`EQ_E2E_CONCURRENCY` overrides),
+  longest first (times from the newest `tests/e2e/artifacts/*/summary.json`, this tree's and then
+  the main clone's; never-timed specs first), at below-normal priority, so the owner can keep using
+  the PC. After the parallel pass every failed spec runs ONCE more, alone. The summary then says:
+  - `FLAKY UNDER LOAD`: failed in parallel, passed alone. The run exits 0, but the line names
+    each spec and `summary.json` lists them under `flaky`. Report them; never hide one.
+  - `RED`: failed both times. The run exits 1; compare with `main_community` (the spec alone on
+    both trees) before calling it a regression.
+  The retry's evidence goes to `artifacts/<run>/<spec>-retry/`, beside the first attempt's.
+  `--serial` stays for debugging only (output straight through, no retry): a gate run serially
+  costs about an hour for the same answer.
+- **The hidden-window frame trap, fixed 2026-11-27 (`tests/e2e/appWindow.mts` FRAME_ARGS).** The e2e
+  windows are `show:false`, and Chromium gave a window it never shows about ONE frame a second.
+  Playwright's `mouse.move`, `hover` and `click` wait for the renderer's next frame, so each cost
+  1 to 3 s and the suite was bound by its pointer actions (input call sites per spec tracked wall
+  time at r=0.84, ~2.3 s each). The harness now launches with `--disable-frame-rate-limit`, a
+  launch argument, so the product is unchanged (under EQ_E2E too). Measured in the hidden main
+  window: rAF 3 frames in 2 s before, 116 after; 10 `mouse.move`s 10.0 s before, 25 ms after; a
+  `hover` 3.0 s before, 12 ms after; a `click` 2.0 s before, 45 ms after; key presses and
+  `evaluate` were always fast; idle CPU unchanged. Tried and NOT effective (each measured, no
+  change): `backgroundThrottling: false`, `--disable-renderer-backgrounding`,
+  `--disable-background-timer-throttling`, `--disable-backgrounding-occluded-windows`,
+  `--disable-features=CalculateNativeWinOcclusion`, `--disable-gpu-vsync`; the page already
+  reported `visibilityState` 'visible' with unclamped timers. Offscreen rendering was not needed.
+  Still true with the fix: `page.screenshot` can time out on the hidden window (seen 2026-11-27 in a
+  failure dump); use the capturePage method below. Old workarounds kept because they still work:
+  `nextFrames`' 50 ms race (settle.mts), curveSteps' scroll-by-a-pixel before `capturePage`,
+  the synchronous measure beside the ResizeObserver in `useMapViewport.ts`, the
+  no-`setZoomFactor`-after-load note in `windows.ts`. TRAP the speed exposed: a step that read the
+  screen right after an action had been passing only because the action took a second. Wait on
+  the condition (settle on the new reading, or on the list having narrowed), never on the action.
+  Fixed that day in `character-sheet` (accepted the previous search's count), `sky-targets`
+  (clicked another quest's Ignore before the search narrowed the list), `overlay-sync` (read a
+  rebuilt overlay once).
+- **e2e times, measured 2026-11-27** (73 specs, the frame fix, 3 at a time, longest first,
+  16 logical cores, BelowNormal, the owner using the PC): 581.6 s wall (9.7 min), against 59 min `--serial`
+  and about 14 min 4-wide before. Longest: gear 122.6 s (285.9 serial before), combat-dashboard
+  101.9 (264.6), planner 66.4 (129.9), sky-recent-sort 49.5, overlay-sync 45.5, character-switch-storm
+  43.1, tradeskills-log 41.1 (238.1), bis-sheet 40.8, text-size 37.8, character-switch 37.8,
+  spell-card 36.2, sky-filters 34.5, respawn-timers 29.5, sky-targets 29.5, voice-alerts 28.4;
+  leveling 25.9 (209.5). Times under load run up to 4x a spec's time alone (planner 14.9 s alone).
+  68/73 green first time; flaky under load: overlay-sync, sky-targets (both fixed after),
+  engine-boots (counts other specs' engines, below); red: sky-recent-sort (red on `main_community`
+  too), character-sheet (fixed after). No engine missed its port announce at 3-wide.
 - **Known e2e reds/flakes:** `respawn-timers.e2e.mts` fails one step ("never claims the mob is
   standing there") on plain upstream main since 2026-08-17. `maps.e2e`, `engine-boots`,
-  `engine-absent`, `sky-achievements`, `sky-reward-inference` can flake under parallel load; run
-  serially. `maps` also failed about one run in three alone until 2026-11-23: the zone chip names
+  `engine-absent`, `sky-achievements`, `sky-reward-inference` can flake under parallel load; the
+  runner retries them alone (above). `sky-recent-sort` is red on `main_community` (known before) and on the e2e-speed
+  branch alike (2026-11-27: "a fresh install opens the Sky tab sorted by most recently looted —
+  shown , stored null", a timeout), open. `maps` also failed about one run in three alone until 2026-11-23: the zone chip names
   the map asked for, so a step waiting only on the chip clicked the previous map's label as it
   vanished. After a zone change, wait on something the drawn map sets. `character-switch-storm`
   fails about 3 runs in 5 even alone ("ZERO module deltas reached the renderer ... 1 or 4 while

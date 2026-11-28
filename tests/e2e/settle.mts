@@ -104,11 +104,12 @@ export async function settleStable<T>(
  *
  * The honest replacement for the short sleeps that followed a pointer move — those layers are
  * rAF-coalesced by design, so "the frame happened" is the real condition. But this suite drives a
- * window that is NEVER SHOWN (`EQ_E2E=1`), and a window Chromium is not compositing may throttle
- * `requestAnimationFrame` to almost nothing or stop it entirely — the same fact that makes the
- * failure screenshots best-effort. MEASURED 2026-08-06: a bare two-frame wait against the hidden
- * window took two full seconds. So the frames are RACED against a short timer: on a compositing
- * window this returns in ~16 ms, and on a hidden one it can never become a stall.
+ * window that is NEVER SHOWN (`EQ_E2E=1`), and Chromium gave such a window about one frame a
+ * second. MEASURED 2026-08-06: a bare two-frame wait against the hidden window took two full
+ * seconds. So the frames are RACED against a short timer, and a hidden window can never make this a
+ * stall. Since 2026-11-27 the harness launches with `--disable-frame-rate-limit` (appWindow.mts
+ * FRAME_ARGS) and the hidden window draws about 58 frames a second, so the frames normally win in
+ * ~35 ms; the timer stays as the guard for a launch without that switch.
  *
  * NO named function bindings inside the callback: tsx/esbuild's `keepNames` wraps
  * `const f = (…) => …` in a `__name` helper that lives in the NODE bundle, and Playwright ships
