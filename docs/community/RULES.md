@@ -98,8 +98,10 @@ and 4).
     not wasting my time"): `npm run typecheck`, `npm run lint`, and on Node 24 only the unit test
     files that name a changed or deleted source file, plus the ones that scan the source tree
     (WORKFLOW.md, Gate, says how to pick them). It runs once on the work branch; a merge whose tree
-    equals the gated tree is not gated again. A change under `engine/` runs the cargo tests of the
-    crates it touches. The FULL suite (`npm test` via `known-reds.sh`, and `cargo test --workspace`
+    equals the gated tree is not gated again. A change that touches an engine input
+    (`bash scripts/community/engine-changed.sh` prints yes: `engine/`, the data files the engine
+    embeds, `protocol/`, `tests/fixtures/`) runs the cargo tests of the crates it touches; one that
+    prints no skips `cargo test` entirely. The FULL suite (`npm test` via `known-reds.sh`, and `cargo test --workspace`
     after an engine change) runs only before a release (RELEASING.md) or when the owner asks.
     Known reds are listed in BRANCHES.md; anything not on that list is a regression and the merge
     does not stand. A change to `electron`,
