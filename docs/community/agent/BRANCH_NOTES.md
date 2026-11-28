@@ -3527,6 +3527,31 @@ test that failed before the fix.
   `ENGINE_OWN_CONNECTION_TIMEOUT_MS` + 5 s (`engineProtocol.ts`), passed as the optional third
   argument of `EngineClient.request`. The supervisor's 20 s timer is the only bound on the ask;
   `REQUEST_DEADLINE_MS` (15 s) applies to every other request.
+- Duplicate merges of 2026-11-27 (`dupes-1127`; outcomes in the audit, "Prototype outcomes"):
+  - Table sort: `shared/tableSort.ts` `nextSort` is the one header rule (new column on its natural
+    end, same column flips). The third click back to a source order is a per-table opt-in (the
+    `source` argument); only AA passes it (`AA_WIKI_ORDER`, requirements 2026-11-26). Stored under
+    `TABLE_SORT_KEYS` through `lib/useTableSort.ts` `useSortPref`: never rename a key; the
+    `sanitize` passed must be module level (it is a memo dependency). Gear keeps `eq.gear.sort`
+    through `useRemembered` (JOS-329). The two zone-rate tables keep a dash row (and, under a goal,
+    a short visit) last in both directions.
+  - Chips: `lib/TagChip.tsx`. Size `tag` (18 px, 11 px text) for Combat, Loot, Factions, Alerts.
+    Gaps chips use size `clickable` (MUI's small chip untouched) and keep their own height
+    overrides (20 or 24 px). The Leveling unlock chips, `SeenAsChips` and `KnowledgeBadge` stay off it.
+  - Loot times are 24-hour in both sources: TS `formatShortStamp` ("Aug 5, 20:26") and engine
+    `views/loot.rs` `display_time` print the same string; change both together.
+    `engine-loot-view.e2e` checks the shape on both sides. The engine pins en-US; the TS side uses
+    the runtime locale.
+  - Time ago: `lib/formatDate.formatAge(ts, now, style)` is the only ladder (90 s, 90 min, 36 h);
+    `terse` for the overlay meters, `long` for the drop report sentence. No local copies.
+  - Stat tiles: `lib/StatTile.tsx`, pixel-identical to the five copies it replaced; a difference
+    between surfaces is a density field or a prop. The Paper is built inside `StatTile` so the
+    Tooltip attaches to it.
+  - Map timer pins (`respawnPins.ts`): seen, then stale, then due, in `respawnClockLabel`'s words; a
+    seen pin never pulses (`justDue`); seen and stale hover ages use the Timers tab's `fmtDuration`.
+  - Exaltations and Wish list class filter: `useFollowingClasses('eq.planner.classPins')`, per
+    character. The old `eq.planner.classes` pin is read as the `'*'` fallback only while the new key
+    is absent (`readClassPins`). Two views share the key; they are never mounted together.
 
 ## Chart readout: drawn on body (2026-11-20)
 
