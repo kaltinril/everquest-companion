@@ -31,3 +31,9 @@ publish = false
 [workspace.dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+
+# Debug builds (cargo test) keep file and line in panics and backtraces, but not full variable
+# info for a debugger (owner, 2026-11-27): about 30% faster test builds and about 3.5 GB less per
+# worktree. For full debug info on one run: CARGO_PROFILE_DEV_DEBUG=true cargo test ...
+[profile.dev]
+debug = "line-tables-only"

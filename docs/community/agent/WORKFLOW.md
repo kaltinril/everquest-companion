@@ -22,6 +22,10 @@ disagree, RULES.md wins; fix this file.
   silently do nothing with identical code (2026-08-25). If clicks do nothing and the renderer
   logs no error, suspect this first.
 - **cargo** lives at `$USERPROFILE/.cargo/bin`.
+- **Lean debug info (since 2026-11-27):** `engine/Cargo.toml` `[profile.dev] debug =
+  "line-tables-only"`. Panics and backtraces keep file and line; a debugger loses variable views.
+  For one run with full info: `CARGO_PROFILE_DEV_DEBUG=true cargo test ...`. The debug builds in
+  the main clone are deleted at each release (the community-release skill, "After").
 - **Shared build cache (sccache, since 2026-11-27).** `%USERPROFILE%\.cargo\config.toml` holds
   `[build] rustc-wrapper = "C:/Users/<user>/.cargo/bin/sccache.exe"`, so every cargo run on this
   PC, in the main clone and every worktree, already open shells included, goes through sccache.
