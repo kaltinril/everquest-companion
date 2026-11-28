@@ -248,8 +248,11 @@ export const IPC = {
   overlayRaise: 'overlay:raise',
   // renderer(main app) -> main: re-fit every open overlay to the screens, then raise them (overlayRecover.ts).
   overlayRecover: 'overlay:recover',
-  // renderer(main app) -> main: get or set the recover hotkey. Args: 'get' | 'set', accelerator or null.
-  overlayRecoverHotkey: 'overlay:recoverHotkey',
+  // renderer(main app) -> main: every action's hotkey (main/hotkeys.ts). Returns HotkeyState.
+  hotkeysGet: 'hotkeys:get',
+  // renderer(main app) -> main: set one action's hotkey. Args: HotkeyAction, accelerator or null
+  // (off). Returns HotkeySetReply: that action's answer and every key after it.
+  hotkeySet: 'hotkeys:set',
   // renderer(main app) -> main: the font families installed on this PC, sorted (installedFonts.ts).
   fontsList: 'fonts:list',
   // renderer(main app) -> main: the last /who listing read this launch, or null (whoWatch.ts).
@@ -382,6 +385,9 @@ export const IPC = {
   // renderer(main app) -> main: read / patch the cursor-ring prefs. Returns CursorRingPrefs.
   cursorRingGet: 'cursorRing:get',
   cursorRingSet: 'cursorRing:set',
+  // main -> renderer(main app): the cursor-ring prefs changed outside Preferences (the on/off
+  // hotkey, main/hotkeys.ts). Payload CursorRingPrefs.
+  onCursorRingChanged: 'cursorRing:changed',
   // renderer(main app) -> main: read / patch the overlay auto-hide prefs. Returns OverlayAutoHidePrefs.
   overlayAutoHideGet: 'overlayAutoHide:get',
   overlayAutoHideSet: 'overlayAutoHide:set',

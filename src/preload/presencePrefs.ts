@@ -14,6 +14,12 @@ export const presencePrefsBridge = {
   /** Merge-patch the cursor-ring prefs; the ring appears/resizes live. */
   setCursorRing: (patch: Partial<CursorRingPrefs>): Promise<CursorRingPrefs> =>
     ipcRenderer.invoke(IPC.cursorRingSet, patch),
+  /** Subscribe to cursor-ring changes made outside Preferences (the on/off hotkey). */
+  onCursorRingChanged: (cb: (p: CursorRingPrefs) => void): (() => void) => {
+    const listener = (_e: unknown, p: CursorRingPrefs): void => cb(p)
+    ipcRenderer.on(IPC.onCursorRingChanged, listener)
+    return () => ipcRenderer.removeListener(IPC.onCursorRingChanged, listener)
+  },
   /** The overlay auto-hide prefs: hide when EQ isn't running / isn't focused. */
   getOverlayAutoHide: (): Promise<OverlayAutoHidePrefs> =>
     ipcRenderer.invoke(IPC.overlayAutoHideGet),

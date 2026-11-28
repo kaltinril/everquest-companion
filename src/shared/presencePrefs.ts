@@ -522,3 +522,15 @@ export function presenceNeeded(
 export function cursorWatchNeeded(ring: CursorRingPrefs): boolean {
   return ring.enabled
 }
+
+/**
+ * The cursor overlay's on/off hotkey (owner, 2026-11-27; main/hotkeys.ts): the master switch's
+ * opposite, written through the same path the Preferences switch uses (`apply`). Every other field
+ * is left as it is. Returns what was stored.
+ */
+export function flipCursorOverlay(
+  read: () => CursorRingPrefs,
+  apply: (patch: Partial<CursorRingPrefs>) => CursorRingPrefs
+): CursorRingPrefs {
+  return apply({ enabled: !read().enabled })
+}

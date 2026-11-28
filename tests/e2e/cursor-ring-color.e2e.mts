@@ -144,6 +144,22 @@ async function stepPickAColor(page: Page): Promise<void> {
   check('…and main stored what was picked', stored === CHOSEN, stored)
 }
 
+/**
+ * WIRING ONLY (owner, 2026-11-27): the tab states the on/off key and its button lands on Hotkeys,
+ * which holds both rows; the recover key is still in Overlays too. No key is set here, because a
+ * set takes a real system-wide key on the machine running the spec.
+ */
+async function stepHotkeyWiring(page: Page): Promise<void> {
+  const line = await page.textContent('[data-testid="pref-cursor-toggle-key-text"]')
+  check('the Cursor overlay tab states its on/off key', line === 'No on/off key set', line ?? '')
+  await page.click('[data-testid="pref-cursor-toggle-key-link"]', { timeout: 15_000 })
+  await page.waitForSelector('[data-testid="pref-hotkey-cursorToggle"]', { timeout: 15_000 })
+  check('…and its button opens Hotkeys with both rows', (await countOf(page, '[data-testid="pref-hotkey-recover"]')) === 1)
+  await page.click('[data-testid="prefs-rail-overlays"]', { timeout: 15_000 })
+  await page.waitForSelector('[data-testid="pref-overlay-recover"]', { timeout: 15_000 })
+  check('the recover key is still in Overlays', (await countOf(page, '[data-testid="pref-overlay-recover-key"]')) === 1)
+}
+
 /** The second launch: the colour is already the chosen one before this spec touches anything. */
 async function stepPersisted(page: Page): Promise<void> {
   const stored = await storedColor(page)
@@ -202,6 +218,7 @@ async function main(): Promise<void> {
     await openCursorRing(page)
     await stepDefaultIsUnchanged(page)
     await stepPickAColor(page)
+    await stepHotkeyWiring(page)
     if (failures.length) await dumpArtifacts(page, 'cursor-ring-color-FAIL-first')
   } finally {
     await first.close()

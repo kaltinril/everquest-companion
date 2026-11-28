@@ -3747,6 +3747,25 @@ test that failed before the fix.
   list the two new fields.
 - **Optional, not built:** "load current icon into the grid"; a trail colour of its own (today
   the shape's).
+- **On/off hotkey and the Hotkeys section (owner, 2026-11-27):** `shared/overlayHotkey.ts`
+  `HOTKEY_ACTIONS` (`recover`, `cursorToggle`), one `makeHotkey` owner per action (was
+  `makeRecoverHotkey`), wrapped by `makeHotkeyBoard`, which refuses a key another action holds (in
+  force or saved and off; `sameAccelerator` ignores order, case, aliases) through the `clash` port.
+  `main/hotkeys.ts` is the only `globalShortcut` user: store keys `overlayRecoverHotkey`
+  (unchanged) and `cursorToggleHotkey`; IPC `hotkeys:get` / `hotkeys:set` (the reply carries that
+  action's answer and every key). `main/overlayRecover.ts` keeps only `recoverOverlays` and the
+  Recover now channel. A press runs `ipc/presence.ts toggleCursorOverlay` = `flipCursorOverlay`
+  over `applyCursorRing`, the switch's own path (`setCursorRing` + `refreshPresenceEffects`), then
+  `sendToMain('cursorRing:changed')`; only the hotkey pushes (the card renders its own reply).
+  App.tsx records the push into the prefs snapshot; the card follows it live.
+- **Renderer:** `HotkeyField.tsx` is the one capture control and `useHotkey(action)` the one state
+  (seeded from the snapshot's `hotkeys`, every set published to all mounted copies). The recover key
+  is in Overlays AND Hotkeys (owner: "everything should be where it is, but also in hotkeys");
+  testids `pref-overlay-recover*` (Overlays) and `pref-hotkey-recover*` / `pref-hotkey-cursorToggle*`
+  (Hotkeys). Hotkeys is last in Display, under Cursor overlay, whose key line
+  (`pref-cursor-toggle-key*`) switches to it through `buildSections`' `onSection` (the rail `pick`).
+  Pinned in `tests/hotkeyBoard.test.mts`, `tests/overlayHotkey.test.mts`; e2e wiring in
+  `cursor-ring-color` (no key is set in e2e: a set takes a real system-wide key).
 
 ## Shared build cache and low-priority builds (2026-11-27, branch `shared-cargo`)
 

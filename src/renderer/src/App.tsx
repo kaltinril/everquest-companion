@@ -429,6 +429,10 @@ function keepPrefsSnapshotCurrent(): () => void {
   const offTray = window.eq.onCloseToTray((p) => {
     recordPref('closeToTray', p)
   })
+  // The cursor overlay's on/off hotkey flips its switch with Preferences nowhere in sight.
+  const offRing = window.eq.onCursorRingChanged((p) => {
+    recordPref('cursorRing', p)
+  })
   const offOverlays = window.eq.onOverlayState((s) => {
     const cur = peekPrefsSnapshot()?.overlayOpen
     if (cur) recordPref('overlayOpen', { ...cur, [s.kind]: s.open })
@@ -442,6 +446,7 @@ function keepPrefsSnapshotCurrent(): () => void {
   })
   return () => {
     offTray()
+    offRing()
     offOverlays()
     offScales()
     offAlphas()

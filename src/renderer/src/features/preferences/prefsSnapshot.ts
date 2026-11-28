@@ -31,6 +31,7 @@ import type { BuffTrustPrefs } from '@shared/buffTrust'
 import type { GraphicsPrefs } from '@shared/graphicsPrefs'
 import type { GraphicsEnvironment } from '@shared/wineDetect'
 import type { CursorRingPrefs, OverlayAutoHidePrefs } from '@shared/presencePrefs'
+import type { HotkeyState } from '@shared/overlayHotkey'
 import type { OverlaySnapPrefs } from '@shared/overlaySnap'
 import type { OverlayTextSizePrefs } from '@shared/overlayTextScale'
 import type { OverlayBgAlphaPrefs } from '@shared/overlayBgAlpha'
@@ -147,8 +148,12 @@ export interface PrefsSnapshot {
   conCard: ConCardSeed
   /** Buff trust — the external-caster allowlist. */
   buffTrust: BuffTrustPrefs
-  /** Cursor ring — the switch, the two sliders and the colour. */
+  /** Cursor ring — the switch, the two sliders and the colour. Kept current by main's push when
+   *  the on/off hotkey flips it (App.tsx). */
   cursorRing: CursorRingPrefs
+  /** Hotkeys — every app key as main holds it: shown in Hotkeys, Overlays and the Cursor overlay
+   *  tab, so a field that read Off for a frame would be this gate's defect (HotkeyField.tsx). */
+  hotkeys: HotkeyState
   /** Voice — engine, voice, speed, volume. */
   voice: VoicePrefs
   /** Performance — the HUD switch and this launch's startup breakdown. */
@@ -195,6 +200,7 @@ export interface PrefsReader {
   getConCardConfig: () => Promise<OverlayConfig>
   getBuffTrust: () => Promise<BuffTrustPrefs>
   getCursorRing: () => Promise<CursorRingPrefs>
+  getHotkeys: () => Promise<HotkeyState>
   getVoicePrefs: () => Promise<VoicePrefs>
   getPerfPrefs: () => Promise<PerfHudPrefs>
   getStartupProfile: () => Promise<StartupProfile>
@@ -232,6 +238,7 @@ export async function readPrefsSnapshot(eq: PrefsReader): Promise<PrefsSnapshot>
     conCardConfig,
     buffTrust,
     cursorRing,
+    hotkeys,
     voice,
     perfHud,
     startup,
@@ -258,6 +265,7 @@ export async function readPrefsSnapshot(eq: PrefsReader): Promise<PrefsSnapshot>
     eq.getConCardConfig(),
     eq.getBuffTrust(),
     eq.getCursorRing(),
+    eq.getHotkeys(),
     eq.getVoicePrefs(),
     eq.getPerfPrefs(),
     eq.getStartupProfile(),
@@ -300,6 +308,7 @@ export async function readPrefsSnapshot(eq: PrefsReader): Promise<PrefsSnapshot>
     },
     buffTrust,
     cursorRing,
+    hotkeys,
     voice,
     perfHud,
     startup,
